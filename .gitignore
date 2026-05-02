@@ -1,0 +1,48 @@
+# Secrets and local configuration
+.env
+.env.*
+auth.json
+auth-profiles.json
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+.claude/
+
+# Build / package artefacts
+build/
+dist/
+*.egg-info/
+.coverage
+coverage.xml
+htmlcov/
+
+# Runtime data (not committed)
+runs/
+reports/
+papers/
+data/
+output/
+src/baseline/
+compare/
+
+# Codex CLI scratch placeholder
+.codex
+
+# Local uv state (prefer committing uv.lock instead)
+.uv/

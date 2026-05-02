@@ -1,0 +1,65 @@
+You are extracting review-relevant CLAIMS from a research paper, so that a
+downstream pipeline can independently verify each claim against the paper's
+own tables, related work, and — for reproducibility claims — re-execution of
+the paper's code.
+
+Return STRICT JSON matching this schema (no prose, no code fences):
+
+{{
+  "claims": [
+    {{
+      "id":        "claim_01",
+      "text":      "<concise, verbatim-or-near-verbatim claim sentence>",
+      "type":      "empirical | methodological | theoretical | reproducibility",
+      "scope":     "broad | local",
+      "datasets":  ["FB15k-237", ...],
+      "baselines": ["TransE", "ConvE", ...],
+      "metrics":   ["MRR", "Hits@10", ...],
+      "location":  {{"section_id": "<id>", "char_start": <int>, "char_end": <int>}},
+      "evidence_targets": [
+        "table_3.MRR.FB15k-237",
+        "execution.link_prediction.mrr",
+        "literature.neighbor_family"
+      ]
+    }}
+  ]
+}}
+
+RULES
+
+1. Prefer the paper's OWN claims. Do not invent numbers, baselines, or
+   datasets that the paper does not state.
+2. "scope":
+   - "broad" if the claim spans multiple (task, dataset, metric) triples
+     — e.g. "outperforms prior work on link prediction, node classification,
+     and graph classification". The decomposer will split it.
+   - "local" otherwise.
+3. "type":
+   - empirical     : asserts a numeric comparison / ranking / SOTA.
+   - methodological: asserts the paper's method / framework is novel or
+                     that the paper provides a specific design.
+   - theoretical   : proves, generalises, or establishes equivalence.
+   - reproducibility: promises code release / public artefacts.
+4. "evidence_targets": for each claim, list the in-paper or external
+   checks needed to move it off "inconclusive" in the §3.4 synthesis
+   stage. Use:
+     - "table_<id>.<metric>.<dataset>" for table-grounded checks
+     - "execution.<task>.<metric>" for re-run checks
+     - "literature.<family>" for positioning checks
+     - "repo.<kind>" for reproducibility checks
+   Only include evidence that the claim actually requires.
+5. IDs must be stable and of the form "claim_01", "claim_02", …, in the
+   order claims appear in the paper body.
+6. Skip sentences from References, Acknowledgements, or the Appendix
+   unless the paper explicitly builds a main-text claim on appendix data.
+7. Return {{"claims": []}} if no review-relevant claims are found.
+
+Paper metadata:
+  title:    {title}
+  key:      {paper_key}
+
+Ingested sections (id — title — char range — text):
+{sections}
+
+Reported numeric results (from tables; may inform evidence_targets):
+{reported_summary}

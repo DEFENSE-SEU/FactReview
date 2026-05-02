@@ -1,0 +1,324 @@
+- id: install_deps
+  family: prepare
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - -m
+  - pip
+  - install
+  - -r
+  - '{paper_root}/requirements.txt'
+  timeout_sec: 3600
+  use_conda: true
+  enabled: false
+- id: train_fb237_transe
+  family: train
+  dataset: FB15k-237
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - run.py
+  - -name
+  - fb237_transe
+  - -data
+  - FB15k-237
+  - -score_func
+  - transe
+  - -opn
+  - sub
+  - -gpu
+  - '1'
+  - -epoch
+  - '200'
+  - -num_workers
+  - '4'
+  - -gamma
+  - '9.0'
+  - -init_dim
+  - '200'
+  - -gcn_dim
+  - '200'
+  - -hid_drop
+  - '0.1'
+  timeout_sec: 43200
+  use_conda: true
+  artifact_paths:
+  - checkpoints/*
+  - log/*
+- id: eval_fb237_transe
+  family: eval
+  dataset: FB15k-237
+  claims:
+  - 'Table 4: TransE+CompGCN(Sub) on FB15k-237, MRR=0.335, MR=194, H@10=0.514'
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - codeeval_eval_ckpt.py
+  - --ckpt-dir
+  - ./checkpoints
+  - --prefix
+  - fb237_transe
+  - --out
+  - ./metrics/fb237_transe_test.json
+  - --split
+  - test
+  timeout_sec: 1800
+  use_conda: true
+  artifact_paths:
+  - metrics/fb237_transe_test.json
+- id: train_fb237_distmult
+  family: train
+  dataset: FB15k-237
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - run.py
+  - -name
+  - fb237_distmult
+  - -data
+  - FB15k-237
+  - -score_func
+  - distmult
+  - -opn
+  - sub
+  - -gpu
+  - '1'
+  - -epoch
+  - '200'
+  - -num_workers
+  - '4'
+  - -init_dim
+  - '200'
+  - -gcn_dim
+  - '200'
+  - -hid_drop
+  - '0.1'
+  timeout_sec: 43200
+  use_conda: true
+  artifact_paths:
+  - checkpoints/*
+  - log/*
+- id: eval_fb237_distmult
+  family: eval
+  dataset: FB15k-237
+  claims:
+  - 'Table 4: DistMult+CompGCN(Sub) on FB15k-237, MRR=0.336, MR=231, H@10=0.513'
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - codeeval_eval_ckpt.py
+  - --ckpt-dir
+  - ./checkpoints
+  - --prefix
+  - fb237_distmult
+  - --out
+  - ./metrics/fb237_distmult_test.json
+  - --split
+  - test
+  timeout_sec: 1800
+  use_conda: true
+  artifact_paths:
+  - metrics/fb237_distmult_test.json
+- id: train_fb237_conve
+  family: train
+  dataset: FB15k-237
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - run.py
+  - -name
+  - fb237_conve
+  - -data
+  - FB15k-237
+  - -score_func
+  - conve
+  - -opn
+  - corr
+  - -gpu
+  - '1'
+  - -epoch
+  - '200'
+  - -num_workers
+  - '4'
+  timeout_sec: 43200
+  use_conda: true
+  artifact_paths:
+  - checkpoints/*
+  - log/*
+- id: eval_fb237_conve
+  family: eval
+  dataset: FB15k-237
+  claims:
+  - 'Table 3: CompGCN on FB15k-237, MRR=0.355, MR=197, H@10=0.535'
+  - 'Table 4: ConvE+CompGCN(Corr) on FB15k-237, MRR=0.355, MR=197, H@10=0.535'
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - codeeval_eval_ckpt.py
+  - --ckpt-dir
+  - ./checkpoints
+  - --prefix
+  - fb237_conve
+  - --out
+  - ./metrics/fb237_conve_test.json
+  - --split
+  - test
+  timeout_sec: 1800
+  use_conda: true
+  artifact_paths:
+  - metrics/fb237_conve_test.json
+- id: train_wn18rr_transe
+  family: train
+  dataset: WN18RR
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - run.py
+  - -name
+  - wn18rr_transe
+  - -data
+  - WN18RR
+  - -score_func
+  - transe
+  - -opn
+  - sub
+  - -gpu
+  - '1'
+  - -epoch
+  - '200'
+  - -num_workers
+  - '4'
+  - -gamma
+  - '9.0'
+  - -init_dim
+  - '200'
+  - -gcn_dim
+  - '200'
+  - -hid_drop
+  - '0.1'
+  timeout_sec: 43200
+  use_conda: true
+  artifact_paths:
+  - checkpoints/*
+  - log/*
+- id: eval_wn18rr_transe
+  family: eval
+  dataset: WN18RR
+  claims:
+  - 'Table 3: CompGCN on WN18RR (TransE), MRR~0.479'
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - codeeval_eval_ckpt.py
+  - --ckpt-dir
+  - ./checkpoints
+  - --prefix
+  - wn18rr_transe
+  - --out
+  - ./metrics/wn18rr_transe_test.json
+  - --split
+  - test
+  timeout_sec: 1800
+  use_conda: true
+  artifact_paths:
+  - metrics/wn18rr_transe_test.json
+- id: train_wn18rr_distmult
+  family: train
+  dataset: WN18RR
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - run.py
+  - -name
+  - wn18rr_distmult
+  - -data
+  - WN18RR
+  - -score_func
+  - distmult
+  - -opn
+  - sub
+  - -gpu
+  - '1'
+  - -epoch
+  - '200'
+  - -num_workers
+  - '4'
+  - -init_dim
+  - '200'
+  - -gcn_dim
+  - '200'
+  - -hid_drop
+  - '0.1'
+  timeout_sec: 43200
+  use_conda: true
+  artifact_paths:
+  - checkpoints/*
+  - log/*
+- id: eval_wn18rr_distmult
+  family: eval
+  dataset: WN18RR
+  claims:
+  - 'Table 3: CompGCN on WN18RR (DistMult), MRR~0.479'
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - codeeval_eval_ckpt.py
+  - --ckpt-dir
+  - ./checkpoints
+  - --prefix
+  - wn18rr_distmult
+  - --out
+  - ./metrics/wn18rr_distmult_test.json
+  - --split
+  - test
+  timeout_sec: 1800
+  use_conda: true
+  artifact_paths:
+  - metrics/wn18rr_distmult_test.json
+- id: train_wn18rr_conve
+  family: train
+  dataset: WN18RR
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - run.py
+  - -name
+  - wn18rr_conve
+  - -data
+  - WN18RR
+  - -score_func
+  - conve
+  - -opn
+  - corr
+  - -gpu
+  - '1'
+  - -epoch
+  - '200'
+  - -num_workers
+  - '4'
+  timeout_sec: 43200
+  use_conda: true
+  artifact_paths:
+  - checkpoints/*
+  - log/*
+- id: eval_wn18rr_conve
+  family: eval
+  dataset: WN18RR
+  claims:
+  - 'Table 3: CompGCN on WN18RR, MRR=0.479, MR=3533, H@10=0.546'
+  cwd: '{paper_root}'
+  cmd:
+  - python
+  - codeeval_eval_ckpt.py
+  - --ckpt-dir
+  - ./checkpoints
+  - --prefix
+  - wn18rr_conve
+  - --out
+  - ./metrics/wn18rr_conve_test.json
+  - --split
+  - test
+  timeout_sec: 1800
+  use_conda: true
+  artifact_paths:
+  - metrics/wn18rr_conve_test.json

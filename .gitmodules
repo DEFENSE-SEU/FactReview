@@ -1,0 +1,3 @@
+[submodule "tools/refchecker"]
+	path = tools/refchecker
+	url = https://github.com/markrussinovich/refchecker

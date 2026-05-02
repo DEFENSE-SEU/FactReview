@@ -1,0 +1,102 @@
+{
+  "checks": [
+    {
+      "type": "json_value",
+      "path": "metrics/fb237_transe_test.json",
+      "json_path": ["ok"],
+      "expected": true,
+      "claim": "eval_fb237_transe ran successfully"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/fb237_transe_test.json",
+      "json_path": ["mrr"],
+      "expected": 0.335,
+      "tolerance": 0.02,
+      "claim": "Table 4: TransE+CompGCN(Sub) on FB15k-237, MRR=0.335"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/fb237_transe_test.json",
+      "json_path": ["hits@10"],
+      "expected": 0.514,
+      "tolerance": 0.02,
+      "claim": "Table 4: TransE+CompGCN(Sub) on FB15k-237, H@10=0.514"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/fb237_distmult_test.json",
+      "json_path": ["ok"],
+      "expected": true,
+      "claim": "eval_fb237_distmult ran successfully"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/fb237_distmult_test.json",
+      "json_path": ["mrr"],
+      "expected": 0.336,
+      "tolerance": 0.02,
+      "claim": "Table 4: DistMult+CompGCN(Sub) on FB15k-237, MRR=0.336"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/fb237_conve_test.json",
+      "json_path": ["ok"],
+      "expected": true,
+      "claim": "eval_fb237_conve ran successfully"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/fb237_conve_test.json",
+      "json_path": ["mrr"],
+      "expected": 0.355,
+      "tolerance": 0.02,
+      "claim": "Table 3: CompGCN (ConvE+Corr) on FB15k-237, MRR=0.355"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/fb237_conve_test.json",
+      "json_path": ["hits@10"],
+      "expected": 0.535,
+      "tolerance": 0.02,
+      "claim": "Table 3: CompGCN (ConvE+Corr) on FB15k-237, H@10=0.535"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/wn18rr_transe_test.json",
+      "json_path": ["ok"],
+      "expected": true,
+      "claim": "eval_wn18rr_transe ran successfully"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/wn18rr_distmult_test.json",
+      "json_path": ["ok"],
+      "expected": true,
+      "claim": "eval_wn18rr_distmult ran successfully"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/wn18rr_conve_test.json",
+      "json_path": ["ok"],
+      "expected": true,
+      "claim": "eval_wn18rr_conve ran successfully"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/wn18rr_conve_test.json",
+      "json_path": ["mrr"],
+      "expected": 0.479,
+      "tolerance": 0.02,
+      "claim": "Table 3: CompGCN on WN18RR, MRR=0.479"
+    },
+    {
+      "type": "json_value",
+      "path": "metrics/wn18rr_conve_test.json",
+      "json_path": ["hits@10"],
+      "expected": 0.546,
+      "tolerance": 0.02,
+      "claim": "Table 3: CompGCN on WN18RR, H@10=0.546"
+    }
+  ]
+}

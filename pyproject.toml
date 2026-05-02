@@ -1,0 +1,209 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "factreview"
+version = "0.1.0"
+description = "Evidence-grounded AI reviewing system with literature positioning and execution-based claim verification."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "AGPL-3.0-only" }
+authors = [{ name = "FactReview authors" }]
+keywords = ["peer-review", "claim-verification", "reproducibility", "langgraph", "llm"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: GNU Affero General Public License v3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+]
+
+# Core dependencies — always required for the package to import and for the
+# orchestrator / schemas / CLI to run. Stage-specific heavy deps are in extras.
+dependencies = [
+  "pydantic>=2.5",
+  "pyyaml>=6.0",
+  "langgraph>=0.2.0",
+  "pandas>=2.0.0",
+  "pypdf>=4.0.0",
+  "numpy<2",
+  "requests>=2.25.0",
+  "tqdm>=4.60.0",
+  # Pulled in transitively by pandas/arxiv but pinned at the top to keep CI
+  # resolution stable; remove if those start owning the floor themselves.
+  "python-dateutil>=2.8.0",
+  "rich>=13.0",
+]
+
+[project.optional-dependencies]
+# ── LLM providers ────────────────────────────────────────────────────────────
+llm = [
+  "openai>=1.0.0",
+  "anthropic>=0.45.0",
+]
+
+# ── preprocessing/parse backend (PDF → structured representation) ────────────
+# Local MinerU CLI fallback for the execution stage's ``prepare`` node. Routine
+# users do not need this: the parse stage uses MinerU's cloud API by default.
+# These packages are not imported by FactReview itself; they are the model/
+# inference deps that the local ``mineru`` CLI pulls in when it runs.
+parse-mineru = [
+  "magic-pdf",
+  "ultralytics",
+  "doclayout-yolo",
+  "rapid-table",
+]
+
+# ── fact_generation/positioning (§3.2) ───────────────────────────────────────
+# Note: positioning/bibtex.py talks to Semantic Scholar via raw HTTP, not the
+# `semanticscholar` SDK, so no extra Python deps beyond bibtexparser are needed.
+positioning = [
+  "bibtexparser>=1.4.0",
+]
+
+# ── fact_generation/refcheck (reference-accuracy validation) ─────────────────
+refcheck = [
+  "numpy>=1.26.0,<2",
+  "requests>=2.32.5",
+  "beautifulsoup4>=4.12.0",
+  "arxiv>=2.1.0",
+  "python-dateutil>=2.9.0.post0",
+  "tqdm>=4.67.0",
+  "colorama>=0.4.4",
+  "fuzzywuzzy>=0.18.0",
+  "python-Levenshtein>=0.25.0",
+  "pandas>=2.0.0",
+  "pdfplumber>=0.10.0",
+  "pybtex>=0.25.1",
+]
+
+# ── fact_generation/execution (§3.3 code execution / verification) ───────────
+# The execution stage drives Docker via subprocess CLI calls (`docker build`,
+# `docker run`), so no Python `docker` SDK is required. The only runtime
+# requirement is a working Docker daemon on the host.
+execution = []
+
+# ── agent_runtime (the OpenAI-Agents-based runtime + PDF rendering) ──────────
+runtime = [
+  "pydantic-settings>=2.3.0",
+  "httpx>=0.27.0",
+  "openai-agents>=0.6.0",
+  "reportlab>=4.2.0",
+  "pymupdf>=1.26.0",
+  "Pillow>=10.0.0",
+  "mdit-py-plugins>=0.4.2",
+  "markdown-it-py>=3.0.0",
+]
+
+# ── Development / testing ────────────────────────────────────────────────────
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=4.1",
+  "pytest-asyncio>=0.23",
+  "ruff>=0.6",
+  "mypy>=1.10",
+  "pre-commit>=3.6",
+  "types-PyYAML",
+  "types-requests",
+]
+
+# ── Meta ─────────────────────────────────────────────────────────────────────
+all = [
+  "factreview[llm]",
+  "factreview[parse-mineru]",
+  "factreview[positioning]",
+  "factreview[refcheck]",
+  "factreview[execution]",
+  "factreview[runtime]",
+]
+
+[project.urls]
+Homepage = "https://github.com/DEFENSE-SEU/FactReview"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+  "src/agent_runtime",
+  "src/common",
+  "src/fact_generation",
+  "src/llm",
+  "src/preprocessing",
+  "src/review",
+  "src/schemas",
+  "src/util",
+]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "demos", "README.md", "LICENSE"]
+
+# ── Ruff ──────────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+src = ["src", "tests"]
+extend-exclude = [
+  "demos/*/execution/repo",
+  "tools",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = [
+  "E501",
+  "B008",
+  "RUF001",
+  "RUF002",
+  "RUF003",
+  "SIM102",
+  "SIM105",
+  "SIM108",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["B", "SIM"]
+"scripts/**" = ["B", "SIM", "E402"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+# ── Mypy ──────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.11"
+packages = [
+  "agent_runtime",
+  "common",
+  "fact_generation",
+  "llm",
+  "preprocessing",
+  "review",
+  "schemas",
+  "util",
+]
+mypy_path = "src"
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+exclude = [
+  "tools/",
+]
+
+# ── Pytest ────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = [
+  "-ra",
+  "--strict-markers",
+  "--strict-config",
+]
+markers = [
+  "slow: marks slow tests (>10s); deselect with '-m \"not slow\"'",
+  "e2e: end-to-end tests that run the full pipeline; require fixtures + network",
+  "requires_docker: test needs docker daemon",
+  "requires_llm: test needs a live LLM API key",
+  "requires_mineru: test needs the `mineru` CLI on PATH",
+]
+asyncio_mode = "auto"
