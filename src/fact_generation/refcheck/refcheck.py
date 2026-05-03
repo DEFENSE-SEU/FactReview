@@ -1,8 +1,15 @@
-"""Reference-checking adapter for the refchecker package.
+"""Reference-checking adapter.
 
-Wraps the refchecker.ArxivReferenceChecker into a simpler API that the
-refcheck stage and optional execution nodes can call without knowing
-refchecker internals.
+By default this dispatches to RefCopilot (`tools/RefCopilot/`). The legacy
+`refchecker` submodule under `tools/refchecker/` is kept for comparison and
+can be selected via the env flag::
+
+    FACTREVIEW_USE_REFCOPILOT=0  → use the original refchecker submodule.
+    FACTREVIEW_USE_REFCOPILOT=1  → use RefCopilot (default).
+
+Both backends expose the same `check_references()` and
+`format_reference_check_markdown()` API, so the rest of the FactReview pipeline
+(stage_runner, execution nodes) does not need to know which is in use.
 
 Usage (library)::
 
@@ -31,12 +38,22 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
-# Ensure the refchecker submodule package (under tools/) is importable.
-# src/reference_check/refcheck.py -> repo_root/tools/refchecker/src
+# Locate the two candidate backends under tools/.
+# src/fact_generation/refcheck/refcheck.py -> repo_root/tools/{refchecker,RefCopilot}/src
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 _REFCHECKER_SRC = _REPO_ROOT / "tools" / "refchecker" / "src"
+_REFCOPILOT_SRC = _REPO_ROOT / "tools" / "RefCopilot" / "src"
+
+if _REFCOPILOT_SRC.exists() and str(_REFCOPILOT_SRC) not in sys.path:
+    sys.path.insert(0, str(_REFCOPILOT_SRC))
 if _REFCHECKER_SRC.exists() and str(_REFCHECKER_SRC) not in sys.path:
     sys.path.insert(0, str(_REFCHECKER_SRC))
+
+
+def _use_refcopilot() -> bool:
+    """Read the FACTREVIEW_USE_REFCOPILOT flag (default: True)."""
+    raw = (os.environ.get("FACTREVIEW_USE_REFCOPILOT") or "1").strip().lower()
+    return raw not in {"0", "false", "no", "off"}
 
 
 def _build_checker(
@@ -95,7 +112,7 @@ def check_references(
     api_key : str, optional
         Semantic Scholar API key. Falls back to env vars.
     db_path : str, optional
-        Path to a local Semantic Scholar SQLite database.
+        Path to a local Semantic Scholar SQLite database (legacy refchecker only).
     output_file : str, optional
         If given, write the error report to this path.
     debug : bool
@@ -111,6 +128,24 @@ def check_references(
         unverified      – number of unverifiable references
         error_message   – non-empty string if the run itself failed
     """
+    if _use_refcopilot():
+        try:
+            from refcopilot.compat import check_references as _refcopilot_check  # type: ignore
+        except Exception as exc:
+            logger.warning("RefCopilot import failed (%s); falling back to refchecker", exc)
+        else:
+            return _refcopilot_check(
+                paper,
+                api_key=api_key,
+                db_path=db_path,
+                output_file=output_file,
+                llm_provider=llm_provider,
+                llm_model=llm_model,
+                debug=debug,
+                enable_parallel=enable_parallel,
+                max_workers=max_workers,
+            )
+
     try:
         checker = _build_checker(
             api_key=api_key,

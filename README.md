@@ -138,12 +138,10 @@ python scripts/execute_review_pipeline.py path/to/paper.pdf --run-execution
 ```
 
 Reference-accuracy checking is also off by default. Enable it when you want
-RefChecker to validate bibliography entries and append warning/error details to
-the final report. RefChecker ships as a git submodule, so fresh clones need a
-one-time setup:
+RefCopilot to validate bibliography entries and append warning/error details to
+the final report:
 
 ```bash
-git submodule update --init --recursive
 pip install -e ".[refcheck]"
 python scripts/execute_review_pipeline.py path/to/paper.pdf --enable-refcheck
 ```
@@ -237,9 +235,8 @@ and writes its verdict into `stages/fact_generation/execution/execution.json`.
 - **`MINERU_API_TOKEN` missing** — the parse stage will raise on the first run.
   Get a token from <https://mineru.net> (free tier is sufficient for most
   papers) and set it in `.env` or pass `--mineru-api-token`.
-- **`--enable-refcheck` errors with "tools/refchecker not found"** — RefChecker
-  is a git submodule that fresh clones don't pull by default. Run
-  `git submodule update --init --recursive` and `pip install -e ".[refcheck]"`.
+- **`--enable-refcheck` errors with missing deps** — install with
+  `pip install -e ".[refcheck]"`.
 - **Positioning stage is slow or returns sparse results** — unauthenticated Semantic Scholar requests are rate-limited. Set `SEMANTIC_SCHOLAR_API_KEY` in `.env` (free key from <https://www.semanticscholar.org/product/api>).
 - **Teaser stage skips silently / no `teaser_figure.png`** — `GEMINI_API_KEY`
   is unset (this is the default). The prompt is still written to
@@ -255,7 +252,7 @@ touch.
 
 | Variable | Purpose |
 |---|---|
-| `FACTREVIEW_ENABLE_REFCHECK` | Enable RefChecker globally (equivalent to the `--enable-refcheck` flag). |
+| `FACTREVIEW_ENABLE_REFCHECK` | Enable reference checking globally (equivalent to the `--enable-refcheck` flag). |
 | `FACTREVIEW_EXECUTION_ENABLE_REFCHECK` | Enable a refcheck sweep *inside* the execution stage's refcheck node. Independent from the global gate above. |
 | `MINERU_BASE_URL` | Override the MinerU cloud API endpoint (default: `https://mineru.net/api/v4`). |
 | `MINERU_ALLOW_LOCAL_FALLBACK` | Set to `true` to let the execution stage's `prepare` node fall back to the local `mineru` CLI when the cloud snapshot is unavailable. |

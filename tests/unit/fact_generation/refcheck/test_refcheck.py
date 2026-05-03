@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 
@@ -10,6 +12,49 @@ def test_refcheck_adapter_importable():
     from fact_generation.refcheck.refcheck import check_references
 
     assert callable(check_references)
+
+
+_REFCOPILOT_FIXTURES = (
+    Path(__file__).resolve().parents[4] / "tools" / "RefCopilot" / "tests" / "fixtures" / "inputs"
+)
+
+
+@pytest.mark.skipif(
+    not (_REFCOPILOT_FIXTURES / "minimal.bib").exists(),
+    reason="RefCopilot fixtures not present",
+)
+def test_refcheck_dispatches_to_refcopilot(monkeypatch):
+    """Default behavior with FACTREVIEW_USE_REFCOPILOT=1 (or unset)."""
+    monkeypatch.setenv("FACTREVIEW_USE_REFCOPILOT", "1")
+    from fact_generation.refcheck.refcheck import check_references
+
+    bib = _REFCOPILOT_FIXTURES / "minimal.bib"
+    result = check_references(paper=str(bib), max_workers=1)
+
+    expected_keys = {
+        "ok", "total_refs", "errors", "warnings", "unverified",
+        "error_message", "issues", "error_details", "warning_details",
+        "unverified_details", "report_file",
+    }
+    assert expected_keys <= set(result.keys())
+    assert isinstance(result["issues"], list)
+    assert result["ok"] is True
+    assert result["total_refs"] >= 0
+
+
+def test_refcheck_legacy_flag_falls_back_to_refchecker(monkeypatch):
+    """When FACTREVIEW_USE_REFCOPILOT=0, the adapter goes through the refchecker submodule path.
+
+    The submodule may be uninitialized in CI; in that case the call should still
+    return a graceful error dict (ok=False).
+    """
+    monkeypatch.setenv("FACTREVIEW_USE_REFCOPILOT", "0")
+    from fact_generation.refcheck.refcheck import check_references
+
+    result = check_references(paper="/nonexistent/paper.pdf")
+    assert isinstance(result, dict)
+    assert "ok" in result
+    assert "error_message" in result
 
 
 def test_refcheck_nonexistent_paper():
