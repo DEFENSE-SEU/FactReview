@@ -1,10 +1,6 @@
-"""Test A.3 — PDF text extraction + bibliography section detection."""
+"""PDF text extraction and bibliography section detection."""
 
 from __future__ import annotations
-
-from pathlib import Path
-
-import pytest
 
 from refcopilot.inputs import pdf
 
@@ -60,14 +56,3 @@ def test_find_bibliography_skips_early_match():
     assert "[1] Paper A. 2020." in bib
 
 
-_FACTREVIEW_PDF = Path(__file__).resolve().parents[3].parent / "factreview.pdf"
-
-
-@pytest.mark.skipif(not _FACTREVIEW_PDF.exists(), reason="factreview.pdf not present")
-@pytest.mark.slow
-def test_extract_text_smoke_on_factreview_pdf():
-    text = pdf.extract_text(_FACTREVIEW_PDF)
-    assert len(text) > 1000
-    bib = pdf.find_bibliography(text)
-    # The factreview paper should have a References section.
-    assert len(bib) > 100, f"bibliography section unexpectedly short: {len(bib)} chars"

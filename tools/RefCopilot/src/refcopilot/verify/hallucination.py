@@ -2,14 +2,11 @@
 
 Two-stage:
 
-1.  *Pre-screen* (no LLM call) — based on title similarity, author overlap, and
-    garbled-title detection.
-2.  *Apply verdict*  — given a verdict (LIKELY/UNLIKELY/UNCERTAIN), decide
-    whether to emit an error. The decision tree mirrors refchecker's
-    `apply_hallucination_verdict`:
-      LIKELY    → emit fake error.
-      UNLIKELY  → no issue (and promote previously-unverified refs to verified).
-      UNCERTAIN → no issue (don't fabricate accusations).
+1.  :func:`pre_screen` — heuristic verdict (no LLM call) based on title
+    similarity, author overlap, and OCR-garbled-title detection.
+2.  :func:`to_issue` — given a final verdict, emit an :class:`Issue` only when
+    the verdict is ``LIKELY``. ``UNLIKELY`` and ``UNCERTAIN`` produce no
+    issue, so we never accuse a reference of being fake without confidence.
 """
 
 from __future__ import annotations

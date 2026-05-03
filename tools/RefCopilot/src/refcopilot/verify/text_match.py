@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 import unicodedata
 
-from rapidfuzz.fuzz import ratio as rapidfuzz_ratio
+from rapidfuzz.fuzz import ratio
 
 from refcopilot.verify.thresholds import (
     LOWERCASE_HEAD_STOPWORDS,
@@ -71,7 +71,7 @@ def title_similarity(a: str | None, b: str | None) -> float:
 
     # Character-level tiebreaker on a normalized form (gives a small boost when
     # token sets disagree only on stems / hyphenation).
-    char_ratio = rapidfuzz_ratio(_normalize_for_match(a), _normalize_for_match(b)) / 100.0
+    char_ratio = ratio(_normalize_for_match(a), _normalize_for_match(b)) / 100.0
     return max(jaccard, jaccard * 0.7 + char_ratio * 0.3) if jaccard > 0 else 0.0
 
 
@@ -96,7 +96,8 @@ def author_overlap(cited: list[str], retrieved: list[str]) -> float:
 
     Strategy:
       1. Drop "et al." sentinels.
-      2. Cap both lists to MAX_AUTHORS_TO_COMPARE (refchecker convention).
+      2. Cap both lists to ``MAX_AUTHORS_TO_COMPARE`` so a long author list
+         doesn't dominate the score.
       3. For each cited author, find the first unused retrieved author whose
          (last_name, first_initial) is compatible.
       4. Return matches / max(len(cited), len(retrieved)).
@@ -183,29 +184,19 @@ def _parse_author(name: str) -> tuple[str, str]:
 
 
 # ---------------------------------------------------------------------------
-# Year matching with off-by-one tolerance
-# ---------------------------------------------------------------------------
-
-
-def year_matches(cited: int | None, retrieved: int | None, *, tolerance: int = 1) -> bool:
-    if cited is None or retrieved is None:
-        return True
-    return abs(int(cited) - int(retrieved)) <= tolerance
-
-
-# ---------------------------------------------------------------------------
 # Garbled / OCR-noise detection
 # ---------------------------------------------------------------------------
 
 
 def is_garbled_title(title: str | None, raw_text: str | None = None) -> bool:
-    """True if the title looks like an OCR artifact rather than fabrication.
+    """True if the title looks like an OCR artifact rather than a fabrication.
 
-    Heuristic from refchecker's `_detect_garbled_metadata`:
-      - Empty title is garbled.
-      - If raw_text begins with `#` (no author field) AND title has ≥5 words AND
-        the first word is lowercase + length ≤4 + not a normal short stopword,
-        the title likely starts mid-word (PDF extraction artifact).
+    Heuristic:
+      - An empty title is garbled.
+      - If ``raw_text`` begins with ``#`` (no author field) AND the title has
+        at least five words AND the first word is lowercase, length ≤4, and
+        not a common short stopword, the title likely starts mid-word — a
+        typical PDF extraction artifact.
     """
     if not title or not title.strip():
         return True

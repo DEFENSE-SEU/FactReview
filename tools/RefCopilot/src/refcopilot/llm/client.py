@@ -1,8 +1,7 @@
-"""Thin wrapper over FactReview's llm.client.llm_json + resolve_llm_config.
+"""LLM JSON-output client.
 
-Importing FactReview's llm package is deferred until first use so that the
-RefCopilot package is importable in environments where FactReview's src is not
-on sys.path (e.g., unit tests using mocks).
+Imports FactReview's :mod:`llm.client` lazily so callers can monkey-patch
+:func:`call_json` without resolving the FactReview ``src/`` path.
 """
 
 from __future__ import annotations

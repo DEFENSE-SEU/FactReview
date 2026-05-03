@@ -1,4 +1,4 @@
-"""Test C.6 — output schema compatibility with FactReview's reference_check.json."""
+"""FactReview ``reference_check.json`` shape contract."""
 
 from __future__ import annotations
 
@@ -15,10 +15,10 @@ from refcopilot.models import (
     SourceFormat,
     Verdict,
 )
-from refcopilot.report import to_legacy_dict
+from refcopilot.report import to_factreview_dict
 
 
-_LEGACY_TOP_KEYS = {
+_TOP_KEYS = {
     "ok",
     "total_refs",
     "errors",
@@ -32,7 +32,7 @@ _LEGACY_TOP_KEYS = {
     "report_file",
 }
 
-_LEGACY_ISSUE_KEYS = {
+_ISSUE_KEYS = {
     "severity",
     "type",
     "reference_title",
@@ -94,37 +94,36 @@ def _sample_report() -> Report:
     )
 
 
-def test_legacy_top_keys_present():
-    payload = to_legacy_dict(_sample_report(), report_file="/tmp/details.txt")
-    assert _LEGACY_TOP_KEYS <= set(payload.keys())
+def test_top_keys_present():
+    payload = to_factreview_dict(_sample_report(), report_file="/tmp/details.txt")
+    assert _TOP_KEYS <= set(payload.keys())
 
 
-def test_legacy_issue_keys_present():
-    payload = to_legacy_dict(_sample_report())
+def test_issue_keys_present():
+    payload = to_factreview_dict(_sample_report())
     for issue in payload["issues"]:
-        assert _LEGACY_ISSUE_KEYS <= set(issue.keys())
+        assert _ISSUE_KEYS <= set(issue.keys())
 
 
-def test_legacy_severity_strings():
-    payload = to_legacy_dict(_sample_report())
+def test_severity_strings():
+    payload = to_factreview_dict(_sample_report())
     severities = {i["severity"] for i in payload["issues"]}
-    # Allowed values per stage_runner.py contract
     assert severities <= {"error", "warning", "unverified"}
 
 
-def test_legacy_grouped_details_consistent():
-    payload = to_legacy_dict(_sample_report())
+def test_grouped_details_consistent():
+    payload = to_factreview_dict(_sample_report())
     assert len(payload["error_details"]) == payload["errors"]
     assert len(payload["warning_details"]) == payload["warnings"]
 
 
-def test_legacy_dict_includes_report_file():
-    payload = to_legacy_dict(_sample_report(), report_file="/tmp/x.txt")
+def test_dict_includes_report_file():
+    payload = to_factreview_dict(_sample_report(), report_file="/tmp/x.txt")
     assert payload["report_file"] == "/tmp/x.txt"
 
 
-def test_legacy_type_label_format():
-    payload = to_legacy_dict(_sample_report())
+def test_type_label_format():
+    payload = to_factreview_dict(_sample_report())
     types = {i["type"] for i in payload["issues"]}
     # type label format is "<category>::<code>"
     assert any("::" in t for t in types)

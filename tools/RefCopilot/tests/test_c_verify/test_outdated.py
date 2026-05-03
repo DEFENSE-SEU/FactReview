@@ -1,4 +1,4 @@
-"""Test C.2 — outdated reference detection."""
+"""Outdated reference detection."""
 
 from __future__ import annotations
 

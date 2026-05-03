@@ -1,4 +1,4 @@
-"""Test C.4 — LLM-driven secondary verification."""
+"""LLM-driven secondary verification."""
 
 from __future__ import annotations
 

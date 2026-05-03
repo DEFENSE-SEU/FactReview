@@ -1,4 +1,4 @@
-"""Test A.5 — LLM-based reference extraction."""
+"""LLM-based reference extraction."""
 
 from __future__ import annotations
 

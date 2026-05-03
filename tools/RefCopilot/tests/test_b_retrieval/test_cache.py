@@ -1,4 +1,4 @@
-"""Test B.1 — disk cache key construction + TTL + prune."""
+"""Disk cache key construction + TTL + prune."""
 
 from __future__ import annotations
 

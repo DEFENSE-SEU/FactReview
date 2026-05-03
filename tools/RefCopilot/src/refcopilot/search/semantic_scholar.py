@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Callable
+from typing import Any, Callable, Protocol
 
 import httpx
 
@@ -37,14 +37,16 @@ _FIELDS = (
 )
 
 
-HttpFn = Callable[[str, dict[str, str], dict[str, str]], "_Response"]
+class _Response(Protocol):
+    """Subset of :class:`httpx.Response` used by this module."""
 
-
-class _Response:
     status_code: int
     headers: dict[str, str]
 
     def json(self) -> Any: ...
+
+
+HttpFn = Callable[[str, dict[str, str], dict[str, str]], _Response]
 
 
 class SemanticScholarBackend:
@@ -83,10 +85,10 @@ class SemanticScholarBackend:
                 return [rec]
 
         if ref.title:
-            rec = self._search_match(ref.title, year=ref.year, authors=ref.authors)
+            rec = self._search_match(ref.title, year=ref.year)
             if rec:
                 return [rec]
-            return self._search_relevance(ref.title, year=ref.year, authors=ref.authors)
+            return self._search_relevance(ref.title, year=ref.year)
 
         return []
 
@@ -107,9 +109,7 @@ class SemanticScholarBackend:
         self._cache_set(cache_key, payload)
         return _payload_to_record(payload)
 
-    def _search_match(
-        self, title: str, *, year: int | None, authors: list[str]
-    ) -> ExternalRecord | None:
+    def _search_match(self, title: str, *, year: int | None) -> ExternalRecord | None:
         cache_key = f"match_{_safe(title)[:80]}_{year or ''}"
         cached = self._cache_get(cache_key)
         if cached is not None:
@@ -130,9 +130,7 @@ class SemanticScholarBackend:
         self._cache_set(cache_key, best)
         return _payload_to_record(best)
 
-    def _search_relevance(
-        self, title: str, *, year: int | None, authors: list[str]
-    ) -> list[ExternalRecord]:
+    def _search_relevance(self, title: str, *, year: int | None) -> list[ExternalRecord]:
         cache_key = f"search_{_safe(title)[:80]}_{year or ''}"
         cached = self._cache_get(cache_key)
         if cached is not None:

@@ -12,7 +12,7 @@ from pathlib import Path
 from refcopilot.cache.disk_cache import DiskCache
 from refcopilot.models import SourceFormat
 from refcopilot.pipeline import RefCopilotPipeline
-from refcopilot.report import to_legacy_dict, to_markdown
+from refcopilot.report import to_factreview_dict, to_markdown
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -32,7 +32,7 @@ def main(argv: list[str] | None = None) -> int:
     check.add_argument("--cache-dir", default=None)
     check.add_argument("--cache-ttl-days", type=int, default=30)
     check.add_argument("--no-cache", action="store_true")
-    check.add_argument("--max-refs", type=int, default=0, help="0 = unlimited")
+    check.add_argument("--max-refs", type=int, default=None, help="cap the number of references checked")
     check.add_argument("--debug", action="store_true")
 
     prune = sub.add_parser("cache", help="Cache management.")
@@ -66,18 +66,21 @@ def _run_check(args) -> int:
     )
 
     input_kind = None if args.input_type == "auto" else SourceFormat(args.input_type)
-    report = pipeline.run(args.input, input_type=input_kind, max_refs=args.max_refs or None)
+    report = pipeline.run(args.input, input_type=input_kind, max_refs=args.max_refs)
 
     if args.output in ("json", "both"):
-        legacy_path = out_dir / "reference_check.json"
-        legacy_path.write_text(
-            json.dumps(to_legacy_dict(report, report_file=str(out_dir / "details.txt")),
-                       ensure_ascii=False, indent=2),
+        summary_path = out_dir / "reference_check.json"
+        summary_path.write_text(
+            json.dumps(
+                to_factreview_dict(report, report_file=str(out_dir / "details.txt")),
+                ensure_ascii=False,
+                indent=2,
+            ),
             encoding="utf-8",
         )
         full_json_path = out_dir / "reference_check.full.json"
         full_json_path.write_text(report.model_dump_json(indent=2), encoding="utf-8")
-        print(f"wrote {legacy_path}", file=sys.stderr)
+        print(f"wrote {summary_path}", file=sys.stderr)
         print(f"wrote {full_json_path}", file=sys.stderr)
 
     if args.output in ("markdown", "both"):

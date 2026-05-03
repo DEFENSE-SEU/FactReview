@@ -1,14 +1,14 @@
-"""Merge ExternalRecords from multiple backends into a single MergedRecord.
+"""Merge :class:`ExternalRecord` results from multiple backends into one :class:`MergedRecord`.
 
-Field priority (per refchecker's `_merge_arxiv_with_semantic_scholar`):
-  - title / authors / year       → arXiv wins (more authoritative for arXiv-cited papers)
-  - venue / publication_venue    → Semantic Scholar wins (S2 has the published venue)
-  - DOI                          → S2 wins; arXiv DOI as fallback
-  - arxiv_id / arxiv_versions / latest_arxiv_version / withdrawn → arXiv
-  - s2_paper_id                  → S2
+Field priority:
+  - title / authors / year       → arXiv (more authoritative for arXiv-cited papers).
+  - venue / publication_venue    → Semantic Scholar (carries the published venue).
+  - DOI                          → Semantic Scholar; arXiv DOI as fallback.
+  - arxiv_id / arxiv_versions / latest_arxiv_version / withdrawn → arXiv.
+  - s2_paper_id                  → Semantic Scholar.
 
-Each merged field records its provenance (Backend) so callers can trace where a
-value came from.
+Each merged field's provenance (``Backend``) is recorded so callers can trace
+where a value came from.
 """
 
 from __future__ import annotations

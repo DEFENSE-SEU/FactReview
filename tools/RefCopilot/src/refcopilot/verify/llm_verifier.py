@@ -1,21 +1,20 @@
 """LLM-driven secondary verification for uncertain references.
 
-Given a reference whose pre-screen verdict is UNCERTAIN or LIKELY (and we have
-some retrieved candidates), ask the LLM to judge whether the citation
-plausibly refers to the same work as one of the candidates. The LLM has access
-to broad academic knowledge from pretraining; for ambiguous cases this is a
-useful extra signal.
+When the heuristic :func:`refcopilot.verify.hallucination.pre_screen` returns
+``UNCERTAIN`` or ``LIKELY``, this module asks the LLM whether the citation
+plausibly refers to the same work as one of the retrieved candidates. The LLM
+has broad academic knowledge from pretraining, which is a useful extra signal
+for ambiguous cases.
 
-The LLM is asked to return a strict JSON object:
-  {"verdict": "LIKELY" | "UNLIKELY" | "UNCERTAIN", "reason": "..."}
+The LLM returns a strict JSON object::
 
-`verdict` here is the hallucination verdict (per `apply_hallucination_verdict`):
-  LIKELY    → fake
-  UNLIKELY  → real (promote unverified to verified)
-  UNCERTAIN → no opinion
+    {"verdict": "LIKELY" | "UNLIKELY" | "UNCERTAIN", "reason": "..."}
 
-If the LLM call fails or returns malformed output, we keep the pre-screen
-verdict.
+where the verdict mirrors :class:`refcopilot.models.HallucinationVerdict`
+(``LIKELY`` = fake, ``UNLIKELY`` = real, ``UNCERTAIN`` = no opinion).
+
+If the LLM call fails or returns malformed output, the pre-screen verdict is
+preserved.
 """
 
 from __future__ import annotations

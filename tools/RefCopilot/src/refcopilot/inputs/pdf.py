@@ -92,7 +92,12 @@ def extract_bibliography(path: str | Path) -> str:
     text = extract_text(path)
     bib = find_bibliography(text)
     if not bib:
-        # Fallback: return the last 30% of text — better than nothing for the LLM
-        # extractor, which is robust to noisy input.
+        # No bibliography header matched. Fall back to the last 30% of the
+        # document so the LLM extractor still has plausible candidates to
+        # scan, and log it so callers can investigate noisy outputs.
+        logger.warning(
+            "no bibliography header found in %s; using last 30%% of document text",
+            path,
+        )
         bib = text[int(len(text) * 0.7):]
     return bib

@@ -1,4 +1,4 @@
-"""Test C.1 — fake (hallucination) detection."""
+"""Fake (hallucination) detection."""
 
 from __future__ import annotations
 

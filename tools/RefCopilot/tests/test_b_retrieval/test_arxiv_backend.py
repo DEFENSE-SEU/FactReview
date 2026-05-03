@@ -1,4 +1,4 @@
-"""Test B.3 — arXiv search backend."""
+"""ArXiv search backend."""
 
 from __future__ import annotations
 

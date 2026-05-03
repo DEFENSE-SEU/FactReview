@@ -1,4 +1,4 @@
-"""Test C.3 — incomplete reference detection."""
+"""Incomplete reference detection."""
 
 from __future__ import annotations
 

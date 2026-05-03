@@ -126,15 +126,3 @@ def test_fix_node_terminates_at_max_attempts(tmp_path):
     history_kinds = [h.get("kind") for h in result.get("history", []) if isinstance(h, dict)]
     assert "fix_stop" in history_kinds
     assert _route_after_fix(result) == "finalize"
-
-
-def test_refchecker_package_importable_when_deps_installed():
-    """refchecker package loads when its optional dependency set is present."""
-    import pytest
-
-    try:
-        import refchecker
-    except ModuleNotFoundError as exc:
-        pytest.skip(f"refchecker optional dependency missing: {exc.name}")
-
-    assert refchecker.__version__

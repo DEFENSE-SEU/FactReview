@@ -1,7 +1,6 @@
-"""Backward-compatible API for FactReview's existing refcheck stage.
-
-Drop-in replacement for `tools/refchecker`'s `check_references()` and
-`format_reference_check_markdown()`.
+"""FactReview integration: produces the JSON / Markdown shapes that
+FactReview's refcheck stage consumes. See :func:`format_factreview_markdown`
+for the embedded-summary policy (errors only by default).
 """
 
 from __future__ import annotations
@@ -12,7 +11,7 @@ from typing import Any
 
 from refcopilot.models import Verdict
 from refcopilot.pipeline import RefCopilotPipeline
-from refcopilot.report import to_legacy_dict, to_markdown
+from refcopilot.report import to_factreview_dict
 
 logger = logging.getLogger(__name__)
 
@@ -21,15 +20,18 @@ def check_references(
     paper: str,
     *,
     api_key: str | None = None,
-    db_path: str | None = None,
     output_file: str | None = None,
-    llm_provider: str | None = None,
-    llm_model: str | None = None,
     debug: bool = False,
     enable_parallel: bool = True,
     max_workers: int = 4,
 ) -> dict[str, Any]:
-    """Run RefCopilot and return the legacy refchecker-compatible dict."""
+    """Run RefCopilot on *paper* and return a structured result dict.
+
+    The dict's top-level keys are ``ok``, ``total_refs``, ``errors``,
+    ``warnings``, ``unverified``, ``error_message``, ``issues``,
+    ``error_details``, ``warning_details``, ``unverified_details``, and
+    ``report_file`` — the schema written to ``reference_check.json``.
+    """
     if debug:
         logging.basicConfig(level=logging.DEBUG)
 
@@ -44,7 +46,7 @@ def check_references(
         logger.exception("RefCopilot run failed")
         return _failure_payload(str(exc), output_file)
 
-    payload = to_legacy_dict(report, report_file=str(output_file or ""))
+    payload = to_factreview_dict(report, report_file=str(output_file or ""))
 
     if output_file:
         try:
@@ -56,11 +58,20 @@ def check_references(
     return payload
 
 
-def format_reference_check_markdown(result: dict[str, Any], *, max_issues: int = 20) -> str:
-    """Render the legacy-shape result dict as markdown.
+def format_factreview_markdown(
+    result: dict[str, Any],
+    *,
+    max_issues: int = 20,
+    include_warnings: bool = False,
+    include_unverified: bool = False,
+) -> str:
+    """Render *result* as Markdown for FactReview's review report.
 
-    Mirrors the original FactReview adapter's `format_reference_check_markdown`
-    contract so the caller in `stage_runner.py` can keep working unchanged.
+    By default only error rows (fabricated / hallucinated references) appear
+    so the embedded section in the final review stays compact. Set
+    ``include_warnings=True`` and/or ``include_unverified=True`` for a full
+    listing — this is the mode the standalone CLI uses through
+    :func:`refcopilot.report.to_markdown`.
     """
     if not isinstance(result, dict):
         return ""
@@ -85,39 +96,34 @@ def format_reference_check_markdown(result: dict[str, Any], *, max_issues: int =
         lines.append(f"- Detail file: `{report_file}`")
     lines.append("")
 
-    grouped: dict[str, list[dict[str, Any]]] = {
-        "Errors": [],
-        "Warnings": [],
-        "Unverified": [],
-    }
-    for issue in result.get("issues") or []:
-        sev = issue.get("severity")
-        if sev == "error":
-            grouped["Errors"].append(issue)
-        elif sev == "warning":
-            grouped["Warnings"].append(issue)
-        elif sev == "unverified":
-            grouped["Unverified"].append(issue)
+    issues = result.get("issues") or []
+    sections: list[tuple[str, list[dict[str, Any]]]] = [
+        ("Errors", [i for i in issues if i.get("severity") == "error"]),
+    ]
+    if include_warnings:
+        sections.append(("Warnings", [i for i in issues if i.get("severity") == "warning"]))
+    if include_unverified:
+        sections.append(("Unverified", [i for i in issues if i.get("severity") == "unverified"]))
 
     rendered_any = False
-    for heading, rows in grouped.items():
+    for heading, rows in sections:
         if not rows:
             continue
         rendered_any = True
         lines.append(f"### {heading}")
         for index, issue in enumerate(rows[:max_issues], start=1):
-            lines.append(_format_legacy_issue(issue, index))
+            lines.append(_format_factreview_issue(issue, index))
         if len(rows) > max_issues:
             lines.append(f"- {len(rows) - max_issues} additional item(s) omitted.")
         lines.append("")
 
     if not rendered_any:
-        lines.append("No issues found.")
+        lines.append("No fabricated references detected.")
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 
 
-def _format_legacy_issue(issue: dict[str, Any], index: int) -> str:
+def _format_factreview_issue(issue: dict[str, Any], index: int) -> str:
     title = (issue.get("reference_title") or "(untitled)").strip()
     type_ = issue.get("type") or "unknown"
     details = issue.get("details") or ""
@@ -144,7 +150,6 @@ def _failure_payload(error_message: str, output_file: str | None) -> dict[str, A
 
 
 def _write_text_report(report, path: Path) -> None:
-    """Write a plaintext details report (parallels refchecker's output_file behavior)."""
     lines = []
     for c in report.checked:
         if c.verdict == Verdict.VALID:

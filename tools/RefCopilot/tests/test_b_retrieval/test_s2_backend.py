@@ -1,4 +1,4 @@
-"""Test B.4 — Semantic Scholar search backend."""
+"""Semantic Scholar search backend."""
 
 from __future__ import annotations
 

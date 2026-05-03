@@ -1,4 +1,4 @@
-"""Test A.4 — URL / arXiv ID normalization."""
+"""URL / arXiv ID normalization."""
 
 from __future__ import annotations
 

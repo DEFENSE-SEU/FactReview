@@ -1,21 +1,16 @@
-"""Centralized threshold constants (referenced from refchecker tuned defaults)."""
+"""Threshold constants used by the verification heuristics."""
 
 from __future__ import annotations
 
-# Author overlap thresholds
-AUTHOR_MATCH_THRESHOLD = 0.6
-AUTHOR_VERIFIED_THRESHOLD = 0.4
+# Author-overlap fraction below which a citation is treated as a fake.
 AUTHOR_FAKE_THRESHOLD = 0.10
 
-# Title similarity thresholds
+# Title-similarity thresholds: at or above SIMILARITY → real; below FAKE → fake.
 TITLE_SIMILARITY_THRESHOLD = 0.75
 TITLE_FAKE_THRESHOLD = 0.25
 
-# Author list comparison
+# Cap on author-list comparison so a long author list does not dominate scoring.
 MAX_AUTHORS_TO_COMPARE = 10
-
-# Year tolerance (off-by-one ignored)
-YEAR_TOLERANCE = 1
 
 # Stop-words for the lowercase-short-word "garbled" heuristic.
 LOWERCASE_HEAD_STOPWORDS = frozenset(

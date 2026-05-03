@@ -1,4 +1,4 @@
-"""Test C.7 — non-academic recheck downgrades fake errors to warnings."""
+"""Non-academic recheck downgrades fake errors to warnings."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Test A.1 — bibtex parsing."""
+"""Bibtex parsing."""
 
 from __future__ import annotations
 

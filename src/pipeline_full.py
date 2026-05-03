@@ -302,7 +302,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--enable-refcheck",
         action="store_true",
-        help="Run RefChecker reference-accuracy validation and append warning/error results to the final report.",
+        help="Run RefCopilot reference-accuracy validation and append fabricated-reference findings to the final report.",
     )
     p.add_argument(
         "--run-execution",

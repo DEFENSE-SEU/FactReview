@@ -138,8 +138,8 @@ python scripts/execute_review_pipeline.py path/to/paper.pdf --run-execution
 ```
 
 Reference-accuracy checking is also off by default. Enable it when you want
-RefCopilot to validate bibliography entries and append warning/error details to
-the final report:
+RefCopilot to validate bibliography entries and append fabricated-reference
+findings to the final report:
 
 ```bash
 pip install -e ".[refcheck]"
@@ -147,10 +147,13 @@ python scripts/execute_review_pipeline.py path/to/paper.pdf --enable-refcheck
 ```
 
 You can also enable it through the environment with `FACTREVIEW_ENABLE_REFCHECK=true`.
-Results are written under `stages/fact_generation/refcheck/reference_check.*` and
-appended to `stages/review/report/final_review.md`. The report sub-stage also writes
-`final_review_clean.md` (without the refcheck section); the teaser sub-stage reads
-that clean copy so refcheck warnings don't pollute teaser prompts.
+The full result — errors, warnings, and unverified entries — is written to
+`stages/fact_generation/refcheck/reference_check.json`. The Markdown summary
+appended to `stages/review/report/final_review.md` lists fabricated references
+only; reviewers who need the full breakdown can run RefCopilot's standalone CLI
+(`refcopilot check ...`) or read the JSON directly. The report sub-stage also
+writes `final_review_clean.md` (without the refcheck section) for the teaser
+sub-stage to use.
 
 ### CLI Flags
 

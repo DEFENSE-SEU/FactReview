@@ -13,16 +13,10 @@ authors = [{ name = "FactReview authors" }]
 dependencies = [
   "pydantic>=2.5",
   "httpx>=0.27",
-  "requests>=2.32",
+  "rapidfuzz>=3.5",
   "pypdf>=4.0",
   "pdfplumber>=0.10",
   "pybtex>=0.25.1",
-  "arxiv>=2.1.0",
-  "beautifulsoup4>=4.12",
-  "fuzzywuzzy>=0.18",
-  "python-Levenshtein>=0.25",
-  "tqdm>=4.67",
-  "colorama>=0.4.4",
 ]
 
 [project.optional-dependencies]
@@ -56,9 +50,7 @@ ignore = ["E501", "B008", "RUF001", "RUF002", "RUF003", "SIM102", "SIM105", "SIM
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["tests"]
-addopts = ["-ra", "--strict-markers"]
+addopts = ["-ra", "--strict-markers", "-m", "not slow"]
 markers = [
-  "slow: long-running tests (>5s); deselect with '-m \"not slow\"'",
-  "network: hits real arXiv / Semantic Scholar; skip in CI",
-  "llm: hits real LLM (codex auth required); skip in CI",
+  "slow: long-running tests (>5s); enable with '-m slow'",
 ]

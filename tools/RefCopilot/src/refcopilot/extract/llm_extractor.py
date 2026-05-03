@@ -77,7 +77,6 @@ USER_PROMPT_TEMPLATE = (
     "{bibliography}\n"
 )
 
-# Heuristics from refchecker
 _TOKEN_BUDGET_DEFAULT = 4000
 _CHARS_PER_TOKEN = 4
 _OVERLAP_RATIO = 0.10
@@ -146,7 +145,7 @@ def _chunk(text: str, *, char_budget: int) -> list[str]:
             if paragraph_break > cur:
                 end = paragraph_break
         chunks.append(text[cur:end])
-        cur = max(end - overlap, end)
+        cur = end - overlap if (end - overlap) > cur else end
     return [c for c in chunks if c.strip()]
 
 

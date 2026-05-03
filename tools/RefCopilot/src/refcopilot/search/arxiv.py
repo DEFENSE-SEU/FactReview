@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 import re
 import xml.etree.ElementTree as ET
-from typing import Any, Callable
+from typing import Callable, Protocol
 
 import httpx
 
@@ -30,19 +30,15 @@ _NS = {
 _ARXIV_API = "https://export.arxiv.org/api/query"
 
 
-HttpGetFn = Callable[[str, dict[str, str] | None], "_HttpResponse"]
-
-
-class _HttpResponse:
-    """Minimal duck-typed response interface used by arxiv.py.
-
-    Real httpx.Response has these attributes; the fixture stubs in tests
-    construct objects that match this shape.
-    """
+class _HttpResponse(Protocol):
+    """Subset of :class:`httpx.Response` used by this module."""
 
     status_code: int
     text: str
     headers: dict[str, str]
+
+
+HttpGetFn = Callable[[str, dict[str, str] | None], _HttpResponse]
 
 
 class ArxivBackend:

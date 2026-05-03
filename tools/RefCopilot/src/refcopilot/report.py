@@ -1,8 +1,7 @@
-"""Report serializers: JSON / Markdown / legacy refchecker-compatible dict."""
+"""Report serializers: Markdown for end users, dict for FactReview's refcheck stage."""
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 from refcopilot.models import (
@@ -15,10 +14,6 @@ from refcopilot.models import (
 )
 
 _MAX_TEXT = 4000
-
-
-def to_json(report: Report) -> str:
-    return report.model_dump_json(indent=2)
 
 
 def to_markdown(report: Report, *, max_issues: int = 50) -> str:
@@ -77,7 +72,7 @@ def _format_checked_reference(c: CheckedReference, index: int) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Legacy schema (compatible with FactReview's existing reference_check.json)
+# FactReview JSON shape (written to ``reference_check.json`` by the refcheck stage)
 # ---------------------------------------------------------------------------
 
 
@@ -88,18 +83,19 @@ _CATEGORY_TO_TYPE = {
 }
 
 
-def to_legacy_dict(report: Report, *, report_file: str = "") -> dict[str, Any]:
-    issues_legacy: list[dict[str, Any]] = []
+def to_factreview_dict(report: Report, *, report_file: str = "") -> dict[str, Any]:
+    """Serialize *report* into the dict shape FactReview's refcheck stage stores."""
+    issues: list[dict[str, Any]] = []
     for c in report.checked:
         if c.issues:
             for issue in c.issues:
-                issues_legacy.append(_issue_to_legacy(c, issue))
+                issues.append(_issue_to_factreview(c, issue))
         elif c.verdict == Verdict.UNVERIFIED:
-            issues_legacy.append(_unverified_to_legacy(c))
+            issues.append(_unverified_to_factreview(c))
 
-    error_details = [i for i in issues_legacy if i["severity"] == "error"]
-    warning_details = [i for i in issues_legacy if i["severity"] == "warning"]
-    unverified_details = [i for i in issues_legacy if i["severity"] == "unverified"]
+    error_details = [i for i in issues if i["severity"] == "error"]
+    warning_details = [i for i in issues if i["severity"] == "warning"]
+    unverified_details = [i for i in issues if i["severity"] == "unverified"]
 
     return {
         "ok": True,
@@ -108,7 +104,7 @@ def to_legacy_dict(report: Report, *, report_file: str = "") -> dict[str, Any]:
         "warnings": report.summary.warnings,
         "unverified": report.summary.unverified,
         "error_message": "",
-        "issues": issues_legacy,
+        "issues": issues,
         "error_details": error_details,
         "warning_details": warning_details,
         "unverified_details": unverified_details,
@@ -116,7 +112,7 @@ def to_legacy_dict(report: Report, *, report_file: str = "") -> dict[str, Any]:
     }
 
 
-def _issue_to_legacy(c: CheckedReference, issue: Issue) -> dict[str, Any]:
+def _issue_to_factreview(c: CheckedReference, issue: Issue) -> dict[str, Any]:
     severity = issue.severity.value
     if severity == Severity.INFO.value:
         severity = "warning"
@@ -145,7 +141,7 @@ def _issue_to_legacy(c: CheckedReference, issue: Issue) -> dict[str, Any]:
     }
 
 
-def _unverified_to_legacy(c: CheckedReference) -> dict[str, Any]:
+def _unverified_to_factreview(c: CheckedReference) -> dict[str, Any]:
     return {
         "severity": "unverified",
         "type": "unverified::no_match",
@@ -166,9 +162,3 @@ def _truncate(value: Any, max_chars: int) -> str:
     if len(text) <= max_chars:
         return text
     return text[: max(0, max_chars - 16)].rstrip() + "\n...(truncated)"
-
-
-def write_legacy_json(report: Report, path: str, *, report_file: str = "") -> None:
-    payload = to_legacy_dict(report, report_file=report_file)
-    with open(path, "w", encoding="utf-8") as fh:
-        json.dump(payload, fh, ensure_ascii=False, indent=2)

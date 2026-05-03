@@ -1,4 +1,4 @@
-"""Test C.5 — end-to-end pipeline (mocked backends + mocked LLM)."""
+"""End-to-end pipeline (mocked backends + mocked LLM)."""
 
 from __future__ import annotations
 

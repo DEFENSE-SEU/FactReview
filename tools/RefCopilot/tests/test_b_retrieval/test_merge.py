@@ -1,4 +1,4 @@
-"""Test B.5 — multi-source merge."""
+"""Multi-source merge."""
 
 from __future__ import annotations
 

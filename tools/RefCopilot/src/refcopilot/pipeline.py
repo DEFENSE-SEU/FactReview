@@ -159,9 +159,7 @@ class RefCopilotPipeline:
                 fake_issue = non_academic.recheck(ref, matches, fake_issue)
             issues.append(fake_issue)
 
-        # Outdated/incomplete checks run unless we *kept* a fake-error verdict.
-        # A non-academic recheck downgrades to a warning, in which case the ref
-        # has metadata worth completing too.
+        # Skip metadata checks only when the LLM-confirmed fake verdict still stands.
         suppress_metadata_checks = (
             verdict == HallucinationVerdict.LIKELY
             and fake_issue is not None

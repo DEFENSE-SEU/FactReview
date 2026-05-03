@@ -1,4 +1,4 @@
-"""Test A.2 — input type detection."""
+"""Input type detection."""
 
 from __future__ import annotations
 
