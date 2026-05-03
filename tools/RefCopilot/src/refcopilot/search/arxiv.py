@@ -1,9 +1,9 @@
 """arXiv backend — Atom feed search + version + withdrawn detection.
 
-We use raw HTTP against http://export.arxiv.org/api/query for both id-based and
-title-based lookups, and per-version metadata via abs/{id}v{n} HTML scraping.
-
-`http_client` is injectable so unit tests can pass a mock.
+Uses raw HTTP against ``https://export.arxiv.org/api/query`` for both id-based
+and title-based lookups, and scrapes per-version metadata from
+``abs/{id}v{n}``. The ``http_get`` constructor argument is injectable so unit
+tests can pass a mock.
 """
 
 from __future__ import annotations

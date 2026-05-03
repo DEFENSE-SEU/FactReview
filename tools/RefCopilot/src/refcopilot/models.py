@@ -19,7 +19,6 @@ from pydantic import BaseModel, ConfigDict, Field
 class Severity(str, Enum):
     ERROR = "error"
     WARNING = "warning"
-    INFO = "info"
     UNVERIFIED = "unverified"
 
 

@@ -69,9 +69,9 @@ def format_factreview_markdown(
 
     By default only error rows (fabricated / hallucinated references) appear
     so the embedded section in the final review stays compact. Set
-    ``include_warnings=True`` and/or ``include_unverified=True`` for a full
-    listing — this is the mode the standalone CLI uses through
-    :func:`refcopilot.report.to_markdown`.
+    ``include_warnings=True`` and/or ``include_unverified=True`` to widen the
+    listing. The standalone CLI uses :func:`refcopilot.report.to_markdown`
+    instead, which always emits all severities.
     """
     if not isinstance(result, dict):
         return ""

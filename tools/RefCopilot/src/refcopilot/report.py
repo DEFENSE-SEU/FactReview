@@ -114,9 +114,6 @@ def to_factreview_dict(report: Report, *, report_file: str = "") -> dict[str, An
 
 def _issue_to_factreview(c: CheckedReference, issue: Issue) -> dict[str, Any]:
     severity = issue.severity.value
-    if severity == Severity.INFO.value:
-        severity = "warning"
-
     cited_url = c.reference.url or ""
     verified_url = ""
     if c.merged and c.merged.url:
@@ -143,7 +140,7 @@ def _issue_to_factreview(c: CheckedReference, issue: Issue) -> dict[str, Any]:
 
 def _unverified_to_factreview(c: CheckedReference) -> dict[str, Any]:
     return {
-        "severity": "unverified",
+        "severity": Severity.UNVERIFIED.value,
         "type": "unverified::no_match",
         "reference_title": _truncate(c.reference.title, 500),
         "reference_year": str(c.reference.year or ""),

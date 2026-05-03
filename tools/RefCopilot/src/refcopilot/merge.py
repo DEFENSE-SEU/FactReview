@@ -5,7 +5,6 @@ Field priority:
   - venue / publication_venue    → Semantic Scholar (carries the published venue).
   - DOI                          → Semantic Scholar; arXiv DOI as fallback.
   - arxiv_id / arxiv_versions / latest_arxiv_version / withdrawn → arXiv.
-  - s2_paper_id                  → Semantic Scholar.
 
 Each merged field's provenance (``Backend``) is recorded so callers can trace
 where a value came from.

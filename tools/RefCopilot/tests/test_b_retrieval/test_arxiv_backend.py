@@ -93,7 +93,7 @@ def test_search_by_title(tmp_path):
     )
     results = backend.search_by_title("Attention Is All You Need", year=2017)
     assert len(results) == 1
-    assert "1706.03762" in calls[0]["params"]["search_query"] or "Attention" in calls[0]["params"]["search_query"]
+    assert "Attention" in calls[0]["params"]["search_query"]
 
 
 def test_lookup_via_reference(tmp_path):
