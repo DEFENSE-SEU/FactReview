@@ -101,3 +101,8 @@ pytest
 
 The `pytest` configuration deselects `slow` tests by default. Run
 `pytest -m slow` to include them.
+
+## Acknowledgements
+
+We gratefully acknowledge [refchecker](https://github.com/markrussinovich/refchecker/issues)
+by Mark Russinovich, whose implementation and design informed parts of RefCopilot.
