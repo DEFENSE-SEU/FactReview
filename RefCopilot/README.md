@@ -104,5 +104,5 @@ The `pytest` configuration deselects `slow` tests by default. Run
 
 ## Acknowledgements
 
-We gratefully acknowledge [refchecker](https://github.com/markrussinovich/refchecker/issues)
+We gratefully acknowledge [refchecker](https://github.com/markrussinovich/refchecker)
 by Mark Russinovich, whose implementation and design informed parts of RefCopilot.
