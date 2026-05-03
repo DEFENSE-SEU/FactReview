@@ -1,10 +1,11 @@
 """Reference-checking adapter.
 
-Thin shim around RefCopilot (`tools/RefCopilot/`). The Markdown summary
-included in the final FactReview review lists only fabricated references
-(``severity == "error"``) so the appendix stays compact; warnings and
-unverified entries remain in ``reference_check.json`` and are shown in full
-when RefCopilot is invoked through its standalone CLI.
+Thin shim around RefCopilot (`RefCopilot/`). The Markdown summary included in
+the final FactReview review lists fabricated references (errors) and
+metadata-warning rows that carry an actionable BibTeX replacement, so users
+can paste the corrected entry directly into their bibliography. Unverified
+entries (no match on either backend) remain in ``reference_check.json`` only
+and surface through RefCopilot's standalone CLI.
 
 Usage (library)::
 
@@ -29,7 +30,7 @@ from pathlib import Path
 from typing import Any
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
-_REFCOPILOT_SRC = _REPO_ROOT / "tools" / "RefCopilot" / "src"
+_REFCOPILOT_SRC = _REPO_ROOT / "RefCopilot" / "src"
 
 if _REFCOPILOT_SRC.exists() and str(_REFCOPILOT_SRC) not in sys.path:
     sys.path.insert(0, str(_REFCOPILOT_SRC))
@@ -64,13 +65,14 @@ def check_references(
 def format_reference_check_markdown(result: dict[str, Any], *, max_issues: int = 20) -> str:
     """Render the Markdown summary embedded in the final FactReview report.
 
-    Errors only — the appendix is meant to flag fabricated citations rather
-    than every metadata nit. Reviewers who need the full breakdown can read
-    ``reference_check.json`` or run RefCopilot's standalone CLI.
+    Includes errors (fabricated references) and warnings, the latter rendered
+    with an inline corrected-BibTeX block (with data-source comments) so the
+    user can copy-paste a fix. Unverified entries are omitted from this
+    embedded summary; they remain in ``reference_check.json``.
     """
     from refcopilot.factreview import format_factreview_markdown  # type: ignore
 
-    return format_factreview_markdown(result, max_issues=max_issues)
+    return format_factreview_markdown(result, max_issues=max_issues, include_warnings=True)
 
 
 def _cli_main() -> int:

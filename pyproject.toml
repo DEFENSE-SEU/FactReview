@@ -64,8 +64,8 @@ positioning = [
 ]
 
 # ── fact_generation/refcheck (reference-accuracy validation) ─────────────────
-# Runtime dependencies of RefCopilot (tools/RefCopilot/), which the refcheck
-# stage imports via sys.path injection from src/fact_generation/refcheck/refcheck.py.
+# Runtime dependencies of RefCopilot (RefCopilot/), which the refcheck stage
+# imports via sys.path injection from src/fact_generation/refcheck/refcheck.py.
 refcheck = [
   "httpx>=0.27.0",
   "rapidfuzz>=3.5.0",
@@ -138,7 +138,7 @@ target-version = "py311"
 src = ["src", "tests"]
 extend-exclude = [
   "demos/*/execution/repo",
-  "tools",
+  "RefCopilot",
 ]
 
 [tool.ruff.lint]
@@ -181,7 +181,7 @@ warn_unused_ignores = true
 disallow_untyped_defs = false
 ignore_missing_imports = true
 exclude = [
-  "tools/",
+  "RefCopilot/",
 ]
 
 # ── Pytest ────────────────────────────────────────────────────────────────────

@@ -9,7 +9,8 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from refcopilot.models import Verdict
+from refcopilot.bibtex_suggest import suggest_bibtex
+from refcopilot.models import Severity, Verdict
 from refcopilot.pipeline import RefCopilotPipeline
 from refcopilot.report import to_factreview_dict
 
@@ -130,6 +131,11 @@ def _format_factreview_issue(issue: dict[str, Any], index: int) -> str:
     head = f"{index}. **{title}** (`{type_}`)"
     if details:
         head += f" — {details}"
+
+    suggested = (issue.get("corrected_bibtex") or "").strip()
+    if suggested:
+        head += "\n\n   Suggested replacement (data sources annotated as comments):\n"
+        head += "\n".join(f"   {line}" for line in ("```bibtex", *suggested.splitlines(), "```"))
     return head
 
 
@@ -165,5 +171,11 @@ def _write_text_report(report, path: Path) -> None:
             )
             if issue.suggestion:
                 lines.append(f"      Suggestion: {issue.suggestion}")
+        if any(i.severity == Severity.WARNING for i in c.issues) and c.merged is not None:
+            bibtex = suggest_bibtex(c.reference, c.merged)
+            if bibtex:
+                lines.append("")
+                lines.append("Suggested replacement:")
+                lines.extend(bibtex.splitlines())
         lines.append("")
     path.write_text("\n".join(lines), encoding="utf-8")

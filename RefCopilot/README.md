@@ -11,6 +11,11 @@ verifies it against arXiv and Semantic Scholar, emitting:
 - **Warnings** for incomplete references (missing DOI / arXiv ID / venue / year,
   truncated authors, abbreviated venue names).
 
+For each warning where a verified record is available, RefCopilot also emits
+a **corrected BibTeX entry** with a leading provenance comment listing which
+backend supplied each field (and its lookup URL) so reviewers can copy-paste
+a fix into their `.bib` file.
+
 Suspected hallucinations are rechecked by an LLM pass that downgrades
 recognisable non-academic citations (system cards, vendor blog posts, technical
 reports, dataset cards, standards, white papers) to a warning instead of a
@@ -21,7 +26,7 @@ hard error.
 From the FactReview workspace root:
 
 ```bash
-pip install -e "./tools/RefCopilot[dev]"
+pip install -e "./RefCopilot[dev]"
 ```
 
 RefCopilot reuses FactReview's LLM client (`src/llm/client.py`). LLM
@@ -72,10 +77,13 @@ from refcopilot.factreview import check_references, format_factreview_markdown
 ```
 
 `check_references()` returns the dict written to `reference_check.json`.
-`format_factreview_markdown()` renders the embedded Markdown summary that
-appears in the final review report — errors only by default, since the
-embedded summary is meant to flag fabrications. Pass `include_warnings=True`
-or `include_unverified=True` for a full listing.
+Each warning row's ``corrected_bibtex`` field carries the suggested
+replacement entry. `format_factreview_markdown()` renders the embedded
+Markdown summary that appears in the final review report — errors only by
+default, since the embedded summary is meant to flag fabrications. Pass
+`include_warnings=True` (used by FactReview's adapter) to surface warnings
+with their inline corrected-BibTeX block, or `include_unverified=True` to
+also list unmatched references.
 
 ## Configuration
 

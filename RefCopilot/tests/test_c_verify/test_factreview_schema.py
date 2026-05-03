@@ -8,6 +8,7 @@ from refcopilot.models import (
     ExternalRecord,
     Issue,
     IssueCategory,
+    MergedRecord,
     Reference,
     Report,
     ReportSummary,
@@ -80,9 +81,28 @@ def _sample_report() -> Report:
                         backend=Backend.SEMANTIC_SCHOLAR,
                         record_id="abc",
                         title="T",
-                        url="https://example.com",
+                        url="https://www.semanticscholar.org/paper/abc",
                     )
                 ],
+                merged=MergedRecord(
+                    title="T",
+                    authors=["A. B."],
+                    year=2020,
+                    doi="10.x/y",
+                    url="https://www.semanticscholar.org/paper/abc",
+                    provenance={
+                        "title": Backend.SEMANTIC_SCHOLAR,
+                        "doi": Backend.SEMANTIC_SCHOLAR,
+                    },
+                    sources=[
+                        ExternalRecord(
+                            backend=Backend.SEMANTIC_SCHOLAR,
+                            record_id="abc",
+                            title="T",
+                            url="https://www.semanticscholar.org/paper/abc",
+                        )
+                    ],
+                ),
                 issues=[issue_warn],
                 verdict=Verdict.WARNING,
             ),
@@ -120,6 +140,23 @@ def test_grouped_details_consistent():
 def test_dict_includes_report_file():
     payload = to_factreview_dict(_sample_report(), report_file="/tmp/x.txt")
     assert payload["report_file"] == "/tmp/x.txt"
+
+
+def test_warning_carries_corrected_bibtex():
+    payload = to_factreview_dict(_sample_report())
+    warning_rows = payload["warning_details"]
+    assert warning_rows, "expected at least one warning row in the sample report"
+    bibtex = warning_rows[0]["corrected_bibtex"]
+    assert bibtex, "warning rows with a verified merged record must carry a bibtex suggestion"
+    assert "@" in bibtex
+    assert "doi = {10.x/y}" in bibtex
+    assert "% Suggested by RefCopilot" in bibtex
+
+
+def test_error_does_not_carry_corrected_bibtex():
+    payload = to_factreview_dict(_sample_report())
+    for row in payload["error_details"]:
+        assert row["corrected_bibtex"] == ""
 
 
 def test_type_label_format():

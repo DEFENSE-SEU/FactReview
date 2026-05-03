@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from refcopilot.bibtex_suggest import suggest_bibtex
 from refcopilot.models import (
     CheckedReference,
     Issue,
@@ -68,6 +69,17 @@ def _format_checked_reference(c: CheckedReference, index: int) -> str:
             f"   - [{issue.severity.value}/{issue.category.value}/{issue.code}] {issue.message}"
             + (f"  _Suggestion: {issue.suggestion}_" if issue.suggestion else "")
         )
+
+    has_warning = any(i.severity == Severity.WARNING for i in c.issues)
+    if has_warning and c.merged is not None:
+        bibtex = suggest_bibtex(c.reference, c.merged)
+        if bibtex:
+            body.append("")
+            body.append("   Suggested replacement (data sources annotated as comments):")
+            body.append("   ```bibtex")
+            body.extend(f"   {line}" for line in bibtex.splitlines())
+            body.append("   ```")
+
     return head + "\n" + "\n".join(body) if body else head
 
 
@@ -123,6 +135,13 @@ def _issue_to_factreview(c: CheckedReference, issue: Issue) -> dict[str, Any]:
         f"{_CATEGORY_TO_TYPE.get(issue.category, issue.category.value)}::{issue.code}"
     )
 
+    # Only emit a suggested bibtex when the issue is fixable from verified
+    # metadata (i.e. warnings against a real, matched paper). Errors are
+    # fabricated references with nothing to "correct" toward.
+    suggested_bibtex = ""
+    if issue.severity == Severity.WARNING and c.merged is not None:
+        suggested_bibtex = suggest_bibtex(c.reference, c.merged)
+
     return {
         "severity": severity,
         "type": type_label,
@@ -133,7 +152,7 @@ def _issue_to_factreview(c: CheckedReference, issue: Issue) -> dict[str, Any]:
         "details": _truncate(issue.message + (f" ({issue.suggestion})" if issue.suggestion else ""), _MAX_TEXT),
         "raw_reference": _truncate(c.reference.raw, _MAX_TEXT),
         "corrected_plaintext": "",
-        "corrected_bibtex": "",
+        "corrected_bibtex": _truncate(suggested_bibtex, _MAX_TEXT),
         "corrected_bibitem": "",
     }
 

@@ -13,7 +13,7 @@ def test_refcheck_adapter_importable():
     assert callable(format_reference_check_markdown)
 
 
-_REFCOPILOT_SRC = Path(__file__).resolve().parents[4] / "tools" / "RefCopilot" / "src"
+_REFCOPILOT_SRC = Path(__file__).resolve().parents[4] / "RefCopilot" / "src"
 if str(_REFCOPILOT_SRC) not in sys.path:
     sys.path.insert(0, str(_REFCOPILOT_SRC))
 
@@ -62,8 +62,10 @@ def test_refcheck_empty_input_returns_failure_dict():
     assert result["error_message"]
 
 
-def test_format_reference_check_markdown_includes_only_errors():
-    """The FactReview-embedded summary lists fabricated references only."""
+def test_format_reference_check_markdown_renders_warnings_with_bibtex():
+    """The embedded summary now lists errors AND warnings; warnings carry a
+    corrected-BibTeX block so users can paste a fix straight into their .bib.
+    Unverified entries are still suppressed."""
     from fact_generation.refcheck.refcheck import format_reference_check_markdown
 
     result = {
@@ -71,7 +73,7 @@ def test_format_reference_check_markdown_includes_only_errors():
         "total_refs": 3,
         "errors": 1,
         "warnings": 1,
-        "unverified": 0,
+        "unverified": 1,
         "report_file": "/tmp/reference_check_details.txt",
         "issues": [
             {
@@ -80,12 +82,28 @@ def test_format_reference_check_markdown_includes_only_errors():
                 "reference_title": "Fake paper",
                 "details": "No matching paper found.",
                 "raw_reference": "[1] Fake paper. 2024.",
+                "corrected_bibtex": "",
             },
             {
                 "severity": "warning",
                 "type": "incomplete::missing_doi",
                 "reference_title": "Real paper",
                 "details": "Citation is missing a DOI.",
+                "corrected_bibtex": (
+                    "% Suggested by RefCopilot. Field provenance:\n"
+                    "%   semantic_scholar: doi — https://www.semanticscholar.org/paper/abc\n"
+                    "@article{realpaper2024,\n"
+                    "  title = {Real paper},\n"
+                    "  doi = {10.1/x},\n"
+                    "}"
+                ),
+            },
+            {
+                "severity": "unverified",
+                "type": "unverified::no_match",
+                "reference_title": "Mystery paper",
+                "details": "Could not verify reference.",
+                "corrected_bibtex": "",
             },
         ],
     }
@@ -95,9 +113,11 @@ def test_format_reference_check_markdown_includes_only_errors():
     assert "## Reference Check" in markdown
     assert "### Errors" in markdown
     assert "Fake paper" in markdown
-    # Warnings are intentionally suppressed in the embedded summary.
-    assert "### Warnings" not in markdown
-    assert "Real paper" not in markdown
+    assert "### Warnings" in markdown
+    assert "Real paper" in markdown
+    assert "```bibtex" in markdown
+    assert "Suggested by RefCopilot" in markdown
+    assert "Mystery paper" not in markdown
 
 
 def test_format_reference_check_markdown_handles_failure():
