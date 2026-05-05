@@ -47,7 +47,8 @@ def test_verifier_promotes_uncertain_to_unlikely(monkeypatch):
     rec = _record(title="Attention Is All You Need", authors=["A. Vaswani"])
 
     out = llm_verifier.verify(ref, [rec], initial=HallucinationVerdict.UNCERTAIN)
-    assert out == HallucinationVerdict.UNLIKELY
+    assert out.verdict == HallucinationVerdict.UNLIKELY
+    assert out.suggestion is None
 
 
 def test_verifier_can_keep_uncertain(monkeypatch):
@@ -55,7 +56,8 @@ def test_verifier_can_keep_uncertain(monkeypatch):
     monkeypatch.setattr(llm_verifier, "call_json", stub)
 
     out = llm_verifier.verify(_ref(title="x"), [], initial=HallucinationVerdict.UNCERTAIN)
-    assert out == HallucinationVerdict.UNCERTAIN
+    assert out.verdict == HallucinationVerdict.UNCERTAIN
+    assert out.suggestion is None
 
 
 def test_verifier_can_flip_likely_to_unlikely(monkeypatch):
@@ -63,7 +65,7 @@ def test_verifier_can_flip_likely_to_unlikely(monkeypatch):
     monkeypatch.setattr(llm_verifier, "call_json", stub)
 
     out = llm_verifier.verify(_ref(title="x"), [], initial=HallucinationVerdict.LIKELY)
-    assert out == HallucinationVerdict.UNLIKELY
+    assert out.verdict == HallucinationVerdict.UNLIKELY
 
 
 def test_verifier_skips_when_already_unlikely(monkeypatch):
@@ -72,7 +74,7 @@ def test_verifier_skips_when_already_unlikely(monkeypatch):
     monkeypatch.setattr(llm_verifier, "call_json", stub)
 
     out = llm_verifier.verify(_ref(title="x"), [], initial=HallucinationVerdict.UNLIKELY)
-    assert out == HallucinationVerdict.UNLIKELY
+    assert out.verdict == HallucinationVerdict.UNLIKELY
     assert stub.calls == []
 
 
@@ -81,7 +83,7 @@ def test_verifier_falls_back_on_error(monkeypatch):
     monkeypatch.setattr(llm_verifier, "call_json", stub)
 
     out = llm_verifier.verify(_ref(title="x"), [], initial=HallucinationVerdict.LIKELY)
-    assert out == HallucinationVerdict.LIKELY
+    assert out.verdict == HallucinationVerdict.LIKELY
 
 
 def test_verifier_falls_back_on_malformed_payload(monkeypatch):
@@ -89,4 +91,76 @@ def test_verifier_falls_back_on_malformed_payload(monkeypatch):
     monkeypatch.setattr(llm_verifier, "call_json", stub)
 
     out = llm_verifier.verify(_ref(title="x"), [], initial=HallucinationVerdict.UNCERTAIN)
-    assert out == HallucinationVerdict.UNCERTAIN
+    assert out.verdict == HallucinationVerdict.UNCERTAIN
+    assert out.suggestion is None
+
+
+def test_verifier_returns_suggestion_when_unlikely(monkeypatch):
+    """When the LLM declares the paper real, it may attach corrected metadata."""
+    stub = _StubLLM(
+        {
+            "verdict": "UNLIKELY",
+            "reason": "Real paper; cited title has a typo.",
+            "suggestion": {
+                "title": "MathArena: Evaluating LLMs on Uncontaminated Math Competitions",
+                "authors": ["Mislav Balunovic", "Jasper Dekoninck"],
+                "year": 2025,
+                "arxiv_id": "2505.23281",
+            },
+        }
+    )
+    monkeypatch.setattr(llm_verifier, "call_json", stub)
+
+    out = llm_verifier.verify(
+        _ref(title="Math-arena: Evaluating llms on uncontaminated math competitions"),
+        [],
+        initial=HallucinationVerdict.LIKELY,
+    )
+    assert out.verdict == HallucinationVerdict.UNLIKELY
+    assert out.suggestion is not None
+    assert out.suggestion.title.startswith("MathArena")
+    assert out.suggestion.arxiv_id == "2505.23281"
+
+
+def test_verifier_drops_suggestion_when_verdict_not_unlikely(monkeypatch):
+    """A suggestion is only meaningful alongside an UNLIKELY verdict."""
+    stub = _StubLLM(
+        {
+            "verdict": "LIKELY",
+            "reason": "Looks fabricated.",
+            "suggestion": {"title": "Some other paper"},
+        }
+    )
+    monkeypatch.setattr(llm_verifier, "call_json", stub)
+
+    out = llm_verifier.verify(_ref(title="x"), [], initial=HallucinationVerdict.LIKELY)
+    assert out.verdict == HallucinationVerdict.LIKELY
+    assert out.suggestion is None
+
+
+def test_verifier_drops_empty_suggestion(monkeypatch):
+    """Suggestion lacking any actionable identifier is discarded."""
+    stub = _StubLLM(
+        {
+            "verdict": "UNLIKELY",
+            "reason": "Real paper.",
+            "suggestion": {"authors": ["Anon"]},  # no title/arxiv_id/doi
+        }
+    )
+    monkeypatch.setattr(llm_verifier, "call_json", stub)
+
+    out = llm_verifier.verify(_ref(title="x"), [], initial=HallucinationVerdict.LIKELY)
+    assert out.verdict == HallucinationVerdict.UNLIKELY
+    assert out.suggestion is None
+
+
+def test_verifier_drops_malformed_suggestion(monkeypatch):
+    """Suggestion that isn't a dict is ignored."""
+    stub = _StubLLM(
+        {"verdict": "UNLIKELY", "reason": "Real.", "suggestion": "not a dict"}
+    )
+    monkeypatch.setattr(llm_verifier, "call_json", stub)
+
+    out = llm_verifier.verify(_ref(title="x"), [], initial=HallucinationVerdict.LIKELY)
+    assert out.verdict == HallucinationVerdict.UNLIKELY
+    assert out.suggestion is None

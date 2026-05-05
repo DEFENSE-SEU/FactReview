@@ -102,3 +102,51 @@ def test_merge_propagates_arxiv_versioning():
 def test_merge_propagates_withdrawn():
     merged = merge_records([_arxiv_record(withdrawn=True), _s2_record()])
     assert merged.withdrawn is True
+
+
+def _openreview_record(**kw):
+    defaults = dict(
+        backend=Backend.OPENREVIEW,
+        record_id="BeFjjyzWOJ",
+        title="A Technical Report on Erasing the Invisible (OR title)",
+        authors=["Mucong Ding", "Bang An"],
+        year=2025,
+        venue="NeurIPS 2025 Datasets and Benchmarks Track poster",
+        publication_venue="NeurIPS 2025 Datasets and Benchmarks Track poster",
+        journal=None,
+        doi=None,
+        arxiv_id=None,
+        url="https://openreview.net/forum?id=BeFjjyzWOJ",
+    )
+    defaults.update(kw)
+    return ExternalRecord(**defaults)
+
+
+def test_merge_openreview_only_supplies_metadata():
+    """When the paper is OpenReview-exclusive, all fields come from there."""
+    merged = merge_records([_openreview_record()])
+    assert merged is not None
+    assert "Erasing the Invisible" in merged.title
+    assert merged.authors == ["Mucong Ding", "Bang An"]
+    assert merged.year == 2025
+    assert merged.venue == "NeurIPS 2025 Datasets and Benchmarks Track poster"
+    assert merged.url == "https://openreview.net/forum?id=BeFjjyzWOJ"
+    assert merged.provenance["title"] == Backend.OPENREVIEW
+    assert merged.provenance["authors"] == Backend.OPENREVIEW
+    assert merged.provenance["venue"] == Backend.OPENREVIEW
+
+
+def test_merge_arxiv_outranks_openreview():
+    """When all three backends respond, arXiv stays authoritative for title/authors."""
+    merged = merge_records([_arxiv_record(), _s2_record(), _openreview_record()])
+    assert merged.provenance["title"] == Backend.ARXIV
+    assert merged.provenance["authors"] == Backend.ARXIV
+    # Venue stays with S2 (the canonical published venue).
+    assert merged.provenance["venue"] == Backend.SEMANTIC_SCHOLAR
+
+
+def test_merge_openreview_fills_venue_when_others_missing():
+    """When arXiv has no venue and S2 is absent, OpenReview's venue wins."""
+    merged = merge_records([_arxiv_record(), _openreview_record()])
+    assert merged.venue == "NeurIPS 2025 Datasets and Benchmarks Track poster"
+    assert merged.provenance["venue"] == Backend.OPENREVIEW

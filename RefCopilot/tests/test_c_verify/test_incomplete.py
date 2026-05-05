@@ -90,3 +90,46 @@ def test_doi_already_present_no_warning():
 
 def test_no_merged_returns_empty():
     assert detect(_ref(title="x"), None) == []
+
+
+# ---------------------------------------------------------------------------
+# canonical_title_mismatch — fires when cited title is a typo of the canonical title
+# ---------------------------------------------------------------------------
+
+
+def test_canonical_title_mismatch_fires_for_typo():
+    ref = _ref(
+        title="Math-arena: Evaluating llms on uncontaminated math competitions",
+        authors=["Mislav Balunovic", "Jasper Dekoninck"],
+    )
+    merged = _merged(
+        title="MathArena: Evaluating LLMs on Uncontaminated Math Competitions",
+        authors=["Mislav Balunovic", "Jasper Dekoninck", "Ivo Petrov"],
+    )
+    issues = detect(ref, merged)
+    codes = {i.code for i in issues}
+    assert "canonical_title_mismatch" in codes
+    issue = next(i for i in issues if i.code == "canonical_title_mismatch")
+    assert issue.suggestion and "MathArena" in issue.suggestion
+
+
+def test_canonical_title_mismatch_silent_when_normalized_titles_equal():
+    """Differences only in case/punctuation that the normalizer collapses must not fire."""
+    ref = _ref(
+        title="ATTENTION IS ALL YOU NEED!!!",
+        authors=["A. Vaswani"],
+    )
+    merged = _merged(
+        title="Attention is all you need",
+        authors=["A. Vaswani"],
+    )
+    codes = {i.code for i in detect(ref, merged)}
+    assert "canonical_title_mismatch" not in codes
+
+
+def test_canonical_title_mismatch_silent_without_author_overlap():
+    """Same title spelled differently is not enough — must also share authors."""
+    ref = _ref(title="Math-arena", authors=["Random Person"])
+    merged = _merged(title="MathArena", authors=["Mislav Balunovic"])
+    codes = {i.code for i in detect(ref, merged)}
+    assert "canonical_title_mismatch" not in codes

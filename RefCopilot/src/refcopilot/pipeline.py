@@ -35,6 +35,7 @@ from refcopilot.models import (
     Verdict,
 )
 from refcopilot.search.arxiv import ArxivBackend
+from refcopilot.search.openreview import OpenReviewBackend
 from refcopilot.search.semantic_scholar import SemanticScholarBackend
 from refcopilot.verify import completeness as completeness_verify
 from refcopilot.verify import hallucination as hallu_verify
@@ -59,6 +60,7 @@ class RefCopilotPipeline:
         s2_base_url: str | None = None,
         arxiv_backend: ArxivBackend | None = None,
         s2_backend: SemanticScholarBackend | None = None,
+        openreview_backend: OpenReviewBackend | None = None,
         use_llm_verify: bool = True,
         max_workers: int = 4,
     ) -> None:
@@ -73,6 +75,7 @@ class RefCopilotPipeline:
             base_url=(s2_base_url or "https://api.semanticscholar.org/graph/v1"),
             cache=self.cache,
         )
+        self.openreview = openreview_backend or OpenReviewBackend(cache=self.cache)
         self.use_llm_verify = use_llm_verify
         self.max_workers = max(1, int(max_workers))
 
@@ -145,12 +148,61 @@ class RefCopilotPipeline:
     def _check_one(self, ref: Reference) -> CheckedReference:
         arxiv_records = _safe_lookup(self.arxiv, ref, "arxiv")
         s2_records = _safe_lookup(self.s2, ref, "semantic_scholar")
-        matches = list(arxiv_records) + list(s2_records)
+        openreview_records = _safe_lookup(self.openreview, ref, "openreview")
+        matches = list(arxiv_records) + list(s2_records) + list(openreview_records)
         merged = merge_records(matches) if matches else None
 
-        verdict = hallu_verify.pre_screen(ref, matches, merged)
+        initial_arxiv_count = len(arxiv_records)
+        initial_s2_count = len(s2_records)
+        initial_openreview_count = len(openreview_records)
+
+        pre_verdict = hallu_verify.pre_screen(ref, matches, merged)
+        verdict = pre_verdict
+        llm_verdict: HallucinationVerdict | None = None
+        suggestion: llm_verifier.LLMSuggestion | None = None
+        retry_arxiv_count: int | None = None
+        retry_s2_count: int | None = None
+        retry_openreview_count: int | None = None
+        retry_used = False
+
         if self.use_llm_verify and verdict != HallucinationVerdict.UNLIKELY:
-            verdict = llm_verifier.verify(ref, matches, initial=verdict)
+            llm_result = llm_verifier.verify(ref, matches, initial=verdict)
+            llm_verdict = llm_result.verdict
+            verdict = llm_result.verdict
+            suggestion = llm_result.suggestion
+
+        # Second-chance lookup: when LLM thinks the cited paper is real but we
+        # haven't found anything yet, re-run backends with the LLM-suggested
+        # canonical metadata. Single retry, no recursion: we don't call the
+        # LLM verifier again on the new matches.
+        if (
+            self.use_llm_verify
+            and not matches
+            and verdict == HallucinationVerdict.UNLIKELY
+            and suggestion is not None
+        ):
+            synth_ref = _build_synth_reference(ref, suggestion)
+            if synth_ref is not None:
+                retry_used = True
+                retry_arxiv = _safe_lookup(self.arxiv, synth_ref, "arxiv (retry)")
+                retry_s2 = _safe_lookup(self.s2, synth_ref, "semantic_scholar (retry)")
+                retry_openreview = _safe_lookup(
+                    self.openreview, synth_ref, "openreview (retry)"
+                )
+                retry_arxiv_count = len(retry_arxiv)
+                retry_s2_count = len(retry_s2)
+                retry_openreview_count = len(retry_openreview)
+                new_matches = (
+                    list(retry_arxiv) + list(retry_s2) + list(retry_openreview)
+                )
+                if new_matches:
+                    matches = new_matches
+                    merged = merge_records(matches)
+                    # Re-evaluate the heuristic against the new evidence.
+                    # We deliberately skip llm_verifier on the retry path —
+                    # the LLM already gave its opinion and we don't want to
+                    # spend another call (or risk drifting).
+                    verdict = hallu_verify.pre_screen(ref, matches, merged)
 
         issues: list[Issue] = []
         fake_issue = hallu_verify.to_issue(verdict, ref, matches)
@@ -170,11 +222,24 @@ class RefCopilotPipeline:
             issues.extend(completeness_verify.detect(ref, merged))
 
         final = _verdict_from_issues(issues, has_match=merged is not None)
+        trace = _build_verification_trace(
+            arxiv_count=initial_arxiv_count,
+            s2_count=initial_s2_count,
+            openreview_count=initial_openreview_count,
+            pre_verdict=pre_verdict,
+            llm_verdict=llm_verdict,
+            suggestion=suggestion,
+            retry_used=retry_used,
+            retry_arxiv_count=retry_arxiv_count,
+            retry_s2_count=retry_s2_count,
+            retry_openreview_count=retry_openreview_count,
+        )
         return CheckedReference(
             reference=ref,
             matches=matches,
             merged=merged,
             hallucination_verdict=verdict,
+            verification_trace=trace,
             issues=issues,
             verdict=final,
         )
@@ -232,3 +297,74 @@ def _verdict_from_issues(issues: list[Issue], *, has_match: bool) -> Verdict:
     if not has_match:
         return Verdict.UNVERIFIED
     return Verdict.VALID
+
+
+def _build_synth_reference(
+    ref: Reference, suggestion: llm_verifier.LLMSuggestion
+) -> Reference | None:
+    """Merge an LLM suggestion onto the original Reference for a re-lookup.
+
+    Only fields the LLM filled in override the original. Returns ``None`` if
+    the resulting reference would be identical to the input (no point in
+    re-running the same query).
+    """
+    new_title = suggestion.title or ref.title
+    new_authors = suggestion.authors if suggestion.authors else ref.authors
+    new_year = suggestion.year if suggestion.year is not None else ref.year
+    new_arxiv_id = suggestion.arxiv_id or ref.arxiv_id
+    new_doi = suggestion.doi or ref.doi
+
+    if (
+        new_title == ref.title
+        and new_authors == ref.authors
+        and new_year == ref.year
+        and new_arxiv_id == ref.arxiv_id
+        and new_doi == ref.doi
+    ):
+        return None
+
+    return Reference(
+        raw=ref.raw,
+        source_format=ref.source_format,
+        bibkey=ref.bibkey,
+        title=new_title,
+        authors=new_authors,
+        year=new_year,
+        venue=ref.venue,
+        doi=new_doi,
+        arxiv_id=new_arxiv_id,
+        arxiv_version=ref.arxiv_version,
+        url=ref.url,
+    )
+
+
+def _build_verification_trace(
+    *,
+    arxiv_count: int,
+    s2_count: int,
+    openreview_count: int,
+    pre_verdict: HallucinationVerdict,
+    llm_verdict: HallucinationVerdict | None,
+    suggestion: llm_verifier.LLMSuggestion | None,
+    retry_used: bool,
+    retry_arxiv_count: int | None,
+    retry_s2_count: int | None,
+    retry_openreview_count: int | None,
+) -> str:
+    """Single-line summary of which sources were tried and what they said."""
+    parts = [
+        f"arXiv: {arxiv_count}",
+        f"S2: {s2_count}",
+        f"OpenReview: {openreview_count}",
+        f"pre-screen: {pre_verdict.value}",
+    ]
+    if llm_verdict is not None and llm_verdict != pre_verdict:
+        parts.append(f"LLM: {llm_verdict.value}")
+    if retry_used:
+        suggested_title = (suggestion.title if suggestion else None) or "(no title)"
+        title_short = suggested_title if len(suggested_title) <= 80 else suggested_title[:77] + "..."
+        parts.append(
+            f"retry with LLM suggestion '{title_short}' → arXiv: {retry_arxiv_count}, "
+            f"S2: {retry_s2_count}, OpenReview: {retry_openreview_count}"
+        )
+    return "; ".join(parts)

@@ -18,6 +18,8 @@ import httpx
 from refcopilot.cache.disk_cache import DiskCache
 from refcopilot.models import Backend, ExternalRecord, Reference
 from refcopilot.ratelimit.arxiv import ArxivRateLimiter
+from refcopilot.verify.text_match import _normalize_for_match, _STOPWORDS, title_similarity
+from refcopilot.verify.thresholds import SEARCH_RESULT_MIN_TITLE_SIM
 
 logger = logging.getLogger(__name__)
 
@@ -67,39 +69,55 @@ class ArxivBackend:
 
     def lookup_by_id(self, arxiv_id: str) -> ExternalRecord | None:
         clean_id = re.sub(r"v\d+$", "", str(arxiv_id), flags=re.IGNORECASE).strip()
-        cache_key = f"id_{clean_id}"
-        if self.cache:
-            cached = self.cache.get_api(self.name, cache_key)
-            if cached is not None:
-                return ExternalRecord(**cached)
-
-        params = {"id_list": clean_id, "max_results": "1"}
-        feed = self._call_api(params)
-        records = _parse_feed(feed)
-        if not records:
+        feed = self._cached_or_fetch(
+            f"id_{clean_id}", {"id_list": clean_id, "max_results": "1"}
+        )
+        if not feed:
             return None
-        record = records[0]
-        if self.cache:
-            self.cache.set_api(self.name, cache_key, record.model_dump())
-        return record
+        records = _parse_feed(feed)
+        return records[0] if records else None
 
     def search_by_title(self, title: str, *, year: int | None = None, max_results: int = 5) -> list[ExternalRecord]:
         clean = re.sub(r"\s+", " ", title.strip())
         cache_key = f"title_{clean[:80]}_{year or ''}"
-        if self.cache:
-            cached = self.cache.get_api(self.name, cache_key)
-            if cached is not None:
-                return [ExternalRecord(**r) for r in cached]
-
-        query = f'ti:"{clean}"'
+        query = _build_title_query(clean)
         if year:
             query += f' AND submittedDate:[{year}01010000 TO {year}12312359]'
-        params = {"search_query": query, "max_results": str(max_results)}
-        feed = self._call_api(params)
+        feed = self._cached_or_fetch(
+            cache_key, {"search_query": query, "max_results": str(max_results)}
+        )
+        if not feed:
+            return []
         records = _parse_feed(feed)
+        # Token-AND queries can still surface papers that share all tokens
+        # but aren't the cited work (especially for short/generic titles).
+        # Apply the gate at READ time so threshold changes don't invalidate
+        # the cache.
+        return [
+            r for r in records
+            if title_similarity(clean, r.title) >= SEARCH_RESULT_MIN_TITLE_SIM
+        ]
+
+    def _cached_or_fetch(self, cache_key: str, params: dict[str, str]) -> str:
+        """Return raw Atom XML for *params* — cache hit or fresh fetch.
+
+        Stores the unmodified API response so changes to parsing/filtering
+        logic never need cache invalidation. Empty string is returned for
+        confirmed-empty (no entries — which we cache) and for transient
+        network/HTTP failures (which we don't cache).
+        """
         if self.cache:
-            self.cache.set_api(self.name, cache_key, [r.model_dump() for r in records])
-        return records
+            cached = self.cache.get_api(self.name, cache_key)
+            if cached is not None and isinstance(cached, dict):
+                return cached.get("xml", "")
+        try:
+            xml = self._call_api(params)
+        except RuntimeError as exc:
+            logger.warning("arxiv api failed (%s); not caching", exc)
+            return ""
+        if self.cache:
+            self.cache.set_api(self.name, cache_key, {"xml": xml})
+        return xml
 
     def _call_api(self, params: dict[str, str]) -> str:
         self.rate_limiter.acquire()
@@ -110,6 +128,36 @@ class ArxivBackend:
         if resp.status_code != 200:
             raise RuntimeError(f"arxiv api returned {resp.status_code}")
         return resp.text
+
+
+_MAX_TITLE_TOKENS = 6
+
+
+def _build_title_query(title: str) -> str:
+    """Build an arXiv ``ti:`` query from informative tokens of *title*.
+
+    The previous exact-quoted form (``ti:"<full title>"``) was too brittle —
+    any punctuation/casing drift between the cited title and the canonical
+    title (e.g. ``Math-arena`` vs ``MathArena``) returned 0 hits. AND-ing
+    a handful of content tokens is far more tolerant while still being
+    specific enough to keep recall narrow.
+    """
+    normalized = _normalize_for_match(title)
+    tokens: list[str] = []
+    seen: set[str] = set()
+    for tok in normalized.split():
+        if len(tok) <= 1 or tok in _STOPWORDS or tok in seen:
+            continue
+        tokens.append(tok)
+        seen.add(tok)
+        if len(tokens) >= _MAX_TITLE_TOKENS:
+            break
+
+    if len(tokens) < 2:
+        # Not enough informative tokens — fall back to the safer quoted form.
+        return f'ti:"{title}"'
+
+    return " AND ".join(f"ti:{tok}" for tok in tokens)
 
 
 def _parse_feed(xml_text: str) -> list[ExternalRecord]:

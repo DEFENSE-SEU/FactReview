@@ -80,6 +80,9 @@ def _format_checked_reference(c: CheckedReference, index: int) -> str:
             body.extend(f"   {line}" for line in bibtex.splitlines())
             body.append("   ```")
 
+    if c.verdict == Verdict.UNVERIFIED and c.verification_trace:
+        body.append(f"   _Verification trace: {c.verification_trace}_")
+
     return head + "\n" + "\n".join(body) if body else head
 
 
@@ -158,6 +161,10 @@ def _issue_to_factreview(c: CheckedReference, issue: Issue) -> dict[str, Any]:
 
 
 def _unverified_to_factreview(c: CheckedReference) -> dict[str, Any]:
+    details = (
+        c.verification_trace
+        or "Could not verify reference (no records found on arXiv or Semantic Scholar)."
+    )
     return {
         "severity": Severity.UNVERIFIED.value,
         "type": "unverified::no_match",
@@ -165,7 +172,7 @@ def _unverified_to_factreview(c: CheckedReference) -> dict[str, Any]:
         "reference_year": str(c.reference.year or ""),
         "cited_url": _truncate(c.reference.url or "", 1000),
         "verified_url": "",
-        "details": "Could not verify reference (no records found on arXiv or Semantic Scholar).",
+        "details": _truncate(details, _MAX_TEXT),
         "raw_reference": _truncate(c.reference.raw, _MAX_TEXT),
         "corrected_plaintext": "",
         "corrected_bibtex": "",

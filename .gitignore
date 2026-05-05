@@ -46,3 +46,6 @@ compare/
 
 # Local uv state (prefer committing uv.lock instead)
 .uv/
+
+# RefCopilot smoke-test output dirs (refcopilot-out, refcopilot-out-or-v3, etc.)
+refcopilot-out*/

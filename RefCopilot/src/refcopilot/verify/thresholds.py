@@ -9,6 +9,21 @@ AUTHOR_FAKE_THRESHOLD = 0.10
 TITLE_SIMILARITY_THRESHOLD = 0.75
 TITLE_FAKE_THRESHOLD = 0.25
 
+# Lower bound for the "real paper, but cited title differs from canonical"
+# warning. Set below TITLE_SIMILARITY_THRESHOLD so it covers the whole
+# matched-but-typo range; the check additionally requires author overlap.
+TITLE_MISMATCH_MIN_SIM = 0.50
+
+# Backends rank title searches by relevance, so unrelated papers that share
+# a few topic words (or even none, when authors prompt-engineer the cited
+# title) can rank near the top — Semantic Scholar's relevance fallback and
+# OpenReview's /notes/search both exhibit this. Drop candidates whose title
+# shares too few content tokens with the query before they reach the merger.
+# Tuned to keep typo / casing variants (Math-arena → MathArena ≈ 0.80) while
+# dropping topical-overlap-only noise (workshop title vs unrelated paper
+# that shares one topic word, ≤ 0.36).
+SEARCH_RESULT_MIN_TITLE_SIM = 0.40
+
 # Cap on author-list comparison so a long author list does not dominate scoring.
 MAX_AUTHORS_TO_COMPARE = 10
 

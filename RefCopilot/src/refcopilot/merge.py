@@ -1,10 +1,11 @@
 """Merge :class:`ExternalRecord` results from multiple backends into one :class:`MergedRecord`.
 
-Field priority:
-  - title / authors / year       → arXiv (more authoritative for arXiv-cited papers).
-  - venue / publication_venue    → Semantic Scholar (carries the published venue).
-  - DOI                          → Semantic Scholar; arXiv DOI as fallback.
-  - arxiv_id / arxiv_versions / latest_arxiv_version / withdrawn → arXiv.
+Field priority (first non-empty wins):
+  - title / authors / year       → arXiv > S2 > OpenReview.
+  - venue / publication_venue    → Semantic Scholar > arXiv > OpenReview.
+  - DOI                          → Semantic Scholar > arXiv (OpenReview rarely has it).
+  - arxiv_id / arxiv_versions / latest_arxiv_version / withdrawn → arXiv > S2.
+  - URL                          → arXiv > S2 > OpenReview.
 
 Each merged field's provenance (``Backend``) is recorded so callers can trace
 where a value came from.
@@ -21,12 +22,13 @@ def merge_records(records: list[ExternalRecord]) -> MergedRecord | None:
 
     arxiv = next((r for r in records if r.backend == Backend.ARXIV), None)
     s2 = next((r for r in records if r.backend == Backend.SEMANTIC_SCHOLAR), None)
+    openreview = next((r for r in records if r.backend == Backend.OPENREVIEW), None)
 
     provenance: dict[str, Backend] = {}
 
-    title, prov_title = _pick("title", arxiv, s2, default="")
-    authors, prov_authors = _pick_list("authors", arxiv, s2)
-    year, prov_year = _pick("year", arxiv, s2)
+    title, prov_title = _pick("title", arxiv, s2, openreview, default="")
+    authors, prov_authors = _pick_list("authors", arxiv, s2, openreview)
+    year, prov_year = _pick("year", arxiv, s2, openreview)
     if title:
         provenance["title"] = prov_title
     if authors:
@@ -36,14 +38,18 @@ def merge_records(records: list[ExternalRecord]) -> MergedRecord | None:
 
     venue: str | None = None
     venue_source: Backend | None = None
-    if s2:
-        venue = s2.publication_venue or s2.venue or s2.journal
-        if venue:
-            venue_source = Backend.SEMANTIC_SCHOLAR
-    if not venue and arxiv:
-        venue = arxiv.publication_venue or arxiv.venue or arxiv.journal
-        if venue:
-            venue_source = Backend.ARXIV
+    for source, backend in (
+        (s2, Backend.SEMANTIC_SCHOLAR),
+        (arxiv, Backend.ARXIV),
+        (openreview, Backend.OPENREVIEW),
+    ):
+        if source is None:
+            continue
+        candidate = source.publication_venue or source.venue or source.journal
+        if candidate:
+            venue = candidate
+            venue_source = backend
+            break
     if venue and venue_source:
         provenance["venue"] = venue_source
 
@@ -71,10 +77,10 @@ def merge_records(records: list[ExternalRecord]) -> MergedRecord | None:
         provenance["arxiv_id"] = Backend.SEMANTIC_SCHOLAR
 
     url = ""
-    if arxiv and arxiv.url:
-        url = arxiv.url
-    elif s2 and s2.url:
-        url = s2.url
+    for source in (arxiv, s2, openreview):
+        if source is not None and source.url:
+            url = source.url
+            break
 
     return MergedRecord(
         title=title or "",
@@ -92,25 +98,41 @@ def merge_records(records: list[ExternalRecord]) -> MergedRecord | None:
     )
 
 
-def _pick(field: str, arxiv: ExternalRecord | None, s2: ExternalRecord | None, *, default=None):
-    if arxiv:
-        v = getattr(arxiv, field)
+def _pick(
+    field: str,
+    arxiv: ExternalRecord | None,
+    s2: ExternalRecord | None,
+    openreview: ExternalRecord | None,
+    *,
+    default=None,
+):
+    for source, backend in (
+        (arxiv, Backend.ARXIV),
+        (s2, Backend.SEMANTIC_SCHOLAR),
+        (openreview, Backend.OPENREVIEW),
+    ):
+        if source is None:
+            continue
+        v = getattr(source, field)
         if v not in (None, "", []):
-            return v, Backend.ARXIV
-    if s2:
-        v = getattr(s2, field)
-        if v not in (None, "", []):
-            return v, Backend.SEMANTIC_SCHOLAR
+            return v, backend
     return default, Backend.ARXIV  # provenance is meaningless when value is empty
 
 
-def _pick_list(field: str, arxiv: ExternalRecord | None, s2: ExternalRecord | None):
-    if arxiv:
-        v = getattr(arxiv, field) or []
+def _pick_list(
+    field: str,
+    arxiv: ExternalRecord | None,
+    s2: ExternalRecord | None,
+    openreview: ExternalRecord | None,
+):
+    for source, backend in (
+        (arxiv, Backend.ARXIV),
+        (s2, Backend.SEMANTIC_SCHOLAR),
+        (openreview, Backend.OPENREVIEW),
+    ):
+        if source is None:
+            continue
+        v = getattr(source, field) or []
         if v:
-            return list(v), Backend.ARXIV
-    if s2:
-        v = getattr(s2, field) or []
-        if v:
-            return list(v), Backend.SEMANTIC_SCHOLAR
+            return list(v), backend
     return [], Backend.ARXIV

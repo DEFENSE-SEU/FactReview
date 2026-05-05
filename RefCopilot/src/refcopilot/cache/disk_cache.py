@@ -7,6 +7,11 @@ Cache key construction:
   - other (e.g. raw text)              → spec_<sha256[:16]>/
 
 API call results land under <root>/api_cache/<source>/<key>.json.
+
+Each backend stores RAW API responses (not pre-filtered records) so that
+changes to filtering/parsing logic never require cache invalidation. The
+on-disk format is bumped via ``API_CACHE_VERSION`` only when the API
+response shape itself changes — old caches are auto-wiped on first use.
 """
 
 from __future__ import annotations
@@ -15,6 +20,7 @@ import hashlib
 import json
 import logging
 import re
+import shutil
 import time
 from pathlib import Path
 from typing import Any
@@ -23,6 +29,11 @@ logger = logging.getLogger(__name__)
 
 
 _DEFAULT_TTL_DAYS = 30
+
+# Bumped only when the SHAPE of cached API payloads changes (e.g. switching
+# from caching pre-filtered records to caching raw responses). Read/parse
+# logic changes don't need a bump — they re-derive from the raw payload.
+API_CACHE_VERSION = 2
 
 
 def cache_key_for_paper(spec: str) -> str:
@@ -63,6 +74,8 @@ class DiskCache:
         self.root = Path(root).expanduser()
         self.ttl_seconds = max(0, int(ttl_days)) * 86400
         self.enabled = enabled
+        if self.enabled:
+            self._ensure_compatible_api_cache()
 
     def paper_dir(self, spec: str) -> Path:
         d = self.root / cache_key_for_paper(spec)
@@ -90,6 +103,46 @@ class DiskCache:
         path = self._api_path(source, key)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(value, ensure_ascii=False), encoding="utf-8")
+
+    def _ensure_compatible_api_cache(self) -> None:
+        """Wipe ``api_cache/`` if its on-disk format version doesn't match.
+
+        The marker file ``api_cache/.version`` holds the integer version that
+        wrote the surrounding files. When it disagrees with the current
+        ``API_CACHE_VERSION``, every cached entry is from an incompatible
+        format (e.g. pre-filtered records vs raw payloads) and we wipe the
+        directory so the next call refetches into the new format.
+        """
+        api_dir = self.root / "api_cache"
+        marker = api_dir / ".version"
+        if not api_dir.exists():
+            api_dir.mkdir(parents=True, exist_ok=True)
+            marker.write_text(str(API_CACHE_VERSION))
+            return
+        existing: int | None = None
+        if marker.exists():
+            try:
+                existing = int(marker.read_text().strip())
+            except (OSError, ValueError):
+                existing = None
+        if existing == API_CACHE_VERSION:
+            return
+        for child in api_dir.iterdir():
+            if child.name == ".version":
+                continue
+            try:
+                if child.is_dir():
+                    shutil.rmtree(child)
+                else:
+                    child.unlink()
+            except OSError as exc:
+                logger.debug("could not remove stale cache entry %s: %s", child, exc)
+        marker.write_text(str(API_CACHE_VERSION))
+        logger.info(
+            "wiped api_cache/ (was version %s, now version %s)",
+            existing,
+            API_CACHE_VERSION,
+        )
 
     def _api_path(self, source: str, key: str) -> Path:
         safe_key = re.sub(r"[^A-Za-z0-9._-]+", "_", key)

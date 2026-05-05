@@ -74,3 +74,48 @@ def test_paper_dir_creates(tmp_path):
     d = c.paper_dir("arxiv:1706.03762")
     assert d.exists()
     assert d.name == "arxiv_1706.03762"
+
+
+def test_api_cache_writes_version_marker(tmp_path):
+    """First-time use should drop a ``.version`` marker into ``api_cache/``
+    so a future on-disk format change can detect and wipe stale entries."""
+    from refcopilot.cache.disk_cache import API_CACHE_VERSION
+
+    DiskCache(tmp_path)
+    marker = tmp_path / "api_cache" / ".version"
+    assert marker.exists()
+    assert marker.read_text().strip() == str(API_CACHE_VERSION)
+
+
+def test_api_cache_wipes_on_version_mismatch(tmp_path):
+    """When the on-disk version disagrees with the running code's version,
+    every cache entry is from an incompatible format and must be wiped."""
+    from refcopilot.cache.disk_cache import API_CACHE_VERSION
+
+    # Pretend we have an old cache from a previous version.
+    api_dir = tmp_path / "api_cache"
+    (api_dir / "arxiv").mkdir(parents=True)
+    stale = api_dir / "arxiv" / "id_old.json"
+    stale.write_text('{"this": "is the old format"}')
+    (api_dir / ".version").write_text(str(API_CACHE_VERSION - 1))
+
+    DiskCache(tmp_path)  # must wipe on init
+
+    assert not stale.exists()
+    # Marker has been rewritten to the current version.
+    assert (api_dir / ".version").read_text().strip() == str(API_CACHE_VERSION)
+
+
+def test_api_cache_preserves_when_version_matches(tmp_path):
+    """Same-version cache entries survive the compatibility check."""
+    from refcopilot.cache.disk_cache import API_CACHE_VERSION
+
+    DiskCache(tmp_path)  # writes the marker
+    c = DiskCache(tmp_path)
+    c.set_api("arxiv", "id_keep", {"x": 1})
+
+    DiskCache(tmp_path)  # fresh handle, same version → must NOT wipe
+    assert c.get_api("arxiv", "id_keep") == {"x": 1}
+    assert (tmp_path / "api_cache" / ".version").read_text().strip() == str(
+        API_CACHE_VERSION
+    )

@@ -13,7 +13,12 @@ from refcopilot.models import (
     Reference,
     Severity,
 )
-from refcopilot.verify.thresholds import ET_AL_VARIANTS
+from refcopilot.verify.text_match import (
+    _normalize_for_match,
+    author_overlap,
+    title_similarity,
+)
+from refcopilot.verify.thresholds import ET_AL_VARIANTS, TITLE_MISMATCH_MIN_SIM
 
 
 def detect(reference: Reference, merged: MergedRecord | None) -> list[Issue]:
@@ -101,7 +106,49 @@ def detect(reference: Reference, merged: MergedRecord | None) -> list[Issue]:
             )
         )
 
+    title_issue = _check_canonical_title(reference, merged)
+    if title_issue is not None:
+        issues.append(title_issue)
+
     return issues
+
+
+def _check_canonical_title(reference: Reference, merged: MergedRecord) -> Issue | None:
+    """Warn when the cited title clearly refers to ``merged`` but spells it differently.
+
+    Fires when a backend record was matched (so we know the paper is real) and
+    the cited title differs from the canonical one by more than just casing /
+    punctuation that the normalizer already collapses. Examples:
+    ``Math-arena`` vs ``MathArena``, ``LLMs`` vs ``Large Language Models`` in
+    a subtitle, etc. Requires non-trivial author overlap to avoid flagging
+    same-titled-but-different-paper coincidences.
+    """
+    cited = reference.title or ""
+    canonical = merged.title or ""
+    if not cited.strip() or not canonical.strip():
+        return None
+    if _normalize_for_match(cited) == _normalize_for_match(canonical):
+        return None
+
+    sim = title_similarity(cited, canonical)
+    if sim < TITLE_MISMATCH_MIN_SIM:
+        return None
+
+    overlap = author_overlap(reference.authors, merged.authors)
+    if overlap < 0.5:
+        return None
+
+    return Issue(
+        severity=Severity.WARNING,
+        category=IssueCategory.INCOMPLETE,
+        code="canonical_title_mismatch",
+        message=(
+            f"Cited title differs from the canonical record "
+            f"(similarity {sim:.2f})."
+        ),
+        suggestion=f"Use canonical title: {canonical}",
+        confidence=0.75,
+    )
 
 
 def _is_et_al(value: str) -> bool:

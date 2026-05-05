@@ -66,6 +66,7 @@ class Reference(BaseModel):
 class Backend(str, Enum):
     ARXIV = "arxiv"
     SEMANTIC_SCHOLAR = "semantic_scholar"
+    OPENREVIEW = "openreview"
 
 
 class ExternalRecord(BaseModel):
@@ -118,6 +119,7 @@ class CheckedReference(BaseModel):
     matches: list[ExternalRecord] = Field(default_factory=list)
     merged: MergedRecord | None = None
     hallucination_verdict: HallucinationVerdict | None = None
+    verification_trace: str | None = None
     issues: list[Issue] = Field(default_factory=list)
     verdict: Verdict = Verdict.VALID
 

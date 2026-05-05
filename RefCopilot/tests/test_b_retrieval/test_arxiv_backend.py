@@ -93,7 +93,10 @@ def test_search_by_title(tmp_path):
     )
     results = backend.search_by_title("Attention Is All You Need", year=2017)
     assert len(results) == 1
-    assert "Attention" in calls[0]["params"]["search_query"]
+    # Token-AND query, lower-cased, with year filter appended.
+    assert "ti:attention" in calls[0]["params"]["search_query"]
+    assert " AND ti:" in calls[0]["params"]["search_query"]
+    assert "submittedDate:[2017" in calls[0]["params"]["search_query"]
 
 
 def test_lookup_via_reference(tmp_path):
@@ -138,3 +141,88 @@ def test_cache_hit_avoids_http(tmp_path):
     assert len(calls) == 1
     backend.lookup_by_id("1706.03762")
     assert len(calls) == 1, "second call should hit cache"
+
+
+# ---------------------------------------------------------------------------
+# Token-AND title query construction (recall fix for typos like Math-arena → MathArena)
+# ---------------------------------------------------------------------------
+
+
+def test_title_query_builds_token_and_form():
+    from refcopilot.search.arxiv import _build_title_query
+
+    q = _build_title_query("Math-arena: Evaluating llms on uncontaminated math competitions")
+    # Hyphen split, lower-cased, stopwords ('on') dropped, AND-joined.
+    assert "ti:math AND ti:arena" in q
+    assert "ti:uncontaminated" in q
+    assert "ti:on" not in q
+    assert q.startswith("ti:")
+
+
+def test_title_query_dedupes_repeated_tokens():
+    from refcopilot.search.arxiv import _build_title_query
+
+    q = _build_title_query("LLMs LLMs LLMs in the LLMs")
+    # Only one informative token after dedupe → fall back to quoted form.
+    assert q == 'ti:"LLMs LLMs LLMs in the LLMs"'
+
+
+def test_title_query_falls_back_when_no_informative_tokens():
+    from refcopilot.search.arxiv import _build_title_query
+
+    assert _build_title_query("the of a") == 'ti:"the of a"'
+    assert _build_title_query("A") == 'ti:"A"'
+
+
+# ---------------------------------------------------------------------------
+# Title-similarity gate on search results
+# ---------------------------------------------------------------------------
+
+
+def _feed_with_title(arxiv_id: str, title: str) -> str:
+    return f"""<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:arxiv="http://arxiv.org/schemas/atom">
+  <entry>
+    <id>http://arxiv.org/abs/{arxiv_id}v1</id>
+    <title>{title}</title>
+    <published>2024-01-01T00:00:00Z</published>
+    <summary>Stub.</summary>
+    <author><name>X. Author</name></author>
+  </entry>
+</feed>
+"""
+
+
+def test_search_drops_dissimilar_title(tmp_path):
+    """Token-AND can still match papers that share all tokens but aren't the
+    cited work. The similarity gate must drop them."""
+    feed = _feed_with_title(
+        "1234.5678",
+        "Multi-head attention with disagreement regularization",
+    )
+    get, _ = _mock_http(feed)
+    backend = ArxivBackend(
+        cache=DiskCache(tmp_path),
+        rate_limiter=ArxivRateLimiter(min_interval_seconds=0.0),
+        http_get=get,
+    )
+    results = backend.search_by_title("Attention is all you need")
+    assert results == []
+
+
+def test_search_keeps_typo_variant(tmp_path):
+    feed = _feed_with_title(
+        "2505.23281",
+        "MathArena: Evaluating LLMs on Uncontaminated Math Competitions",
+    )
+    get, _ = _mock_http(feed)
+    backend = ArxivBackend(
+        cache=DiskCache(tmp_path),
+        rate_limiter=ArxivRateLimiter(min_interval_seconds=0.0),
+        http_get=get,
+    )
+    results = backend.search_by_title(
+        "Math-arena: Evaluating llms on uncontaminated math competitions"
+    )
+    assert len(results) == 1
+    assert results[0].arxiv_id == "2505.23281"

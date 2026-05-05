@@ -26,6 +26,8 @@ from refcopilot.ratelimit.semantic_scholar import (
     SemanticScholarRateLimiter,
     parse_retry_after,
 )
+from refcopilot.verify.text_match import title_similarity
+from refcopilot.verify.thresholds import SEARCH_RESULT_MIN_TITLE_SIM
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +70,14 @@ class SemanticScholarBackend:
         self.rate_limiter = rate_limiter or SemanticScholarRateLimiter()
         self._http_get = http_get
         self.timeout = timeout
+        # Permanent failure (network down, persistent 5xx). Once set, all
+        # subsequent lookups short-circuit to []. NOT set by 429 alone.
         self._failed = False
+        # True when the most recent ``_get_json`` returned None for a transient
+        # reason (429 exhaustion, network error). Callers use this to decide
+        # whether to cache an empty result — we don't want to cache "not
+        # found" if the underlying call simply failed transiently.
+        self._last_was_transient = False
 
     def lookup(self, ref: Reference) -> list[ExternalRecord]:
         if self._failed:
@@ -98,54 +107,75 @@ class SemanticScholarBackend:
 
     def _fetch_by_id(self, prefix: str, identifier: str) -> ExternalRecord | None:
         cache_key = f"{prefix.lower()}_{identifier.replace('/', '_')}"
-        cached = self._cache_get(cache_key)
-        if cached is not None:
-            return _payload_to_record(cached)
-
-        path = f"/paper/{prefix}:{identifier}"
-        payload = self._get_json(path, {"fields": _FIELDS})
-        if not payload:
-            return None
-        self._cache_set(cache_key, payload)
-        return _payload_to_record(payload)
+        payload = self._cached_or_fetch_payload(
+            cache_key,
+            f"/paper/{prefix}:{identifier}",
+            {"fields": _FIELDS},
+        )
+        return _payload_to_record(payload) if payload else None
 
     def _search_match(self, title: str, *, year: int | None) -> ExternalRecord | None:
         cache_key = f"match_{_safe(title)[:80]}_{year or ''}"
-        cached = self._cache_get(cache_key)
-        if cached is not None:
-            return _payload_to_record(cached) if cached else None
-
-        params = {"query": title, "fields": _FIELDS}
-        payload = self._get_json("/paper/search/match", params)
+        payload = self._cached_or_fetch_payload(
+            cache_key,
+            "/paper/search/match",
+            {"query": title, "fields": _FIELDS},
+        )
         if not payload:
-            self._cache_set(cache_key, {})
             return None
-
         candidates = payload.get("data") or []
         if not candidates:
-            self._cache_set(cache_key, {})
             return None
-
-        best = candidates[0]
-        self._cache_set(cache_key, best)
-        return _payload_to_record(best)
+        rec = _payload_to_record(candidates[0])
+        # ``/paper/search/match`` occasionally returns a topical neighbour
+        # rather than the actual paper. Apply the similarity gate at READ
+        # time so threshold changes don't invalidate the cache.
+        if rec is None or title_similarity(title, rec.title) < SEARCH_RESULT_MIN_TITLE_SIM:
+            return None
+        return rec
 
     def _search_relevance(self, title: str, *, year: int | None) -> list[ExternalRecord]:
         cache_key = f"search_{_safe(title)[:80]}_{year or ''}"
+        payload = self._cached_or_fetch_payload(
+            cache_key,
+            "/paper/search",
+            {"query": title, "fields": _FIELDS, "limit": "5"},
+        )
+        if not payload:
+            return []
+        records: list[ExternalRecord] = []
+        for item in (payload.get("data") or [])[:5]:
+            rec = _payload_to_record(item)
+            if rec is None:
+                continue
+            # Drop topical neighbours that share a few words but aren't the
+            # cited paper (e.g. an unrelated docker-security paper ranking
+            # high for "AssetOpsBench Docker images").
+            if title_similarity(title, rec.title) < SEARCH_RESULT_MIN_TITLE_SIM:
+                continue
+            records.append(rec)
+        return records
+
+    def _cached_or_fetch_payload(
+        self, cache_key: str, path: str, params: dict[str, str]
+    ) -> dict[str, Any] | None:
+        """Return the raw API response (cache hit or fresh fetch).
+
+        The cache stores unmodified API payloads so that filtering / parsing
+        changes never need a cache invalidation. Returns None for
+        confirmed-empty (404 / empty data array) and for transient errors;
+        only the former is cached.
+        """
         cached = self._cache_get(cache_key)
         if cached is not None:
-            return [_payload_to_record(p) for p in cached if p]
-
-        params = {"query": title, "fields": _FIELDS, "limit": "5"}
-        payload = self._get_json("/paper/search", params)
-        records: list[ExternalRecord] = []
-        if payload:
-            for item in (payload.get("data") or [])[:5]:
-                rec = _payload_to_record(item)
-                if rec:
-                    records.append(rec)
-        self._cache_set(cache_key, [r.model_dump() for r in records])
-        return records
+            return cached or None
+        payload = self._get_json(path, params)
+        if payload is None:
+            if not self._last_was_transient:
+                self._cache_set(cache_key, {})
+            return None
+        self._cache_set(cache_key, payload)
+        return payload
 
     # ------------------------------------------------------------------
     # HTTP plumbing
@@ -157,6 +187,7 @@ class SemanticScholarBackend:
         if self.api_key:
             headers["x-api-key"] = self.api_key
 
+        self._last_was_transient = False
         attempt = 0
         while attempt <= self.rate_limiter.max_retries:
             self.rate_limiter.acquire()
@@ -170,6 +201,7 @@ class SemanticScholarBackend:
                 attempt += 1
                 if attempt > self.rate_limiter.max_retries:
                     self._failed = True
+                    self._last_was_transient = True
                     return None
                 time.sleep(self.rate_limiter.backoff_for_attempt(attempt))
                 continue
@@ -196,10 +228,15 @@ class SemanticScholarBackend:
             attempt += 1
             if attempt > self.rate_limiter.max_retries:
                 self._failed = True
+                self._last_was_transient = True
                 return None
             time.sleep(self.rate_limiter.backoff_for_attempt(attempt))
 
-        self._failed = True
+        # Fell out of the loop without an explicit return — the only way that
+        # happens is exhausting the 429 retry budget. Treat as transient:
+        # don't poison the backend (the next reference may succeed) and let
+        # callers know not to cache the empty result.
+        self._last_was_transient = True
         return None
 
     def _cache_get(self, key: str) -> Any | None:
