@@ -106,7 +106,7 @@ class Settings(BaseSettings):
     final_report_audit_max_source_chars: int = 80000
     final_report_audit_max_review_chars: int = 50000
 
-    # Optional reference-accuracy checking with tools/refchecker.
+    # Optional reference-accuracy checking via RefCopilot/.
     reference_check_enabled: bool = Field(
         default=False,
         validation_alias=AliasChoices(

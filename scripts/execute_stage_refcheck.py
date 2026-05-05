@@ -26,7 +26,7 @@ def parse_args() -> argparse.Namespace:
         "--enable-refcheck",
         action="store_true",
         default=None,
-        help="Run RefChecker; otherwise this stage records a disabled result unless enabled by environment.",
+        help="Run RefCopilot; otherwise this stage records a disabled result unless enabled by environment.",
     )
     return p.parse_args()
 

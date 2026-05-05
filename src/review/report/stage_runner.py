@@ -2,12 +2,12 @@
 
 Reads the agent-runner's final report artifacts (markdown + audit) from the
 parse-stage snapshot, normalises image paths, optionally appends a
-``RefChecker`` summary, re-renders the PDF, and writes the canonical review
+``RefCopilot`` summary, re-renders the PDF, and writes the canonical review
 output to ``stages/review/report/``.
 
 A clean copy of the markdown (without the refcheck section) is also written to
 ``final_review_clean.md`` so the teaser sub-stage can build its prompt from a
-report that has not been polluted by reference-check warnings.
+report that has not been polluted by reference-check findings.
 """
 
 from __future__ import annotations

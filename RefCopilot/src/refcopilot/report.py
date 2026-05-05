@@ -1,0 +1,187 @@
+"""Report serializers: Markdown for end users, dict for FactReview's refcheck stage."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from refcopilot.bibtex_suggest import suggest_bibtex
+from refcopilot.models import (
+    CheckedReference,
+    Issue,
+    IssueCategory,
+    Report,
+    Severity,
+    Verdict,
+)
+
+_MAX_TEXT = 4000
+
+
+def to_markdown(report: Report, *, max_issues: int = 50) -> str:
+    s = report.summary
+    paper = report.paper or {}
+    lines: list[str] = ["## Reference Check (RefCopilot)\n"]
+    lines.append(
+        f"Input: `{paper.get('input', '?')}` (kind: `{paper.get('kind', '?')}`)\n"
+    )
+    lines.append(
+        f"- References processed: `{s.total_refs}`; "
+        f"errors: `{s.errors}`; warnings: `{s.warnings}`; unverified: `{s.unverified}`."
+    )
+    if s.by_category:
+        cats = ", ".join(f"`{k}`: {v}" for k, v in sorted(s.by_category.items()))
+        lines.append(f"- By category: {cats}")
+    lines.append("")
+
+    grouped = {
+        "Errors": [c for c in report.checked if c.verdict == Verdict.ERROR],
+        "Warnings": [c for c in report.checked if c.verdict == Verdict.WARNING],
+        "Unverified": [c for c in report.checked if c.verdict == Verdict.UNVERIFIED],
+    }
+    rendered = False
+    for heading, rows in grouped.items():
+        if not rows:
+            continue
+        rendered = True
+        lines.append(f"### {heading}")
+        for index, c in enumerate(rows[:max_issues], start=1):
+            lines.append(_format_checked_reference(c, index))
+        if len(rows) > max_issues:
+            lines.append(f"- {len(rows) - max_issues} additional item(s) omitted.")
+        lines.append("")
+
+    if not rendered:
+        lines.append("All references verified successfully.")
+        lines.append("")
+
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def _format_checked_reference(c: CheckedReference, index: int) -> str:
+    title = (c.reference.title or c.reference.bibkey or "(untitled)").strip()
+    authors = ", ".join(c.reference.authors[:3])
+    if len(c.reference.authors) > 3:
+        authors += ", ..."
+    head = f"{index}. **{title}**" + (f" — {authors}" if authors else "")
+    body = []
+    for issue in c.issues:
+        body.append(
+            f"   - [{issue.severity.value}/{issue.category.value}/{issue.code}] {issue.message}"
+            + (f"  _Suggestion: {issue.suggestion}_" if issue.suggestion else "")
+        )
+
+    has_warning = any(i.severity == Severity.WARNING for i in c.issues)
+    if has_warning and c.merged is not None:
+        bibtex = suggest_bibtex(c.reference, c.merged)
+        if bibtex:
+            body.append("")
+            body.append("   Suggested replacement (data sources annotated as comments):")
+            body.append("   ```bibtex")
+            body.extend(f"   {line}" for line in bibtex.splitlines())
+            body.append("   ```")
+
+    if c.verdict == Verdict.UNVERIFIED and c.verification_trace:
+        body.append(f"   _Verification trace: {c.verification_trace}_")
+
+    return head + "\n" + "\n".join(body) if body else head
+
+
+# ---------------------------------------------------------------------------
+# FactReview JSON shape (written to ``reference_check.json`` by the refcheck stage)
+# ---------------------------------------------------------------------------
+
+
+_CATEGORY_TO_TYPE = {
+    IssueCategory.FAKE: "hallucination",
+    IssueCategory.OUTDATED: "outdated",
+    IssueCategory.INCOMPLETE: "incomplete",
+}
+
+
+def to_factreview_dict(report: Report, *, report_file: str = "") -> dict[str, Any]:
+    """Serialize *report* into the dict shape FactReview's refcheck stage stores."""
+    issues: list[dict[str, Any]] = []
+    for c in report.checked:
+        if c.issues:
+            for issue in c.issues:
+                issues.append(_issue_to_factreview(c, issue))
+        elif c.verdict == Verdict.UNVERIFIED:
+            issues.append(_unverified_to_factreview(c))
+
+    error_details = [i for i in issues if i["severity"] == "error"]
+    warning_details = [i for i in issues if i["severity"] == "warning"]
+    unverified_details = [i for i in issues if i["severity"] == "unverified"]
+
+    return {
+        "ok": True,
+        "total_refs": report.summary.total_refs,
+        "errors": report.summary.errors,
+        "warnings": report.summary.warnings,
+        "unverified": report.summary.unverified,
+        "error_message": "",
+        "issues": issues,
+        "error_details": error_details,
+        "warning_details": warning_details,
+        "unverified_details": unverified_details,
+        "report_file": report_file,
+    }
+
+
+def _issue_to_factreview(c: CheckedReference, issue: Issue) -> dict[str, Any]:
+    severity = issue.severity.value
+    cited_url = c.reference.url or ""
+    verified_url = ""
+    if c.merged and c.merged.url:
+        verified_url = c.merged.url
+
+    type_label = (
+        f"{_CATEGORY_TO_TYPE.get(issue.category, issue.category.value)}::{issue.code}"
+    )
+
+    # Only emit a suggested bibtex when the issue is fixable from verified
+    # metadata (i.e. warnings against a real, matched paper). Errors are
+    # fabricated references with nothing to "correct" toward.
+    suggested_bibtex = ""
+    if issue.severity == Severity.WARNING and c.merged is not None:
+        suggested_bibtex = suggest_bibtex(c.reference, c.merged)
+
+    return {
+        "severity": severity,
+        "type": type_label,
+        "reference_title": _truncate(c.reference.title, 500),
+        "reference_year": str(c.reference.year or ""),
+        "cited_url": _truncate(cited_url, 1000),
+        "verified_url": _truncate(verified_url, 1000),
+        "details": _truncate(issue.message + (f" ({issue.suggestion})" if issue.suggestion else ""), _MAX_TEXT),
+        "raw_reference": _truncate(c.reference.raw, _MAX_TEXT),
+        "corrected_plaintext": "",
+        "corrected_bibtex": _truncate(suggested_bibtex, _MAX_TEXT),
+        "corrected_bibitem": "",
+    }
+
+
+def _unverified_to_factreview(c: CheckedReference) -> dict[str, Any]:
+    details = (
+        c.verification_trace
+        or "Could not verify reference (no records found on arXiv or Semantic Scholar)."
+    )
+    return {
+        "severity": Severity.UNVERIFIED.value,
+        "type": "unverified::no_match",
+        "reference_title": _truncate(c.reference.title, 500),
+        "reference_year": str(c.reference.year or ""),
+        "cited_url": _truncate(c.reference.url or "", 1000),
+        "verified_url": "",
+        "details": _truncate(details, _MAX_TEXT),
+        "raw_reference": _truncate(c.reference.raw, _MAX_TEXT),
+        "corrected_plaintext": "",
+        "corrected_bibtex": "",
+        "corrected_bibitem": "",
+    }
+
+
+def _truncate(value: Any, max_chars: int) -> str:
+    text = str(value or "")
+    if len(text) <= max_chars:
+        return text
+    return text[: max(0, max_chars - 16)].rstrip() + "\n...(truncated)"

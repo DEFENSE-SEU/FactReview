@@ -1,92 +1,71 @@
-"""Minimal tests for the reference-checking adapter."""
+"""Tests for the reference-checking adapter."""
 
 from __future__ import annotations
 
-import pytest
+import sys
+from pathlib import Path
 
 
 def test_refcheck_adapter_importable():
-    """The adapter module must be importable without heavy refchecker deps."""
-    from fact_generation.refcheck.refcheck import check_references
+    from fact_generation.refcheck.refcheck import check_references, format_reference_check_markdown
 
     assert callable(check_references)
+    assert callable(format_reference_check_markdown)
 
 
-def test_refcheck_nonexistent_paper():
-    """Passing a non-existent file should return ok=False gracefully."""
-    try:
-        import arxiv  # noqa: F401
-    except ImportError:
-        pytest.skip("refchecker deps (arxiv) not installed")
+_REFCOPILOT_SRC = Path(__file__).resolve().parents[4] / "RefCopilot" / "src"
+if str(_REFCOPILOT_SRC) not in sys.path:
+    sys.path.insert(0, str(_REFCOPILOT_SRC))
 
+
+def test_refcheck_returns_expected_schema(monkeypatch):
+    """The adapter forwards RefCopilot's output dict with the documented keys."""
+    from refcopilot.models import (
+        CheckedReference,
+        Reference,
+        Report,
+        ReportSummary,
+        SourceFormat,
+        Verdict,
+    )
+
+    def _fake_run(self, spec, **_kwargs):
+        ref = Reference(raw="x", source_format=SourceFormat.BIBTEX, title="T", authors=["A"])
+        return Report(
+            paper={"input": spec, "kind": "bibtex"},
+            checked=[CheckedReference(reference=ref, verdict=Verdict.VALID)],
+            summary=ReportSummary(total_refs=1, errors=0, warnings=0, unverified=0, by_category={}),
+        )
+
+    monkeypatch.setattr("refcopilot.pipeline.RefCopilotPipeline.run", _fake_run)
     from fact_generation.refcheck.refcheck import check_references
 
-    result = check_references(paper="/nonexistent/paper.pdf")
-    # The adapter calls refchecker which will fail; should not raise.
+    result = check_references(paper="dummy.bib")
+
+    expected_keys = {
+        "ok", "total_refs", "errors", "warnings", "unverified",
+        "error_message", "issues", "error_details", "warning_details",
+        "unverified_details", "report_file",
+    }
+    assert expected_keys <= set(result.keys())
+    assert result["ok"] is True
+    assert result["total_refs"] == 1
+
+
+def test_refcheck_empty_input_returns_failure_dict():
+    """Genuinely unparseable input surfaces as ``ok=False`` with an error message."""
+    from fact_generation.refcheck.refcheck import check_references
+
+    result = check_references(paper="")
     assert isinstance(result, dict)
-    assert "ok" in result
-    assert "error_message" in result
+    assert result["ok"] is False
+    assert result["error_message"]
 
 
-def test_refchecker_package_importable_when_deps_installed():
-    """The upstream refchecker package should import when its own deps are installed."""
-    try:
-        import refchecker
-    except ModuleNotFoundError as exc:
-        pytest.skip(f"refchecker optional dependency missing: {exc.name}")
-
-    assert hasattr(refchecker, "__version__")
-    assert refchecker.__version__
-
-
-def test_refcheck_extracts_severity_from_original_issue_fields():
-    from fact_generation.refcheck.refcheck import _extract_issues
-
-    class Checker:
-        def __init__(self):
-            self.errors = [
-                {
-                    "ref_title": "Author mismatch",
-                    "error_type": "author",
-                    "error_details": "Author list differs.",
-                    "_original_errors": [{"error_type": "author", "error_details": "Author list differs."}],
-                },
-                {
-                    "ref_title": "Year mismatch",
-                    "error_type": "year",
-                    "error_details": "Year differs.",
-                    "_original_errors": [{"warning_type": "year", "warning_details": "Year differs."}],
-                },
-                {
-                    "ref_title": "Mixed issue",
-                    "error_type": "multiple",
-                    "error_details": "- DOI differs.\n- Venue differs.",
-                    "_original_errors": [
-                        {"error_type": "doi", "error_details": "DOI differs."},
-                        {"warning_type": "venue", "warning_details": "Venue differs."},
-                    ],
-                },
-                {
-                    "ref_title": "Not found",
-                    "error_type": "unverified",
-                    "error_details": "Could not verify reference.",
-                    "_original_errors": [
-                        {"error_type": "unverified", "error_details": "Could not verify reference."}
-                    ],
-                },
-            ]
-
-    issues = _extract_issues(Checker())
-    by_severity = {}
-    for issue in issues:
-        by_severity.setdefault(issue["severity"], []).append(issue["type"])
-
-    assert by_severity["error"] == ["author", "doi"]
-    assert by_severity["warning"] == ["year", "venue"]
-    assert by_severity["unverified"] == ["unverified"]
-
-
-def test_refcheck_markdown_includes_warning_and_error_details():
+def test_format_reference_check_markdown_renders_warnings_with_bibtex():
+    """The embedded summary now lists errors AND warnings; warnings carry a
+    corrected-BibTeX block so users can paste a fix straight into their .bib.
+    Unverified entries are still suppressed."""
     from fact_generation.refcheck.refcheck import format_reference_check_markdown
 
     result = {
@@ -94,21 +73,37 @@ def test_refcheck_markdown_includes_warning_and_error_details():
         "total_refs": 3,
         "errors": 1,
         "warnings": 1,
-        "unverified": 0,
+        "unverified": 1,
         "report_file": "/tmp/reference_check_details.txt",
         "issues": [
             {
                 "severity": "error",
-                "type": "title",
-                "reference_title": "Wrong title",
-                "details": "Title mismatch: cited A but verified B.",
-                "raw_reference": "A. Wrong title. 2024.",
+                "type": "hallucination::no_match",
+                "reference_title": "Fake paper",
+                "details": "No matching paper found.",
+                "raw_reference": "[1] Fake paper. 2024.",
+                "corrected_bibtex": "",
             },
             {
                 "severity": "warning",
-                "type": "year",
-                "reference_title": "Year issue",
-                "details": "Year mismatch: cited as 2023 but actually 2024.",
+                "type": "incomplete::missing_doi",
+                "reference_title": "Real paper",
+                "details": "Citation is missing a DOI.",
+                "corrected_bibtex": (
+                    "% Suggested by RefCopilot. Field provenance:\n"
+                    "%   semantic_scholar: doi — https://www.semanticscholar.org/paper/abc\n"
+                    "@article{realpaper2024,\n"
+                    "  title = {Real paper},\n"
+                    "  doi = {10.1/x},\n"
+                    "}"
+                ),
+            },
+            {
+                "severity": "unverified",
+                "type": "unverified::no_match",
+                "reference_title": "Mystery paper",
+                "details": "Could not verify reference.",
+                "corrected_bibtex": "",
             },
         ],
     }
@@ -117,6 +112,18 @@ def test_refcheck_markdown_includes_warning_and_error_details():
 
     assert "## Reference Check" in markdown
     assert "### Errors" in markdown
-    assert "Title mismatch" in markdown
+    assert "Fake paper" in markdown
     assert "### Warnings" in markdown
-    assert "Year mismatch" in markdown
+    assert "Real paper" in markdown
+    assert "```bibtex" in markdown
+    assert "Suggested by RefCopilot" in markdown
+    assert "Mystery paper" not in markdown
+
+
+def test_format_reference_check_markdown_handles_failure():
+    from fact_generation.refcheck.refcheck import format_reference_check_markdown
+
+    result = {"ok": False, "error_message": "boom", "report_file": ""}
+    markdown = format_reference_check_markdown(result)
+    assert "did not complete successfully" in markdown
+    assert "boom" in markdown
