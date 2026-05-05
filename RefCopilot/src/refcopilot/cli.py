@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import logging
 import os
+import re
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from refcopilot.cache.disk_cache import DiskCache
@@ -51,9 +54,35 @@ def main(argv: list[str] | None = None) -> int:
     return 2
 
 
+def _slug_for_input(spec: str) -> str:
+    s = spec.strip()
+    # Bare arXiv ID: 1706.03762 or 1706.03762v2
+    m = re.match(r"^(\d{4}\.\d{4,5}(?:v\d+)?)$", s, re.IGNORECASE)
+    if m:
+        return re.sub(r"[^A-Za-z0-9_-]+", "_", m.group(1))
+    # arxiv: prefix
+    if s.lower().startswith("arxiv:"):
+        return re.sub(r"[^A-Za-z0-9_-]+", "_", s[6:].strip())
+    # URL: use last non-empty path segment before any query string
+    if s.startswith(("http://", "https://")):
+        tail = s.rstrip("/").rsplit("/", 1)[-1].split("?")[0]
+        if tail:
+            slug = re.sub(r"[^A-Za-z0-9_-]+", "_", tail)[:40].strip("_")
+            return slug or "url"
+        return "url_" + hashlib.sha256(s.encode()).hexdigest()[:8]
+    # Local file: use stem (no extension, no dots)
+    p = Path(s)
+    if p.exists() and p.is_file():
+        return re.sub(r"[^A-Za-z0-9_-]+", "_", p.stem)[:40].strip("_") or "file"
+    # Fallback
+    return "input_" + hashlib.sha256(s.encode("utf-8")).hexdigest()[:8]
+
+
 def _run_check(args) -> int:
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO)
-    out_dir = Path(args.output_dir)
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    slug = _slug_for_input(args.input)
+    out_dir = Path(args.output_dir) / f"{slug}_{timestamp}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     pipeline = RefCopilotPipeline(
