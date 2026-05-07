@@ -328,12 +328,28 @@ def _pick_python_executable(repo_root: Path) -> Path:
     return Path("python3")
 
 
-def _run_review_runtime(*, repo_root: Path, run_dir: Path, paper_pdf: Path, title: str) -> dict[str, Any]:
+def _run_review_runtime(
+    *,
+    repo_root: Path,
+    run_dir: Path,
+    paper_pdf: Path,
+    title: str,
+    cutoff_date: str = "",
+    cutoff_source: str = "",
+) -> dict[str, Any]:
     py_exec = _pick_python_executable(repo_root)
     script = repo_root / "scripts" / "execute_review_runtime_job.py"
 
     env = os.environ.copy()
     env["DATA_DIR"] = str((run_dir / "runtime").resolve())
+
+    cmd: list[str] = [str(py_exec), str(script), "--paper-pdf", str(paper_pdf), "--title", title]
+    cutoff_token = str(cutoff_date or "").strip()
+    if cutoff_token:
+        cmd.extend(["--cutoff-date", cutoff_token])
+    cutoff_source_token = str(cutoff_source or "").strip()
+    if cutoff_source_token:
+        cmd.extend(["--cutoff-source", cutoff_source_token])
 
     # Hard ceiling: a single agent runtime job for one paper should never need
     # more than a few hours. Without this, a hung subprocess would pin the
@@ -341,7 +357,7 @@ def _run_review_runtime(*, repo_root: Path, run_dir: Path, paper_pdf: Path, titl
     runtime_timeout_seconds = 3 * 60 * 60
     try:
         proc = subprocess.run(
-            [str(py_exec), str(script), "--paper-pdf", str(paper_pdf), "--title", title],
+            cmd,
             cwd=str(repo_root),
             env=env,
             capture_output=True,
@@ -449,6 +465,8 @@ def bootstrap_bridge_state(
     paper_pdf: Path | None = None,
     paper_key: str,
     reuse_job_id: str = "",
+    cutoff_date: str = "",
+    cutoff_source: str = "",
 ) -> RuntimeBridgeState:
     run_dir.mkdir(parents=True, exist_ok=True)
     existing = load_bridge_state(run_dir)
@@ -518,7 +536,14 @@ def bootstrap_bridge_state(
         raise FileNotFoundError(f"paper pdf not found: {resolved_pdf}")
 
     key = str(paper_key or "").strip() or resolved_pdf.parent.name or "paper"
-    own_payload = _run_review_runtime(repo_root=repo_root, run_dir=run_dir, paper_pdf=resolved_pdf, title=key)
+    own_payload = _run_review_runtime(
+        repo_root=repo_root,
+        run_dir=run_dir,
+        paper_pdf=resolved_pdf,
+        title=key,
+        cutoff_date=cutoff_date,
+        cutoff_source=cutoff_source,
+    )
     return save_bridge_state(
         run_dir=run_dir,
         paper_pdf=resolved_pdf,

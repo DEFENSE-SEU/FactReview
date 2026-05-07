@@ -7,6 +7,8 @@ from typing import Any
 
 import httpx
 
+from util.cutoff_date import CutoffDate, filter_papers
+
 
 @dataclass
 class SemanticScholarConfig:
@@ -21,7 +23,13 @@ class SemanticScholarAdapter:
     def __init__(self, cfg: SemanticScholarConfig):
         self.cfg = cfg
 
-    async def search_related(self, *, query: str, top_k: int | None = None) -> dict[str, Any]:
+    async def search_related(
+        self,
+        *,
+        query: str,
+        top_k: int | None = None,
+        cutoff_date: CutoffDate | None = None,
+    ) -> dict[str, Any]:
         q = str(query or "").strip()
         if not self.cfg.enabled or not q:
             return {
@@ -30,16 +38,23 @@ class SemanticScholarAdapter:
                 "success": False,
                 "papers": [],
                 "message": "semantic_scholar_disabled_or_empty_query",
+                "cutoff_date": cutoff_date.to_metadata() if cutoff_date else None,
             }
 
         k = max(5, min(10, int(top_k or self.cfg.top_k or 8)))
-        fetch_limit = max(k * 3, 20)
+        # When a cutoff is in play we need to overfetch — the server filter is
+        # year-only and we'll prune anything that slips through client-side, so
+        # plan for some attrition.
+        fetch_multiplier = 5 if cutoff_date is not None else 3
+        fetch_limit = max(k * fetch_multiplier, 20)
         url = f"{self.cfg.base_url.rstrip('/')}/paper/search"
-        params = {
+        params: dict[str, str] = {
             "query": q,
             "limit": str(fetch_limit),
             "fields": "title,year,citationCount,venue,url,authors,externalIds",
         }
+        if cutoff_date is not None:
+            params["year"] = cutoff_date.s2_year_param()
         headers: dict[str, str] = {}
         api_key = str(self.cfg.api_key or "").strip()
         if api_key:
@@ -57,6 +72,7 @@ class SemanticScholarAdapter:
                 "success": False,
                 "papers": [],
                 "message": f"{type(exc).__name__}: {exc}",
+                "cutoff_date": cutoff_date.to_metadata() if cutoff_date else None,
             }
 
         data = payload.get("data") if isinstance(payload, dict) else None
@@ -95,8 +111,15 @@ class SemanticScholarAdapter:
                 }
             )
 
+        # Client-side double-check after the server `year=` filter. Defensive:
+        # catches any row past the cutoff that slips through the server filter
+        # (e.g. mis-tagged year). Rows with year=null are deliberately kept by
+        # filter_papers — we'd rather surface a paper with missing metadata
+        # than silently drop it from the novelty matrix.
+        kept_rows, dropped_rows = filter_papers(norm_rows, cutoff_date)
+
         dedup: dict[str, dict[str, Any]] = {}
-        for row in norm_rows:
+        for row in kept_rows:
             key = str(row.get("title") or "").strip().lower()
             prev = dedup.get(key)
             if prev is None or float(row.get("score") or 0.0) > float(prev.get("score") or 0.0):
@@ -117,14 +140,18 @@ class SemanticScholarAdapter:
                 }
             )
 
-        return {
+        result: dict[str, Any] = {
             "enabled": True,
             "query": q,
             "success": True,
             "papers": papers,
             "count": len(papers),
             "message": None,
+            "cutoff_date": cutoff_date.to_metadata() if cutoff_date else None,
         }
+        if cutoff_date is not None:
+            result["filtered_out_count"] = len(dropped_rows)
+        return result
 
 
 _TITLE_STOPWORDS = {

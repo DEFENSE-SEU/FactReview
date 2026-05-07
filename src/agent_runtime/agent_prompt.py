@@ -1417,6 +1417,7 @@ def _build_fact_review_extractor_prompt(
     source_file_name: str,
     semantic_scholar_context: str = "",
     ui_language: str = "en",
+    paper_cutoff_date: dict | None = None,
 ) -> str:
     markdown_text = (paper_markdown or "").strip()
     if len(markdown_text) > 120000:
@@ -1428,6 +1429,24 @@ def _build_fact_review_extractor_prompt(
         if resolved_ui_language == "zh-CN"
         else "All user-visible final report content must be in English."
     )
+
+    if isinstance(paper_cutoff_date, dict) and str(paper_cutoff_date.get("value") or "").strip():
+        cutoff_block = (
+            "[Publication-Date Cutoff]\n"
+            f"value: {paper_cutoff_date.get('value')}\n"
+            f"precision: {paper_cutoff_date.get('precision')}\n"
+            f"source: {paper_cutoff_date.get('source')}\n"
+            "rule: when judging novelty/positioning, treat papers published AFTER this cutoff as out of scope. "
+            "Do not cite them as prior work that the manuscript should have addressed.\n"
+            "rule: paper_search and Semantic Scholar results have already been filtered to <= cutoff "
+            "(client-side double-check applied), so all listed papers are eligible for novelty comparison.\n\n"
+        )
+    else:
+        cutoff_block = (
+            "[Publication-Date Cutoff]\n"
+            "value: (none)\n"
+            "rule: no cutoff is applied; treat all retrieved papers as eligible for positioning.\n\n"
+        )
 
     return (
         "You are a paper-information extraction agent.\n"
@@ -1528,6 +1547,7 @@ def _build_fact_review_extractor_prompt(
         "\n"
         f"Output language rule: {output_language_rule}\n"
         "\n"
+        f"{cutoff_block}"
         "[Semantic Scholar Retrieval]\n"
         f"{semantic_scholar_context or '(empty)'}\n"
         "\n"
@@ -1547,6 +1567,7 @@ def build_review_agent_system_prompt(
     paper_search_runtime_state: dict | None = None,
     semantic_scholar_context: str = "",
     ui_language: str = "en",
+    paper_cutoff_date: dict | None = None,
 ) -> str:
     return _build_fact_review_extractor_prompt(
         paper_markdown=paper_markdown,
@@ -1554,6 +1575,7 @@ def build_review_agent_system_prompt(
         source_file_name=source_file_name,
         semantic_scholar_context=semantic_scholar_context,
         ui_language=ui_language,
+        paper_cutoff_date=paper_cutoff_date,
     )
 
 

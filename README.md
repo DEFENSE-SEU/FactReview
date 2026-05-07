@@ -112,6 +112,13 @@ download automatically:
 python scripts/execute_review_pipeline.py https://arxiv.org/abs/1911.03082 --paper-key compgcn
 ```
 
+When the input is an arXiv link, FactReview auto-derives a publication-date
+cutoff (`YYYY-MM`) from the arXiv identifier so positioning retrieval only
+considers prior work — the agent will not penalise the manuscript for missing
+citations to papers published after it. Pass `--cutoff-date YYYY[-MM[-DD]]` to
+override, or `--no-cutoff` to disable filtering entirely. Local PDFs default to
+no cutoff unless `--cutoff-date` is supplied.
+
 This runs the pipeline's seven sub-stages, grouped into three phases. `refcheck`
 and `execution` are skipped by default; see the flags below to enable them.
 
@@ -172,6 +179,8 @@ Common one-off overrides:
 | `--no-pdf-extract` | off | Skip MinerU re-extraction inside the execution `prepare` node when the parse stage already produced the snapshot. |
 | `--reuse-job-id` | – | Reuse a prior agent-runtime job, skipping the parse-stage agent run. Accepts either an absolute path to a `runtime/jobs/<id>` directory (taken as-is) or a bare job id (looked up under the current run dir, then under `<run-root>/**/runtime/jobs/<id>`). Useful for re-rendering the report after a downstream-stage tweak without paying the parse cost again. |
 | `--run-root` | `runs` | Override the root output directory. |
+| `--cutoff-date` | auto | Inclusive publication-date cutoff for positioning retrieval, as `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`. When omitted, an arXiv URL/ID is used to auto-derive `YYYY-MM` from the arXiv identifier; for non-arXiv inputs no cutoff is applied. Both Semantic Scholar (server-side `year=` filter) and the agent's `paper_search` calls (client-side filter) are constrained to papers at or before the cutoff, so the agent does not penalise the manuscript for not citing later work. |
+| `--no-cutoff` | off | Disable the publication-date cutoff entirely (overrides `--cutoff-date` and arXiv auto-derivation). Useful for analysing how the paper compares against later work. |
 
 ### Single-Stage Reruns
 

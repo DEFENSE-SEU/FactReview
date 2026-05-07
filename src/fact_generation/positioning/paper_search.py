@@ -8,6 +8,8 @@ from urllib.parse import quote_plus
 
 import httpx
 
+from util.cutoff_date import CutoffDate, filter_papers
+
 
 @dataclass
 class PaperSearchConfig:
@@ -67,16 +69,20 @@ class PaperSearchAdapter:
         *,
         query: str | None = None,
         question_list: list[str] | None = None,
+        cutoff_date: CutoffDate | None = None,
     ) -> dict:
         state = await self.get_search_runtime_state()
         if not state.started:
-            return self._search_not_started_payload(
+            payload = self._search_not_started_payload(
                 state=state,
                 query=query,
                 question_list=question_list,
             )
+            if cutoff_date is not None:
+                payload["cutoff_date"] = cutoff_date.to_metadata()
+            return payload
         try:
-            return await self._search_remote(query=query, question_list=question_list)
+            result = await self._search_remote(query=query, question_list=question_list)
         except Exception as exc:
             self._search_state_cache = PaperSearchRuntimeState(
                 enabled=bool(self.search_cfg.enabled),
@@ -87,6 +93,8 @@ class PaperSearchAdapter:
                 error=f"{type(exc).__name__}: {exc}",
             )
             raise
+
+        return _apply_cutoff_to_search_result(result, cutoff_date)
 
     async def read_papers(self, *, items: list[dict]) -> dict:
         if self.read_configured:
@@ -558,6 +566,45 @@ class PaperSearchAdapter:
             )
 
         return papers
+
+
+def _apply_cutoff_to_search_result(result: dict, cutoff: CutoffDate | None) -> dict:
+    """Filter ``papers`` and ``question_results`` by ``cutoff`` (client-side).
+
+    The remote paper-search service has no documented year filter, so the
+    cutoff is enforced here as a final safety net before the result reaches
+    the agent. Returns the same dict (mutated) for convenience.
+    """
+    if not isinstance(result, dict):
+        return result
+    if cutoff is None:
+        return result
+
+    papers_raw = result.get("papers") if isinstance(result.get("papers"), list) else []
+    kept, dropped = filter_papers(papers_raw, cutoff)
+    result["papers"] = kept
+    result["count"] = len(kept)
+    result["filtered_out_count"] = len(dropped)
+    result["cutoff_date"] = cutoff.to_metadata()
+
+    grouped = result.get("question_results")
+    if isinstance(grouped, list):
+        rebuilt: list[dict] = []
+        for row in grouped:
+            if not isinstance(row, dict):
+                continue
+            sub_papers = row.get("papers") if isinstance(row.get("papers"), list) else []
+            sub_kept, sub_dropped = filter_papers(sub_papers, cutoff)
+            rebuilt.append(
+                {
+                    **row,
+                    "papers": sub_kept,
+                    "count": len(sub_kept),
+                    "filtered_out_count": len(sub_dropped),
+                }
+            )
+        result["question_results"] = rebuilt
+    return result
 
 
 def normalize_question_list(raw: object) -> list[str]:

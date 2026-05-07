@@ -22,6 +22,7 @@ from review.report.stage_runner import run_report_stage
 from review.teaser.stage_runner import run_teaser_stage
 from schemas.execution import ExecutionPayload
 from schemas.stage import StageResult
+from util.cutoff_date import CutoffDate, derive_cutoff_from_source, parse_cutoff
 from util.paper_input import infer_paper_key, materialize_paper_pdf
 from util.run_layout import build_run_dir, ensure_run_subdirs, make_run_id
 
@@ -90,6 +91,23 @@ def _apply_cli_env_overrides(args: argparse.Namespace) -> None:
     get_settings.cache_clear()
 
 
+def _resolve_cutoff(*, args: argparse.Namespace, paper_source: str) -> CutoffDate | None:
+    """Pick the publication-date cutoff to apply to positioning retrieval.
+
+    Precedence:
+    1. ``--no-cutoff`` -> always None.
+    2. ``--cutoff-date`` -> parse as ``YYYY[-MM[-DD]]``.
+    3. arXiv URL/ID -> derive ``YYYY-MM`` from the ID prefix.
+    4. Otherwise -> None (no filter; current-date semantics).
+    """
+    if bool(getattr(args, "no_cutoff", False)):
+        return None
+    explicit = str(getattr(args, "cutoff_date", "") or "").strip()
+    if explicit:
+        return parse_cutoff(explicit, source="user")
+    return derive_cutoff_from_source(paper_source)
+
+
 def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     repo_root = Path(__file__).resolve().parents[1]
     settings = get_settings()
@@ -107,10 +125,16 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     init_full_pipeline_context(run_dir=run_dir)
     run_execution = bool(getattr(args, "run_execution", False))
 
+    cutoff = _resolve_cutoff(args=args, paper_source=paper_input.source)
+
     _log("FactReview pipeline starting")
     _log(f"  paper_key : {paper_key}")
     _log(f"  paper_pdf : {paper_pdf}")
     _log(f"  run_dir   : {run_dir}")
+    if cutoff is not None:
+        _log(f"  cutoff    : {cutoff.to_string()} (source={cutoff.source}, precision={cutoff.precision})")
+    else:
+        _log("  cutoff    : (none — using current date; all retrieved papers will be considered)")
 
     parse_result = _run_stage(
         1,
@@ -122,6 +146,8 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             paper_key=paper_key,
             reuse_job_id=str(args.reuse_job_id or "").strip(),
             materialize_execution_extract=run_execution,
+            cutoff_date=cutoff.to_string() if cutoff is not None else "",
+            cutoff_source=cutoff.source if cutoff is not None else "",
         ),
     )
     claim_extract_result = _run_stage(
@@ -243,6 +269,7 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
         "outputs": outputs,
         "reference_check": refcheck_result.extra.get("reference_check") or {"enabled": enable_refcheck},
         "teaser_figure": teaser_result.extra.get("teaser_figure") or {},
+        "paper_cutoff_date": cutoff.to_metadata() if cutoff is not None else None,
     }
 
     summary_path = run_dir / "full_pipeline_summary.json"
@@ -314,6 +341,26 @@ def parse_args() -> argparse.Namespace:
         "--no-pdf-extract",
         action="store_true",
         help="Pass through to external execution stage (skip MinerU in execution prepare).",
+    )
+    p.add_argument(
+        "--cutoff-date",
+        type=str,
+        default="",
+        help=(
+            "Inclusive publication-date cutoff for positioning retrieval, "
+            "as YYYY, YYYY-MM, or YYYY-MM-DD. If omitted, an arXiv URL/ID is "
+            "used to auto-derive YYYY-MM; for non-arXiv inputs no cutoff is "
+            "applied (current-date semantics)."
+        ),
+    )
+    p.add_argument(
+        "--no-cutoff",
+        action="store_true",
+        help=(
+            "Disable publication-date cutoff entirely (overrides --cutoff-date "
+            "and arXiv auto-derivation). Useful for analysing how the paper "
+            "compares against later work."
+        ),
     )
     return p.parse_args()
 

@@ -14,6 +14,7 @@ from common.storage import annotations_path, append_event, write_json_atomic, wr
 from common.types import AnnotationItem, PaperSearchUsage
 from fact_generation.positioning.paper_search import PaperSearchAdapter, normalize_question_list
 from review.report.final_report import validate_final_report
+from util.cutoff_date import CutoffDate
 
 
 def _normalize_signature(text: str) -> str:
@@ -484,6 +485,7 @@ class ReviewRuntimeContext:
     paper_adapter: PaperSearchAdapter
     paper_search_runtime_state: dict[str, Any]
     settings: Settings
+    cutoff_date: CutoffDate | None = None
 
     annotations: list[AnnotationItem] = field(default_factory=list)
     final_markdown_text: str | None = None
@@ -841,6 +843,7 @@ def build_review_tools(runtime: ReviewRuntimeContext) -> list[Any]:
             result = await rt.paper_adapter.search(
                 query=query_text if query_text else None,
                 question_list=questions or None,
+                cutoff_date=rt.cutoff_date,
             )
         except Exception as exc:
             runtime_state = (await rt.paper_adapter.get_search_runtime_state()).to_dict()
@@ -861,6 +864,7 @@ def build_review_tools(runtime: ReviewRuntimeContext) -> list[Any]:
                 "retry_required": True,
                 "retry_tool": "paper_search",
                 "paper_search_state": runtime_state,
+                "cutoff_date": rt.cutoff_date.to_metadata() if rt.cutoff_date else None,
             }
 
         runtime_state_payload = _paper_search_state_payload(

@@ -44,6 +44,7 @@ from preprocessing.parse.mineru_adapter import MineruAdapter, MineruConfig
 from review.report.final_report_audit import audit_and_refine_final_report
 from review.report.pdf_renderer import build_review_report_pdf
 from review.report.source_annotations import build_source_annotations_for_export
+from util.cutoff_date import CutoffDate, parse_cutoff
 
 
 def _resolved_api_key() -> str:
@@ -134,6 +135,31 @@ def _build_semantic_scholar_adapter() -> SemanticScholarAdapter:
     )
 
 
+def _resolve_runtime_cutoff(job: Any) -> CutoffDate | None:
+    """Pull the publication-date cutoff out of ``JobState.metadata``.
+
+    The cutoff is set by ``execute_review_runtime_job.py`` from the
+    ``--cutoff-date`` / ``--cutoff-source`` args propagated by
+    ``pipeline_full``. A malformed value is logged and ignored rather than
+    failing the whole run.
+    """
+    metadata = getattr(job, "metadata", None)
+    token = ""
+    source = "user"
+    if isinstance(metadata, dict):
+        token = str(metadata.get("paper_cutoff_date") or "").strip()
+        explicit_source = str(metadata.get("paper_cutoff_date_source") or "").strip()
+        if explicit_source:
+            source = explicit_source
+    if not token:
+        return None
+    try:
+        return parse_cutoff(token, source=source)
+    except ValueError as exc:
+        append_event(str(getattr(job, "id", "")), "paper_cutoff_invalid", value=token, error=str(exc))
+        return None
+
+
 def _extract_title_hint(markdown_text: str, fallback_name: str) -> str:
     lines = [line.strip() for line in str(markdown_text or "").splitlines() if line.strip()]
     for line in lines[:30]:
@@ -155,17 +181,34 @@ def _format_semantic_scholar_context(payload: dict[str, Any]) -> str:
     success = bool(payload.get("success"))
     query = str(payload.get("query") or "").strip()
     papers = payload.get("papers") if isinstance(payload.get("papers"), list) else []
-    if not success or not papers:
-        msg = str(payload.get("message") or "No results").strip()
-        return (
-            f"success: false\n"
-            f"query: {query or '(empty)'}\n"
-            f"message: {msg or 'No results'}\n"
-            "papers: []\n"
-            "strict_rule: objective_retrieval_unavailable_do_not_invent_papers"
+    cutoff_meta = payload.get("cutoff_date") if isinstance(payload.get("cutoff_date"), dict) else None
+    cutoff_lines: list[str] = []
+    if cutoff_meta:
+        cutoff_lines.append(
+            f"cutoff_date: {cutoff_meta.get('value')} "
+            f"(precision={cutoff_meta.get('precision')}, source={cutoff_meta.get('source')})"
+        )
+        filtered_out = payload.get("filtered_out_count")
+        if filtered_out is not None:
+            cutoff_lines.append(f"filtered_out_after_cutoff: {filtered_out}")
+        cutoff_lines.append(
+            "strict_rule: do_not_cite_or_compare_against_papers_published_after_cutoff"
         )
 
-    lines = ["success: true", f"query: {query or '(empty)'}", "papers:"]
+    if not success or not papers:
+        msg = str(payload.get("message") or "No results").strip()
+        base = [
+            "success: false",
+            f"query: {query or '(empty)'}",
+            f"message: {msg or 'No results'}",
+            "papers: []",
+            "strict_rule: objective_retrieval_unavailable_do_not_invent_papers",
+        ]
+        return "\n".join(base + cutoff_lines)
+
+    lines = ["success: true", f"query: {query or '(empty)'}"]
+    lines.extend(cutoff_lines)
+    lines.append("papers:")
     for row in papers:
         if not isinstance(row, dict):
             continue
@@ -3184,10 +3227,17 @@ async def run_job_async(job_id: str) -> None:
 
     mutate_job_state(job_id, apply_paper_search_state)
 
+    # Resolve the publication-date cutoff (set by the parse-stage subprocess
+    # via metadata["paper_cutoff_date"]). Both server-side year filtering and
+    # the client-side double-check key off this value.
+    cutoff_date = _resolve_runtime_cutoff(job)
+
     # Objective retrieval context for section-2 niche positioning matrix.
     semantic_adapter = _build_semantic_scholar_adapter()
     title_hint = _extract_title_hint(parse_result.markdown, job.source_pdf_name)
-    semantic_payload = await semantic_adapter.search_related(query=title_hint)
+    semantic_payload = await semantic_adapter.search_related(
+        query=title_hint, cutoff_date=cutoff_date
+    )
     semantic_context = _format_semantic_scholar_context(semantic_payload)
     write_json_atomic(
         Path(artifacts["source_pdf"]).parent / "semantic_scholar_candidates.json", semantic_payload
@@ -3201,6 +3251,7 @@ async def run_job_async(job_id: str) -> None:
         use_meta_review=False,
         paper_search_runtime_state=paper_search_runtime_state,
         semantic_scholar_context=semantic_context,
+        paper_cutoff_date=cutoff_date.to_metadata() if cutoff_date else None,
     )
     write_text_atomic(Path(artifacts["prompt_snapshot"]), prompt)
 
@@ -3217,6 +3268,7 @@ async def run_job_async(job_id: str) -> None:
         paper_adapter=paper_adapter,
         paper_search_runtime_state=paper_search_runtime_state,
         settings=settings,
+        cutoff_date=cutoff_date,
     )
 
     tools = build_review_tools(runtime)

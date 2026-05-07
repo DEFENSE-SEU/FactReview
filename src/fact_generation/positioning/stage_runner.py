@@ -63,12 +63,19 @@ def run_positioning_stage(
         else f"paper search reported started but semantic candidates file is missing ({semantic_path})"
     )
 
+    cutoff_meta = (
+        semantic_payload.get("cutoff_date")
+        if isinstance(semantic_payload.get("cutoff_date"), dict)
+        else None
+    )
+
     positioning_out = positioning_stage_dir(run_dir) / "positioning.json"
     write_json_file(
         positioning_out,
         {
             "semantic_scholar": semantic_payload,
             "paper_search_runtime_state": paper_search_state,
+            "paper_cutoff_date": cutoff_meta,
             "job_id": bridge.job_id,
             "job_json_path": str(bridge.job_json_path),
         },
