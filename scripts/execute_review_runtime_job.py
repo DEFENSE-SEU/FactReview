@@ -29,11 +29,6 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="Inclusive publication-date cutoff (YYYY[-MM[-DD]]) for positioning retrieval.",
     )
-    p.add_argument(
-        "--cutoff-source",
-        default="",
-        help="Origin of the cutoff value (e.g. 'arxiv', 'user'). Informational; used in the prompt and metadata.",
-    )
     return p.parse_args()
 
 
@@ -65,15 +60,12 @@ def main() -> None:
     shutil.copy2(source_pdf, artifacts["source_pdf"])
 
     cutoff_token = str(args.cutoff_date or "").strip()
-    cutoff_source_token = str(args.cutoff_source or "").strip()
 
     def _apply(state: JobState) -> None:
         state.artifacts.source_pdf_path = str(artifacts["source_pdf"])
         if cutoff_token:
             metadata = dict(state.metadata)
             metadata["paper_cutoff_date"] = cutoff_token
-            if cutoff_source_token:
-                metadata["paper_cutoff_date_source"] = cutoff_source_token
             state.metadata = metadata
 
     mutate_job_state(str(job.id), _apply)

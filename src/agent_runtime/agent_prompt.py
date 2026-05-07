@@ -1435,7 +1435,6 @@ def _build_fact_review_extractor_prompt(
             "[Publication-Date Cutoff]\n"
             f"value: {paper_cutoff_date.get('value')}\n"
             f"precision: {paper_cutoff_date.get('precision')}\n"
-            f"source: {paper_cutoff_date.get('source')}\n"
             "rule: when judging novelty/positioning, treat papers published AFTER this cutoff as out of scope. "
             "Do not cite them as prior work that the manuscript should have addressed.\n"
             "rule: paper_search and Semantic Scholar results have already been filtered to <= cutoff "

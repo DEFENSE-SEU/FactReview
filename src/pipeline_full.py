@@ -104,7 +104,7 @@ def _resolve_cutoff(*, args: argparse.Namespace, paper_source: str) -> CutoffDat
         return None
     explicit = str(getattr(args, "cutoff_date", "") or "").strip()
     if explicit:
-        return parse_cutoff(explicit, source="user")
+        return parse_cutoff(explicit)
     return derive_cutoff_from_source(paper_source)
 
 
@@ -132,7 +132,7 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     _log(f"  paper_pdf : {paper_pdf}")
     _log(f"  run_dir   : {run_dir}")
     if cutoff is not None:
-        _log(f"  cutoff    : {cutoff.to_string()} (source={cutoff.source}, precision={cutoff.precision})")
+        _log(f"  cutoff    : {cutoff.to_string()} (precision={cutoff.precision})")
     else:
         _log("  cutoff    : (none — using current date; all retrieved papers will be considered)")
 
@@ -147,7 +147,6 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             reuse_job_id=str(args.reuse_job_id or "").strip(),
             materialize_execution_extract=run_execution,
             cutoff_date=cutoff.to_string() if cutoff is not None else "",
-            cutoff_source=cutoff.source if cutoff is not None else "",
         ),
     )
     claim_extract_result = _run_stage(

@@ -64,7 +64,6 @@ def run_parse_stage(
     reuse_job_id: str = "",
     materialize_execution_extract: bool = True,
     cutoff_date: str = "",
-    cutoff_source: str = "",
 ) -> StageResult:
     ensure_full_pipeline_context(run_dir=run_dir, allow_standalone=True, stage="parse")
     state = bootstrap_bridge_state(
@@ -74,7 +73,6 @@ def run_parse_stage(
         paper_key=paper_key,
         reuse_job_id=reuse_job_id,
         cutoff_date=cutoff_date,
-        cutoff_source=cutoff_source,
     )
     own_payload = state.own_payload if isinstance(state.own_payload, dict) else {}
     materialize_stage_inputs_snapshot(

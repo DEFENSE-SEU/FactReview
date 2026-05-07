@@ -99,11 +99,7 @@ def test_cutoff_sends_year_param_and_filters_client_side(monkeypatch: pytest.Mon
     # Papers with no year are kept (we don't silently drop missing metadata).
     assert "No-year paper" in titles
     assert result["filtered_out_count"] == 1
-    assert result["cutoff_date"] == {
-        "value": "2022",
-        "precision": "year",
-        "source": "user",
-    }
+    assert result["cutoff_date"] == {"value": "2022", "precision": "year"}
 
 
 def test_no_cutoff_omits_year_param_and_filtered_count(monkeypatch: pytest.MonkeyPatch) -> None:

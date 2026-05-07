@@ -14,7 +14,7 @@ from util.cutoff_date import (
 class TestParseCutoff:
     def test_year_only_expands_to_year_end(self) -> None:
         cutoff = parse_cutoff("2022")
-        assert cutoff == CutoffDate(year=2022, month=12, day=31, precision="year", source="user")
+        assert cutoff == CutoffDate(year=2022, month=12, day=31, precision="year")
         assert cutoff.s2_year_param() == "-2022"
 
     def test_year_month_expands_to_month_end(self) -> None:
@@ -30,7 +30,7 @@ class TestParseCutoff:
 
     def test_full_date(self) -> None:
         cutoff = parse_cutoff("2022-10-15")
-        assert cutoff == CutoffDate(year=2022, month=10, day=15, precision="day", source="user")
+        assert cutoff == CutoffDate(year=2022, month=10, day=15, precision="day")
 
     def test_empty_returns_none(self) -> None:
         assert parse_cutoff("") is None
@@ -62,7 +62,6 @@ class TestDeriveCutoffFromSource:
         assert cutoff is not None
         assert cutoff.year == expected_year
         assert cutoff.month == expected_month
-        assert cutoff.source == "arxiv"
         assert cutoff.precision == "month"
 
     def test_old_arxiv_id_pre_2000(self) -> None:

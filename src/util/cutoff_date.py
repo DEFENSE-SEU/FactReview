@@ -37,7 +37,6 @@ class CutoffDate:
     month: int
     day: int
     precision: str  # "year" | "month" | "day"
-    source: str  # "user" | "arxiv" | other
 
     def to_string(self) -> str:
         if self.precision == "year":
@@ -59,14 +58,10 @@ class CutoffDate:
         return f"-{self.year}"
 
     def to_metadata(self) -> dict[str, str]:
-        return {
-            "value": self.to_string(),
-            "precision": self.precision,
-            "source": self.source,
-        }
+        return {"value": self.to_string(), "precision": self.precision}
 
 
-def parse_cutoff(token: str | None, *, source: str = "user") -> CutoffDate | None:
+def parse_cutoff(token: str | None) -> CutoffDate | None:
     """Parse ``YYYY``, ``YYYY-MM`` or ``YYYY-MM-DD``. Return ``None`` for empty
     input. Raise ``ValueError`` for non-empty input that is not a valid date so
     the user gets a clear error rather than a silent fallback."""
@@ -84,7 +79,7 @@ def parse_cutoff(token: str | None, *, source: str = "user") -> CutoffDate | Non
         raise ValueError(f"cutoff year out of range: {token!r}")
 
     if len(parts) == 1:
-        return CutoffDate(year=year, month=12, day=31, precision="year", source=source)
+        return CutoffDate(year=year, month=12, day=31, precision="year")
 
     try:
         month = int(parts[1])
@@ -95,14 +90,14 @@ def parse_cutoff(token: str | None, *, source: str = "user") -> CutoffDate | Non
 
     if len(parts) == 2:
         last_day = monthrange(year, month)[1]
-        return CutoffDate(year=year, month=month, day=last_day, precision="month", source=source)
+        return CutoffDate(year=year, month=month, day=last_day, precision="month")
 
     try:
         day = int(parts[2])
         date(year, month, day)
     except ValueError as exc:
         raise ValueError(f"invalid cutoff date day: {token!r}") from exc
-    return CutoffDate(year=year, month=month, day=day, precision="day", source=source)
+    return CutoffDate(year=year, month=month, day=day, precision="day")
 
 
 def derive_cutoff_from_source(source: str | None) -> CutoffDate | None:
@@ -129,7 +124,7 @@ def derive_cutoff_from_source(source: str | None) -> CutoffDate | None:
     # Years 91..99 -> 1991..1999; 00..50 -> 2000..2050.
     year = 1900 + yy if yy >= 91 else 2000 + yy
     last_day = monthrange(year, month)[1]
-    return CutoffDate(year=year, month=month, day=last_day, precision="month", source="arxiv")
+    return CutoffDate(year=year, month=month, day=last_day, precision="month")
 
 
 def is_after_cutoff(

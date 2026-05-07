@@ -335,7 +335,6 @@ def _run_review_runtime(
     paper_pdf: Path,
     title: str,
     cutoff_date: str = "",
-    cutoff_source: str = "",
 ) -> dict[str, Any]:
     py_exec = _pick_python_executable(repo_root)
     script = repo_root / "scripts" / "execute_review_runtime_job.py"
@@ -347,9 +346,6 @@ def _run_review_runtime(
     cutoff_token = str(cutoff_date or "").strip()
     if cutoff_token:
         cmd.extend(["--cutoff-date", cutoff_token])
-    cutoff_source_token = str(cutoff_source or "").strip()
-    if cutoff_source_token:
-        cmd.extend(["--cutoff-source", cutoff_source_token])
 
     # Hard ceiling: a single agent runtime job for one paper should never need
     # more than a few hours. Without this, a hung subprocess would pin the
@@ -466,7 +462,6 @@ def bootstrap_bridge_state(
     paper_key: str,
     reuse_job_id: str = "",
     cutoff_date: str = "",
-    cutoff_source: str = "",
 ) -> RuntimeBridgeState:
     run_dir.mkdir(parents=True, exist_ok=True)
     existing = load_bridge_state(run_dir)
@@ -542,7 +537,6 @@ def bootstrap_bridge_state(
         paper_pdf=resolved_pdf,
         title=key,
         cutoff_date=cutoff_date,
-        cutoff_source=cutoff_source,
     )
     return save_bridge_state(
         run_dir=run_dir,

@@ -139,22 +139,17 @@ def _resolve_runtime_cutoff(job: Any) -> CutoffDate | None:
     """Pull the publication-date cutoff out of ``JobState.metadata``.
 
     The cutoff is set by ``execute_review_runtime_job.py`` from the
-    ``--cutoff-date`` / ``--cutoff-source`` args propagated by
-    ``pipeline_full``. A malformed value is logged and ignored rather than
-    failing the whole run.
+    ``--cutoff-date`` arg propagated by ``pipeline_full``. A malformed value is
+    logged and ignored rather than failing the whole run.
     """
     metadata = getattr(job, "metadata", None)
     token = ""
-    source = "user"
     if isinstance(metadata, dict):
         token = str(metadata.get("paper_cutoff_date") or "").strip()
-        explicit_source = str(metadata.get("paper_cutoff_date_source") or "").strip()
-        if explicit_source:
-            source = explicit_source
     if not token:
         return None
     try:
-        return parse_cutoff(token, source=source)
+        return parse_cutoff(token)
     except ValueError as exc:
         append_event(str(getattr(job, "id", "")), "paper_cutoff_invalid", value=token, error=str(exc))
         return None
@@ -185,8 +180,7 @@ def _format_semantic_scholar_context(payload: dict[str, Any]) -> str:
     cutoff_lines: list[str] = []
     if cutoff_meta:
         cutoff_lines.append(
-            f"cutoff_date: {cutoff_meta.get('value')} "
-            f"(precision={cutoff_meta.get('precision')}, source={cutoff_meta.get('source')})"
+            f"cutoff_date: {cutoff_meta.get('value')} (precision={cutoff_meta.get('precision')})"
         )
         filtered_out = payload.get("filtered_out_count")
         if filtered_out is not None:
