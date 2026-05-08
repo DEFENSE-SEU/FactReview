@@ -87,7 +87,11 @@ def test_generate_teaser_figure_without_gemini_key_writes_prompt(tmp_path: Path,
     assert result.used_gemini_api is False
     assert Path(result.prompt_path).exists()
     assert result.prompt
-    assert "Gemini web app" in result.message
+    # Manual workflow guidance: where to paste + that there's a reference image
+    # to upload alongside it. Avoid asserting an exact product name so the
+    # message can evolve without breaking the test.
+    assert "Paste" in result.message
+    assert "reference" in result.message.lower()
 
 
 def test_generate_teaser_figure_ignores_openai_key_without_image_base_url(
@@ -123,7 +127,8 @@ def test_generate_teaser_figure_prompt_only_mode_returns_manual_prompt(tmp_path:
     assert result.status == "prompt_only"
     assert result.used_gemini_api is False
     assert result.prompt
-    assert "Gemini web app" in result.message
+    assert "Paste" in result.message
+    assert "reference" in result.message.lower()
 
 
 def test_extract_inline_image_bytes_finds_nested_base64() -> None:

@@ -97,6 +97,15 @@ GEMINI_API_KEY=
 To force prompt-only output even when a Gemini key is configured, pass
 `--teaser-mode prompt` on the CLI (or set `TEASER_USE_GEMINI=false` in `.env`).
 
+**Prompt-only workflow (manual upload).** The prompt refers to "the attached
+reference image" — when you paste it into Gemini / ChatGPT / any image-model
+web UI, **also upload a layout reference image in the same message**. The
+recommended reference is `demos/Graph/compgcn/teaser_figure.png`, which the
+prompt's geometry constraints are written against. Without this image the
+model has nothing to anchor the layout to and tends to leave panels empty.
+You can override which file is used as the reference by setting
+`TEASER_TEMPLATE_REFERENCE_PNG=path/to/your_template.png` in `.env`.
+
 ## Running
 
 Full default pipeline on a local PDF:

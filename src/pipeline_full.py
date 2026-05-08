@@ -286,6 +286,20 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     if review_md:
         _log(f"Final review: {review_md}")
     _log(f"Summary: {summary_path}")
+
+    # Surface teaser prompt-only guidance at the very end so it's the last
+    # thing the user sees and can act on without scrolling through JSON.
+    teaser_info = summary.get("teaser_figure") or {}
+    if isinstance(teaser_info, dict) and teaser_info.get("status") == "prompt_only":
+        teaser_message = str(teaser_info.get("message") or "").strip()
+        teaser_prompt_path = outputs.get("teaser_figure_prompt") or ""
+        if teaser_message:
+            _log("")
+            _log("Teaser figure (manual step):")
+            _log(f"  {teaser_message}")
+            if teaser_prompt_path:
+                _log(f"  Prompt file: {teaser_prompt_path}")
+
     return summary
 
 
