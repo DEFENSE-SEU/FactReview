@@ -106,6 +106,25 @@ class Settings(BaseSettings):
     final_report_audit_max_source_chars: int = 80000
     final_report_audit_max_review_chars: int = 50000
 
+    # Post-report claim audit: deterministic significance / axis / ablation
+    # checks plus an optional LLM adjudication pass. The deterministic checks
+    # are cheap and always run when enabled; the LLM pass can be turned off
+    # for offline / unit-test runs.
+    enable_review_claim_audit: bool = Field(
+        default=True,
+        validation_alias=AliasChoices(
+            "FACTREVIEW_REVIEW_CLAIM_AUDIT",
+            "ENABLE_REVIEW_CLAIM_AUDIT",
+        ),
+    )
+    enable_review_claim_audit_llm: bool = Field(
+        default=True,
+        validation_alias=AliasChoices(
+            "FACTREVIEW_REVIEW_CLAIM_AUDIT_LLM",
+            "ENABLE_REVIEW_CLAIM_AUDIT_LLM",
+        ),
+    )
+
     # Optional reference-accuracy checking via RefCopilot/.
     reference_check_enabled: bool = Field(
         default=False,
