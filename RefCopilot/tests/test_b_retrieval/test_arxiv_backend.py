@@ -118,7 +118,7 @@ def test_lookup_via_reference(tmp_path):
     assert out[0].arxiv_id == "1706.03762"
 
 
-def test_handles_withdrawn(tmp_path):
+def test_handles_retracted_arxiv(tmp_path):
     get, _ = _mock_http(_WITHDRAWN_FEED)
     backend = ArxivBackend(
         cache=DiskCache(tmp_path),
@@ -127,7 +127,7 @@ def test_handles_withdrawn(tmp_path):
     )
     rec = backend.lookup_by_id("9999.99999")
     assert rec is not None
-    assert rec.withdrawn is True
+    assert rec.is_retracted is True
 
 
 def test_cache_hit_avoids_http(tmp_path):

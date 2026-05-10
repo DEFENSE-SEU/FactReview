@@ -43,6 +43,7 @@ from refcopilot.verify import hallucination as hallu_verify
 from refcopilot.verify import llm_verifier
 from refcopilot.verify import non_academic
 from refcopilot.verify import outdated as outdated_verify
+from refcopilot.verify import retraction as retraction_verify
 
 logger = logging.getLogger(__name__)
 
@@ -250,6 +251,10 @@ class RefCopilotPipeline:
             if self.use_llm_verify:
                 fake_issue = non_academic.recheck(ref, matches, fake_issue)
             issues.append(fake_issue)
+
+        # Retraction is critical info even when the reference looks fake —
+        # don't gate it behind suppress_metadata_checks.
+        issues.extend(retraction_verify.detect(ref, merged))
 
         # Skip metadata checks only when the LLM-confirmed fake verdict still stands.
         suppress_metadata_checks = (

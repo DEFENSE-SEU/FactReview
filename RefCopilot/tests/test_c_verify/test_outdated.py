@@ -22,7 +22,7 @@ def _merged(**kw):
         arxiv_id=None,
         latest_arxiv_version=None,
         arxiv_versions=[],
-        withdrawn=False,
+        is_retracted=False,
         url="",
         provenance={},
         sources=[],
@@ -73,13 +73,6 @@ def test_workshop_to_conference():
     merged = _merged(venue="ICML 2024", arxiv_id="2401.12345")
     issues = detect(ref, merged)
     assert any(i.code == "workshop_promoted" for i in issues)
-
-
-def test_withdrawn_paper():
-    ref = _ref(arxiv_id="1234.5678")
-    merged = _merged(arxiv_id="1234.5678", withdrawn=True)
-    issues = detect(ref, merged)
-    assert any(i.code == "withdrawn" for i in issues)
 
 
 def test_no_merged_returns_empty():

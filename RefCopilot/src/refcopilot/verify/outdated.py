@@ -1,11 +1,13 @@
 """Outdated reference detection.
 
-Four categories:
+Three categories:
   - arxiv_published   : cited as arXiv preprint but a real venue publication exists.
   - old_version       : cited arXiv vN, but a newer arXiv version exists.
-  - withdrawn         : arXiv paper has been withdrawn.
   - workshop_promoted : cited workshop venue, but the same paper exists at a
                         full conference / journal.
+
+Retraction (formerly the ``withdrawn`` case) lives in ``verify/retraction.py``
+and is reported as an error rather than a warning.
 """
 
 from __future__ import annotations
@@ -24,18 +26,6 @@ def detect(reference: Reference, merged: MergedRecord | None) -> list[Issue]:
     issues: list[Issue] = []
     if merged is None:
         return issues
-
-    if merged.withdrawn:
-        issues.append(
-            Issue(
-                severity=Severity.WARNING,
-                category=IssueCategory.OUTDATED,
-                code="withdrawn",
-                message="The cited paper has been withdrawn from arXiv.",
-                suggestion="Remove this citation or replace with a current source.",
-                confidence=0.95,
-            )
-        )
 
     if _cited_as_arxiv(reference) and _has_real_venue(merged):
         issues.append(

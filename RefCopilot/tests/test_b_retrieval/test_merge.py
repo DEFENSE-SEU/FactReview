@@ -20,7 +20,7 @@ def _arxiv_record(**kw):
         arxiv_id="1706.03762",
         latest_arxiv_version=7,
         arxiv_versions=[7],
-        withdrawn=False,
+        is_retracted=False,
         url="https://arxiv.org/abs/1706.03762",
     )
     defaults.update(kw)
@@ -99,9 +99,26 @@ def test_merge_propagates_arxiv_versioning():
     assert merged.arxiv_versions == [7]
 
 
-def test_merge_propagates_withdrawn():
-    merged = merge_records([_arxiv_record(withdrawn=True), _s2_record()])
-    assert merged.withdrawn is True
+def test_merge_propagates_retraction():
+    merged = merge_records([_arxiv_record(is_retracted=True), _s2_record()])
+    assert merged.is_retracted is True
+
+
+def test_merge_retraction_or_across_backends():
+    """Any backend reporting retraction wins, even non-priority ones."""
+    openalex = ExternalRecord(
+        backend=Backend.OPENALEX,
+        record_id="W123",
+        title="Some retracted paper",
+        authors=["X"],
+        year=2020,
+        doi="10.1109/access.2020.3018326",
+        is_retracted=True,
+        url="https://openalex.org/W123",
+    )
+    merged = merge_records([_arxiv_record(is_retracted=False), openalex])
+    assert merged is not None
+    assert merged.is_retracted is True
 
 
 def _openreview_record(**kw):

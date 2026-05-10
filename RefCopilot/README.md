@@ -7,8 +7,10 @@ OpenAlex, emitting:
 
 - **Errors** for fabricated / hallucinated references that don't match any
   retrievable record.
+- **Errors** for retracted citations (publisher retractions surfaced via
+  OpenAlex's `is_retracted` flag, plus arXiv author-withdrawn preprints).
 - **Warnings** for outdated references (an arXiv preprint that's since been
-  published, an older arXiv version, withdrawn papers, workshop → full upgrades).
+  published, an older arXiv version, workshop → full upgrades).
 - **Warnings** for incomplete references (missing DOI / arXiv ID / venue / year,
   truncated authors, abbreviated venue names).
 

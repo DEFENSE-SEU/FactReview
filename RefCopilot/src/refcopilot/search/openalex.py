@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 _DEFAULT_BASE = "https://api.openalex.org"
 _SELECT_FIELDS = (
     "id,doi,title,display_name,publication_year,authorships,"
-    "primary_location,ids,type"
+    "primary_location,ids,type,is_retracted"
 )
 
 
@@ -313,6 +313,7 @@ def _work_to_record(work: dict[str, Any]) -> ExternalRecord | None:
         venue=venue,
         publication_venue=venue,
         doi=doi,
+        is_retracted=bool(work.get("is_retracted")),
         url=work_url or f"https://openalex.org/{record_id}",
         raw={"openalex_id": record_id, "type": str(work.get("type") or "")},
     )

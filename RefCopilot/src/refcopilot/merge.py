@@ -6,7 +6,8 @@ considered more authoritative for that field:
   - title / authors / year       → arXiv > S2 > OpenAlex > OpenReview.
   - venue / publication_venue    → S2 > OpenAlex > arXiv > OpenReview.
   - DOI                          → S2 > OpenAlex > arXiv (OpenReview rarely has it).
-  - arxiv_id / arxiv_versions / latest_arxiv_version / withdrawn → arXiv > S2.
+  - arxiv_id / arxiv_versions / latest_arxiv_version → arXiv > S2.
+  - is_retracted                 → OR across all backends (any positive wins).
   - URL                          → arXiv > S2 > OpenAlex > OpenReview.
 
 Each merged field's provenance (``Backend``) is recorded so callers can trace
@@ -83,12 +84,10 @@ def merge_records(records: list[ExternalRecord]) -> MergedRecord | None:
     arxiv_id: str | None = None
     arxiv_versions: list[int] = []
     latest_arxiv_version: int | None = None
-    withdrawn = False
     if arxiv_rec:
         arxiv_id = arxiv_rec.arxiv_id
         arxiv_versions = list(arxiv_rec.arxiv_versions)
         latest_arxiv_version = arxiv_rec.latest_arxiv_version
-        withdrawn = arxiv_rec.withdrawn
         if arxiv_id:
             provenance["arxiv_id"] = Backend.ARXIV
     if not arxiv_id:
@@ -97,6 +96,11 @@ def merge_records(records: list[ExternalRecord]) -> MergedRecord | None:
         if s2_rec and s2_rec.arxiv_id:
             arxiv_id = s2_rec.arxiv_id
             provenance["arxiv_id"] = Backend.SEMANTIC_SCHOLAR
+
+    # Retraction is a positive signal — any backend that flags the work as
+    # retracted (arXiv "withdrawn" string, OpenAlex is_retracted, future
+    # CrossRef update-to) wins, regardless of backend priority.
+    is_retracted = any(rec.is_retracted for rec in records)
 
     url_value, _ = _pick(by_backend, _URL_PRIORITY, lambda r: r.url)
     url = url_value or ""
@@ -110,7 +114,7 @@ def merge_records(records: list[ExternalRecord]) -> MergedRecord | None:
         arxiv_id=arxiv_id,
         arxiv_versions=arxiv_versions,
         latest_arxiv_version=latest_arxiv_version,
-        withdrawn=withdrawn,
+        is_retracted=is_retracted,
         url=url,
         provenance=provenance,
         sources=list(records),

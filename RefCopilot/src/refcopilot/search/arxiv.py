@@ -1,4 +1,4 @@
-"""arXiv backend — Atom feed search + version + withdrawn detection.
+"""arXiv backend — Atom feed search + version + retraction (withdrawn) detection.
 
 Uses raw HTTP against ``https://export.arxiv.org/api/query`` for both id-based
 and title-based lookups, and scrapes per-version metadata from
@@ -198,7 +198,7 @@ def _entry_to_record(entry: ET.Element) -> ExternalRecord | None:
     year = int(year_match.group(1)) if year_match else None
 
     summary = (entry.findtext("atom:summary", default="", namespaces=_NS) or "").strip()
-    withdrawn = "this paper has been withdrawn" in summary.lower()
+    is_retracted = "this paper has been withdrawn" in summary.lower()
 
     journal_ref = (entry.findtext("arxiv:journal_ref", default="", namespaces=_NS) or "").strip()
     venue: str | None = journal_ref or None
@@ -218,7 +218,7 @@ def _entry_to_record(entry: ET.Element) -> ExternalRecord | None:
         arxiv_id=arxiv_id,
         latest_arxiv_version=version,
         arxiv_versions=[version] if version else [],
-        withdrawn=withdrawn,
+        is_retracted=is_retracted,
         url=f"https://arxiv.org/abs/{arxiv_id}{f'v{version}' if version else ''}",
         raw={"summary": summary[:1000], "journal_ref": journal_ref},
     )

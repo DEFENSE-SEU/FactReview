@@ -22,7 +22,7 @@ def _merged(**kw):
         arxiv_id=None,
         latest_arxiv_version=None,
         arxiv_versions=[],
-        withdrawn=False,
+        is_retracted=False,
         url="",
         provenance={},
         sources=[],

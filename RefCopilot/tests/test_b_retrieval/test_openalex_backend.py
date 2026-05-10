@@ -350,3 +350,42 @@ def test_repository_source_type_drops_venue(tmp_path):
     assert rec.year == 2017
     assert rec.venue is None
     assert rec.publication_venue is None
+
+
+# ---------------------------------------------------------------------------
+# Retraction flag
+# ---------------------------------------------------------------------------
+
+
+def test_lookup_captures_is_retracted_true(tmp_path):
+    payload = {**_WORK_PAYLOAD, "is_retracted": True}
+    get, _ = _mock_http(payload)
+    backend = _make_backend(tmp_path, get)
+    rec = backend.lookup_by_doi("10.7717/peerj.4375")
+    assert rec is not None
+    assert rec.is_retracted is True
+
+
+def test_lookup_is_retracted_defaults_false_when_absent(tmp_path):
+    # _WORK_PAYLOAD has no is_retracted key — should coerce to False.
+    get, _ = _mock_http(_WORK_PAYLOAD)
+    backend = _make_backend(tmp_path, get)
+    rec = backend.lookup_by_doi("10.7717/peerj.4375")
+    assert rec is not None
+    assert rec.is_retracted is False
+
+
+def test_lookup_is_retracted_coerces_none_to_false(tmp_path):
+    payload = {**_WORK_PAYLOAD, "is_retracted": None}
+    get, _ = _mock_http(payload)
+    backend = _make_backend(tmp_path, get)
+    rec = backend.lookup_by_doi("10.7717/peerj.4375")
+    assert rec is not None
+    assert rec.is_retracted is False
+
+
+def test_select_fields_request_includes_is_retracted(tmp_path):
+    get, calls = _mock_http(_WORK_PAYLOAD)
+    backend = _make_backend(tmp_path, get)
+    backend.lookup_by_doi("10.7717/peerj.4375")
+    assert "is_retracted" in calls[0]["params"]["select"]

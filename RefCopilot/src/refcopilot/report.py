@@ -95,6 +95,7 @@ _CATEGORY_TO_TYPE = {
     IssueCategory.FAKE: "hallucination",
     IssueCategory.OUTDATED: "outdated",
     IssueCategory.INCOMPLETE: "incomplete",
+    IssueCategory.RETRACTED: "retracted",
 }
 
 

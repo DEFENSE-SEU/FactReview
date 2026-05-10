@@ -27,6 +27,7 @@ class IssueCategory(str, Enum):
     OUTDATED = "outdated"
     INCOMPLETE = "incomplete"
     NON_ACADEMIC = "non_academic"
+    RETRACTED = "retracted"
 
 
 class Verdict(str, Enum):
@@ -85,7 +86,7 @@ class ExternalRecord(BaseModel):
     arxiv_id: str | None = None
     arxiv_versions: list[int] = Field(default_factory=list)
     latest_arxiv_version: int | None = None
-    withdrawn: bool = False
+    is_retracted: bool = False
     s2_paper_id: str | None = None
     url: str = ""
     raw: dict[str, Any] = Field(default_factory=dict)
@@ -100,7 +101,7 @@ class MergedRecord(BaseModel):
     arxiv_id: str | None = None
     arxiv_versions: list[int] = Field(default_factory=list)
     latest_arxiv_version: int | None = None
-    withdrawn: bool = False
+    is_retracted: bool = False
     url: str = ""
     provenance: dict[str, Backend] = Field(default_factory=dict)
     sources: list[ExternalRecord] = Field(default_factory=list)
