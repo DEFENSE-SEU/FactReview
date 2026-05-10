@@ -1,11 +1,13 @@
 """Merge :class:`ExternalRecord` results from multiple backends into one :class:`MergedRecord`.
 
-Field priority (first non-empty wins):
-  - title / authors / year       → arXiv > S2 > OpenReview.
-  - venue / publication_venue    → Semantic Scholar > arXiv > OpenReview.
-  - DOI                          → Semantic Scholar > arXiv (OpenReview rarely has it).
+Field priority (first non-empty wins) — earlier backends in each list are
+considered more authoritative for that field:
+
+  - title / authors / year       → arXiv > S2 > OpenAlex > OpenReview.
+  - venue / publication_venue    → S2 > OpenAlex > arXiv > OpenReview.
+  - DOI                          → S2 > OpenAlex > arXiv (OpenReview rarely has it).
   - arxiv_id / arxiv_versions / latest_arxiv_version / withdrawn → arXiv > S2.
-  - URL                          → arXiv > S2 > OpenReview.
+  - URL                          → arXiv > S2 > OpenAlex > OpenReview.
 
 Each merged field's provenance (``Backend``) is recorded so callers can trace
 where a value came from.
@@ -13,78 +15,95 @@ where a value came from.
 
 from __future__ import annotations
 
+from typing import Callable
+
 from refcopilot.models import Backend, ExternalRecord, MergedRecord
+
+
+_TITLE_PRIORITY = (
+    Backend.ARXIV,
+    Backend.SEMANTIC_SCHOLAR,
+    Backend.OPENALEX,
+    Backend.OPENREVIEW,
+)
+_VENUE_PRIORITY = (
+    Backend.SEMANTIC_SCHOLAR,
+    Backend.OPENALEX,
+    Backend.ARXIV,
+    Backend.OPENREVIEW,
+)
+_DOI_PRIORITY = (
+    Backend.SEMANTIC_SCHOLAR,
+    Backend.OPENALEX,
+    Backend.ARXIV,
+)
+_ARXIV_ID_PRIORITY = (Backend.ARXIV, Backend.SEMANTIC_SCHOLAR)
+_URL_PRIORITY = (
+    Backend.ARXIV,
+    Backend.SEMANTIC_SCHOLAR,
+    Backend.OPENALEX,
+    Backend.OPENREVIEW,
+)
 
 
 def merge_records(records: list[ExternalRecord]) -> MergedRecord | None:
     if not records:
         return None
 
-    arxiv = next((r for r in records if r.backend == Backend.ARXIV), None)
-    s2 = next((r for r in records if r.backend == Backend.SEMANTIC_SCHOLAR), None)
-    openreview = next((r for r in records if r.backend == Backend.OPENREVIEW), None)
+    # Index by backend; if a backend appears multiple times, keep the first.
+    by_backend: dict[Backend, ExternalRecord] = {}
+    for r in records:
+        by_backend.setdefault(r.backend, r)
 
     provenance: dict[str, Backend] = {}
 
-    title, prov_title = _pick("title", arxiv, s2, openreview, default="")
-    authors, prov_authors = _pick_list("authors", arxiv, s2, openreview)
-    year, prov_year = _pick("year", arxiv, s2, openreview)
+    title, prov_title = _pick(by_backend, _TITLE_PRIORITY, lambda r: r.title)
+    authors, prov_authors = _pick(by_backend, _TITLE_PRIORITY, lambda r: r.authors)
+    year, prov_year = _pick(by_backend, _TITLE_PRIORITY, lambda r: r.year)
     if title:
-        provenance["title"] = prov_title
+        provenance["title"] = prov_title  # type: ignore[assignment]
     if authors:
-        provenance["authors"] = prov_authors
+        provenance["authors"] = prov_authors  # type: ignore[assignment]
     if year is not None:
-        provenance["year"] = prov_year
+        provenance["year"] = prov_year  # type: ignore[assignment]
 
-    venue: str | None = None
-    venue_source: Backend | None = None
-    for source, backend in (
-        (s2, Backend.SEMANTIC_SCHOLAR),
-        (arxiv, Backend.ARXIV),
-        (openreview, Backend.OPENREVIEW),
-    ):
-        if source is None:
-            continue
-        candidate = source.publication_venue or source.venue or source.journal
-        if candidate:
-            venue = candidate
-            venue_source = backend
-            break
-    if venue and venue_source:
-        provenance["venue"] = venue_source
+    venue, prov_venue = _pick(
+        by_backend,
+        _VENUE_PRIORITY,
+        lambda r: r.publication_venue or r.venue or r.journal,
+    )
+    if venue:
+        provenance["venue"] = prov_venue  # type: ignore[assignment]
 
-    doi: str | None = None
-    if s2 and s2.doi:
-        doi = s2.doi
-        provenance["doi"] = Backend.SEMANTIC_SCHOLAR
-    elif arxiv and arxiv.doi:
-        doi = arxiv.doi
-        provenance["doi"] = Backend.ARXIV
+    doi, prov_doi = _pick(by_backend, _DOI_PRIORITY, lambda r: r.doi)
+    if doi:
+        provenance["doi"] = prov_doi  # type: ignore[assignment]
 
+    arxiv_rec = by_backend.get(Backend.ARXIV)
     arxiv_id: str | None = None
     arxiv_versions: list[int] = []
     latest_arxiv_version: int | None = None
     withdrawn = False
-    if arxiv:
-        arxiv_id = arxiv.arxiv_id
-        arxiv_versions = list(arxiv.arxiv_versions)
-        latest_arxiv_version = arxiv.latest_arxiv_version
-        withdrawn = arxiv.withdrawn
+    if arxiv_rec:
+        arxiv_id = arxiv_rec.arxiv_id
+        arxiv_versions = list(arxiv_rec.arxiv_versions)
+        latest_arxiv_version = arxiv_rec.latest_arxiv_version
+        withdrawn = arxiv_rec.withdrawn
         if arxiv_id:
             provenance["arxiv_id"] = Backend.ARXIV
-    if not arxiv_id and s2 and s2.arxiv_id:
-        arxiv_id = s2.arxiv_id
-        provenance["arxiv_id"] = Backend.SEMANTIC_SCHOLAR
+    if not arxiv_id:
+        # Fall back to S2's externalIds.ArXiv.
+        s2_rec = by_backend.get(Backend.SEMANTIC_SCHOLAR)
+        if s2_rec and s2_rec.arxiv_id:
+            arxiv_id = s2_rec.arxiv_id
+            provenance["arxiv_id"] = Backend.SEMANTIC_SCHOLAR
 
-    url = ""
-    for source in (arxiv, s2, openreview):
-        if source is not None and source.url:
-            url = source.url
-            break
+    url_value, _ = _pick(by_backend, _URL_PRIORITY, lambda r: r.url)
+    url = url_value or ""
 
     return MergedRecord(
         title=title or "",
-        authors=authors,
+        authors=authors or [],
         year=year,
         venue=venue,
         doi=doi,
@@ -99,40 +118,20 @@ def merge_records(records: list[ExternalRecord]) -> MergedRecord | None:
 
 
 def _pick(
-    field: str,
-    arxiv: ExternalRecord | None,
-    s2: ExternalRecord | None,
-    openreview: ExternalRecord | None,
-    *,
-    default=None,
+    by_backend: dict[Backend, ExternalRecord],
+    priority: tuple[Backend, ...],
+    getter: Callable[[ExternalRecord], object],
 ):
-    for source, backend in (
-        (arxiv, Backend.ARXIV),
-        (s2, Backend.SEMANTIC_SCHOLAR),
-        (openreview, Backend.OPENREVIEW),
-    ):
-        if source is None:
-            continue
-        v = getattr(source, field)
-        if v not in (None, "", []):
-            return v, backend
-    return default, Backend.ARXIV  # provenance is meaningless when value is empty
+    """Return the first non-empty ``getter(record)`` walking ``priority``.
 
-
-def _pick_list(
-    field: str,
-    arxiv: ExternalRecord | None,
-    s2: ExternalRecord | None,
-    openreview: ExternalRecord | None,
-):
-    for source, backend in (
-        (arxiv, Backend.ARXIV),
-        (s2, Backend.SEMANTIC_SCHOLAR),
-        (openreview, Backend.OPENREVIEW),
-    ):
-        if source is None:
+    Returns a ``(value, backend)`` tuple, or ``(None, None)`` if no backend in
+    the priority list has a non-empty value.
+    """
+    for backend in priority:
+        rec = by_backend.get(backend)
+        if rec is None:
             continue
-        v = getattr(source, field) or []
-        if v:
-            return list(v), backend
-    return [], Backend.ARXIV
+        value = getter(rec)
+        if value not in (None, "", []):
+            return value, backend
+    return None, None

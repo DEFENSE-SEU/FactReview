@@ -2,7 +2,8 @@
 
 A focused reference-accuracy checker for academic papers. Given a PDF, URL,
 BibTeX file, or plain text bibliography, RefCopilot extracts each citation and
-verifies it against arXiv and Semantic Scholar, emitting:
+verifies it against arXiv, Semantic Scholar, OpenReview, and (optionally)
+OpenAlex, emitting:
 
 - **Errors** for fabricated / hallucinated references that don't match any
   retrievable record.
@@ -91,6 +92,8 @@ also list unmatched references.
 |---|---|
 | `SEMANTIC_SCHOLAR_API_KEY` | Optional Semantic Scholar API key (recommended to avoid rate limits). |
 | `SEMANTIC_SCHOLAR_BASE_URL` | Override the S2 base URL. |
+| `OPENALEX_API_KEY` | Optional OpenAlex API key. When set, OpenAlex is queried in parallel with arXiv / S2 / OpenReview as a fourth cross-check signal; when empty, OpenAlex is skipped. Free key at https://openalex.org/settings/api. |
+| `OPENALEX_BASE_URL` | Override the OpenAlex base URL (default `https://api.openalex.org`). |
 | `REFCOPILOT_FACTREVIEW_SRC` | Override the FactReview `src/` path used to load the LLM client. |
 
 ## Running the tests

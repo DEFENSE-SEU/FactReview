@@ -67,6 +67,7 @@ class Backend(str, Enum):
     ARXIV = "arxiv"
     SEMANTIC_SCHOLAR = "semantic_scholar"
     OPENREVIEW = "openreview"
+    OPENALEX = "openalex"
 
 
 class ExternalRecord(BaseModel):

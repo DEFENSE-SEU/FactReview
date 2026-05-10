@@ -3,7 +3,7 @@
 Tying together:
   inputs (detector / bibtex / pdf / url / plain_text)
     → extract (LLM-only)
-    → search (arxiv + semantic_scholar)
+    → search (arxiv + semantic_scholar + openreview [+ openalex])
     → merge
     → verify (hallucination → optional LLM verifier → outdated → completeness)
     → report
@@ -35,6 +35,7 @@ from refcopilot.models import (
     Verdict,
 )
 from refcopilot.search.arxiv import ArxivBackend
+from refcopilot.search.openalex import OpenAlexBackend
 from refcopilot.search.openreview import OpenReviewBackend
 from refcopilot.search.semantic_scholar import SemanticScholarBackend
 from refcopilot.verify import completeness as completeness_verify
@@ -58,9 +59,12 @@ class RefCopilotPipeline:
         cache_ttl_days: int = 30,
         s2_api_key: str | None = None,
         s2_base_url: str | None = None,
+        openalex_api_key: str | None = None,
+        openalex_base_url: str | None = None,
         arxiv_backend: ArxivBackend | None = None,
         s2_backend: SemanticScholarBackend | None = None,
         openreview_backend: OpenReviewBackend | None = None,
+        openalex_backend: OpenAlexBackend | None = None,
         use_llm_verify: bool = True,
         max_workers: int = 4,
     ) -> None:
@@ -76,6 +80,20 @@ class RefCopilotPipeline:
             cache=self.cache,
         )
         self.openreview = openreview_backend or OpenReviewBackend(cache=self.cache)
+        # OpenAlex is opt-in: only enabled when an API key is provided. When
+        # absent, ``self.openalex`` stays None and ``_safe_lookup`` returns []
+        # without complaint.
+        clean_openalex_key = (openalex_api_key or "").strip()
+        if openalex_backend is not None:
+            self.openalex: OpenAlexBackend | None = openalex_backend
+        elif clean_openalex_key:
+            self.openalex = OpenAlexBackend(
+                api_key=clean_openalex_key,
+                base_url=(openalex_base_url or "https://api.openalex.org"),
+                cache=self.cache,
+            )
+        else:
+            self.openalex = None
         self.use_llm_verify = use_llm_verify
         self.max_workers = max(1, int(max_workers))
 
@@ -149,12 +167,24 @@ class RefCopilotPipeline:
         arxiv_records = _safe_lookup(self.arxiv, ref, "arxiv")
         s2_records = _safe_lookup(self.s2, ref, "semantic_scholar")
         openreview_records = _safe_lookup(self.openreview, ref, "openreview")
-        matches = list(arxiv_records) + list(s2_records) + list(openreview_records)
+        openalex_records = _safe_lookup(self.openalex, ref, "openalex")
+        matches = (
+            list(arxiv_records)
+            + list(s2_records)
+            + list(openreview_records)
+            + list(openalex_records)
+        )
         merged = merge_records(matches) if matches else None
 
         initial_arxiv_count = len(arxiv_records)
         initial_s2_count = len(s2_records)
         initial_openreview_count = len(openreview_records)
+        # ``None`` means OpenAlex isn't configured; an int (incl. 0) means it
+        # was called. The trace builder uses this to decide whether to mention
+        # OpenAlex at all.
+        initial_openalex_count: int | None = (
+            len(openalex_records) if self.openalex is not None else None
+        )
 
         pre_verdict = hallu_verify.pre_screen(ref, matches, merged)
         verdict = pre_verdict
@@ -163,6 +193,7 @@ class RefCopilotPipeline:
         retry_arxiv_count: int | None = None
         retry_s2_count: int | None = None
         retry_openreview_count: int | None = None
+        retry_openalex_count: int | None = None
         retry_used = False
 
         if self.use_llm_verify and verdict != HallucinationVerdict.UNLIKELY:
@@ -189,11 +220,20 @@ class RefCopilotPipeline:
                 retry_openreview = _safe_lookup(
                     self.openreview, synth_ref, "openreview (retry)"
                 )
+                retry_openalex = _safe_lookup(
+                    self.openalex, synth_ref, "openalex (retry)"
+                )
                 retry_arxiv_count = len(retry_arxiv)
                 retry_s2_count = len(retry_s2)
                 retry_openreview_count = len(retry_openreview)
+                retry_openalex_count = (
+                    len(retry_openalex) if self.openalex is not None else None
+                )
                 new_matches = (
-                    list(retry_arxiv) + list(retry_s2) + list(retry_openreview)
+                    list(retry_arxiv)
+                    + list(retry_s2)
+                    + list(retry_openreview)
+                    + list(retry_openalex)
                 )
                 if new_matches:
                     matches = new_matches
@@ -226,6 +266,7 @@ class RefCopilotPipeline:
             arxiv_count=initial_arxiv_count,
             s2_count=initial_s2_count,
             openreview_count=initial_openreview_count,
+            openalex_count=initial_openalex_count,
             pre_verdict=pre_verdict,
             llm_verdict=llm_verdict,
             suggestion=suggestion,
@@ -233,6 +274,7 @@ class RefCopilotPipeline:
             retry_arxiv_count=retry_arxiv_count,
             retry_s2_count=retry_s2_count,
             retry_openreview_count=retry_openreview_count,
+            retry_openalex_count=retry_openalex_count,
         )
         return CheckedReference(
             reference=ref,
@@ -343,6 +385,7 @@ def _build_verification_trace(
     arxiv_count: int,
     s2_count: int,
     openreview_count: int,
+    openalex_count: int | None,
     pre_verdict: HallucinationVerdict,
     llm_verdict: HallucinationVerdict | None,
     suggestion: llm_verifier.LLMSuggestion | None,
@@ -350,21 +393,30 @@ def _build_verification_trace(
     retry_arxiv_count: int | None,
     retry_s2_count: int | None,
     retry_openreview_count: int | None,
+    retry_openalex_count: int | None,
 ) -> str:
     """Single-line summary of which sources were tried and what they said."""
     parts = [
         f"arXiv: {arxiv_count}",
         f"S2: {s2_count}",
         f"OpenReview: {openreview_count}",
-        f"pre-screen: {pre_verdict.value}",
     ]
+    if openalex_count is not None:
+        parts.append(f"OpenAlex: {openalex_count}")
+    parts.append(f"pre-screen: {pre_verdict.value}")
     if llm_verdict is not None and llm_verdict != pre_verdict:
         parts.append(f"LLM: {llm_verdict.value}")
     if retry_used:
         suggested_title = (suggestion.title if suggestion else None) or "(no title)"
         title_short = suggested_title if len(suggested_title) <= 80 else suggested_title[:77] + "..."
+        retry_summary = (
+            f"arXiv: {retry_arxiv_count}, "
+            f"S2: {retry_s2_count}, "
+            f"OpenReview: {retry_openreview_count}"
+        )
+        if retry_openalex_count is not None:
+            retry_summary += f", OpenAlex: {retry_openalex_count}"
         parts.append(
-            f"retry with LLM suggestion '{title_short}' → arXiv: {retry_arxiv_count}, "
-            f"S2: {retry_s2_count}, OpenReview: {retry_openreview_count}"
+            f"retry with LLM suggestion '{title_short}' → {retry_summary}"
         )
     return "; ".join(parts)

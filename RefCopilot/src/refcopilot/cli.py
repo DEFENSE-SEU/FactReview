@@ -91,6 +91,8 @@ def _run_check(args) -> int:
         cache_ttl_days=args.cache_ttl_days,
         s2_api_key=os.environ.get("SEMANTIC_SCHOLAR_API_KEY"),
         s2_base_url=os.environ.get("SEMANTIC_SCHOLAR_BASE_URL"),
+        openalex_api_key=os.environ.get("OPENALEX_API_KEY"),
+        openalex_base_url=os.environ.get("OPENALEX_BASE_URL"),
         use_llm_verify=not args.no_llm_verify,
     )
 

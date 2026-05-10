@@ -1,1 +1,1 @@
-"""Search backends: arXiv + Semantic Scholar."""
+"""Search backends: arXiv, Semantic Scholar, OpenReview, OpenAlex (optional)."""
