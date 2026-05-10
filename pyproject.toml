@@ -192,6 +192,13 @@ addopts = [
   "-ra",
   "--strict-markers",
   "--strict-config",
+  # Default to fast-only. Heavy / external tests opt back in via marker:
+  #   pytest -m e2e
+  #   pytest -m requires_docker
+  #   pytest -m requires_llm
+  # CI runs the full set with: pytest -m ""
+  "-m",
+  "not slow and not e2e and not requires_docker and not requires_llm and not requires_mineru",
 ]
 markers = [
   "slow: marks slow tests (>10s); deselect with '-m \"not slow\"'",

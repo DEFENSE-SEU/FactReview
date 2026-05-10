@@ -294,7 +294,10 @@ ruff format --check .
 # full pass, run `mypy` with no args — it picks up the broader package list
 # from pyproject.toml's [tool.mypy] section.
 mypy src/schemas src/util src/common
-pytest tests/unit -m "not slow and not e2e and not requires_docker and not requires_llm and not requires_mineru"
+pytest                          # default: ~50 fast tests, gated markers off
+pytest -m e2e                   # report-audit + teaser tail integration
+pytest -m requires_docker       # execution stage (needs Docker daemon)
+pytest -m ""                    # full set, including all gated tests
 ```
 
 ## Paper

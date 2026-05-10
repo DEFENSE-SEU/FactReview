@@ -50,7 +50,8 @@ ignore = ["E501", "B008", "RUF001", "RUF002", "RUF003", "SIM102", "SIM105", "SIM
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["tests"]
-addopts = ["-ra", "--strict-markers", "-m", "not slow"]
+addopts = ["-ra", "--strict-markers", "-m", "not slow and not e2e"]
 markers = [
   "slow: long-running tests (>5s); enable with '-m slow'",
+  "e2e: adapter integration tests; enable with '-m e2e'",
 ]
