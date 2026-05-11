@@ -1279,6 +1279,7 @@ def _build_experimental_claim_assessment(
     evidence: str,
     location: str,
     alignment: dict[str, Any],
+    authored_assessment: str = "",
 ) -> tuple[str, str]:
     """Build an assessment cell + status for an experimental claim.
 
@@ -1419,25 +1420,21 @@ def _augment_claims_with_assessment_status(
         model_claim_type = _cell_value(cells, claim_type_idx, "")
         resolved_claim_type = _resolve_claim_type_label(model_claim_type)
         if resolved_claim_type == "Experimental":
-            _generated_assess, stat = _build_experimental_claim_assessment(
+            assess, stat = _build_experimental_claim_assessment(
                 claim=claim,
                 evidence=evidence,
                 location=location,
                 alignment=alignment,
+                authored_assessment=authored_assessment,
             )
         else:
-            # Theoretical / methodological claims defer status to the
-            # post-hoc LLM-driven claim audit. The agent's authored
-            # assessment text is preserved as the visible cell content.
-            _generated_assess, stat = "", "Pending"
-        # Experimental claims with reproduction data carry a deterministic
-        # numeric assessment; everything else falls back to the agent's
-        # authored assessment, with the audit setting the final status.
-        assess = _generated_assess or (
-            authored_assessment
-            if _is_meaningful_assessment(authored_assessment)
-            else "Not found in manuscript"
-        )
+            # Non-experimental claims defer to the post-hoc claim audit.
+            assess = (
+                authored_assessment
+                if _is_meaningful_assessment(authored_assessment)
+                else "Not found in manuscript"
+            )
+            stat = "Pending"
         claim = _cell_safe(claim)
         evidence = _cell_safe(evidence)
         assess = _cell_safe(assess)
@@ -1712,10 +1709,8 @@ def _style_status_value(value: str) -> str:
     if _strip_inline_formatting(value).strip().lower() == "pending":
         return value
     normalized = _as_status_label(value)
-    if normalized == "Supported":
+    if normalized in ("Supported", "paper-supported"):
         return '<span style="color: green;">✓ Supported</span>'
-    if normalized == "paper-supported":
-        return '<span style="color: #1E5EFF;">☑ Paper-supported</span>'
     if normalized == "Partially supported":
         return '<span style="color: #E6B800;">⚠ Partially supported</span>'
     if normalized == "In conflict":
@@ -1851,7 +1846,6 @@ def _normalize_experiment_tables_in_block(block: str) -> tuple[str, list[str]]:
                     )
                 row[diff_idx] = colored_diff
             row[status_idx] = _as_status_label(raw_status_cell)
-            # Experiment section is restricted to 3 statuses only.
             if row[status_idx] == "paper-supported":
                 row[status_idx] = "Inconclusive"
             row_statuses.append(_as_status_label(row[status_idx]))
@@ -2745,13 +2739,7 @@ def _render_report_pdf(
     final_report_markdown = _stabilize_experiment_section(final_report_markdown)
     final_report_markdown = _ensure_experiment_contract(final_report_markdown)
     final_report_markdown = _compress_experiment_note(final_report_markdown)
-    # The execution stage now runs as a separate sub-stage after the agent
-    # runtime job (``stages/fact_generation/execution``) and emits its own
-    # outputs there. The two augment helpers below still produce useful work
-    # against empty payloads — they normalise the Claims / Experiment table
-    # columns and insert their colour legends — but they cannot mark
-    # execution-aligned status until/unless the execution-stage outputs are
-    # wired back into this in-process render pass.
+    # The execution stage runs separately; this first augmentation pass uses
     execution_summary: dict[str, Any] = {}
     execution_alignment: dict[str, Any] = {}
     final_report_markdown = _augment_claims_with_assessment_status(

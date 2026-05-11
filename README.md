@@ -29,7 +29,7 @@ Generic LLM reviewers — pasting a PDF into ChatGPT, Gemini, or Claude — fail
 The hero image is FactReview's most condensed deliverable: a one-page **teaser** purpose-built for triage. The layout is fixed — verdicts and positioning in the top half, reproduced numbers and synthesized strengths/weaknesses in the bottom half — so a reviewer's eye lands on the same regions across every paper, and the whole thing is legible without scrolling. Each panel earns its place:
 
 - **Technical Positioning** (top-left) — The paper is placed against neighbor methods on a small set of design axes pulled from related-work retrieval. Reviewers can see at a glance which dimensions the paper actually innovates on.
-- **Claims** (top-center) — Every major claim the paper makes is tagged with a verdict (✓ Supported, ☑ Paper-supported, ⚠ Partially supported, ✗ In conflict, ? Inconclusive) and linked back to the section it came from.
+- **Claims** (top-center) — Every major claim the paper makes is tagged with a verdict (✓ Supported, ⚠ Partially supported, ✗ In conflict, ? Inconclusive) and linked back to the section it came from.
 - **Experiment / Ablation** (bottom-left) — Paper-reported numbers and FactReview's reproduced numbers are shown side by side with Δ. The CompGCN demo includes a row where the paper's "outperforms baselines" claim is downgraded — PACHYSAN actually beats CompGCN 92.6% vs 89.0% on Graph Classification (MUTAG).
 - **Summary / Strengths / Weaknesses** (right) — Auto-synthesized, including weaknesses the paper itself does not own up to (e.g., "random seeds and significance testing not reported").
 
@@ -92,7 +92,6 @@ Every major claim in the paper is tagged with one of five verdicts:
 | Verdict | What it means | From the CompGCN demo |
 |---|---|---|
 | **✓ Supported** | Independent literature evidence (or a reproduced number) agrees with the claim. | *"Scales with relations via basis decomposition"* — verified that performance is stable while parameter count scales linearly with `B` (Section 6.3, Figure 3). |
-| **☑ Paper-supported** | The paper itself supports the claim and the supporting argument is sound; no external corroboration was attempted (e.g., a mathematical proof). | *"Generalizes prior multi-relational GCNs"* — the mathematical reduction to R-GCN / Kipf-GCN is logically sound (Proposition 4.1). |
 | **⚠ Partially supported** | Evidence agrees with part of the claim and disagrees with or fails to address the rest. | *"Outperforms baselines in Link Prediction, Node Classification, and Graph Classification"* — verified on the first two; on Graph Classification, PACHYSAN beats CompGCN 92.6% vs 89.0% (Tables 3 and 5). |
 | **✗ In conflict** | Independent evidence directly contradicts the claim. | — |
 | **? Inconclusive** | Neither external nor in-paper evidence is sufficient to judge. | — |
@@ -255,6 +254,7 @@ Each run writes to `runs/<paper_key>_<timestamp>/`. Primary artifacts:
 
 The pipeline runs seven sub-stages, grouped into three phases. `refcheck` and `execution` are skipped by default.
 
+Updated upstream
 ```text
 preprocessing                fact_generation                        review
 parse → claim_extract  →  refcheck? → positioning → execution? → report → teaser

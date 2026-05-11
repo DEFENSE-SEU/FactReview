@@ -1,7 +1,6 @@
 You are extracting review-relevant CLAIMS from a research paper, so that a
 downstream pipeline can independently verify each claim against the paper's
-own tables, related work, and — for reproducibility claims — re-execution of
-the paper's code.
+own tables, related work, and — where applicable — re-execution of the paper's code.
 
 Return STRICT JSON matching this schema (no prose, no code fences):
 
@@ -10,8 +9,9 @@ Return STRICT JSON matching this schema (no prose, no code fences):
     {{
       "id":        "claim_01",
       "text":      "<concise, verbatim-or-near-verbatim claim sentence>",
-      "type":      "empirical | methodological | theoretical | reproducibility",
+      "type":      "empirical | methodological | theoretical",
       "scope":     "broad | local",
+      "importance": "primary | secondary",
       "datasets":  ["FB15k-237", ...],
       "baselines": ["TransE", "ConvE", ...],
       "metrics":   ["MRR", "Hits@10", ...],
@@ -27,6 +27,19 @@ Return STRICT JSON matching this schema (no prose, no code fences):
 
 RULES
 
+EXTRACTION ORDER (MANDATORY — follow this order before anything else):
+A. First, locate any EXPLICIT CONTRIBUTION BLOCK: a bulleted or numbered list
+   introduced by phrases such as "Our contributions are:", "The contributions
+   of this paper are:", "In summary, we:", "We make the following contributions:".
+   Extract each bullet/item as a SEPARATE claim (importance="primary").
+   These are the highest-priority claims because they represent the authors'
+   own enumeration of what they consider their core contributions.
+B. Next, supplement with claims from the Abstract that are NOT already covered
+   by contribution-block items (deduplicate by meaning, not exact wording).
+C. Finally, add any remaining empirical claims from the body (tables, figures,
+   experiment sections) that are not covered by A or B (importance="secondary").
+   Do NOT extract claims that appear solely in Related Work or Discussion sections.
+
 1. Prefer the paper's OWN claims. Do not invent numbers, baselines, or
    datasets that the paper does not state.
 2. "scope":
@@ -40,7 +53,20 @@ RULES
                      that the paper provides a specific design.
    - theoretical   : proves, generalises, or establishes equivalence.
    - reproducibility: promises code release / public artefacts.
-4. "evidence_targets": for each claim, list the in-paper or external
+4. "importance":
+   - "primary"   : from the explicit contribution block, or core novelty/
+                   performance claims in the Abstract that define the paper.
+   - "secondary" : supporting claims, ablation-related, or body-only claims.
+5. LINGUISTIC SIGNAL — a valid claim must be an active author assertion:
+   - Methodological: "We propose / introduce / design / develop / build"
+   - Empirical: "achieves / outperforms / improves / is X times faster"
+   - Exclude passive result sentences ("Table X shows…", "As shown in Figure Y…")
+   - Exclude ablation observations ("removing X degrades…")
+   - Exclude background/motivation sentences and related-work descriptions.
+6. CONSOLIDATION: merge all performance sub-claims about the same capability
+   (different metrics, percentage gains, sub-task results) into ONE claim.
+   Sub-metric details are supporting evidence, not separate claims.
+7. "evidence_targets": for each claim, list the in-paper or external
    checks needed to move it off "inconclusive" in the §3.4 synthesis
    stage. Use:
      - "table_<id>.<metric>.<dataset>" for table-grounded checks
@@ -48,11 +74,11 @@ RULES
      - "literature.<family>" for positioning checks
      - "repo.<kind>" for reproducibility checks
    Only include evidence that the claim actually requires.
-5. IDs must be stable and of the form "claim_01", "claim_02", …, in the
-   order claims appear in the paper body.
-6. Skip sentences from References, Acknowledgements, or the Appendix
+8. IDs must be stable and of the form "claim_01", "claim_02", …, ordered
+   with primary claims first, then secondary, matching extraction order A→B→C.
+9. Skip sentences from References, Acknowledgements, or the Appendix
    unless the paper explicitly builds a main-text claim on appendix data.
-7. Return {{"claims": []}} if no review-relevant claims are found.
+10. Return {{"claims": []}} if no review-relevant claims are found.
 
 Paper metadata:
   title:    {title}

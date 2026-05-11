@@ -55,13 +55,15 @@ _THEORY_TRIGGERS = [
     r"\bspecial\s+case\s+of\b",
 ]
 
-_REPRO_TRIGGERS = [
-    r"\bsource\s+code\b",
-    r"\bcode\s+(?:is|will\s+be|has\s+been)\s+(?:made\s+)?(?:publicly\s+)?available\b",
-    r"\b(?:released|release)\s+(?:the\s+)?(?:code|implementation)\b",
-    r"github\.com/[\w\-./]+",
-    r"\breproducib(?:le|ility)\b",
-]
+# Detects the start of an explicit contribution block.
+_CONTRIBUTION_BLOCK_RE = re.compile(
+    r"(?i)\b("
+    r"our\s+(?:main\s+)?contributions?\s+(?:are|include)"
+    r"|the\s+(?:main\s+)?contributions?\s+(?:of\s+this\s+(?:paper|work)\s+)?(?:are|include)"
+    r"|in\s+(?:this\s+paper|summary)[,\s]+we\s+(?:make\s+the\s+following|propose|present|introduce)"
+    r"|we\s+(?:make\s+the\s+following|summarize\s+our)\s+contributions?"
+    r")\b"
+)
 
 
 # Compile at module import for speed; case-insensitive on free-text.
@@ -69,7 +71,6 @@ _TRIG_BY_TYPE: dict[ClaimType, list[re.Pattern[str]]] = {
     ClaimType.EMPIRICAL: [re.compile(p, re.IGNORECASE) for p in _EMPIRICAL_TRIGGERS],
     ClaimType.METHODOLOGICAL: [re.compile(p, re.IGNORECASE) for p in _METHOD_TRIGGERS],
     ClaimType.THEORETICAL: [re.compile(p, re.IGNORECASE) for p in _THEORY_TRIGGERS],
-    ClaimType.REPRODUCIBILITY: [re.compile(p, re.IGNORECASE) for p in _REPRO_TRIGGERS],
 }
 
 
@@ -116,7 +117,7 @@ def _classify_sentence(sentence: str) -> ClaimType | None:
     if empirical_hit or has_numeric:
         return ClaimType.EMPIRICAL
 
-    for ctype in (ClaimType.THEORETICAL, ClaimType.METHODOLOGICAL, ClaimType.REPRODUCIBILITY):
+    for ctype in (ClaimType.THEORETICAL, ClaimType.METHODOLOGICAL):
         if any(p.search(sentence) for p in _TRIG_BY_TYPE[ctype]):
             return ctype
     return None
@@ -162,6 +163,51 @@ def _is_body_section(section: Section) -> bool:
     return not any(title.startswith(s) for s in skip)
 
 
+def _extract_contribution_block_claims(paper: Paper) -> list[Claim]:
+    """Return one Claim per bullet/numbered item found in a contributions block.
+
+    Priority source for heuristic extraction: author-stated contribution bullets
+    are the most reliable signal for review-relevant claims and map directly to
+    what a human reviewer would enumerate.
+    """
+    claims: list[Claim] = []
+    for section in paper.sections:
+        if not _is_body_section(section):
+            continue
+        text = section.text or ""
+        block_match = _CONTRIBUTION_BLOCK_RE.search(text)
+        if not block_match:
+            continue
+        block_text = text[block_match.end() : block_match.end() + 2500]
+        items = re.findall(
+            r"(?:^|\n)\s*(?:[•\-\*]|\(?[ivxIVX\d]+[.\)]\)?)\s+(.+?)(?=\n\s*(?:[•\-\*]|\(?[ivxIVX\d]+[.\)]\)?)\s|\Z)",
+            block_text,
+            re.DOTALL,
+        )
+        for i, raw in enumerate(items, start=1):
+            sentence = " ".join(raw.split()).strip()
+            if len(sentence) < 15:
+                continue
+            ctype = _classify_sentence(sentence) or ClaimType.METHODOLOGICAL
+            claims.append(
+                Claim(
+                    id=f"contrib_{i:02d}",
+                    text=sentence,
+                    type=ctype,
+                    scope=_infer_scope(sentence, ctype),
+                    datasets=_extract_datasets(sentence),
+                    metrics=_extract_metrics(sentence),
+                    location=ClaimLocation(
+                        section_id=section.id,
+                        char_start=section.char_start,
+                    ),
+                )
+            )
+        if claims:
+            return claims  # use first block found; stop scanning
+    return claims
+
+
 def extract_claims_heuristic(paper: Paper, *, max_claims: int = 60) -> list[Claim]:
     """Regex-based claim extraction.
 
@@ -174,6 +220,11 @@ def extract_claims_heuristic(paper: Paper, *, max_claims: int = 60) -> list[Clai
         deliberately over-generative; the cap prevents downstream stages
         from being swamped on pathologically long papers.
     """
+    # Contribution-block claims are highest-priority: they come from the
+    # author's own enumerated contribution list, which is the most reliable
+    # signal for review-relevant claims.
+    contrib_claims = _extract_contribution_block_claims(paper)
+
     mentions: list[_Mention] = []
     for section in paper.sections:
         if not _is_body_section(section):
@@ -184,10 +235,15 @@ def extract_claims_heuristic(paper: Paper, *, max_claims: int = 60) -> list[Clai
     # offset within section.
     mentions.sort(key=lambda m: (m.section.char_start, m.char_offset_in_section))
 
-    claims: list[Claim] = []
-    for i, m in enumerate(mentions[:max_claims], start=1):
+    # Sentence-level claims, de-duplicated against contribution-block claims.
+    contrib_texts = {c.text.lower() for c in contrib_claims}
+    sentence_claims: list[Claim] = []
+    remaining = max_claims - len(contrib_claims)
+    for i, m in enumerate(mentions[:max(remaining, 0)], start=1):
+        if m.sentence.lower() in contrib_texts:
+            continue
         sec_char_start = m.section.char_start or 0
-        claims.append(
+        sentence_claims.append(
             Claim(
                 id=f"claim_{i:02d}",
                 text=m.sentence,
@@ -203,7 +259,11 @@ def extract_claims_heuristic(paper: Paper, *, max_claims: int = 60) -> list[Clai
                 ),
             )
         )
-    return claims
+
+    # Contribution-block claims first, sentence-level claims appended after.
+    # Re-number ids so the final list is dense and ordered.
+    merged = contrib_claims + sentence_claims
+    return [c.model_copy(update={"id": f"claim_{i:02d}"}) for i, c in enumerate(merged, start=1)]
 
 
 # ---------------------------------------------------------------------------
