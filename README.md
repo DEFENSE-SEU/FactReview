@@ -254,7 +254,7 @@ Each run writes to `runs/<paper_key>_<timestamp>/`. Primary artifacts:
 
 The pipeline runs seven sub-stages, grouped into three phases. `refcheck` and `execution` are skipped by default.
 
-Updated upstream
+
 ```text
 preprocessing                fact_generation                        review
 parse → claim_extract  →  refcheck? → positioning → execution? → report → teaser
