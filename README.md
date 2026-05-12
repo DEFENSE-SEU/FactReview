@@ -66,8 +66,13 @@ runs/<paper_key>_<timestamp>/stages/review/report/final_review.pdf
 
 That is your review. To run on your own paper:
 
+**Template** — replace the path and key with your own:
 ```bash
 python scripts/execute_review_pipeline.py path/to/paper.pdf --paper-key my_paper
+```
+
+**Example** — fetch directly from arXiv:
+```bash
 python scripts/execute_review_pipeline.py https://arxiv.org/abs/1911.03082
 ```
 
