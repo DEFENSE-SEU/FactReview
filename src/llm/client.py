@@ -3,8 +3,11 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 from dataclasses import dataclass
 from typing import Any
+
+from common import run_stats
 
 from .codex_auth import get_codex_auth
 from .codex_client import (
@@ -116,10 +119,15 @@ def llm_json(
     prompt: str,
     system: str,
     cfg: LLMConfig,
+    *,
+    module: str | None = None,
 ) -> dict[str, Any]:
     """
     Minimal JSON response helper for the providers used in the execution stage.
     """
+    t0 = time.monotonic()
+    usage: dict[str, Any] = {}
+    text = ""
     try:
         if cfg.provider == "claude":
             from anthropic import Anthropic
@@ -138,15 +146,26 @@ def llm_json(
                     text = (resp.content[0].text or "").strip()
             except Exception:
                 text = str(resp).strip()
+            raw_usage = getattr(resp, "usage", None)
+            usage = {
+                "input_tokens": int(getattr(raw_usage, "input_tokens", 0) or 0),
+                "output_tokens": int(getattr(raw_usage, "output_tokens", 0) or 0),
+            }
+            usage["total_tokens"] = int(usage["input_tokens"]) + int(usage["output_tokens"])
         elif cfg.provider == "openai-codex":
             auth = get_codex_auth(allow_browser_login=True)
-            text = invoke_codex(
+            codex_result = invoke_codex(
                 prompt=prompt,
                 system=system,
                 auth=auth,
                 model=cfg.model,
                 base_url=cfg.base_url or "https://chatgpt.com/backend-api/codex",
+                return_usage=True,
             )
+            if isinstance(codex_result, tuple):
+                text, usage = codex_result
+            else:
+                text = codex_result
         else:
             from openai import OpenAI
 
@@ -161,6 +180,12 @@ def llm_json(
                 max_tokens=cfg.max_tokens,
             )
             text = (resp.choices[0].message.content or "").strip()
+            raw_usage = getattr(resp, "usage", None)
+            usage = {
+                "input_tokens": int(getattr(raw_usage, "prompt_tokens", 0) or 0),
+                "output_tokens": int(getattr(raw_usage, "completion_tokens", 0) or 0),
+                "total_tokens": int(getattr(raw_usage, "total_tokens", 0) or 0),
+            }
     except Exception as e:
         return {
             "status": "error",
@@ -169,5 +194,17 @@ def llm_json(
             "model": cfg.model,
             "base_url": cfg.base_url,
         }
+
+    if run_stats.stats_path() is not None:
+        run_stats.record_llm_call(
+            module=module,
+            provider=cfg.provider,
+            model=cfg.model,
+            usage=usage,
+            prompt=prompt,
+            system=system,
+            response_text=text,
+            duration_sec=time.monotonic() - t0,
+        )
 
     return _parse_json_response(text)

@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import sys
+import time
 import traceback
 from datetime import UTC, datetime
 from pathlib import Path
@@ -21,6 +22,7 @@ from openai.types.shared import Reasoning
 from agent_runtime.agent_prompt import build_review_agent_system_prompt
 from agent_runtime.agent_tools import ReviewRuntimeContext, build_review_tools
 from common.config import get_settings
+from common import run_stats
 from common.state import (
     ensure_artifact_paths,
     fail_job,
@@ -2989,7 +2991,15 @@ async def run_job_async(job_id: str) -> None:
     set_status(job_id, JobStatus.pdf_parsing, "Polling MinerU parse result and assembling markdown...")
 
     mineru = _build_mineru_adapter()
-    parse_result = await mineru.parse_pdf(pdf_path=source_pdf, data_id=job_id)
+    parse_t0 = time.monotonic()
+    try:
+        parse_result = await mineru.parse_pdf(pdf_path=source_pdf, data_id=job_id)
+    except Exception:
+        run_stats.record_duration("parse", time.monotonic() - parse_t0)
+        run_stats.record_module_status("parse", "failed")
+        raise
+    run_stats.record_duration("parse", time.monotonic() - parse_t0)
+    run_stats.record_module_status("parse", "ok")
     mineru_image_map = _persist_mineru_image_files(
         job_dir=source_pdf.parent,
         image_files=parse_result.image_files,
@@ -3028,6 +3038,7 @@ async def run_job_async(job_id: str) -> None:
     page_index = build_page_index(parse_result.markdown, parse_result.content_list)
 
     set_status(job_id, JobStatus.agent_running, "Running review agent with tool loop...")
+    analysis_started_at = time.monotonic()
 
     paper_adapter = _build_paper_adapter()
     paper_search_runtime_state = (await paper_adapter.get_search_runtime_state()).to_dict()
@@ -3091,6 +3102,9 @@ async def run_job_async(job_id: str) -> None:
         paper_search_runtime_state=paper_search_runtime_state,
         settings=settings,
         cutoff_date=cutoff_date,
+        analysis_started_at=analysis_started_at,
+        agent_provider=str(settings.model_provider or ""),
+        agent_model=_resolved_agent_model(),
     )
 
     tools = build_review_tools(runtime)
@@ -3125,13 +3139,14 @@ async def run_job_async(job_id: str) -> None:
 
     def _consume_run_result(run_result: Any, *, output_tag: str) -> str:
         usage = run_result.context_wrapper.usage
+        runtime.record_agent_usage_delta(usage)
         usage_totals["requests"] += int(getattr(usage, "requests", 0) or 0)
         usage_totals["input_tokens"] += int(getattr(usage, "input_tokens", 0) or 0)
         usage_totals["output_tokens"] += int(getattr(usage, "output_tokens", 0) or 0)
         usage_totals["total_tokens"] += int(getattr(usage, "total_tokens", 0) or 0)
         usage_payload = SimpleNamespace(**usage_totals)
         _sync_token_usage(job_id, usage_payload)
-        runtime.sync_state_usage(usage_payload)
+        runtime.sync_state_usage(usage_payload, record_stats=False)
 
         final_output_text = str(run_result.final_output or "").strip()
         if final_output_text:
@@ -3358,6 +3373,10 @@ async def run_job_async(job_id: str) -> None:
             "Final report gate was not satisfied."
         )
 
+    if not runtime.report_generation_started:
+        runtime.mark_report_generation_started()
+    report_generation_started_at = runtime.report_generation_started_at or time.monotonic()
+
     set_status(job_id, JobStatus.pdf_exporting, "Rendering final markdown report into PDF...")
 
     final_md_path = Path(artifacts["final_markdown"])
@@ -3436,6 +3455,11 @@ async def run_job_async(job_id: str) -> None:
 
     mutate_job_state(job_id, apply_completed)
     append_event(job_id, "completed", report_pdf_path=str(report_pdf_path))
+    run_stats.record_duration(
+        "report_generation",
+        time.monotonic() - float(report_generation_started_at),
+    )
+    run_stats.record_module_status("report_generation", "ok")
 
 
 def run_job(job_id: str) -> None:

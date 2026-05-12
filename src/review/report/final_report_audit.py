@@ -322,7 +322,12 @@ def audit_and_refine_final_report(
             paper_markdown=sent_source,
             review_markdown=_truncate_for_model(result.final_markdown, max_review_chars),
         )
-        payload = llm_json(prompt=prompt, system=_build_audit_system_prompt(), cfg=cfg)
+        payload = llm_json(
+            prompt=prompt,
+            system=_build_audit_system_prompt(),
+            cfg=cfg,
+            module="report_generation",
+        )
         audit_iteration = FinalReportAuditIteration(
             iteration=iteration,
             audit_summary=str(payload.get("audit_summary") or "").strip(),
@@ -365,6 +370,7 @@ def audit_and_refine_final_report(
             ),
             system=_build_revision_system_prompt(output_language=output_language),
             cfg=cfg,
+            module="report_generation",
         )
         if str(revision_payload.get("status") or "").strip().lower() == "error":
             audit_iteration.error = str(revision_payload.get("error") or "unknown llm error").strip()

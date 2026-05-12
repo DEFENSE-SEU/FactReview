@@ -148,7 +148,7 @@ def judge_node(state: dict[str, Any]) -> dict[str, Any]:
             str(cfg.get("llm_model") or ""),
             str(cfg.get("llm_base_url") or ""),
         )
-        resp = llm_json(prompt=prompt, system=system, cfg=llm_cfg)
+        resp = llm_json(prompt=prompt, system=system, cfg=llm_cfg, module="execution")
         try:
             write_text(logs_dir / "judge_llm_prompt.json", prompt + "\n")
             write_text(

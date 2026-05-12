@@ -22,6 +22,8 @@ import json
 import os
 import shutil
 import subprocess
+import sys
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -351,20 +353,54 @@ def _run_review_runtime(
     # entire pipeline indefinitely.
     runtime_timeout_seconds = 3 * 60 * 60
     try:
-        proc = subprocess.run(
+        proc = subprocess.Popen(
             cmd,
             cwd=str(repo_root),
             env=env,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
-            timeout=runtime_timeout_seconds,
+            bufsize=1,
         )
-    except subprocess.TimeoutExpired as exc:
-        raise RuntimeError(f"agent runtime pipeline timed out after {runtime_timeout_seconds}s") from exc
-    if proc.returncode != 0:
-        raise RuntimeError(f"agent runtime pipeline failed\nstdout:\n{proc.stdout}\nstderr:\n{proc.stderr}\n")
+    except OSError as exc:
+        raise RuntimeError(f"failed to start agent runtime pipeline: {exc}") from exc
 
-    text = (proc.stdout or "").strip()
+    stdout_parts: list[str] = []
+    stderr_parts: list[str] = []
+
+    def collect_stdout() -> None:
+        if proc.stdout is None:
+            return
+        for line in proc.stdout:
+            stdout_parts.append(line)
+
+    def collect_stderr() -> None:
+        if proc.stderr is None:
+            return
+        for line in proc.stderr:
+            stderr_parts.append(line)
+            print(line, end="", file=sys.stderr, flush=True)
+
+    stdout_thread = threading.Thread(target=collect_stdout, daemon=True)
+    stderr_thread = threading.Thread(target=collect_stderr, daemon=True)
+    stdout_thread.start()
+    stderr_thread.start()
+    try:
+        return_code = proc.wait(timeout=runtime_timeout_seconds)
+    except subprocess.TimeoutExpired as exc:
+        proc.kill()
+        stdout_thread.join(timeout=5)
+        stderr_thread.join(timeout=5)
+        raise RuntimeError(f"agent runtime pipeline timed out after {runtime_timeout_seconds}s") from exc
+    stdout_thread.join(timeout=10)
+    stderr_thread.join(timeout=10)
+
+    stdout_text = "".join(stdout_parts)
+    stderr_text = "".join(stderr_parts)
+    if return_code != 0:
+        raise RuntimeError(f"agent runtime pipeline failed\nstdout:\n{stdout_text}\nstderr:\n{stderr_text}\n")
+
+    text = stdout_text.strip()
     payload: dict[str, Any] | None = None
     if text:
         try:

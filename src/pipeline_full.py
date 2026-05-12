@@ -12,6 +12,7 @@ from typing import Any
 from common.config import get_settings
 from common.env import load_env_file
 from common.pipeline_context import execution_stage_dir, init_full_pipeline_context
+from common import run_stats
 from fact_generation.execution.stage_runner import run_execution_stage
 from fact_generation.positioning.stage_runner import run_positioning_stage
 from fact_generation.refcheck.stage_runner import run_refcheck_stage
@@ -39,16 +40,33 @@ def _log(msg: str) -> None:
     print(msg, flush=True, file=sys.stderr)
 
 
-def _run_stage(index: int, name: str, fn: Callable[[], StageResult]) -> StageResult:
+def _run_stage(
+    index: int,
+    name: str,
+    fn: Callable[[], StageResult],
+    *,
+    stats_module: str | None = None,
+) -> StageResult:
     _log(f"[{index}/{_TOTAL_STAGES}] {name}: starting...")
     t0 = time.monotonic()
     try:
-        result = fn()
+        if stats_module:
+            with run_stats.module_scope(stats_module):
+                result = fn()
+        else:
+            result = fn()
     except Exception as exc:
         dt = time.monotonic() - t0
+        if stats_module:
+            run_stats.record_duration(stats_module, dt)
+            run_stats.record_module_status(stats_module, "failed", warning=str(exc))
         _log(f"[{index}/{_TOTAL_STAGES}] {name}: failed ({dt:.1f}s) — {exc}")
-        return StageResult(status="failed", error=str(exc))
+        return StageResult(status="failed", error=str(exc), extra={"duration_sec": dt})
     dt = time.monotonic() - t0
+    result.extra["duration_sec"] = dt
+    if stats_module:
+        run_stats.record_duration(stats_module, dt)
+        run_stats.record_module_status(stats_module, result.status)
     status = result.status
     err = (result.error or "").strip()
     suffix = f" — {err}" if err else ""
@@ -114,6 +132,7 @@ def _resolve_cutoff(*, args: argparse.Namespace, paper_source: str) -> CutoffDat
 
 
 def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
+    pipeline_t0 = time.monotonic()
     repo_root = Path(__file__).resolve().parents[1]
     settings = get_settings()
     paper_source = str(args.paper_pdf or "").strip()
@@ -121,6 +140,9 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     run_id = make_run_id()
     run_dir = build_run_dir(args.run_root, paper_key, run_id)
     layout = ensure_run_subdirs(run_dir)
+    stats_path = run_dir / "run_stats.json"
+    run_stats.initialize(stats_path)
+    run_stats.enable_cli_status()
     paper_input = materialize_paper_pdf(
         paper_source,
         layout["inputs"] / "source_pdf",
@@ -136,6 +158,7 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     _log(f"  paper_key : {paper_key}")
     _log(f"  paper_pdf : {paper_pdf}")
     _log(f"  run_dir   : {run_dir}")
+    _log(f"  stats     : {stats_path}")
     if cutoff is not None:
         _log(f"  cutoff    : {cutoff.to_string()} (precision={cutoff.precision})")
     else:
@@ -154,6 +177,14 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             cutoff_date=cutoff.to_string() if cutoff is not None else "",
         ),
     )
+    if parse_result.status == "failed":
+        run_stats.record_module_status("parse", "failed", warning=parse_result.error)
+    elif run_stats.read(stats_path)["modules"]["parse"].get("status") == "pending":
+        # Reused jobs do not run the parse subprocess, so no child process marks
+        # the parse module complete. Keep token usage at zero and make the reuse
+        # explicit in the summary table.
+        parse_status = "reused" if str(args.reuse_job_id or "").strip() else "ok"
+        run_stats.record_module_status("parse", parse_status)
     claim_extract_result = _run_stage(
         2,
         "claim_extract",
@@ -161,6 +192,7 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             repo_root=repo_root,
             run_dir=run_dir,
         ),
+        stats_module="analysis",
     )
     enable_refcheck = bool(getattr(args, "enable_refcheck", False) or settings.reference_check_enabled)
     refcheck_result = _run_stage(
@@ -173,6 +205,7 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             paper_key=paper_key,
             enable_refcheck=enable_refcheck,
         ),
+        stats_module="reference_check",
     )
     positioning_result = _run_stage(
         4,
@@ -181,9 +214,11 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             repo_root=repo_root,
             run_dir=run_dir,
         ),
+        stats_module="analysis",
     )
     if not run_execution:
         _log(f"[5/{_TOTAL_STAGES}] execution: skipped (use --run-execution to enable)")
+        run_stats.record_module_status("execution", "skipped")
         skipped_payload = ExecutionPayload(
             paper_key=paper_key,
             paper_pdf=str(paper_pdf),
@@ -212,6 +247,7 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
                 max_attempts=int(args.max_attempts),
                 no_pdf_extract=bool(args.no_pdf_extract),
             ),
+            stats_module="execution",
         )
     report_result = _run_stage(
         6,
@@ -220,12 +256,23 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             repo_root=repo_root,
             run_dir=run_dir,
         ),
+        stats_module="report_generation",
     )
     if report_result.status == "failed":
         _log(f"[7/{_TOTAL_STAGES}] teaser: skipped — report stage failed")
+        run_stats.record_module_status("teaser_figure", "skipped", warning="report stage failed")
         teaser_result = StageResult(status="skipped", error="report stage failed")
     else:
-        teaser_result = _run_stage(7, "teaser", lambda: run_teaser_stage(run_dir=run_dir))
+        teaser_result = _run_stage(
+            7,
+            "teaser",
+            lambda: run_teaser_stage(run_dir=run_dir),
+            stats_module="teaser_figure",
+        )
+        teaser_info = teaser_result.extra.get("teaser_figure") if isinstance(teaser_result.extra, dict) else {}
+        teaser_status = str((teaser_info or {}).get("status") or "").strip()
+        if teaser_status:
+            run_stats.record_module_status("teaser_figure", teaser_status)
 
     results: dict[str, StageResult] = {
         "parse": parse_result,
@@ -237,6 +284,11 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
         "teaser": teaser_result,
     }
     statuses = {name: r.status for name, r in results.items()}
+    stage_durations = {
+        name: float(r.extra.get("duration_sec") or 0.0)
+        for name, r in results.items()
+        if isinstance(r.extra, dict) and "duration_sec" in r.extra
+    }
     stage_errors = {name: r.error for name, r in results.items() if r.error}
     # PDF render is best-effort within the report stage (markdown is canonical),
     # so the stage stays status="ok" even when the PDF fails. Surface the cause
@@ -262,6 +314,11 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     for key, value in granular:
         if value:
             outputs[key] = value
+    outputs["run_stats"] = str(stats_path)
+
+    run_stats.set_pipeline_duration(time.monotonic() - pipeline_t0)
+    stats_payload = run_stats.with_totals(run_stats.read(stats_path))
+    _write_json(stats_path, stats_payload)
 
     summary = {
         "paper_key": paper_key,
@@ -273,8 +330,10 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
         "job_id": parse_result.extra.get("job_id"),
         "job_dir": parse_result.extra.get("job_dir"),
         "stages": statuses,
+        "stage_durations_sec": stage_durations,
         "stage_errors": stage_errors,
         "outputs": outputs,
+        "run_stats": stats_payload,
         "reference_check": refcheck_result.extra.get("reference_check") or {"enabled": enable_refcheck},
         "teaser_figure": teaser_result.extra.get("teaser_figure") or {},
         "paper_cutoff_date": cutoff.to_metadata() if cutoff is not None else None,
@@ -295,6 +354,9 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     if review_md:
         _log(f"Final review: {review_md}")
     _log(f"Summary: {summary_path}")
+    _log("")
+    for line in run_stats.format_summary_table(stats_payload):
+        _log(line)
 
     # Surface teaser prompt-only guidance at the very end so it's the last
     # thing the user sees and can act on without scrolling through JSON.

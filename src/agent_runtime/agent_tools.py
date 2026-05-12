@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,7 @@ from uuid import uuid4
 from agents import RunContextWrapper, function_tool
 
 from common.config import Settings
+from common import run_stats
 from common.state import mutate_job_state
 from common.storage import annotations_path, append_event, write_json_atomic, write_text_atomic
 from common.types import AnnotationItem, PaperSearchUsage
@@ -486,11 +488,17 @@ class ReviewRuntimeContext:
     paper_search_runtime_state: dict[str, Any]
     settings: Settings
     cutoff_date: CutoffDate | None = None
+    analysis_started_at: float = field(default_factory=time.monotonic)
+    agent_provider: str = ""
+    agent_model: str = ""
 
     annotations: list[AnnotationItem] = field(default_factory=list)
     final_markdown_text: str | None = None
     final_report_draft_sections: dict[str, str] = field(default_factory=dict)
     final_report_draft_version: int = 0
+    report_generation_started: bool = False
+    report_generation_started_at: float | None = None
+    last_agent_usage: dict[str, int] = field(default_factory=dict)
 
     tool_counts: dict[str, int] = field(default_factory=dict)
     paper_search_usage: PaperSearchUsage = field(default_factory=PaperSearchUsage)
@@ -501,11 +509,70 @@ class ReviewRuntimeContext:
     def record_tool(self, name: str) -> None:
         self.tool_counts[name] = int(self.tool_counts.get(name, 0)) + 1
 
+    def mark_report_generation_started(self) -> None:
+        if self.report_generation_started:
+            return
+        now = time.monotonic()
+        self.report_generation_started = True
+        self.report_generation_started_at = now
+        run_stats.record_duration("analysis", now - float(self.analysis_started_at or now))
+        run_stats.record_module_status("analysis", "ok")
+
+    def record_agent_usage_delta(self, token_usage: Any | None) -> None:
+        if token_usage is None or run_stats.stats_path() is None:
+            return
+        current = {
+            "requests": int(getattr(token_usage, "requests", 0) or 0),
+            "input_tokens": int(getattr(token_usage, "input_tokens", 0) or 0),
+            "output_tokens": int(getattr(token_usage, "output_tokens", 0) or 0),
+            "total_tokens": int(getattr(token_usage, "total_tokens", 0) or 0),
+        }
+        if current["total_tokens"] <= 0:
+            current["total_tokens"] = current["input_tokens"] + current["output_tokens"]
+
+        previous = self.last_agent_usage or {
+            "requests": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0,
+        }
+        if (
+            current["requests"] < int(previous.get("requests") or 0)
+            or current["total_tokens"] < int(previous.get("total_tokens") or 0)
+        ):
+            previous = {
+                "requests": 0,
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0,
+            }
+
+        delta = {
+            key: max(0, int(current.get(key) or 0) - int(previous.get(key) or 0))
+            for key in current
+        }
+        self.last_agent_usage = current
+        if not any(delta.values()):
+            return
+        module = "report_generation" if self.report_generation_started else "analysis"
+        run_stats.add_token_delta(
+            module=module,
+            provider=self.agent_provider or str(self.settings.model_provider or ""),
+            model=self.agent_model or str(self.settings.agent_model or ""),
+            requests=delta["requests"],
+            input_tokens=delta["input_tokens"],
+            output_tokens=delta["output_tokens"],
+            total_tokens=delta["total_tokens"],
+        )
+
     @property
     def annotation_count(self) -> int:
         return len(self.annotations)
 
-    def sync_state_usage(self, token_usage: Any | None = None) -> None:
+    def sync_state_usage(self, token_usage: Any | None = None, *, record_stats: bool = True) -> None:
+        if record_stats:
+            self.record_agent_usage_delta(token_usage)
+
         def apply(job):
             tool_counts = dict(self.tool_counts)
             job.usage.tool.per_tool = tool_counts
@@ -561,6 +628,8 @@ def build_review_tools(runtime: ReviewRuntimeContext) -> list[Any]:
             "todo": str(todo or "").strip(),
         }
         rt.status_updates.append(row)
+        if row["step"]:
+            run_stats.log_status(f"[agent] {row['step']}")
 
         def apply(job):
             job.metadata["last_status_update"] = row
@@ -1036,6 +1105,7 @@ def build_review_tools(runtime: ReviewRuntimeContext) -> list[Any]:
     ) -> dict[str, Any]:
         rt = ctx.context
         rt.record_tool("review_final_markdown_write")
+        rt.mark_report_generation_started()
         attempt_no = int(rt.tool_counts.get("review_final_markdown_write", 0))
         usage = rt.paper_search_usage
         section_order = _required_final_report_section_order()

@@ -542,7 +542,12 @@ def _resolve_default_llm_call() -> Callable[[str], dict[str, Any]]:
     cfg = resolve_llm_config()
 
     def _call(prompt: str) -> dict[str, Any]:
-        result = llm_json(prompt=prompt, system=_LLM_SYSTEM_PROMPT, cfg=cfg)
+        result = llm_json(
+            prompt=prompt,
+            system=_LLM_SYSTEM_PROMPT,
+            cfg=cfg,
+            module="report_generation",
+        )
         if isinstance(result, dict) and result.get("status") == "error":
             raise RuntimeError(
                 "LLM call failed: "

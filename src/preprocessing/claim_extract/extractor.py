@@ -117,6 +117,7 @@ def _call_llm_for_claims(
             prompt=prompt,
             system="You are a careful reviewer extracting structured claims from a paper. Return strict JSON only.",
             cfg=cfg,
+            module="analysis",
         )
     except Exception as exc:
         logger.warning("LLM extraction failed: %s", exc)

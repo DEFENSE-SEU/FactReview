@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import subprocess
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,7 @@ import requests
 from PIL import Image
 
 from common.env import load_env_file
+from common import run_stats
 
 _SECTION_RE = re.compile(
     r"(?ims)^##\s+(?P<title>(?:\*\*)?\d+\.\s+.+?(?:\*\*)?)\s*$\n(?P<body>.*?)(?=^##\s+|\Z)"
@@ -1449,6 +1451,76 @@ def _call_gemini_image_api(
     return payload
 
 
+def _extract_image_api_usage(payload: dict[str, Any]) -> dict[str, int]:
+    if not isinstance(payload, dict):
+        return {}
+    usage = payload.get("usage")
+    if isinstance(usage, dict):
+        input_tokens = usage.get("input_tokens", usage.get("prompt_tokens"))
+        output_tokens = usage.get("output_tokens", usage.get("completion_tokens"))
+        total_tokens = usage.get("total_tokens")
+        result = {
+            "input_tokens": max(0, int(input_tokens or 0)),
+            "output_tokens": max(0, int(output_tokens or 0)),
+            "total_tokens": max(0, int(total_tokens or 0)),
+        }
+        if result["total_tokens"] <= 0:
+            result["total_tokens"] = result["input_tokens"] + result["output_tokens"]
+        if result["total_tokens"] > 0:
+            return result
+    usage_meta = payload.get("usageMetadata") or payload.get("usage_metadata")
+    if isinstance(usage_meta, dict):
+        input_tokens = usage_meta.get("promptTokenCount", usage_meta.get("prompt_token_count"))
+        output_tokens = usage_meta.get("candidatesTokenCount", usage_meta.get("candidates_token_count"))
+        total_tokens = usage_meta.get("totalTokenCount", usage_meta.get("total_token_count"))
+        result = {
+            "input_tokens": max(0, int(input_tokens or 0)),
+            "output_tokens": max(0, int(output_tokens or 0)),
+            "total_tokens": max(0, int(total_tokens or 0)),
+        }
+        if result["total_tokens"] <= 0:
+            result["total_tokens"] = result["input_tokens"] + result["output_tokens"]
+        if result["total_tokens"] > 0:
+            return result
+    return {}
+
+
+def _record_teaser_image_usage(
+    *,
+    provider: str,
+    model: str,
+    prompt: str,
+    response_payload: dict[str, Any] | None,
+    duration_sec: float,
+    failed: bool = False,
+) -> None:
+    usage = _extract_image_api_usage(response_payload or {})
+    estimated = not bool(usage)
+    warning = ""
+    if estimated:
+        warning = (
+            "Estimated teaser image token usage from the text prompt only; "
+            "the image API response did not include token usage."
+        )
+        if failed:
+            warning = (
+                "Estimated teaser image request tokens after an API failure; "
+                "the response did not include token usage."
+            )
+    run_stats.record_llm_call(
+        module="teaser_figure",
+        provider=provider,
+        model=model,
+        usage=usage,
+        prompt=prompt,
+        system="",
+        response_text="",
+        duration_sec=duration_sec,
+        estimated=estimated,
+        warning=warning,
+    )
+
+
 def _resolve_technical_reference_image_bytes(
     *,
     latest_path: Path,
@@ -1625,14 +1697,34 @@ def generate_teaser_figure(
         attempt_prompt_path = final_output_dir / f"teaser_figure_prompt_attempt_{attempt_index}.txt"
         attempt_prompt_path.write_text(attempt_prompt, encoding="utf-8")
 
-        attempt_response = _call_gemini_image_api(
-            prompt=attempt_prompt,
-            api_key=api_key,
+        api_provider = "openrouter" if str(base_url or "").strip() else "gemini"
+        api_t0 = time.monotonic()
+        try:
+            attempt_response = _call_gemini_image_api(
+                prompt=attempt_prompt,
+                api_key=api_key,
+                model=model,
+                timeout_seconds=timeout_seconds,
+                base_url=base_url,
+                template_image_png_bytes=template_image_png_bytes,
+                technical_image_png_bytes=technical_image_png_bytes,
+            )
+        except Exception:
+            _record_teaser_image_usage(
+                provider=api_provider,
+                model=model,
+                prompt=attempt_prompt,
+                response_payload=None,
+                duration_sec=time.monotonic() - api_t0,
+                failed=True,
+            )
+            raise
+        _record_teaser_image_usage(
+            provider=api_provider,
             model=model,
-            timeout_seconds=timeout_seconds,
-            base_url=base_url,
-            template_image_png_bytes=template_image_png_bytes,
-            technical_image_png_bytes=technical_image_png_bytes,
+            prompt=attempt_prompt,
+            response_payload=attempt_response,
+            duration_sec=time.monotonic() - api_t0,
         )
         attempt_response_path = (
             final_output_dir / f"teaser_figure_gemini_response_attempt_{attempt_index}.json"

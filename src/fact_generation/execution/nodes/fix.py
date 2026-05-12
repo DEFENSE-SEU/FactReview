@@ -315,7 +315,7 @@ def fix_node(state: dict[str, Any]) -> dict[str, Any]:
             "confidence": 0.0,
         },
     }
-    plan = llm_json(prompt=str(prompt), system=system, cfg=llm_cfg)
+    plan = llm_json(prompt=str(prompt), system=system, cfg=llm_cfg, module="execution")
     write_text(
         fixes_dir / f"fix_{attempt:03d}_plan.json",
         __import__("json").dumps(plan, ensure_ascii=False, indent=2) + "\n",

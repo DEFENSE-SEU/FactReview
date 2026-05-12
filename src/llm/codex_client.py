@@ -99,7 +99,61 @@ def _iter_sse_data(response) -> list[str]:
     return events
 
 
-def invoke_codex(prompt: str, system: str, *, auth: CodexAuth, model: str, base_url: str) -> str:
+def _coerce_usage(value: Any) -> dict[str, int]:
+    if not isinstance(value, dict):
+        return {}
+    input_tokens = value.get("input_tokens", value.get("prompt_tokens"))
+    output_tokens = value.get("output_tokens", value.get("completion_tokens"))
+    total_tokens = value.get("total_tokens")
+    try:
+        input_count = max(0, int(input_tokens or 0))
+    except Exception:
+        input_count = 0
+    try:
+        output_count = max(0, int(output_tokens or 0))
+    except Exception:
+        output_count = 0
+    try:
+        total_count = max(0, int(total_tokens or 0))
+    except Exception:
+        total_count = 0
+    if total_count <= 0:
+        total_count = input_count + output_count
+    if input_count <= 0 and output_count <= 0 and total_count <= 0:
+        return {}
+    return {
+        "input_tokens": input_count,
+        "output_tokens": output_count,
+        "total_tokens": total_count,
+    }
+
+
+def _extract_usage(payload: dict[str, Any]) -> dict[str, int]:
+    direct = _coerce_usage(payload.get("usage"))
+    if direct:
+        return direct
+    response = payload.get("response")
+    if isinstance(response, dict):
+        nested = _coerce_usage(response.get("usage"))
+        if nested:
+            return nested
+    item = payload.get("item")
+    if isinstance(item, dict):
+        item_usage = _coerce_usage(item.get("usage"))
+        if item_usage:
+            return item_usage
+    return {}
+
+
+def invoke_codex(
+    prompt: str,
+    system: str,
+    *,
+    auth: CodexAuth,
+    model: str,
+    base_url: str,
+    return_usage: bool = False,
+) -> str | tuple[str, dict[str, int]]:
     url = resolve_codex_base_url(base_url).rstrip("/") + "/responses"
     payload = {
         "model": resolve_codex_model(model),
@@ -133,6 +187,7 @@ def invoke_codex(prompt: str, system: str, *, auth: CodexAuth, model: str, base_
 
     chunks: list[str] = []
     last_payload: dict[str, Any] = {}
+    usage: dict[str, int] = {}
     for event in events:
         try:
             payload_item = json.loads(event)
@@ -141,6 +196,9 @@ def invoke_codex(prompt: str, system: str, *, auth: CodexAuth, model: str, base_
         if not isinstance(payload_item, dict):
             continue
         last_payload = payload_item
+        event_usage = _extract_usage(payload_item)
+        if event_usage:
+            usage = event_usage
         event_type = payload_item.get("type")
         if event_type == "response.output_text.delta" and isinstance(payload_item.get("delta"), str):
             chunks.append(payload_item["delta"])
@@ -159,5 +217,7 @@ def invoke_codex(prompt: str, system: str, *, auth: CodexAuth, model: str, base_
 
     text = "".join(chunks).strip()
     if text:
+        if return_usage:
+            return text, usage
         return text
     raise RuntimeError(f"Codex backend returned no text. Response keys: {sorted(last_payload.keys())}")

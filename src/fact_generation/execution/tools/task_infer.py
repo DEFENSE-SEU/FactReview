@@ -418,7 +418,12 @@ def infer_tasks_llm(
     }
     system = "You are a senior engineer generating a safe, reproducible tasks.yaml for a research repo."
     llm_cfg = resolve_llm_config(cfg_provider, cfg_model, cfg_base_url)
-    resp = llm_json(prompt=json.dumps(prompt, ensure_ascii=False), system=system, cfg=llm_cfg)
+    resp = llm_json(
+        prompt=json.dumps(prompt, ensure_ascii=False),
+        system=system,
+        cfg=llm_cfg,
+        module="execution",
+    )
     if not isinstance(resp, dict) or resp.get("status") == "error":
         # fallback to heuristics if LLM fails
         hr = infer_tasks_heuristic(repo_root, mode=mode)

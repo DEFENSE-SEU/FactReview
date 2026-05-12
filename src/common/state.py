@@ -10,6 +10,7 @@ from uuid import UUID
 
 from .storage import append_event, job_dir, read_json, state_path, write_json_atomic
 from .types import JobState, JobStatus
+from .run_stats import log_status
 
 _STATE_LOCK = threading.RLock()
 
@@ -63,6 +64,7 @@ def mutate_job_state(job_id: UUID | str, fn: Callable[[JobState], None]) -> JobS
 def set_status(job_id: UUID | str, status: JobStatus, message: str, *, event: str | None = None) -> JobState:
     job = update_job_state(job_id, status=status, message=message)
     append_event(job_id, event or "status", status=status.value, message=message)
+    log_status(f"[runtime] {status.value}: {message}")
     return job
 
 
