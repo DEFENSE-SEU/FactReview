@@ -19,6 +19,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from agent_runtime.runner import augment_claims_with_assessment_status
 from common.config import get_settings
 from common.pipeline_context import (
     ensure_full_pipeline_context,
@@ -241,11 +242,29 @@ def run_report_stage(
     audit_ok = copy_file_if_exists(final_audit, review_audit)
     pdf_ok = copy_file_if_exists(final_pdf, pdf_path)
 
+    # Re-augment claims table with real execution alignment. The first augmentation
+    # pass (inside the agent runtime job) always ran with alignment={} because
+    # execution hadn't completed yet. The report stage runs after execution, so
+    # we re-run the augmentation here with the real alignment data.
+    if md_ok:
+        exec_json = read_json_file(execution_stage_dir(run_dir) / "execution.json")
+        exec_alignment = exec_json.get("alignment") if isinstance(exec_json, dict) else {}
+        if exec_alignment:
+            current_md = review_md.read_text(encoding="utf-8", errors="ignore")
+            augmented_md = augment_claims_with_assessment_status(
+                current_md,
+                summary=exec_json.get("summary") or {},
+                alignment=exec_alignment,
+            )
+            if augmented_md != current_md:
+                review_md.write_text(augmented_md, encoding="utf-8")
+
     settings = get_settings()
     reference_check_payload = _load_reference_check_payload(run_dir)
     reference_check_markdown = ""
     reference_check_appended = False
     pdf_render_error = ""
+    claim_audit_payload: dict[str, Any] = {}
 
     if md_ok:
         if final_md is not None and final_md.exists():
@@ -258,8 +277,7 @@ def run_report_stage(
 
         # When execution was skipped, strip the Evaluation Status column so the
         # report and the teaser figure do not display all-Inconclusive placeholders.
-        exec_payload_early = read_json_file(execution_stage_dir(run_dir) / "execution.json")
-        if exec_payload_early.get("status") == "skipped":
+        if exec_json.get("status") == "skipped":
             for md_path in (review_md, review_md_clean):
                 stripped = _strip_experiment_eval_status(
                     md_path.read_text(encoding="utf-8", errors="ignore")

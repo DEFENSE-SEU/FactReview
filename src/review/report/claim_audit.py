@@ -404,17 +404,76 @@ def _verdict_to_label(verdict: str) -> str:
     return _VERDICT_LABEL_MAPPING.get(v_spaced, "")
 
 
+def _is_novelty_claim(claim: str) -> bool:
+    return bool(re.search(
+        r"(?i)\b(first to|to our knowledge|to the best of our knowledge"
+        r"|novel(ly)?|pioneering|newly (proposed|introduced|developed)"
+        r"|we propose|we introduce|unprecedented)\b",
+        str(claim or ""),
+    ))
+
+
+def _is_comparative_claim(claim: str) -> bool:
+    return bool(re.search(
+        r"(?i)\b(outperform\w*|surpass\w*|better than|superior to|exceed\w*"
+        r"|state.?of.?the.?art|sota|best.{0,15}baseline|competitive with"
+        r"|compared (to|against|with))\b",
+        str(claim or ""),
+    ))
+
+
+def _extract_positioning_context(markdown: str) -> str:
+    sec = re.search(
+        r"(?ims)^##\s+\*?\*?2\.\s+Technical\s+Positioning\*?\*?\s*$\n(?P<body>.*?)(?=^##\s+|\Z)",
+        str(markdown or ""),
+    )
+    if not sec:
+        return ""
+    body = sec.group("body")
+    table_lines = [ln for ln in body.splitlines() if ln.strip().startswith("|")]
+    if not table_lines:
+        return body.strip()[:1500]
+    return "\n".join(table_lines)[:1500]
+
+
 # Cap on how much of the ablation block we send to the LLM. Most ablation
 # blocks are << 4000 chars; this guard prevents pathological reports from
 # blowing the context.
 _ABLATION_BLOCK_CHAR_LIMIT = 8000
 
+_TYPE_SPECIFIC_RULES = (
+    "\n\nType-specific rules (infer claim type from text):\n"
+    "- Theoretical claims (theorem, proof, derivation, formal guarantee): "
+    "'supported' requires a formal proof/theorem anchored to a numbered equation, lemma, or proposition. "
+    "'partially_supported' for informal argument or sketch without full derivation. "
+    "'in_conflict' for verbal description only with no formal anchor.\n"
+    "- Methodological claims (architecture, algorithm, pipeline, design component): "
+    "'supported' requires the component explicitly described in a named section, figure, algorithm box, or equation. "
+    "'partially_supported' if high-level module is shown but a critical sub-component is absent.\n"
+    "- [NOVELTY] claims ('first to', 'novel', 'to our knowledge'): "
+    "finding prior contradicting work → 'in_conflict'. "
+    "Absence of contradiction alone does not establish novelty — use 'partially_supported' when evidence is insufficient. "
+    "'supported' requires positive evidence (e.g. positioning comparison) showing no directly comparable prior work.\n"
+    "- [COMPARATIVE] claims ('outperforms', 'surpasses', 'SOTA'): "
+    "'supported' requires the specific baseline(s) named AND numeric results for both method and baseline present; "
+    "gap must clearly exceed the reported error bar (>= 2 sigma if given)."
+)
 
-def _build_llm_prompt(*, claims: list[dict[str, Any]], ablation_block: str) -> str:
+
+def _build_llm_prompt(
+    *, claims: list[dict[str, Any]], ablation_block: str, positioning_context: str = ""
+) -> str:
+    has_novelty = any(_is_novelty_claim(e["claim"]) for e in claims)
     claim_blocks: list[str] = []
     for entry in claims:
+        flags: list[str] = []
+        if _is_novelty_claim(entry["claim"]):
+            flags.append("NOVELTY")
+        if _is_comparative_claim(entry["claim"]):
+            flags.append("COMPARATIVE")
+        flag_str = f" [{', '.join(flags)}]" if flags else ""
         claim_blocks.append(
-            f"--- claim id={entry['id']} ---\n"
+            f"--- claim id={entry['id']}{flag_str} ---\n"
             f"Claim: {entry['claim']}\n"
             f"Evidence: {entry['evidence']}\n"
             f"Location: {entry['location']}"
@@ -427,6 +486,12 @@ def _build_llm_prompt(*, claims: list[dict[str, Any]], ablation_block: str) -> s
         )
     if not trimmed_ablation:
         trimmed_ablation = "(no ablation section in this report)"
+    positioning_block = ""
+    if has_novelty and positioning_context:
+        positioning_block = (
+            "\n\nTechnical positioning (use when auditing [NOVELTY] claims):\n"
+            + positioning_context
+        )
     return (
         "You audit the following claim rows from a paper review report. "
         "Return one verdict per claim id and, separately, a list of method "
@@ -446,8 +511,10 @@ def _build_llm_prompt(*, claims: list[dict[str, Any]], ablation_block: str) -> s
         "rather than tabular.\n"
         "- 'in_conflict' applies when the evidence contradicts the claim's "
         "verb (e.g., paper value lower than the strongest comparator on a "
-        "higher-is-better metric).\n\n"
-        "For ablation_missing_components, look across every methodological "
+        "higher-is-better metric).\n"
+        + _TYPE_SPECIFIC_RULES
+        + positioning_block
+        + "\n\nFor ablation_missing_components, look across every methodological "
         "claim that enumerates a list of components (\"X with A, B, and C\", "
         "\"system consisting of A, B, C\", etc.) and list any component name "
         "that the ablation block clearly does not exercise. Use the original "
@@ -598,6 +665,8 @@ def audit_review_markdown(
     ablation_match = _ABLATION_PATTERN.search(text)
     ablation_block = ablation_match.group("body") if ablation_match else ""
 
+    positioning_context = _extract_positioning_context(text)
+
     prompt = _build_llm_prompt(
         claims=[
             {
@@ -609,6 +678,7 @@ def audit_review_markdown(
             for entry in entries
         ],
         ablation_block=ablation_block,
+        positioning_context=positioning_context,
     )
     raw = llm_call(prompt) or {}
     if not isinstance(raw, dict):

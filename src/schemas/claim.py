@@ -17,14 +17,14 @@ class ClaimType(StrEnum):
     EMPIRICAL = "empirical"
     METHODOLOGICAL = "methodological"
     THEORETICAL = "theoretical"
-    REPRODUCIBILITY = "reproducibility"
 
 
 class ClaimLabel(StrEnum):
-    """The three verdicts for claim assessment."""
+    """The four verdicts for claim assessment."""
 
     SUPPORTED = "supported"
     PARTIALLY_SUPPORTED = "partially_supported"
+    INCONCLUSIVE = "inconclusive"
     IN_CONFLICT = "in_conflict"
 
 

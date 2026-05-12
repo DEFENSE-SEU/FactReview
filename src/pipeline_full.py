@@ -42,7 +42,12 @@ def _log(msg: str) -> None:
 def _run_stage(index: int, name: str, fn: Callable[[], StageResult]) -> StageResult:
     _log(f"[{index}/{_TOTAL_STAGES}] {name}: starting...")
     t0 = time.monotonic()
-    result = fn()
+    try:
+        result = fn()
+    except Exception as exc:
+        dt = time.monotonic() - t0
+        _log(f"[{index}/{_TOTAL_STAGES}] {name}: failed ({dt:.1f}s) — {exc}")
+        return StageResult(status="failed", error=str(exc))
     dt = time.monotonic() - t0
     status = result.status
     err = (result.error or "").strip()
@@ -216,7 +221,11 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             run_dir=run_dir,
         ),
     )
-    teaser_result = _run_stage(7, "teaser", lambda: run_teaser_stage(run_dir=run_dir))
+    if report_result.status == "failed":
+        _log(f"[7/{_TOTAL_STAGES}] teaser: skipped — report stage failed")
+        teaser_result = StageResult(status="skipped", error="report stage failed")
+    else:
+        teaser_result = _run_stage(7, "teaser", lambda: run_teaser_stage(run_dir=run_dir))
 
     results: dict[str, StageResult] = {
         "parse": parse_result,

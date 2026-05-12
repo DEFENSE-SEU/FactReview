@@ -66,7 +66,7 @@ def resolve_llm_config(provider: str = "", model: str = "", base_url: str = "") 
     if prov == "claude":
         api_key = (os.getenv("CLAUDE_API_KEY") or "").strip() or None
         base = base_url or os.getenv("CLAUDE_BASE_URL", "https://api.anthropic.com")
-        mdl = model or os.getenv("CLAUDE_MODEL", "claude-4-sonnet")
+        mdl = model or os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
         return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key)
 
     if is_codex_provider(prov):

@@ -1292,8 +1292,6 @@ def build_teaser_figure_prompt_from_latest_extraction(latest_extraction_path: st
 
 def _default_teaser_output_dir(latest_extraction_path: Path) -> Path:
     parent = latest_extraction_path.parent.resolve()
-    if parent.name == "output":
-        return parent / "teaser_figure"
     return parent / "teaser_figure"
 
 

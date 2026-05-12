@@ -155,9 +155,6 @@ def run_node(state: dict[str, Any]) -> dict[str, Any]:
             results.append({"id": task_id, "success": False, "error": "invalid_cmd"})
             continue
 
-        # Docker mode always runs inside container; ignore per-task use_conda.
-        use_conda = bool(task.get("use_conda", True))
-
         append_event(
             run_dir,
             "task_start",
