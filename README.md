@@ -6,7 +6,7 @@
 
 <p align="center"><strong>Evidence-grounded reviews for ML papers — every claim traced back to the literature, the paper, or actually running the code.</strong></p>
 
-You give FactReview a paper PDF (or an arXiv URL). It returns a Markdown + PDF review where every major claim is tagged with one of five verdicts and linked to a paper section, a literature neighbor, or a number it reproduced by running the paper's code. The image above is a real FactReview output for [CompGCN](https://arxiv.org/abs/1911.03082) — design-axis positioning, color-coded verdicts, paper-vs-reproduced numbers with Δ, and auto-synthesized strengths and weaknesses, on one page. It is **deliberately designed as a one-minute review aid**: as ML submission volumes outrun reviewer capacity and per-paper attention shrinks, the bottleneck is no longer "can a reviewer read the paper" but "can they triage ten of them this week."
+You give FactReview a paper PDF (or an arXiv URL). It returns a Markdown + PDF review where every major claim is tagged with one of four verdicts and linked to a paper section, a literature neighbor, or a number it reproduced by running the paper's code. The image above is a real FactReview output for [CompGCN](https://arxiv.org/abs/1911.03082) — design-axis positioning, color-coded verdicts, paper-vs-reproduced numbers with Δ, and auto-synthesized strengths and weaknesses, on one page. It is **deliberately designed as a one-minute review aid**: as ML submission volumes outrun reviewer capacity and per-paper attention shrinks, the bottleneck is no longer "can a reviewer read the paper" but "can they triage ten of them this week."
 
 > **Two tools in this repo.**
 > **[FactReview](#quick-start--factreview)** takes a paper and returns a full evidence-grounded review.
@@ -87,7 +87,7 @@ You get a Markdown + JSON report listing fabricated, retracted, outdated, and in
 
 ## What FactReview Produces
 
-Every major claim in the paper is tagged with one of five verdicts:
+Every major claim in the paper is tagged with one of four verdicts:
 
 | Verdict | What it means | From the CompGCN demo |
 |---|---|---|
@@ -254,7 +254,6 @@ Each run writes to `runs/<paper_key>_<timestamp>/`. Primary artifacts:
 
 The pipeline runs seven sub-stages, grouped into three phases. `refcheck` and `execution` are skipped by default.
 
-Updated upstream
 ```text
 preprocessing                fact_generation                        review
 parse → claim_extract  →  refcheck? → positioning → execution? → report → teaser

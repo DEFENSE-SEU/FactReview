@@ -2,7 +2,7 @@
 
 Tests the public ``extract_facts`` entry point that the stage_runner ends up
 delegating to. The three cases pin down the contract that downstream stages
-rely on: heuristic mode produces the four claim types from the body text,
+rely on: heuristic mode produces the three claim types from the body text,
 LLM mode parses LLM JSON into ``Claim`` objects, and auto mode falls back to
 heuristics when the LLM call fails.
 """
@@ -20,12 +20,9 @@ def test_heuristic_mode_extracts_all_claim_types(tiny_paper) -> None:
     assert result.backend == "heuristic"
     assert result.claims, "heuristic must surface at least one claim from tiny_paper"
     types = {c.type for c in result.claims}
-    # tiny_paper's intro embeds one trigger sentence per claim type so the
-    # heuristic's classification stays observable from the public API.
     assert ClaimType.METHODOLOGICAL in types
     assert ClaimType.EMPIRICAL in types
     assert ClaimType.THEORETICAL in types
-    assert ClaimType.REPRODUCIBILITY in types
 
     # Empirical claims should carry the dataset hits the heuristic recognises;
     # this is the load-bearing piece downstream evidence-targeting reads.
@@ -57,8 +54,8 @@ def test_llm_mode_parses_llm_response(tiny_paper, monkeypatch) -> None:
                 },
                 {
                     "id": "claim_02",
-                    "text": "Code is open-source.",
-                    "type": "reproducibility",
+                    "text": "We prove TinyMethod generalizes prior work.",
+                    "type": "theoretical",
                     "location": {"section_id": "sec_1"},
                 },
             ]
@@ -74,7 +71,7 @@ def test_llm_mode_parses_llm_response(tiny_paper, monkeypatch) -> None:
     assert captured["paper_key"] == "tiny"
     assert [c.id for c in result.claims] == ["claim_01", "claim_02"]
     assert result.claims[0].type is ClaimType.EMPIRICAL
-    assert result.claims[1].type is ClaimType.REPRODUCIBILITY
+    assert result.claims[1].type is ClaimType.THEORETICAL
 
 
 def test_auto_mode_falls_back_to_heuristic_when_llm_fails(tiny_paper, monkeypatch) -> None:

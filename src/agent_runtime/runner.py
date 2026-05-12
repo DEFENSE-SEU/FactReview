@@ -416,19 +416,15 @@ def _extract_scope_line(text: str, prefix: str) -> str:
 
 def _collect_table_rows(text: str) -> list[list[str]]:
     rows: list[list[str]] = []
-    in_table = False
     for raw in str(text or "").splitlines():
         line = raw.strip()
-        if line.startswith("|") and line.endswith("|"):
-            cells = [cell.strip() for cell in line.strip("|").split("|")]
-            # skip markdown separator line
-            if all(re.fullmatch(r":?-{3,}:?", cell or "") for cell in cells):
-                continue
-            rows.append(cells)
-            in_table = True
-        else:
-            if in_table:
-                in_table = False
+        if not (line.startswith("|") and line.endswith("|")):
+            continue
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+        # skip markdown separator line
+        if all(re.fullmatch(r":?-{3,}:?", cell or "") for cell in cells):
+            continue
+        rows.append(cells)
     return rows
 
 
@@ -1320,7 +1316,7 @@ def _build_experimental_claim_assessment(
     return "", "Pending"
 
 
-def _augment_claims_with_assessment_status(
+def augment_claims_with_assessment_status(
     markdown_text: str,
     *,
     summary: dict[str, Any],
@@ -1365,7 +1361,6 @@ def _augment_claims_with_assessment_status(
                 return idx
         return -1
 
-    claim_type_idx = _header_index("claim type", exact="claim type")
     claim_idx = _header_index("claim", exact="claim")
     evidence_idx = _header_index("evidence")
     assessment_idx = _header_index("assessment")
@@ -1417,18 +1412,19 @@ def _augment_claims_with_assessment_status(
         default_location = _cell_value(cells, len(cells) - 1, "Not found in manuscript")
         location = _cell_value(cells, location_idx, default_location)
         authored_assessment = _cell_value(cells, assessment_idx, "")
-        model_claim_type = _cell_value(cells, claim_type_idx, "")
-        resolved_claim_type = _resolve_claim_type_label(model_claim_type)
-        if resolved_claim_type == "Experimental":
-            assess, stat = _build_experimental_claim_assessment(
-                claim=claim,
-                evidence=evidence,
-                location=location,
-                alignment=alignment,
-                authored_assessment=authored_assessment,
-            )
-        else:
-            # Non-experimental claims defer to the post-hoc claim audit.
+        # Try execution-alignment path for all claims; the helper naturally
+        # returns ("", "Pending") when no dataset/metric match is found,
+        # so non-experimental claims fall through to the authored-assessment
+        # fallback below. This avoids depending on a "Claim Type" column that
+        # the prompt no longer instructs the agent to emit.
+        assess, stat = _build_experimental_claim_assessment(
+            claim=claim,
+            evidence=evidence,
+            location=location,
+            alignment=alignment,
+            authored_assessment=authored_assessment,
+        )
+        if not assess:
             assess = (
                 authored_assessment
                 if _is_meaningful_assessment(authored_assessment)
@@ -2742,7 +2738,7 @@ def _render_report_pdf(
     # The execution stage runs separately; this first augmentation pass uses
     execution_summary: dict[str, Any] = {}
     execution_alignment: dict[str, Any] = {}
-    final_report_markdown = _augment_claims_with_assessment_status(
+    final_report_markdown = augment_claims_with_assessment_status(
         final_report_markdown,
         summary=execution_summary,
         alignment=execution_alignment,

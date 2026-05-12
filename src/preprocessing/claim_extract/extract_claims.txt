@@ -52,7 +52,6 @@ C. Finally, add any remaining empirical claims from the body (tables, figures,
    - methodological: asserts the paper's method / framework is novel or
                      that the paper provides a specific design.
    - theoretical   : proves, generalises, or establishes equivalence.
-   - reproducibility: promises code release / public artefacts.
 4. "importance":
    - "primary"   : from the explicit contribution block, or core novelty/
                    performance claims in the Abstract that define the paper.
@@ -72,7 +71,6 @@ C. Finally, add any remaining empirical claims from the body (tables, figures,
      - "table_<id>.<metric>.<dataset>" for table-grounded checks
      - "execution.<task>.<metric>" for re-run checks
      - "literature.<family>" for positioning checks
-     - "repo.<kind>" for reproducibility checks
    Only include evidence that the claim actually requires.
 8. IDs must be stable and of the form "claim_01", "claim_02", …, ordered
    with primary claims first, then secondary, matching extraction order A→B→C.

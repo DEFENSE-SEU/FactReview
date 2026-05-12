@@ -596,14 +596,8 @@ def finalize_node(state: dict[str, Any]) -> dict[str, Any]:
         try:
             from ..tools.bibtex import lookup_bibtex
 
-            # Collect unique claim titles from tasks
-            seen_titles: set = set()
-            for t in tasks:
-                for _claim in t.get("claims") or []:
-                    # Claims look like "Table 4: TransE+CompGCN(...) on FB15k-237, MRR=0.335"
-                    # Try to extract a paper title from the paper_key or config
-                    pass
             # Use the paper's own title if available from extracted metadata
+            seen_titles: set = set()
             paper_title = str(cfg.get("paper_title") or "").strip()
             if not paper_title:
                 # Try to derive from paper_key

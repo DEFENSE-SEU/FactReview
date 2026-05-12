@@ -951,9 +951,7 @@ def build_review_tools(runtime: ReviewRuntimeContext) -> list[Any]:
         result_payload["can_start_pdf_annotate"] = can_start_pdf_annotate
         result_payload["annotation_gate_hint"] = annotation_gate_hint
         existing_message = str(result_payload.get("message") or "").strip()
-        if retrieval_not_started:
-            pass
-        elif bool(result_payload.get("success")) or not existing_message:
+        if not retrieval_not_started and (bool(result_payload.get("success")) or not existing_message):
             result_payload["message"] = annotation_gate_hint
         result_payload["next_action"] = (
             "enter_retrieval_disabled_mode"

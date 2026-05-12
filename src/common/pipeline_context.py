@@ -129,10 +129,9 @@ def ensure_full_pipeline_context(*, run_dir: Path, allow_standalone: bool = Fals
             "Invalid pipeline context marker. Expected full_pipeline or standalone_stage, "
             f"got runner={runner!r}. Marker: {marker}"
         )
-    if runner != "full_pipeline":
-        raise RuntimeError(
-            "Invalid pipeline context marker. Please run through scripts/execute_review_pipeline.py."
-        )
+    raise RuntimeError(
+        "Invalid pipeline context marker. Please run through scripts/execute_review_pipeline.py."
+    )
 
 
 # ── Stage directory helpers ──────────────────────────────────────────────────

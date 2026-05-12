@@ -2371,12 +2371,7 @@ def _measure_text_width(
     if width > 0:
         return width
 
-    try:
-        import pymupdf as fitz
-
-        return float(len(text_value)) * normalized_font_size * 0.52
-    except Exception:
-        return float(len(text_value)) * normalized_font_size * 0.52
+    return float(len(text_value)) * normalized_font_size * 0.52
 
 
 def _split_token_by_width(

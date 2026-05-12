@@ -1435,10 +1435,35 @@ def _build_fact_review_extractor_prompt(
     semantic_scholar_context: str = "",
     ui_language: str = "en",
     paper_cutoff_date: dict | None = None,
+    paper_search_runtime_state: dict | None = None,
 ) -> str:
     markdown_text = (paper_markdown or "").strip()
     if len(markdown_text) > 120000:
         markdown_text = f"{markdown_text[:120000]}\n\n[...truncated...]"
+
+    search_state = paper_search_runtime_state if isinstance(paper_search_runtime_state, dict) else {}
+    search_started = bool(search_state.get("started", True))
+    search_error = str(search_state.get("error") or "").strip()
+    search_availability = str(search_state.get("availability") or "").strip() or (
+        "ready" if search_started else "unknown"
+    )
+    if search_started:
+        retrieval_status_block = (
+            "[Runtime Retrieval Status]\n"
+            "External paper search is available for this run. "
+            "The provided [Semantic Scholar Retrieval] block contains pre-fetched results; "
+            "use them directly for Section 2 without calling paper_search.\n\n"
+        )
+    else:
+        reason_detail = search_availability
+        if search_error:
+            reason_detail = f"{reason_detail}; {search_error}"
+        retrieval_status_block = (
+            "[Runtime Retrieval Status]\n"
+            f"External paper search is NOT available for this run ({reason_detail}). "
+            "Use only the manuscript text and any [Semantic Scholar Retrieval] content already injected below. "
+            "Do not call paper_search; mark any novelty/comparison conclusions as requiring manual verification.\n\n"
+        )
 
     resolved_ui_language = normalize_ui_language(ui_language, fallback="en", strict=False)
     output_language_rule = (
@@ -1465,6 +1490,7 @@ def _build_fact_review_extractor_prompt(
         )
 
     return (
+        f"{retrieval_status_block}"
         "You are a paper-information extraction agent.\n"
         "Your job is to extract factual manuscript information and organize it into a fixed structured report.\n"
         "\n"
@@ -1491,6 +1517,8 @@ def _build_fact_review_extractor_prompt(
         "- Final completion happens only after `review_final_markdown_write` succeeds.\n"
         "- Avoid repeated search loops: if required evidence cannot be confirmed quickly, write `Not found in manuscript` and continue to the next section.\n"
         "- Tool-call cap for extraction mode: total `pdf_search` calls must be <= 1 for the whole run, and `pdf_read_lines` calls must be <= 1 for the whole run.\n"
+        "- Anti-stall rule: if evidence for a field cannot be found after one scan of [Paper Markdown], write `Not found in manuscript` immediately and move to the next field. Do not re-scan the same section more than once for the same field.\n"
+        "- Think-budget rule: complete all reasoning and evidence gathering for one section before submitting it via `review_final_markdown_write`, then move to the next section. Do not interleave evidence gathering across sections or defer submission indefinitely.\n"
         "\n"
         "Required final sections and order:\n"
         "1. `metadata`\n"
@@ -1516,7 +1544,11 @@ def _build_fact_review_extractor_prompt(
         "- `2. Technical Positioning`: derive the self-row method by this priority: (1) named method/acronym explicitly introduced in title/abstract/introduction/method, (2) concise proposed-method phrase from the manuscript, (3) `Not found in manuscript`.\n"
         "- `2. Technical Positioning`: never write `This Work`, `Ours`, the current paper title, a dataset name, a metric name, `Baseline`, `Val`, `Test`, or another generic table word in the self-row `Method` cell.\n"
         "- `2. Technical Positioning`: never place the current paper title as an external row. Use only the final `This Work` row for self-row identity.\n"
-        "- `2. Technical Positioning`: before writing the table, internally (do NOT output this reasoning as text) enumerate candidate niche dimensions: (a) list each claimed contribution of the current paper; (b) for each Semantic Scholar retrieval paper, identify its 1-2 key distinguishing capabilities; (c) select the 3-8 most discriminating dimensions — those that produce different √/× patterns across method rows. Output only the figure caption and the table, nothing else.\n"
+        "- `2. Technical Positioning`: before writing the table, internally (do NOT output this reasoning as text) run this 3-step reasoning:\n"
+        "  (a) Contribution decomposition: for each core contribution C of this paper, decompose it into four fields — `core mechanism` (what the method does differently), `target setting` (task/domain/data regime), `evaluation protocol` (metrics and benchmark setup), `claimed gain` (quantitative or qualitative improvement asserted). This identifies what dimensions actually matter for positioning.\n"
+        "  (b) Per-paper gap analysis: for each Semantic Scholar retrieval paper, identify its 1-2 key distinguishing capabilities and compare them against the core mechanism and target setting of each C. Record where overlap exists and where gaps remain.\n"
+        "  (c) Dimension selection: choose the 3-8 niche dimensions that produce the most discriminating √/× patterns across all method rows — prioritize dimensions where This Work and at least one external paper differ. Discard dimensions where all rows have the same value.\n"
+        "  Output only the figure caption and the table, nothing else.\n"
         "- `2. Technical Positioning`: after the first two columns, append the selected niche-dimension columns; minimum 4 dimensions if Semantic Scholar returns ≥5 papers, minimum 3 dimensions derived from manuscript claims if fewer than 3 papers are returned.\n"
         "- `2. Technical Positioning`: the table must include at least 2 external method rows before the `This Work` row; if Semantic Scholar returns fewer than 2 relevant papers, use baselines or competing methods explicitly named in the manuscript's Introduction or Related Work sections to fill external rows.\n"
         "- `2. Technical Positioning`: niche-dimension column names must be plain capability/ecological-niche labels, not Semantic Scholar paper titles, not R-IDs such as R1/R2/R3, and not a legend.\n"
@@ -1524,6 +1556,8 @@ def _build_fact_review_extractor_prompt(
         "- `2. Technical Positioning`: include 4-10 method rows; keep wording short academic phrases.\n"
         "- `2. Technical Positioning`: do not output a separate legend block.\n"
         "- `2. Technical Positioning`: after the table, include one short line `Gap:` describing missing high-impact related work if any.\n"
+        "- `3. Claims` PRIMARY SOURCE: locate the manuscript's explicit contributions block first — any bulleted or numbered list introduced by phrases such as \"Our contributions are:\", \"In summary, we:\", \"The main contributions of this paper are:\", or equivalent. Use that block as the primary extraction source. Supplement only with claims from the Abstract that are not already covered. Do not extract claims that appear solely in result sections, discussion sections, or ablation studies.\n"
+        "- `3. Claims` LINGUISTIC SIGNAL: each extracted claim must correspond to an active author-assertion. For Methodological/Data claims, the source sentence must use language such as \"We propose / introduce / construct / design / develop / build\". For Experimental/Efficiency claims, the source sentence must use language such as \"achieves / outperforms / demonstrates / is X times faster\". Exclude passive result sentences (\"Table X shows...\", \"As shown in Figure Y...\") and ablation observations (\"removing X degrades...\", \"without X the performance drops...\").\n"
         "- `3. Claims`: begin with `Paper scope:` and `Evaluation scope:` lines, then one blank line.\n"
         "- `3. Claims`: provide all contribution claims that pass the extraction constraints above; "
         "most papers yield a focused set of core claims — performance sub-claims about the same capability should be consolidated into one row, "
@@ -1531,16 +1565,23 @@ def _build_fact_review_extractor_prompt(
         "deduplicate claims that refer to the same underlying contribution.\n"
         "- `3. Claims`: provide a markdown table with columns `Claim | Evidence | Assessment | Location`.\n"
         "- `3. Claims`: internally classify each claim as `Experimental`, `Theoretical`, or `Methodological` before writing `Assessment`, but do not add a separate `Claim Type` column.\n"
-        "- `3. Claims`: `Evidence` must have two parts separated by a blank line: "
+        "- `3. Claims`: `Evidence` must have two parts separated by `<br><br>` (not a blank line, which would break the table): "
         "(1) `Supporting:` — quote/paraphrase the exact manuscript support for the claim, including table/figure/equation/section anchors; "
         "(2) `Missing:` — explicitly list what evidence is absent but would be needed to fully support the claim scope "
         "(e.g. no variance/CI for a statistical claim, missing key baselines, claim scope broader than tested setting, no ablation for a methodological claim). "
         "If nothing critical is missing, write `Missing: None`.\n"
         "- `3. Claims`: `Assessment` must be evidence-driven and type-aware: for `Experimental`, evaluate numeric/empirical support; for `Theoretical`, evaluate theorem/proof/derivation support; for `Methodological`, evaluate design-description and implementation traceability support. Avoid repeated boilerplate sentences.\n"
+        "- `3. Claims`: before writing each `Assessment` cell, internally verify three checks (do NOT output these checks as text — they inform the verdict only):\n"
+        "  F1 (Numerical consistency): are gains stated in the abstract/text consistent with the actual numbers in tables and figures? If abstract says '+5%' but the table shows '+3.1%', note the mismatch in the Assessment.\n"
+        "  F2 (Text-table consistency): does the narrative claim match what the reported table numbers actually show? If the claim says 'outperforms all baselines' but a baseline is missing from the comparison table, reflect this in `Missing:`.\n"
+        "  F5 (Causal validity): for claims attributing gains to a specific mechanism or component, is there an ablation or controlled experiment that supports the causal direction? If not, the verdict must be at most `partially_supported` — do not use `supported` for unverified causal claims.\n"
         "- `3. Claims`: do not include a `Status` column (status will be appended by the system).\n"
         "- `3. Claims`: at the END of each `Assessment` cell, append exactly one self-verdict tag in the form `[verdict: <label>; reason: <one short clause>]`, where `<label>` is one of `supported`, `partially_supported`, `inconclusive`, or `in_conflict`. Decision rules: use `supported` only when the cited evidence directly proves the claim's verb (for comparative claims like 'leading'/'outperforms'/'best', the gap vs. the strongest comparator must clearly exceed the reported error bar — Δ ≥ 2σ if σ is reported); use `partially_supported` when the evidence supports the qualitative direction but the magnitude or scope is weaker than what the claim asserts, or only some components of a multi-component claim are evidenced; use `inconclusive` when the gap is within ~1σ, the comparator is a system-card / proprietary report rather than an apples-to-apples re-run, or evidence is anecdotal (case study / appendix); use `in_conflict` only when evidence contradicts the claim. The system reconciles your tag with its own audit and keeps whichever is more conservative; over-claim and your tag will be ignored.\n"
         "- `4. Summary`: first give a short whole-paper summary paragraph, then include two sublabels exactly named `Strengths:` and `Weaknesses:` followed by bullet lists.\n"
         "- `4. Summary`: `Strengths` and `Weaknesses` must evaluate the manuscript end-to-end (problem, method, evidence, and presentation), not a single subsection only.\n"
+        "- `4. Summary`: each `Strengths:` bullet must cite a specific manuscript anchor (table number, equation, section name, or figure) that justifies the strength. Do not write generic praise without evidence.\n"
+        "- `4. Summary`: each `Weaknesses:` bullet must follow this format: `[Problem] → [Root cause] → [Validity/novelty impact] → [Repair direction]`. Example: 'Causal attribution of gains to the routing module is unverified → no matched-capacity ablation is reported → core mechanism claim is partially supported at best → add a controlled ablation removing only the routing component under identical parameter budget.'\n"
+        "- `4. Summary`: sort `Weaknesses:` by impact — validity-critical issues first (claims unsupported by evidence, missing controls, causal overreach), methodological gaps second, presentation issues last.\n"
         "- `5. Experiment`: include two subsection headings exactly `### Main Result` and `### Ablation Result`; never use `## Main Result` or `## Ablation Result` inside section 5.\n"
         "- `5. Experiment`: extract `Main Result` and `Ablation Result` from DIFFERENT source sections; never classify the same table as both.\n"
         "- `5. Experiment`: extract and display all reported main experimental-result rows; do not sample, summarize-only, or truncate valid main-result rows.\n"
@@ -1600,6 +1641,7 @@ def build_review_agent_system_prompt(
         semantic_scholar_context=semantic_scholar_context,
         ui_language=ui_language,
         paper_cutoff_date=paper_cutoff_date,
+        paper_search_runtime_state=paper_search_runtime_state,
     )
 
 

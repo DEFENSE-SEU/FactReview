@@ -175,7 +175,8 @@ def _merge_claims(llm_claims: list[Claim], heuristic_claims: list[Claim]) -> lis
     """Keep all LLM claims, append heuristic claims that add new information.
 
     A heuristic claim is kept when no LLM claim shares ≥60% of its tokens
-    (very rough dedup) and no same-type claim exists in the same section.
+    (very rough dedup) and no same-type claim from any source exists in the
+    same section.
     """
     if not heuristic_claims:
         return llm_claims
@@ -189,7 +190,7 @@ def _merge_claims(llm_claims: list[Claim], heuristic_claims: list[Claim]) -> lis
         ht = hc.text.lower()
         if any(_jaccard(ht, kt) >= 0.6 for kt in known_texts):
             continue
-        if not any(c.type == hc.type and hc.location.section_id == c.location.section_id for c in llm_claims):
+        if not any(c.type == hc.type and hc.location.section_id == c.location.section_id for c in out):
             out.append(hc)
     # Re-number so ids stay stable & dense.
     for i, c in enumerate(out, start=1):
