@@ -8,7 +8,7 @@ import re
 import shutil
 import subprocess
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -1024,6 +1024,24 @@ def _row_to_dict(table: TableBlock, row: list[str]) -> dict[str, str]:
     }
 
 
+def _claim_display_priority(row: dict[str, str], original_index: int) -> tuple[int, int]:
+    """Prioritize claim rows that reduce teaser bias under space limits."""
+    claim = _strip_inline_markup(row.get("Claim", "")).lower()
+    status = _strip_inline_markup(row.get("Status", "")).lower()
+    evidence = _strip_inline_markup(row.get("Evidence", "")).lower()
+    text = f"{claim} {evidence}"
+    priority = 50
+    if any(token in text for token in ("first", "novel", "to our knowledge", "innovation")):
+        priority = min(priority, 0)
+    if "in conflict" in status:
+        priority = min(priority, 1)
+    elif "partial" in status or "inconclusive" in status:
+        priority = min(priority, 2)
+    elif "missing:" in evidence and "missing: none" not in evidence:
+        priority = min(priority, 3)
+    return priority, original_index
+
+
 def _select_claim_rows(table: TableBlock | None, limit: int = 3) -> list[dict[str, str]]:
     if table is None:
         return []
@@ -1044,9 +1062,35 @@ def _select_claim_rows(table: TableBlock | None, limit: int = 3) -> list[dict[st
                 "Status": status_text or "Not found in manuscript",
             }
         )
-        if len(selected) >= limit:
+    selected_with_index = [
+        (row, idx)
+        for idx, row in enumerate(selected)
+    ]
+    selected_with_index.sort(key=lambda item: _claim_display_priority(item[0], item[1]))
+    return [row for row, _idx in selected_with_index[:limit]]
+
+
+def _core_claim_rows(core_claims: list[dict[str, Any]] | None, *, limit: int = 3) -> list[dict[str, str]]:
+    if not core_claims:
+        return []
+    rows: list[dict[str, str]] = []
+    for item in core_claims:
+        if len(rows) >= limit:
             break
-    return selected
+        if not isinstance(item, dict):
+            continue
+        text = re.sub(r"\s+", " ", str(item.get("text") or "")).strip()
+        if not text:
+            continue
+        rows.append(
+            {
+                "Claim": text,
+                "Evidence": "",
+                "Status": "Core claim",
+                "Layer": "core",
+            }
+        )
+    return rows
 
 
 def _derive_claims_aggregate_status(rows: list[dict[str, str]]) -> str:
@@ -1071,12 +1115,28 @@ def _derive_claims_aggregate_status(rows: list[dict[str, str]]) -> str:
 def _format_selected_claims(rows: list[dict[str, str]]) -> str:
     if not rows:
         return "1. **Claim:** **Not found in manuscript**"
-    return "\n".join(
-        f"{idx}. **Claim:** **{row.get('Claim', 'Not found in manuscript')}**; "
-        f"**Evidence:** {row.get('Evidence', 'Not found in manuscript')}; "
-        f"**Status:** {row.get('Status', 'Not found in manuscript')}"
-        for idx, row in enumerate(rows, start=1)
-    )
+    lines: list[str] = []
+    for idx, row in enumerate(rows, start=1):
+        claim = row.get("Claim", "Not found in manuscript")
+        if row.get("Layer") == "core" or row.get("Status") == "Core claim":
+            lines.append(f"{idx}. **Core claim:** **{claim}**")
+            continue
+        lines.append(
+            f"{idx}. **Claim:** **{claim}**; "
+            f"**Evidence:** {row.get('Evidence', 'Not found in manuscript')}; "
+            f"**Status:** {row.get('Status', 'Not found in manuscript')}"
+        )
+    return "\n".join(lines)
+
+
+def _with_core_claim_rows(
+    payload: TeaserFigurePayload,
+    core_claims: list[dict[str, Any]] | None,
+) -> TeaserFigurePayload:
+    rows = _core_claim_rows(core_claims)
+    if not rows:
+        return payload
+    return replace(payload, selected_claim_rows=rows)
 
 
 def extract_teaser_figure_payload(markdown_text: str) -> TeaserFigurePayload:
@@ -1218,8 +1278,10 @@ def build_teaser_figure_prompt(
         "- The Improvement and Reduction badges must always appear below the status badges with fixed "
         "labels ('Improvement', 'Reduction'), fixed colors, and fixed positions — do not modify their "
         "text or derive them from execution results.\n"
-        "- The claims section should show exactly 3 claim rows, and they must be dynamically extracted from the report's claims table using the Claim, Evidence, and Status information.\n"
-        "- In claims rows, each claim's status badge must display the exact status label from the claim's Status field "
+        "- The claims section may show up to 3 compact display claim rows because of visual space limits; the audited claims table below is supporting context, while the report markdown remains the complete claim record. "
+        "Prefer the provided Core claim rows when present; otherwise prioritize novelty/positioning claims, in-conflict claims, partially supported or inconclusive claims, and claims with non-empty Missing evidence before fully supported claims.\n"
+        "- If a selected display row is labelled `Core claim`, render it as a neutral compact claim statement without a per-row status badge; detailed support/status lives in the report's claim tables.\n"
+        "- For selected display rows that include a real Status field from the audited claims table, each claim's status badge must display the exact status label from the claim's Status field "
         "(e.g., '⚠ Inconclusive', '⚠ Partially supported', '✓ Supported', '✗ In conflict') — "
         "do NOT substitute the combined top-right badge label '⚠ Partially supported / Inconclusive' for individual claim row badges.\n"
         "- In the claims module, each claim sentence must be visually bold in the figure.\n"
@@ -1263,10 +1325,10 @@ def build_teaser_figure_prompt(
         f"{_table_to_markdown(payload.technical_positioning_table)}\n"
         "\n"
         "[Claims]\n"
-        "Selected 3 claim rows for direct layout use:\n"
+        "Selected display claim rows for direct layout use (space-limited; audited claims table follows):\n"
         f"{selected_claims_text}\n"
         "\n"
-        "Full claims table:\n"
+        "Audited claims table:\n"
         f"{_table_to_markdown(payload.claims_table)}\n"
         "\n"
         "[Summary]\n"
@@ -1591,6 +1653,7 @@ def generate_teaser_figure(
     latest_extraction_path: str | Path,
     *,
     output_dir: str | Path | None = None,
+    core_claims: list[dict[str, Any]] | None = None,
     gemini_api_key: str | None = None,
     gemini_model: str | None = None,
     timeout_seconds: int = 120,
@@ -1599,7 +1662,10 @@ def generate_teaser_figure(
 ) -> TeaserFigureGenerationResult:
     _ensure_env_loaded()
     latest_path = _coerce_path(latest_extraction_path).resolve()
-    teaser_payload = extract_teaser_figure_payload_from_latest_extraction(latest_path)
+    teaser_payload = _with_core_claim_rows(
+        extract_teaser_figure_payload_from_latest_extraction(latest_path),
+        core_claims,
+    )
     prompt = build_teaser_figure_prompt(
         teaser_payload,
         execution_skipped=execution_skipped,

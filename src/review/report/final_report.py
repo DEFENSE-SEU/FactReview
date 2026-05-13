@@ -117,8 +117,8 @@ def _validate_claims(markdown: str) -> str | None:
         return (
             "Claims table must not include Status before system assessment; status is appended automatically."
         )
-    if len(rows) != 3:
-        return "Claims table must contain exactly 3 core claims."
+    if not rows:
+        return "Claims table must contain at least one claim."
     evidence_idx = next((i for i, h in enumerate(lowered) if "evidence" in h), -1)
     assessment_idx = next((i for i, h in enumerate(lowered) if "assessment" in h), -1)
     location_idx = next((i for i, h in enumerate(lowered) if "location" in h), -1)

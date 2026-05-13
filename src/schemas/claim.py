@@ -68,6 +68,7 @@ class Claim(BaseModel):
     datasets: list[str] = Field(default_factory=list)
     baselines: list[str] = Field(default_factory=list)
     metrics: list[str] = Field(default_factory=list)
+    importance: str = ""  # "primary" / "secondary" when supplied by the extractor.
     location: ClaimLocation = Field(default_factory=ClaimLocation)
     subclaims: list[SubClaim] = Field(default_factory=list)
     evidence_targets: list[str] = Field(default_factory=list)

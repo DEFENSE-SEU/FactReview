@@ -1,89 +1,169 @@
-You are extracting review-relevant CLAIMS from a research paper, so that a
-downstream pipeline can independently verify each claim against the paper's
-own tables, related work, and — where applicable — re-execution of the paper's code.
+You extract reviewer-salient CLAIMS from a research paper.
 
-Return STRICT JSON matching this schema (no prose, no code fences):
+Your output is not a summary of the paper. It is the set of author assertions
+that an expert reviewer would need to audit because they affect novelty,
+validity, contribution, reproducibility, or scope.
+
+Return STRICT JSON only, matching this schema:
 
 {{
+  "core_claims": [
+    {{
+      "id": "core_claim_01",
+      "text": "<concise high-level reviewer-facing claim>",
+      "type": "empirical | methodological | theoretical",
+      "scope": "broad | local",
+      "importance": "primary",
+      "datasets": ["FB15k-237", "..."],
+      "baselines": ["TransE", "..."],
+      "metrics": ["MRR", "..."],
+      "location": {{"section_id": "<id>", "char_start": <int>, "char_end": <int>}},
+      "evidence_targets": ["claim_03", "table_1.MRR", "literature.agent_skill_retrieval"]
+    }}
+  ],
   "claims": [
     {{
-      "id":        "claim_01",
-      "text":      "<concise, verbatim-or-near-verbatim claim sentence>",
-      "type":      "empirical | methodological | theoretical",
-      "scope":     "broad | local",
+      "id": "claim_01",
+      "text": "<concise verbatim-or-near-verbatim author claim>",
+      "type": "empirical | methodological | theoretical",
+      "scope": "broad | local",
       "importance": "primary | secondary",
-      "datasets":  ["FB15k-237", ...],
-      "baselines": ["TransE", "ConvE", ...],
-      "metrics":   ["MRR", "Hits@10", ...],
-      "location":  {{"section_id": "<id>", "char_start": <int>, "char_end": <int>}},
-      "evidence_targets": [
-        "table_3.MRR.FB15k-237",
-        "execution.link_prediction.mrr",
-        "literature.neighbor_family"
-      ]
+      "datasets": ["FB15k-237", "..."],
+      "baselines": ["TransE", "..."],
+      "metrics": ["MRR", "..."],
+      "location": {{"section_id": "<id>", "char_start": <int>, "char_end": <int>}},
+      "evidence_targets": ["table_1.MRR", "literature.agent_skill_retrieval"]
     }}
   ]
 }}
 
-RULES
+Two-layer output:
 
-EXTRACTION ORDER (MANDATORY — follow this order before anything else):
-A. First, locate any EXPLICIT CONTRIBUTION BLOCK: a bulleted or numbered list
-   introduced by phrases such as "Our contributions are:", "The contributions
-   of this paper are:", "In summary, we:", "We make the following contributions:".
-   Extract each bullet/item as a SEPARATE claim (importance="primary").
-   These are the highest-priority claims because they represent the authors'
-   own enumeration of what they consider their core contributions.
-B. Next, supplement with claims from the Abstract that are NOT already covered
-   by contribution-block items (deduplicate by meaning, not exact wording).
-C. Finally, add any remaining empirical claims from the body (tables, figures,
-   experiment sections) that are not covered by A or B (importance="secondary").
-   Do NOT extract claims that appear solely in Related Work or Discussion sections.
+- `core_claims` is the compact display layer for the report overview and
+  teaser figure. Return about 2-4 claims, normally 3, unless the paper truly
+  has fewer or more central claims. These should be the paper's main
+  reviewer-facing assertions: the strongest positioning/novelty assertion,
+  the central method or artifact contribution, and the headline empirical or
+  causal result. They may synthesize several detailed claims, but must remain
+  neutral author assertions rather than your judgment.
+- `claims` is the complete detailed audit layer. Return every
+  reviewer-salient author claim that should be checked downstream. This layer
+  has no fixed length.
+- Construct `claims` first, then select or synthesize `core_claims` from that
+  complete detailed set. Do not drop, merge away, or omit a detailed claim
+  merely because a broader core claim already covers the same topic.
+- Do not make `core_claims` more favorable than the paper warrants. If the
+  paper positions itself as first/novel but related work may already cover the
+  idea, still extract that positioning as a claim; do not present it as proven
+  novelty.
+- Every core claim should correspond to one or more detailed claims by meaning.
+  Use detailed claim ids in `evidence_targets` when helpful.
 
-1. Prefer the paper's OWN claims. Do not invent numbers, baselines, or
-   datasets that the paper does not state.
-2. "scope":
-   - "broad" if the claim spans multiple (task, dataset, metric) triples
-     — e.g. "outperforms prior work on link prediction, node classification,
-     and graph classification". The decomposer will split it.
-   - "local" otherwise.
-3. "type":
-   - empirical     : asserts a numeric comparison / ranking / SOTA.
-   - methodological: asserts the paper's method / framework is novel or
-                     that the paper provides a specific design.
-   - theoretical   : proves, generalises, or establishes equivalence.
-4. "importance":
-   - "primary"   : from the explicit contribution block, or core novelty/
-                   performance claims in the Abstract that define the paper.
-   - "secondary" : supporting claims, ablation-related, or body-only claims.
-5. LINGUISTIC SIGNAL — a valid claim must be an active author assertion:
-   - Methodological: "We propose / introduce / design / develop / build"
-   - Empirical: "achieves / outperforms / improves / is X times faster"
-   - Exclude passive result sentences ("Table X shows…", "As shown in Figure Y…")
-   - Exclude ablation observations ("removing X degrades…")
-   - Exclude background/motivation sentences and related-work descriptions.
-6. CONSOLIDATION: merge all performance sub-claims about the same capability
-   (different metrics, percentage gains, sub-task results) into ONE claim.
-   Sub-metric details are supporting evidence, not separate claims.
-7. "evidence_targets": for each claim, list the in-paper or external
-   checks needed to move it off "inconclusive" in the §3.4 synthesis
-   stage. Use:
-     - "table_<id>.<metric>.<dataset>" for table-grounded checks
-     - "execution.<task>.<metric>" for re-run checks
-     - "literature.<family>" for positioning checks
-   Only include evidence that the claim actually requires.
-8. IDs must be stable and of the form "claim_01", "claim_02", …, ordered
-   with primary claims first, then secondary, matching extraction order A→B→C.
-9. Skip sentences from References, Acknowledgements, or the Appendix
-   unless the paper explicitly builds a main-text claim on appendix data.
-10. Return {{"claims": []}} if no review-relevant claims are found.
+What counts as a reviewer-salient claim:
+
+- Novelty, first-work, uniqueness, or literature-gap positioning.
+- A central method or design contribution, only when the paper presents it as
+  a contribution or when it is necessary to evaluate the claimed result.
+- Artifact/resource claims that matter to the contribution, such as corpus
+  scale, provenance, availability, or benchmark construction.
+- Main empirical effect claims, including improvements, null results,
+  efficiency/cost claims, ceilings, and statistically tested comparisons.
+- Causal or explanatory claims drawn from results, such as what the paper says
+  is the bottleneck, mechanism, or reason for success/failure.
+- Generalization, coverage, reproducibility, or practical-impact claims.
+
+What should not be extracted:
+
+- Neutral descriptions of the system architecture or pipeline mechanics unless
+  the paper asserts novelty, evidence, or contribution through that description.
+- Routine settings, hyperparameters, model names, truncation lengths, top-k
+  values, prompt templates, implementation details, or benchmark descriptions
+  unless the paper makes them part of a reviewed contribution or result.
+- Background/motivation facts and generic related-work summaries, except for
+  explicit gap or positioning claims made by the authors.
+- Figure/table captions as separate claims when they only restate a claim that
+  already appears in the abstract, contribution block, or main results text.
+- Repeated restatements of the same assertion from different sections.
+- Supporting measurements that only justify a broader takeaway in the same
+  paragraph or section. Put those measurements in metrics/evidence_targets of
+  the broader claim instead of returning separate claims.
+
+Granularity:
+
+- There is no fixed number of claims. Include every reviewer-salient author
+  claim in `claims` and omit low-salience descriptive facts.
+- One returned claim should have one main verifiable predicate.
+- Split claims that require different evidence. For example, split resource
+  size from public availability; score improvement from oracle-ceiling ratio;
+  skill-use rate from performance gain; causal interpretation from the result
+  it interprets; retrieval coverage from agent use rate; method existence
+  from first/novel positioning.
+- When extracting novelty or positioning, do not keep extra artifact, corpus,
+  benchmark, or implementation clauses inside that novelty claim. Extract the
+  novelty assertion itself, then extract the other assertions separately if
+  they are reviewer-salient.
+- For artifact/resource claims, keep availability, provenance/construction,
+  and exact size as separate claims when they are all reviewer-salient. Do not
+  repeat the exact size inside the availability claim if a size claim is also
+  returned.
+- Deduplicate by meaning, not wording. If the same assertion appears in the
+  abstract, introduction, contribution block, and discussion, keep the clearest
+  contribution-block or abstract wording once.
+- If one claim already captures the reviewed takeaway, do not also return each
+  table row, stage metric, sub-metric, or implementation-detail sentence that
+  merely supports it.
+- If two returned claims would cite essentially the same evidence and have the
+  same reviewer consequence, merge them into the clearer higher-level claim.
+  If they require different evidence, split them.
+- Preserve the authors' assertion neutrally. Do not make it stronger, weaker,
+  more favorable, or more skeptical; downstream audit will judge support.
+- `core_claims` can be broader than detailed claims because it is a display
+  layer, but it should not become a vague summary. Each core claim still needs
+  a concrete reviewed predicate and a trace to detailed claims or manuscript
+  evidence.
+
+Granularity examples:
+
+- Too broad: "We present the first X method over a 36K corpus and improve
+  Pass@1." Better: "This is the first X method"; "The corpus contains 36K
+  items"; "The method improves Pass@1 from A to B."
+- Too broad: "The method improves Pass@1 and reaches 84% of the oracle
+  ceiling." Better: one claim for the improvement, one claim for the oracle
+  ceiling.
+- Too broad: "Agents use retrieved skills but performance does not improve."
+  Better: one claim for use rate, one claim for null performance gain.
+- Too broad: "The system retrieves 61.8% of oracle items and agents use them
+  at 68.8%." Better: one claim for retrieval coverage, one claim for agent use.
+- Too fine: "Stage 1 has R@1000 of 0.905; Stage 2 has MRR 0.587; Stage 3
+  has MRR 0.634." Better: "Each stage progressively improves ranking quality"
+  unless one stage's number is itself a headline contribution.
+
+Before returning JSON, silently check each detailed claim: if a reviewer would
+need two different evidence checks to verify it, split it. If a detailed claim
+is only evidence for another returned detailed claim, remove it and attach its
+evidence target there. Then check that `core_claims` is a compact neutral
+display layer over the detailed claims, not a second exhaustive list.
+
+Type guidance:
+
+- empirical: numeric result, comparison, statistical test, null result,
+  efficiency/cost/latency claim, benchmark or artifact statistic.
+- methodological: proposed method/framework/design/resource construction.
+- theoretical: conceptual framing, explanatory/causal interpretation,
+  generality, or literature-positioning claim that is not itself numeric.
+
+Use "primary" for core novelty/contribution/result/causal claims. Use
+"secondary" for supporting claims that a reviewer may still need to check.
+
+Return {{"core_claims": [], "claims": []}} only if there are no
+reviewer-salient author claims.
 
 Paper metadata:
-  title:    {title}
-  key:      {paper_key}
+  title: {title}
+  key: {paper_key}
 
-Ingested sections (id — title — char range — text):
+Ingested sections:
 {sections}
 
-Reported numeric results (from tables; may inform evidence_targets):
+Reported numeric results from tables:
 {reported_summary}

@@ -17,6 +17,8 @@ import pytest
 
 from agent_runtime.runner import augment_claims_with_assessment_status
 from review.report.claim_audit import audit_review_markdown
+from review.report.final_report import validate_final_report_logic
+from review.report.stage_runner import _DETAILED_CLAIMS_HEADING, _append_detailed_claims_block
 
 
 def _stub_llm(verdicts: list[dict[str, Any]], missing: list[str] | None = None):
@@ -26,6 +28,74 @@ def _stub_llm(verdicts: list[dict[str, Any]], missing: list[str] | None = None):
         return {"verdicts": verdicts, "ablation_missing_components": missing or []}
 
     return _call
+
+
+def test_final_report_logic_allows_variable_number_of_claims() -> None:
+    md = (
+        "## 2. Technical Positioning\n"
+        "| Research domain | Method | A | B |\n"
+        "| --- | --- | --- | --- |\n"
+        "| Other | Baseline | × | √ |\n"
+        "| This Work | TinyMethod | √ | √ |\n\n"
+        "## 3. Claims\n"
+        "| Claim | Evidence | Assessment | Location |\n"
+        "|---|---|---|---|\n"
+        "| Novelty claim. | Supporting: Related Work comparison.<br><br>Missing: external verification. | partial | Intro |\n"
+        "| Method claim. | Supporting: Section 3.<br><br>Missing: None. | ok | Section 3 |\n"
+        "| Artifact claim. | Supporting: Appendix A.<br><br>Missing: release URL. | partial | Appendix A |\n"
+        "| Result claim. | Supporting: Table 1.<br><br>Missing: None. | ok | Table 1 |\n\n"
+        "## 5. Experiment\n"
+        "### Main Result\n"
+        "| Task | Metric | Paper Result |\n"
+        "|---|---|---|\n"
+        "| T | M | 1.0 |\n\n"
+        "### Ablation Result\n"
+        "| Ablation Dimension | Configuration | Full Model | Paper Result | Difference |\n"
+        "|---|---|---|---|---|\n"
+        "| Optimal setup | full | 1.0 | 1.0 | 0 |\n"
+    )
+
+    assert validate_final_report_logic(md) is None
+
+
+def test_report_appends_detailed_claims_without_changing_primary_claim_table() -> None:
+    md = (
+        "## 2. Technical Positioning\n"
+        "| Research domain | Method | A |\n"
+        "| --- | --- | --- |\n"
+        "| Other | Baseline | × |\n"
+        "| This Work | TinyMethod | √ |\n\n"
+        "## 3. Claims\n"
+        "**Paper scope:** TinyMethod.\n"
+        "**Evaluation scope:** One benchmark.\n"
+        "| Claim | Evidence | Assessment | Location |\n"
+        "|---|---|---|---|\n"
+        "| Core claim. | Supporting: Section 1.<br><br>Missing: None. | ok | Section 1 |\n\n"
+        "## 5. Experiment\n"
+        "### Main Result\n"
+        "| Task | Metric | Paper Result |\n"
+        "|---|---|---|\n"
+        "| T | M | 1.0 |\n\n"
+        "### Ablation Result\n"
+        "| Ablation Dimension | Configuration | Full Model | Paper Result | Difference |\n"
+        "|---|---|---|---|---|\n"
+        "| Optimal setup | full | 1.0 | 1.0 | 0 |\n"
+    )
+
+    updated = _append_detailed_claims_block(
+        md,
+        {
+            "claims": [
+                {"id": "claim_01", "text": "Detailed first claim.", "type": "methodological"},
+                {"id": "claim_02", "text": "Detailed second claim.", "type": "empirical"},
+            ]
+        },
+    )
+
+    assert _DETAILED_CLAIMS_HEADING in updated
+    assert "| claim_02 | Detailed second claim. | empirical |" in updated
+    assert updated.index("| Claim | Evidence | Assessment | Location |") < updated.index(_DETAILED_CLAIMS_HEADING)
+    assert validate_final_report_logic(updated) is None
 
 
 def test_audit_caps_supported_to_inconclusive_when_llm_disagrees(

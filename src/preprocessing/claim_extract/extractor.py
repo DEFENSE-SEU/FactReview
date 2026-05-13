@@ -6,13 +6,12 @@ the extractor runs:
 
   - ``heuristic`` : regex-only (deterministic, no API cost).
   - ``llm``       : LLM-only (strict JSON).
-  - ``auto``      : LLM with heuristic as backfill. If the LLM call
-                    fails or returns zero claims, we still return the
-                    heuristic set so downstream stages have something
-                    to work with.
+  - ``auto``      : strict LLM path. If the LLM call fails or returns an
+                    unusable payload, extraction raises instead of falling
+                    back to heuristic output.
 
-After extraction, broad claims are run through the decomposer so the
-returned list is guaranteed to be in its final §3.1b form.
+The LLM prompt is responsible for keeping claims atomic. Legacy broad-claim
+decomposition remains available only when explicitly enabled in config.
 """
 
 from __future__ import annotations
@@ -41,9 +40,14 @@ logger = logging.getLogger(__name__)
 class ExtractionResult:
     """Bundle returned by :func:`extract_facts`."""
 
+    core_claims: list[Claim]
     claims: list[Claim]
     reported_results: list[ReportedResult]
-    backend: str  # "llm" | "heuristic" | "auto:llm+heuristic"
+    backend: str  # "llm" | "heuristic" | "auto:llm"
+
+
+class ClaimExtractionError(RuntimeError):
+    """Raised when strict LLM claim extraction cannot produce usable claims."""
 
 
 # ---------------------------------------------------------------------------
@@ -90,20 +94,20 @@ def _render_reported_summary(reported: list[ReportedResult], *, max_entries: int
 def _call_llm_for_claims(
     paper: Paper,
     reported: list[ReportedResult],
+    claim_cfg: ClaimExtractCfg,
     llm_cfg: LLMCfg,
-) -> list[Claim] | None:
-    """Run the LLM extraction pass, returning ``None`` on any failure."""
+) -> tuple[list[Claim], list[Claim]]:
+    """Run the LLM extraction pass, raising on any unusable result."""
     try:
         from llm.client import llm_json, resolve_llm_config
-    except Exception:
-        logger.warning("LLM client not importable; skipping LLM extraction.")
-        return None
+    except Exception as exc:
+        raise ClaimExtractionError("LLM client is not importable for claim extraction.") from exc
 
     template = _load_prompt_template()
     prompt = template.format(
         title=(paper.metadata.title or paper.metadata.paper_key),
         paper_key=paper.metadata.paper_key,
-        sections=_render_sections_for_prompt(paper),
+        sections=_render_sections_for_prompt(paper, max_chars=claim_cfg.prompt_max_chars),
         reported_summary=_render_reported_summary(reported),
     )
 
@@ -111,6 +115,7 @@ def _call_llm_for_claims(
         provider=llm_cfg.provider,
         model=llm_cfg.model,
         base_url=llm_cfg.base_url,
+        max_tokens=llm_cfg.max_tokens,
     )
     try:
         payload = llm_json(
@@ -120,15 +125,24 @@ def _call_llm_for_claims(
             module="analysis",
         )
     except Exception as exc:
-        logger.warning("LLM extraction failed: %s", exc)
-        return None
+        raise ClaimExtractionError(f"LLM claim extraction failed: {exc}") from exc
 
+    raw_core_claims = (payload or {}).get("core_claims")
+    if not isinstance(raw_core_claims, list):
+        raise ClaimExtractionError(
+            f"LLM claim extraction returned no list-valued 'core_claims' field: {payload!r}"
+        )
     raw_claims = (payload or {}).get("claims")
     if not isinstance(raw_claims, list):
-        logger.warning("LLM extraction returned no 'claims' field; raw=%r", payload)
-        return None
+        raise ClaimExtractionError(f"LLM claim extraction returned no list-valued 'claims' field: {payload!r}")
 
-    return list(_parse_llm_claims(raw_claims))
+    core_claims = list(_parse_llm_claims(raw_core_claims))
+    claims = list(_parse_llm_claims(raw_claims))
+    if not core_claims:
+        raise ClaimExtractionError("LLM claim extraction returned zero usable core claims.")
+    if not claims:
+        raise ClaimExtractionError("LLM claim extraction returned zero usable claims.")
+    return core_claims, claims
 
 
 def _parse_llm_claims(raw: list[dict]) -> list[Claim]:
@@ -159,53 +173,13 @@ def _parse_llm_claims(raw: list[dict]) -> list[Claim]:
             datasets=[str(x) for x in (item.get("datasets") or []) if x],
             baselines=[str(x) for x in (item.get("baselines") or []) if x],
             metrics=[str(x) for x in (item.get("metrics") or []) if x],
+            importance=str(item.get("importance", "")).strip(),
             location=location,
             evidence_targets=[str(x) for x in (item.get("evidence_targets") or []) if x],
         )
         if claim.text:
             parsed.append(claim)
     return parsed
-
-
-# ---------------------------------------------------------------------------
-# Merge logic (for mode="auto")
-# ---------------------------------------------------------------------------
-
-
-def _merge_claims(llm_claims: list[Claim], heuristic_claims: list[Claim]) -> list[Claim]:
-    """Keep all LLM claims, append heuristic claims that add new information.
-
-    A heuristic claim is kept when no LLM claim shares ≥60% of its tokens
-    (very rough dedup) and no same-type claim from any source exists in the
-    same section.
-    """
-    if not heuristic_claims:
-        return llm_claims
-    if not llm_claims:
-        return heuristic_claims
-
-    out: list[Claim] = list(llm_claims)
-    known_texts = [c.text.lower() for c in llm_claims]
-
-    for hc in heuristic_claims:
-        ht = hc.text.lower()
-        if any(_jaccard(ht, kt) >= 0.6 for kt in known_texts):
-            continue
-        if not any(c.type == hc.type and hc.location.section_id == c.location.section_id for c in out):
-            out.append(hc)
-    # Re-number so ids stay stable & dense.
-    for i, c in enumerate(out, start=1):
-        if not c.id.startswith("claim_"):
-            c.id = f"claim_{i:02d}"
-    return out
-
-
-def _jaccard(a: str, b: str) -> float:
-    ta = set(a.split())
-    tb = set(b.split())
-    if not ta or not tb:
-        return 0.0
-    return len(ta & tb) / len(ta | tb)
 
 
 # ---------------------------------------------------------------------------
@@ -227,7 +201,7 @@ def extract_facts(
         The structured paper produced by :mod:`ingestion`.
     cfg
         Fact-extraction sub-config. Defaults to :class:`ClaimExtractCfg`
-        with ``mode="auto"`` and decomposition enabled.
+        with ``mode="auto"`` and strict LLM extraction.
     llm_cfg
         LLM routing sub-config; only consulted when mode ∈ {auto, llm}.
     """
@@ -236,30 +210,22 @@ def extract_facts(
 
     reported = extract_reported_results(paper)
 
-    llm_claims: list[Claim] | None = None
-    heuristic_claims: list[Claim] = []
-
-    if mode in {"llm", "auto"} and llm_cfg is not None:
-        llm_claims = _call_llm_for_claims(paper, reported, llm_cfg)
-
-    if mode in {"heuristic", "auto"} or llm_claims is None:
-        heuristic_claims = extract_claims_heuristic(paper)
-
-    if mode == "llm":
-        claims = llm_claims or []
-        backend = "llm"
+    if mode in {"llm", "auto"}:
+        core_claims, claims = _call_llm_for_claims(paper, reported, cfg, llm_cfg or LLMCfg())
+        backend = "llm" if mode == "llm" else "auto:llm"
     elif mode == "heuristic":
-        claims = heuristic_claims
+        claims = extract_claims_heuristic(paper)
+        core_claims = claims[:3]
         backend = "heuristic"
-    else:  # auto
-        if llm_claims is None:
-            claims = heuristic_claims
-            backend = "auto:heuristic-fallback"
-        else:
-            claims = _merge_claims(llm_claims, heuristic_claims)
-            backend = "auto:llm+heuristic"
+    else:
+        raise ValueError(f"Unknown claim extraction mode: {cfg.mode!r}")
 
     if cfg.decompose_broad_claims:
         claims = decompose_claims(claims, reported)
 
-    return ExtractionResult(claims=claims, reported_results=reported, backend=backend)
+    return ExtractionResult(
+        core_claims=core_claims,
+        claims=claims,
+        reported_results=reported,
+        backend=backend,
+    )

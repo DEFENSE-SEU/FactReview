@@ -11,12 +11,14 @@ from pydantic import BaseModel, Field
 
 
 class ClaimExtractCfg(BaseModel):
-    mode: str = "auto"  # auto | llm | heuristic
-    decompose_broad_claims: bool = True
+    mode: str = "auto"  # auto = strict LLM extraction; llm | heuristic
+    decompose_broad_claims: bool = False
+    prompt_max_chars: int = 50_000
 
 
 class LLMCfg(BaseModel):
     provider: str = "openai-codex"
     model: str = ""
     base_url: str = ""
+    max_tokens: int | None = None
     route: dict[str, str] = Field(default_factory=dict)

@@ -11,9 +11,13 @@ from common.pipeline_context import (
     load_job_state_snapshot,
     load_stage_assets_snapshot,
     read_json_file,
+    parse_stage_dir,
     resolve_artifact_path,
     write_json_file,
 )
+from preprocessing.claim_extract.extractor import extract_facts
+from preprocessing.claim_extract.paper_loader import paper_from_parse_payload
+from schemas.config import ClaimExtractCfg, LLMCfg
 from schemas.stage import StageResult
 
 
@@ -57,10 +61,28 @@ def run_claim_extract_stage(
         # Agent runtime can legitimately complete a job with zero annotations and no annotations.json.
         annotations_payload = []
 
+    parse_payload = read_json_file(parse_stage_dir(run_dir) / "paper.json")
+    paper = paper_from_parse_payload(
+        repo_root=repo_root,
+        paper_key=paper_key or str(bridge.paper_key or ""),
+        parse_payload=parse_payload,
+    )
+    extraction = extract_facts(
+        paper,
+        cfg=ClaimExtractCfg(mode="auto", decompose_broad_claims=False),
+        llm_cfg=LLMCfg(),
+    )
+
     facts_out = claim_extract_stage_dir(run_dir) / "facts.json"
     write_json_file(
         facts_out,
         {
+            "backend": extraction.backend,
+            "core_claim_count": len(extraction.core_claims),
+            "core_claims": [claim.model_dump(mode="json") for claim in extraction.core_claims],
+            "claim_count": len(extraction.claims),
+            "claims": [claim.model_dump(mode="json") for claim in extraction.claims],
+            "reported_results": [result.model_dump(mode="json") for result in extraction.reported_results],
             "annotation_count": annotation_count,
             "annotations_path": annotations_raw if has_annotations_file else "",
             "annotations": annotations_payload,
@@ -85,7 +107,12 @@ def run_claim_extract_stage(
     return StageResult(
         status="ok" if ok else "failed",
         outputs={"main": str(facts_out)},
-        extra={"job_id": bridge.job_id},
+        extra={
+            "job_id": bridge.job_id,
+            "core_claim_count": len(extraction.core_claims),
+            "claim_count": len(extraction.claims),
+            "backend": extraction.backend,
+        },
         error=error,
     )
 

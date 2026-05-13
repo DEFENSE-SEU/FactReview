@@ -14,6 +14,7 @@ import pytest
 from pydantic import ValidationError
 
 from schemas.claim import Claim, ClaimLabel, ClaimLocation, ClaimType
+from schemas.config import LLMCfg
 from schemas.paper import Paper, PaperMetadata, Section
 from schemas.review import ClaimAssessment, EvidenceLink, FinalReview
 from schemas.stage import StageResult
@@ -85,3 +86,7 @@ def test_final_review_assessments_round_trip() -> None:
     assert rehydrated.paper_key == "k"
     assert rehydrated.assessments[0].label is ClaimLabel.SUPPORTED
     assert rehydrated.summary_counts.get(ClaimLabel.SUPPORTED) == 1
+
+
+def test_llm_cfg_does_not_set_default_output_cap() -> None:
+    assert LLMCfg().max_tokens is None

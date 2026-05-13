@@ -22,6 +22,7 @@ from typing import Any
 from agent_runtime.runner import augment_claims_with_assessment_status
 from common.config import get_settings
 from common.pipeline_context import (
+    claim_extract_stage_dir,
     ensure_full_pipeline_context,
     execution_stage_dir,
     load_job_state_snapshot,
@@ -38,6 +39,9 @@ from review.report.claim_audit import audit_review_markdown
 from review.report.pdf_renderer import build_review_report_pdf
 from schemas.stage import StageResult
 from util.fs import copy_file_if_exists
+
+
+_DETAILED_CLAIMS_HEADING = "**Detailed extracted claims:**"
 
 
 def _read_text(path: Path) -> str:
@@ -96,6 +100,131 @@ def _strip_experiment_eval_status(text: str) -> str:
 
     new_body = "".join(result)
     return text[: sec.start(2)] + new_body + text[sec.end(2) :]
+
+
+def _markdown_cell(value: Any) -> str:
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    return text.replace("|", "&#124;") or "Not found in manuscript"
+
+
+def _claim_location_text(claim: dict[str, Any]) -> str:
+    location = claim.get("location")
+    if not isinstance(location, dict):
+        return ""
+    parts: list[str] = []
+    section_id = str(location.get("section_id") or "").strip()
+    if section_id:
+        parts.append(section_id)
+    page = location.get("page")
+    if page is not None:
+        parts.append(f"page {page}")
+    char_start = location.get("char_start")
+    char_end = location.get("char_end")
+    if char_start is not None or char_end is not None:
+        start = "" if char_start is None else str(char_start)
+        end = "" if char_end is None else str(char_end)
+        parts.append(f"chars {start}-{end}")
+    return "; ".join(parts)
+
+
+def _claim_table_row_count(claims_body: str) -> int:
+    lines = claims_body.splitlines()
+    header_idx = -1
+    for idx, line in enumerate(lines):
+        stripped = line.strip()
+        if (
+            stripped.startswith("|")
+            and "claim" in stripped.lower()
+            and "evidence" in stripped.lower()
+            and "location" in stripped.lower()
+        ):
+            header_idx = idx
+            break
+    if header_idx < 0:
+        return 0
+    count = 0
+    for line in lines[header_idx + 2 :]:
+        stripped = line.strip()
+        if not (stripped.startswith("|") and stripped.endswith("|")):
+            break
+        count += 1
+    return count
+
+
+def _format_detailed_claims_block(claims: list[dict[str, Any]]) -> str:
+    rows = [
+        _DETAILED_CLAIMS_HEADING,
+        "Full detailed claim-extraction layer used for downstream review; teaser figures use only the compact core-claim layer.",
+        "",
+        "| ID | Claim | Type | Importance | Location | Evidence targets |",
+        "|---|---|---|---|---|---|",
+    ]
+    for idx, claim in enumerate(claims, start=1):
+        if not isinstance(claim, dict):
+            continue
+        claim_id = str(claim.get("id") or f"claim_{idx:02d}")
+        targets = claim.get("evidence_targets")
+        rows.append(
+            "| "
+            + " | ".join(
+                [
+                    _markdown_cell(claim_id),
+                    _markdown_cell(claim.get("text")),
+                    _markdown_cell(claim.get("type")),
+                    _markdown_cell(claim.get("importance")),
+                    _markdown_cell(_claim_location_text(claim)),
+                    _markdown_cell(", ".join(str(t) for t in targets) if isinstance(targets, list) else ""),
+                ]
+            )
+            + " |"
+        )
+    return "\n".join(rows).rstrip()
+
+
+def _append_detailed_claims_block(markdown_text: str, facts_payload: dict[str, Any]) -> str:
+    claims = facts_payload.get("claims")
+    if not isinstance(claims, list) or not claims:
+        return markdown_text
+    if _DETAILED_CLAIMS_HEADING in markdown_text:
+        return markdown_text
+
+    sec = re.search(
+        r"(?ims)(^##\s+(?:\*\*)?3\.\s+Claims(?:\*\*)?\s*$\n)(?P<body>.*?)(?=^##\s+|\Z)",
+        markdown_text,
+    )
+    if not sec:
+        return markdown_text
+    body = sec.group("body")
+    if _claim_table_row_count(body) >= len(claims):
+        return markdown_text
+
+    lines = body.splitlines()
+    insert_idx = -1
+    header_idx = -1
+    for idx, line in enumerate(lines):
+        stripped = line.strip()
+        if (
+            stripped.startswith("|")
+            and "claim" in stripped.lower()
+            and "evidence" in stripped.lower()
+            and "location" in stripped.lower()
+        ):
+            header_idx = idx
+            break
+    if header_idx >= 0:
+        insert_idx = header_idx + 2
+        while insert_idx < len(lines):
+            stripped = lines[insert_idx].strip()
+            if not (stripped.startswith("|") and stripped.endswith("|")):
+                break
+            insert_idx += 1
+    if insert_idx < 0:
+        insert_idx = len(lines)
+
+    block = _format_detailed_claims_block([claim for claim in claims if isinstance(claim, dict)])
+    updated_lines = lines[:insert_idx] + ["", block, ""] + lines[insert_idx:]
+    updated_body = "\n".join(updated_lines).rstrip() + "\n\n"
+    return markdown_text[: sec.start("body")] + updated_body + markdown_text[sec.end("body") :]
 
 
 def _render_review_pdf(
@@ -260,6 +389,7 @@ def run_report_stage(
 
     settings = get_settings()
     reference_check_payload = _load_reference_check_payload(run_dir)
+    claim_extract_payload = read_json_file(claim_extract_stage_dir(run_dir) / "facts.json")
     reference_check_markdown = ""
     reference_check_appended = False
     pdf_render_error = ""
@@ -293,6 +423,10 @@ def run_report_stage(
             audited_text, outcome = audit_review_markdown(source_text)
             if audited_text != source_text:
                 review_md.write_text(audited_text, encoding="utf-8")
+            current_text = review_md.read_text(encoding="utf-8", errors="ignore")
+            detailed_text = _append_detailed_claims_block(current_text, claim_extract_payload)
+            if detailed_text != current_text:
+                review_md.write_text(detailed_text, encoding="utf-8")
             shutil.copy2(review_md, review_md_clean)
             claim_audit_payload = {
                 "claim_results": [

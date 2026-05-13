@@ -1,9 +1,9 @@
-"""Regex-based claim detection — the no-LLM fallback for §3.1b.
+"""Regex-based claim detection for explicit heuristic-mode §3.1b runs.
 
-The extractor uses these heuristics when the LLM route is disabled or
-unavailable. They over-generate by design: the decomposer and the §3.4
-synthesiser are expected to drop or merge claims that end up without
-supporting evidence.
+The default extractor path is strict LLM extraction. These heuristics remain
+available only when the caller explicitly selects ``mode="heuristic"``.
+They over-generate by design and should not be used as silent backfill for
+failed LLM extraction.
 
 The patterns are intentionally domain-generic — no CompGCN-specific
 literals. Dataset / baseline / metric names are discovered from the

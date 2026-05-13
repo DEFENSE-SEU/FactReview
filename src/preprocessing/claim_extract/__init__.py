@@ -7,12 +7,13 @@ with :class:`ReportedResult` values extracted from tables.
 """
 
 from preprocessing.claim_extract.decomposer import decompose_claim, decompose_claims
-from preprocessing.claim_extract.extractor import ExtractionResult, extract_facts
+from preprocessing.claim_extract.extractor import ClaimExtractionError, ExtractionResult, extract_facts
 from preprocessing.claim_extract.heuristics import extract_claims_heuristic
 from preprocessing.claim_extract.results_parser import extract_reported_results
 
 __all__ = [
     "ExtractionResult",
+    "ClaimExtractionError",
     "decompose_claim",
     "decompose_claims",
     "extract_claims_heuristic",

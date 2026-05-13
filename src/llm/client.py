@@ -25,7 +25,7 @@ class LLMConfig:
     base_url: str | None
     api_key: str | None
     temperature: float = 0.1
-    max_tokens: int = 1500
+    max_tokens: int | None = None
 
 
 def _resolve_openai_codex_model(explicit_model: str = "") -> str:
@@ -51,26 +51,37 @@ def _resolve_provider(explicit_provider: str = "") -> str:
     return "openai-codex"
 
 
-def resolve_llm_config(provider: str = "", model: str = "", base_url: str = "") -> LLMConfig:
+def _resolve_max_tokens(max_tokens: int | None) -> int | None:
+    value = int(max_tokens or 0)
+    return value if value > 0 else None
+
+
+def resolve_llm_config(
+    provider: str = "",
+    model: str = "",
+    base_url: str = "",
+    max_tokens: int | None = None,
+) -> LLMConfig:
+    resolved_max_tokens = _resolve_max_tokens(max_tokens)
     prov = _resolve_provider(provider)
 
     if prov == "deepseek":
         api_key = (os.getenv("DEEPSEEK_API_KEY") or "").strip() or None
         base = base_url or os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
         mdl = model or os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
-        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key)
+        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens)
 
     if prov == "qwen":
         api_key = (os.getenv("QWEN_API_KEY") or "").strip() or None
         base = base_url or os.getenv("QWEN_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
         mdl = model or os.getenv("QWEN_MODEL", "qwen-3")
-        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key)
+        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens)
 
     if prov == "claude":
         api_key = (os.getenv("CLAUDE_API_KEY") or "").strip() or None
         base = base_url or os.getenv("CLAUDE_BASE_URL", "https://api.anthropic.com")
         mdl = model or os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
-        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key)
+        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens)
 
     if is_codex_provider(prov):
         return LLMConfig(
@@ -78,6 +89,7 @@ def resolve_llm_config(provider: str = "", model: str = "", base_url: str = "") 
             model=model or _resolve_openai_codex_model(),
             base_url=resolve_codex_base_url(base_url or os.getenv("OPENAI_CODEX_BASE_URL", "")),
             api_key=None,
+            max_tokens=resolved_max_tokens,
         )
 
     api_key = (
@@ -91,6 +103,7 @@ def resolve_llm_config(provider: str = "", model: str = "", base_url: str = "") 
             or os.getenv("EXECUTION_OPENAI_BASE_URL")
             or os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
             api_key=api_key,
+            max_tokens=resolved_max_tokens,
         )
 
     # No API key: automatically fall back to the Codex subscription backend.
@@ -99,6 +112,7 @@ def resolve_llm_config(provider: str = "", model: str = "", base_url: str = "") 
         model=_resolve_openai_codex_model(model),
         base_url=resolve_codex_base_url(base_url or os.getenv("OPENAI_CODEX_BASE_URL", "")),
         api_key=None,
+        max_tokens=resolved_max_tokens,
     )
 
 
@@ -135,7 +149,7 @@ def llm_json(
             client = Anthropic(api_key=cfg.api_key)
             resp = client.messages.create(
                 model=cfg.model,
-                max_tokens=cfg.max_tokens,
+                max_tokens=cfg.max_tokens or 8192,
                 temperature=cfg.temperature,
                 system=system,
                 messages=[{"role": "user", "content": prompt}],
@@ -170,15 +184,17 @@ def llm_json(
             from openai import OpenAI
 
             client = OpenAI(api_key=cfg.api_key, base_url=cfg.base_url)
-            resp = client.chat.completions.create(
-                model=cfg.model,
-                messages=[
+            kwargs: dict[str, Any] = {
+                "model": cfg.model,
+                "messages": [
                     {"role": "system", "content": system},
                     {"role": "user", "content": prompt},
                 ],
-                temperature=cfg.temperature,
-                max_tokens=cfg.max_tokens,
-            )
+                "temperature": cfg.temperature,
+            }
+            if cfg.max_tokens is not None:
+                kwargs["max_tokens"] = cfg.max_tokens
+            resp = client.chat.completions.create(**kwargs)
             text = (resp.choices[0].message.content or "").strip()
             raw_usage = getattr(resp, "usage", None)
             usage = {
