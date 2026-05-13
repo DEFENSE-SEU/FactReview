@@ -420,7 +420,10 @@ def run_report_stage(
         claim_audit_payload = {}
         if review_md.exists():
             source_text = review_md.read_text(encoding="utf-8", errors="ignore")
-            audited_text, outcome = audit_review_markdown(source_text)
+            audited_text, outcome = audit_review_markdown(
+                source_text,
+                execution_alignment=exec_alignment if isinstance(exec_alignment, dict) else None,
+            )
             if audited_text != source_text:
                 review_md.write_text(audited_text, encoding="utf-8")
             current_text = review_md.read_text(encoding="utf-8", errors="ignore")

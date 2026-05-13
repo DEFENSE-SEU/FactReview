@@ -492,8 +492,37 @@ _TYPE_SPECIFIC_RULES = (
 )
 
 
+def _format_execution_matches_block(matches: list[dict[str, Any]]) -> str:
+    """Format execution reproduction matches into a readable context block."""
+    if not matches:
+        return ""
+    lines = [
+        "Execution reproduction results (treat as authoritative for empirical claims):"
+    ]
+    for m in matches[:20]:
+        key = str(m.get("paper_key") or m.get("observed_key") or "").strip()
+        paper_val = m.get("paper_value")
+        obs_val = m.get("observed_value")
+        within = m.get("within_tolerance")
+        if paper_val is None or obs_val is None:
+            continue
+        try:
+            delta_pct = abs(float(paper_val) - float(obs_val)) / max(abs(float(paper_val)), 1e-9) * 100
+        except (TypeError, ValueError):
+            continue
+        lines.append(
+            f"  {key}: paper={paper_val}, reproduced={obs_val}, Δ={delta_pct:.1f}%"
+        )
+    return "\n".join(lines)
+
+
 def _build_llm_prompt(
-    *, claims: list[dict[str, Any]], ablation_block: str, positioning_context: str = ""
+    *,
+    claims: list[dict[str, Any]],
+    ablation_block: str,
+    positioning_context: str = "",
+    execution_matches: list[dict[str, Any]] | None = None,
+    agent_notes: dict[int, tuple[str, str]] | None = None,
 ) -> str:
     has_novelty = any(_is_novelty_claim(e["claim"]) for e in claims)
     claim_blocks: list[str] = []
@@ -504,12 +533,28 @@ def _build_llm_prompt(
         if _is_comparative_claim(entry["claim"]):
             flags.append("COMPARATIVE")
         flag_str = f" [{', '.join(flags)}]" if flags else ""
-        claim_blocks.append(
-            f"--- claim id={entry['id']}{flag_str} ---\n"
-            f"Claim: {entry['claim']}\n"
-            f"Evidence: {entry['evidence']}\n"
-            f"Location: {entry['location']}"
-        )
+
+        lines = [
+            f"--- claim id={entry['id']}{flag_str} ---",
+            f"Claim: {entry['claim']}",
+            f"Evidence: {entry['evidence']}",
+            f"Location: {entry['location']}",
+        ]
+
+        # Raw execution data is surfaced in the block below; no pre-computed
+        # directional verdict is injected here so the LLM can determine metric
+        # direction and significance threshold from context.
+
+        if agent_notes:
+            note = agent_notes.get(entry["id"])
+            if note and note[0]:
+                reason_part = f" — {note[1]}" if note[1] else ""
+                lines.append(
+                    f"Agent self-note (reference only, may be biased): {note[0]}{reason_part}"
+                )
+
+        claim_blocks.append("\n".join(lines))
+
     trimmed_ablation = ablation_block.strip()
     if len(trimmed_ablation) > _ABLATION_BLOCK_CHAR_LIMIT:
         trimmed_ablation = (
@@ -518,16 +563,37 @@ def _build_llm_prompt(
         )
     if not trimmed_ablation:
         trimmed_ablation = "(no ablation section in this report)"
+
     positioning_block = ""
     if has_novelty and positioning_context:
         positioning_block = (
             "\n\nTechnical positioning (use when auditing [NOVELTY] claims):\n"
             + positioning_context
         )
+
+    exec_block = ""
+    if execution_matches:
+        formatted = _format_execution_matches_block(execution_matches)
+        if formatted:
+            exec_block = "\n\n" + formatted
+
+    execution_rules = (
+        "\n\nExecution evidence rules (apply when execution comparison data is present below):\n"
+        "- First determine the metric's direction (higher-is-better or lower-is-better) from "
+        "the metric name and claim context — do not assume higher is always better.\n"
+        "- Then assess whether the observed delta is meaningful: a 0.1% gap on a saturated "
+        "benchmark (e.g. ImageNet top-1 above 85%) is different from the same absolute gap "
+        "on a noisy task. Use your knowledge of the benchmark and metric to judge significance.\n"
+        "- If the delta is clearly in the wrong direction (e.g. FID went up when the claim "
+        "says generation quality improved), that is strong evidence against 'supported'.\n"
+        "- Agent self-notes are provided for context only. Do not treat them as verdicts — "
+        "the same model that wrote the report produced them and may be optimistic."
+    )
+
     return (
-        "You audit the following claim rows from a paper review report. "
-        "Return one verdict per claim id and, separately, a list of method "
-        "components that the ablation tables do not cover.\n\n"
+        "You are an independent reviewer auditing claim rows from a paper review report. "
+        "Make a single holistic judgment per claim using all available evidence: "
+        "the claim text, supporting evidence, execution reproduction data, and positioning context.\n\n"
         "Decision rules:\n"
         "- 'supported' requires the evidence to directly justify the claim's "
         "verb. For comparative claims, the gap vs. the strongest comparator "
@@ -545,7 +611,9 @@ def _build_llm_prompt(
         "verb (e.g., paper value lower than the strongest comparator on a "
         "higher-is-better metric).\n"
         + _TYPE_SPECIFIC_RULES
+        + execution_rules
         + positioning_block
+        + exec_block
         + "\n\nFor ablation_missing_components, look across every methodological "
         "claim that enumerates a list of components (\"X with A, B, and C\", "
         "\"system consisting of A, B, C\", etc.) and list any component name "
@@ -665,6 +733,7 @@ def audit_review_markdown(
     markdown: str,
     *,
     llm_call: Callable[[str], dict[str, Any]] | None = None,
+    execution_alignment: dict[str, Any] | None = None,
 ) -> tuple[str, ReportAuditOutcome]:
     """Apply all audits and return ``(updated_markdown, outcome)``.
 
@@ -699,10 +768,32 @@ def audit_review_markdown(
     if llm_call is None:
         llm_call = _resolve_default_llm_call()
 
+    # Pre-pass: extract agent self-tags and execution statuses from every
+    # entry before building the prompt. Self-tags are stripped from the
+    # display cells here so the LLM does not see its own prior assessment
+    # as authoritative — it receives them as labelled reference notes only.
+    agent_notes: dict[int, tuple[str, str]] = {}
+    for entry in entries:
+        cells = entry["cells"]
+        original_status_cell = cells[status_idx] if 0 <= status_idx < len(cells) else ""
+        entry["execution_status"] = _normalize_status(original_status_cell)
+        if 0 <= assessment_idx < len(cells):
+            agent_verdict, agent_reason, cleaned = _extract_self_tag(cells[assessment_idx])
+            if cleaned != cells[assessment_idx]:
+                cells[assessment_idx] = cleaned
+            if agent_verdict:
+                agent_notes[entry["id"]] = (agent_verdict, agent_reason)
+
     ablation_match = _ABLATION_PATTERN.search(text)
     ablation_block = ablation_match.group("body") if ablation_match else ""
 
     positioning_context = _extract_positioning_context(text)
+
+    execution_matches: list[dict[str, Any]] = []
+    if isinstance(execution_alignment, dict):
+        raw_matches = execution_alignment.get("matches")
+        if isinstance(raw_matches, list):
+            execution_matches = [m for m in raw_matches if isinstance(m, dict)]
 
     prompt = _build_llm_prompt(
         claims=[
@@ -711,11 +802,14 @@ def audit_review_markdown(
                 "claim": entry["claim"],
                 "evidence": entry["evidence"],
                 "location": entry["location"],
+                "execution_status": entry["execution_status"],
             }
             for entry in entries
         ],
         ablation_block=ablation_block,
         positioning_context=positioning_context,
+        execution_matches=execution_matches,
+        agent_notes=agent_notes,
     )
     raw = llm_call(prompt) or {}
     if not isinstance(raw, dict):
@@ -746,23 +840,20 @@ def audit_review_markdown(
     new_lines = list(lines)
     for entry in entries:
         cells = entry["cells"]
-        original_status_cell = cells[status_idx]
-        normalized_original = _normalize_status(original_status_cell)
+        normalized_original = entry["execution_status"]
 
         result = ClaimAuditResult(
             original_status=normalized_original,
             final_status=normalized_original,
         )
 
-        # Strip the agent's self-tag out of the assessment cell.
-        if 0 <= assessment_idx < len(cells):
-            agent_verdict, agent_reason, cleaned = _extract_self_tag(cells[assessment_idx])
-            if agent_verdict and cleaned != cells[assessment_idx]:
-                cells[assessment_idx] = cleaned
-            result.agent_self_verdict = agent_verdict
-            result.agent_self_reason = agent_reason
-            if agent_reason:
-                result.notes.append(f"Agent self-tag: {agent_reason}")
+        # Restore agent self-tag metadata for tracking (already stripped from cell).
+        agent_note = agent_notes.get(entry["id"])
+        if agent_note:
+            result.agent_self_verdict = agent_note[0]
+            result.agent_self_reason = agent_note[1]
+            if agent_note[1]:
+                result.notes.append(f"Agent self-note: {agent_note[1]}")
 
         llm_item = verdict_by_id.get(entry["id"], {})
         llm_verdict = _verdict_to_label(str(llm_item.get("verdict") or ""))
@@ -772,11 +863,15 @@ def audit_review_markdown(
         if llm_reason:
             result.notes.append(f"LLM: {llm_reason}")
 
-        new_label = normalized_original
-        for cap in (llm_verdict, result.agent_self_verdict):
-            if cap:
-                new_label = _cap_status(new_label, cap)
-        if not new_label:
+        # The LLM is the single decision maker: it received execution data and
+        # agent notes as labelled context and produced a holistic verdict.
+        # Fall back to execution pre-assessment when the LLM returns nothing,
+        # and to "inconclusive" when neither source has a usable verdict.
+        if llm_verdict:
+            new_label = llm_verdict
+        elif normalized_original and normalized_original != "pending":
+            new_label = normalized_original
+        else:
             new_label = "inconclusive"
         result.final_status = new_label
 

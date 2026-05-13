@@ -167,7 +167,7 @@ def test_claim_status_augmentation_preserves_pipe_inside_evidence_cell() -> None
     assert outcome.claim_results[0].final_status == "partially supported"
 
 
-def test_audit_takes_more_conservative_of_llm_and_agent_self_tag() -> None:
+def test_audit_llm_is_single_decision_maker_agent_self_tag_is_reference_only() -> None:
     md = (
         "## 3. Claims\n"
         "| Claim | Evidence | Assessment | Status | Location |\n"
@@ -182,11 +182,13 @@ def test_audit_takes_more_conservative_of_llm_and_agent_self_tag() -> None:
     )
 
     result = outcome.claim_results[0]
-    # Capping takes the more conservative of the two verdicts; the agent
-    # self-tag wins here even though the LLM was more lenient.
+    # The LLM is the single decision maker: it received the agent self-tag as
+    # a labelled reference note and produced its own holistic verdict.
+    # final_status equals the LLM verdict; the agent self-tag is tracked for
+    # metadata but no longer caps the result.
     assert result.agent_self_verdict == "in conflict"
     assert result.llm_verdict == "partially supported"
-    assert result.final_status == "in conflict"
+    assert result.final_status == "partially supported"
     # The bracketed self-tag is stripped from the visible cell.
     assert "[verdict:" not in new_md
 
