@@ -63,22 +63,6 @@ class Figure(BaseModel):
     section_id: str | None = None
 
 
-class ReportedResult(BaseModel):
-    """A numeric result claimed by the paper — usually extracted from tables."""
-
-    id: str
-    metric: str  # "MRR", "Accuracy", "F1", …
-    value: float
-    unit: str | None = None  # "%", "ms", …
-    dataset: str | None = None
-    task: str | None = None
-    method: str | None = None  # the method the number belongs to
-    table_id: str | None = None
-    row_index: int | None = None
-    col_index: int | None = None
-    context: str = ""  # short surrounding text
-
-
 class Paper(BaseModel):
     """Structured paper — the output of §3.1a ingestion."""
 
@@ -90,7 +74,6 @@ class Paper(BaseModel):
     sections: list[Section] = Field(default_factory=list)
     tables: list[Table] = Field(default_factory=list)
     figures: list[Figure] = Field(default_factory=list)
-    reported_results: list[ReportedResult] = Field(default_factory=list)
 
     # Provenance from the ingestion backend.
     backend: str = "unknown"

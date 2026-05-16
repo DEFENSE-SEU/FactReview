@@ -1,8 +1,4 @@
-"""Claim schemas — the output of §3.1b claim_extract.
-
-The paper's unit of analysis is the *claim*. Every judgment in the final
-review traces back to a :class:`Claim` defined here.
-"""
+"""Claim schemas used by the review and audit pipeline."""
 
 from __future__ import annotations
 

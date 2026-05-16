@@ -103,24 +103,3 @@ def test_teaser_claim_selection_prioritizes_novelty_and_weak_statuses(tmp_path: 
     selected_block = result.prompt.split("Audited claims table:", 1)[0]
     assert "TinyMethod is the first framework for X" in selected_block
     assert "TinyMethod beats all baselines" in selected_block
-
-
-def test_teaser_uses_core_claims_when_provided(tmp_path: Path) -> None:
-    md_path = tmp_path / "review.md"
-    md_path.write_text(_REVIEW_MD_FOR_TEASER, encoding="utf-8")
-
-    result = generate_teaser_figure(
-        md_path,
-        output_dir=tmp_path,
-        generate_image=False,
-        core_claims=[
-            {"id": "core_claim_01", "text": "TinyMethod is positioned as a first framework for X."},
-            {"id": "core_claim_02", "text": "TinyMethod combines retrieval with skill execution."},
-            {"id": "core_claim_03", "text": "TinyMethod improves the headline benchmark result."},
-        ],
-    )
-
-    selected_block = result.prompt.split("Audited claims table:", 1)[0]
-    assert "Core claim" in selected_block
-    assert "TinyMethod is positioned as a first framework for X" in selected_block
-    assert "TinyMethod is leading on FB15k" not in selected_block

@@ -26,14 +26,12 @@ def test_all_stage_runners_import_and_expose_run_entry() -> None:
     from fact_generation.execution.stage_runner import run_execution_stage
     from fact_generation.positioning.stage_runner import run_positioning_stage
     from fact_generation.refcheck.stage_runner import run_refcheck_stage
-    from preprocessing.claim_extract.stage_runner import run_claim_extract_stage
     from preprocessing.parse.stage_runner import run_parse_stage
     from review.report.stage_runner import run_report_stage
     from review.teaser.stage_runner import run_teaser_stage
 
     for fn in (
         run_parse_stage,
-        run_claim_extract_stage,
         run_refcheck_stage,
         run_positioning_stage,
         run_execution_stage,

@@ -17,7 +17,6 @@ from fact_generation.execution.stage_runner import run_execution_stage
 from fact_generation.positioning.stage_runner import run_positioning_stage
 from fact_generation.refcheck.stage_runner import run_refcheck_stage
 from llm.provider_capabilities import is_codex_provider
-from preprocessing.claim_extract.stage_runner import run_claim_extract_stage
 from preprocessing.parse.stage_runner import run_parse_stage
 from review.report.stage_runner import run_report_stage
 from review.teaser.stage_runner import run_teaser_stage
@@ -33,7 +32,7 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-_TOTAL_STAGES = 7
+_TOTAL_STAGES = 6
 
 
 def _log(msg: str) -> None:
@@ -185,18 +184,9 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
         # explicit in the summary table.
         parse_status = "reused" if str(args.reuse_job_id or "").strip() else "ok"
         run_stats.record_module_status("parse", parse_status)
-    claim_extract_result = _run_stage(
-        2,
-        "claim_extract",
-        lambda: run_claim_extract_stage(
-            repo_root=repo_root,
-            run_dir=run_dir,
-        ),
-        stats_module="analysis",
-    )
     enable_refcheck = bool(getattr(args, "enable_refcheck", False) or settings.reference_check_enabled)
     refcheck_result = _run_stage(
-        3,
+        2,
         "refcheck",
         lambda: run_refcheck_stage(
             repo_root=repo_root,
@@ -208,7 +198,7 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
         stats_module="reference_check",
     )
     positioning_result = _run_stage(
-        4,
+        3,
         "positioning",
         lambda: run_positioning_stage(
             repo_root=repo_root,
@@ -217,7 +207,7 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
         stats_module="analysis",
     )
     if not run_execution:
-        _log(f"[5/{_TOTAL_STAGES}] execution: skipped (use --run-execution to enable)")
+        _log(f"[4/{_TOTAL_STAGES}] execution: skipped (use --run-execution to enable)")
         run_stats.record_module_status("execution", "skipped")
         skipped_payload = ExecutionPayload(
             paper_key=paper_key,
@@ -234,7 +224,7 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
         )
     else:
         execution_result = _run_stage(
-            5,
+            4,
             "execution",
             lambda: run_execution_stage(
                 run_dir=run_dir,
@@ -250,7 +240,7 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             stats_module="execution",
         )
     report_result = _run_stage(
-        6,
+        5,
         "report",
         lambda: run_report_stage(
             repo_root=repo_root,
@@ -259,12 +249,12 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
         stats_module="report_generation",
     )
     if report_result.status == "failed":
-        _log(f"[7/{_TOTAL_STAGES}] teaser: skipped — report stage failed")
+        _log(f"[6/{_TOTAL_STAGES}] teaser: skipped — report stage failed")
         run_stats.record_module_status("teaser_figure", "skipped", warning="report stage failed")
         teaser_result = StageResult(status="skipped", error="report stage failed")
     else:
         teaser_result = _run_stage(
-            7,
+            6,
             "teaser",
             lambda: run_teaser_stage(run_dir=run_dir),
             stats_module="teaser_figure",
@@ -276,7 +266,6 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
 
     results: dict[str, StageResult] = {
         "parse": parse_result,
-        "claim_extract": claim_extract_result,
         "refcheck": refcheck_result,
         "positioning": positioning_result,
         "execution": execution_result,
@@ -298,7 +287,7 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
         stage_errors["report_pdf"] = report_pdf_error
 
     outputs: dict[str, str] = {}
-    for name in ("parse", "claim_extract", "refcheck", "positioning", "execution"):
+    for name in ("parse", "refcheck", "positioning", "execution"):
         main = results[name].outputs.get("main")
         if main:
             outputs[name] = main

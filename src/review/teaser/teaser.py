@@ -8,7 +8,7 @@ import re
 import shutil
 import subprocess
 import time
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -1024,22 +1024,25 @@ def _row_to_dict(table: TableBlock, row: list[str]) -> dict[str, str]:
     }
 
 
-def _claim_display_priority(row: dict[str, str], original_index: int) -> tuple[int, int]:
-    """Prioritize claim rows that reduce teaser bias under space limits."""
+def _claim_display_priority(row: dict[str, str], original_index: int) -> tuple[int, int, int]:
+    """Prioritize claim rows for teaser: primary importance first, then by content signals."""
+    importance = row.get("Importance", "").lower().strip()
+    importance_rank = 0 if importance == "primary" else 1
+
     claim = _strip_inline_markup(row.get("Claim", "")).lower()
     status = _strip_inline_markup(row.get("Status", "")).lower()
     evidence = _strip_inline_markup(row.get("Evidence", "")).lower()
     text = f"{claim} {evidence}"
-    priority = 50
+    content_rank = 50
     if any(token in text for token in ("first", "novel", "to our knowledge", "innovation")):
-        priority = min(priority, 0)
+        content_rank = min(content_rank, 0)
     if "in conflict" in status:
-        priority = min(priority, 1)
+        content_rank = min(content_rank, 1)
     elif "partial" in status or "inconclusive" in status:
-        priority = min(priority, 2)
+        content_rank = min(content_rank, 2)
     elif "missing:" in evidence and "missing: none" not in evidence:
-        priority = min(priority, 3)
-    return priority, original_index
+        content_rank = min(content_rank, 3)
+    return importance_rank, content_rank, original_index
 
 
 def _select_claim_rows(table: TableBlock | None, limit: int = 3) -> list[dict[str, str]]:
@@ -1048,11 +1051,13 @@ def _select_claim_rows(table: TableBlock | None, limit: int = 3) -> list[dict[st
     claim_idx = next((idx for idx, header in enumerate(table.headers) if "claim" in header.lower()), -1)
     evidence_idx = next((idx for idx, header in enumerate(table.headers) if "evidence" in header.lower()), -1)
     status_idx = next((idx for idx, header in enumerate(table.headers) if "status" in header.lower()), -1)
+    importance_idx = next((idx for idx, header in enumerate(table.headers) if "importance" in header.lower()), -1)
     selected: list[dict[str, str]] = []
     for row in table.rows:
-        claim_text = row[claim_idx].strip() if claim_idx >= 0 and claim_idx < len(row) else ""
-        evidence_text = row[evidence_idx].strip() if evidence_idx >= 0 and evidence_idx < len(row) else ""
-        status_text = row[status_idx].strip() if status_idx >= 0 and status_idx < len(row) else ""
+        claim_text = row[claim_idx].strip() if 0 <= claim_idx < len(row) else ""
+        evidence_text = row[evidence_idx].strip() if 0 <= evidence_idx < len(row) else ""
+        status_text = row[status_idx].strip() if 0 <= status_idx < len(row) else ""
+        importance_text = row[importance_idx].strip() if 0 <= importance_idx < len(row) else ""
         if not any([claim_text, evidence_text, status_text]):
             continue
         selected.append(
@@ -1060,37 +1065,12 @@ def _select_claim_rows(table: TableBlock | None, limit: int = 3) -> list[dict[st
                 "Claim": claim_text or "Not found in manuscript",
                 "Evidence": evidence_text or "Not found in manuscript",
                 "Status": status_text or "Not found in manuscript",
+                "Importance": importance_text,
             }
         )
-    selected_with_index = [
-        (row, idx)
-        for idx, row in enumerate(selected)
-    ]
+    selected_with_index = [(row, idx) for idx, row in enumerate(selected)]
     selected_with_index.sort(key=lambda item: _claim_display_priority(item[0], item[1]))
     return [row for row, _idx in selected_with_index[:limit]]
-
-
-def _core_claim_rows(core_claims: list[dict[str, Any]] | None, *, limit: int = 3) -> list[dict[str, str]]:
-    if not core_claims:
-        return []
-    rows: list[dict[str, str]] = []
-    for item in core_claims:
-        if len(rows) >= limit:
-            break
-        if not isinstance(item, dict):
-            continue
-        text = re.sub(r"\s+", " ", str(item.get("text") or "")).strip()
-        if not text:
-            continue
-        rows.append(
-            {
-                "Claim": text,
-                "Evidence": "",
-                "Status": "Core claim",
-                "Layer": "core",
-            }
-        )
-    return rows
 
 
 def _derive_claims_aggregate_status(rows: list[dict[str, str]]) -> str:
@@ -1117,26 +1097,12 @@ def _format_selected_claims(rows: list[dict[str, str]]) -> str:
         return "1. **Claim:** **Not found in manuscript**"
     lines: list[str] = []
     for idx, row in enumerate(rows, start=1):
-        claim = row.get("Claim", "Not found in manuscript")
-        if row.get("Layer") == "core" or row.get("Status") == "Core claim":
-            lines.append(f"{idx}. **Core claim:** **{claim}**")
-            continue
         lines.append(
-            f"{idx}. **Claim:** **{claim}**; "
+            f"{idx}. **Claim:** **{row.get('Claim', 'Not found in manuscript')}**; "
             f"**Evidence:** {row.get('Evidence', 'Not found in manuscript')}; "
             f"**Status:** {row.get('Status', 'Not found in manuscript')}"
         )
     return "\n".join(lines)
-
-
-def _with_core_claim_rows(
-    payload: TeaserFigurePayload,
-    core_claims: list[dict[str, Any]] | None,
-) -> TeaserFigurePayload:
-    rows = _core_claim_rows(core_claims)
-    if not rows:
-        return payload
-    return replace(payload, selected_claim_rows=rows)
 
 
 def extract_teaser_figure_payload(markdown_text: str) -> TeaserFigurePayload:
@@ -1653,7 +1619,6 @@ def generate_teaser_figure(
     latest_extraction_path: str | Path,
     *,
     output_dir: str | Path | None = None,
-    core_claims: list[dict[str, Any]] | None = None,
     gemini_api_key: str | None = None,
     gemini_model: str | None = None,
     timeout_seconds: int = 120,
@@ -1662,10 +1627,7 @@ def generate_teaser_figure(
 ) -> TeaserFigureGenerationResult:
     _ensure_env_loaded()
     latest_path = _coerce_path(latest_extraction_path).resolve()
-    teaser_payload = _with_core_claim_rows(
-        extract_teaser_figure_payload_from_latest_extraction(latest_path),
-        core_claims,
-    )
+    teaser_payload = extract_teaser_figure_payload_from_latest_extraction(latest_path)
     prompt = build_teaser_figure_prompt(
         teaser_payload,
         execution_skipped=execution_skipped,
