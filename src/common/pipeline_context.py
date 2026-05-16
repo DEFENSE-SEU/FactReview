@@ -37,7 +37,6 @@ _STAGE_ASSETS_SNAPSHOT_FILE = "_stage_assets_snapshot.json"
 # snapshot artifacts. Kept here (not in parse/) because the snapshot loaders
 # are called from every downstream stage and we want a single source of truth.
 _PARSE_STAGE_PATH: tuple[str, ...] = ("preprocessing", "parse")
-_CLAIM_EXTRACT_STAGE_PATH: tuple[str, ...] = ("preprocessing", "claim_extract")
 _REFCHECK_STAGE_PATH: tuple[str, ...] = ("fact_generation", "refcheck")
 _POSITIONING_STAGE_PATH: tuple[str, ...] = ("fact_generation", "positioning")
 _EXECUTION_STAGE_PATH: tuple[str, ...] = ("fact_generation", "execution")
@@ -146,11 +145,6 @@ def ensure_full_pipeline_context(*, run_dir: Path, allow_standalone: bool = Fals
 def parse_stage_dir(run_dir: Path) -> Path:
     """Return ``run_dir/stages/preprocessing/parse``."""
     return run_dir.joinpath("stages", *_PARSE_STAGE_PATH)
-
-
-def claim_extract_stage_dir(run_dir: Path) -> Path:
-    """Return ``run_dir/stages/preprocessing/claim_extract``."""
-    return run_dir.joinpath("stages", *_CLAIM_EXTRACT_STAGE_PATH)
 
 
 def refcheck_stage_dir(run_dir: Path) -> Path:

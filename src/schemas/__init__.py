@@ -6,7 +6,7 @@ is defined here. Internal per-module types stay local.
 
 from __future__ import annotations
 
-from schemas.claim import Claim, ClaimLabel, ClaimType, SubClaim
+from schemas.claim import ClaimLabel
 from schemas.execution import (
     ExecutionEvidence,
     ExecutionExitStatus,
@@ -15,16 +15,14 @@ from schemas.execution import (
     RunArtifact,
     Task,
 )
-from schemas.paper import Figure, Paper, PaperMetadata, ReportedResult, Section, Table
+from schemas.paper import Figure, Paper, PaperMetadata, Section, Table
 from schemas.positioning import LiteratureContext, NeighborMethod, NoveltyType
 from schemas.review import ClaimAssessment, EvidenceLink, FinalReview
 from schemas.stage import StageResult, StageStatus
 
 __all__ = [
-    "Claim",
     "ClaimAssessment",
     "ClaimLabel",
-    "ClaimType",
     "EvidenceLink",
     "ExecutionEvidence",
     "ExecutionExitStatus",
@@ -37,12 +35,10 @@ __all__ = [
     "NoveltyType",
     "Paper",
     "PaperMetadata",
-    "ReportedResult",
     "RunArtifact",
     "Section",
     "StageResult",
     "StageStatus",
-    "SubClaim",
     "Table",
     "Task",
 ]

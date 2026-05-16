@@ -223,7 +223,6 @@ Each stage has a standalone script that reads the same per-run layout. `parse` t
 
 ```bash
 python scripts/execute_stage_parse.py          path/to/paper.pdf --run-dir runs/<run>
-python scripts/execute_stage_claim_extract.py  --run-dir runs/<run>
 python scripts/execute_stage_refcheck.py       --run-dir runs/<run>
 python scripts/execute_stage_positioning.py    --run-dir runs/<run>
 python scripts/execute_stage_execution.py      --run-dir runs/<run>
@@ -239,7 +238,6 @@ Each run writes to `runs/<paper_key>_<timestamp>/`. Primary artifacts:
 - `inputs/source_pdf/` — copy of the input paper PDF.
 - `runtime/jobs/<job_id>/` — raw runtime job state, MinerU output, prompts, and agent traces.
 - `stages/preprocessing/parse/paper.json` — parse-stage outputs and bridge state.
-- `stages/preprocessing/claim_extract/` — extracted claim list.
 - `stages/fact_generation/refcheck/` — reference check report (only when `--enable-refcheck`).
 - `stages/fact_generation/positioning/` — literature neighbours and design-axis table.
 - `stages/fact_generation/execution/current/` — in-place workspace for the latest execution attempt; the prior attempt is archived alongside as `current.<timestamp>` (only when `--run-execution`).
@@ -257,19 +255,18 @@ Each run writes to `runs/<paper_key>_<timestamp>/`. Primary artifacts:
   <img src="overview.png" alt="FactReview pipeline overview" width="800">
 </p>
 
-The pipeline runs seven sub-stages, grouped into three phases. `refcheck` and `execution` are skipped by default.
+The pipeline runs six sub-stages, grouped into three phases. `refcheck` and `execution` are skipped by default.
 
 ```text
 preprocessing                fact_generation                        review
-parse → claim_extract  →  refcheck? → positioning → execution? → report → teaser
+parse → refcheck? → positioning → execution? → report → teaser
 ```
 
 - **parse** — PDF → structured `Paper` (MinerU cloud).
-- **claim_extract** — `Paper` → list of major claims (LLM + decomposer).
 - **refcheck** — bibliography validation via [RefCopilot](RefCopilot/) (off by default; `--enable-refcheck`).
 - **positioning** — neighbour papers, design axes, novelty verdict.
 - **execution** — optional Docker-based code-running stage (off by default; `--run-execution`).
-- **report** — synthesises the final review Markdown / PDF, runs the claim audit.
+- **report** — synthesises the final review Markdown / PDF, extracts reviewer-salient claims, and runs the claim audit.
 - **teaser** — teaser figure prompt and (optionally) image.
 
 ## Troubleshooting

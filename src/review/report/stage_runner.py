@@ -22,7 +22,6 @@ from typing import Any
 from agent_runtime.runner import augment_claims_with_assessment_status
 from common.config import get_settings
 from common.pipeline_context import (
-    claim_extract_stage_dir,
     ensure_full_pipeline_context,
     execution_stage_dir,
     load_job_state_snapshot,
@@ -39,9 +38,6 @@ from review.report.claim_audit import audit_review_markdown
 from review.report.pdf_renderer import build_review_report_pdf
 from schemas.stage import StageResult
 from util.fs import copy_file_if_exists
-
-
-_DETAILED_CLAIMS_HEADING = "**Detailed extracted claims:**"
 
 
 def _read_text(path: Path) -> str:
@@ -102,129 +98,110 @@ def _strip_experiment_eval_status(text: str) -> str:
     return text[: sec.start(2)] + new_body + text[sec.end(2) :]
 
 
-def _markdown_cell(value: Any) -> str:
-    text = re.sub(r"\s+", " ", str(value or "")).strip()
-    return text.replace("|", "&#124;") or "Not found in manuscript"
-
-
-def _claim_location_text(claim: dict[str, Any]) -> str:
-    location = claim.get("location")
-    if not isinstance(location, dict):
-        return ""
-    parts: list[str] = []
-    section_id = str(location.get("section_id") or "").strip()
-    if section_id:
-        parts.append(section_id)
-    page = location.get("page")
-    if page is not None:
-        parts.append(f"page {page}")
-    char_start = location.get("char_start")
-    char_end = location.get("char_end")
-    if char_start is not None or char_end is not None:
-        start = "" if char_start is None else str(char_start)
-        end = "" if char_end is None else str(char_end)
-        parts.append(f"chars {start}-{end}")
-    return "; ".join(parts)
-
-
-def _claim_table_row_count(claims_body: str) -> int:
-    lines = claims_body.splitlines()
-    header_idx = -1
-    for idx, line in enumerate(lines):
-        stripped = line.strip()
-        if (
-            stripped.startswith("|")
-            and "claim" in stripped.lower()
-            and "evidence" in stripped.lower()
-            and "location" in stripped.lower()
-        ):
-            header_idx = idx
-            break
-    if header_idx < 0:
-        return 0
-    count = 0
-    for line in lines[header_idx + 2 :]:
-        stripped = line.strip()
-        if not (stripped.startswith("|") and stripped.endswith("|")):
-            break
-        count += 1
-    return count
-
-
-def _format_detailed_claims_block(claims: list[dict[str, Any]]) -> str:
-    rows = [
-        _DETAILED_CLAIMS_HEADING,
-        "Full detailed claim-extraction layer used for downstream review; teaser figures use only the compact core-claim layer.",
-        "",
-        "| ID | Claim | Type | Importance | Location | Evidence targets |",
-        "|---|---|---|---|---|---|",
-    ]
-    for idx, claim in enumerate(claims, start=1):
-        if not isinstance(claim, dict):
-            continue
-        claim_id = str(claim.get("id") or f"claim_{idx:02d}")
-        targets = claim.get("evidence_targets")
-        rows.append(
-            "| "
-            + " | ".join(
-                [
-                    _markdown_cell(claim_id),
-                    _markdown_cell(claim.get("text")),
-                    _markdown_cell(claim.get("type")),
-                    _markdown_cell(claim.get("importance")),
-                    _markdown_cell(_claim_location_text(claim)),
-                    _markdown_cell(", ".join(str(t) for t in targets) if isinstance(targets, list) else ""),
-                ]
-            )
-            + " |"
-        )
-    return "\n".join(rows).rstrip()
-
-
-def _append_detailed_claims_block(markdown_text: str, facts_payload: dict[str, Any]) -> str:
-    claims = facts_payload.get("claims")
-    if not isinstance(claims, list) or not claims:
-        return markdown_text
-    if _DETAILED_CLAIMS_HEADING in markdown_text:
-        return markdown_text
-
+def _sort_claims_by_importance(markdown: str) -> str:
+    """Reorder the Section 3 claim table so primary-importance rows precede secondary rows."""
     sec = re.search(
         r"(?ims)(^##\s+(?:\*\*)?3\.\s+Claims(?:\*\*)?\s*$\n)(?P<body>.*?)(?=^##\s+|\Z)",
-        markdown_text,
+        markdown,
     )
     if not sec:
-        return markdown_text
+        return markdown
     body = sec.group("body")
-    if _claim_table_row_count(body) >= len(claims):
-        return markdown_text
+    lines = body.split("\n")
 
-    lines = body.splitlines()
-    insert_idx = -1
     header_idx = -1
-    for idx, line in enumerate(lines):
-        stripped = line.strip()
-        if (
-            stripped.startswith("|")
-            and "claim" in stripped.lower()
-            and "evidence" in stripped.lower()
-            and "location" in stripped.lower()
-        ):
-            header_idx = idx
+    for i, ln in enumerate(lines):
+        s = ln.strip()
+        if s.startswith("|") and "claim" in s.lower() and "evidence" in s.lower() and "importance" in s.lower():
+            header_idx = i
             break
-    if header_idx >= 0:
-        insert_idx = header_idx + 2
-        while insert_idx < len(lines):
-            stripped = lines[insert_idx].strip()
-            if not (stripped.startswith("|") and stripped.endswith("|")):
-                break
-            insert_idx += 1
-    if insert_idx < 0:
-        insert_idx = len(lines)
+    if header_idx < 0:
+        return markdown
 
-    block = _format_detailed_claims_block([claim for claim in claims if isinstance(claim, dict)])
-    updated_lines = lines[:insert_idx] + ["", block, ""] + lines[insert_idx:]
-    updated_body = "\n".join(updated_lines).rstrip() + "\n\n"
-    return markdown_text[: sec.start("body")] + updated_body + markdown_text[sec.end("body") :]
+    headers = [c.strip().lower() for c in lines[header_idx].strip("|").split("|")]
+    importance_col = next((i for i, h in enumerate(headers) if "importance" in h), -1)
+    if importance_col < 0:
+        return markdown
+
+    data_start = header_idx + 2
+    data_end = data_start
+    while data_end < len(lines):
+        s = lines[data_end].strip()
+        if not (s.startswith("|") and s.endswith("|")):
+            break
+        data_end += 1
+
+    if data_end <= data_start:
+        return markdown
+
+    primary: list[str] = []
+    secondary: list[str] = []
+    for row in lines[data_start:data_end]:
+        cells = [c.strip() for c in row.strip("|").split("|")]
+        val = cells[importance_col].strip().lower() if importance_col < len(cells) else ""
+        (primary if val == "primary" else secondary).append(row)
+
+    new_lines = lines[:data_start] + primary + secondary + lines[data_end:]
+    new_body = "\n".join(new_lines)
+    return markdown[: sec.start("body")] + new_body + markdown[sec.end("body") :]
+
+
+def _strip_claim_columns(markdown: str, columns: list[str]) -> str:
+    """Remove named columns from the Section 3 claim table (case-insensitive)."""
+    if not columns:
+        return markdown
+    col_set = {c.lower() for c in columns}
+    sec = re.search(
+        r"(?ims)(^##\s+(?:\*\*)?3\.\s+Claims(?:\*\*)?\s*$\n)(?P<body>.*?)(?=^##\s+|\Z)",
+        markdown,
+    )
+    if not sec:
+        return markdown
+    body = sec.group("body")
+    lines = body.split("\n")
+
+    header_idx = -1
+    for i, ln in enumerate(lines):
+        s = ln.strip()
+        if s.startswith("|") and "claim" in s.lower() and "evidence" in s.lower():
+            header_idx = i
+            break
+    if header_idx < 0:
+        return markdown
+
+    headers_raw = [c.strip() for c in lines[header_idx].strip("|").split("|")]
+    # Strip markdown formatting when matching column names
+    col_indices = sorted(
+        [i for i, h in enumerate(headers_raw) if re.sub(r"[*`_ ]", "", h).lower() in col_set],
+        reverse=True,
+    )
+    if not col_indices:
+        return markdown
+
+    data_start = header_idx + 2
+    data_end = data_start
+    while data_end < len(lines):
+        s = lines[data_end].strip()
+        if not (s.startswith("|") and s.endswith("|")):
+            break
+        data_end += 1
+
+    def _drop_cols(line: str) -> str:
+        s = line.strip()
+        if not (s.startswith("|") and s.endswith("|")):
+            return line
+        cells = s.strip("|").split("|")
+        for idx in col_indices:
+            if idx < len(cells):
+                cells.pop(idx)
+        return "|" + "|".join(cells) + "|"
+
+    new_lines = lines[:]
+    for i in range(header_idx, data_end):
+        new_lines[i] = _drop_cols(lines[i])
+
+    new_body = "\n".join(new_lines)
+    return markdown[: sec.start("body")] + new_body + markdown[sec.end("body") :]
 
 
 def _render_review_pdf(
@@ -371,13 +348,14 @@ def run_report_stage(
     audit_ok = copy_file_if_exists(final_audit, review_audit)
     pdf_ok = copy_file_if_exists(final_pdf, pdf_path)
 
+    exec_json = read_json_file(execution_stage_dir(run_dir) / "execution.json")
+    exec_alignment = exec_json.get("alignment") if isinstance(exec_json, dict) else {}
+
     # Re-normalize the claims table after the runtime job. The first pass inside
     # the agent runtime ran before execution, so this stage can add real
     # execution alignment when available and keep markdown-table escaping stable
     # before the mandatory claim audit.
     if md_ok:
-        exec_json = read_json_file(execution_stage_dir(run_dir) / "execution.json")
-        exec_alignment = exec_json.get("alignment") if isinstance(exec_json, dict) else {}
         current_md = review_md.read_text(encoding="utf-8", errors="ignore")
         augmented_md = augment_claims_with_assessment_status(
             current_md,
@@ -389,7 +367,6 @@ def run_report_stage(
 
     settings = get_settings()
     reference_check_payload = _load_reference_check_payload(run_dir)
-    claim_extract_payload = read_json_file(claim_extract_stage_dir(run_dir) / "facts.json")
     reference_check_markdown = ""
     reference_check_appended = False
     pdf_render_error = ""
@@ -417,7 +394,6 @@ def run_report_stage(
         # at this point (refcheck is appended later only to review_md), so run
         # the mandatory LLM audit once and copy the audited canonical markdown
         # into the clean teaser source.
-        claim_audit_payload = {}
         if review_md.exists():
             source_text = review_md.read_text(encoding="utf-8", errors="ignore")
             audited_text, outcome = audit_review_markdown(
@@ -426,11 +402,15 @@ def run_report_stage(
             )
             if audited_text != source_text:
                 review_md.write_text(audited_text, encoding="utf-8")
+
+            # Sort claim table by importance (primary first) then produce two versions:
+            # review_md_clean keeps Type+Importance for teaser selection;
+            # review_md strips them for the public-facing report/PDF.
             current_text = review_md.read_text(encoding="utf-8", errors="ignore")
-            detailed_text = _append_detailed_claims_block(current_text, claim_extract_payload)
-            if detailed_text != current_text:
-                review_md.write_text(detailed_text, encoding="utf-8")
-            shutil.copy2(review_md, review_md_clean)
+            sorted_text = _sort_claims_by_importance(current_text)
+            review_md_clean.write_text(sorted_text, encoding="utf-8")
+            public_text = _strip_claim_columns(sorted_text, ["type", "importance"])
+            review_md.write_text(public_text, encoding="utf-8")
             claim_audit_payload = {
                 "claim_results": [
                     {
@@ -475,7 +455,7 @@ def run_report_stage(
         else:
             pdf_ok = rendered_pdf_ok or pdf_ok
 
-    execution_payload = read_json_file(execution_stage_dir(run_dir) / "execution.json")
+    execution_payload = exec_json
 
     if claim_audit_payload:
         write_json_file(out_dir / "claim_audit.json", claim_audit_payload)

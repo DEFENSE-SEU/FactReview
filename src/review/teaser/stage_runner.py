@@ -13,7 +13,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from common.pipeline_context import (
-    claim_extract_stage_dir,
     ensure_full_pipeline_context,
     execution_stage_dir,
     read_json_file,
@@ -62,16 +61,11 @@ def run_teaser_stage(
 
     execution_payload = read_json_file(execution_stage_dir(run_dir) / "execution.json")
     execution_skipped = execution_payload.get("status") == "skipped"
-    facts_payload = read_json_file(claim_extract_stage_dir(run_dir) / "facts.json")
-    core_claims = facts_payload.get("core_claims")
-    if not isinstance(core_claims, list):
-        core_claims = []
 
     use_gemini = _env_true("TEASER_USE_GEMINI", default=True)
     teaser_result = generate_teaser_figure(
         source_md,
         output_dir=out_dir,
-        core_claims=core_claims,
         generate_image=use_gemini,
         execution_skipped=execution_skipped,
     )

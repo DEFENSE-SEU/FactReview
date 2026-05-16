@@ -93,7 +93,11 @@ class MineruAdapter:
         upload_url = self._build_url(self.cfg.upload_endpoint)
         timeout = max(20, int(self.cfg.poll_timeout_seconds))
 
-        async with httpx.AsyncClient(timeout=timeout) as client:
+        # trust_env=False prevents httpx from picking up HTTP_PROXY / HTTPS_PROXY
+        # from the shell environment. MinerU upload issues a PUT to a pre-signed
+        # CDN URL that may differ from the API host, so any proxy in the env
+        # would intercept and break that request.
+        async with httpx.AsyncClient(timeout=timeout, trust_env=False) as client:
             response = await client.post(upload_url, headers=headers, json=payload)
             response.raise_for_status()
             apply_result = response.json()
