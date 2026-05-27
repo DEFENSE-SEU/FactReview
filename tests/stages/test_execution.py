@@ -1948,6 +1948,15 @@ def test_docker_install_deps_installs_numpy_before_torch() -> None:
     assert text.index("if numpy_line:") < text.index("if torch_pin:")
 
 
+def test_docker_install_deps_fallback_uses_requirements_file() -> None:
+    text = _paper_install_deps_py_text()
+
+    assert "requirements.codegen.single_rest.txt" in text
+    assert "'-r', str(tmp)" in text
+    assert "'--upgrade', dep" not in text
+    assert "*shlex.split(dep)" not in text
+
+
 def test_docker_install_deps_clears_old_torch_execstack() -> None:
     text = _paper_install_deps_py_text()
 
@@ -3362,13 +3371,37 @@ def test_download_url_bytes_can_use_curl_backend(monkeypatch) -> None:
 
     def fake_run(cmd, capture_output, timeout, check):
         assert "--max-time" in cmd
+        assert "--max-filesize" in cmd
+        output_path = Path(cmd[cmd.index("--output") + 1])
+        output_path.write_bytes(b"archive-bytes")
         assert cmd[-1] == "https://example.com/archive.zip"
         assert capture_output is True
-        return subprocess.CompletedProcess(cmd, 0, stdout=b"archive-bytes", stderr=b"")
+        return subprocess.CompletedProcess(cmd, 0, stdout=b"", stderr=b"")
 
     monkeypatch.setattr("fact_generation.execution.nodes.prepare.subprocess.run", fake_run)
 
     assert _download_url_bytes("https://example.com/archive.zip", timeout_sec=30) == b"archive-bytes"
+
+
+def test_download_url_bytes_curl_maps_max_filesize_to_limit_error(monkeypatch) -> None:
+    monkeypatch.setenv("EXECUTION_DOWNLOAD_BACKEND", "curl")
+    monkeypatch.setenv("EXECUTION_DOWNLOAD_MAX_BYTES", "10")
+    monkeypatch.setattr("fact_generation.execution.nodes.prepare.shutil.which", lambda name: "curl")
+    output_paths: list[Path] = []
+
+    def fake_run(cmd, capture_output, timeout, check):
+        output_path = Path(cmd[cmd.index("--output") + 1])
+        output_paths.append(output_path)
+        output_path.write_bytes(b"partial")
+        return subprocess.CompletedProcess(cmd, 63, stdout=b"", stderr=b"curl: (63) Maximum file size exceeded")
+
+    monkeypatch.setattr("fact_generation.execution.nodes.prepare.subprocess.run", fake_run)
+
+    with pytest.raises(DownloadLimitError, match="download_too_large"):
+        _download_url_bytes("https://example.com/archive.zip", timeout_sec=30)
+
+    assert output_paths
+    assert not output_paths[0].exists()
 
 
 def test_anonymous_4open_binary_download_uses_size_guard(monkeypatch) -> None:

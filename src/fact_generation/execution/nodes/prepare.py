@@ -8,6 +8,7 @@ import shutil
 import stat
 import subprocess
 import tarfile
+import tempfile
 import time
 import zipfile
 from io import BytesIO
@@ -1120,6 +1121,10 @@ def _download_url_bytes_curl(url: str, timeout_sec: int = 180) -> bytes:
     if not exe:
         raise OSError("curl_unavailable")
     timeout = max(1, int(timeout_sec or 180))
+    max_bytes = _download_max_bytes()
+    fd, tmp_name = tempfile.mkstemp(prefix="factreview-download-", suffix=".bin")
+    os.close(fd)
+    tmp_path = Path(tmp_name)
     cmd = [
         exe,
         "--fail",
@@ -1130,30 +1135,41 @@ def _download_url_bytes_curl(url: str, timeout_sec: int = 180) -> bytes:
         str(min(30, timeout)),
         "--max-time",
         str(timeout),
+        "--max-filesize",
+        str(max_bytes),
+        "--output",
+        str(tmp_path),
         "--user-agent",
         "FactReview execution",
         url,
     ]
     try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            timeout=timeout + 10,
-            check=False,
-        )
-    except subprocess.TimeoutExpired as exc:
-        raise TimeoutError(f"download_curl_timeout: {url}") from exc
-    if result.returncode != 0:
-        stderr = (result.stderr or b"").decode("utf-8", errors="replace")
-        http_match = re.search(r"returned error:\s*(\d{3})", stderr, flags=re.IGNORECASE)
-        if http_match:
-            raise HTTPError(url, int(http_match.group(1)), stderr.strip() or "curl_http_error", hdrs=None, fp=None)
-        raise OSError(f"download_curl_failed: rc={result.returncode} {stderr.strip()}")
-    blob = result.stdout or b""
-    max_bytes = _download_max_bytes()
-    if len(blob) > max_bytes:
-        raise DownloadLimitError(f"download_too_large: {url} bytes_read={len(blob)} max_bytes={max_bytes}")
-    return blob
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                timeout=timeout + 10,
+                check=False,
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise TimeoutError(f"download_curl_timeout: {url}") from exc
+        if result.returncode != 0:
+            stderr = (result.stderr or b"").decode("utf-8", errors="replace")
+            if result.returncode == 63 or "maximum file size exceeded" in stderr.lower():
+                raise DownloadLimitError(f"download_too_large: {url} max_bytes={max_bytes}")
+            http_match = re.search(r"returned error:\s*(\d{3})", stderr, flags=re.IGNORECASE)
+            if http_match:
+                raise HTTPError(url, int(http_match.group(1)), stderr.strip() or "curl_http_error", hdrs=None, fp=None)
+            raise OSError(f"download_curl_failed: rc={result.returncode} {stderr.strip()}")
+        size = tmp_path.stat().st_size if tmp_path.exists() else 0
+        if size > max_bytes:
+            raise DownloadLimitError(f"download_too_large: {url} bytes_read={size} max_bytes={max_bytes}")
+        return tmp_path.read_bytes()
+    finally:
+        try:
+            tmp_path.unlink()
+        except OSError:
+            pass
 
 
 def _download_url_bytes(url: str, timeout_sec: int = 180) -> bytes:
@@ -1294,13 +1310,18 @@ def _shorten_archive_member_path(dest: Path, rel: Path) -> tuple[Path, str]:
         "on",
     }
     limit = _archive_short_path_limit()
+    parts = [_shorten_archive_component(part) for part in rel.parts]
+    shortened = Path(*parts)
+    shortened_rel = str(shortened).replace("\\", "/")
+
     if not force and (os.name != "nt" or len(str(dest / rel)) < limit):
         return rel, ""
 
-    parts = [_shorten_archive_component(part) for part in rel.parts]
-    shortened = Path(*parts)
-    if len(str(dest / shortened)) < limit:
-        return shortened, original if shortened != rel else ""
+    if shortened != rel and len(shortened_rel) < limit:
+        return shortened, original
+
+    if shortened == rel and len(original) < max(96, limit // 2):
+        return rel, ""
 
     digest = hashlib.sha1(original.encode("utf-8", errors="ignore")).hexdigest()[:16]
     leaf = _shorten_archive_component(rel.name or "member", max_len=80)
