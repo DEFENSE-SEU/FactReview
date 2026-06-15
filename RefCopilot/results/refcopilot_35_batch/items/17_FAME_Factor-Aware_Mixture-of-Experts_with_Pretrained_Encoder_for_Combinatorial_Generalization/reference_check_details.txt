@@ -1,0 +1,598 @@
+======================================================================
+Reference: Diffusion policy: Visuomotor policy learning via action diffusion
+Authors  : Cheng Chi, Zhenjia Xu, Siyuan Feng, Eric Cousineau, Yilun Du, Benjamin Burchfiel, Russ Tedrake, Shuran Song
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1177/02783649241273668
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.04137
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.04137v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/bdba3bd30a49ea4c5b20b43dbd8f0eb59e9d80e2
+@article{chi2023diffusion,
+  title = {Diffusion Policy: Visuomotor Policy Learning via Action Diffusion},
+  author = {Cheng Chi and Zhenjia Xu and Siyuan Feng and Eric Cousineau and Yilun Du and Benjamin Burchfiel and Russ Tedrake and Shuran Song},
+  year = {2023},
+  journal = {Robotics: Science and Systems},
+  doi = {10.1177/02783649241273668},
+  eprint = {2303.04137},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.04137v5},
+}
+
+======================================================================
+Reference: An image is worth 16x16 words: Transformers for image recognition at scale
+Authors  : Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, Neil Houlsby
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2105.15075
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2105.15075v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/268d347e8a55b5eb82fb5e7d2f800e33c75ab18a
+@inproceedings{wang2021images,
+  title = {Not All Images are Worth 16x16 Words: Dynamic Transformers for Efficient Image Recognition},
+  author = {Yulin Wang and Rui Huang and Shiji Song and Zeyi Huang and Gao Huang},
+  year = {2021},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2105.15075},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2105.15075v2},
+}
+
+======================================================================
+Reference: Switch transformers: Scaling to trillion parameter models with simple and efficient sparsity
+Authors  : William Fedus, Barret Zoph, Noam Shazeer
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Journal of machine learning research' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Journal of machine learning research.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2101.03961v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/fdacf2a732f55befdc410ea927091cad3b791f13
+@article{fedus2021switch,
+  title = {Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity},
+  author = {William Fedus and Barret Zoph and Noam Shazeer},
+  year = {2021},
+  journal = {Journal of machine learning research},
+  eprint = {2101.03961},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2101.03961v3},
+}
+
+======================================================================
+Reference: Learning diverse manipulation skills with a mixture-of-experts policy
+Authors  : Jian Fu, Ling Chen, Bo Li
+Year     : 2022
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: Ladi-wm: Latent diffusion-based world models for robotic manipulation
+Authors  : Huang Gu, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2505.11528
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2505.11528
+  - [warning/incomplete/truncated_authors] Citation lists 1 authors with et al.; the published record has 6.
+      Suggestion: List all 6 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2505.11528v6
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6c5fb2cc4f3d61850d40469b609f469ff1982b6b
+@misc{huang2025ladiwm,
+  title = {LaDi-WM: A Latent Diffusion-based World Model for Predictive Manipulation},
+  author = {Yuhang Huang and Jiazhao Zhang and Shilong Zou and Xinwang Liu and Ruizhen Hu and Kai Xu},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2505.11528},
+  eprint = {2505.11528},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2505.11528v6},
+}
+
+======================================================================
+Reference: Generalization in embodied ai with a mixture of task-specific experts
+Authors  : Sanjay Gupta, Yang Li, Yan Chen
+Year     : 2023
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: Deep residual learning for image recognition
+Authors  : Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2016.90
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1512.03385
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2c03df8b48bf3fa39054345bafabfeff15bfd11d
+@article{he2015deep,
+  title = {Deep Residual Learning for Image Recognition},
+  author = {Kaiming He and X. Zhang and Shaoqing Ren and Jian Sun},
+  year = {2015},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2016.90},
+  eprint = {1512.03385},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/2c03df8b48bf3fa39054345bafabfeff15bfd11d},
+}
+
+======================================================================
+Reference: Denoising diffusion probabilistic models
+Authors  : Jonathan Ho, Ajay Jain, Pieter Abbeel
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2006.11239v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/5c126ae3421f05768d8edd97ecd44b1364e2c99a
+@article{ho2020denoising,
+  title = {Denoising Diffusion Probabilistic Models},
+  author = {Jonathan Ho and Ajay Jain and Pieter Abbeel},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2006.11239},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2006.11239v2},
+}
+
+======================================================================
+Reference: Parameter-efficient transfer learning for NLP
+Authors  : Neil Houlsby, Andrei Giurgiu, Stanislaw Jastrzebski, Bruna Morrone, Quentin De Laroussilhe, Andrea Gesmundo, Mona Attariyan, Sylvain Gelly
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1902.00751
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1902.00751v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/29ddc1f43f28af7c846515e32cc167bc66886d0c
+@inproceedings{houlsby2019parameterefficient,
+  title = {Parameter-Efficient Transfer Learning for NLP},
+  author = {Neil Houlsby and Andrei Giurgiu and Stanislaw Jastrzebski and Bruna Morrone and Quentin de Laroussilhe and Andrea Gesmundo and Mona Attariyan and Sylvain Gelly},
+  year = {2019},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1902.00751},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1902.00751v2},
+}
+
+======================================================================
+Reference: Lora: Low-rank adaptation of large language models
+Authors  : Edward J. Hu, Yelong Shen, Phillip Wallis, Zhuohan Allen-Zhu, Yuanzhi Li, Shean Wang, Weizhu Chen
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2106.09685v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/a8ca46b171467ceb2d7652fbfb67fe701ad86092
+@inproceedings{hu2021lora,
+  title = {LoRA: Low-Rank Adaptation of Large Language Models},
+  author = {Edward J. Hu and Yelong Shen and Phillip Wallis and Zeyuan Allen-Zhu and Yuanzhi Li and Shean Wang and Lu Wang and Weizhu Chen},
+  year = {2021},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2106.09685},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2106.09685v2},
+}
+
+======================================================================
+Reference: Memory-gated diffusion policy: advancing robotic behaviour learning with memory-oriented architectures
+Authors  : Xiao Huang, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.knosys.2025.113738
+  - [warning/incomplete/truncated_authors] Citation lists 1 authors with et al.; the published record has 6.
+      Suggestion: List all 6 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/13353926f03e96f512f1dde4ba74a9b669510171
+@article{huang2025memorygated,
+  title = {Memory-gated diffusion policy: Advancing robotic behaviour learning with memory-oriented architectures},
+  author = {Xiao Huang and Jiwei Hu and Quan Liu and Guangpeng Zhao and Wupeng Deng and Weiling Liu},
+  year = {2025},
+  journal = {Knowledge-Based Systems},
+  doi = {10.1016/j.knosys.2025.113738},
+  url = {https://www.semanticscholar.org/paper/13353926f03e96f512f1dde4ba74a9b669510171},
+}
+
+======================================================================
+Reference: Mixtral of experts
+Authors  : Albert Jiang, Aristide Loukas, Barret Zoph, Noam Shazeer
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Nature Physics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Nature Physics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41567-024-02483-3
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2309.04359v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/398ad1d0c75e648083304258189ed259b02ff2e9
+@article{fabritius2023irreversible,
+  title = {Irreversible entropy transport enhanced by fermionic superfluidity},
+  author = {Philipp Fabritius and Jeffrey Mohan and Mohsen Talebi and Simon Wili and Wilhelm Zwerger and Meng-Zi Huang and Tilman Esslinger},
+  year = {2023},
+  journal = {Nature Physics},
+  doi = {10.1038/s41567-024-02483-3},
+  eprint = {2309.04359},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2309.04359v2},
+}
+
+======================================================================
+Reference: Prefix-tuning: Optimizing continuous prompts for generation
+Authors  : Xiang Lisa Li, Percy Liang
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2021.acl-long.353
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2101.00190
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2101.00190v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/53d8b356551a2361020a948f64454a6d599af69f
+@inproceedings{li2021prefixtuning,
+  title = {Prefix-Tuning: Optimizing Continuous Prompts for Generation},
+  author = {Xiang Lisa Li and Percy Liang},
+  year = {2021},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2021.acl-long.353},
+  eprint = {2101.00190},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2101.00190v1},
+}
+
+======================================================================
+Reference: A hybrid framework using diffusion policy and residual rl for force-sensitive robotic manipulation
+Authors  : Yinbei Li, Qingyang Lyu, Jiaqiang Yang, Yasir Salam, Wanglong Wang
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/lra.2025.3596487
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/9a3eda5c9e19c43cac90ed5af40f1b113b47460c
+@article{li2025hybrid,
+  title = {A Hybrid Framework Using Diffusion Policy and Residual RL for Force-Sensitive Robotic Manipulation},
+  author = {Yinbei Li and Qingyang Lyu and Jiaqiang Yang and Yasir Salam and Weiang Wang},
+  year = {2025},
+  journal = {IEEE Robotics and Automation Letters},
+  doi = {10.1109/lra.2025.3596487},
+  url = {https://www.semanticscholar.org/paper/9a3eda5c9e19c43cac90ed5af40f1b113b47460c},
+}
+
+======================================================================
+Reference: Mixture-of-experts for multi-modal perception in autonomous driving
+Authors  : Yu Liu, Wei Zhang, Si Li
+Year     : 2022
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: Vip: Towards universal visual reward and representation via value-implicit pre-training
+Authors  : Yecheng Jason Ma, Shagun Sodhani, Dinesh Jayaraman, Osbert Bastani, Vikash Kumar, Amy Zhang
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2210.00030
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2210.00030v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/3fbe2e8413df0207c26ff393c9aaa8488e3ca4c3
+@inproceedings{ma2022towards,
+  title = {VIP: Towards Universal Visual Reward and Representation via Value-Implicit Pre-Training},
+  author = {Yecheng Jason Ma and Shagun Sodhani and Dinesh Jayaraman and Osbert Bastani and Vikash Kumar and Amy Zhang},
+  year = {2022},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2210.00030},
+  eprint = {2210.00030},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2210.00030v2},
+}
+
+======================================================================
+Reference: Where are we in the search for an artificial visual cortex for embodied intelligence?
+Authors  : Arjun Majumdar, Karmesh Yadav, Sergio Arnaud, Jason Ma, Claire Chen, Sneha Silwal, Aryan Jain, Vincent-Pierre Berges, Tingfan Wu, Jay Vakil, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2303.18240
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.18240
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 15.
+      Suggestion: List all 15 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/326f6a8011e43322c433751b9cc31fd56564621c
+@article{majumdar2023where,
+  title = {Where are we in the search for an Artificial Visual Cortex for Embodied Intelligence?},
+  author = {Arjun Majumdar and K. Yadav and Sergio Arnaud and Y. Ma and C. Chen and S. Silwal and Aryan Jain and Vincent-Pierre Berges and P. Abbeel and J. Malik and Dhruv Batra and Yixin Lin and Oleksandr Maksymets and A. Rajeswaran and F. Meier},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2303.18240},
+  eprint = {2303.18240},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/326f6a8011e43322c433751b9cc31fd56564621c},
+}
+
+======================================================================
+Reference: R3m: A universal visual representation for robot manipulation
+Authors  : Suraj Nair, Aravind Rajeswaran, Vikash Kumar, Chelsea Finn, Abhinav Gupta
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Robot Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Robot Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2203.12601
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2203.12601v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c9bdc9ad2c3cf3230ba9aac7b5783ab411f0d204
+@inproceedings{nair2022universal,
+  title = {R3M: A Universal Visual Representation for Robot Manipulation},
+  author = {Suraj Nair and Aravind Rajeswaran and Vikash Kumar and Chelsea Finn and Abhinav Gupta},
+  year = {2022},
+  booktitle = {Conference on Robot Learning},
+  doi = {10.48550/arxiv.2203.12601},
+  eprint = {2203.12601},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2203.12601v3},
+}
+
+======================================================================
+Reference: Dinov2: Learning robust visual features without supervision
+Authors  : Maxime Oquab, Timothée Darcet, Theo Moutakanni, Huy Vo, Marc Szafraniec, Vasil Khalidov, Pierre Fernandez, Daniel Haziza, Francisco Massa, Alaaeldin El-Nouby, Russell Howes, Po-Yao Huang, Hu Xu, Vasu Sharma, Shang-Wen Li, Wojciech Galuba, Mike Rabbat, Mido Assran, Nicolas Ballas, Gabriel Synnaeve, Ishan Misra, Herve Jegou, Julien Mairal, Patrick Labatut, Armand Joulin, Piotr Bojanowski
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Trans. Mach. Learn. Res.' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Trans. Mach. Learn. Res..
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2304.07193
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2304.07193v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5a9cb1b3dc4655218b3deeaf4a2417a9a8cd0891
+@article{oquab2023dinov,
+  title = {DINOv2: Learning Robust Visual Features without Supervision},
+  author = {Maxime Oquab and Timothée Darcet and Théo Moutakanni and Huy Vo and Marc Szafraniec and Vasil Khalidov and Pierre Fernandez and Daniel Haziza and Francisco Massa and Alaaeldin El-Nouby and Mahmoud Assran and Nicolas Ballas and Wojciech Galuba and Russell Howes and Po-Yao Huang and Shang-Wen Li and Ishan Misra and Michael Rabbat and Vasu Sharma and Gabriel Synnaeve and Hu Xu and Hervé Jegou and Julien Mairal and Patrick Labatut and Armand Joulin and Piotr Bojanowski},
+  year = {2023},
+  journal = {Trans. Mach. Learn. Res.},
+  doi = {10.48550/arxiv.2304.07193},
+  eprint = {2304.07193},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2304.07193v2},
+}
+
+======================================================================
+Reference: Learning transferable visual models from natural language supervision
+Authors  : Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al.
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 12.
+      Suggestion: List all 12 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2103.00020v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/6f870f7f02a8c59c3e23f407f3ef00dd1dcf8fc4
+@inproceedings{radford2021learning,
+  title = {Learning Transferable Visual Models From Natural Language Supervision},
+  author = {Alec Radford and Jong Wook Kim and Chris Hallacy and Aditya Ramesh and Gabriel Goh and Sandhini Agarwal and Girish Sastry and Amanda Askell and Pamela Mishkin and Jack Clark and Gretchen Krueger and Ilya Sutskever},
+  year = {2021},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2103.00020},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2103.00020v1},
+}
+
+======================================================================
+Reference: Outrageously large neural networks: The sparsely-gated mixture-of-experts layer
+Authors  : Noam Shazeer, Azalia Mirhoseini, Krzysztof Maziarz, Andy Davis, Quoc Le, Geoffrey Hinton, Zhifeng Chen
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1701.06538v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/510e26733aaff585d65701b9f1be7ca9d5afc586
+@inproceedings{shazeer2017outrageously,
+  title = {Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer},
+  author = {Noam Shazeer and Azalia Mirhoseini and Krzysztof Maziarz and Andy Davis and Quoc Le and Geoffrey Hinton and Jeff Dean},
+  year = {2017},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1701.06538},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1701.06538v1},
+}
+
+======================================================================
+Reference: Mp1: Mean flow tames policy learning in 1-step for robotic manipulation
+Authors  : Juyi Sheng, Ziyi Wang, Peiming Li, Yong Liu, Mengyuan Liu
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'AAAI Conference on Artificial Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: AAAI Conference on Artificial Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2507.10543
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.79).
+      Suggestion: Use canonical title: MP1: MeanFlow Tames Policy Learning in 1-step for Robotic Manipulation
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2507.10543v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4665878d8f54aa7024ef50afb958270803524531
+@inproceedings{sheng2025meanflow,
+  title = {MP1: MeanFlow Tames Policy Learning in 1-step for Robotic Manipulation},
+  author = {Juyi Sheng and Ziyi Wang and Peiming Li and Mengyuan Liu},
+  year = {2025},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.48550/arxiv.2507.10543},
+  eprint = {2507.10543},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2507.10543v5},
+}
+
+======================================================================
+Reference: Generative modeling by estimating gradients of the data distribution
+Authors  : Yang Song, Stefano Ermon
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1907.05600v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/965359b3008ab50dd04e171551220ec0e7f83aba
+@article{song2019generative,
+  title = {Generative Modeling by Estimating Gradients of the Data Distribution},
+  author = {Yang Song and Stefano Ermon},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1907.05600},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1907.05600v3},
+}
+
+======================================================================
+Reference: Et-seed: Efficient trajectory-level se (3) equivariant diffusion policy
+Authors  : Chenrui Tie, Yue Chen, Ruihai Wu, Hao Dong
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2411.03990
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2411.03990
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d1ada187dcbffffea4fe54970f0faecd3d697fff
+@inproceedings{tie2024etseed,
+  title = {ET-SEED: Efficient Trajectory-Level SE(3) Equivariant Diffusion Policy},
+  author = {Chenrui Tie and Yue Chen and Ruihai Wu and Bo Dong and Zeyi Li and Chongkai Gao and Hao Dong},
+  year = {2024},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2411.03990},
+  eprint = {2411.03990},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/d1ada187dcbffffea4fe54970f0faecd3d697fff},
+}
+
+======================================================================
+Reference: Moe-based adaptive planning for autonomous vehicles in complex scenarios
+Authors  : Yang Wang, Si Li, Lin Chen
+Year     : 2023
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: Diffusion actor-critic with entropy regulator
+Authors  : Yinuo Wang, Likun Wang, Yuxuan Jiang, Wenjun Zou, Tong Liu, Xujie Song, Wenxuan Wang, Liming Xiao, Jiang Wu, Jingliang Duan, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2405.15177
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2405.15177
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.15177v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/88f0b92bdb29505055b73b751722da0d2cd3f0ab
+@article{wang2024diffusion,
+  title = {Diffusion Actor-Critic with Entropy Regulator},
+  author = {Yinuo Wang and Likun Wang and Yuxuan Jiang and Wenjun Zou and Tong Liu and Xujie Song and Wenxuan Wang and Liming Xiao and Jiang Wu and Jingliang Duan and Shengbo Eben Li},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2405.15177},
+  eprint = {2405.15177},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.15177v5},
+}
+
+======================================================================
+Reference: Masked visual pre-training for motor control
+Authors  : Tete Xiao, Ilija Radosavovic, Trevor Darrell, Jitendra Malik
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2203.06173
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2203.06173v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/523acd658742fb9c978e3f7638c09d7ce78af719
+@misc{xiao2022masked,
+  title = {Masked Visual Pre-training for Motor Control},
+  author = {Tete Xiao and Ilija Radosavovic and Trevor Darrell and Jitendra Malik},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2203.06173},
+  eprint = {2203.06173},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2203.06173v1},
+}
+
+======================================================================
+Reference: Meta-world: A benchmark and evaluation for multi-task and meta reinforcement learning
+Authors  : Tianhe Yu, Deirdre Quillen, Zhanpeng He, Ryan Julian, Karol Hausman, Chelsea Finn, Sergey Levine
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1910.10897
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/0bc855f84668b35cb65618d996d09f6e434d28c9
+@inproceedings{yu2019metaworld,
+  title = {Meta-World: A Benchmark and Evaluation for Multi-Task and Meta Reinforcement Learning},
+  author = {Tianhe Yu and Deirdre Quillen and Zhanpeng He and Ryan C. Julian and Karol Hausman and Chelsea Finn and S. Levine},
+  year = {2019},
+  booktitle = {Conference on Robot Learning},
+  eprint = {1910.10897},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/0bc855f84668b35cb65618d996d09f6e434d28c9},
+}

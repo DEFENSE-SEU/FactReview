@@ -1,0 +1,576 @@
+======================================================================
+Reference: Dbpedia: A nucleus for a web of open data
+Authors  : S. Auer, C. Bizer, G. Kobilarov, J. Lehmann, R. Cyganiak, Z. Ives
+Year     : 2007
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-540-76298-0_52
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2b2c30dfd3968c5d9418bb2c14b2382d3ccc64b2
+@article{auer2007dbpedia,
+  title = {DBpedia: A Nucleus for a Web of Open Data},
+  author = {S. Auer and Christian Bizer and Georgi Kobilarov and Jens Lehmann and Richard Cyganiak and Z. Ives},
+  year = {2007},
+  journal = {ISWC/ASWC},
+  doi = {10.1007/978-3-540-76298-0_52},
+  url = {https://www.semanticscholar.org/paper/2b2c30dfd3968c5d9418bb2c14b2382d3ccc64b2},
+}
+
+======================================================================
+Reference: Freebase: a collaboratively created graph database for structuring human knowledge
+Authors  : K. Bollacker, C. Evans, P. Paritosh, T. Sturge, J. Taylor
+Year     : 2008
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/1376616.1376746
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/1976c9eeccc7115d18a04f1e7fb5145db6b96002
+@inproceedings{bollacker2008freebase,
+  title = {Freebase: a collaboratively created graph database for structuring human knowledge},
+  author = {K. Bollacker and Colin Evans and Praveen K. Paritosh and Tim Sturge and Jamie Taylor},
+  year = {2008},
+  booktitle = {SIGMOD Conference},
+  doi = {10.1145/1376616.1376746},
+  url = {https://www.semanticscholar.org/paper/1976c9eeccc7115d18a04f1e7fb5145db6b96002},
+}
+
+======================================================================
+Reference: Spectral networks and locally connected networks on graphs
+Authors  : J. Bruna, W. Zaremba, A. Szlam, Y. LeCun
+Year     : 2013
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1312.6203v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/5e925a9f1e20df61d1e860a7aa71894b35a1c186
+@inproceedings{bruna2013spectral,
+  title = {Spectral Networks and Locally Connected Networks on Graphs},
+  author = {Joan Bruna and Wojciech Zaremba and Arthur Szlam and Yann LeCun},
+  year = {2013},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1312.6203},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1312.6203v3},
+}
+
+======================================================================
+Reference: Toward an architecture for never-ending language learning
+Authors  : A. Carlson, J. Betteridge, B. Kisiel, B. Settles, E. R. Hruschka Jr, T. M. Mitchell
+Year     : 2010
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v24i1.7519
+  - [warning/incomplete/abbreviated_venue] Cited venue 'AAAI' may be an abbreviation of 'AAAI Conference on Artificial Intelligence'.
+      Suggestion: Use the full venue name: AAAI Conference on Artificial Intelligence.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ddf0f2226cc837750eb1eb57c43d8192ef0fc2b3
+@inproceedings{carlson2010toward,
+  title = {Toward an Architecture for Never-Ending Language Learning},
+  author = {Andrew Carlson and J. Betteridge and B. Kisiel and Burr Settles and Estevam R. Hruschka and Tom M. Mitchell},
+  year = {2010},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v24i1.7519},
+  url = {https://www.semanticscholar.org/paper/ddf0f2226cc837750eb1eb57c43d8192ef0fc2b3},
+}
+
+======================================================================
+Reference: Convolutional neural networks on graphs with fast localized spectral ﬁltering
+Authors  : M. Defferrard, X. Bresson, P. Vandergheynst
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1606.09375
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1606.09375v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/c41eb895616e453dcba1a70c9b942c5063cc656c
+@article{defferrard2016convolutional,
+  title = {Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering},
+  author = {Michaël Defferrard and Xavier Bresson and Pierre Vandergheynst},
+  year = {2016},
+  journal = {Neural Information Processing Systems},
+  eprint = {1606.09375},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1606.09375v3},
+}
+
+======================================================================
+Reference: Convolutional 2d knowledge graph embeddings
+Authors  : T. Dettmers, P. Minervini, P. Stenetorp, S. Riedel
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'AAAI Conference on Artificial Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: AAAI Conference on Artificial Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v32i1.11573
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1707.01476v6
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/9697d32ed0a16da167f2bdba05ef96d0da066eb5
+@inproceedings{dettmers2017convolutional,
+  title = {Convolutional 2D Knowledge Graph Embeddings},
+  author = {Tim Dettmers and Pasquale Minervini and Pontus Stenetorp and Sebastian Riedel},
+  year = {2017},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v32i1.11573},
+  eprint = {1707.01476},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1707.01476v6},
+}
+
+======================================================================
+Reference: Inductive representation learning on large graphs
+Authors  : W. Hamilton, Z. Ying, J. Leskovec
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1706.02216
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1706.02216v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/6b7d6e6416343b2a122f8416e69059ce919026ef
+@article{hamilton2017inductive,
+  title = {Inductive Representation Learning on Large Graphs},
+  author = {William L. Hamilton and Rex Ying and Jure Leskovec},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1706.02216},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1706.02216v4},
+}
+
+======================================================================
+Reference: Representation learning on graphs: Methods and applications
+Authors  : W. L. Hamilton, R. Ying, J. Leskovec
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'IEEE Data Engineering Bulletin' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: IEEE Data Engineering Bulletin.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1709.05584v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/ecf6c42d84351f34e1625a6a2e4cc6526da45c74
+@article{hamilton2017representation,
+  title = {Representation Learning on Graphs: Methods and Applications},
+  author = {William L. Hamilton and Rex Ying and Jure Leskovec},
+  year = {2017},
+  journal = {IEEE Data Engineering Bulletin},
+  eprint = {1709.05584},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1709.05584v3},
+}
+
+======================================================================
+Reference: Knowledge graph embedding via dynamic mapping matrix
+Authors  : G. Ji, S. He, L. Xu, K. Liu, J. Zhao
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/v1/p15-1067
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/18bd7cd489874ed9976b4f87a6a558f9533316e0
+@inproceedings{ji2015knowledge,
+  title = {Knowledge Graph Embedding via Dynamic Mapping Matrix},
+  author = {Guoliang Ji and Shizhu He and Liheng Xu and Kang Liu and Jun Zhao},
+  year = {2015},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.3115/v1/p15-1067},
+  url = {https://www.semanticscholar.org/paper/18bd7cd489874ed9976b4f87a6a558f9533316e0},
+}
+
+======================================================================
+Reference: Adam: A method for stochastic optimization
+Authors  : D. P. Kingma, J. Ba
+Year     : 2014
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1412.6980v9
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/a6cb366736791bcccc5c8639de5a8f9636bf87e8
+@inproceedings{kingma2014adam,
+  title = {Adam: A Method for Stochastic Optimization},
+  author = {Diederik P. Kingma and Jimmy Ba},
+  year = {2014},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1412.6980},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1412.6980v9},
+}
+
+======================================================================
+Reference: Variational graph auto-encoders
+Authors  : T. N. Kipf, M. Welling
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Advances in neural information processing systems, Bayesian Deep Learning Workshop', but a full version appears at 'arXiv.org'.
+      Suggestion: Cite the full version at arXiv.org.
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1611.07308
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1611.07308v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/54906484f42e871f7c47bbfe784a358b1448231f
+@misc{kipf2016variational,
+  title = {Variational Graph Auto-Encoders},
+  author = {Thomas N. Kipf and Max Welling},
+  year = {2016},
+  journal = {arXiv.org},
+  eprint = {1611.07308},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1611.07308v1},
+}
+
+======================================================================
+Reference: Semi-supervised classiﬁcation with graph convolutional networks
+Authors  : T. N. Kipf, M. Welling
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1609.02907v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/36eff562f65125511b5dfab68ce7f7a943c27478
+@inproceedings{kipf2016semisupervised,
+  title = {Semi-Supervised Classification with Graph Convolutional Networks},
+  author = {Thomas N. Kipf and Max Welling},
+  year = {2016},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1609.02907},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1609.02907v4},
+}
+
+======================================================================
+Reference: Learning entity and relation embeddings for knowledge graph completion
+Authors  : Y. Lin, Z. Liu, M. Sun, Y. Liu, X. Zhu
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v29i1.9491
+  - [warning/incomplete/abbreviated_venue] Cited venue 'AAAI' may be an abbreviation of 'AAAI Conference on Artificial Intelligence'.
+      Suggestion: Use the full venue name: AAAI Conference on Artificial Intelligence.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/994afdf0db0cb0456f4f76468380822c2f532726
+@inproceedings{lin2015learning,
+  title = {Learning Entity and Relation Embeddings for Knowledge Graph Completion},
+  author = {Yankai Lin and Zhiyuan Liu and Maosong Sun and Yang Liu and Xuan Zhu},
+  year = {2015},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v29i1.9491},
+  url = {https://www.semanticscholar.org/paper/994afdf0db0cb0456f4f76468380822c2f532726},
+}
+
+======================================================================
+Reference: Yago3: A knowledge base from multilingual wikipedias
+Authors  : F. Mahdisoltani, J. Biega, F. M. Suchanek
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CIDR' may be an abbreviation of 'Conference on Innovative Data Systems Research'.
+      Suggestion: Use the full venue name: Conference on Innovative Data Systems Research.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/6c5b5adc3830ac45bf1d764603b1b71e5f729616
+@inproceedings{mahdisoltani2015yago,
+  title = {YAGO3: A Knowledge Base from Multilingual Wikipedias},
+  author = {F. Mahdisoltani and J. Biega and Fabian M. Suchanek},
+  year = {2015},
+  booktitle = {Conference on Innovative Data Systems Research},
+  url = {https://www.semanticscholar.org/paper/6c5b5adc3830ac45bf1d764603b1b71e5f729616},
+}
+
+======================================================================
+Reference: Stranse: a novel embedding model of entities and relationships in knowledge bases
+Authors  : D. Q. Nguyen, K. Sirts, L. Qu, M. Johnson
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/n16-1054
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1606.08140v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/50de83b8a00f448b3e344701a60dfdcfd84881f4
+@article{nguyen2016stranse,
+  title = {STransE: a novel embedding model of entities and relationships in knowledge bases},
+  author = {Dat Quoc Nguyen and Kairit Sirts and Lizhen Qu and Mark Johnson},
+  year = {2016},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/n16-1054},
+  eprint = {1606.08140},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1606.08140v3},
+}
+
+======================================================================
+Reference: A novel embedding model for knowledge base completion based on convolutional neural network
+Authors  : D. Q. Nguyen, T. D. Nguyen, D. Q. Nguyen, D. Phung
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/n18-2053
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1712.02121v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/41cbe3cdfee7539f8ff20144e6bd028ef762e00c
+@article{nguyen2017novel,
+  title = {A Novel Embedding Model for Knowledge Base Completion Based on Convolutional Neural Network},
+  author = {Dai Quoc Nguyen and Tu Dinh Nguyen and Dat Quoc Nguyen and Dinh Phung},
+  year = {2017},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/n18-2053},
+  eprint = {1712.02121},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1712.02121v2},
+}
+
+======================================================================
+Reference: An overview of embedding models of entities and relationships for knowledge base completion
+Authors  : D. Q. Nguyen
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.69).
+      Suggestion: Use canonical title: A survey of embedding models of entities and relationships for knowledge graph completion
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1703.08098v9
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/c84c924810c57b4ee868055934bd7d443986f0d6
+@misc{nguyen2017survey,
+  title = {A survey of embedding models of entities and relationships for knowledge graph completion},
+  author = {Dat Quoc Nguyen},
+  year = {2017},
+  journal = {arXiv.org},
+  eprint = {1703.08098},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1703.08098v9},
+}
+
+======================================================================
+Reference: Column networks for collective classiﬁcation
+Authors  : T. Pham, T. Tran, D. Phung, S. Venkatesh
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v31i1.10851
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1609.04508
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: AAAI Conference on Artificial Intelligence
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/97f7ef7a5332218e0e9ce75ad5cf77048466ca83
+@inproceedings{pham2016column,
+  title = {Column Networks for Collective Classification},
+  author = {Trang Pham and T. Tran and Dinh Q. Phung and S. Venkatesh},
+  year = {2016},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v31i1.10851},
+  eprint = {1609.04508},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/97f7ef7a5332218e0e9ce75ad5cf77048466ca83},
+}
+
+======================================================================
+Reference: Modeling relational data with graph convolutional networks
+Authors  : M. Schlichtkrull, T. N. Kipf, P. Bloem, R. van den Berg, I. Titov, M. Welling
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-319-93417-4_38
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1703.06103
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/cd8a9914d50b0ac63315872530274d158d6aff09
+@inproceedings{schlichtkrull2017modeling,
+  title = {Modeling Relational Data with Graph Convolutional Networks},
+  author = {M. Schlichtkrull and Thomas Kipf and Peter Bloem and Rianne van den Berg and Ivan Titov and M. Welling},
+  year = {2017},
+  booktitle = {Extended Semantic Web Conference},
+  doi = {10.1007/978-3-319-93417-4_38},
+  eprint = {1703.06103},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/cd8a9914d50b0ac63315872530274d158d6aff09},
+}
+
+======================================================================
+Reference: Towards understanding the geometry of knowledge graph embeddings
+Authors  : A. Sharma, P. Talukdar, et al.
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/p18-1012
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/477cc0e5533ed08768f83d41718feaf7cbcaf3a6
+@inproceedings{chandrahas2018towards,
+  title = {Towards Understanding the Geometry of Knowledge Graph Embeddings},
+  author = {Chandrahas and Aditya Sharma and Partha P. Talukdar},
+  year = {2018},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/p18-1012},
+  url = {https://www.semanticscholar.org/paper/477cc0e5533ed08768f83d41718feaf7cbcaf3a6},
+}
+
+======================================================================
+Reference: Observed versus latent features for knowledge base and text inference
+Authors  : K. Toutanova, D. Chen
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/w15-4007
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/b5c29457a90ee9af7c3b2985e9f665ce4b5b97d6
+@inproceedings{toutanova2015observed,
+  title = {Observed versus latent features for knowledge base and text inference},
+  author = {Kristina Toutanova and Danqi Chen},
+  year = {2015},
+  booktitle = {Workshop on Continuous Vector Space Models and their Compositionality},
+  doi = {10.18653/v1/w15-4007},
+  url = {https://www.semanticscholar.org/paper/b5c29457a90ee9af7c3b2985e9f665ce4b5b97d6},
+}
+
+======================================================================
+Reference: Complex embeddings for simple link prediction
+Authors  : T. Trouillon, J. Welbl, S. Riedel, É. Gaussier, G. Bouchard
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1606.06357
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1606.06357v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/2218e2e1df2c3adfb70e0def2e326a39928aacfc
+@inproceedings{trouillon2016complex,
+  title = {Complex Embeddings for Simple Link Prediction},
+  author = {Théo Trouillon and Johannes Welbl and Sebastian Riedel and Éric Gaussier and Guillaume Bouchard},
+  year = {2016},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1606.06357},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1606.06357v1},
+}
+
+======================================================================
+Reference: Knowledge graph embedding by translating on hyperplanes
+Authors  : Z. Wang, J. Zhang, J. Feng, Z. Chen
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v28i1.8870
+  - [warning/incomplete/abbreviated_venue] Cited venue 'AAAI' may be an abbreviation of 'AAAI Conference on Artificial Intelligence'.
+      Suggestion: Use the full venue name: AAAI Conference on Artificial Intelligence.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2a3f862199883ceff5e3c74126f0c80770653e05
+@inproceedings{wang2014knowledge,
+  title = {Knowledge Graph Embedding by Translating on Hyperplanes},
+  author = {Zhen Wang and Jianwen Zhang and Jianlin Feng and Zheng Chen},
+  year = {2014},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v28i1.8870},
+  url = {https://www.semanticscholar.org/paper/2a3f862199883ceff5e3c74126f0c80770653e05},
+}
+
+======================================================================
+Reference: Knowledge graph embedding: A survey of approaches and applications
+Authors  : Q. Wang, Z. Mao, B. Wang, L. Guo
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tkde.2017.2754499
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/30321b036607a7936221235ea8ec7cf7c1627100
+@article{wang2017knowledge,
+  title = {Knowledge Graph Embedding: A Survey of Approaches and Applications},
+  author = {Quan Wang and Zhendong Mao and Bin Wang and Li Guo},
+  year = {2017},
+  journal = {IEEE Transactions on Knowledge and Data Engineering},
+  doi = {10.1109/tkde.2017.2754499},
+  url = {https://www.semanticscholar.org/paper/30321b036607a7936221235ea8ec7cf7c1627100},
+}
+
+======================================================================
+Reference: Embedding entities and relations for learning and inference in knowledge bases
+Authors  : B. Yang, W.-t. Yih, X. He, J. Gao, L. Deng
+Year     : 2014
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1412.6575v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/86412306b777ee35aba71d4795b02915cb8a04c3
+@inproceedings{yang2014embedding,
+  title = {Embedding Entities and Relations for Learning and Inference in Knowledge Bases},
+  author = {Bishan Yang and Wen-tau Yih and Xiaodong He and Jianfeng Gao and Li Deng},
+  year = {2014},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1412.6575},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1412.6575v4},
+}
+
+======================================================================
+Reference: Graph convolutional neural networks for web-scale recommender systems
+Authors  : R. Ying, R. He, K. Chen, P. Eksombatchai, W. L. Hamilton, J. Leskovec
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3219819.3219890
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1806.01973
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1806.01973v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6c96c2d4a3fbd572fef2d59cb856521ee1746789
+@article{ying2018graph,
+  title = {Graph Convolutional Neural Networks for Web-Scale Recommender Systems},
+  author = {Rex Ying and Ruining He and Kaifeng Chen and Pong Eksombatchai and William L. Hamilton and Jure Leskovec},
+  year = {2018},
+  journal = {Knowledge Discovery and Data Mining},
+  doi = {10.1145/3219819.3219890},
+  eprint = {1806.01973},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1806.01973v1},
+}

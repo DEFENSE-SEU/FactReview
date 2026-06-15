@@ -1,0 +1,411 @@
+======================================================================
+Reference: A computational approach to edge detection
+Authors  : John Canny
+Year     : 1986
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tpami.1986.4767851
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/fcf9fc4e23b45345c2404ce7d6cb0fc9dea2c9ec
+@article{canny1986computational,
+  title = {A Computational Approach to Edge Detection},
+  author = {J. Canny},
+  year = {1986},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  doi = {10.1109/tpami.1986.4767851},
+  url = {https://www.semanticscholar.org/paper/fcf9fc4e23b45345c2404ce7d6cb0fc9dea2c9ec},
+}
+
+======================================================================
+Reference: End-to-end object detection with transformers
+Authors  : Nicolas Carion, Francisco Massa, Gabriel Synnaeve, Nicolas Usunier, Alexander Kirillov, Sergey Zagoruyko
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-030-58452-8_13
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2005.12872
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2005.12872v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/962dc29fdc3fbdc5930a10aba114050b82fe5a3e
+@inproceedings{carion2020endtoend,
+  title = {End-to-End Object Detection with Transformers},
+  author = {Nicolas Carion and Francisco Massa and Gabriel Synnaeve and Nicolas Usunier and Alexander Kirillov and Sergey Zagoruyko},
+  year = {2020},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-030-58452-8_13},
+  eprint = {2005.12872},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2005.12872v3},
+}
+
+======================================================================
+Reference: Stroke extraction for offline handwritten mathematical expression recognition
+Authors  : Chungkwong Chan
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/access.2020.2984627
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1905.06749
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/3c5a2594b7fd216487d662f7c6575d467767bd34
+@article{chan2019stroke,
+  title = {Stroke Extraction for Offline Handwritten Mathematical Expression Recognition},
+  author = {Chungkwong Chan},
+  year = {2019},
+  journal = {IEEE Access},
+  doi = {10.1109/access.2020.2984627},
+  eprint = {1905.06749},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/3c5a2594b7fd216487d662f7c6575d467767bd34},
+}
+
+======================================================================
+Reference: Parallel thinning with two-subiteration algorithms
+Authors  : Zicheng Guo, Richard W Hall
+Year     : 1989
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/62065.62074
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/7d2e489121c72ed9f467bc6d87e928e6e3dcc750
+@article{guo1989parallel,
+  title = {Parallel thinning with two-subiteration algorithms},
+  author = {Zicheng Guo and R. W. Hall},
+  year = {1989},
+  journal = {Communications of the ACM},
+  doi = {10.1145/62065.62074},
+  url = {https://www.semanticscholar.org/paper/7d2e489121c72ed9f467bc6d87e928e6e3dcc750},
+}
+
+======================================================================
+Reference: Spacegtn: A time-agnostic graph transformer network for handwritten diagram recognition and segmentation
+Authors  : Haoxiang Hu, Cangjun Gao, Yaokun Li, Xiaoming Deng, YuKun Lai, Cuixia Ma, Yong-Jin Liu, Hongan Wang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v38i3.27994
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d4010fabbecd78c1fcb15d33702d52b5c77258ff
+@inproceedings{hu2024spacegtn,
+  title = {SpaceGTN: A Time-Agnostic Graph Transformer Network for Handwritten Diagram Recognition and Segmentation},
+  author = {Haoxiang Hu and Cangjun Gao and Yaokun Li and Xiaoming Deng and Yu-Kun Lai and Cuixia Ma and Yong-Jin Liu and Hongan Wang},
+  year = {2024},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v38i3.27994},
+  url = {https://www.semanticscholar.org/paper/d4010fabbecd78c1fcb15d33702d52b5c77258ff},
+}
+
+======================================================================
+Reference: Detection in Online Handwritten Graphics Using Faster R-CNN
+Authors  : Frank D. Julca-Aguilar, Nina S. T. Hirata
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1712.04833
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.88).
+      Suggestion: Use canonical title: Symbol Detection in Online Handwritten Graphics Using Faster R-CNN
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4ddfe4488b2c0fcc6119be0e8fb8d02c70ff3bbf
+@inproceedings{julcaaguilar2017symbol,
+  title = {Symbol Detection in Online Handwritten Graphics Using Faster R-CNN},
+  author = {Frank D. Julca-Aguilar and N. Hirata},
+  year = {2017},
+  booktitle = {International Workshop on Document Analysis Systems},
+  doi = {10.1109/das.2018.79},
+  eprint = {1712.04833},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/4ddfe4488b2c0fcc6119be0e8fb8d02c70ff3bbf},
+}
+
+======================================================================
+Reference: Semi-supervised classification with graph convolutional networks
+Authors  : Thomas N Kipf, Max Welling
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1609.02907v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/36eff562f65125511b5dfab68ce7f7a943c27478
+@inproceedings{kipf2016semisupervised,
+  title = {Semi-Supervised Classification with Graph Convolutional Networks},
+  author = {Thomas N. Kipf and Max Welling},
+  year = {2016},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1609.02907},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1609.02907v4},
+}
+
+======================================================================
+Reference: Stroke extraction of chinese character based on deep structure deformable image registration
+Authors  : Meng Li, Yahan Yu, Yi Yang, Guanghao Ren, Jian Wang
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v37i1.25220
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2307.04341
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2307.04341v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d98fd91ed23b3ab623a60cd1713382b2163d5ce2
+@inproceedings{li2023stroke,
+  title = {Stroke Extraction of Chinese Character Based on Deep Structure Deformable Image Registration},
+  author = {Meng Li and Yahan Yu and Yi Yang and Guanghao Ren and Jian Wang},
+  year = {2023},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v37i1.25220},
+  eprint = {2307.04341},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2307.04341v1},
+}
+
+======================================================================
+Reference: Model-based stroke extraction and matching for handwritten chinese character recognition
+Authors  : Cheng-Lin Liu, In-Jung Kim, Jin H Kim
+Year     : 2001
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/s0031-3203(00)00165-5
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ca0d422e1aea6db27902c19e34ee5921a2fdbd1d
+@article{liu2001modelbased,
+  title = {Model-based stroke extraction and matching for handwritten Chinese character recognition},
+  author = {Chenglin Liu and In-Jung Kim and J. H. Kim},
+  year = {2001},
+  journal = {Pattern Recognition},
+  doi = {10.1016/s0031-3203(00)00165-5},
+  url = {https://www.semanticscholar.org/paper/ca0d422e1aea6db27902c19e34ee5921a2fdbd1d},
+}
+
+======================================================================
+Reference: How domain experts create conceptual diagrams and implications for tool design
+Authors  : Dor Ma’ayan, Wode Ni, Katherine Ye, Chinmay Kulkarni, Joshua Sunshine
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3313831.3376253
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e8749c8558e5d66a48308921f623d7e1ff1a8374
+@inproceedings{maayan2020domain,
+  title = {How Domain Experts Create Conceptual Diagrams and Implications for Tool Design},
+  author = {Dor Ma'ayan and Wode Ni and Katherine Q. Ye and Chinmay Kulkarni and Joshua Sunshine},
+  year = {2020},
+  booktitle = {International Conference on Human Factors in Computing Systems},
+  doi = {10.1145/3313831.3376253},
+  url = {https://www.semanticscholar.org/paper/e8749c8558e5d66a48308921f623d7e1ff1a8374},
+}
+
+======================================================================
+Reference: Set, sort! a novel sub-stroke level transformers for offline handwriting to online conversion
+Authors  : Elmokhtar Mohamed Moussa, Thibault Lelore, Harold Mouchère
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-031-41676-7_5
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/801a3f7a2702609c7ca1cfcbbcb91a783f847169
+@inproceedings{moussa2023sort,
+  title = {SET, SORT! A Novel Sub-stroke Level Transformers for Offline Handwriting to Online Conversion},
+  author = {Elmokhtar Mohamed Moussa and T. Lelore and Harold Mouchère},
+  year = {2023},
+  booktitle = {IEEE International Conference on Document Analysis and Recognition},
+  doi = {10.1007/978-3-031-41676-7_5},
+  url = {https://www.semanticscholar.org/paper/801a3f7a2702609c7ca1cfcbbcb91a783f847169},
+}
+
+======================================================================
+Reference: Gpt-4 technical report
+Authors  : OpenAI
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.08774
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: CoRR 2024
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.08774v6
+%   openreview: venue — https://openreview.net/forum?id=53paKRfmgs
+@article{openai2023technical,
+  title = {GPT-4 Technical Report},
+  author = {OpenAI and Josh Achiam and Steven Adler and Sandhini Agarwal and Lama Ahmad and Ilge Akkaya and Florencia Leoni Aleman and Diogo Almeida and Janko Altenschmidt and Sam Altman and Shyamal Anadkat and Red Avila and Igor Babuschkin and Suchir Balaji and Valerie Balcom and Paul Baltescu and Haiming Bao and Mohammad Bavarian and Jeff Belgum and Irwan Bello and Jake Berdine and Gabriel Bernadett-Shapiro and Christopher Berner and Lenny Bogdonoff and Oleg Boiko and Madelaine Boyd and Anna-Luisa Brakman and Greg Brockman and Tim Brooks and Miles Brundage and Kevin Button and Trevor Cai and Rosie Campbell and Andrew Cann and Brittany Carey and Chelsea Carlson and Rory Carmichael and Brooke Chan and Che Chang and Fotis Chantzis and Derek Chen and Sully Chen and Ruby Chen and Jason Chen and Mark Chen and Ben Chess and Chester Cho and Casey Chu and Hyung Won Chung and Dave Cummings and Jeremiah Currier and Yunxing Dai and Cory Decareaux and Thomas Degry and Noah Deutsch and Damien Deville and Arka Dhar and David Dohan and Steve Dowling and Sheila Dunning and Adrien Ecoffet and Atty Eleti and Tyna Eloundou and David Farhi and Liam Fedus and Niko Felix and Simón Posada Fishman and Juston Forte and Isabella Fulford and Leo Gao and Elie Georges and Christian Gibson and Vik Goel and Tarun Gogineni and Gabriel Goh and Rapha Gontijo-Lopes and Jonathan Gordon and Morgan Grafstein and Scott Gray and Ryan Greene and Joshua Gross and Shixiang Shane Gu and Yufei Guo and Chris Hallacy and Jesse Han and Jeff Harris and Yuchen He and Mike Heaton and Johannes Heidecke and Chris Hesse and Alan Hickey and Wade Hickey and Peter Hoeschele and Brandon Houghton and Kenny Hsu and Shengli Hu and Xin Hu and Joost Huizinga and Shantanu Jain and Shawn Jain and Joanne Jang and Angela Jiang and Roger Jiang and Haozhun Jin and Denny Jin and Shino Jomoto and Billie Jonn and Heewoo Jun and Tomer Kaftan and Łukasz Kaiser and Ali Kamali and Ingmar Kanitscheider and Nitish Shirish Keskar and Tabarak Khan and Logan Kilpatrick and Jong Wook Kim and Christina Kim and Yongjik Kim and Jan Hendrik Kirchner and Jamie Kiros and Matt Knight and Daniel Kokotajlo and Łukasz Kondraciuk and Andrew Kondrich and Aris Konstantinidis and Kyle Kosic and Gretchen Krueger and Vishal Kuo and Michael Lampe and Ikai Lan and Teddy Lee and Jan Leike and Jade Leung and Daniel Levy and Chak Ming Li and Rachel Lim and Molly Lin and Stephanie Lin and Mateusz Litwin and Theresa Lopez and Ryan Lowe and Patricia Lue and Anna Makanju and Kim Malfacini and Sam Manning and Todor Markov and Yaniv Markovski and Bianca Martin and Katie Mayer and Andrew Mayne and Bob McGrew and Scott Mayer McKinney and Christine McLeavey and Paul McMillan and Jake McNeil and David Medina and Aalok Mehta and Jacob Menick and Luke Metz and Andrey Mishchenko and Pamela Mishkin and Vinnie Monaco and Evan Morikawa and Daniel Mossing and Tong Mu and Mira Murati and Oleg Murk and David Mély and Ashvin Nair and Reiichiro Nakano and Rajeev Nayak and Arvind Neelakantan and Richard Ngo and Hyeonwoo Noh and Long Ouyang and Cullen O'Keefe and Jakub Pachocki and Alex Paino and Joe Palermo and Ashley Pantuliano and Giambattista Parascandolo and Joel Parish and Emy Parparita and Alex Passos and Mikhail Pavlov and Andrew Peng and Adam Perelman and Filipe de Avila Belbute Peres and Michael Petrov and Henrique Ponde de Oliveira Pinto and Michael and Pokorny and Michelle Pokrass and Vitchyr H. Pong and Tolly Powell and Alethea Power and Boris Power and Elizabeth Proehl and Raul Puri and Alec Radford and Jack Rae and Aditya Ramesh and Cameron Raymond and Francis Real and Kendra Rimbach and Carl Ross and Bob Rotsted and Henri Roussez and Nick Ryder and Mario Saltarelli and Ted Sanders and Shibani Santurkar and Girish Sastry and Heather Schmidt and David Schnurr and John Schulman and Daniel Selsam and Kyla Sheppard and Toki Sherbakov and Jessica Shieh and Sarah Shoker and Pranav Shyam and Szymon Sidor and Eric Sigler and Maddie Simens and Jordan Sitkin and Katarina Slama and Ian Sohl and Benjamin Sokolowsky and Yang Song and Natalie Staudacher and Felipe Petroski Such and Natalie Summers and Ilya Sutskever and Jie Tang and Nikolas Tezak and Madeleine B. Thompson and Phil Tillet and Amin Tootoonchian and Elizabeth Tseng and Preston Tuggle and Nick Turley and Jerry Tworek and Juan Felipe Cerón Uribe and Andrea Vallone and Arun Vijayvergiya and Chelsea Voss and Carroll Wainwright and Justin Jay Wang and Alvin Wang and Ben Wang and Jonathan Ward and Jason Wei and CJ Weinmann and Akila Welihinda and Peter Welinder and Jiayi Weng and Lilian Weng and Matt Wiethoff and Dave Willner and Clemens Winter and Samuel Wolrich and Hannah Wong and Lauren Workman and Sherwin Wu and Jeff Wu and Michael Wu and Kai Xiao and Tao Xu and Sarah Yoo and Kevin Yu and Qiming Yuan and Wojciech Zaremba and Rowan Zellers and Chong Zhang and Marvin Zhang and Shengjia Zhao and Tianhao Zheng and Juntang Zhuang and William Zhuk and Barret Zoph},
+  year = {2023},
+  journal = {CoRR 2024},
+  eprint = {2303.08774},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.08774v6},
+}
+
+======================================================================
+Reference: High-resolution image synthesis with latent diffusion models
+Authors  : Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52688.2022.01042
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2112.10752
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/c10075b3746a9f3dd5811970e93c8ca3ad39b39d
+@article{rombach2021highresolution,
+  title = {High-Resolution Image Synthesis with Latent Diffusion Models},
+  author = {Robin Rombach and A. Blattmann and Dominik Lorenz and Patrick Esser and B. Ommer},
+  year = {2021},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52688.2022.01042},
+  eprint = {2112.10752},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/c10075b3746a9f3dd5811970e93c8ca3ad39b39d},
+}
+
+======================================================================
+Reference: Arrow r-cnn for handwritten diagram recognition
+Authors  : Bernhard Schäfer, Margret Keuper, Heiner Stuckenschmidt
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Int. J. Doc. Anal. Recognit.' may be an abbreviation of 'International Journal on Document Analysis and Recognition'.
+      Suggestion: Use the full venue name: International Journal on Document Analysis and Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/79a28e4ea52f49d3fccf3dde05f9e13e328a7187
+@article{schäfer2021arrow,
+  title = {Arrow R-CNN for handwritten diagram recognition},
+  author = {Bernhard Schäfer and Margret Keuper and H. Stuckenschmidt},
+  year = {2021},
+  journal = {International Journal on Document Analysis and Recognition},
+  doi = {10.1007/s10032-020-00361-1},
+  url = {https://www.semanticscholar.org/paper/79a28e4ea52f49d3fccf3dde05f9e13e328a7187},
+}
+
+======================================================================
+Reference: Denoising diffusion implicit models
+Authors  : Jiaming Song, Chenlin Meng, Stefano Ermon
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2010.02502v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/014576b866078524286802b1d0e18628520aa886
+@inproceedings{song2020denoising,
+  title = {Denoising Diffusion Implicit Models},
+  author = {Jiaming Song and Chenlin Meng and Stefano Ermon},
+  year = {2020},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2010.02502},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2010.02502v4},
+}
+
+======================================================================
+Reference: Graphdecoder: Recovering diverse network graphs from visualization images via attention-aware learning
+Authors  : Sicheng Song, Chenhui Li, Dong Li, Juntong Chen, Changbo Wang
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tvcg.2022.3225554
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ae5195e2bba5bd2822113a241c1fac65031c4f05
+@article{song2022graphdecoder,
+  title = {GraphDecoder: Recovering Diverse Network Graphs From Visualization Images via Attention-Aware Learning},
+  author = {Sicheng Song and Chenhui Li and Dong Li and Juntong Chen and Changbo Wang},
+  year = {2022},
+  journal = {IEEE Transactions on Visualization and Computer Graphics},
+  doi = {10.1109/tvcg.2022.3225554},
+  url = {https://www.semanticscholar.org/paper/ae5195e2bba5bd2822113a241c1fac65031c4f05},
+}
+
+======================================================================
+Reference: Vividgraph: Learning to extract and redesign network graphs from visualization images
+Authors  : Sicheng Song, Chenhui Li, Yujing Sun, Changbo Wang
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tvcg.2022.3153514
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e00300edde643b261e9e536aacd46cb5f2ceddef
+@article{song2022vividgraph,
+  title = {VividGraph: Learning to Extract and Redesign Network Graphs From Visualization Images},
+  author = {Sicheng Song and Chenhui Li and Yujing Sun and Changbo Wang},
+  year = {2022},
+  journal = {IEEE Transactions on Visualization and Computer Graphics},
+  doi = {10.1109/tvcg.2022.3153514},
+  url = {https://www.semanticscholar.org/paper/e00300edde643b261e9e536aacd46cb5f2ceddef},
+}
+
+======================================================================
+Reference: Query pixel guided stroke extraction with model-based matching for offline handwritten chinese characters
+Authors  : Tie-Qiang Wang, Xiaoyi Jiang, Cheng-Lin Liu
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.patcog.2021.108416
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/b5c85f3c7a95e3b7b3f0e18c99d47454fdc1d119
+@article{wang2021query,
+  title = {Query Pixel Guided Stroke Extraction with Model-Based Matching for Offline Handwritten Chinese Characters},
+  author = {Tie-Qiang Wang and Xiaoyi Jiang and Chenglin Liu},
+  year = {2021},
+  journal = {Pattern Recognition},
+  doi = {10.1016/j.patcog.2021.108416},
+  url = {https://www.semanticscholar.org/paper/b5c85f3c7a95e3b7b3f0e18c99d47454fdc1d119},
+}
+
+======================================================================
+Reference: Deformable detr: Deformable transformers for end-to-end object detection
+Authors  : Xizhou Zhu, Weijie Su, Lewei Lu, Bin Li, Xiaogang Wang, Jifeng Dai
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2010.04159v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/39ca8f8ff28cc640e3b41a6bd7814ab85c586504
+@inproceedings{zhu2020deformable,
+  title = {Deformable DETR: Deformable Transformers for End-to-End Object Detection},
+  author = {Xizhou Zhu and Weijie Su and Lewei Lu and Bin Li and Xiaogang Wang and Jifeng Dai},
+  year = {2020},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2010.04159},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2010.04159v4},
+}

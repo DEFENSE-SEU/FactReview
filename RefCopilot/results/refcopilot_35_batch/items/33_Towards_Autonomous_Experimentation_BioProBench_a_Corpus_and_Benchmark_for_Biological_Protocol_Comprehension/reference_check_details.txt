@@ -1,0 +1,944 @@
+======================================================================
+Reference: Gpt-4 technical report
+Authors  : Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CoRR 2024' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CoRR 2024.
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 281.
+      Suggestion: List all 281 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.08774v6
+%   openreview: venue — https://openreview.net/forum?id=53paKRfmgs
+@article{openai2023technical,
+  title = {GPT-4 Technical Report},
+  author = {OpenAI and Josh Achiam and Steven Adler and Sandhini Agarwal and Lama Ahmad and Ilge Akkaya and Florencia Leoni Aleman and Diogo Almeida and Janko Altenschmidt and Sam Altman and Shyamal Anadkat and Red Avila and Igor Babuschkin and Suchir Balaji and Valerie Balcom and Paul Baltescu and Haiming Bao and Mohammad Bavarian and Jeff Belgum and Irwan Bello and Jake Berdine and Gabriel Bernadett-Shapiro and Christopher Berner and Lenny Bogdonoff and Oleg Boiko and Madelaine Boyd and Anna-Luisa Brakman and Greg Brockman and Tim Brooks and Miles Brundage and Kevin Button and Trevor Cai and Rosie Campbell and Andrew Cann and Brittany Carey and Chelsea Carlson and Rory Carmichael and Brooke Chan and Che Chang and Fotis Chantzis and Derek Chen and Sully Chen and Ruby Chen and Jason Chen and Mark Chen and Ben Chess and Chester Cho and Casey Chu and Hyung Won Chung and Dave Cummings and Jeremiah Currier and Yunxing Dai and Cory Decareaux and Thomas Degry and Noah Deutsch and Damien Deville and Arka Dhar and David Dohan and Steve Dowling and Sheila Dunning and Adrien Ecoffet and Atty Eleti and Tyna Eloundou and David Farhi and Liam Fedus and Niko Felix and Simón Posada Fishman and Juston Forte and Isabella Fulford and Leo Gao and Elie Georges and Christian Gibson and Vik Goel and Tarun Gogineni and Gabriel Goh and Rapha Gontijo-Lopes and Jonathan Gordon and Morgan Grafstein and Scott Gray and Ryan Greene and Joshua Gross and Shixiang Shane Gu and Yufei Guo and Chris Hallacy and Jesse Han and Jeff Harris and Yuchen He and Mike Heaton and Johannes Heidecke and Chris Hesse and Alan Hickey and Wade Hickey and Peter Hoeschele and Brandon Houghton and Kenny Hsu and Shengli Hu and Xin Hu and Joost Huizinga and Shantanu Jain and Shawn Jain and Joanne Jang and Angela Jiang and Roger Jiang and Haozhun Jin and Denny Jin and Shino Jomoto and Billie Jonn and Heewoo Jun and Tomer Kaftan and Łukasz Kaiser and Ali Kamali and Ingmar Kanitscheider and Nitish Shirish Keskar and Tabarak Khan and Logan Kilpatrick and Jong Wook Kim and Christina Kim and Yongjik Kim and Jan Hendrik Kirchner and Jamie Kiros and Matt Knight and Daniel Kokotajlo and Łukasz Kondraciuk and Andrew Kondrich and Aris Konstantinidis and Kyle Kosic and Gretchen Krueger and Vishal Kuo and Michael Lampe and Ikai Lan and Teddy Lee and Jan Leike and Jade Leung and Daniel Levy and Chak Ming Li and Rachel Lim and Molly Lin and Stephanie Lin and Mateusz Litwin and Theresa Lopez and Ryan Lowe and Patricia Lue and Anna Makanju and Kim Malfacini and Sam Manning and Todor Markov and Yaniv Markovski and Bianca Martin and Katie Mayer and Andrew Mayne and Bob McGrew and Scott Mayer McKinney and Christine McLeavey and Paul McMillan and Jake McNeil and David Medina and Aalok Mehta and Jacob Menick and Luke Metz and Andrey Mishchenko and Pamela Mishkin and Vinnie Monaco and Evan Morikawa and Daniel Mossing and Tong Mu and Mira Murati and Oleg Murk and David Mély and Ashvin Nair and Reiichiro Nakano and Rajeev Nayak and Arvind Neelakantan and Richard Ngo and Hyeonwoo Noh and Long Ouyang and Cullen O'Keefe and Jakub Pachocki and Alex Paino and Joe Palermo and Ashley Pantuliano and Giambattista Parascandolo and Joel Parish and Emy Parparita and Alex Passos and Mikhail Pavlov and Andrew Peng and Adam Perelman and Filipe de Avila Belbute Peres and Michael Petrov and Henrique Ponde de Oliveira Pinto and Michael and Pokorny and Michelle Pokrass and Vitchyr H. Pong and Tolly Powell and Alethea Power and Boris Power and Elizabeth Proehl and Raul Puri and Alec Radford and Jack Rae and Aditya Ramesh and Cameron Raymond and Francis Real and Kendra Rimbach and Carl Ross and Bob Rotsted and Henri Roussez and Nick Ryder and Mario Saltarelli and Ted Sanders and Shibani Santurkar and Girish Sastry and Heather Schmidt and David Schnurr and John Schulman and Daniel Selsam and Kyla Sheppard and Toki Sherbakov and Jessica Shieh and Sarah Shoker and Pranav Shyam and Szymon Sidor and Eric Sigler and Maddie Simens and Jordan Sitkin and Katarina Slama and Ian Sohl and Benjamin Sokolowsky and Yang Song and Natalie Staudacher and Felipe Petroski Such and Natalie Summers and Ilya Sutskever and Jie Tang and Nikolas Tezak and Madeleine B. Thompson and Phil Tillet and Amin Tootoonchian and Elizabeth Tseng and Preston Tuggle and Nick Turley and Jerry Tworek and Juan Felipe Cerón Uribe and Andrea Vallone and Arun Vijayvergiya and Chelsea Voss and Carroll Wainwright and Justin Jay Wang and Alvin Wang and Ben Wang and Jonathan Ward and Jason Wei and CJ Weinmann and Akila Welihinda and Peter Welinder and Jiayi Weng and Lilian Weng and Matt Wiethoff and Dave Willner and Clemens Winter and Samuel Wolrich and Hannah Wong and Lauren Workman and Sherwin Wu and Jeff Wu and Michael Wu and Kai Xiao and Tao Xu and Sarah Yoo and Kevin Yu and Qiming Yuan and Wojciech Zaremba and Rowan Zellers and Chong Zhang and Marvin Zhang and Shengjia Zhao and Tianhao Zheng and Juntang Zhuang and William Zhuk and Barret Zoph},
+  year = {2023},
+  journal = {CoRR 2024},
+  eprint = {2303.08774},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.08774v6},
+}
+
+======================================================================
+Reference: Palm 2 technical report
+Authors  : Rohan Anil, Andrew M Dai, Orhan Firat, Melvin Johnson, Dmitry Lepikhin, Alexandre Passos, Siamak Shakeri, Emanuel Taropa, Paige Bailey, Zhifeng Chen, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 128.
+      Suggestion: List all 128 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2305.10403v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/b6d6c33298b852cf63edac233deca70530d69a2a
+@misc{anil2023palm,
+  title = {PaLM 2 Technical Report},
+  author = {Rohan Anil and Andrew M. Dai and Orhan Firat and Melvin Johnson and Dmitry Lepikhin and Alexandre Passos and Siamak Shakeri and Emanuel Taropa and Paige Bailey and Zhifeng Chen and Eric Chu and Jonathan H. Clark and Laurent El Shafey and Yanping Huang and Kathy Meier-Hellstern and Gaurav Mishra and Erica Moreira and Mark Omernick and Kevin Robinson and Sebastian Ruder and Yi Tay and Kefan Xiao and Yuanzhong Xu and Yujing Zhang and Gustavo Hernandez Abrego and Junwhan Ahn and Jacob Austin and Paul Barham and Jan Botha and James Bradbury and Siddhartha Brahma and Kevin Brooks and Michele Catasta and Yong Cheng and Colin Cherry and Christopher A. Choquette-Choo and Aakanksha Chowdhery and Clément Crepy and Shachi Dave and Mostafa Dehghani and Sunipa Dev and Jacob Devlin and Mark Díaz and Nan Du and Ethan Dyer and Vlad Feinberg and Fangxiaoyu Feng and Vlad Fienber and Markus Freitag and Xavier Garcia and Sebastian Gehrmann and Lucas Gonzalez and Guy Gur-Ari and Steven Hand and Hadi Hashemi and Le Hou and Joshua Howland and Andrea Hu and Jeffrey Hui and Jeremy Hurwitz and Michael Isard and Abe Ittycheriah and Matthew Jagielski and Wenhao Jia and Kathleen Kenealy and Maxim Krikun and Sneha Kudugunta and Chang Lan and Katherine Lee and Benjamin Lee and Eric Li and Music Li and Wei Li and YaGuang Li and Jian Li and Hyeontaek Lim and Hanzhao Lin and Zhongtao Liu and Frederick Liu and Marcello Maggioni and Aroma Mahendru and Joshua Maynez and Vedant Misra and Maysam Moussalem and Zachary Nado and John Nham and Eric Ni and Andrew Nystrom and Alicia Parrish and Marie Pellat and Martin Polacek and Alex Polozov and Reiner Pope and Siyuan Qiao and Emily Reif and Bryan Richter and Parker Riley and Alex Castro Ros and Aurko Roy and Brennan Saeta and Rajkumar Samuel and Renee Shelby and Ambrose Slone and Daniel Smilkov and David R. So and Daniel Sohn and Simon Tokumine and Dasha Valter and Vijay Vasudevan and Kiran Vodrahalli and Xuezhi Wang and Pidong Wang and Zirui Wang and Tao Wang and John Wieting and Yuhuai Wu and Kelvin Xu and Yunhan Xu and Linting Xue and Pengcheng Yin and Jiahui Yu and Qiao Zhang and Steven Zheng and Ce Zheng and Weikang Zhou and Denny Zhou and Slav Petrov and Yonghui Wu},
+  year = {2023},
+  journal = {arXiv.org},
+  eprint = {2305.10403},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2305.10403v3},
+}
+
+======================================================================
+Reference: Meteor: An automatic metric for mt evaluation with improved correlation with human judgments
+Authors  : Satanjeev Banerjee, Alon Lavie
+Year     : 2005
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Proceedings of the ACL workshop on intrinsic and extrinsic evaluation measures for machine translation and/or summarization', but a full version appears at 'IEEvaluation@ACL'.
+      Suggestion: Cite the full version at IEEvaluation@ACL.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/7533d30329cfdbf04ee8ee82bfef792d08015ee5
+@article{banerjee2005meteor,
+  title = {METEOR: An Automatic Metric for MT Evaluation with Improved Correlation with Human Judgments},
+  author = {Satanjeev Banerjee and A. Lavie},
+  year = {2005},
+  journal = {IEEvaluation@ACL},
+  url = {https://www.semanticscholar.org/paper/7533d30329cfdbf04ee8ee82bfef792d08015ee5},
+}
+
+======================================================================
+Reference: Cardbiomedbench: A benchmark for evaluating large language model performance in biomedical research
+Authors  : Owen Bianchi, Maya Willey, Chelsea X Alvarado, Benjamin Danek, Marzieh Khani, Nicole Kuznetsov, Anant Dadu, Syed Shah, Mathew J Koretsky, Mary B Makarious, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1101/2025.01.15.633272
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 24.
+      Suggestion: List all 24 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8b9312c65220e7ef9c5edfc5b3b9f8bb259e1444
+@article{bianchi2025cardbiomedbench,
+  title = {CARDBiomedBench: A Benchmark for Evaluating Large Language Model Performance in Biomedical Research},
+  author = {Owen Bianchi and Maya Willey and Chelsea X. Alvarado and Benjamin P. Danek and Marzieh Khani and Nicole Kuznetsov and Anant Dadu and S. Shah and Mathew J. Koretsky and M. Makarious and Cory A. Weller and K. Levine and Sungwon Kim and Paige Jarreau and Dan Vitale and Elise Marsan and Hirtotaka Iwaki and H. Leonard and Sara Bandres-Ciga and Andrew B. Singleton and Mike A. Nalls and S. Mokhtari and Daniel Khashabi and F. Faghri},
+  year = {2025},
+  journal = {bioRxiv},
+  doi = {10.1101/2025.01.15.633272},
+  url = {https://www.semanticscholar.org/paper/8b9312c65220e7ef9c5edfc5b3b9f8bb259e1444},
+}
+
+======================================================================
+Reference: Autonomous chemical research with large language models
+Authors  : Daniil A Boiko, Robert MacKnight, Ben Kline, Gabe Gomes
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41586-023-06792-0
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/6fe3779fe5f2e9402abdd08ad8db41a0f13a99eb
+@article{boiko2023autonomous,
+  title = {Autonomous chemical research with large language models},
+  author = {Daniil A. Boiko and R. MacKnight and Benjamin C Kline and Gabe Gomes},
+  year = {2023},
+  journal = {Nature},
+  doi = {10.1038/s41586-023-06792-0},
+  url = {https://www.semanticscholar.org/paper/6fe3779fe5f2e9402abdd08ad8db41a0f13a99eb},
+}
+
+======================================================================
+Reference: Language models are few-shot learners
+Authors  : Tom B Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al.
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2005.14165
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 31.
+      Suggestion: List all 31 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2005.14165v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/90abbc2cf38462b954ae1b772fac9532e2ccd8b0
+@article{brown2020language,
+  title = {Language Models are Few-Shot Learners},
+  author = {Tom B. Brown and Benjamin Mann and Nick Ryder and Melanie Subbiah and Jared Kaplan and Prafulla Dhariwal and Arvind Neelakantan and Pranav Shyam and Girish Sastry and Amanda Askell and Sandhini Agarwal and Ariel Herbert-Voss and Gretchen Krueger and Tom Henighan and Rewon Child and Aditya Ramesh and Daniel M. Ziegler and Jeffrey Wu and Clemens Winter and Christopher Hesse and Mark Chen and Eric Sigler and Mateusz Litwin and Scott Gray and Benjamin Chess and Jack Clark and Christopher Berner and Sam McCandlish and Alec Radford and Ilya Sutskever and Dario Amodei},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2005.14165},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2005.14165v4},
+}
+
+======================================================================
+Reference: Probio: A protocol-guided multimodal dataset for molecular biology lab
+Authors  : Jieming Cui, Ziren Gong, Baoxiong Jia, Siyuan Huang, Zilong Zheng, Jianzhu Ma, Yixin Zhu
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2311.00556
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2311.00556
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2311.00556v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f9a15e32f95f41de30a9bfc182a621ecc3f37ad1
+@article{cui2023probio,
+  title = {ProBio: A Protocol-guided Multimodal Dataset for Molecular Biology Lab},
+  author = {Jieming Cui and Ziren Gong and Baoxiong Jia and Siyuan Huang and Zilong Zheng and Jianzhu Ma and Yixin Zhu},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2311.00556},
+  eprint = {2311.00556},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2311.00556v1},
+}
+
+======================================================================
+Reference: Datasheets for datasets
+Authors  : Timnit Gebru, Jamie Morgenstern, Briana Vecchione, Jennifer Wortman Vaughan, Hanna Wallach, Hal Daumé Iii, Kate Crawford
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3458723
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1803.09010
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0df347f5e3118fac7c351917e3a497899b071d1e
+@article{gebru2018datasheets,
+  title = {Datasheets for datasets},
+  author = {Timnit Gebru and Jamie H. Morgenstern and Briana Vecchione and Jennifer Wortman Vaughan and Hanna M. Wallach and Hal Daumé and Kate Crawford},
+  year = {2018},
+  journal = {Communications of the ACM},
+  doi = {10.1145/3458723},
+  eprint = {1803.09010},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/0df347f5e3118fac7c351917e3a497899b071d1e},
+}
+
+======================================================================
+Reference: Introducing gemini 2.0: Our new ai model for the agentic era
+Authors  : Google AI Blog
+Year     : 2024
+Verdict  : unverified
+
+======================================================================
+Reference: Introducing gemini 2.5 pro experimental (model id gemini-2.5-pro-exp-03-25)
+Authors  : Google AI Blog
+Year     : 2025
+Verdict  : unverified
+
+======================================================================
+Reference: Maartengr/keybert: Bibtex
+Authors  : Maarten Grootendorst
+Year     : 2021
+Verdict  : unverified
+
+======================================================================
+Reference: Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning
+Authors  : Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu, Shirong Ma, Peiyi Wang, Xiao Bi, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Nature' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Nature.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41586-025-09422-z
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 200.
+      Suggestion: List all 200 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2501.12948v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2eed1fad9bbf887d4395de40f20144c4fafefd7f
+@article{deepseekai2025deepseekr,
+  title = {DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning},
+  author = {DeepSeek-AI and Daya Guo and Dejian Yang and Haowei Zhang and Junxiao Song and Peiyi Wang and Qihao Zhu and Runxin Xu and Ruoyu Zhang and Shirong Ma and Xiao Bi and Xiaokang Zhang and Xingkai Yu and Yu Wu and Z. F. Wu and Zhibin Gou and Zhihong Shao and Zhuoshu Li and Ziyi Gao and Aixin Liu and Bing Xue and Bingxuan Wang and Bochao Wu and Bei Feng and Chengda Lu and Chenggang Zhao and Chengqi Deng and Chenyu Zhang and Chong Ruan and Damai Dai and Deli Chen and Dongjie Ji and Erhang Li and Fangyun Lin and Fucong Dai and Fuli Luo and Guangbo Hao and Guanting Chen and Guowei Li and H. Zhang and Han Bao and Hanwei Xu and Haocheng Wang and Honghui Ding and Huajian Xin and Huazuo Gao and Hui Qu and Hui Li and Jianzhong Guo and Jiashi Li and Jiawei Wang and Jingchang Chen and Jingyang Yuan and Junjie Qiu and Junlong Li and J. L. Cai and Jiaqi Ni and Jian Liang and Jin Chen and Kai Dong and Kai Hu and Kaige Gao and Kang Guan and Kexin Huang and Kuai Yu and Lean Wang and Lecong Zhang and Liang Zhao and Litong Wang and Liyue Zhang and Lei Xu and Leyi Xia and Mingchuan Zhang and Minghua Zhang and Minghui Tang and Meng Li and Miaojun Wang and Mingming Li and Ning Tian and Panpan Huang and Peng Zhang and Qiancheng Wang and Qinyu Chen and Qiushi Du and Ruiqi Ge and Ruisong Zhang and Ruizhe Pan and Runji Wang and R. J. Chen and R. L. Jin and Ruyi Chen and Shanghao Lu and Shangyan Zhou and Shanhuang Chen and Shengfeng Ye and Shiyu Wang and Shuiping Yu and Shunfeng Zhou and Shuting Pan and S. S. Li and Shuang Zhou and Shaoqing Wu and Shengfeng Ye and Tao Yun and Tian Pei and Tianyu Sun and T. Wang and Wangding Zeng and Wanjia Zhao and Wen Liu and Wenfeng Liang and Wenjun Gao and Wenqin Yu and Wentao Zhang and W. L. Xiao and Wei An and Xiaodong Liu and Xiaohan Wang and Xiaokang Chen and Xiaotao Nie and Xin Cheng and Xin Liu and Xin Xie and Xingchao Liu and Xinyu Yang and Xinyuan Li and Xuecheng Su and Xuheng Lin and X. Q. Li and Xiangyue Jin and Xiaojin Shen and Xiaosha Chen and Xiaowen Sun and Xiaoxiang Wang and Xinnan Song and Xinyi Zhou and Xianzu Wang and Xinxia Shan and Y. K. Li and Y. Q. Wang and Y. X. Wei and Yang Zhang and Yanhong Xu and Yao Li and Yao Zhao and Yaofeng Sun and Yaohui Wang and Yi Yu and Yichao Zhang and Yifan Shi and Yiliang Xiong and Ying He and Yishi Piao and Yisong Wang and Yixuan Tan and Yiyang Ma and Yiyuan Liu and Yongqiang Guo and Yuan Ou and Yuduan Wang and Yue Gong and Yuheng Zou and Yujia He and Yunfan Xiong and Yuxiang Luo and Yuxiang You and Yuxuan Liu and Yuyang Zhou and Y. X. Zhu and Yanhong Xu and Yanping Huang and Yaohui Li and Yi Zheng and Yuchen Zhu and Yunxian Ma and Ying Tang and Yukun Zha and Yuting Yan and Z. Z. Ren and Zehui Ren and Zhangli Sha and Zhe Fu and Zhean Xu and Zhenda Xie and Zhengyan Zhang and Zhewen Hao and Zhicheng Ma and Zhigang Yan and Zhiyu Wu and Zihui Gu and Zijia Zhu and Zijun Liu and Zilin Li and Ziwei Xie and Ziyang Song and Zizheng Pan and Zhen Huang and Zhipeng Xu and Zhongyu Zhang and Zhen Zhang},
+  year = {2025},
+  journal = {Nature},
+  doi = {10.1038/s41586-025-09422-z},
+  eprint = {2501.12948},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2501.12948v2},
+}
+
+======================================================================
+Reference: Biolp-bench: Measuring understanding of biological lab protocols by large language models
+Authors  : Igor Ivanov
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1101/2024.08.21.608694
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/61ab4a42d07e7803d78505ccbfce89a4cd447969
+@article{ivanov2024biolpbench,
+  title = {BioLP-bench: Measuring understanding of biological lab protocols by large language models},
+  author = {Igor Ivanov},
+  year = {2024},
+  journal = {bioRxiv},
+  doi = {10.1101/2024.08.21.608694},
+  url = {https://www.semanticscholar.org/paper/61ab4a42d07e7803d78505ccbfce89a4cd447969},
+}
+
+======================================================================
+Reference: A comprehensive evaluation of large language models on benchmark biomedical text processing tasks
+Authors  : Israt Jahan, Md Tahmid Rahman Laskar, Chun Peng, Jimmy Xiangji Huang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.04270
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2409.20288
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2409.20288v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/7b5b7aefc727bdf1e73efdd65af539d79628230a
+@article{li2024lexeval,
+  title = {LexEval: A Comprehensive Chinese Legal Benchmark for Evaluating Large Language Models},
+  author = {Haitao Li and You Chen and Qingyao Ai and Yueyue Wu and Ruizhe Zhang and Yiqun Liu},
+  year = {2024},
+  journal = {Comput. Biol. Medicine},
+  doi = {10.48550/arxiv.2310.04270},
+  eprint = {2409.20288},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2409.20288v4},
+}
+
+======================================================================
+Reference: Disease diagnosis in the era of deep learning: A comprehensive survey
+Authors  : Qi Jin, Yucheng Diao, Feng Song, et al.
+Year     : 2021
+Verdict  : unverified
+
+======================================================================
+Reference: Pubmedqa: A dataset for biomedical research question answering
+Authors  : Qiao Jin, Bhuwan Dhingra, Zhengping Liu, William Cohen, Xinghua Lu
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d19-1259
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1909.06146
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1909.06146v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0c3c4c88c7b07596221ac640c7b7102686e3eae3
+@inproceedings{jin2019pubmedqa,
+  title = {PubMedQA: A Dataset for Biomedical Research Question Answering},
+  author = {Qiao Jin and Bhuwan Dhingra and Zhengping Liu and William W. Cohen and Xinghua Lu},
+  year = {2019},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d19-1259},
+  eprint = {1909.06146},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1909.06146v1},
+}
+
+======================================================================
+Reference: Large language models are zero-shot reasoners
+Authors  : Takeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, Yusuke Iwasawa
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/068431-1613
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2205.11916
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2205.11916v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e7ad08848d5d7c5c47673ffe0da06af443643bda
+@article{kojima2022large,
+  title = {Large Language Models are Zero-Shot Reasoners},
+  author = {Takeshi Kojima and Shixiang Shane Gu and Machel Reid and Yutaka Matsuo and Yusuke Iwasawa},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/068431-1613},
+  eprint = {2205.11916},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2205.11916v4},
+}
+
+======================================================================
+Reference: Biomistral: A collection of open-source pretrained large language models for medical domains
+Authors  : Yanis Labrak, Adrien Bazoge, Emmanuel Morin, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.10373
+  - [warning/incomplete/truncated_authors] Citation lists 3 authors with et al.; the published record has 6.
+      Suggestion: List all 6 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.10373v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/13b8934468665ecb586f491d7f9f6c460cb095e5
+@inproceedings{labrak2024biomistral,
+  title = {BioMistral: A Collection of Open-Source Pretrained Large Language Models for Medical Domains},
+  author = {Yanis Labrak and Adrien Bazoge and Emmanuel Morin and Pierre-Antoine Gourraud and Mickael Rouvier and Richard Dufour},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2402.10373},
+  eprint = {2402.10373},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.10373v3},
+}
+
+======================================================================
+Reference: Lab-bench: Measuring capabilities of language models for biology research
+Authors  : Jon M Laurent, Joseph D Janizek, Michael Ruzo, Michaela M Hinks, Michael J Hammerling, Siddharth Narayanan, Manvitha Ponnapati, Andrew D White, Samuel G Rodriques
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.10362
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.10362v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2a87cbb8179f537dc1fa811b83e0b06323223c1f
+@misc{laurent2024labbench,
+  title = {LAB-Bench: Measuring Capabilities of Language Models for Biology Research},
+  author = {Jon M. Laurent and Joseph D. Janizek and Michael Ruzo and Michaela M. Hinks and Michael J. Hammerling and Siddharth Narayanan and Manvitha Ponnapati and Andrew D. White and Samuel G. Rodriques},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2407.10362},
+  eprint = {2407.10362},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.10362v3},
+}
+
+======================================================================
+Reference: Biobert: a pre-trained biomedical language representation model for biomedical text mining
+Authors  : Jinhyuk Lee, Wonjin Yoon, Sungdong Kim, Donghyeon Kim, Sunkyu Kim, Chan Ho So, Jae-woo Kang
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1093/bioinformatics/btz682
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1901.08746
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/1e43c7084bdcb6b3102afaf301cce10faead2702
+@article{lee2019biobert,
+  title = {BioBERT: a pre-trained biomedical language representation model for biomedical text mining},
+  author = {Jinhyuk Lee and WonJin Yoon and Sungdong Kim and Donghyeon Kim and Sunkyu Kim and Chan Ho So and Jaewoo Kang},
+  year = {2019},
+  journal = {Bioinform.},
+  doi = {10.1093/bioinformatics/btz682},
+  eprint = {1901.08746},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/1e43c7084bdcb6b3102afaf301cce10faead2702},
+}
+
+======================================================================
+Reference: Can large language models reason about medical questions?
+Authors  : Valentin Liévin, Christoffer Egeberg Hother, Andreas Geert Motzfeldt, Ole Winther
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.patter.2024.100943
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2411.19589
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2411.19589v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d697b440dd0e65a05fe027e4c0ea85f62dcba033
+@article{cohn2024large,
+  title = {Can Large Language Models Reason about the Region Connection Calculus?},
+  author = {Anthony G Cohn and Robert E Blackwell},
+  year = {2024},
+  journal = {Patterns},
+  doi = {10.1016/j.patter.2024.100943},
+  eprint = {2411.19589},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2411.19589v1},
+}
+
+======================================================================
+Reference: Deepseek-v2: A strong, economical, and efficient mixture-of-experts language model
+Authors  : Aixin Liu, Bei Feng, Bin Wang, Bingxuan Wang, Bo Liu, Chenggang Zhao, Chengqi Dengr, Chong Ruan, Damai Dai, Daya Guo, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2405.04434
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 157.
+      Suggestion: List all 157 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.04434v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/53a803388e83ae89261624099d7be4287ace67cb
+@misc{deepseekai2024deepseekv,
+  title = {DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model},
+  author = {DeepSeek-AI and Aixin Liu and Bei Feng and Bin Wang and Bingxuan Wang and Bo Liu and Chenggang Zhao and Chengqi Dengr and Chong Ruan and Damai Dai and Daya Guo and Dejian Yang and Deli Chen and Dongjie Ji and Erhang Li and Fangyun Lin and Fuli Luo and Guangbo Hao and Guanting Chen and Guowei Li and H. Zhang and Hanwei Xu and Hao Yang and Haowei Zhang and Honghui Ding and Huajian Xin and Huazuo Gao and Hui Li and Hui Qu and J. L. Cai and Jian Liang and Jianzhong Guo and Jiaqi Ni and Jiashi Li and Jin Chen and Jingyang Yuan and Junjie Qiu and Junxiao Song and Kai Dong and Kaige Gao and Kang Guan and Lean Wang and Lecong Zhang and Lei Xu and Leyi Xia and Liang Zhao and Liyue Zhang and Meng Li and Miaojun Wang and Mingchuan Zhang and Minghua Zhang and Minghui Tang and Mingming Li and Ning Tian and Panpan Huang and Peiyi Wang and Peng Zhang and Qihao Zhu and Qinyu Chen and Qiushi Du and R. J. Chen and R. L. Jin and Ruiqi Ge and Ruizhe Pan and Runxin Xu and Ruyi Chen and S. S. Li and Shanghao Lu and Shangyan Zhou and Shanhuang Chen and Shaoqing Wu and Shengfeng Ye and Shirong Ma and Shiyu Wang and Shuang Zhou and Shuiping Yu and Shunfeng Zhou and Size Zheng and T. Wang and Tian Pei and Tian Yuan and Tianyu Sun and W. L. Xiao and Wangding Zeng and Wei An and Wen Liu and Wenfeng Liang and Wenjun Gao and Wentao Zhang and X. Q. Li and Xiangyue Jin and Xianzu Wang and Xiao Bi and Xiaodong Liu and Xiaohan Wang and Xiaojin Shen and Xiaokang Chen and Xiaosha Chen and Xiaotao Nie and Xiaowen Sun and Xiaoxiang Wang and Xin Liu and Xin Xie and Xingkai Yu and Xinnan Song and Xinyi Zhou and Xinyu Yang and Xuan Lu and Xuecheng Su and Y. Wu and Y. K. Li and Y. X. Wei and Y. X. Zhu and Yanhong Xu and Yanping Huang and Yao Li and Yao Zhao and Yaofeng Sun and Yaohui Li and Yaohui Wang and Yi Zheng and Yichao Zhang and Yiliang Xiong and Yilong Zhao and Ying He and Ying Tang and Yishi Piao and Yixin Dong and Yixuan Tan and Yiyuan Liu and Yongji Wang and Yongqiang Guo and Yuchen Zhu and Yuduan Wang and Yuheng Zou and Yukun Zha and Yunxian Ma and Yuting Yan and Yuxiang You and Yuxuan Liu and Z. Z. Ren and Zehui Ren and Zhangli Sha and Zhe Fu and Zhen Huang and Zhen Zhang and Zhenda Xie and Zhewen Hao and Zhihong Shao and Zhiniu Wen and Zhipeng Xu and Zhongyu Zhang and Zhuoshu Li and Zihan Wang and Zihui Gu and Zilin Li and Ziwei Xie},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2405.04434},
+  eprint = {2405.04434},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.04434v5},
+}
+
+======================================================================
+Reference: Deepseek-v3 technical report
+Authors  : Aixin Liu, Bei Feng, Bing Xue, Bingxuan Wang, Bochao Wu, Chengda Lu, Chenggang Zhao, Chengqi Deng, Chenyu Zhang, Chong Ruan, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CoRR 2024' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CoRR 2024.
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 200.
+      Suggestion: List all 200 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2412.19437v2
+%   openreview: venue — https://openreview.net/forum?id=flMS0vfo9P
+@article{deepseekai2024deepseekv,
+  title = {DeepSeek-V3 Technical Report},
+  author = {DeepSeek-AI and Aixin Liu and Bei Feng and Bing Xue and Bingxuan Wang and Bochao Wu and Chengda Lu and Chenggang Zhao and Chengqi Deng and Chenyu Zhang and Chong Ruan and Damai Dai and Daya Guo and Dejian Yang and Deli Chen and Dongjie Ji and Erhang Li and Fangyun Lin and Fucong Dai and Fuli Luo and Guangbo Hao and Guanting Chen and Guowei Li and H. Zhang and Han Bao and Hanwei Xu and Haocheng Wang and Haowei Zhang and Honghui Ding and Huajian Xin and Huazuo Gao and Hui Li and Hui Qu and J. L. Cai and Jian Liang and Jianzhong Guo and Jiaqi Ni and Jiashi Li and Jiawei Wang and Jin Chen and Jingchang Chen and Jingyang Yuan and Junjie Qiu and Junlong Li and Junxiao Song and Kai Dong and Kai Hu and Kaige Gao and Kang Guan and Kexin Huang and Kuai Yu and Lean Wang and Lecong Zhang and Lei Xu and Leyi Xia and Liang Zhao and Litong Wang and Liyue Zhang and Meng Li and Miaojun Wang and Mingchuan Zhang and Minghua Zhang and Minghui Tang and Mingming Li and Ning Tian and Panpan Huang and Peiyi Wang and Peng Zhang and Qiancheng Wang and Qihao Zhu and Qinyu Chen and Qiushi Du and R. J. Chen and R. L. Jin and Ruiqi Ge and Ruisong Zhang and Ruizhe Pan and Runji Wang and Runxin Xu and Ruoyu Zhang and Ruyi Chen and S. S. Li and Shanghao Lu and Shangyan Zhou and Shanhuang Chen and Shaoqing Wu and Shengfeng Ye and Shengfeng Ye and Shirong Ma and Shiyu Wang and Shuang Zhou and Shuiping Yu and Shunfeng Zhou and Shuting Pan and T. Wang and Tao Yun and Tian Pei and Tianyu Sun and W. L. Xiao and Wangding Zeng and Wanjia Zhao and Wei An and Wen Liu and Wenfeng Liang and Wenjun Gao and Wenqin Yu and Wentao Zhang and X. Q. Li and Xiangyue Jin and Xianzu Wang and Xiao Bi and Xiaodong Liu and Xiaohan Wang and Xiaojin Shen and Xiaokang Chen and Xiaokang Zhang and Xiaosha Chen and Xiaotao Nie and Xiaowen Sun and Xiaoxiang Wang and Xin Cheng and Xin Liu and Xin Xie and Xingchao Liu and Xingkai Yu and Xinnan Song and Xinxia Shan and Xinyi Zhou and Xinyu Yang and Xinyuan Li and Xuecheng Su and Xuheng Lin and Y. K. Li and Y. Q. Wang and Y. X. Wei and Y. X. Zhu and Yang Zhang and Yanhong Xu and Yanhong Xu and Yanping Huang and Yao Li and Yao Zhao and Yaofeng Sun and Yaohui Li and Yaohui Wang and Yi Yu and Yi Zheng and Yichao Zhang and Yifan Shi and Yiliang Xiong and Ying He and Ying Tang and Yishi Piao and Yisong Wang and Yixuan Tan and Yiyang Ma and Yiyuan Liu and Yongqiang Guo and Yu Wu and Yuan Ou and Yuchen Zhu and Yuduan Wang and Yue Gong and Yuheng Zou and Yujia He and Yukun Zha and Yunfan Xiong and Yunxian Ma and Yuting Yan and Yuxiang Luo and Yuxiang You and Yuxuan Liu and Yuyang Zhou and Z. F. Wu and Z. Z. Ren and Zehui Ren and Zhangli Sha and Zhe Fu and Zhean Xu and Zhen Huang and Zhen Zhang and Zhenda Xie and Zhengyan Zhang and Zhewen Hao and Zhibin Gou and Zhicheng Ma and Zhigang Yan and Zhihong Shao and Zhipeng Xu and Zhiyu Wu and Zhongyu Zhang and Zhuoshu Li and Zihui Gu and Zijia Zhu and Zijun Liu and Zilin Li and Ziwei Xie and Ziyang Song and Ziyi Gao and Zizheng Pan},
+  year = {2024},
+  journal = {CoRR 2024},
+  eprint = {2412.19437},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2412.19437v2},
+}
+
+======================================================================
+Reference: Biogpt: generative pre-trained transformer for biomedical text generation and mining
+Authors  : Renqian Luo, Liai Sun, Yingce Xia, Tao Qin, Sheng Zhang, Hoifung Poon, Tie-Yan Liu
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1093/bib/bbac409
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2210.10341
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2210.10341v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/44279244407a64431810f982be6d0c7da4429dd7
+@article{luo2022biogpt,
+  title = {BioGPT: Generative Pre-trained Transformer for Biomedical Text Generation and Mining},
+  author = {Renqian Luo and Liai Sun and Yingce Xia and Tao Qin and Sheng Zhang and Hoifung Poon and Tie-Yan Liu},
+  year = {2022},
+  journal = {Briefings Bioinform.},
+  doi = {10.1093/bib/bbac409},
+  eprint = {2210.10341},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2210.10341v3},
+}
+
+======================================================================
+Reference: Biomedgpt: Open multimodal generative pre-trained transformer for biomedicine
+Authors  : Yizhen Luo, Jiahuan Zhang, Siqi Fan, Kai Yang, Yushuai Wu, Mu Qiao, Zaiqing Nie
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2308.09442
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2308.09442v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e3fd89a7f6b28973cfc68bfc51caebd8fb93f0bc
+@misc{luo2023biomedgpt,
+  title = {BioMedGPT: Open Multimodal Generative Pre-trained Transformer for BioMedicine},
+  author = {Yizhen Luo and Jiahuan Zhang and Siqi Fan and Kai Yang and Yushuai Wu and Mu Qiao and Zaiqing Nie},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2308.09442},
+  eprint = {2308.09442},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2308.09442v2},
+}
+
+======================================================================
+Reference: Bixbench: a comprehensive benchmark for llm-based agents in computational biology
+Authors  : Ludovico Mitchener, Jon M Laurent, Benjamin Tenmann, Siddharth Narayanan, Geemi P Wellawatte, Andrew White, Lorenzo Sani, Samuel G Rodriques
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2503.00096
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2503.00096v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/53f7efc5cadfe7d1a9313fd649947fbf8f22c553
+@misc{mitchener2025bixbench,
+  title = {BixBench: a Comprehensive Benchmark for LLM-based Agents in Computational Biology},
+  author = {Ludovico Mitchener and Jon M Laurent and Alex Andonian and Benjamin Tenmann and Siddharth Narayanan and Geemi P Wellawatte and Andrew White and Lorenzo Sani and Samuel G Rodriques},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2503.00096},
+  eprint = {2503.00096},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2503.00096v3},
+}
+
+======================================================================
+Reference: Laboratory automation and high-throughput biology
+Authors  : Tal Murthy, Jamien Lim
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.slast.2024.100169
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: SLAS technology
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4a0c1f66b621bc49295038a2ce5936aece0ed456
+@article{murthy2024laboratory,
+  title = {Laboratory automation and high-throughput biology.},
+  author = {T. Murthy and Jamie Lim},
+  year = {2024},
+  journal = {SLAS technology},
+  doi = {10.1016/j.slast.2024.100169},
+  url = {https://www.semanticscholar.org/paper/4a0c1f66b621bc49295038a2ce5936aece0ed456},
+}
+
+======================================================================
+Reference: Can generalist foundation models outcompete special-purpose tuning? case study in medicine
+Authors  : Harsha Nori, Yin Tat Lee, Sheng Zhang, Dean Carignan, Richard Edgar, Nicolo Fusi, Nicholas King, Jonathan Larson, Yuanzhi Li, Weishung Liu, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2311.16452
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 18.
+      Suggestion: List all 18 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2311.16452v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/bde9da9a39a065588d7f4573936731510d6f4f29
+@misc{nori2023generalist,
+  title = {Can Generalist Foundation Models Outcompete Special-Purpose Tuning? Case Study in Medicine},
+  author = {Harsha Nori and Yin Tat Lee and Sheng Zhang and Dean Carignan and Richard Edgar and Nicolo Fusi and Nicholas King and Jonathan Larson and Yuanzhi Li and Weishung Liu and Renqian Luo and Scott Mayer McKinney and Robert Osazuwa Ness and Hoifung Poon and Tao Qin and Naoto Usuyama and Chris White and Eric Horvitz},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2311.16452},
+  eprint = {2311.16452},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2311.16452v1},
+}
+
+======================================================================
+Reference: Bioplanner: automatic evaluation of llms on protocol planning in biology
+Authors  : Odhran O’Donoghue, Aleksandar Shtedritski, John Ginger, Ralph Abboud, Ali Essa Ghareeb, Justin Booth, Samuel G Rodriques
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.10632
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.10632v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1efb48995732f58dbf2e251bfdf8571545033db9
+@inproceedings{odonoghue2023bioplanner,
+  title = {BioPlanner: Automatic Evaluation of LLMs on Protocol Planning in Biology},
+  author = {Odhran O'Donoghue and Aleksandar Shtedritski and John Ginger and Ralph Abboud and Ali Essa Ghareeb and Justin Booth and Samuel G Rodriques},
+  year = {2023},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2310.10632},
+  eprint = {2310.10632},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.10632v1},
+}
+
+======================================================================
+Reference: Openai announces gpt-4 turbo
+Authors  : OpenAI
+Year     : 2023
+Verdict  : unverified
+
+======================================================================
+Reference: Gpt-4o system card
+Authors  : OpenAI
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2410.21276
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2410.21276v1
+@misc{openai2024gpto,
+  title = {GPT-4o System Card},
+  author = {OpenAI and : and Aaron Hurst and Adam Lerer and Adam P. Goucher and Adam Perelman and Aditya Ramesh and Aidan Clark and AJ Ostrow and Akila Welihinda and Alan Hayes and Alec Radford and Aleksander Mądry and Alex Baker-Whitcomb and Alex Beutel and Alex Borzunov and Alex Carney and Alex Chow and Alex Kirillov and Alex Nichol and Alex Paino and Alex Renzin and Alex Tachard Passos and Alexander Kirillov and Alexi Christakis and Alexis Conneau and Ali Kamali and Allan Jabri and Allison Moyer and Allison Tam and Amadou Crookes and Amin Tootoochian and Amin Tootoonchian and Ananya Kumar and Andrea Vallone and Andrej Karpathy and Andrew Braunstein and Andrew Cann and Andrew Codispoti and Andrew Galu and Andrew Kondrich and Andrew Tulloch and Andrey Mishchenko and Angela Baek and Angela Jiang and Antoine Pelisse and Antonia Woodford and Anuj Gosalia and Arka Dhar and Ashley Pantuliano and Avi Nayak and Avital Oliver and Barret Zoph and Behrooz Ghorbani and Ben Leimberger and Ben Rossen and Ben Sokolowsky and Ben Wang and Benjamin Zweig and Beth Hoover and Blake Samic and Bob McGrew and Bobby Spero and Bogo Giertler and Bowen Cheng and Brad Lightcap and Brandon Walkin and Brendan Quinn and Brian Guarraci and Brian Hsu and Bright Kellogg and Brydon Eastman and Camillo Lugaresi and Carroll Wainwright and Cary Bassin and Cary Hudson and Casey Chu and Chad Nelson and Chak Li and Chan Jun Shern and Channing Conger and Charlotte Barette and Chelsea Voss and Chen Ding and Cheng Lu and Chong Zhang and Chris Beaumont and Chris Hallacy and Chris Koch and Christian Gibson and Christina Kim and Christine Choi and Christine McLeavey and Christopher Hesse and Claudia Fischer and Clemens Winter and Coley Czarnecki and Colin Jarvis and Colin Wei and Constantin Koumouzelis and Dane Sherburn and Daniel Kappler and Daniel Levin and Daniel Levy and David Carr and David Farhi and David Mely and David Robinson and David Sasaki and Denny Jin and Dev Valladares and Dimitris Tsipras and Doug Li and Duc Phong Nguyen and Duncan Findlay and Edede Oiwoh and Edmund Wong and Ehsan Asdar and Elizabeth Proehl and Elizabeth Yang and Eric Antonow and Eric Kramer and Eric Peterson and Eric Sigler and Eric Wallace and Eugene Brevdo and Evan Mays and Farzad Khorasani and Felipe Petroski Such and Filippo Raso and Francis Zhang and Fred von Lohmann and Freddie Sulit and Gabriel Goh and Gene Oden and Geoff Salmon and Giulio Starace and Greg Brockman and Hadi Salman and Haiming Bao and Haitang Hu and Hannah Wong and Haoyu Wang and Heather Schmidt and Heather Whitney and Heewoo Jun and Hendrik Kirchner and Henrique Ponde de Oliveira Pinto and Hongyu Ren and Huiwen Chang and Hyung Won Chung and Ian Kivlichan and Ian O'Connell and Ian O'Connell and Ian Osband and Ian Silber and Ian Sohl and Ibrahim Okuyucu and Ikai Lan and Ilya Kostrikov and Ilya Sutskever and Ingmar Kanitscheider and Ishaan Gulrajani and Jacob Coxon and Jacob Menick and Jakub Pachocki and James Aung and James Betker and James Crooks and James Lennon and Jamie Kiros and Jan Leike and Jane Park and Jason Kwon and Jason Phang and Jason Teplitz and Jason Wei and Jason Wolfe and Jay Chen and Jeff Harris and Jenia Varavva and Jessica Gan Lee and Jessica Shieh and Ji Lin and Jiahui Yu and Jiayi Weng and Jie Tang and Jieqi Yu and Joanne Jang and Joaquin Quinonero Candela and Joe Beutler and Joe Landers and Joel Parish and Johannes Heidecke and John Schulman and Jonathan Lachman and Jonathan McKay and Jonathan Uesato and Jonathan Ward and Jong Wook Kim and Joost Huizinga and Jordan Sitkin and Jos Kraaijeveld and Josh Gross and Josh Kaplan and Josh Snyder and Joshua Achiam and Joy Jiao and Joyce Lee and Juntang Zhuang and Justyn Harriman and Kai Fricke and Kai Hayashi and Karan Singhal and Katy Shi and Kavin Karthik and Kayla Wood and Kendra Rimbach and Kenny Hsu and Kenny Nguyen and Keren Gu-Lemberg and Kevin Button and Kevin Liu and Kiel Howe and Krithika Muthukumar and Kyle Luther and Lama Ahmad and Larry Kai and Lauren Itow and Lauren Workman and Leher Pathak and Leo Chen and Li Jing and Lia Guy and Liam Fedus and Liang Zhou and Lien Mamitsuka and Lilian Weng and Lindsay McCallum and Lindsey Held and Long Ouyang and Louis Feuvrier and Lu Zhang and Lukas Kondraciuk and Lukasz Kaiser and Luke Hewitt and Luke Metz and Lyric Doshi and Mada Aflak and Maddie Simens and Madelaine Boyd and Madeleine Thompson and Marat Dukhan and Mark Chen and Mark Gray and Mark Hudnall and Marvin Zhang and Marwan Aljubeh and Mateusz Litwin and Matthew Zeng and Max Johnson and Maya Shetty and Mayank Gupta and Meghan Shah and Mehmet Yatbaz and Meng Jia Yang and Mengchao Zhong and Mia Glaese and Mianna Chen and Michael Janner and Michael Lampe and Michael Petrov and Michael Wu and Michele Wang and Michelle Fradin and Michelle Pokrass and Miguel Castro and Miguel Oom Temudo de Castro and Mikhail Pavlov and Miles Brundage and Miles Wang and Minal Khan and Mira Murati and Mo Bavarian and Molly Lin and Murat Yesildal and Nacho Soto and Natalia Gimelshein and Natalie Cone and Natalie Staudacher and Natalie Summers and Natan LaFontaine and Neil Chowdhury and Nick Ryder and Nick Stathas and Nick Turley and Nik Tezak and Niko Felix and Nithanth Kudige and Nitish Keskar and Noah Deutsch and Noel Bundick and Nora Puckett and Ofir Nachum and Ola Okelola and Oleg Boiko and Oleg Murk and Oliver Jaffe and Olivia Watkins and Olivier Godement and Owen Campbell-Moore and Patrick Chao and Paul McMillan and Pavel Belov and Peng Su and Peter Bak and Peter Bakkum and Peter Deng and Peter Dolan and Peter Hoeschele and Peter Welinder and Phil Tillet and Philip Pronin and Philippe Tillet and Prafulla Dhariwal and Qiming Yuan and Rachel Dias and Rachel Lim and Rahul Arora and Rajan Troll and Randall Lin and Rapha Gontijo Lopes and Raul Puri and Reah Miyara and Reimar Leike and Renaud Gaubert and Reza Zamani and Ricky Wang and Rob Donnelly and Rob Honsby and Rocky Smith and Rohan Sahai and Rohit Ramchandani and Romain Huet and Rory Carmichael and Rowan Zellers and Roy Chen and Ruby Chen and Ruslan Nigmatullin and Ryan Cheu and Saachi Jain and Sam Altman and Sam Schoenholz and Sam Toizer and Samuel Miserendino and Sandhini Agarwal and Sara Culver and Scott Ethersmith and Scott Gray and Sean Grove and Sean Metzger and Shamez Hermani and Shantanu Jain and Shengjia Zhao and Sherwin Wu and Shino Jomoto and Shirong Wu and Shuaiqi and Xia and Sonia Phene and Spencer Papay and Srinivas Narayanan and Steve Coffey and Steve Lee and Stewart Hall and Suchir Balaji and Tal Broda and Tal Stramer and Tao Xu and Tarun Gogineni and Taya Christianson and Ted Sanders and Tejal Patwardhan and Thomas Cunninghman and Thomas Degry and Thomas Dimson and Thomas Raoux and Thomas Shadwell and Tianhao Zheng and Todd Underwood and Todor Markov and Toki Sherbakov and Tom Rubin and Tom Stasi and Tomer Kaftan and Tristan Heywood and Troy Peterson and Tyce Walters and Tyna Eloundou and Valerie Qi and Veit Moeller and Vinnie Monaco and Vishal Kuo and Vlad Fomenko and Wayne Chang and Weiyi Zheng and Wenda Zhou and Wesam Manassra and Will Sheu and Wojciech Zaremba and Yash Patil and Yilei Qian and Yongjik Kim and Youlong Cheng and Yu Zhang and Yuchen He and Yuchen Zhang and Yujia Jin and Yunxing Dai and Yury Malkov},
+  year = {2024},
+  eprint = {2410.21276},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2410.21276v1},
+}
+
+======================================================================
+Reference: Bleu: a method for automatic evaluation of machine translation
+Authors  : Kishore Papineni, Sanjeev Roukos, Todd Ward, Wei-Jing Zhu
+Year     : 2002
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/1073083.1073135
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d7da009f457917aa381619facfa5ffae9329a6e9
+@inproceedings{papineni2002bleu,
+  title = {Bleu: a Method for Automatic Evaluation of Machine Translation},
+  author = {Kishore Papineni and Salim Roukos and T. Ward and Wei-Jing Zhu},
+  year = {2002},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.3115/1073083.1073135},
+  url = {https://www.semanticscholar.org/paper/d7da009f457917aa381619facfa5ffae9329a6e9},
+}
+
+======================================================================
+Reference: Qwen2.5-72b-instruct
+Authors  : Qwen Team
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3765325.3765350
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/7e34d02353cb6a7bf6903fa02255cb48d3240d84
+@inproceedings{xie2025study,
+  title = {A Study on Prompt Engineering for K12 Exam Paper Correction Using Qwen2.5-VL-72B-Instruct},
+  author = {Tianxiong Xie and Xuesong Wang and Juan Li},
+  year = {2025},
+  booktitle = {Proceedings of the 2025 3rd International Conference on Educational Knowledge and Informatization},
+  doi = {10.1145/3765325.3765350},
+  url = {https://www.semanticscholar.org/paper/7e34d02353cb6a7bf6903fa02255cb48d3240d84},
+}
+
+======================================================================
+Reference: Qwq-32b
+Authors  : Qwen Team
+Year     : 2025
+Verdict  : unverified
+
+======================================================================
+Reference: Towards scientific intelligence: A survey of llm-based scientific agents
+Authors  : Shuo Ren, Pu Jian, Zhenjiang Ren, Chunlin Leng, Can Xie, Jiajun Zhang
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2503.24047
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2503.24047v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/95154330d74be6c79ac45e97b38ef0038e2b8e2a
+@misc{ren2025towards,
+  title = {Towards Scientific Intelligence: A Survey of LLM-based Scientific Agents},
+  author = {Shuo Ren and Can Xie and Pu Jian and Zhenjiang Ren and Chunlin Leng and Jiajun Zhang},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2503.24047},
+  eprint = {2503.24047},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2503.24047v3},
+}
+
+======================================================================
+Reference: Toward expert-level medical question answering with large language models
+Authors  : Karan Singhal, Tao Tu, Juraj Gottweis, Rory Sayres, Ellery Wulczyn, Mohamed Amin, Le Hou, Kevin Clark, Stephen R Pfohl, Heather Cole-Lewis, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41591-024-03423-7
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 35.
+      Suggestion: List all 35 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/b34c0b0169925a6c7f14e3de9764ed9505f30de3
+@article{singhal2025toward,
+  title = {Toward expert-level medical question answering with large language models},
+  author = {Karan Singhal and Tao Tu and Juraj Gottweis and R. Sayres and Ellery Wulczyn and Mohamed Amin and Le Hou and Kevin Clark and Stephen R. Pfohl and Heather Cole-Lewis and Darlene Neal and Q. Rashid and Mike Schaekermann and Amy Wang and D. Dash and Jonathan H. Chen and Nigam H. Shah and Sami Lachgar and P. Mansfield and Sushant Prakash and Bradley Green and Ewa Dominowska and Blaise Agüera y Arcas and Nenad Tomašev and Yun Liu and Renee Wong and Christopher Semturs and S. Mahdavi and Joelle K. Barral and Dale R. Webster and G. Corrado and Yossi Matias and Shekoofeh Azizi and A. Karthikesalingam and Vivek Natarajan},
+  year = {2025},
+  journal = {Nature Medicine},
+  doi = {10.1038/s41591-024-03423-7},
+  url = {https://www.semanticscholar.org/paper/b34c0b0169925a6c7f14e3de9764ed9505f30de3},
+}
+
+======================================================================
+Reference: Gemini: a family of highly capable multimodal models
+Authors  : Gemini Team, Rohan Anil, Sebastian Borgeaud, Jean-Baptiste Alayrac, Jiahui Yu, Radu Soricut, Johan Schalkwyk, Andrew M Dai, Anja Hauth, Katie Millican, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 1351.
+      Suggestion: List all 1351 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2312.11805v5
+@misc{team2023gemini,
+  title = {Gemini: A Family of Highly Capable Multimodal Models},
+  author = {Gemini Team and Rohan Anil and Sebastian Borgeaud and Jean-Baptiste Alayrac and Jiahui Yu and Radu Soricut and Johan Schalkwyk and Andrew M. Dai and Anja Hauth and Katie Millican and David Silver and Melvin Johnson and Ioannis Antonoglou and Julian Schrittwieser and Amelia Glaese and Jilin Chen and Emily Pitler and Timothy Lillicrap and Angeliki Lazaridou and Orhan Firat and James Molloy and Michael Isard and Paul R. Barham and Tom Hennigan and Benjamin Lee and Fabio Viola and Malcolm Reynolds and Yuanzhong Xu and Ryan Doherty and Eli Collins and Clemens Meyer and Eliza Rutherford and Erica Moreira and Kareem Ayoub and Megha Goel and Jack Krawczyk and Cosmo Du and Ed Chi and Heng-Tze Cheng and Eric Ni and Purvi Shah and Patrick Kane and Betty Chan and Manaal Faruqui and Aliaksei Severyn and Hanzhao Lin and YaGuang Li and Yong Cheng and Abe Ittycheriah and Mahdis Mahdieh and Mia Chen and Pei Sun and Dustin Tran and Sumit Bagri and Balaji Lakshminarayanan and Jeremiah Liu and Andras Orban and Fabian Güra and Hao Zhou and Xinying Song and Aurelien Boffy and Harish Ganapathy and Steven Zheng and HyunJeong Choe and Ágoston Weisz and Tao Zhu and Yifeng Lu and Siddharth Gopal and Jarrod Kahn and Maciej Kula and Jeff Pitman and Rushin Shah and Emanuel Taropa and Majd Al Merey and Martin Baeuml and Zhifeng Chen and Laurent El Shafey and Yujing Zhang and Olcan Sercinoglu and George Tucker and Enrique Piqueras and Maxim Krikun and Iain Barr and Nikolay Savinov and Ivo Danihelka and Becca Roelofs and Anaïs White and Anders Andreassen and Tamara von Glehn and Lakshman Yagati and Mehran Kazemi and Lucas Gonzalez and Misha Khalman and Jakub Sygnowski and Alexandre Frechette and Charlotte Smith and Laura Culp and Lev Proleev and Yi Luan and Xi Chen and James Lottes and Nathan Schucher and Federico Lebron and Alban Rrustemi and Natalie Clay and Phil Crone and Tomas Kocisky and Jeffrey Zhao and Bartek Perz and Dian Yu and Heidi Howard and Adam Bloniarz and Jack W. Rae and Han Lu and Laurent Sifre and Marcello Maggioni and Fred Alcober and Dan Garrette and Megan Barnes and Shantanu Thakoor and Jacob Austin and Gabriel Barth-Maron and William Wong and Rishabh Joshi and Rahma Chaabouni and Deeni Fatiha and Arun Ahuja and Gaurav Singh Tomar and Evan Senter and Martin Chadwick and Ilya Kornakov and Nithya Attaluri and Iñaki Iturrate and Ruibo Liu and Yunxuan Li and Sarah Cogan and Jeremy Chen and Chao Jia and Chenjie Gu and Qiao Zhang and Jordan Grimstad and Ale Jakse Hartman and Xavier Garcia and Thanumalayan Sankaranarayana Pillai and Jacob Devlin and Michael Laskin and Diego de Las Casas and Dasha Valter and Connie Tao and Lorenzo Blanco and Adrià Puigdomènech Badia and David Reitter and Mianna Chen and Jenny Brennan and Clara Rivera and Sergey Brin and Shariq Iqbal and Gabriela Surita and Jane Labanowski and Abhi Rao and Stephanie Winkler and Emilio Parisotto and Yiming Gu and Kate Olszewska and Ravi Addanki and Antoine Miech and Annie Louis and Denis Teplyashin and Geoff Brown and Elliot Catt and Jan Balaguer and Jackie Xiang and Pidong Wang and Zoe Ashwood and Anton Briukhov and Albert Webson and Sanjay Ganapathy and Smit Sanghavi and Ajay Kannan and Ming-Wei Chang and Axel Stjerngren and Josip Djolonga and Yuting Sun and Ankur Bapna and Matthew Aitchison and Pedram Pejman and Henryk Michalewski and Tianhe Yu and Cindy Wang and Juliette Love and Junwhan Ahn and Dawn Bloxwich and Kehang Han and Peter Humphreys and Thibault Sellam and James Bradbury and Varun Godbole and Sina Samangooei and Bogdan Damoc and Alex Kaskasoli and Sébastien M. R. Arnold and Vijay Vasudevan and Shubham Agrawal and Jason Riesa and Dmitry Lepikhin and Richard Tanburn and Srivatsan Srinivasan and Hyeontaek Lim and Sarah Hodkinson and Pranav Shyam and Johan Ferret and Steven Hand and Ankush Garg and Tom Le Paine and Jian Li and Yujia Li and Minh Giang and Alexander Neitz and Zaheer Abbas and Sarah York and Machel Reid and Elizabeth Cole and Aakanksha Chowdhery and Dipanjan Das and Dominika Rogozińska and Vitaliy Nikolaev and Pablo Sprechmann and Zachary Nado and Lukas Zilka and Flavien Prost and Luheng He and Marianne Monteiro and Gaurav Mishra and Chris Welty and Josh Newlan and Dawei Jia and Miltiadis Allamanis and Clara Huiyi Hu and Raoul de Liedekerke and Justin Gilmer and Carl Saroufim and Shruti Rijhwani and Shaobo Hou and Disha Shrivastava and Anirudh Baddepudi and Alex Goldin and Adnan Ozturel and Albin Cassirer and Yunhan Xu and Daniel Sohn and Devendra Sachan and Reinald Kim Amplayo and Craig Swanson and Dessie Petrova and Shashi Narayan and Arthur Guez and Siddhartha Brahma and Jessica Landon and Miteyan Patel and Ruizhe Zhao and Kevin Villela and Luyu Wang and Wenhao Jia and Matthew Rahtz and Mai Giménez and Legg Yeung and James Keeling and Petko Georgiev and Diana Mincu and Boxi Wu and Salem Haykal and Rachel Saputro and Kiran Vodrahalli and James Qin and Zeynep Cankara and Abhanshu Sharma and Nick Fernando and Will Hawkins and Behnam Neyshabur and Solomon Kim and Adrian Hutter and Priyanka Agrawal and Alex Castro-Ros and George van den Driessche and Tao Wang and Fan Yang and Shuo-yiin Chang and Paul Komarek and Ross McIlroy and Mario Lučić and Guodong Zhang and Wael Farhan and Michael Sharman and Paul Natsev and Paul Michel and Yamini Bansal and Siyuan Qiao and Kris Cao and Siamak Shakeri and Christina Butterfield and Justin Chung and Paul Kishan Rubenstein and Shivani Agrawal and Arthur Mensch and Kedar Soparkar and Karel Lenc and Timothy Chung and Aedan Pope and Loren Maggiore and Jackie Kay and Priya Jhakra and Shibo Wang and Joshua Maynez and Mary Phuong and Taylor Tobin and Andrea Tacchetti and Maja Trebacz and Kevin Robinson and Yash Katariya and Sebastian Riedel and Paige Bailey and Kefan Xiao and Nimesh Ghelani and Lora Aroyo and Ambrose Slone and Neil Houlsby and Xuehan Xiong and Zhen Yang and Elena Gribovskaya and Jonas Adler and Mateo Wirth and Lisa Lee and Music Li and Thais Kagohara and Jay Pavagadhi and Sophie Bridgers and Anna Bortsova and Sanjay Ghemawat and Zafarali Ahmed and Tianqi Liu and Richard Powell and Vijay Bolina and Mariko Iinuma and Polina Zablotskaia and James Besley and Da-Woon Chung and Timothy Dozat and Ramona Comanescu and Xiance Si and Jeremy Greer and Guolong Su and Martin Polacek and Raphaël Lopez Kaufman and Simon Tokumine and Hexiang Hu and Elena Buchatskaya and Yingjie Miao and Mohamed Elhawaty and Aditya Siddhant and Nenad Tomasev and Jinwei Xing and Christina Greer and Helen Miller and Shereen Ashraf and Aurko Roy and Zizhao Zhang and Ada Ma and Angelos Filos and Milos Besta and Rory Blevins and Ted Klimenko and Chih-Kuan Yeh and Soravit Changpinyo and Jiaqi Mu and Oscar Chang and Mantas Pajarskas and Carrie Muir and Vered Cohen and Charline Le Lan and Krishna Haridasan and Amit Marathe and Steven Hansen and Sholto Douglas and Rajkumar Samuel and Mingqiu Wang and Sophia Austin and Chang Lan and Jiepu Jiang and Justin Chiu and Jaime Alonso Lorenzo and Lars Lowe Sjösund and Sébastien Cevey and Zach Gleicher and Thi Avrahami and Anudhyan Boral and Hansa Srinivasan and Vittorio Selo and Rhys May and Konstantinos Aisopos and Léonard Hussenot and Livio Baldini Soares and Kate Baumli and Michael B. Chang and Adrià Recasens and Ben Caine and Alexander Pritzel and Filip Pavetic and Fabio Pardo and Anita Gergely and Justin Frye and Vinay Ramasesh and Dan Horgan and Kartikeya Badola and Nora Kassner and Subhrajit Roy and Ethan Dyer and Víctor Campos Campos and Alex Tomala and Yunhao Tang and Dalia El Badawy and Elspeth White and Basil Mustafa and Oran Lang and Abhishek Jindal and Sharad Vikram and Zhitao Gong and Sergi Caelles and Ross Hemsley and Gregory Thornton and Fangxiaoyu Feng and Wojciech Stokowiec and Ce Zheng and Phoebe Thacker and Çağlar Ünlü and Zhishuai Zhang and Mohammad Saleh and James Svensson and Max Bileschi and Piyush Patil and Ankesh Anand and Roman Ring and Katerina Tsihlas and Arpi Vezer and Marco Selvi and Toby Shevlane and Mikel Rodriguez and Tom Kwiatkowski and Samira Daruki and Keran Rong and Allan Dafoe and Nicholas FitzGerald and Keren Gu-Lemberg and Mina Khan and Lisa Anne Hendricks and Marie Pellat and Vladimir Feinberg and James Cobon-Kerr and Tara Sainath and Maribeth Rauh and Sayed Hadi Hashemi and Richard Ives and Yana Hasson and Eric Noland and Yuan Cao and Nathan Byrd and Le Hou and Qingze Wang and Thibault Sottiaux and Michela Paganini and Jean-Baptiste Lespiau and Alexandre Moufarek and Samer Hassan and Kaushik Shivakumar and Joost van Amersfoort and Amol Mandhane and Pratik Joshi and Anirudh Goyal and Matthew Tung and Andrew Brock and Hannah Sheahan and Vedant Misra and Cheng Li and Nemanja Rakićević and Mostafa Dehghani and Fangyu Liu and Sid Mittal and Junhyuk Oh and Seb Noury and Eren Sezener and Fantine Huot and Matthew Lamm and Nicola De Cao and Charlie Chen and Sidharth Mudgal and Romina Stella and Kevin Brooks and Gautam Vasudevan and Chenxi Liu and Mainak Chain and Nivedita Melinkeri and Aaron Cohen and Venus Wang and Kristie Seymore and Sergey Zubkov and Rahul Goel and Summer Yue and Sai Krishnakumaran and Brian Albert and Nate Hurley and Motoki Sano and Anhad Mohananey and Jonah Joughin and Egor Filonov and Tomasz Kępa and Yomna Eldawy and Jiawern Lim and Rahul Rishi and Shirin Badiezadegan and Taylor Bos and Jerry Chang and Sanil Jain and Sri Gayatri Sundara Padmanabhan and Subha Puttagunta and Kalpesh Krishna and Leslie Baker and Norbert Kalb and Vamsi Bedapudi and Adam Kurzrok and Shuntong Lei and Anthony Yu and Oren Litvin and Xiang Zhou and Zhichun Wu and Sam Sobell and Andrea Siciliano and Alan Papir and Robby Neale and Jonas Bragagnolo and Tej Toor and Tina Chen and Valentin Anklin and Feiran Wang and Richie Feng and Milad Gholami and Kevin Ling and Lijuan Liu and Jules Walter and Hamid Moghaddam and Arun Kishore and Jakub Adamek and Tyler Mercado and Jonathan Mallinson and Siddhinita Wandekar and Stephen Cagle and Eran Ofek and Guillermo Garrido and Clemens Lombriser and Maksim Mukha and Botu Sun and Hafeezul Rahman Mohammad and Josip Matak and Yadi Qian and Vikas Peswani and Pawel Janus and Quan Yuan and Leif Schelin and Oana David and Ankur Garg and Yifan He and Oleksii Duzhyi and Anton Älgmyr and Timothée Lottaz and Qi Li and Vikas Yadav and Luyao Xu and Alex Chinien and Rakesh Shivanna and Aleksandr Chuklin and Josie Li and Carrie Spadine and Travis Wolfe and Kareem Mohamed and Subhabrata Das and Zihang Dai and Kyle He and Daniel von Dincklage and Shyam Upadhyay and Akanksha Maurya and Luyan Chi and Sebastian Krause and Khalid Salama and Pam G Rabinovitch and Pavan Kumar Reddy M and Aarush Selvan and Mikhail Dektiarev and Golnaz Ghiasi and Erdem Guven and Himanshu Gupta and Boyi Liu and Deepak Sharma and Idan Heimlich Shtacher and Shachi Paul and Oscar Akerlund and François-Xavier Aubet and Terry Huang and Chen Zhu and Eric Zhu and Elico Teixeira and Matthew Fritze and Francesco Bertolini and Liana-Eleonora Marinescu and Martin Bölle and Dominik Paulus and Khyatti Gupta and Tejasi Latkar and Max Chang and Jason Sanders and Roopa Wilson and Xuewei Wu and Yi-Xuan Tan and Lam Nguyen Thiet and Tulsee Doshi and Sid Lall and Swaroop Mishra and Wanming Chen and Thang Luong and Seth Benjamin and Jasmine Lee and Ewa Andrejczuk and Dominik Rabiej and Vipul Ranjan and Krzysztof Styrc and Pengcheng Yin and Jon Simon and Malcolm Rose Harriott and Mudit Bansal and Alexei Robsky and Geoff Bacon and David Greene and Daniil Mirylenka and Chen Zhou and Obaid Sarvana and Abhimanyu Goyal and Samuel Andermatt and Patrick Siegler and Ben Horn and Assaf Israel and Francesco Pongetti and Chih-Wei "Louis" Chen and Marco Selvatici and Pedro Silva and Kathie Wang and Jackson Tolins and Kelvin Guu and Roey Yogev and Xiaochen Cai and Alessandro Agostini and Maulik Shah and Hung Nguyen and Noah Ó Donnaile and Sébastien Pereira and Linda Friso and Adam Stambler and Adam Kurzrok and Chenkai Kuang and Yan Romanikhin and Mark Geller and ZJ Yan and Kane Jang and Cheng-Chun Lee and Wojciech Fica and Eric Malmi and Qijun Tan and Dan Banica and Daniel Balle and Ryan Pham and Yanping Huang and Diana Avram and Hongzhi Shi and Jasjot Singh and Chris Hidey and Niharika Ahuja and Pranab Saxena and Dan Dooley and Srividya Pranavi Potharaju and Eileen O'Neill and Anand Gokulchandran and Ryan Foley and Kai Zhao and Mike Dusenberry and Yuan Liu and Pulkit Mehta and Ragha Kotikalapudi and Chalence Safranek-Shrader and Andrew Goodman and Joshua Kessinger and Eran Globen and Prateek Kolhar and Chris Gorgolewski and Ali Ibrahim and Yang Song and Ali Eichenbaum and Thomas Brovelli and Sahitya Potluri and Preethi Lahoti and Cip Baetu and Ali Ghorbani and Charles Chen and Andy Crawford and Shalini Pal and Mukund Sridhar and Petru Gurita and Asier Mujika and Igor Petrovski and Pierre-Louis Cedoz and Chenmei Li and Shiyuan Chen and Niccolò Dal Santo and Siddharth Goyal and Jitesh Punjabi and Karthik Kappaganthu and Chester Kwak and Pallavi LV and Sarmishta Velury and Himadri Choudhury and Jamie Hall and Premal Shah and Ricardo Figueira and Matt Thomas and Minjie Lu and Ting Zhou and Chintu Kumar and Thomas Jurdi and Sharat Chikkerur and Yenai Ma and Adams Yu and Soo Kwak and Victor Ähdel and Sujeevan Rajayogam and Travis Choma and Fei Liu and Aditya Barua and Colin Ji and Ji Ho Park and Vincent Hellendoorn and Alex Bailey and Taylan Bilal and Huanjie Zhou and Mehrdad Khatir and Charles Sutton and Wojciech Rzadkowski and Fiona Macintosh and Roopali Vij and Konstantin Shagin and Paul Medina and Chen Liang and Jinjing Zhou and Pararth Shah and Yingying Bi and Attila Dankovics and Shipra Banga and Sabine Lehmann and Marissa Bredesen and Zifan Lin and John Eric Hoffmann and Jonathan Lai and Raynald Chung and Kai Yang and Nihal Balani and Arthur Bražinskas and Andrei Sozanschi and Matthew Hayes and Héctor Fernández Alcalde and Peter Makarov and Will Chen and Antonio Stella and Liselotte Snijders and Michael Mandl and Ante Kärrman and Paweł Nowak and Xinyi Wu and Alex Dyck and Krishnan Vaidyanathan and Raghavender R and Jessica Mallet and Mitch Rudominer and Eric Johnston and Sushil Mittal and Akhil Udathu and Janara Christensen and Vishal Verma and Zach Irving and Andreas Santucci and Gamaleldin Elsayed and Elnaz Davoodi and Marin Georgiev and Ian Tenney and Nan Hua and Geoffrey Cideron and Edouard Leurent and Mahmoud Alnahlawi and Ionut Georgescu and Nan Wei and Ivy Zheng and Dylan Scandinaro and Heinrich Jiang and Jasper Snoek and Mukund Sundararajan and Xuezhi Wang and Zack Ontiveros and Itay Karo and Jeremy Cole and Vinu Rajashekhar and Lara Tumeh and Eyal Ben-David and Rishub Jain and Jonathan Uesato and Romina Datta and Oskar Bunyan and Shimu Wu and John Zhang and Piotr Stanczyk and Ye Zhang and David Steiner and Subhajit Naskar and Michael Azzam and Matthew Johnson and Adam Paszke and Chung-Cheng Chiu and Jaume Sanchez Elias and Afroz Mohiuddin and Faizan Muhammad and Jin Miao and Andrew Lee and Nino Vieillard and Jane Park and Jiageng Zhang and Jeff Stanway and Drew Garmon and Abhijit Karmarkar and Zhe Dong and Jong Lee and Aviral Kumar and Luowei Zhou and Jonathan Evens and William Isaac and Geoffrey Irving and Edward Loper and Michael Fink and Isha Arkatkar and Nanxin Chen and Izhak Shafran and Ivan Petrychenko and Zhe Chen and Johnson Jia and Anselm Levskaya and Zhenkai Zhu and Peter Grabowski and Yu Mao and Alberto Magni and Kaisheng Yao and Javier Snaider and Norman Casagrande and Evan Palmer and Paul Suganthan and Alfonso Castaño and Irene Giannoumis and Wooyeol Kim and Mikołaj Rybiński and Ashwin Sreevatsa and Jennifer Prendki and David Soergel and Adrian Goedeckemeyer and Willi Gierke and Mohsen Jafari and Meenu Gaba and Jeremy Wiesner and Diana Gage Wright and Yawen Wei and Harsha Vashisht and Yana Kulizhskaya and Jay Hoover and Maigo Le and Lu Li and Chimezie Iwuanyanwu and Lu Liu and Kevin Ramirez and Andrey Khorlin and Albert Cui and Tian LIN and Marcus Wu and Ricardo Aguilar and Keith Pallo and Abhishek Chakladar and Ginger Perng and Elena Allica Abellan and Mingyang Zhang and Ishita Dasgupta and Nate Kushman and Ivo Penchev and Alena Repina and Xihui Wu and Tom van der Weide and Priya Ponnapalli and Caroline Kaplan and Jiri Simsa and Shuangfeng Li and Olivier Dousse and Fan Yang and Jeff Piper and Nathan Ie and Rama Pasumarthi and Nathan Lintz and Anitha Vijayakumar and Daniel Andor and Pedro Valenzuela and Minnie Lui and Cosmin Paduraru and Daiyi Peng and Katherine Lee and Shuyuan Zhang and Somer Greene and Duc Dung Nguyen and Paula Kurylowicz and Cassidy Hardin and Lucas Dixon and Lili Janzer and Kiam Choo and Ziqiang Feng and Biao Zhang and Achintya Singhal and Dayou Du and Dan McKinnon and Natasha Antropova and Tolga Bolukbasi and Orgad Keller and David Reid and Daniel Finchelstein and Maria Abi Raad and Remi Crocker and Peter Hawkins and Robert Dadashi and Colin Gaffney and Ken Franko and Anna Bulanova and Rémi Leblond and Shirley Chung and Harry Askham and Luis C. Cobo and Kelvin Xu and Felix Fischer and Jun Xu and Christina Sorokin and Chris Alberti and Chu-Cheng Lin and Colin Evans and Alek Dimitriev and Hannah Forbes and Dylan Banarse and Zora Tung and Mark Omernick and Colton Bishop and Rachel Sterneck and Rohan Jain and Jiawei Xia and Ehsan Amid and Francesco Piccinno and Xingyu Wang and Praseem Banzal and Daniel J. Mankowitz and Alex Polozov and Victoria Krakovna and Sasha Brown and MohammadHossein Bateni and Dennis Duan and Vlad Firoiu and Meghana Thotakuri and Tom Natan and Matthieu Geist and Ser tan Girgin and Hui Li and Jiayu Ye and Ofir Roval and Reiko Tojo and Michael Kwong and James Lee-Thorp and Christopher Yew and Danila Sinopalnikov and Sabela Ramos and John Mellor and Abhishek Sharma and Kathy Wu and David Miller and Nicolas Sonnerat and Denis Vnukov and Rory Greig and Jennifer Beattie and Emily Caveness and Libin Bai and Julian Eisenschlos and Alex Korchemniy and Tomy Tsai and Mimi Jasarevic and Weize Kong and Phuong Dao and Zeyu Zheng and Frederick Liu and Fan Yang and Rui Zhu and Tian Huey Teh and Jason Sanmiya and Evgeny Gladchenko and Nejc Trdin and Daniel Toyama and Evan Rosen and Sasan Tavakkol and Linting Xue and Chen Elkind and Oliver Woodman and John Carpenter and George Papamakarios and Rupert Kemp and Sushant Kafle and Tanya Grunina and Rishika Sinha and Alice Talbert and Diane Wu and Denese Owusu-Afriyie and Cosmo Du and Chloe Thornton and Jordi Pont-Tuset and Pradyumna Narayana and Jing Li and Saaber Fatehi and John Wieting and Omar Ajmeri and Benigno Uria and Yeongil Ko and Laura Knight and Amélie Héliou and Ning Niu and Shane Gu and Chenxi Pang and Yeqing Li and Nir Levine and Ariel Stolovich and Rebeca Santamaria-Fernandez and Sonam Goenka and Wenny Yustalim and Robin Strudel and Ali Elqursh and Charlie Deck and Hyo Lee and Zonglin Li and Kyle Levin and Raphael Hoffmann and Dan Holtmann-Rice and Olivier Bachem and Sho Arora and Christy Koh and Soheil Hassas Yeganeh and Siim Põder and Mukarram Tariq and Yanhua Sun and Lucian Ionita and Mojtaba Seyedhosseini and Pouya Tafti and Zhiyu Liu and Anmol Gulati and Jasmine Liu and Xinyu Ye and Bart Chrzaszcz and Lily Wang and Nikhil Sethi and Tianrun Li and Ben Brown and Shreya Singh and Wei Fan and Aaron Parisi and Joe Stanton and Vinod Koverkathu and Christopher A. Choquette-Choo and Yunjie Li and TJ Lu and Abe Ittycheriah and Prakash Shroff and Mani Varadarajan and Sanaz Bahargam and Rob Willoughby and David Gaddy and Guillaume Desjardins and Marco Cornero and Brona Robenek and Bhavishya Mittal and Ben Albrecht and Ashish Shenoy and Fedor Moiseev and Henrik Jacobsson and Alireza Ghaffarkhah and Morgane Rivière and Alanna Walton and Clément Crepy and Alicia Parrish and Zongwei Zhou and Clement Farabet and Carey Radebaugh and Praveen Srinivasan and Claudia van der Salm and Andreas Fidjeland and Salvatore Scellato and Eri Latorre-Chimoto and Hanna Klimczak-Plucińska and David Bridson and Dario de Cesare and Tom Hudson and Piermaria Mendolicchio and Lexi Walker and Alex Morris and Matthew Mauger and Alexey Guseynov and Alison Reid and Seth Odoom and Lucia Loher and Victor Cotruta and Madhavi Yenugula and Dominik Grewe and Anastasia Petrushkina and Tom Duerig and Antonio Sanchez and Steve Yadlowsky and Amy Shen and Amir Globerson and Lynette Webb and Sahil Dua and Dong Li and Surya Bhupatiraju and Dan Hurt and Haroon Qureshi and Ananth Agarwal and Tomer Shani and Matan Eyal and Anuj Khare and Shreyas Rammohan Belle and Lei Wang and Chetan Tekur and Mihir Sanjay Kale and Jinliang Wei and Ruoxin Sang and Brennan Saeta and Tyler Liechty and Yi Sun and Yao Zhao and Stephan Lee and Pandu Nayak and Doug Fritz and Manish Reddy Vuyyuru and John Aslanides and Nidhi Vyas and Martin Wicke and Xiao Ma and Evgenii Eltyshev and Nina Martin and Hardie Cate and James Manyika and Keyvan Amiri and Yelin Kim and Xi Xiong and Kai Kang and Florian Luisier and Nilesh Tripuraneni and David Madras and Mandy Guo and Austin Waters and Oliver Wang and Joshua Ainslie and Jason Baldridge and Han Zhang and Garima Pruthi and Jakob Bauer and Feng Yang and Riham Mansour and Jason Gelman and Yang Xu and George Polovets and Ji Liu and Honglong Cai and Warren Chen and XiangHai Sheng and Emily Xue and Sherjil Ozair and Christof Angermueller and Xiaowei Li and Anoop Sinha and Weiren Wang and Julia Wiesinger and Emmanouil Koukoumidis and Yuan Tian and Anand Iyer and Madhu Gurumurthy and Mark Goldenson and Parashar Shah and MK Blake and Hongkun Yu and Anthony Urbanowicz and Jennimaria Palomaki and Chrisantha Fernando and Ken Durden and Harsh Mehta and Nikola Momchev and Elahe Rahimtoroghi and Maria Georgaki and Amit Raul and Sebastian Ruder and Morgan Redshaw and Jinhyuk Lee and Denny Zhou and Komal Jalan and Dinghua Li and Blake Hechtman and Parker Schuh and Milad Nasr and Kieran Milan and Vladimir Mikulik and Juliana Franco and Tim Green and Nam Nguyen and Joe Kelley and Aroma Mahendru and Andrea Hu and Joshua Howland and Ben Vargas and Jeffrey Hui and Kshitij Bansal and Vikram Rao and Rakesh Ghiya and Emma Wang and Ke Ye and Jean Michel Sarr and Melanie Moranski Preston and Madeleine Elish and Steve Li and Aakash Kaku and Jigar Gupta and Ice Pasupat and Da-Cheng Juan and Milan Someswar and Tejvi M. and Xinyun Chen and Aida Amini and Alex Fabrikant and Eric Chu and Xuanyi Dong and Amruta Muthal and Senaka Buthpitiya and Sarthak Jauhari and Nan Hua and Urvashi Khandelwal and Ayal Hitron and Jie Ren and Larissa Rinaldi and Shahar Drath and Avigail Dabush and Nan-Jiang Jiang and Harshal Godhia and Uli Sachs and Anthony Chen and Yicheng Fan and Hagai Taitelbaum and Hila Noga and Zhuyun Dai and James Wang and Chen Liang and Jenny Hamer and Chun-Sung Ferng and Chenel Elkind and Aviel Atias and Paulina Lee and Vít Listík and Mathias Carlen and Jan van de Kerkhof and Marcin Pikus and Krunoslav Zaher and Paul Müller and Sasha Zykova and Richard Stefanec and Vitaly Gatsko and Christoph Hirnschall and Ashwin Sethi and Xingyu Federico Xu and Chetan Ahuja and Beth Tsai and Anca Stefanoiu and Bo Feng and Keshav Dhandhania and Manish Katyal and Akshay Gupta and Atharva Parulekar and Divya Pitta and Jing Zhao and Vivaan Bhatia and Yashodha Bhavnani and Omar Alhadlaq and Xiaolin Li and Peter Danenberg and Dennis Tu and Alex Pine and Vera Filippova and Abhipso Ghosh and Ben Limonchik and Bhargava Urala and Chaitanya Krishna Lanka and Derik Clive and Yi Sun and Edward Li and Hao Wu and Kevin Hongtongsak and Ianna Li and Kalind Thakkar and Kuanysh Omarov and Kushal Majmundar and Michael Alverson and Michael Kucharski and Mohak Patel and Mudit Jain and Maksim Zabelin and Paolo Pelagatti and Rohan Kohli and Saurabh Kumar and Joseph Kim and Swetha Sankar and Vineet Shah and Lakshmi Ramachandruni and Xiangkai Zeng and Ben Bariach and Laura Weidinger and Tu Vu and Alek Andreev and Antoine He and Kevin Hui and Sheleem Kashem and Amar Subramanya and Sissie Hsiao and Demis Hassabis and Koray Kavukcuoglu and Adam Sadovsky and Quoc Le and Trevor Strohman and Yonghui Wu and Slav Petrov and Jeffrey Dean and Oriol Vinyals},
+  year = {2023},
+  eprint = {2312.11805},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2312.11805v5},
+}
+
+======================================================================
+Reference: Large language models in medicine
+Authors  : Arun James Thirunavukarasu, Darren Shu Jeng Ting, Kabilan Elangovan, Laura Gutierrez, Ting Fang Tan, Daniel Shu Wei Ting
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41591-023-02448-8
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2309.00087
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2309.00087v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/94ce1d5924e05e8d75e43ce70044293ddcef850a
+@article{omiye2023large,
+  title = {Large language models in medicine: the potentials and pitfalls},
+  author = {Jesutofunmi A. Omiye and Haiwen Gui and Shawheen J. Rezaei and James Zou and Roxana Daneshjou},
+  year = {2023},
+  journal = {Nature Medicine},
+  doi = {10.1038/s41591-023-02448-8},
+  eprint = {2309.00087},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2309.00087v1},
+}
+
+======================================================================
+Reference: Llama: Open and efficient foundation language models
+Authors  : Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 14.
+      Suggestion: List all 14 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2302.13971v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/57e849d0de13ed5f91d086936296721d4ff75a75
+@misc{touvron2023llama,
+  title = {LLaMA: Open and Efficient Foundation Language Models},
+  author = {Hugo Touvron and Thibaut Lavril and Gautier Izacard and Xavier Martinet and Marie-Anne Lachaux and Timothée Lacroix and Baptiste Rozière and Naman Goyal and Eric Hambro and Faisal Azhar and Aurelien Rodriguez and Armand Joulin and Edouard Grave and Guillaume Lample},
+  year = {2023},
+  journal = {arXiv.org},
+  eprint = {2302.13971},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2302.13971v1},
+}
+
+======================================================================
+Reference: Llama 2: Open foundation and fine-tuned chat models
+Authors  : Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajwal Bhargava, Shruti Bhosale, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 68.
+      Suggestion: List all 68 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2307.09288v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/104b0bb1da562d53cbda87aec79ef6a2827d191a
+@misc{touvron2023llama,
+  title = {Llama 2: Open Foundation and Fine-Tuned Chat Models},
+  author = {Hugo Touvron and Louis Martin and Kevin Stone and Peter Albert and Amjad Almahairi and Yasmine Babaei and Nikolay Bashlykov and Soumya Batra and Prajjwal Bhargava and Shruti Bhosale and Dan Bikel and Lukas Blecher and Cristian Canton Ferrer and Moya Chen and Guillem Cucurull and David Esiobu and Jude Fernandes and Jeremy Fu and Wenyin Fu and Brian Fuller and Cynthia Gao and Vedanuj Goswami and Naman Goyal and Anthony Hartshorn and Saghar Hosseini and Rui Hou and Hakan Inan and Marcin Kardas and Viktor Kerkez and Madian Khabsa and Isabel Kloumann and Artem Korenev and Punit Singh Koura and Marie-Anne Lachaux and Thibaut Lavril and Jenya Lee and Diana Liskovich and Yinghai Lu and Yuning Mao and Xavier Martinet and Todor Mihaylov and Pushkar Mishra and Igor Molybog and Yixin Nie and Andrew Poulton and Jeremy Reizenstein and Rashi Rungta and Kalyan Saladi and Alan Schelten and Ruan Silva and Eric Michael Smith and Ranjan Subramanian and Xiaoqing Ellen Tan and Binh Tang and Ross Taylor and Adina Williams and Jian Xiang Kuan and Puxin Xu and Zheng Yan and Iliyan Zarov and Yuchen Zhang and Angela Fan and Melanie Kambadur and Sharan Narang and Aurelien Rodriguez and Robert Stojnic and Sergey Edunov and Thomas Scialom},
+  year = {2023},
+  journal = {arXiv.org},
+  eprint = {2307.09288},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2307.09288v2},
+}
+
+======================================================================
+Reference: An overview of the bioasq large-scale biomedical semantic indexing and question answering competition
+Authors  : George Tsatsaronis, Georgios Balikas, Prodromos Malakasiotis, Ioannis Partalas, Matthias Zschunke, Michael R Alvers, Dirk Weissenborn, Anastasia Krithara, Sergios Petridis, Dimitris Polychronopoulos, et al.
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1186/s12859-015-0564-6
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 22.
+      Suggestion: List all 22 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/c4dd9a19d822c965ce8cde55ab23b8a0b628278a
+@article{tsatsaronis2015overview,
+  title = {An overview of the BIOASQ large-scale biomedical semantic indexing and question answering competition},
+  author = {G. Tsatsaronis and Georgios Balikas and Prodromos Malakasiotis and Ioannis Partalas and M. Zschunke and M. Alvers and Dirk Weissenborn and Anastasia Krithara and Sergios Petridis and D. Polychronopoulos and Y. Almirantis and John Pavlopoulos and Nicolas Baskiotis and P. Gallinari and T. Artières and Axel-Cyrille Ngonga Ngomo and Norman Heino and Éric Gaussier and L. Barrio-Alvers and M. Schroeder and Ion Androutsopoulos and G. Paliouras},
+  year = {2015},
+  journal = {BMC Bioinformatics},
+  doi = {10.1186/s12859-015-0564-6},
+  url = {https://www.semanticscholar.org/paper/c4dd9a19d822c965ce8cde55ab23b8a0b628278a},
+}
+
+======================================================================
+Reference: Chain-of-thought prompting elicits reasoning in large language models
+Authors  : Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/068431-1800
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2201.11903
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2201.11903v6
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1b6e810ce0afd0dd093f789d2b2742d047e316d5
+@article{wei2022chainofthought,
+  title = {Chain-of-Thought Prompting Elicits Reasoning in Large Language Models},
+  author = {Jason Wei and Xuezhi Wang and Dale Schuurmans and Maarten Bosma and Brian Ichter and Fei Xia and Ed Chi and Quoc Le and Denny Zhou},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/068431-1800},
+  eprint = {2201.11903},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2201.11903v6},
+}
+
+======================================================================
+Reference: Advancing multimodal medical capabilities of gemini
+Authors  : Lin Yang, Shawn Xu, Andrew Sellergren, Timo Kohlberger, Yuchen Zhou, Ira Ktena, Atilla Kiraly, Faruk Ahmed, Farhad Hormozdiari, Tiam Jaroensri, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2405.03162
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 47.
+      Suggestion: List all 47 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.03162v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/cf4d2cc2270e9b48f5fc94ce26ee702697b9c79d
+@misc{yang2024advancing,
+  title = {Advancing Multimodal Medical Capabilities of Gemini},
+  author = {Lin Yang and Shawn Xu and Andrew Sellergren and Timo Kohlberger and Yuchen Zhou and Ira Ktena and Atilla Kiraly and Faruk Ahmed and Farhad Hormozdiari and Tiam Jaroensri and Eric Wang and Ellery Wulczyn and Fayaz Jamil and Theo Guidroz and Chuck Lau and Siyuan Qiao and Yun Liu and Akshay Goel and Kendall Park and Arnav Agharwal and Nick George and Yang Wang and Ryutaro Tanno and David G. T. Barrett and Wei-Hung Weng and S. Sara Mahdavi and Khaled Saab and Tao Tu and Sreenivasa Raju Kalidindi and Mozziyar Etemadi and Jorge Cuadros and Gregory Sorensen and Yossi Matias and Katherine Chou and Greg Corrado and Joelle Barral and Shravya Shetty and David Fleet and S. M. Ali Eslami and Daniel Tse and Shruthi Prabhakara and Cory McLean and Dave Steiner and Rory Pilgrim and Christopher Kelly and Shekoofeh Azizi and Daniel Golden},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2405.03162},
+  eprint = {2405.03162},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.03162v1},
+}
+
+======================================================================
+Reference: Biobart: Pretraining and evaluation of a biomedical generative language model
+Authors  : Hongyi Yuan, Zheng Yuan, Ruyi Gan, Jiaxing Zhang, Yutao Xie, Sheng Yu
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Workshop on Biomedical Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Workshop on Biomedical Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2204.03905
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2204.03905v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0db5207510819b9956849eb84bfe8703f8f3688d
+@inproceedings{yuan2022biobart,
+  title = {BioBART: Pretraining and Evaluation of A Biomedical Generative Language Model},
+  author = {Hongyi Yuan and Zheng Yuan and Ruyi Gan and Jiaxing Zhang and Yutao Xie and Sheng Yu},
+  year = {2022},
+  booktitle = {Workshop on Biomedical Natural Language Processing},
+  doi = {10.48550/arxiv.2204.03905},
+  eprint = {2204.03905},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2204.03905v2},
+}
+
+======================================================================
+Reference: Medxpertqa: Benchmarking expert-level medical reasoning and understanding
+Authors  : Yuxin Zuo, Shang Qu, Yifei Li, Zhangren Chen, Xuekai Zhu, Ermo Hua, Kaiyan Zhang, Ning Ding, Bowen Zhou
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2501.18362
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2501.18362v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/ccf92ec10b578411bb0c4950fc4e747bed31c17d
+@inproceedings{zuo2025medxpertqa,
+  title = {MedXpertQA: Benchmarking Expert-Level Medical Reasoning and Understanding},
+  author = {Yuxin Zuo and Shang Qu and Yifei Li and Zhangren Chen and Xuekai Zhu and Ermo Hua and Kaiyan Zhang and Ning Ding and Bowen Zhou},
+  year = {2025},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2501.18362},
+  eprint = {2501.18362},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2501.18362v3},
+}

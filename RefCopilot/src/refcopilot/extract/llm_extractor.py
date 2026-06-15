@@ -95,6 +95,7 @@ def extract_references(bibliography: str, *, source_format: SourceFormat) -> lis
 
     chunks = _chunk(text, char_budget=_TOKEN_BUDGET_DEFAULT * _CHARS_PER_TOKEN)
     raw_items: list[dict[str, Any]] = []
+    failed_chunks = 0
 
     if len(chunks) == 1:
         raw_items.extend(_extract_chunk(chunks[0]))
@@ -108,9 +109,13 @@ def extract_references(bibliography: str, *, source_format: SourceFormat) -> lis
                     ordered[idx] = fut.result()
                 except Exception as exc:
                     logger.warning("chunk %d extraction failed: %s", idx, exc)
+                    failed_chunks += 1
                     ordered[idx] = []
             for chunk_items in ordered:
                 raw_items.extend(chunk_items)
+
+    if failed_chunks == len(chunks):
+        raise RuntimeError("LLM reference extraction failed for all bibliography chunks")
 
     cleaned = _post_process(raw_items)
     return [_to_reference(item, source_format) for item in cleaned]
@@ -156,8 +161,8 @@ def _extract_chunk(chunk: str) -> list[dict[str, Any]]:
     )
 
     if not isinstance(payload, dict) or payload.get("status") in ("error", "unknown"):
-        logger.warning("LLM returned unusable payload: status=%s", payload.get("status"))
-        return []
+        detail = payload.get("error") or payload.get("raw") or ""
+        raise RuntimeError(f"LLM returned unusable payload: status={payload.get('status')} {detail}")
 
     refs = payload.get("references")
     if not isinstance(refs, list):

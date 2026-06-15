@@ -1,0 +1,730 @@
+======================================================================
+Reference: Stacking fault energy and mechanical properties
+Authors  : Manfred Ahlers
+Year     : 1970
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/bf03038369
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Metallurgical Transactions' may be an abbreviation of 'Metallurgical and Materials Transactions B'.
+      Suggestion: Use the full venue name: Metallurgical and Materials Transactions B.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e3428e2904a48ca86c375e468168145faa21e1f2
+@article{ahlers1970stacking,
+  title = {Stacking fault energy and mechanical properties},
+  author = {M. Ahlers},
+  year = {1970},
+  journal = {Metallurgical and Materials Transactions B},
+  doi = {10.1007/bf03038369},
+  url = {https://www.semanticscholar.org/paper/e3428e2904a48ca86c375e468168145faa21e1f2},
+}
+
+======================================================================
+Reference: Preference-aware constrained multi-objective Bayesian optimization
+Authors  : Alaleh Ahmadianshalchi, Syrine Belakaria, Janardhan Rao Doppa
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3632410.3632427
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.13034
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/53b9dbec65b02c1ef3ac039ab9652725cff0bf4a
+@article{ahmadianshalchi2023preferenceaware,
+  title = {Preference-Aware Constrained Multi-Objective Bayesian Optimization},
+  author = {Alaleh Ahmadianshalchi and Syrine Belakaria and J. Doppa},
+  year = {2023},
+  journal = {COMAD/CODS},
+  doi = {10.1145/3632410.3632427},
+  eprint = {2303.13034},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/53b9dbec65b02c1ef3ac039ab9652725cff0bf4a},
+}
+
+======================================================================
+Reference: Unexpected improvements to expected improvement for Bayesian optimization
+Authors  : Sebastian Ament, Samuel Daulton, David Eriksson, Maximilian Balandat, Eytan Bakshy
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.20708
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2310.20708
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.20708v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0a1bf4740dc9f02c292d5489c5097cc8da7f4368
+@article{ament2023unexpected,
+  title = {Unexpected Improvements to Expected Improvement for Bayesian Optimization},
+  author = {Sebastian Ament and Samuel Daulton and David Eriksson and Maximilian Balandat and Eytan Bakshy},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2310.20708},
+  eprint = {2310.20708},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.20708v3},
+}
+
+======================================================================
+Reference: Materials selection in mechanical design
+Authors  : Michael F Ashby, D Cebon
+Year     : 2005
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/c2009-0-25539-5
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, year — https://www.semanticscholar.org/paper/b1697e16ee4ece4a53faaac04cd6154a9e9bf4a6
+@article{ashby1992materials,
+  title = {Materials Selection in Mechanical Design},
+  author = {M. Ashby and D. Cebon},
+  year = {1992},
+  doi = {10.1016/c2009-0-25539-5},
+  url = {https://www.semanticscholar.org/paper/b1697e16ee4ece4a53faaac04cd6154a9e9bf4a6},
+}
+
+======================================================================
+Reference: Theory of the hypervolume indicator: optimal µ-distributions and the choice of the reference point
+Authors  : Anne Auger, Johannes Bader, Dimo Brockhoff, Eckart Zitzler
+Year     : 2009
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Proceedings of the tenth ACM SIGEVO workshop on Foundations of genetic algorithms', but a full version appears at 'Foundations of Genetic Algorithms'.
+      Suggestion: Cite the full version at Foundations of Genetic Algorithms.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/1527125.1527138
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ad93bf18c563c25ffb8f00bb77a284affd03daf4
+@article{auger2009theory,
+  title = {Theory of the hypervolume indicator: optimal μ-distributions and the choice of the reference point},
+  author = {A. Auger and J. Bader and D. Brockhoff and E. Zitzler},
+  year = {2009},
+  journal = {Foundations of Genetic Algorithms},
+  doi = {10.1145/1527125.1527138},
+  url = {https://www.semanticscholar.org/paper/ad93bf18c563c25ffb8f00bb77a284affd03daf4},
+}
+
+======================================================================
+Reference: A portfolio approach to massively parallel Bayesian optimization
+Authors  : Mickael Binois, Nicholson Collier, Jonathan Ozik
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1613/jair.1.16868
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2110.09334
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/41c21b7fd9209b1a93dc386101c3f56c27e84478
+@article{binois2021portfolio,
+  title = {A Portfolio Approach to Massively Parallel Bayesian Optimization},
+  author = {M. Binois and Nicholson T. Collier and J. Ozik},
+  year = {2021},
+  journal = {Journal of Artificial Intelligence Research},
+  doi = {10.1613/jair.1.16868},
+  eprint = {2110.09334},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/41c21b7fd9209b1a93dc386101c3f56c27e84478},
+}
+
+======================================================================
+Reference: Differentiable expected hypervolume improvement for parallel multi-objective Bayesian optimization
+Authors  : Samuel Daulton, Maximilian Balandat, Eytan Bakshy
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2006.05078
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2006.05078v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/1c55f470a8273788d82f05500d507b408a5722b8
+@article{daulton2020differentiable,
+  title = {Differentiable Expected Hypervolume Improvement for Parallel Multi-Objective Bayesian Optimization},
+  author = {Samuel Daulton and Maximilian Balandat and Eytan Bakshy},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2006.05078},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2006.05078v3},
+}
+
+======================================================================
+Reference: Scalable test problems for evolutionary multiobjective optimization
+Authors  : Kalyanmoy Deb, Lothar Thiele, Marco Laumanns, Eckart Zitzler
+Year     : 2005
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/1-84628-137-7_6
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/277706e9ea2a0aea2d7433089fee5e163205dc4a
+@article{deb2005scalable,
+  title = {Scalable Test Problems for Evolutionary Multiobjective Optimization},
+  author = {K. Deb and L. Thiele and M. Laumanns and E. Zitzler},
+  year = {2005},
+  journal = {Evolutionary Multiobjective Optimization},
+  doi = {10.1007/1-84628-137-7_6},
+  url = {https://www.semanticscholar.org/paper/277706e9ea2a0aea2d7433089fee5e163205dc4a},
+}
+
+======================================================================
+Reference: Solidification processing
+Authors  : Merton C Flemings
+Year     : 1974
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/bf02643923
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Metallurgical transactions' may be an abbreviation of 'Metallurgical and Materials Transactions B'.
+      Suggestion: Use the full venue name: Metallurgical and Materials Transactions B.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a60b813fedd2cec2346987ed2b8333ccf7f5c99d
+@article{flemings1974solidification,
+  title = {Solidification processing},
+  author = {M. Flemings},
+  year = {1974},
+  journal = {Metallurgical and Materials Transactions B},
+  doi = {10.1007/bf02643923},
+  url = {https://www.semanticscholar.org/paper/a60b813fedd2cec2346987ed2b8333ccf7f5c99d},
+}
+
+======================================================================
+Reference: Noisy-input entropy search for efficient robust Bayesian optimization
+Authors  : Lukas Fröhlich, Edgar Klenske, Julia Vinogradska, Christian Daniel, Melanie Zeilinger
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2002.02820
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2002.02820v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/920280dd2598d2461c108c15df9361f290f62e88
+@inproceedings{fröhlich2020noisyinput,
+  title = {Noisy-Input Entropy Search for Efficient Robust Bayesian Optimization},
+  author = {Lukas P. Fröhlich and Edgar D. Klenske and Julia Vinogradska and Christian Daniel and Melanie N. Zeilinger},
+  year = {2020},
+  booktitle = {International Conference on Artificial Intelligence and Statistics},
+  eprint = {2002.02820},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2002.02820v1},
+}
+
+======================================================================
+Reference: Bayesian Optimization
+Authors  : Roman Garnett
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3712255.3716507
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2310.09766
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.09766v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/7ee1a9c5958c41237e89c72a183825d51b652c7c
+@article{chen2023pseudobayesian,
+  title = {Pseudo-Bayesian Optimization},
+  author = {Haoxian Chen and Henry Lam},
+  year = {2023},
+  journal = {GECCO Companion},
+  doi = {10.1145/3712255.3716507},
+  eprint = {2310.09766},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.09766v3},
+}
+
+======================================================================
+Reference: Thermal characterization of aerospace structures
+Authors  : AR Hanuska, EP Scott, K Daryabeigi
+Year     : 2000
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.2514/2.6548
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/320e1f36bd256b24274b1ac888d3dea7747a2140
+@article{hanuska1999thermal,
+  title = {Thermal characterization of aerospace structures},
+  author = {A. Hanuska and E. Scott and K. Daryabeigi},
+  year = {1999},
+  journal = {Journal of Thermophysics and Heat Transfer},
+  doi = {10.2514/2.6548},
+  url = {https://www.semanticscholar.org/paper/320e1f36bd256b24274b1ac888d3dea7747a2140},
+}
+
+======================================================================
+Reference: An interoperable multi-objective batch Bayesian optimization framework for high throughput materials discovery
+Authors  : Trevor Hastings, Mrinalini Mulukutla, Danial Khatamsaz, Daniel Salas, Wenle Xu, Daniel Lewis, Nicole Person, Matthew Skokan, Braden Miller, James Paramore, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CEC 2024' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CEC 2024.
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 17.
+      Suggestion: List all 17 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.08900v2
+%   openreview: venue — https://openreview.net/forum?id=q31opzrsKX
+@article{hastings2024accelerated,
+  title = {Accelerated Multi-Objective Alloy Discovery through Efficient Bayesian Methods: Application to the FCC Alloy Space},
+  author = {Trevor Hastings and Mrinalini Mulukutla and Danial Khatamsaz and Daniel Salas and Wenle Xu and Daniel Lewis and Nicole Person and Matthew Skokan and Braden Miller and James Paramore and Brady Butler and Douglas Allaire and Vahid Attari and Ibrahim Karaman and George Pharr and Ankit Srivastava and Raymundo Arroyave},
+  year = {2024},
+  journal = {CEC 2024},
+  eprint = {2405.08900},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.08900v2},
+}
+
+======================================================================
+Reference: A theory of the yielding and plastic flow of anisotropic metals
+Authors  : Rodney Hill
+Year     : 1948
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1098/rspa.1948.0045
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4933b5c6147501beb63da5bdae2c3a7861afd376
+@inproceedings{hill1948theory,
+  title = {A theory of the yielding and plastic flow of anisotropic metals},
+  author = {R. Hill},
+  year = {1948},
+  booktitle = {Proceedings of the Royal Society of London. Series A, Mathematical and physical sciences},
+  doi = {10.1098/rspa.1948.0045},
+  url = {https://www.semanticscholar.org/paper/4933b5c6147501beb63da5bdae2c3a7861afd376},
+}
+
+======================================================================
+Reference: Critical assessment 16: anisotropy in metals
+Authors  : Bevis Hutchinson
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1179/1743284715y.0000000118
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a0d003757e7eed2f1fb4c82767fdb6ff04d48a20
+@article{hutchinson2015critical,
+  title = {Critical Assessment 16: Anisotropy in metals},
+  author = {B. Hutchinson},
+  year = {2015},
+  journal = {Materials Science and Technology},
+  doi = {10.1179/1743284715y.0000000118},
+  url = {https://www.semanticscholar.org/paper/a0d003757e7eed2f1fb4c82767fdb6ff04d48a20},
+}
+
+======================================================================
+Reference: Modified distance calculation in generational distance and inverted generational distance
+Authors  : Hisao Ishibuchi, Hiroyuki Masuda, Yuki Tanigaki, Yusuke Nojima
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-319-15892-1_8
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/b147763f96e9c914e321bacebbc4c6d7ea9deac5
+@inproceedings{ishibuchi2015modified,
+  title = {Modified Distance Calculation in Generational Distance and Inverted Generational Distance},
+  author = {H. Ishibuchi and Hiroyuki Masuda and Yuki Tanigaki and Y. Nojima},
+  year = {2015},
+  booktitle = {International Conference on Evolutionary Multi-Criterion Optimization},
+  doi = {10.1007/978-3-319-15892-1_8},
+  url = {https://www.semanticscholar.org/paper/b147763f96e9c914e321bacebbc4c6d7ea9deac5},
+}
+
+======================================================================
+Reference: Minimax and maximin distance designs
+Authors  : Mark E Johnson, Leslie M Moore, Donald Ylvisaker
+Year     : 1990
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/0378-3758(90)90122-b
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e096b635dde6ce4409a180657ac066630d719829
+@article{johnson1990minimax,
+  title = {Minimax and maximin distance designs},
+  author = {Mark E. Johnson and L. Moore and D. Ylvisaker},
+  year = {1990},
+  journal = {Journal of Statistical Planning and Inference},
+  doi = {10.1016/0378-3758(90)90122-b},
+  url = {https://www.semanticscholar.org/paper/e096b635dde6ce4409a180657ac066630d719829},
+}
+
+======================================================================
+Reference: Efficiently exploiting process-structure-property relationships in material design by multi-information source fusion
+Authors  : Danial Khatamsaz, Abhilash Molkeri, Richard Couperthwaite, Jaylen James, Raymundo Arróyave, Douglas Allaire, Ankit Srivastava
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.actamat.2020.116619
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ca0b756567391e4352c6b0f75896be9368cb7ad8
+@article{khatamsaz2021efficiently,
+  title = {Efficiently exploiting process-structure-property relationships in material design by multi-information source fusion},
+  author = {D. Khatamsaz and A. Molkeri and Richard Couperthwaite and Jaylen James and R. Arróyave and D. Allaire and Ankit Srivastava},
+  year = {2021},
+  journal = {Acta Materialia},
+  doi = {10.1016/j.actamat.2020.116619},
+  url = {https://www.semanticscholar.org/paper/ca0b756567391e4352c6b0f75896be9368cb7ad8},
+}
+
+======================================================================
+Reference: Multi-objective materials Bayesian optimization with active learning of design constraints: Design of ductile refractory multi-principal-element alloys
+Authors  : Danial Khatamsaz, Brent Vela, Prashant Singh, Duane D Johnson, Douglas Allaire, Raymundo Arróyave
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41524-023-01006-7
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/27433c1bc3a18352d94db56cd93dc5baca26d30c
+@article{khatamsaz2023bayesian,
+  title = {Bayesian optimization with active learning of design constraints using an entropy-based approach},
+  author = {D. Khatamsaz and Brent Vela and Prashant Singh and Duane D. Johnson and D. Allaire and R. Arróyave},
+  year = {2023},
+  journal = {npj Computational Materials},
+  doi = {10.1038/s41524-023-01006-7},
+  url = {https://www.semanticscholar.org/paper/27433c1bc3a18352d94db56cd93dc5baca26d30c},
+}
+
+======================================================================
+Reference: Bayesian multiobjective optimisation with mixed analytical and black-box functions: application to tissue engineering
+Authors  : Simon Olofsson, Mohammad Mehrian, Roberto Calandra, Liesbet Geris, Marc Peter Deisenroth, Ruth Misener
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tbme.2018.2855404
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/bec8d32b6001784ed7972a03461860421941b3e0
+@article{olofsson2019bayesian,
+  title = {Bayesian Multiobjective Optimisation With Mixed Analytical and Black-Box Functions: Application to Tissue Engineering},
+  author = {Simon Olofsson and M. Mehrian and R. Calandra and L. Geris and M. Deisenroth and R. Misener},
+  year = {2019},
+  journal = {IEEE Transactions on Biomedical Engineering},
+  doi = {10.1109/tbme.2018.2855404},
+  url = {https://www.semanticscholar.org/paper/bec8d32b6001784ed7972a03461860421941b3e0},
+}
+
+======================================================================
+Reference: Design of computer experiments: space filling and beyond
+Authors  : Luc Pronzato, Werner G Müller
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s11222-011-9242-3
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0530ccc659b33622266980e685455e716cd541fa
+@article{pronzato2011design,
+  title = {Design of computer experiments: space filling and beyond},
+  author = {L. Pronzato and Werner G. Müller},
+  year = {2011},
+  journal = {Statistics and computing},
+  doi = {10.1007/s11222-011-9242-3},
+  url = {https://www.semanticscholar.org/paper/0530ccc659b33622266980e685455e716cd541fa},
+}
+
+======================================================================
+Reference: Gaussian processes in machine learning
+Authors  : Carl Edward Rasmussen
+Year     : 2003
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.7551/mitpress/3206.001.0001
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 1.00).
+      Suggestion: Use canonical title: Gaussian Processes for Machine Learning
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8ca86e941da7254613a5d03dd7a6c36886fadc1d
+@article{rasmussen2005gaussian,
+  title = {Gaussian Processes for Machine Learning},
+  author = {Carl E. Rasmussen and Christopher K. I. Williams},
+  year = {2005},
+  journal = {Adaptive computation and machine learning},
+  doi = {10.7551/mitpress/3206.001.0001},
+  url = {https://www.semanticscholar.org/paper/8ca86e941da7254613a5d03dd7a6c36886fadc1d},
+}
+
+======================================================================
+Reference: An easy-to-use real-world multi-objective optimization problem suite
+Authors  : Ryoji Tanabe, Hisao Ishibuchi
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.asoc.2020.106078
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2009.12867
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2009.12867v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/ad8c95627ebb85fde2026bf2ecfe7b4d980983d6
+@article{tanabe2020easytouse,
+  title = {An Easy-to-use Real-world Multi-objective Optimization Problem Suite},
+  author = {Ryoji Tanabe and Hisao Ishibuchi},
+  year = {2020},
+  journal = {Applied Soft Computing},
+  doi = {10.1016/j.asoc.2020.106078},
+  eprint = {2009.12867},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2009.12867v1},
+}
+
+======================================================================
+Reference: A multi-objective evolutionary algorithm based on an enhanced inverted generational distance metric
+Authors  : Ye Tian, Xingyi Zhang, Ran Cheng, Yaochu Jin
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cec.2016.7748352
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/301f27b6ca9ca414787d4cac106c184310091a3c
+@article{tian2016multiobjective,
+  title = {A multi-objective evolutionary algorithm based on an enhanced inverted generational distance metric},
+  author = {Ye Tian and Xing-yi Zhang and Ran Cheng and Yaochu Jin},
+  year = {2016},
+  journal = {IEEE Congress on Evolutionary Computation},
+  doi = {10.1109/cec.2016.7748352},
+  url = {https://www.semanticscholar.org/paper/301f27b6ca9ca414787d4cac106c184310091a3c},
+}
+
+======================================================================
+Reference: Joint entropy search for multi-objective Bayesian optimization
+Authors  : Ben Tu, Axel Gandy, Nikolas Kantas, Behrang Shafei
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2210.02905
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2210.02905
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2210.02905v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a9f7f2b9900c7138dbd8eb4c564858ee6becc15d
+@article{tu2022joint,
+  title = {Joint Entropy Search for Multi-objective Bayesian Optimization},
+  author = {Ben Tu and Axel Gandy and Nikolas Kantas and Behrang Shafei},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2210.02905},
+  eprint = {2210.02905},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2210.02905v1},
+}
+
+======================================================================
+Reference: Alloying effects on the stacking fault energy in austenitic stainless steels from first-principles theory
+Authors  : Levente Vitos, J-O Nilsson, Börje Johansson
+Year     : 2006
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.actamat.2006.04.013
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/6a773be83b6e8253b95676e825b8b4d06d05e4f4
+@article{vitos2006alloying,
+  title = {Alloying effects on the stacking fault energy in austenitic stainless steels from first-principles theory},
+  author = {L. Vitos and J. Nilsson and B. Johansson},
+  year = {2006},
+  journal = {Acta Materialia},
+  doi = {10.1016/j.actamat.2006.04.013},
+  url = {https://www.semanticscholar.org/paper/6a773be83b6e8253b95676e825b8b4d06d05e4f4},
+}
+
+======================================================================
+Reference: Pre-trained Gaussian processes for Bayesian optimization
+Authors  : Zi Wang, George E Dahl, Kevin Swersky, Chansoo Lee, Zachary Nado, Justin Gilmer, Jasper Snoek, Zoubin Ghahramani
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2109.08215
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/e80af65ecf5bfe3b2b5e8c3eae01ec7e9bf26c17
+@article{wang2021pretrained,
+  title = {Pre-trained Gaussian Processes for Bayesian Optimization},
+  author = {Z. Wang and George E. Dahl and Kevin Swersky and Chansoo Lee and Zelda E. Mariet and Zachary Nado and J. Gilmer and Jasper Snoek and Z. Ghahramani},
+  year = {2021},
+  journal = {Journal of machine learning research},
+  eprint = {2109.08215},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/e80af65ecf5bfe3b2b5e8c3eae01ec7e9bf26c17},
+}
+
+======================================================================
+Reference: Efficient computation of expected hypervolume improvement using box decomposition algorithms
+Authors  : Kaifeng Yang, Michael Emmerich, André Deutz, Thomas Bäck
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s10898-019-00798-7
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1904.12672
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1904.12672v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/196aee40aee77528187494190198ebdc014e732a
+@article{yang2019efficient,
+  title = {Efficient Computation of Expected Hypervolume Improvement Using Box Decomposition Algorithms},
+  author = {Kaifeng Yang and Michael Emmerich and André Deutz and Thomas Bäck},
+  year = {2019},
+  journal = {Journal of Global Optimization},
+  doi = {10.1007/s10898-019-00798-7},
+  eprint = {1904.12672},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1904.12672v2},
+}
+
+======================================================================
+Reference: Multi-objective Bayesian global optimization using expected hypervolume improvement gradient
+Authors  : Kaifeng Yang, Michael Emmerich, André Deutz, Thomas Bäck
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.swevo.2018.10.007
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/1ef2333727c5dc3b18f44947af18f4fa7f501a5d
+@article{yang2019multiobjective,
+  title = {Multi-Objective Bayesian Global Optimization using expected hypervolume improvement gradient},
+  author = {Kaifeng Yang and M. Emmerich and A. Deutz and Thomas Bäck},
+  year = {2019},
+  journal = {Swarm and Evolutionary Computation},
+  doi = {10.1016/j.swevo.2018.10.007},
+  url = {https://www.semanticscholar.org/paper/1ef2333727c5dc3b18f44947af18f4fa7f501a5d},
+}
+
+======================================================================
+Reference: On the theory of anomalous yield behavior of Ni/sub 3/Al-Effect of elastic anisotropy
+Authors  : MH Yoo
+Year     : 1986
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/0036-9748(86)90466-7
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.73).
+      Suggestion: Use canonical title: On the theory of anomalous yield behavior of Ni3Al — Effect of elastic anisotropy
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d7daaf330d6d88f5cae9bb215bce138475446a1d
+@article{yoo1986theory,
+  title = {On the theory of anomalous yield behavior of Ni3Al — Effect of elastic anisotropy},
+  author = {M. Yoo},
+  year = {1986},
+  journal = {Scripta Metallurgica},
+  doi = {10.1016/0036-9748(86)90466-7},
+  url = {https://www.semanticscholar.org/paper/d7daaf330d6d88f5cae9bb215bce138475446a1d},
+}
+
+======================================================================
+Reference: Simultaneous estimation of heat transfer coefficient and thermal conductivity with application to microelectronic materials
+Authors  : Tomasz Zawada
+Year     : 2006
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.mejo.2005.04.052
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0622be4eb0d38da83ec7c6749cf9af713fd76281
+@article{zawada2006simultaneous,
+  title = {Simultaneous estimation of heat transfer coefficient and thermal conductivity with application to microelectronic materials},
+  author = {T. Zawada},
+  year = {2006},
+  journal = {Microelectronics Journal},
+  doi = {10.1016/j.mejo.2005.04.052},
+  url = {https://www.semanticscholar.org/paper/0622be4eb0d38da83ec7c6749cf9af713fd76281},
+}
+
+======================================================================
+Reference: Combining model-based and genetics-based offspring generation for multi-objective optimization using a convergence criterion
+Authors  : Aimin Zhou, Yaochu Jin, Qingfu Zhang, Bernhard Sendhoff, Edward Tsang
+Year     : 2006
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cec.2006.1688406
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a66776c5c07f6cc7391e320efca1013185ea6a52
+@inproceedings{zhou2006combining,
+  title = {Combining Model-based and Genetics-based Offspring Generation for Multi-objective Optimization Using a Convergence Criterion},
+  author = {Aimin Zhou and Yaochu Jin and Qingfu Zhang and B. Sendhoff and E. Tsang},
+  year = {2006},
+  booktitle = {International Conference on Evolutionary Computation},
+  doi = {10.1109/cec.2006.1688406},
+  url = {https://www.semanticscholar.org/paper/a66776c5c07f6cc7391e320efca1013185ea6a52},
+}
+
+======================================================================
+Reference: Multiobjective evolutionary algorithms: a comparative case study and the strength Pareto approach
+Authors  : Eckart Zitzler, Lothar Thiele
+Year     : 2002
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/4235.797969
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e3fd3c06b87ba2f764c65a5b4790d3b22e62b976
+@article{zitzler1999multiobjective,
+  title = {Multiobjective evolutionary algorithms: a comparative case study and the strength Pareto approach},
+  author = {E. Zitzler and L. Thiele},
+  year = {1999},
+  journal = {IEEE Transactions on Evolutionary Computation},
+  doi = {10.1109/4235.797969},
+  url = {https://www.semanticscholar.org/paper/e3fd3c06b87ba2f764c65a5b4790d3b22e62b976},
+}
+
+======================================================================
+Reference: Comparison of multiobjective evolutionary algorithms: Empirical results
+Authors  : Eckart Zitzler, Kalyanmoy Deb, Lothar Thiele
+Year     : 2000
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/106365600568202
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/3cf23da3fb520ab78477648e53dc3d8dbbd690a7
+@article{zitzler2000comparison,
+  title = {Comparison of Multiobjective Evolutionary Algorithms: Empirical Results},
+  author = {E. Zitzler and K. Deb and L. Thiele},
+  year = {2000},
+  journal = {Evolutionary Computation},
+  doi = {10.1162/106365600568202},
+  url = {https://www.semanticscholar.org/paper/3cf23da3fb520ab78477648e53dc3d8dbbd690a7},
+}

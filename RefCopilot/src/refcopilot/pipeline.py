@@ -12,6 +12,7 @@ Tying together:
 from __future__ import annotations
 
 import logging
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -69,8 +70,9 @@ class RefCopilotPipeline:
         use_llm_verify: bool = True,
         max_workers: int = 4,
     ) -> None:
+        env_cache_dir = os.environ.get("REFCOPILOT_CACHE_DIR")
         self.cache = DiskCache(
-            Path(cache_dir or _DEFAULT_CACHE_DIR),
+            Path(cache_dir or env_cache_dir or _DEFAULT_CACHE_DIR),
             ttl_days=cache_ttl_days,
             enabled=cache_enabled,
         )

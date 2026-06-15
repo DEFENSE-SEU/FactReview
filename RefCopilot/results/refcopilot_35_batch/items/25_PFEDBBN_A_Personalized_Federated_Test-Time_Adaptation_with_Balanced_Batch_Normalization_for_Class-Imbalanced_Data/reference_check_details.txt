@@ -1,0 +1,691 @@
+======================================================================
+Reference: Adaptive test-time personalization for federated learning
+Authors  : Wenxuan Bao, Tianxin Wei, Haohan Wang, Jingrui He
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.18816
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.18816v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6e28a7531963fd65d9e150fdb0b788de79717ce3
+@article{bao2023adaptive,
+  title = {Adaptive Test-Time Personalization for Federated Learning},
+  author = {Wenxuan Bao and Tianxin Wei and Haohan Wang and Jingrui He},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2310.18816},
+  eprint = {2310.18816},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.18816v1},
+}
+
+======================================================================
+Reference: Advances in robust federated learning: A survey with heterogeneity considerations
+Authors  : Chuan Chen, Tianchi Liao, Xiaojun Deng, Zihou Wu, Sheng Huang, Zibin Zheng
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tbdata.2025.3527202
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2405.09839
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0107b0a68076552d53dea1cb7bea88355e1b3305
+@article{chen2024advances,
+  title = {Advances in Robust Federated Learning: A Survey With Heterogeneity Considerations},
+  author = {Chuan Chen and Tianchi Liao and Xiaojun Deng and Zihou Wu and Sheng Huang and Zibin Zheng},
+  year = {2024},
+  journal = {IEEE Transactions on Big Data},
+  doi = {10.1109/tbdata.2025.3527202},
+  eprint = {2405.09839},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/0107b0a68076552d53dea1cb7bea88355e1b3305},
+}
+
+======================================================================
+Reference: Momentum benefits non-iid federated learning simply and provably
+Authors  : Ziheng Cheng, Xinmeng Huang, Pengfei Wu, Kun Yuan
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2306.16504
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2306.16504
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e48c95489430ad7d0978aaa7f6995eaf8d8d92d1
+@inproceedings{cheng2023momentum,
+  title = {Momentum Benefits Non-IID Federated Learning Simply and Provably},
+  author = {Ziheng Cheng and Xinmeng Huang and K. Yuan},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2306.16504},
+  eprint = {2306.16504},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/e48c95489430ad7d0978aaa7f6995eaf8d8d92d1},
+}
+
+======================================================================
+Reference: Self-balancing federated learning with global imbalanced data in mobile systems
+Authors  : Moming Duan, Duo Liu, Xianzhang Chen, Renping Liu, Yujuan Tan, Liang Liang
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tpds.2020.3009406
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/bdef93491b2eec2e71b9ba14fd304ff5eebf5188
+@article{duan2021selfbalancing,
+  title = {Self-Balancing Federated Learning With Global Imbalanced Data in Mobile Systems},
+  author = {Moming Duan and Duo Liu and Xianzhang Chen and Renping Liu and Yujuan Tan and Liang Liang},
+  year = {2021},
+  journal = {IEEE Transactions on Parallel and Distributed Systems},
+  doi = {10.1109/tpds.2020.3009406},
+  url = {https://www.semanticscholar.org/paper/bdef93491b2eec2e71b9ba14fd304ff5eebf5188},
+}
+
+======================================================================
+Reference: Note: Robust continual test-time adaptation against temporal correlation
+Authors  : Taesik Gong, Jongheon Jeong, Taewon Kim, Yewon Kim, Jinwoo Shin, Sung-Ju Lee
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/068431-1976
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2208.05117
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2208.05117v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/62c29e503d18ac3a6a08aef4d4f076621a99504a
+@article{gong2022note,
+  title = {NOTE: Robust Continual Test-time Adaptation Against Temporal Correlation},
+  author = {Taesik Gong and Jongheon Jeong and Taewon Kim and Yewon Kim and Jinwoo Shin and Sung-Ju Lee},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/068431-1976},
+  eprint = {2208.05117},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2208.05117v3},
+}
+
+======================================================================
+Reference: Learning deep representation for imbalanced classification
+Authors  : Chen Huang, Yining Li, Chen Change Loy, Xiaoou Tang
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2016.580
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/c88dbaa5d8f4c915e286be5e38b5599038220493
+@article{huang2016learning,
+  title = {Learning Deep Representation for Imbalanced Classification},
+  author = {Chen Huang and Yining Li and Chen Change Loy and Xiaoou Tang},
+  year = {2016},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2016.580},
+  url = {https://www.semanticscholar.org/paper/c88dbaa5d8f4c915e286be5e38b5599038220493},
+}
+
+======================================================================
+Reference: Personalized cross-silo federated learning on non-iid data
+Authors  : Yutao Huang, Lingyang Chu, Zirui Zhou, Lanjun Wang, Jiangchuan Liu, Jian Pei, Yong Zhang
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2007.03797
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/679237737ab2392a87a1f3c44d62b2e37f36bf01
+@inproceedings{huang2020personalized,
+  title = {Personalized Cross-Silo Federated Learning on Non-IID Data},
+  author = {Yutao Huang and Lingyang Chu and Zirui Zhou and Lanjun Wang and Jiangchuan Liu and J. Pei and Yong Zhang},
+  year = {2020},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v35i9.16960},
+  eprint = {2007.03797},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/679237737ab2392a87a1f3c44d62b2e37f36bf01},
+}
+
+======================================================================
+Reference: Test-time robust personalization for federated learning
+Authors  : Liangze Jiang, Tao Lin
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2205.10920
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2205.10920v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/8b2ee805275ec92d032e0e5848b3196727b6c431
+@inproceedings{jiang2022testtime,
+  title = {Test-Time Robust Personalization for Federated Learning},
+  author = {Liangze Jiang and Tao Lin},
+  year = {2022},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2205.10920},
+  eprint = {2205.10920},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2205.10920v4},
+}
+
+======================================================================
+Reference: Advances and open problems in federated learning
+Authors  : Peter Kairouz, H Brendan McMahan, Brendan Avent, Aurélien Bellet, Mehdi Bennis, Arjun Nitin Bhagoji, Kallista Bonawitz, Zachary Charles, Graham Cormode, Rachel Cummings, et al.
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1561/2200000083
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1912.04977
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 58.
+      Suggestion: List all 58 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/07912741c6c96e6ad5b2c2d6c6c3b2de5c8a271b
+@article{kairouz2019advances,
+  title = {Advances and Open Problems in Federated Learning},
+  author = {P. Kairouz and H. B. McMahan and Brendan Avent and A. Bellet and M. Bennis and A. Bhagoji and Keith Bonawitz and Zachary B. Charles and Graham Cormode and Rachel Cummings and Rafael G. L. D'Oliveira and S. E. Rouayheb and David Evans and Josh Gardner and Zachary Garrett and A. Gascón and Badih Ghazi and Phillip B. Gibbons and M. Gruteser and Z. Harchaoui and Chaoyang He and Lie He and Zhouyuan Huo and Ben Hutchinson and Justin Hsu and Martin Jaggi and T. Javidi and Gauri Joshi and M. Khodak and Jakub Konecný and A. Korolova and F. Koushanfar and Oluwasanmi Koyejo and Tancrède Lepoint and Yang Liu and Prateek Mittal and M. Mohri and R. Nock and A. Özgür and R. Pagh and Mariana Raykova and Hang Qi and Daniel Ramage and R. Raskar and D. Song and Weikang Song and Sebastian U. Stich and Ziteng Sun and A. Suresh and Florian Tramèr and Praneeth Vepakomma and Jianyu Wang and Li Xiong and Zheng Xu and Qiang Yang and Felix X. Yu and Han Yu and Sen Zhao},
+  year = {2019},
+  journal = {Found. Trends Mach. Learn.},
+  doi = {10.1561/2200000083},
+  eprint = {1912.04977},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/07912741c6c96e6ad5b2c2d6c6c3b2de5c8a271b},
+}
+
+======================================================================
+Reference: Cost-sensitive learning of deep feature representations from imbalanced data
+Authors  : Salman H Khan, Munawar Hayat, Mohammed Bennamoun, Ferdous A Sohel, Roberto Togneri
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tnnls.2017.2732482
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1508.03422
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/c982cc1ee52f5963a570399d619e8edb112fc9b6
+@article{khan2015costsensitive,
+  title = {Cost-Sensitive Learning of Deep Feature Representations From Imbalanced Data},
+  author = {Salman Hameed Khan and Munawar Hayat and Bennamoun and Ferdous Sohel and R. Togneri},
+  year = {2015},
+  journal = {IEEE Transactions on Neural Networks and Learning Systems},
+  doi = {10.1109/tnnls.2017.2732482},
+  eprint = {1508.03422},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/c982cc1ee52f5963a570399d619e8edb112fc9b6},
+}
+
+======================================================================
+Reference: A comparative performance analysis of data resampling methods on imbalance medical data
+Authors  : Matloob Khushi, Kamran Shaukat, Talha Mahboob Alam, Ibrahim A Hameed, Shahadat Uddin, Suhuai Luo, Xiaoyan Yang, Maranatha Consuelo Reyes
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/access.2021.3102399
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/b57e210f0e42d5ef6b71757268d9eeb75ec48787
+@article{khushi2021comparative,
+  title = {A Comparative Performance Analysis of Data Resampling Methods on Imbalance Medical Data},
+  author = {Matloob Khushi and K. Shaukat and Talha Mahboob Alam and I. Hameed and S. Uddin and S. Luo and Xiaoyan Yang and Maranatha Consuelo Reyes},
+  year = {2021},
+  journal = {IEEE Access},
+  doi = {10.1109/access.2021.3102399},
+  url = {https://www.semanticscholar.org/paper/b57e210f0e42d5ef6b71757268d9eeb75ec48787},
+}
+
+======================================================================
+Reference: Federated optimization in heterogeneous networks
+Authors  : Tian Li, Anit Kumar Sahu, Manzil Zaheer, Maziar Sanjabi, Ameet Talwalkar, Virginia Smith
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1812.06127
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/1284ed4bf6a043ecf8cebca09e4811f1e3b83b65
+@inproceedings{sahu2018federated,
+  title = {Federated Optimization in Heterogeneous Networks},
+  author = {Anit Kumar Sahu and Tian Li and Maziar Sanjabi and M. Zaheer and Ameet Talwalkar and Virginia Smith},
+  year = {2018},
+  booktitle = {Conference on Machine Learning and Systems},
+  eprint = {1812.06127},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/1284ed4bf6a043ecf8cebca09e4811f1e3b83b65},
+}
+
+======================================================================
+Reference: Ttn: A domain-shift aware batch normalization in test-time adaptation
+Authors  : Hyesu Lim, Byeonggeun Kim, Jaegul Choo, Sungha Choi
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2302.05155
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2302.05155v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f175795f1a93c62f3d42cf11bb24f70895839504
+@inproceedings{lim2023domainshift,
+  title = {TTN: A Domain-Shift Aware Batch Normalization in Test-Time Adaptation},
+  author = {Hyesu Lim and Byeonggeun Kim and Jaegul Choo and Sungha Choi},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2302.05155},
+  eprint = {2302.05155},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2302.05155v2},
+}
+
+======================================================================
+Reference: Recent advances on federated learning: A systematic survey
+Authors  : Bingyan Liu, Nuoyan Lv, Yuanchun Guo, Yawen Li
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2301.01299
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2301.01299
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/9d10eac7b7a9010c27c8e55d33694a94c678b2a4
+@article{liu2023recent,
+  title = {Recent Advances on Federated Learning: A Systematic Survey},
+  author = {Bingyan Liu and Nuoya Lv and Yuanchun Guo and Yawen Li},
+  year = {2023},
+  journal = {Neurocomputing},
+  doi = {10.48550/arxiv.2301.01299},
+  eprint = {2301.01299},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/9d10eac7b7a9010c27c8e55d33694a94c678b2a4},
+}
+
+======================================================================
+Reference: Universal test-time adaptation through weight ensembling, diversity weighting, and prior correction
+Authors  : Robert A Marsden, Mario Döbler, Bin Yang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/wacv57701.2024.00254
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2306.00650
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/639a0a95a6f81d89cfa7d30238fd58b2fcd87d20
+@inproceedings{marsden2023universal,
+  title = {Universal Test-time Adaptation through Weight Ensembling, Diversity Weighting, and Prior Correction},
+  author = {Robert A. Marsden and Mario Döbler and Bin Yang},
+  year = {2023},
+  booktitle = {IEEE Workshop/Winter Conference on Applications of Computer Vision},
+  doi = {10.1109/wacv57701.2024.00254},
+  eprint = {2306.00650},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/639a0a95a6f81d89cfa7d30238fd58b2fcd87d20},
+}
+
+======================================================================
+Reference: Communication-efficient learning of deep networks from decentralized data
+Authors  : Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, Blaise Aguera y Arcas
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1602.05629
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Artificial intelligence and statistics' may be an abbreviation of 'International Conference on Artificial Intelligence and Statistics'.
+      Suggestion: Use the full venue name: International Conference on Artificial Intelligence and Statistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/d1dbf643447405984eeef098b1b320dee0b3b8a7
+@inproceedings{mcmahan2016communicationefficient,
+  title = {Communication-Efficient Learning of Deep Networks from Decentralized Data},
+  author = {H. B. McMahan and Eider Moore and Daniel Ramage and S.C.D. Hampson and B. A. Y. Arcas},
+  year = {2016},
+  booktitle = {International Conference on Artificial Intelligence and Statistics},
+  eprint = {1602.05629},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/d1dbf643447405984eeef098b1b320dee0b3b8a7},
+}
+
+======================================================================
+Reference: Efficient test-time model adaptation without forgetting
+Authors  : Shuaicheng Niu, Jiaxiang Wu, Yifan Zhang, Yaofo Chen, Shijian Zheng, Peilin Zhao, Mingkui Tan
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2204.02610
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2204.02610
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2204.02610v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e9c9ea9c463c3a4a0589b196a7ac708698723c9c
+@inproceedings{niu2022efficient,
+  title = {Efficient Test-Time Model Adaptation without Forgetting},
+  author = {Shuaicheng Niu and Jiaxiang Wu and Yifan Zhang and Yaofo Chen and Shijian Zheng and Peilin Zhao and Mingkui Tan},
+  year = {2022},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2204.02610},
+  eprint = {2204.02610},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2204.02610v2},
+}
+
+======================================================================
+Reference: Towards stable test-time adaptation in dynamic wild world
+Authors  : Shuaicheng Niu, Jiaxiang Wu, Yifan Zhang, Zhiquan Wen, Yaofo Chen, Peilin Zhao, Mingkui Tan
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2302.12400
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2302.12400v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f849b873e94f28e1f2a3e1dc4d7bef17eb64adab
+@inproceedings{niu2023towards,
+  title = {Towards Stable Test-Time Adaptation in Dynamic Wild World},
+  author = {Shuaicheng Niu and Jiaxiang Wu and Yifan Zhang and Zhiquan Wen and Yaofo Chen and Peilin Zhao and Mingkui Tan},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2302.12400},
+  eprint = {2302.12400},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2302.12400v1},
+}
+
+======================================================================
+Reference: Differentially private federated learning on heterogeneous data
+Authors  : Maxence Noble, Aurélien Bellet, Aymeric Dieuleveut
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2205.03168
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2205.03168v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/55b5afd8bdea06dc3512ce2ee73d2e83565ca4d6
+@inproceedings{ziegler2022defending,
+  title = {Defending against Reconstruction Attacks through Differentially Private Federated Learning for Classification of Heterogeneous Chest X-Ray Data},
+  author = {Joceline Ziegler and Bjarne Pfitzner and Heinrich Schulz and Axel Saalbach and Bert Arnrich},
+  year = {2022},
+  booktitle = {International Conference on Artificial Intelligence and Statistics},
+  eprint = {2205.03168},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2205.03168v2},
+}
+
+======================================================================
+Reference: Fedctta: A collaborative approach to continual test-time adaptation in federated learning
+Authors  : Rakibul Hasan Rajib, Md Akil Raihan Iftee, Mir Sazzat Hossain, AKM Rahman, Sajib Mistry, M Ashraful Amin, Amin Ahsan Ali
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'IEEE International Joint Conference on Neural Network' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: IEEE International Joint Conference on Neural Network.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/ijcnn64981.2025.11228519
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2505.13643v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/ec8123b46ccb0fe5c6425e99fd11517399dd7b49
+@inproceedings{rajib2025fedctta,
+  title = {FedCTTA: A Collaborative Approach to Continual Test-Time Adaptation in Federated Learning},
+  author = {Rakibul Hasan Rajib and Md Akil Raihan Iftee and Mir Sazzat Hossain and A. K. M. Mahbubur Rahman and Sajib Mistry and M Ashraful Amin and Amin Ahsan Ali},
+  year = {2025},
+  booktitle = {IEEE International Joint Conference on Neural Network},
+  doi = {10.1109/ijcnn64981.2025.11228519},
+  eprint = {2505.13643},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2505.13643v1},
+}
+
+======================================================================
+Reference: Performance enhancement in federated learning by reducing class imbalance of non-iid data
+Authors  : Mihye Seol, Taejoon Kim
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3390/s23031152
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Sensors' may be an abbreviation of 'Italian National Conference on Sensors'.
+      Suggestion: Use the full venue name: Italian National Conference on Sensors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0c90c2e657a8b260f0ba4b3db32f5b74bf1ac3e1
+@inproceedings{seol2023performance,
+  title = {Performance Enhancement in Federated Learning by Reducing Class Imbalance of Non-IID Data},
+  author = {Mihye Seol and Taejoon Kim},
+  year = {2023},
+  booktitle = {Italian National Conference on Sensors},
+  doi = {10.3390/s23031152},
+  url = {https://www.semanticscholar.org/paper/0c90c2e657a8b260f0ba4b3db32f5b74bf1ac3e1},
+}
+
+======================================================================
+Reference: Balancefl: Addressing class imbalance in long-tail federated learning
+Authors  : Xian Shuai, Yulin Shen, Siyang Jiang, Zhihe Zhao, Zhenyu Yan, Guoliang Xing
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/ipsn54338.2022.00029
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/9e237e06f02fa29533c6461576579e5519415e85
+@inproceedings{shuai2022balancefl,
+  title = {BalanceFL: Addressing Class Imbalance in Long-Tail Federated Learning},
+  author = {Xian Shuai and Yulin Shen and Siyang Jiang and Zhihe Zhao and Zhenyu Yan and Guoliang Xing},
+  year = {2022},
+  booktitle = {International Symposium on Information Processing in Sensor Networks},
+  doi = {10.1109/ipsn54338.2022.00029},
+  url = {https://www.semanticscholar.org/paper/9e237e06f02fa29533c6461576579e5519415e85},
+}
+
+======================================================================
+Reference: Is heterogeneity notorious? taming heterogeneity to handle test-time shift in federated learning
+Authors  : Yue Tan, Chen Chen, Weiming Zhuang, Xin Dong, Lingjuan Lyu, Guodong Long
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/075280-1183
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/1779b31d41a77bbbad65397583a5a5248351a7d3
+@article{tan2023heterogeneity,
+  title = {Is Heterogeneity Notorious? Taming Heterogeneity to Handle Test-Time Shift in Federated Learning},
+  author = {Yue Tan and Chen Chen and Weiming Zhuang and Xin Dong and Lingjuan Lyu and Guodong Long},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/075280-1183},
+  url = {https://www.semanticscholar.org/paper/1779b31d41a77bbbad65397583a5a5248351a7d3},
+}
+
+======================================================================
+Reference: Addressing class imbalance in federated learning
+Authors  : Lixu Wang, Shichao Xu, Xiao Wang, Qi Zhu
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v35i11.17219
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2f970d898fead11c2504ba8f19e2ac919510a56b
+@inproceedings{wang2020addressing,
+  title = {Addressing Class Imbalance in Federated Learning},
+  author = {Lixu Wang and Shichao Xu and Xiao Wang and Qi Zhu},
+  year = {2020},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v35i11.17219},
+  url = {https://www.semanticscholar.org/paper/2f970d898fead11c2504ba8f19e2ac919510a56b},
+}
+
+======================================================================
+Reference: Continual test-time domain adaptation
+Authors  : Qin Wang, Olga Fink, Luc Van Gool, Dengxin Dai
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52688.2022.00706
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2203.13591
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2203.13591v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0430dbcbfed0a737881d22340fb044028ed851a9
+@article{wang2022continual,
+  title = {Continual Test-Time Domain Adaptation},
+  author = {Qin Wang and Olga Fink and Luc Van Gool and Dengxin Dai},
+  year = {2022},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52688.2022.00706},
+  eprint = {2203.13591},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2203.13591v1},
+}
+
+======================================================================
+Reference: An experimental study of class imbalance in federated learning
+Authors  : Chenguang Xiao, Shuo Wang
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/ssci50451.2021.9660072
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2109.04094
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2109.04094v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/011113d759073f25895ded673802ffca88b6e336
+@inproceedings{xiao2021experimental,
+  title = {An Experimental Study of Class Imbalance in Federated Learning},
+  author = {C. Xiao and S. Wang},
+  year = {2021},
+  booktitle = {IEEE Symposium Series on Computational Intelligence},
+  doi = {10.1109/ssci50451.2021.9660072},
+  eprint = {2109.04094},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2109.04094v2},
+}
+
+======================================================================
+Reference: Robust test-time adaptation in dynamic scenarios
+Authors  : Longhui Yuan, Binhui Xie, Shuang Li
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52729.2023.01528
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.13899
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.13899v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e6357834e6145b607c350b92238b5bc4d662e920
+@article{yuan2023robust,
+  title = {Robust Test-Time Adaptation in Dynamic Scenarios},
+  author = {Longhui Yuan and Binhui Xie and Shuang Li},
+  year = {2023},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52729.2023.01528},
+  eprint = {2303.13899},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.13899v1},
+}
+
+======================================================================
+Reference: Enabling collaborative test-time adaptation in dynamic environment via federated learning
+Authors  : Jiayuan Zhang, Xuefeng Liu, Yukang Zhang, Guogang Zhu, Jianwei Niu, Shaojie Tang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3637528.3671908
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/698088cbe810f7a02b980bd3a70cf2d18804a897
+@article{zhang2024enabling,
+  title = {Enabling Collaborative Test-Time Adaptation in Dynamic Environment via Federated Learning},
+  author = {Jiayuan Zhang and Xuefeng Liu and Yukang Zhang and Guogang Zhu and Jianwei Niu and Shaojie Tang},
+  year = {2024},
+  journal = {Knowledge Discovery and Data Mining},
+  doi = {10.1145/3637528.3671908},
+  url = {https://www.semanticscholar.org/paper/698088cbe810f7a02b980bd3a70cf2d18804a897},
+}
+
+======================================================================
+Reference: A survey on class imbalance in federated learning
+Authors  : Jing Zhang, Chuanwen Li, Jianzgong Qi, Jiayuan He
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2303.11673
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.11673v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/96321cd0a89c264faefc3d6f57d726e9d37eccbc
+@misc{zhang2023survey,
+  title = {A Survey on Class Imbalance in Federated Learning},
+  author = {Jing Zhang and Chuanwen Li and Jianzgong Qi and Jiayuan He},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2303.11673},
+  eprint = {2303.11673},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.11673v1},
+}
+
+======================================================================
+Reference: Federated learning with non-iid data
+Authors  : Yue Zhao, Meng Li, Liangzhen Lai, Naveen Suda, Damon Civin, Vikas Chandra
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.1806.00582
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1806.00582v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5cfc112c932e38df95a0ba35009688735d1a386b
+@misc{zhao2018federated,
+  title = {Federated Learning with Non-IID Data},
+  author = {Yue Zhao and Meng Li and Liangzhen Lai and Naveen Suda and Damon Civin and Vikas Chandra},
+  year = {2018},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.1806.00582},
+  eprint = {1806.00582},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1806.00582v2},
+}

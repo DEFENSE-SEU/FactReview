@@ -1,0 +1,837 @@
+======================================================================
+Reference: Grokking in the wild: Data augmentation for real-world multi-hop reasoning with transformers
+Authors  : Roman Abramov, Felix Steinbauer, Gjergji Kasneci
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2504.20752
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Machine Learning
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2504.20752v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5b3f18492bd171e9eb69249b5a0a13d6f1717852
+@inproceedings{abramov2025grokking,
+  title = {Grokking in the Wild: Data Augmentation for Real-World Multi-Hop Reasoning with Transformers},
+  author = {Roman Abramov and Felix Steinbauer and Gjergji Kasneci},
+  year = {2025},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2504.20752},
+  eprint = {2504.20752},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2504.20752v2},
+}
+
+======================================================================
+Reference: Physics of language models: Part 3.2, knowledge manipulation
+Authors  : Zeyuan Allen-Zhu, Yuanzhi Li
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2309.14402
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Learning Representations
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2309.14402v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/47daf5f81470564f94adcac672405c2cd39dd186
+@inproceedings{allenzhu2023physics,
+  title = {Physics of Language Models: Part 3.2, Knowledge Manipulation},
+  author = {Zeyuan Allen-Zhu and Yuanzhi Li},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2309.14402},
+  eprint = {2309.14402},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2309.14402v2},
+}
+
+======================================================================
+Reference: Training a helpful and harmless assistant with reinforcement learning from human feedback
+Authors  : Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, Nicholas Joseph, Saurav Kadavath, Jackson Kernion, Tom Conerly, Sheer El-Showk, Nelson Elhage, Zac Hatfield-Dodds, Danny Hernandez, Tristan Hume, Scott Johnston, Shauna Kravec, Liane Lovitt, Neel Nanda, Catherine Olsson, Dario Amodei, Tom Brown, Jack Clark, Sam McCandlish, Chris Olah, Ben Mann, Jared Kaplan
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2204.05862
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2204.05862v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0286b2736a114198b25fb5553c671c33aed5d477
+@misc{bai2022training,
+  title = {Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback},
+  author = {Yuntao Bai and Andy Jones and Kamal Ndousse and Amanda Askell and Anna Chen and Nova DasSarma and Dawn Drain and Stanislav Fort and Deep Ganguli and Tom Henighan and Nicholas Joseph and Saurav Kadavath and Jackson Kernion and Tom Conerly and Sheer El-Showk and Nelson Elhage and Zac Hatfield-Dodds and Danny Hernandez and Tristan Hume and Scott Johnston and Shauna Kravec and Liane Lovitt and Neel Nanda and Catherine Olsson and Dario Amodei and Tom Brown and Jack Clark and Sam McCandlish and Chris Olah and Ben Mann and Jared Kaplan},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2204.05862},
+  eprint = {2204.05862},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2204.05862v1},
+}
+
+======================================================================
+Reference: Constitutional ai: Harmlessness from ai feedback
+Authors  : Yuntao Bai, Saurav Kadavath, Sandipan Kundu, Amanda Askell, Jackson Kernion, Andy Jones, Anna Chen, Anna Goldie, Azalia Mirhoseini, Cameron McKinnon, Carol Chen, Catherine Olsson, Christopher Olah, Danny Hernandez, Dawn Drain, Deep Ganguli, Dustin Li, Eli Tran-Johnson, Ethan Perez, Jamie Kerr, Jared Mueller, Jeffrey Ladish, Joshua Landau, Kamal Ndousse, Kamile Lukosiute, Liane Lovitt, Michael Sellitto, Nelson Elhage, Nicholas Schiefer, Noemi Mercado, Nova DasSarma, Robert Lasenby, Robin Larson, Sam Ringer, Scott Johnston, Shauna Kravec, Sheer El-Showk, Stanislav Fort, Tamera Lanham, Timothy Telleen-Lawton, Tom Conerly, Tom Henighan, Tristan Hume, Samuel R. Bowman, Zac Hatfield-Dodds, Ben Mann, Dario Amodei, Nicholas Joseph, Sam McCandlish, Tom Brown, Jared Kaplan
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2212.08073
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2212.08073v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/3936fd3c6187f606c6e4e2e20b196dbc41cc4654
+@misc{bai2022constitutional,
+  title = {Constitutional AI: Harmlessness from AI Feedback},
+  author = {Yuntao Bai and Saurav Kadavath and Sandipan Kundu and Amanda Askell and Jackson Kernion and Andy Jones and Anna Chen and Anna Goldie and Azalia Mirhoseini and Cameron McKinnon and Carol Chen and Catherine Olsson and Christopher Olah and Danny Hernandez and Dawn Drain and Deep Ganguli and Dustin Li and Eli Tran-Johnson and Ethan Perez and Jamie Kerr and Jared Mueller and Jeffrey Ladish and Joshua Landau and Kamal Ndousse and Kamile Lukosuite and Liane Lovitt and Michael Sellitto and Nelson Elhage and Nicholas Schiefer and Noemi Mercado and Nova DasSarma and Robert Lasenby and Robin Larson and Sam Ringer and Scott Johnston and Shauna Kravec and Sheer El Showk and Stanislav Fort and Tamera Lanham and Timothy Telleen-Lawton and Tom Conerly and Tom Henighan and Tristan Hume and Samuel R. Bowman and Zac Hatfield-Dodds and Ben Mann and Dario Amodei and Nicholas Joseph and Sam McCandlish and Tom Brown and Jared Kaplan},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2212.08073},
+  eprint = {2212.08073},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2212.08073v1},
+}
+
+======================================================================
+Reference: Hopping too late: Exploring the limitations of large language models on multi-hop queries
+Authors  : Eden Biran, Daniela Gottesman, Sohee Yang, Mor Geva, Amir Globerson
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2406.12775
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference on Empirical Methods in Natural Language Processing
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2406.12775v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d610e066e5c3cc7eda13313554e25a340ce18f71
+@inproceedings{biran2024hopping,
+  title = {Hopping Too Late: Exploring the Limitations of Large Language Models on Multi-Hop Queries},
+  author = {Eden Biran and Daniela Gottesman and Sohee Yang and Mor Geva and Amir Globerson},
+  year = {2024},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2406.12775},
+  eprint = {2406.12775},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2406.12775v2},
+}
+
+======================================================================
+Reference: Counterfactual token generation in large language models
+Authors  : Ivi Chatzi, Shreyas Singh, Gabriel Ilharco, Thomas Kollar, Leslie Pack Kaelbling
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2409.17027
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2409.17027
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: CLEaR
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2409.17027v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1c72e052c0a244a4c93a418f96b06e09f10cadeb
+@article{chatzi2024counterfactual,
+  title = {Counterfactual Token Generation in Large Language Models},
+  author = {Ivi Chatzi and Nina Corvelo Benz and Eleni Straitouri and Stratis Tsirtsis and Manuel Gomez-Rodriguez},
+  year = {2024},
+  journal = {CLEaR},
+  doi = {10.48550/arxiv.2409.17027},
+  eprint = {2409.17027},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2409.17027v3},
+}
+
+======================================================================
+Reference: Counterbench: A benchmark for counterfactuals reasoning in large language models
+Authors  : Yuefei Chen, Vivek K. Singh, Jing Ma, Ruixiang Tang
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2502.11008
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e137e53bfa6076587f4802c88bb496a8b8ff00d1
+@article{chen2025counterbench,
+  title = {CounterBench: A Benchmark for Counterfactuals Reasoning in Large Language Models},
+  author = {Yuefei Chen and Vivek Singh and Jing Ma and Ruxian Tang},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2502.11008},
+  url = {https://www.semanticscholar.org/paper/e137e53bfa6076587f4802c88bb496a8b8ff00d1},
+}
+
+======================================================================
+Reference: Faithful explanations of black-box NLP models using LLM-generated counterfactuals
+Authors  : Yair Ori Gat, Nitay Calderon, Amir Feder, Alexander Chapanin, Amit Sharma, Roi Reichart
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.00603
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2310.00603
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/894df6e5d0f34014e6a67b2d5f43e2bde91f63e3
+@inproceedings{gat2023faithful,
+  title = {Faithful Explanations of Black-box NLP Models Using LLM-generated Counterfactuals},
+  author = {Y. Gat and Nitay Calderon and Amir Feder and Alexander Chapanin and Amit Sharma and Roi Reichart},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2310.00603},
+  eprint = {2310.00603},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/894df6e5d0f34014e6a67b2d5f43e2bde91f63e3},
+}
+
+======================================================================
+Reference: Improving alignment of dialogue agents via targeted human judgements
+Authors  : Amelia Glaese, Nat McAleese, Maja Tręb​​acz, John Aslanides, Vlad Firoiu, Timo Ewalds, Maribeth Rauh, Laura Weidinger, Martin Chadwick, Phoebe Thacker, Lucy Campbell-Gillingham, Jonathan Uesato, Po-Sen Huang, Ramona Comanescu, Fan Yang, Abigail See, Sumanth Dathathri, Rory Greig, Charlie Chen, Doug Fritz, Jaume Sanchez Elias, Richard Green, Soňa Mokrá, Nicholas Fernando, Boxi Wu, Rachel Foley, Susannah Young, Iason Gabriel, William Isaac, John Mellor, Demis Hassabis, Koray Kavukcuoglu, Lisa Anne Hendricks, Geoffrey Irving
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2209.14375
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2209.14375v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/74eae12620bd1c1393e268bddcb6f129a5025166
+@misc{glaese2022improving,
+  title = {Improving alignment of dialogue agents via targeted human judgements},
+  author = {Amelia Glaese and Nat McAleese and Maja Trębacz and John Aslanides and Vlad Firoiu and Timo Ewalds and Maribeth Rauh and Laura Weidinger and Martin Chadwick and Phoebe Thacker and Lucy Campbell-Gillingham and Jonathan Uesato and Po-Sen Huang and Ramona Comanescu and Fan Yang and Abigail See and Sumanth Dathathri and Rory Greig and Charlie Chen and Doug Fritz and Jaume Sanchez Elias and Richard Green and Soňa Mokrá and Nicholas Fernando and Boxi Wu and Rachel Foley and Susannah Young and Iason Gabriel and William Isaac and John Mellor and Demis Hassabis and Koray Kavukcuoglu and Lisa Anne Hendricks and Geoffrey Irving},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2209.14375},
+  eprint = {2209.14375},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2209.14375v1},
+}
+
+======================================================================
+Reference: Context-parametric inversion: Why instruction finetuning can worsen context reliance
+Authors  : Sachin Goyal, Christina Baek, J. Zico Kolter, Aditi Raghunathan
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'ICLR 2025 Workshop Data Problems Poster' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: ICLR 2025 Workshop Data Problems Poster.
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: ICLR 2025 Workshop Data Problems Poster
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2410.10796v3
+%   openreview: venue — https://openreview.net/forum?id=Mdop78Qz9T
+@inproceedings{goyal2024contextparametric,
+  title = {Context-Parametric Inversion: Why Instruction Finetuning Can Worsen Context Reliance},
+  author = {Sachin Goyal and Christina Baek and J. Zico Kolter and Aditi Raghunathan},
+  year = {2024},
+  booktitle = {ICLR 2025 Workshop Data Problems Poster},
+  eprint = {2410.10796},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2410.10796v3},
+}
+
+======================================================================
+Reference: Realm: Retrieval-augmented language model pre-training
+Authors  : Kelvin Guu, Kenton Lee, Zora Tung, Panupong Pasupat, Ming-Wei Chang
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2002.08909
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2002.08909v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/832fff14d2ed50eb7969c4c4b976c35776548f56
+@inproceedings{guu2020realm,
+  title = {REALM: Retrieval-Augmented Language Model Pre-Training},
+  author = {Kelvin Guu and Kenton Lee and Zora Tung and Panupong Pasupat and Ming-Wei Chang},
+  year = {2020},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2002.08909},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2002.08909v1},
+}
+
+======================================================================
+Reference: Leveraging passage retrieval with generative models for open domain question answering
+Authors  : Gautier Izacard, Édouard Grave
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference of the European Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference of the European Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2021.eacl-main.74
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2007.01282v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/ea8c46e193d5121e440daf96edfd15a47151c293
+@inproceedings{izacard2020leveraging,
+  title = {Leveraging Passage Retrieval with Generative Models for Open Domain Question Answering},
+  author = {Gautier Izacard and Edouard Grave},
+  year = {2020},
+  booktitle = {Conference of the European Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2021.eacl-main.74},
+  eprint = {2007.01282},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2007.01282v2},
+}
+
+======================================================================
+Reference: CLadder: Assessing Causal Reasoning in Language Models
+Authors  : Zhijing Jin, Yuen Chen, Felix Leeb, Luigi Gresele, Ojasv Kamal, Zhiheng Lyu, Kevin Blin, Fernando Gonzalez Adauto, Max Kleiman-Weiner, Mrinmaya Sachan, Bernhard Schölkopf
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/075280-1353
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2312.04350
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2312.04350v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6ac627f57b26354ab537734d820da4a6a7dde2c6
+@article{jin2023cladder,
+  title = {CLadder: Assessing Causal Reasoning in Language Models},
+  author = {Zhijing Jin and Yuen Chen and Felix Leeb and Luigi Gresele and Ojasv Kamal and Zhiheng Lyu and Kevin Blin and Fernando Gonzalez Adauto and Max Kleiman-Weiner and Mrinmaya Sachan and Bernhard Schölkopf},
+  year = {2023},
+  journal = {Advances in Neural Information Processing Systems 36},
+  doi = {10.52202/075280-1353},
+  eprint = {2312.04350},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2312.04350v3},
+}
+
+======================================================================
+Reference: Tug-of-war between knowledge: Exploring and resolving knowledge conflicts in retrieval-augmented language models
+Authors  : Zhuoran Jin, Pengfei Cao, Yubo Chen, Kang Liu, Xiaojian Jiang, Jiexin Xu, Qiuxia Li, Jun Zhao
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.14409
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2402.14409
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.14409v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/812b87876b22260fe046af447c5f40a4ce2906ea
+@inproceedings{jin2024tugofwar,
+  title = {Tug-of-War Between Knowledge: Exploring and Resolving Knowledge Conflicts in Retrieval-Augmented Language Models},
+  author = {Zhuoran Jin and Pengfei Cao and Yubo Chen and Kang Liu and Xiaojian Jiang and Jiexin Xu and Qiuxia Li and Jun Zhao},
+  year = {2024},
+  booktitle = {International Conference on Language Resources and Evaluation},
+  doi = {10.48550/arxiv.2402.14409},
+  eprint = {2402.14409},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.14409v1},
+}
+
+======================================================================
+Reference: Dense passage retrieval for open-domain question answering
+Authors  : Vladimir Karpukhin, Barlas Oguz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, Wen-tau Yih
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2004.04906
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.04906v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b26f2037f769d5ffc5f7bdcec2de8da28ec14bee
+@inproceedings{karpukhin2020dense,
+  title = {Dense Passage Retrieval for Open-Domain Question Answering},
+  author = {Vladimir Karpukhin and Barlas Oğuz and Sewon Min and Patrick Lewis and Ledell Wu and Sergey Edunov and Danqi Chen and Wen-tau Yih},
+  year = {2020},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/2020.emnlp-main.550},
+  eprint = {2004.04906},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.04906v3},
+}
+
+======================================================================
+Reference: Causal reasoning and large language models: Opening a new frontier for causality
+Authors  : Emre Kiciman, Robert Osazuwa Ness, Amit Sharma, Chenhao Tan
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2305.00050
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2305.00050
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/10632e0a667cbc3c52cc8f11a46d8e8e9c7739e3
+@article{kıcıman2023causal,
+  title = {Causal Reasoning and Large Language Models: Opening a New Frontier for Causality},
+  author = {Emre Kıcıman and R. Ness and Amit Sharma and Chenhao Tan},
+  year = {2023},
+  journal = {Trans. Mach. Learn. Res.},
+  doi = {10.48550/arxiv.2305.00050},
+  eprint = {2305.00050},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/10632e0a667cbc3c52cc8f11a46d8e8e9c7739e3},
+}
+
+======================================================================
+Reference: Natural questions: a benchmark for question answering research
+Authors  : Tom Kwiatkowski, Jennimaria Palomaki, Olivia Redfield, Michael Collins, Ankur Parikh, Chris Alberti, Danielle Epstein, Illia Polosukhin, Matthew Kelcey, Jacob Devlin, Kenton Lee, Kristina N. Toutanova, Llion Jones, Ming-Wei Chang, Andrew Dai, Jakob Uszkoreit, Quoc Le, Slav Petrov
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/tacl_a_00276
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/17dbd7b72029181327732e4d11b52a08ed4630d0
+@article{kwiatkowski2019natural,
+  title = {Natural Questions: A Benchmark for Question Answering Research},
+  author = {T. Kwiatkowski and J. Palomaki and Olivia Redfield and Michael Collins and Ankur P. Parikh and Chris Alberti and D. Epstein and I. Polosukhin and Jacob Devlin and Kenton Lee and Kristina Toutanova and Llion Jones and Matthew Kelcey and Ming-Wei Chang and Andrew M. Dai and Jakob Uszkoreit and Quoc V. Le and Slav Petrov},
+  year = {2019},
+  journal = {Transactions of the Association for Computational Linguistics},
+  doi = {10.1162/tacl_a_00276},
+  url = {https://www.semanticscholar.org/paper/17dbd7b72029181327732e4d11b52a08ed4630d0},
+}
+
+======================================================================
+Reference: Retrieval-augmented generation for knowledge-intensive nlp tasks
+Authors  : Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen tau Yih, Tim Rocktäschel, Sebastian Riedel, Douwe Kiela
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Neural Information Processing Systems
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2005.11401v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/659bf9ce7175e1ec266ff54359e2bd76e0b7ff31
+@article{lewis2020retrievalaugmented,
+  title = {Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks},
+  author = {Patrick Lewis and Ethan Perez and Aleksandra Piktus and Fabio Petroni and Vladimir Karpukhin and Naman Goyal and Heinrich Küttler and Mike Lewis and Wen-tau Yih and Tim Rocktäschel and Sebastian Riedel and Douwe Kiela},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2005.11401},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2005.11401v4},
+}
+
+======================================================================
+Reference: Taming knowledge conflicts in language models
+Authors  : Gaotang Li, Yuzhong Chen, Hanghang Tong
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2503.10996
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Machine Learning
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2503.10996v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b7ba9df4eb239708cf48f25be87b5bceeca010e3
+@inproceedings{li2025taming,
+  title = {Taming Knowledge Conflicts in Language Models},
+  author = {Gaotang Li and Yuzhong Chen and Hanghang Tong},
+  year = {2025},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2503.10996},
+  eprint = {2503.10996},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2503.10996v2},
+}
+
+======================================================================
+Reference: Are LLMs Capable of Data-based Statistical and Causal Reasoning? Benchmarking Advanced Quantitative Reasoning with Data
+Authors  : Xiao Liu, Zirui Wu, Xueqing Wu, Pan Lu, Kai-Wei Chang, Yansong Feng
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.17644
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2402.17644
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.17644v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/83ed094e60c16abae2f1eb6a1be25934dc83648d
+@inproceedings{liu2024llms,
+  title = {Are LLMs Capable of Data-based Statistical and Causal Reasoning? Benchmarking Advanced Quantitative Reasoning with Data},
+  author = {Xiao Liu and Zirui Wu and Xueqing Wu and Pan Lu and Kai-Wei Chang and Yansong Feng},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2402.17644},
+  eprint = {2402.17644},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.17644v2},
+}
+
+======================================================================
+Reference: Large Language Models and Causal Inference in Collaboration: A Survey
+Authors  : Xiaoyu Liu, Zuobang Ma, Jiarui Liu, Pengfei Liu, Chen Gong, Yabo Niu, Ling Geng, Yunjia Xi, Shuai Li, Emiao Lu, Sarvnaz Karimi, Ruichu Cai
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2403.09606
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: NAACL (Findings) 2025
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2403.09606v3
+%   openreview: venue — https://openreview.net/forum?id=9Bcnwt67Bb
+@article{liu2024large,
+  title = {Large Language Models and Causal Inference in Collaboration: A Survey},
+  author = {Xiaoyu Liu and Paiheng Xu and Junda Wu and Jiaxin Yuan and Yifan Yang and Yuhang Zhou and Fuxiao Liu and Tianrui Guan and Haoliang Wang and Tong Yu and Julian McAuley and Wei Ai and Furong Huang},
+  year = {2024},
+  journal = {NAACL (Findings) 2025},
+  eprint = {2403.09606},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2403.09606v3},
+}
+
+======================================================================
+Reference: Roberta: A robustly optimized bert pretraining approach
+Authors  : Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, Veselin Stoyanov
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1907.11692v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/077f8329a7b6fa3b7c877a57b81eb6c18b5f87de
+@misc{liu2019roberta,
+  title = {RoBERTa: A Robustly Optimized BERT Pretraining Approach},
+  author = {Yinhan Liu and Myle Ott and Naman Goyal and Jingfei Du and Mandar Joshi and Danqi Chen and Omer Levy and Mike Lewis and Luke Zettlemoyer and Veselin Stoyanov},
+  year = {2019},
+  journal = {arXiv.org},
+  eprint = {1907.11692},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1907.11692v1},
+}
+
+======================================================================
+Reference: Training language models to follow instructions with human feedback
+Authors  : Long Ouyang, Jeff Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul Christiano, Jan Leike, Ryan Lowe
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/068431-2011
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2203.02155
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2203.02155v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d766bffc357127e0dc86dd69561d5aeb520d6f4c
+@article{ouyang2022training,
+  title = {Training language models to follow instructions with human feedback},
+  author = {Long Ouyang and Jeff Wu and Xu Jiang and Diogo Almeida and Carroll L. Wainwright and Pamela Mishkin and Chong Zhang and Sandhini Agarwal and Katarina Slama and Alex Ray and John Schulman and Jacob Hilton and Fraser Kelton and Luke Miller and Maddie Simens and Amanda Askell and Peter Welinder and Paul Christiano and Jan Leike and Ryan Lowe},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/068431-2011},
+  eprint = {2203.02155},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2203.02155v1},
+}
+
+======================================================================
+Reference: Language models as knowledge bases?
+Authors  : Fabio Petroni, Tim Rocktäschel, Patrick Lewis, Anton Bakhtin, Yuxiang Wu, Alexander H. Miller, Sebastian Riedel
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d19-1250
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference on Empirical Methods in Natural Language Processing
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1909.01066v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d0086b86103a620a86bc918746df0aa642e2a8a3
+@inproceedings{petroni2019language,
+  title = {Language Models as Knowledge Bases?},
+  author = {Fabio Petroni and Tim Rocktäschel and Patrick Lewis and Anton Bakhtin and Yuxiang Wu and Alexander H. Miller and Sebastian Riedel},
+  year = {2019},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d19-1250},
+  eprint = {1909.01066},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1909.01066v2},
+}
+
+======================================================================
+Reference: How much knowledge can you pack into the parameters of a language model?
+Authors  : Adam Roberts, Colin Raffel, Noam Shazeer
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.emnlp-main.437
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference on Empirical Methods in Natural Language Processing
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2002.08910v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/80376bdec5f534be78ba82821f540590ebce5559
+@inproceedings{roberts2020much,
+  title = {How Much Knowledge Can You Pack Into the Parameters of a Language Model?},
+  author = {Adam Roberts and Colin Raffel and Noam Shazeer},
+  year = {2020},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/2020.emnlp-main.437},
+  eprint = {2002.08910},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2002.08910v4},
+}
+
+======================================================================
+Reference: Learning to summarize from human feedback
+Authors  : Nisan Stiennon, Long Ouyang, Jeff Wu, Daniel M. Ziegler, Ryan Lowe, Chelsea Voss, Alec Radford, Dario Amodei, Paul Christiano
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2009.01325
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2009.01325v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/053b1d7b97eb2c91fc3921d589c160b0923c70b1
+@article{stiennon2020learning,
+  title = {Learning to summarize from human feedback},
+  author = {Nisan Stiennon and Long Ouyang and Jeff Wu and Daniel M. Ziegler and Ryan Lowe and Chelsea Voss and Alec Radford and Dario Amodei and Paul Christiano},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2009.01325},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2009.01325v3},
+}
+
+======================================================================
+Reference: Grokked transformers are implicit reasoners: A mechanistic journey to the edge of generalization
+Authors  : Boshi Wang, Xiang Yue, Yu Su, Huan Sun
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2405.15071
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.15071v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5b1120f547d3969afc49b4a094e874d568e53aca
+@misc{wang2024grokked,
+  title = {Grokked Transformers are Implicit Reasoners: A Mechanistic Journey to the Edge of Generalization},
+  author = {Boshi Wang and Xiang Yue and Yu Su and Huan Sun},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2405.15071},
+  eprint = {2405.15071},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.15071v3},
+}
+
+======================================================================
+Reference: Adacad: Adaptively decoding to balance conflicts between contextual and parametric knowledge
+Authors  : Han Wang, Archiki Prasad, Elias Stengel-Eskin, Mohit Bansal
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2409.07394
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: North American Chapter of the Association for Computational Linguistics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2409.07394v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/40411dcf9575ea5e4d12480d71ecbee9049714c5
+@article{wang2024adacad,
+  title = {AdaCAD: Adaptively Decoding to Balance Conflicts between Contextual and Parametric Knowledge},
+  author = {Han Wang and Archiki Prasad and Elias Stengel-Eskin and Mohit Bansal},
+  year = {2024},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2409.07394},
+  eprint = {2409.07394},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2409.07394v2},
+}
+
+======================================================================
+Reference: Failure Modes of LLMs for Causal Reasoning on Narratives
+Authors  : Khurram Yamin, Shantanu Gupta, Gaurav R. Ghosal, Zachary C. Lipton, Bryan Wilder
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2410.23884
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2410.23884v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/268722213f964689ba77cbaa4172563282508d91
+@misc{yamin2024failure,
+  title = {Failure Modes of LLMs for Causal Reasoning on Narratives},
+  author = {Khurram Yamin and Shantanu Gupta and Gaurav R. Ghosal and Zachary C. Lipton and Bryan Wilder},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2410.23884},
+  eprint = {2410.23884},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2410.23884v5},
+}
+
+======================================================================
+Reference: Do large language models latently perform multi-hop reasoning?
+Authors  : Sohee Yang, Elena Gribovskaya, Nora Kassner, Mor Geva, Sebastian Riedel
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.16837
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2402.16837
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.16837v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c36f638781953f995eb3079f882174846b9ac16a
+@inproceedings{yang2024large,
+  title = {Do Large Language Models Latently Perform Multi-Hop Reasoning?},
+  author = {Sohee Yang and Elena Gribovskaya and Nora Kassner and Mor Geva and Sebastian Riedel},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2402.16837},
+  eprint = {2402.16837},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.16837v2},
+}
+
+======================================================================
+Reference: Do large language models perform latent multi-hop reasoning without exploiting shortcuts?
+Authors  : Sohee Yang, Nora Kassner, Elena Gribovskaya, Sebastian Riedel, Mor Geva
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2411.16679
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Annual Meeting of the Association for Computational Linguistics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2411.16679v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a4f8d79f85ddb7e835ef56a6a44c6821ddeea313
+@inproceedings{yang2024large,
+  title = {Do Large Language Models Perform Latent Multi-Hop Reasoning without Exploiting Shortcuts?},
+  author = {Sohee Yang and Nora Kassner and Elena Gribovskaya and Sebastian Riedel and Mor Geva},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2411.16679},
+  eprint = {2411.16679},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2411.16679v2},
+}
+
+======================================================================
+Reference: Hotpotqa: A dataset for diverse, explainable multi-hop question answering
+Authors  : Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William W. Cohen, Ruslan Salakhutdinov, Christopher D. Manning
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d18-1259
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference on Empirical Methods in Natural Language Processing
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1809.09600v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/22655979df781d222eaf812b0d325fa9adf11594
+@inproceedings{yang2018hotpotqa,
+  title = {HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering},
+  author = {Zhilin Yang and Peng Qi and Saizheng Zhang and Yoshua Bengio and William W. Cohen and Ruslan Salakhutdinov and Christopher D. Manning},
+  year = {2018},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d18-1259},
+  eprint = {1809.09600},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1809.09600v1},
+}
+
+======================================================================
+Reference: Discerning and resolving knowledge conflicts through adaptive decoding with contextual information-entropy constraint
+Authors  : Xiaowei Yuan, Zhao Yang, Yequan Wang, Shengping Liu, Jun Zhao, Kang Liu
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2402.11893
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.11893v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/654c9a01b995637f5849e8977691ae648160b5ca
+@inproceedings{yuan2024discerning,
+  title = {Discerning and Resolving Knowledge Conflicts through Adaptive Decoding with Contextual Information-Entropy Constraint},
+  author = {Xiaowei Yuan and Zhao Yang and Yequan Wang and Shengping Liu and Jun Zhao and Kang Liu},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2402.11893},
+  eprint = {2402.11893},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.11893v3},
+}
+
+======================================================================
+Reference: Causal parrots: Large language models may talk causality but are not causal
+Authors  : Matej Zečević, Moritz Willig, Devendra Singh Dhami, Kristian Kersting
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2308.13067
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2308.13067
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2308.13067v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b9672ac98913c43fcb996b3def314789d1cc0cf4
+@article{zečević2023causal,
+  title = {Causal Parrots: Large Language Models May Talk Causality But Are Not Causal},
+  author = {Matej Zečević and Moritz Willig and Devendra Singh Dhami and Kristian Kersting},
+  year = {2023},
+  journal = {Trans. Mach. Learn. Res.},
+  doi = {10.48550/arxiv.2308.13067},
+  eprint = {2308.13067},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2308.13067v1},
+}

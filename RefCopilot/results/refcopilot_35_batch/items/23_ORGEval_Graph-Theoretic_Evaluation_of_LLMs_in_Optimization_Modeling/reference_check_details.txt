@@ -1,0 +1,1228 @@
+======================================================================
+Reference: Optimus: Scalable optimization modeling with (mi) lp solvers and large language models
+Authors  : Ali AhmadiTeshnizi, Wenzhi Gao, Madeleine Udell
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.10172
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.10172v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6857a1439cfd5057d7e129eff16e5a58ab94bf14
+@inproceedings{ahmaditeshnizi2024optimus,
+  title = {OptiMUS: Scalable Optimization Modeling with (MI)LP Solvers and Large Language Models},
+  author = {Ali AhmadiTeshnizi and Wenzhi Gao and Madeleine Udell},
+  year = {2024},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2402.10172},
+  eprint = {2402.10172},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.10172v1},
+}
+
+======================================================================
+Reference: Combining sequential model-based algorithm configuration with default-guided probabilistic sampling
+Authors  : Marie Anastacio, Holger H Hoos
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3377929.3389999
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d6b1583625fbe157f52aca44553ab96b753724e9
+@article{anastacio2020combining,
+  title = {Combining sequential model-based algorithm configuration with default-guided probabilistic sampling},
+  author = {Marie Anastacio and H. Hoos},
+  year = {2020},
+  journal = {GECCO Companion},
+  doi = {10.1145/3377929.3389999},
+  url = {https://www.semanticscholar.org/paper/d6b1583625fbe157f52aca44553ab96b753724e9},
+}
+
+======================================================================
+Reference: A gender-based genetic algorithm for the automatic configuration of algorithms
+Authors  : Carlos Ansótegui, Meinolf Sellmann, Kevin Tierney
+Year     : 2009
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-642-04244-7_14
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/997dd6c2d49f6d89a4f9b28729163dc18549f3d3
+@inproceedings{ansótegui2009genderbased,
+  title = {A Gender-Based Genetic Algorithm for the Automatic Configuration of Algorithms},
+  author = {C. Ansótegui and Meinolf Sellmann and Kevin Tierney},
+  year = {2009},
+  booktitle = {International Conference on Principles and Practice of Constraint Programming},
+  doi = {10.1007/978-3-642-04244-7_14},
+  url = {https://www.semanticscholar.org/paper/997dd6c2d49f6d89a4f9b28729163dc18549f3d3},
+}
+
+======================================================================
+Reference: claude-4
+Authors  : Anthropic
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3390/diagnostics15151919
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Diagnostics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/18b8bd2d5fc5b29a8d517a7a28b9bfcd34fec675
+@article{şalbaş2025performance,
+  title = {Performance of Large Language Models in Recognizing Brain MRI Sequences: A Comparative Analysis of ChatGPT-4o, Claude 4 Opus, and Gemini 2.5 Pro},
+  author = {Ali Şalbaş and R. Buyuktoka},
+  year = {2025},
+  journal = {Diagnostics},
+  doi = {10.3390/diagnostics15151919},
+  url = {https://www.semanticscholar.org/paper/18b8bd2d5fc5b29a8d517a7a28b9bfcd34fec675},
+}
+
+======================================================================
+Reference: 9th aimms-mopta optimization modeling competition (2017) production and delivery of radiopharmaceuticals to medical imaging centers
+Authors  : Team ApIO, Santiago Ramírez Palacio, Mariana Escallón Barrios, Daniel López Cornejo
+Year     : 
+Verdict  : unverified
+
+======================================================================
+Reference: Autoformulation of mathematical optimization models using llms
+Authors  : Nicolás Astorga, Tennison Liu, Yuanzhang Xiao, Mihaela van der Schaar
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2411.01679
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2411.01679v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/fee99505eddb66b815320a48314875265ed6230a
+@inproceedings{astorga2024autoformulation,
+  title = {Autoformulation of Mathematical Optimization Models Using LLMs},
+  author = {Nicolás Astorga and Tennison Liu and Yuanzhang Xiao and Mihaela van der Schaar},
+  year = {2024},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2411.01679},
+  eprint = {2411.01679},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2411.01679v2},
+}
+
+======================================================================
+Reference: Graph isomorphism in quasipolynomial time
+Authors  : László Babai
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/2897518.2897542
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1512.03547
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.85).
+      Suggestion: Use canonical title: Graph isomorphism in quasipolynomial time [extended abstract]
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/12fc55090dceb389d526aefd956cad3a211105af
+@inproceedings{babai2015graph,
+  title = {Graph isomorphism in quasipolynomial time [extended abstract]},
+  author = {L. Babai},
+  year = {2015},
+  booktitle = {Symposium on the Theory of Computing},
+  doi = {10.1145/2897518.2897542},
+  eprint = {1512.03547},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/12fc55090dceb389d526aefd956cad3a211105af},
+}
+
+======================================================================
+Reference: Janos: an integrated predictive and prescriptive modeling framework
+Authors  : David Bergman, Teng Huang, Philip Brooks, Andrea Lodi, Arvind U Raghunathan
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1287/ijoc.2020.1023
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1911.09461
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0d6bb64ecdf52e0dc2fb5ae812f418c85ee6398c
+@article{bergman2019janos,
+  title = {JANOS: An Integrated Predictive and Prescriptive Modeling Framework},
+  author = {David Bergman and Teng Huang and Philip Brooks and Andrea Lodi and A. Raghunathan},
+  year = {2019},
+  journal = {INFORMS journal on computing},
+  doi = {10.1287/ijoc.2020.1023},
+  eprint = {1911.09461},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/0d6bb64ecdf52e0dc2fb5ae812f418c85ee6398c},
+}
+
+======================================================================
+Reference: A question-answering system for high school algebra word problems
+Authors  : Daniel G Bobrow
+Year     : 1964
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/1464052.1464108
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/56b46699e2f38d28bbc5619f81333dc20f4f2172
+@article{bobrow1899questionanswering,
+  title = {A question-answering system for high school algebra word problems},
+  author = {D. Bobrow},
+  year = {1899},
+  journal = {AFIPS '64 (Fall, part I)},
+  doi = {10.1145/1464052.1464108},
+  url = {https://www.semanticscholar.org/paper/56b46699e2f38d28bbc5619f81333dc20f4f2172},
+}
+
+======================================================================
+Reference: An optimal lower bound on the number of variables for graph identification
+Authors  : Jin-Yi Cai, Martin Fürer, Neil Immerman
+Year     : 1992
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/bf01305232
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/262d9a9cd7b99a6008e59d440c8fadf1f375b51e
+@article{cai1992optimal,
+  title = {An optimal lower bound on the number of variables for graph identification},
+  author = {Jin-Yi Cai and Martin Fürer and N. Immerman},
+  year = {1992},
+  journal = {Comb.},
+  doi = {10.1007/bf01305232},
+  url = {https://www.semanticscholar.org/paper/262d9a9cd7b99a6008e59d440c8fadf1f375b51e},
+}
+
+======================================================================
+Reference: Gala: Global llm agents for text-to-model translation
+Authors  : Junyang Cai, Serdar Kadioglu, Bistra Dilkina
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'NeurIPS 2025 Workshop MLxOR' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: NeurIPS 2025 Workshop MLxOR.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2509.08970v2
+%   openreview: venue — https://openreview.net/forum?id=VD59fu9pEE
+@inproceedings{cai2025gala,
+  title = {Gala: Global LLM Agents for Text-to-Model Translation},
+  author = {Junyang Cai and Serdar Kadioglu and Bistra Dilkina},
+  year = {2025},
+  booktitle = {NeurIPS 2025 Workshop MLxOR},
+  eprint = {2509.08970},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2509.08970v2},
+}
+
+======================================================================
+Reference: Optichat: Bridging optimization models and practitioners with large language models
+Authors  : Hao Chen, Gonzalo Esteban Constante-Flores, Krishna Sri Ipsit Mantri, Sai Madhukiran Kompalli, Akshdeep Singh Ahluwalia, Can Li
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2501.08406
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2501.08406
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2501.08406v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/04eb39fb141f058081036a3c65610c59cd781792
+@article{chen2025optichat,
+  title = {OptiChat: Bridging Optimization Models and Practitioners with Large Language Models},
+  author = {Hao Chen and Gonzalo Esteban Constante-Flores and Krishna Sri Ipsit Mantri and Sai Madhukiran Kompalli and Akshdeep Singh Ahluwalia and Can Li},
+  year = {2025},
+  journal = {INFORMS Journal on Data Science},
+  doi = {10.48550/arxiv.2501.08406},
+  eprint = {2501.08406},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2501.08406v2},
+}
+
+======================================================================
+Reference: Program of thoughts prompting: Disentangling computation from reasoning for numerical reasoning tasks
+Authors  : Wenhu Chen, Xueguang Ma, Xinyi Wang, William W Cohen
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Trans. Mach. Learn. Res.' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Trans. Mach. Learn. Res..
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2211.12588v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/6c943670dca38bfc7c8b477ae7c2d1fba1ad3691
+@article{chen2022program,
+  title = {Program of Thoughts Prompting: Disentangling Computation from Reasoning for Numerical Reasoning Tasks},
+  author = {Wenhu Chen and Xueguang Ma and Xinyi Wang and William W. Cohen},
+  year = {2022},
+  journal = {Trans. Mach. Learn. Res.},
+  eprint = {2211.12588},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2211.12588v4},
+}
+
+======================================================================
+Reference: On representing linear programs by graph neural networks
+Authors  : Ziang Chen, Jialin Liu, Xinshang Wang, Jianfeng Lu, Wotao Yin
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2209.12288
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2209.12288v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e0fe6efa4e0046f6b03d83e5bad4516277c22cee
+@inproceedings{chen2022representing,
+  title = {On Representing Linear Programs by Graph Neural Networks},
+  author = {Ziang Chen and Jialin Liu and Xinshang Wang and Jianfeng Lu and Wotao Yin},
+  year = {2022},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2209.12288},
+  eprint = {2209.12288},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2209.12288v2},
+}
+
+======================================================================
+Reference: A deep reinforcement learning framework for column generation
+Authors  : Cheng Chi, Amine Aboussalah, Elias Khalil, Juyoung Wang, Zoha Sherkat-Masoumi
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2206.02568
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2206.02568
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2206.02568v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f063888136669bde478fe4f5b46b92ffba1762d5
+@article{chi2022deep,
+  title = {A Deep Reinforcement Learning Framework For Column Generation},
+  author = {Cheng Chi and Amine Mohamed Aboussalah and Elias B. Khalil and Juyoung Wang and Zoha Sherkat-Masoumi},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2206.02568},
+  eprint = {2206.02568},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2206.02568v3},
+}
+
+======================================================================
+Reference: Ner4opt: Named entity recognition for optimization modelling from natural language
+Authors  : Parag Pravin Dakle, Serdar Kadıo˘glu, Karthik Uppuluri, Regina Politi, Preethi Raghavan, SaiKrishna Rallabandi, Ravisutha Srinivasamurthy
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s10601-024-09376-5
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/b889a220df8b27948432dcce6c660e734d59a7f3
+@article{dakle2024neropt,
+  title = {Ner4Opt: named entity recognition for optimization modelling from natural language},
+  author = {Parag Dakle and Serdar Kadioğlu and Karthik Uppuluri and R. Politi and Preethi Raghavan and Sai Krishna Rallabandi and R. Srinivasamurthy},
+  year = {2024},
+  journal = {Constraints},
+  doi = {10.1007/s10601-024-09376-5},
+  url = {https://www.semanticscholar.org/paper/b889a220df8b27948432dcce6c660e734d59a7f3},
+}
+
+======================================================================
+Reference: A computer simulation of children’s arithmetic word-problem solving
+Authors  : Denise Dellarosa
+Year     : 1986
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3758/bf03201014
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/c321e6238cbb5933c0c1166f07f5033eee98b7ae
+@article{dellarosa1986computer,
+  title = {A computer simulation of children’s arithmetic word-problem solving},
+  author = {D. Dellarosa},
+  year = {1986},
+  journal = {Behavior Research Methods, Instruments, & Computers},
+  doi = {10.3758/bf03201014},
+  url = {https://www.semanticscholar.org/paper/c321e6238cbb5933c0c1166f07f5033eee98b7ae},
+}
+
+======================================================================
+Reference: Smart “predict, then optimize”
+Authors  : Adam N Elmachtoub, Paul Grigas
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1287/mnsc.2020.3922
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1710.08005
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0eb3c110b1a42dc79a988f3a3e6f9a6c73a57cb0
+@article{elmachtoub2017smart,
+  title = {Smart "Predict, then Optimize"},
+  author = {Adam N. Elmachtoub and Paul Grigas},
+  year = {2017},
+  journal = {Management Sciences},
+  doi = {10.1287/mnsc.2020.3922},
+  eprint = {1710.08005},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/0eb3c110b1a42dc79a988f3a3e6f9a6c73a57cb0},
+}
+
+======================================================================
+Reference: Specifying data
+Authors  : Robert Fourer, David M. Gay, Brian W. Kernighan
+Year     : 2003
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 0909.3596
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/828bd2c4886f7ffdd62d506f6bceed42b14b0ab8
+@misc{preston2009specifying,
+  title = {Specifying Data Objects with Initial Algebras},
+  author = {C. Preston},
+  year = {2009},
+  journal = {arXiv.org},
+  eprint = {0909.3596},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/828bd2c4886f7ffdd62d506f6bceed42b14b0ab8},
+}
+
+======================================================================
+Reference: Exact combinatorial optimization with graph convolutional neural networks
+Authors  : Maxime Gasse, Didier Chételat, Nicola Ferroni, Laurent Charlin, Andrea Lodi
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1906.01629
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1906.01629v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/03097420a1c4b2500cec6f29740f9d3c2164168f
+@article{gasse2019exact,
+  title = {Exact Combinatorial Optimization with Graph Convolutional Neural Networks},
+  author = {Maxime Gasse and Didier Chételat and Nicola Ferroni and Laurent Charlin and Andrea Lodi},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1906.01629},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1906.01629v3},
+}
+
+======================================================================
+Reference: Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning
+Authors  : Daya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu, Shirong Ma, Peiyi Wang, Xiao Bi, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Nature' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Nature.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41586-025-09422-z
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 200.
+      Suggestion: List all 200 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2501.12948v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2eed1fad9bbf887d4395de40f20144c4fafefd7f
+@article{deepseekai2025deepseekr,
+  title = {DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning},
+  author = {DeepSeek-AI and Daya Guo and Dejian Yang and Haowei Zhang and Junxiao Song and Peiyi Wang and Qihao Zhu and Runxin Xu and Ruoyu Zhang and Shirong Ma and Xiao Bi and Xiaokang Zhang and Xingkai Yu and Yu Wu and Z. F. Wu and Zhibin Gou and Zhihong Shao and Zhuoshu Li and Ziyi Gao and Aixin Liu and Bing Xue and Bingxuan Wang and Bochao Wu and Bei Feng and Chengda Lu and Chenggang Zhao and Chengqi Deng and Chenyu Zhang and Chong Ruan and Damai Dai and Deli Chen and Dongjie Ji and Erhang Li and Fangyun Lin and Fucong Dai and Fuli Luo and Guangbo Hao and Guanting Chen and Guowei Li and H. Zhang and Han Bao and Hanwei Xu and Haocheng Wang and Honghui Ding and Huajian Xin and Huazuo Gao and Hui Qu and Hui Li and Jianzhong Guo and Jiashi Li and Jiawei Wang and Jingchang Chen and Jingyang Yuan and Junjie Qiu and Junlong Li and J. L. Cai and Jiaqi Ni and Jian Liang and Jin Chen and Kai Dong and Kai Hu and Kaige Gao and Kang Guan and Kexin Huang and Kuai Yu and Lean Wang and Lecong Zhang and Liang Zhao and Litong Wang and Liyue Zhang and Lei Xu and Leyi Xia and Mingchuan Zhang and Minghua Zhang and Minghui Tang and Meng Li and Miaojun Wang and Mingming Li and Ning Tian and Panpan Huang and Peng Zhang and Qiancheng Wang and Qinyu Chen and Qiushi Du and Ruiqi Ge and Ruisong Zhang and Ruizhe Pan and Runji Wang and R. J. Chen and R. L. Jin and Ruyi Chen and Shanghao Lu and Shangyan Zhou and Shanhuang Chen and Shengfeng Ye and Shiyu Wang and Shuiping Yu and Shunfeng Zhou and Shuting Pan and S. S. Li and Shuang Zhou and Shaoqing Wu and Shengfeng Ye and Tao Yun and Tian Pei and Tianyu Sun and T. Wang and Wangding Zeng and Wanjia Zhao and Wen Liu and Wenfeng Liang and Wenjun Gao and Wenqin Yu and Wentao Zhang and W. L. Xiao and Wei An and Xiaodong Liu and Xiaohan Wang and Xiaokang Chen and Xiaotao Nie and Xin Cheng and Xin Liu and Xin Xie and Xingchao Liu and Xinyu Yang and Xinyuan Li and Xuecheng Su and Xuheng Lin and X. Q. Li and Xiangyue Jin and Xiaojin Shen and Xiaosha Chen and Xiaowen Sun and Xiaoxiang Wang and Xinnan Song and Xinyi Zhou and Xianzu Wang and Xinxia Shan and Y. K. Li and Y. Q. Wang and Y. X. Wei and Yang Zhang and Yanhong Xu and Yao Li and Yao Zhao and Yaofeng Sun and Yaohui Wang and Yi Yu and Yichao Zhang and Yifan Shi and Yiliang Xiong and Ying He and Yishi Piao and Yisong Wang and Yixuan Tan and Yiyang Ma and Yiyuan Liu and Yongqiang Guo and Yuan Ou and Yuduan Wang and Yue Gong and Yuheng Zou and Yujia He and Yunfan Xiong and Yuxiang Luo and Yuxiang You and Yuxuan Liu and Yuyang Zhou and Y. X. Zhu and Yanhong Xu and Yanping Huang and Yaohui Li and Yi Zheng and Yuchen Zhu and Yunxian Ma and Ying Tang and Yukun Zha and Yuting Yan and Z. Z. Ren and Zehui Ren and Zhangli Sha and Zhe Fu and Zhean Xu and Zhenda Xie and Zhengyan Zhang and Zhewen Hao and Zhicheng Ma and Zhigang Yan and Zhiyu Wu and Zihui Gu and Zijia Zhu and Zijun Liu and Zilin Li and Ziwei Xie and Ziyang Song and Zizheng Pan and Zhen Huang and Zhipeng Xu and Zhongyu Zhang and Zhen Zhang},
+  year = {2025},
+  journal = {Nature},
+  doi = {10.1038/s41586-025-09422-z},
+  eprint = {2501.12948},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2501.12948v2},
+}
+
+======================================================================
+Reference: Pyomo: modeling and solving mathematical programs in python
+Authors  : William E Hart, Jean-Paul Watson, David L Woodruff
+Year     : 2011
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s12532-011-0026-8
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e3504ad0646241fa161a81921d24b73564d88c24
+@article{hart2011pyomo,
+  title = {Pyomo: modeling and solving mathematical programs in Python},
+  author = {W. Hart and J. Watson and D. L. Woodruff},
+  year = {2011},
+  journal = {Mathematical Programming Computation},
+  doi = {10.1007/s12532-011-0026-8},
+  url = {https://www.semanticscholar.org/paper/e3504ad0646241fa161a81921d24b73564d88c24},
+}
+
+======================================================================
+Reference: Introduction to operations research
+Authors  : Frederick S Hillier, Gerald J Lieberman
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.2307/2345190
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, year — https://www.semanticscholar.org/paper/9dd7ff6bf7223da5976d878db7b6d594c0374cb6
+@article{kmietowicz1968introduction,
+  title = {Introduction to Operations Research.},
+  author = {Z. W. Kmietowicz and F. Hillier and G. Lieberman},
+  year = {1968},
+  doi = {10.2307/2345190},
+  url = {https://www.semanticscholar.org/paper/9dd7ff6bf7223da5976d878db7b6d594c0374cb6},
+}
+
+======================================================================
+Reference: Orlm: A customizable framework in training large models for automated optimization modeling
+Authors  : Chenyu Huang, Zhengyang Tang, Shixi Hu, Ruoqing Jiang, Xin Zheng, Dongdong Ge, Benyou Wang, Zizhuo Wang
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1287/opre.2024.1233
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2405.17743
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/de15adff32896fa645ab46392ef0a84e23aa66a2
+@article{huang2024orlm,
+  title = {ORLM: A Customizable Framework in Training Large Models for Automated Optimization Modeling},
+  author = {Chenyu Huang and Zhengyang Tang and S. Hu and Ruoqing Jiang and Xin Zheng and Dongdong Ge and Benyou Wang and Zizhuo Wang},
+  year = {2024},
+  journal = {Operational Research},
+  doi = {10.1287/opre.2024.1233},
+  eprint = {2405.17743},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/de15adff32896fa645ab46392ef0a84e23aa66a2},
+}
+
+======================================================================
+Reference: Mamo: a mathematical modeling benchmark with solvers
+Authors  : Xuhan Huang, Qingning Shen, Yan Hu, Anningzhe Gao, Benyou Wang
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2025.findings-naacl.146
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.13144v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/674fc0f78d9a7c0d68207f9748bdd94a638ffc95
+@article{huang2024llms,
+  title = {LLMs for Mathematical Modeling: Towards Bridging the Gap between Natural and Mathematical Languages},
+  author = {Xuhan Huang and Qingning Shen and Yan Hu and Anningzhe Gao and Benyou Wang},
+  year = {2024},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2025.findings-naacl.146},
+  eprint = {2405.13144},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.13144v3},
+}
+
+======================================================================
+Reference: Llmopt: Learning to define and solve general optimization problems from scratch
+Authors  : Caigao Jiang, Xiang Shu, Hong Qian, Xingyu Lu, Jun Zhou, Aimin Zhou, Yang Yu
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2410.13213
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2410.13213v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/537266d4bb895ffbb1fc77af12aafded491d1037
+@inproceedings{jiang2024llmopt,
+  title = {LLMOPT: Learning to Define and Solve General Optimization Problems from Scratch},
+  author = {Caigao Jiang and Xiang Shu and Hong Qian and Xingyu Lu and Jun Zhou and Aimin Zhou and Yang Yu},
+  year = {2024},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2410.13213},
+  eprint = {2410.13213},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2410.13213v2},
+}
+
+======================================================================
+Reference: Isac–instance-specific algorithm configuration
+Authors  : Serdar Kadioglu, Yuri Malitsky, Meinolf Sellmann, Kevin Tierney
+Year     : 2010
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3233/978-1-60750-606-5-751
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/bad5e63f54e54228be1d166163cf9de071a12d0c
+@inproceedings{kadioğlu2010isac,
+  title = {ISAC - Instance-Specific Algorithm Configuration},
+  author = {Serdar Kadioğlu and Yuri Malitsky and Meinolf Sellmann and Kevin Tierney},
+  year = {2010},
+  booktitle = {European Conference on Artificial Intelligence},
+  doi = {10.3233/978-1-60750-606-5-751},
+  url = {https://www.semanticscholar.org/paper/bad5e63f54e54228be1d166163cf9de071a12d0c},
+}
+
+======================================================================
+Reference: Algorithm selection and scheduling
+Authors  : Serdar Kadioglu, Yuri Malitsky, Ashish Sabharwal, Horst Samulowitz, Meinolf Sellmann
+Year     : 2011
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-642-23786-7_35
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/bfeebf0c5e2b72653cc1faa950170bb497bd21b1
+@inproceedings{kadioğlu2011algorithm,
+  title = {Algorithm Selection and Scheduling},
+  author = {Serdar Kadioğlu and Yuri Malitsky and Ashish Sabharwal and Horst Samulowitz and Meinolf Sellmann},
+  year = {2011},
+  booktitle = {International Conference on Principles and Practice of Constraint Programming},
+  doi = {10.1007/978-3-642-23786-7_35},
+  url = {https://www.semanticscholar.org/paper/bfeebf0c5e2b72653cc1faa950170bb497bd21b1},
+}
+
+======================================================================
+Reference: A reduction of a graph to a canonical form and an algebra arising during this reduction
+Authors  : Andrei Leman, Boris Weisfeiler
+Year     : 1968
+Verdict  : warning
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.54).
+      Suggestion: Use canonical title: THE REDUCTION OF A GRAPH TO CANONICAL FORM AND THE ALGEBRA WHICH APPEARS THEREIN
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, year — https://www.semanticscholar.org/paper/6d1d91a413af1212fea8791e266282019b62c37d
+@article{leman2018reduction,
+  title = {THE REDUCTION OF A GRAPH TO CANONICAL FORM AND THE ALGEBRA WHICH APPEARS THEREIN},
+  author = {A. Leman},
+  year = {2018},
+  url = {https://www.semanticscholar.org/paper/6d1d91a413af1212fea8791e266282019b62c37d},
+}
+
+======================================================================
+Reference: Smac3: A versatile bayesian optimization package for hyperparameter optimization
+Authors  : Marius Lindauer, Katharina Eggensperger, Matthias Feurer, André Biedenkapp, Difan Deng, Carolin Benjamins, Tim Ruhkopf, René Sass, Frank Hutter
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2109.09831
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/c3d07f6838e9c50c0bdd0e5b4b761c6f7244b617
+@article{lindauer2021smac,
+  title = {SMAC3: A Versatile Bayesian Optimization Package for Hyperparameter Optimization},
+  author = {M. Lindauer and Katharina Eggensperger and Matthias Feurer and André Biedenkapp and Difan Deng and C. Benjamins and René Sass and F. Hutter},
+  year = {2021},
+  journal = {Journal of machine learning research},
+  eprint = {2109.09831},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/c3d07f6838e9c50c0bdd0e5b4b761c6f7244b617},
+}
+
+======================================================================
+Reference: Deepseek-v3 technical report
+Authors  : Aixin Liu, Bei Feng, Bing Xue, Bingxuan Wang, Bochao Wu, Chengda Lu, Chenggang Zhao, Chengqi Deng, Chenyu Zhang, Chong Ruan, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CoRR 2024' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CoRR 2024.
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 200.
+      Suggestion: List all 200 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2412.19437v2
+%   openreview: venue — https://openreview.net/forum?id=flMS0vfo9P
+@article{deepseekai2024deepseekv,
+  title = {DeepSeek-V3 Technical Report},
+  author = {DeepSeek-AI and Aixin Liu and Bei Feng and Bing Xue and Bingxuan Wang and Bochao Wu and Chengda Lu and Chenggang Zhao and Chengqi Deng and Chenyu Zhang and Chong Ruan and Damai Dai and Daya Guo and Dejian Yang and Deli Chen and Dongjie Ji and Erhang Li and Fangyun Lin and Fucong Dai and Fuli Luo and Guangbo Hao and Guanting Chen and Guowei Li and H. Zhang and Han Bao and Hanwei Xu and Haocheng Wang and Haowei Zhang and Honghui Ding and Huajian Xin and Huazuo Gao and Hui Li and Hui Qu and J. L. Cai and Jian Liang and Jianzhong Guo and Jiaqi Ni and Jiashi Li and Jiawei Wang and Jin Chen and Jingchang Chen and Jingyang Yuan and Junjie Qiu and Junlong Li and Junxiao Song and Kai Dong and Kai Hu and Kaige Gao and Kang Guan and Kexin Huang and Kuai Yu and Lean Wang and Lecong Zhang and Lei Xu and Leyi Xia and Liang Zhao and Litong Wang and Liyue Zhang and Meng Li and Miaojun Wang and Mingchuan Zhang and Minghua Zhang and Minghui Tang and Mingming Li and Ning Tian and Panpan Huang and Peiyi Wang and Peng Zhang and Qiancheng Wang and Qihao Zhu and Qinyu Chen and Qiushi Du and R. J. Chen and R. L. Jin and Ruiqi Ge and Ruisong Zhang and Ruizhe Pan and Runji Wang and Runxin Xu and Ruoyu Zhang and Ruyi Chen and S. S. Li and Shanghao Lu and Shangyan Zhou and Shanhuang Chen and Shaoqing Wu and Shengfeng Ye and Shengfeng Ye and Shirong Ma and Shiyu Wang and Shuang Zhou and Shuiping Yu and Shunfeng Zhou and Shuting Pan and T. Wang and Tao Yun and Tian Pei and Tianyu Sun and W. L. Xiao and Wangding Zeng and Wanjia Zhao and Wei An and Wen Liu and Wenfeng Liang and Wenjun Gao and Wenqin Yu and Wentao Zhang and X. Q. Li and Xiangyue Jin and Xianzu Wang and Xiao Bi and Xiaodong Liu and Xiaohan Wang and Xiaojin Shen and Xiaokang Chen and Xiaokang Zhang and Xiaosha Chen and Xiaotao Nie and Xiaowen Sun and Xiaoxiang Wang and Xin Cheng and Xin Liu and Xin Xie and Xingchao Liu and Xingkai Yu and Xinnan Song and Xinxia Shan and Xinyi Zhou and Xinyu Yang and Xinyuan Li and Xuecheng Su and Xuheng Lin and Y. K. Li and Y. Q. Wang and Y. X. Wei and Y. X. Zhu and Yang Zhang and Yanhong Xu and Yanhong Xu and Yanping Huang and Yao Li and Yao Zhao and Yaofeng Sun and Yaohui Li and Yaohui Wang and Yi Yu and Yi Zheng and Yichao Zhang and Yifan Shi and Yiliang Xiong and Ying He and Ying Tang and Yishi Piao and Yisong Wang and Yixuan Tan and Yiyang Ma and Yiyuan Liu and Yongqiang Guo and Yu Wu and Yuan Ou and Yuchen Zhu and Yuduan Wang and Yue Gong and Yuheng Zou and Yujia He and Yukun Zha and Yunfan Xiong and Yunxian Ma and Yuting Yan and Yuxiang Luo and Yuxiang You and Yuxuan Liu and Yuyang Zhou and Z. F. Wu and Z. Z. Ren and Zehui Ren and Zhangli Sha and Zhe Fu and Zhean Xu and Zhen Huang and Zhen Zhang and Zhenda Xie and Zhengyan Zhang and Zhewen Hao and Zhibin Gou and Zhicheng Ma and Zhigang Yan and Zhihong Shao and Zhipeng Xu and Zhiyu Wu and Zhongyu Zhang and Zhuoshu Li and Zihui Gu and Zijia Zhu and Zijun Liu and Zilin Li and Ziwei Xie and Ziyang Song and Ziyi Gao and Zizheng Pan},
+  year = {2024},
+  journal = {CoRR 2024},
+  eprint = {2412.19437},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2412.19437v2},
+}
+
+======================================================================
+Reference: Mm-agent: Llm as agents for real-world mathematical modeling problem
+Authors  : Fan Liu, Zherui Yang, Cancheng Liu, Tianrui Song, Xiaofeng Gao, Hao Liu
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2505.14148
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2505.14148v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e31e308af1ed531d550adb3483cba0bb0a85e5bb
+@misc{liu2025mmagent,
+  title = {MM-Agent: LLM as Agents for Real-world Mathematical Modeling Problem},
+  author = {Fan Liu and Zherui Yang and Cancheng Liu and Tianrui Song and Xiaofeng Gao and Hao Liu},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2505.14148},
+  eprint = {2505.14148},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2505.14148v1},
+}
+
+======================================================================
+Reference: Mathbench: Evaluating the theory and application proficiency of llms with a hierarchical mathematics benchmark
+Authors  : Hongwei Liu, Zilong Zheng, Yuxuan Qiao, Haodong Duan, Zhiwei Fei, Fengzhe Zhou, Wenwei Zhang, Songyang Zhang, Dahua Lin, Kai Chen
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2405.12209
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.12209v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f957b64a4ce31dd9032570ee11b9fca942365f81
+@inproceedings{liu2024mathbench,
+  title = {MathBench: Evaluating the Theory and Application Proficiency of LLMs with a Hierarchical Mathematics Benchmark},
+  author = {Hongwei Liu and Zilong Zheng and Yuxuan Qiao and Haodong Duan and Zhiwei Fei and Fengzhe Zhou and Wenwei Zhang and Songyang Zhang and Dahua Lin and Kai Chen},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2405.12209},
+  eprint = {2405.12209},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.12209v1},
+}
+
+======================================================================
+Reference: Optmath: A scalable bidirectional data synthesis framework for optimization modeling
+Authors  : Hongliang Lu, Zhonglin Xie, Yaoyu Wu, Can Ren, Yuxuan Chen, Zaiwen Wen
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2502.11102
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2502.11102v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/ed0caf27d3dcee024b81323a04c4f2185da011c2
+@inproceedings{lu2025optmath,
+  title = {OptMATH: A Scalable Bidirectional Data Synthesis Framework for Optimization Modeling},
+  author = {Hongliang Lu and Zhonglin Xie and Yaoyu Wu and Can Ren and Yuxuan Chen and Zaiwen Wen},
+  year = {2025},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2502.11102},
+  eprint = {2502.11102},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2502.11102v2},
+}
+
+======================================================================
+Reference: Linear and nonlinear programming
+Authors  : David G Luenberger, Yinyu Ye, et al.
+Year     : 1984
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/0378-4754(86)90092-3
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: doi, title, year — https://www.semanticscholar.org/paper/81b7664331dccc3c584cd909ea3531520e266704
+@article{2016linear,
+  title = {Linear And Nonlinear Programming},
+  year = {2016},
+  doi = {10.1016/0378-4754(86)90092-3},
+  url = {https://www.semanticscholar.org/paper/81b7664331dccc3c584cd909ea3531520e266704},
+}
+
+======================================================================
+Reference: Mixed-integer optimization with constraint learning
+Authors  : Donato Maragno, Holly Wiberg, Dimitris Bertsimas, ¸ S ˙Ilker Birbil, Dick den Hertog, Adejuyigbe O Fajemisin
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1287/opre.2021.0707
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2111.04469
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a972fc95f9c3385c2f3896e1aac40fe1dcd12b99
+@article{maragno2021mixedinteger,
+  title = {Mixed-Integer Optimization with Constraint Learning},
+  author = {Donato Maragno and H. Wiberg and D. Bertsimas and Ş. Birbil and D. Hertog and Adejuyigbe O. Fajemisin},
+  year = {2021},
+  journal = {Operational Research},
+  doi = {10.1287/opre.2021.0707},
+  eprint = {2111.04469},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/a972fc95f9c3385c2f3896e1aac40fe1dcd12b99},
+}
+
+======================================================================
+Reference: Constraint modelling with llms using in-context learning
+Authors  : Kostis Michailidis, Dimos Tsouros, Tias Guns
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.4230/lipics.cp.2024.20
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ed1a1c698706f2fdfb2dc4f1b2965fef50a54068
+@inproceedings{michailidis2024constraint,
+  title = {Constraint Modelling with LLMs Using In-Context Learning},
+  author = {Kostis Michailidis and Dimos Tsouros and Tias Guns},
+  year = {2024},
+  booktitle = {International Conference on Principles and Practice of Constraint Programming},
+  doi = {10.4230/lipics.cp.2024.20},
+  url = {https://www.semanticscholar.org/paper/ed1a1c698706f2fdfb2dc4f1b2965fef50a54068},
+}
+
+======================================================================
+Reference: Openai o1 system card
+Authors  : OpenAI
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2412.16720
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2412.16720
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2412.16720v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/985298bd0b6f4c84ab34bb15cfed0b092f43b83a
+@misc{openai2024openai,
+  title = {OpenAI o1 System Card},
+  author = {OpenAI and : and Aaron Jaech and Adam Kalai and Adam Lerer and Adam Richardson and Ahmed El-Kishky and Aiden Low and Alec Helyar and Aleksander Madry and Alex Beutel and Alex Carney and Alex Iftimie and Alex Karpenko and Alex Tachard Passos and Alexander Neitz and Alexander Prokofiev and Alexander Wei and Allison Tam and Ally Bennett and Ananya Kumar and Andre Saraiva and Andrea Vallone and Andrew Duberstein and Andrew Kondrich and Andrey Mishchenko and Andy Applebaum and Angela Jiang and Ashvin Nair and Barret Zoph and Behrooz Ghorbani and Bohan Zhang and Ben Rossen and Benjamin Sokolowsky and Boaz Barak and Bob McGrew and Borys Minaiev and Botao Hao and Bowen Baker and Brandon Houghton and Brandon McKinzie and Brydon Eastman and Camillo Lugaresi and Cary Bassin and Cary Hudson and Chak Ming Li and Charles de Bourcy and Chelsea Voss and Chen Shen and Chong Zhang and Chris Koch and Chris Orsinger and Christopher Hesse and Claudia Fischer and Clive Chan and Dan Roberts and Daniel Kappler and Daniel Levy and Daniel Selsam and David Dohan and David Farhi and David Mely and David Robinson and Dimitris Tsipras and Doug Li and Dragos Oprica and Eben Freeman and Eddie Zhang and Edmund Wong and Elizabeth Proehl and Enoch Cheung and Eric Mitchell and Eric Wallace and Erik Ritter and Evan Mays and Fan Wang and Felipe Petroski Such and Filippo Raso and Florencia Leoni and Foivos Tsimpourlas and Francis Song and Fred von Lohmann and Freddie Sulit and Geoff Salmon and Giambattista Parascandolo and Gildas Chabot and Grace Zhao and Greg Brockman and Guillaume Leclerc and Hadi Salman and Haiming Bao and Hao Sheng and Hart Andrin and Hessam Bagherinezhad and Hongyu Ren and Hunter Lightman and Hyung Won Chung and Ian Kivlichan and Ian O'Connell and Ian Osband and Ignasi Clavera Gilaberte and Ilge Akkaya and Ilya Kostrikov and Ilya Sutskever and Irina Kofman and Jakub Pachocki and James Lennon and Jason Wei and Jean Harb and Jerry Twore and Jiacheng Feng and Jiahui Yu and Jiayi Weng and Jie Tang and Jieqi Yu and Joaquin Quiñonero Candela and Joe Palermo and Joel Parish and Johannes Heidecke and John Hallman and John Rizzo and Jonathan Gordon and Jonathan Uesato and Jonathan Ward and Joost Huizinga and Julie Wang and Kai Chen and Kai Xiao and Karan Singhal and Karina Nguyen and Karl Cobbe and Katy Shi and Kayla Wood and Kendra Rimbach and Keren Gu-Lemberg and Kevin Liu and Kevin Lu and Kevin Stone and Kevin Yu and Lama Ahmad and Lauren Yang and Leo Liu and Leon Maksin and Leyton Ho and Liam Fedus and Lilian Weng and Linden Li and Lindsay McCallum and Lindsey Held and Lorenz Kuhn and Lukas Kondraciuk and Lukasz Kaiser and Luke Metz and Madelaine Boyd and Maja Trebacz and Manas Joglekar and Mark Chen and Marko Tintor and Mason Meyer and Matt Jones and Matt Kaufer and Max Schwarzer and Meghan Shah and Mehmet Yatbaz and Melody Y. Guan and Mengyuan Xu and Mengyuan Yan and Mia Glaese and Mianna Chen and Michael Lampe and Michael Malek and Michele Wang and Michelle Fradin and Mike McClay and Mikhail Pavlov and Miles Wang and Mingxuan Wang and Mira Murati and Mo Bavarian and Mostafa Rohaninejad and Nat McAleese and Neil Chowdhury and Neil Chowdhury and Nick Ryder and Nikolas Tezak and Noam Brown and Ofir Nachum and Oleg Boiko and Oleg Murk and Olivia Watkins and Patrick Chao and Paul Ashbourne and Pavel Izmailov and Peter Zhokhov and Rachel Dias and Rahul Arora and Randall Lin and Rapha Gontijo Lopes and Raz Gaon and Reah Miyara and Reimar Leike and Renny Hwang and Rhythm Garg and Robin Brown and Roshan James and Rui Shu and Ryan Cheu and Ryan Greene and Saachi Jain and Sam Altman and Sam Toizer and Sam Toyer and Samuel Miserendino and Sandhini Agarwal and Santiago Hernandez and Sasha Baker and Scott McKinney and Scottie Yan and Shengjia Zhao and Shengli Hu and Shibani Santurkar and Shraman Ray Chaudhuri and Shuyuan Zhang and Siyuan Fu and Spencer Papay and Steph Lin and Suchir Balaji and Suvansh Sanjeev and Szymon Sidor and Tal Broda and Aidan Clark and Tao Wang and Taylor Gordon and Ted Sanders and Tejal Patwardhan and Thibault Sottiaux and Thomas Degry and Thomas Dimson and Tianhao Zheng and Timur Garipov and Tom Stasi and Trapit Bansal and Trevor Creech and Troy Peterson and Tyna Eloundou and Valerie Qi and Vineet Kosaraju and Vinnie Monaco and Vitchyr Pong and Vlad Fomenko and Weiyi Zheng and Wenda Zhou and Wenting Zhan and Wes McCabe and Wojciech Zaremba and Yann Dubois and Yinghai Lu and Yining Chen and Young Cha and Yu Bai and Yuchen He and Yuchen Zhang and Yunyun Wang and Zheng Shao and Zhuohan Li},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2412.16720},
+  eprint = {2412.16720},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2412.16720v2},
+}
+
+======================================================================
+Reference: Openai o3 system card
+Authors  : OpenAI
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: CoRR 2024
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   openreview: authors, venue, year — https://openreview.net/forum?id=WJe5NW1noE
+%   semantic_scholar: title — https://www.semanticscholar.org/paper/3b6ffb33c01fa6c4986785bdfd69ab705d6b05b6
+@article{jaech2024openai,
+  title = {OpenAI o3 and o4-mini System Card},
+  author = {Aaron Jaech and Adam Kalai and Adam Lerer and Adam Richardson and Ahmed El-Kishky and Aiden Low and Alec Helyar and Aleksander Madry and Alex Beutel and Alex Carney and Alex Iftimie and Alex Karpenko and Alex Tachard Passos and Alexander Neitz and Alexander Prokofiev and Alexander Wei and Allison Tam and Ally Bennett and Ananya Kumar and Andre Saraiva and Andrea Vallone and Andrew Duberstein and Andrew Kondrich and Andrey Mishchenko and Andy Applebaum and Angela Jiang and Ashvin Nair and Barret Zoph and Behrooz Ghorbani and Ben Rossen and Benjamin Sokolowsky and Boaz Barak and Bob McGrew and Borys Minaiev and Botao Hao and Bowen Baker and Brandon Houghton and Brandon McKinzie and Brydon Eastman and Camillo Lugaresi and Cary Bassin and Cary Hudson and Chak Ming Li and Charles de Bourcy and Chelsea Voss and Chen Shen and Chong Zhang and Chris Koch and Chris Orsinger and Christopher Hesse and Claudia Fischer and Clive Chan and Dan Roberts and Daniel Kappler and Daniel Levy and Daniel Selsam and David Dohan and David Farhi and David Mely and David Robinson and Dimitris Tsipras and Doug Li and Dragos Oprica and Eben Freeman and Eddie Zhang and Edmund Wong and Elizabeth Proehl and Enoch Cheung and Eric Mitchell and Eric Wallace and Erik Ritter and Evan Mays and Fan Wang and Felipe Petroski Such and Filippo Raso and Florencia Leoni and Foivos Tsimpourlas and Francis Song and Fred von Lohmann and Freddie Sulit and Geoff Salmon and Giambattista Parascandolo and Gildas Chabot and Grace Zhao and Greg Brockman and Guillaume Leclerc and Hadi Salman and Haiming Bao and Hao Sheng and Hart Andrin and Hessam Bagherinezhad and Hongyu Ren and Hunter Lightman and Hyung Won Chung and Ian Kivlichan and Ian O'Connell and Ian Osband and Ignasi Clavera Gilaberte and Ilge Akkaya},
+  year = {2024},
+  journal = {CoRR 2024},
+  url = {https://www.semanticscholar.org/paper/3b6ffb33c01fa6c4986785bdfd69ab705d6b05b6},
+}
+
+======================================================================
+Reference: Augmenting operations research with auto-formulation of optimization models from problem descriptions
+Authors  : Rindranirina Ramamonjison, Haley Li, Timothy T Yu, Shiqi He, Vishnu Rengan, Amin Banitalebi-Dehkordi, Zirui Zhou, Yong Zhang
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2209.15565
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2209.15565v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2fe6060ced80c1c245a718e6188b6516207bf0a8
+@inproceedings{ramamonjison2022augmenting,
+  title = {Augmenting Operations Research with Auto-Formulation of Optimization Models from Problem Descriptions},
+  author = {Rindranirina Ramamonjison and Haley Li and Timothy T. Yu and Shiqi He and Vishnu Rengan and Amin Banitalebi-Dehkordi and Zirui Zhou and Yong Zhang},
+  year = {2022},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2209.15565},
+  eprint = {2209.15565},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2209.15565v2},
+}
+
+======================================================================
+Reference: Nl4opt competition: Formulating optimization problems based on their natural language descriptions
+Authors  : Rindranirina Ramamonjison, Timothy Yu, Raymond Li, Haley Li, Giuseppe Carenini, Bissan Ghaddar, Shiqi He, Mahdi Mostajabdaveh, Amin Banitalebi-Dehkordi, Zirui Zhou, Yong Zhang
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2303.08233
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.08233
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/c9a9735216915e9afa0fc97b02b57148a0491bdd
+@article{ramamonjison2023nlopt,
+  title = {NL4Opt Competition: Formulating Optimization Problems Based on Their Natural Language Descriptions},
+  author = {Rindranirina Ramamonjison and Timothy T. L. Yu and Raymond Li and Haley Li and G. Carenini and Bissan Ghaddar and Shiqi He and Mahdi Mostajabdaveh and Amin Banitalebi-Dehkordi and Zirui Zhou and Yong Zhang},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2303.08233},
+  eprint = {2303.08233},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/c9a9735216915e9afa0fc97b02b57148a0491bdd},
+}
+
+======================================================================
+Reference: Mathematical discoveries from program search with large language models
+Authors  : Bernardino Romera-Paredes, Mohammadamin Barekatain, Alexander Novikov, Matej Balog, M Pawan Kumar, Emilien Dupont, Francisco JR Ruiz, Jordan S Ellenberg, Pengming Wang, Omar Fawzi, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41586-023-06924-6
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 17.
+      Suggestion: List all 17 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d32ba88571141ed0ebe7aeefbaa4ccaf8cda7be3
+@article{romeraparedes2023mathematical,
+  title = {Mathematical discoveries from program search with large language models},
+  author = {B. Romera-Paredes and M. Barekatain and Alexander Novikov and Matej Balog and M. P. Kumar and Emilien Dupont and Francisco J. R. Ruiz and J. Ellenberg and Pengming Wang and Omar Fawzi and Pushmeet Kohli and Alhussein Fawzi and Joshua A. Grochow and Andrea Lodi and Jean-Baptiste Mouret and Talia Ringer and Tao Yu},
+  year = {2023},
+  journal = {Nature},
+  doi = {10.1038/s41586-023-06924-6},
+  url = {https://www.semanticscholar.org/paper/d32ba88571141ed0ebe7aeefbaa4ccaf8cda7be3},
+}
+
+======================================================================
+Reference: Arb: Advanced reasoning benchmark for large language models
+Authors  : Tomohiro Sawada, Daniel Paleka, Alexander Havrilla, Pranav Tadepalli, Paula Vidas, Alexander Kranias, John J Nay, Kshitij Gupta, Aran Komatsuzaki
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2307.13692
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2307.13692v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c29dbfbc17fa190b787a2662d49f08a38c8bd166
+@misc{sawada2023advanced,
+  title = {ARB: Advanced Reasoning Benchmark for Large Language Models},
+  author = {Tomohiro Sawada and Daniel Paleka and Alexander Havrilla and Pranav Tadepalli and Paula Vidas and Alexander Kranias and John J. Nay and Kshitij Gupta and Aran Komatsuzaki},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2307.13692},
+  eprint = {2307.13692},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2307.13692v2},
+}
+
+======================================================================
+Reference: Text2zinc: A cross-domain dataset for modeling optimization and satisfaction problems in minizinc
+Authors  : Akash Singirikonda, Serdar Kadioglu, Karthik Uppuluri
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2503.10642
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2503.10642v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/55e97aa15f296b2bcd950b244e57706b8de17063
+@misc{singirikonda2025textzinc,
+  title = {Text2Zinc: A Cross-Domain Dataset for Modeling Optimization and Satisfaction Problems in MiniZinc},
+  author = {Akash Singirikonda and Serdar Kadioglu and Karthik Uppuluri},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2503.10642},
+  eprint = {2503.10642},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2503.10642v1},
+}
+
+======================================================================
+Reference: Metaheuristics: From design to implementation
+Authors  : EG Talbi
+Year     : 2009
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1002/9780470496916
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, year — https://www.semanticscholar.org/paper/52ff98489e49632eb3626696f5f58b948b6dbbe4
+@article{talbi2009metaheuristics,
+  title = {Metaheuristics: From Design to Implementation},
+  author = {El-Ghazali Talbi},
+  year = {2009},
+  doi = {10.1002/9780470496916},
+  url = {https://www.semanticscholar.org/paper/52ff98489e49632eb3626696f5f58b948b6dbbe4},
+}
+
+======================================================================
+Reference: Orlm: Training large language models for optimization modeling
+Authors  : Zhengyang Tang, Chenyu Huang, Xin Zheng, Shixi Hu, Zizhuo Wang, Dongdong Ge, Benyou Wang
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Operational Research' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Operational Research.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1287/opre.2024.1233
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.63).
+      Suggestion: Use canonical title: ORLM: A Customizable Framework in Training Large Models for Automated Optimization Modeling
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.17743v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/de15adff32896fa645ab46392ef0a84e23aa66a2
+@article{huang2024orlm,
+  title = {ORLM: A Customizable Framework in Training Large Models for Automated Optimization Modeling},
+  author = {Chenyu Huang and Zhengyang Tang and Shixi Hu and Ruoqing Jiang and Xin Zheng and Dongdong Ge and Benyou Wang and Zizhuo Wang},
+  year = {2024},
+  journal = {Operational Research},
+  doi = {10.1287/opre.2024.1233},
+  eprint = {2405.17743},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.17743v5},
+}
+
+======================================================================
+Reference: Holy grail 2.0: From natural language to constraint models
+Authors  : Dimos Tsouros, Hélène Verhaeghe, Serdar Kadıo˘glu, Tias Guns
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2308.01589
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2308.01589v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d44a71c57e06e77fe869b71129a72d2bd7405ef5
+@misc{tsouros2023holy,
+  title = {Holy Grail 2.0: From Natural Language to Constraint Models},
+  author = {Dimos Tsouros and Hélène Verhaeghe and Serdar Kadıoğlu and Tias Guns},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2308.01589},
+  eprint = {2308.01589},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2308.01589v1},
+}
+
+======================================================================
+Reference: Satnet: Bridging deep learning and logical reasoning using a differentiable satisfiability solver
+Authors  : Po-Wei Wang, Priya Donti, Bryan Wilder, Zico Kolter
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1905.12149
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.12149v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/d3850595d3ae7c73e9488054c9b437f75511b569
+@inproceedings{wang2019satnet,
+  title = {SATNet: Bridging deep learning and logical reasoning using a differentiable satisfiability solver},
+  author = {Po-Wei Wang and Priya L. Donti and Bryan Wilder and Zico Kolter},
+  year = {2019},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1905.12149},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.12149v1},
+}
+
+======================================================================
+Reference: Operations research: applications and algorithm
+Authors  : Wayne L Winston
+Year     : 2004
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1080/00401706.1988.10488426
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/b3250dc1970006b07b690762cf7e4e261462848a
+@article{zieyel1988operations,
+  title = {Operations research : applications and algorithms},
+  author = {Eric R. Zieyel},
+  year = {1988},
+  journal = {Technometrics},
+  doi = {10.1080/00401706.1988.10488426},
+  url = {https://www.semanticscholar.org/paper/b3250dc1970006b07b690762cf7e4e261462848a},
+}
+
+======================================================================
+Reference: Benchmarking llms for optimization modeling and enhancing reasoning via reverse socratic synthesis
+Authors  : Zhicheng Yang, Yinya Huang, Wei Shi, Liang Feng, Linqi Song, Yiwei Wang, Xiaodan Liang, Jing Tang
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.09887v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/0e375b1f162589cd2e7368de0cc459debb6154a9
+@inproceedings{yang2024optibench,
+  title = {OptiBench Meets ReSocratic: Measure and Improve LLMs for Optimization Modeling},
+  author = {Zhicheng Yang and Yiwei Wang and Yinya Huang and Zhijiang Guo and Wei Shi and Xiongwei Han and Liang Feng and Linqi Song and Xiaodan Liang and Jing Tang},
+  year = {2024},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2407.09887},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.09887v4},
+}
+
+======================================================================
+Reference: Optibench meets resocratic: Measure and improve llms for optimization modeling
+Authors  : Zhicheng Yang, Yiwei Wang, Yinya Huang, Zhijiang Guo, Wei Shi, Xiongwei Han, Liang Feng, Linqi Song, Xiaodan Liang, Jing Tang
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.09887v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/0e375b1f162589cd2e7368de0cc459debb6154a9
+@inproceedings{yang2024optibench,
+  title = {OptiBench Meets ReSocratic: Measure and Improve LLMs for Optimization Modeling},
+  author = {Zhicheng Yang and Yiwei Wang and Yinya Huang and Zhijiang Guo and Wei Shi and Xiongwei Han and Liang Feng and Linqi Song and Xiaodan Liang and Jing Tang},
+  year = {2024},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2407.09887},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.09887v4},
+}
+
+======================================================================
+Reference: A reinforcement learning approach to parameter selection for distributed optimal power flow
+Authors  : Sihan Zeng, Alyssa Kody, Youngdae Kim, Kibaek Kim, Daniel K Molzahn
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.epsr.2022.108546
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2110.11991
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2a480633811af1df9dfbc7bb369bb2c00a071a11
+@article{zeng2021reinforcement,
+  title = {A reinforcement learning approach to parameter selection for distributed optimal power flow},
+  author = {Sihan Zeng and A. Kody and Youngdae Kim and Kibaek Kim and D. Molzahn},
+  year = {2021},
+  journal = {Electric power systems research},
+  doi = {10.1016/j.epsr.2022.108546},
+  eprint = {2110.11991},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/2a480633811af1df9dfbc7bb369bb2c00a071a11},
+}
+
+======================================================================
+Reference: Equivamap: Leveraging llms for automatic equivalence checking of optimization formulations
+Authors  : Haotian Zhai, Connor Lawless, Ellen Vitercik, Liu Leqi
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2502.14760
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2502.14760v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f6bafe58b85a1d25c62e6fc488b02d2fab25a7a3
+@inproceedings{zhai2025equivamap,
+  title = {EquivaMap: Leveraging LLMs for Automatic Equivalence Checking of Optimization Formulations},
+  author = {Haotian Zhai and Connor Lawless and Ellen Vitercik and Liu Leqi},
+  year = {2025},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2502.14760},
+  eprint = {2502.14760},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2502.14760v2},
+}
+
+======================================================================
+Reference: Graph neural networks: A review of methods and applications
+Authors  : Jie Zhou, Ganqu Cui, Shengding Hu, Zhengyan Zhang, Cheng Yang, Zhiyuan Liu, Lifeng Wang, Changcheng Li, Maosong Sun
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.aiopen.2021.01.001
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1812.08434
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ea5dd6a3d8f210d05e53a7b6fa5e16f1b115f693
+@article{zhou2018graph,
+  title = {Graph Neural Networks: A Review of Methods and Applications},
+  author = {Jie Zhou and Ganqu Cui and Zhengyan Zhang and Cheng Yang and Zhiyuan Liu and Maosong Sun},
+  year = {2018},
+  journal = {AI Open},
+  doi = {10.1016/j.aiopen.2021.01.001},
+  eprint = {1812.08434},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/ea5dd6a3d8f210d05e53a7b6fa5e16f1b115f693},
+}
+
+======================================================================
+Reference: Is your model really a good math reasoner? evaluating mathematical reasoning with checklist
+Authors  : Zihao Zhou, Shudong Liu, Maizhen Ning, Wei Liu, Jindong Wang, Derek F Wong, Xiaowei Huang, Qiufeng Wang, Kaizhu Huang
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.08733
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.08733v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d97d7c977da22d94c7c82b57e5fa43d379c26ced
+@inproceedings{zhou2024your,
+  title = {Is Your Model Really A Good Math Reasoner? Evaluating Mathematical Reasoning with Checklist},
+  author = {Zihao Zhou and Shudong Liu and Maizhen Ning and Wei Liu and Jindong Wang and Derek F. Wong and Xiaowei Huang and Qiufeng Wang and Kaizhu Huang},
+  year = {2024},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2407.08733},
+  eprint = {2407.08733},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.08733v2},
+}

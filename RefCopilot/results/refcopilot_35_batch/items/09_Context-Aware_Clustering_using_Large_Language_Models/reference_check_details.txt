@@ -1,0 +1,541 @@
+======================================================================
+Reference: Gpt-4 technical report
+Authors  : Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CoRR 2024' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CoRR 2024.
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 281.
+      Suggestion: List all 281 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.08774v6
+%   openreview: venue — https://openreview.net/forum?id=53paKRfmgs
+@article{openai2023technical,
+  title = {GPT-4 Technical Report},
+  author = {OpenAI and Josh Achiam and Steven Adler and Sandhini Agarwal and Lama Ahmad and Ilge Akkaya and Florencia Leoni Aleman and Diogo Almeida and Janko Altenschmidt and Sam Altman and Shyamal Anadkat and Red Avila and Igor Babuschkin and Suchir Balaji and Valerie Balcom and Paul Baltescu and Haiming Bao and Mohammad Bavarian and Jeff Belgum and Irwan Bello and Jake Berdine and Gabriel Bernadett-Shapiro and Christopher Berner and Lenny Bogdonoff and Oleg Boiko and Madelaine Boyd and Anna-Luisa Brakman and Greg Brockman and Tim Brooks and Miles Brundage and Kevin Button and Trevor Cai and Rosie Campbell and Andrew Cann and Brittany Carey and Chelsea Carlson and Rory Carmichael and Brooke Chan and Che Chang and Fotis Chantzis and Derek Chen and Sully Chen and Ruby Chen and Jason Chen and Mark Chen and Ben Chess and Chester Cho and Casey Chu and Hyung Won Chung and Dave Cummings and Jeremiah Currier and Yunxing Dai and Cory Decareaux and Thomas Degry and Noah Deutsch and Damien Deville and Arka Dhar and David Dohan and Steve Dowling and Sheila Dunning and Adrien Ecoffet and Atty Eleti and Tyna Eloundou and David Farhi and Liam Fedus and Niko Felix and Simón Posada Fishman and Juston Forte and Isabella Fulford and Leo Gao and Elie Georges and Christian Gibson and Vik Goel and Tarun Gogineni and Gabriel Goh and Rapha Gontijo-Lopes and Jonathan Gordon and Morgan Grafstein and Scott Gray and Ryan Greene and Joshua Gross and Shixiang Shane Gu and Yufei Guo and Chris Hallacy and Jesse Han and Jeff Harris and Yuchen He and Mike Heaton and Johannes Heidecke and Chris Hesse and Alan Hickey and Wade Hickey and Peter Hoeschele and Brandon Houghton and Kenny Hsu and Shengli Hu and Xin Hu and Joost Huizinga and Shantanu Jain and Shawn Jain and Joanne Jang and Angela Jiang and Roger Jiang and Haozhun Jin and Denny Jin and Shino Jomoto and Billie Jonn and Heewoo Jun and Tomer Kaftan and Łukasz Kaiser and Ali Kamali and Ingmar Kanitscheider and Nitish Shirish Keskar and Tabarak Khan and Logan Kilpatrick and Jong Wook Kim and Christina Kim and Yongjik Kim and Jan Hendrik Kirchner and Jamie Kiros and Matt Knight and Daniel Kokotajlo and Łukasz Kondraciuk and Andrew Kondrich and Aris Konstantinidis and Kyle Kosic and Gretchen Krueger and Vishal Kuo and Michael Lampe and Ikai Lan and Teddy Lee and Jan Leike and Jade Leung and Daniel Levy and Chak Ming Li and Rachel Lim and Molly Lin and Stephanie Lin and Mateusz Litwin and Theresa Lopez and Ryan Lowe and Patricia Lue and Anna Makanju and Kim Malfacini and Sam Manning and Todor Markov and Yaniv Markovski and Bianca Martin and Katie Mayer and Andrew Mayne and Bob McGrew and Scott Mayer McKinney and Christine McLeavey and Paul McMillan and Jake McNeil and David Medina and Aalok Mehta and Jacob Menick and Luke Metz and Andrey Mishchenko and Pamela Mishkin and Vinnie Monaco and Evan Morikawa and Daniel Mossing and Tong Mu and Mira Murati and Oleg Murk and David Mély and Ashvin Nair and Reiichiro Nakano and Rajeev Nayak and Arvind Neelakantan and Richard Ngo and Hyeonwoo Noh and Long Ouyang and Cullen O'Keefe and Jakub Pachocki and Alex Paino and Joe Palermo and Ashley Pantuliano and Giambattista Parascandolo and Joel Parish and Emy Parparita and Alex Passos and Mikhail Pavlov and Andrew Peng and Adam Perelman and Filipe de Avila Belbute Peres and Michael Petrov and Henrique Ponde de Oliveira Pinto and Michael and Pokorny and Michelle Pokrass and Vitchyr H. Pong and Tolly Powell and Alethea Power and Boris Power and Elizabeth Proehl and Raul Puri and Alec Radford and Jack Rae and Aditya Ramesh and Cameron Raymond and Francis Real and Kendra Rimbach and Carl Ross and Bob Rotsted and Henri Roussez and Nick Ryder and Mario Saltarelli and Ted Sanders and Shibani Santurkar and Girish Sastry and Heather Schmidt and David Schnurr and John Schulman and Daniel Selsam and Kyla Sheppard and Toki Sherbakov and Jessica Shieh and Sarah Shoker and Pranav Shyam and Szymon Sidor and Eric Sigler and Maddie Simens and Jordan Sitkin and Katarina Slama and Ian Sohl and Benjamin Sokolowsky and Yang Song and Natalie Staudacher and Felipe Petroski Such and Natalie Summers and Ilya Sutskever and Jie Tang and Nikolas Tezak and Madeleine B. Thompson and Phil Tillet and Amin Tootoonchian and Elizabeth Tseng and Preston Tuggle and Nick Turley and Jerry Tworek and Juan Felipe Cerón Uribe and Andrea Vallone and Arun Vijayvergiya and Chelsea Voss and Carroll Wainwright and Justin Jay Wang and Alvin Wang and Ben Wang and Jonathan Ward and Jason Wei and CJ Weinmann and Akila Welihinda and Peter Welinder and Jiayi Weng and Lilian Weng and Matt Wiethoff and Dave Willner and Clemens Winter and Samuel Wolrich and Hannah Wong and Lauren Workman and Sherwin Wu and Jeff Wu and Michael Wu and Kai Xiao and Tao Xu and Sarah Yoo and Kevin Yu and Qiming Yuan and Wojciech Zaremba and Rowan Zellers and Chong Zhang and Marvin Zhang and Shengjia Zhao and Tianhao Zheng and Juntang Zhuang and William Zhuk and Barret Zoph},
+  year = {2023},
+  journal = {CoRR 2024},
+  eprint = {2303.08774},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.08774v6},
+}
+
+======================================================================
+Reference: Short text clustering algorithms, application and challenges: A survey
+Authors  : Majid Hameed Ahmed, Sabrina Tiun, Nazlia Omar, Nor Samsiah Sani
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3390/app13010342
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/42ff9337a806c81ba9e013f9716201a14d7f787e
+@article{ahmed2022short,
+  title = {Short Text Clustering Algorithms, Application and Challenges: A Survey},
+  author = {Majidul Ahmed and S. Tiun and N. Omar and N. Sani},
+  year = {2022},
+  journal = {Applied Sciences},
+  doi = {10.3390/app13010342},
+  url = {https://www.semanticscholar.org/paper/42ff9337a806c81ba9e013f9716201a14d7f787e},
+}
+
+======================================================================
+Reference: ETC: encoding long and structured inputs in transformers
+Authors  : Joshua Ainslie, Santiago Ontañón, Chris Alberti, Vaclav Cvicek, Zachary Fisher, Philip Pham, Anirudh Ravula, Sumit Sanghai, Qifan Wang, Li Yang
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2004.08483
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.08483v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d27669c82faf78ea08cceaa0a171b540cccc304d
+@inproceedings{ainslie2020encoding,
+  title = {ETC: Encoding Long and Structured Inputs in Transformers},
+  author = {Joshua Ainslie and Santiago Ontanon and Chris Alberti and Vaclav Cvicek and Zachary Fisher and Philip Pham and Anirudh Ravula and Sumit Sanghai and Qifan Wang and Li Yang},
+  year = {2020},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/2020.emnlp-main.19},
+  eprint = {2004.08483},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.08483v5},
+}
+
+======================================================================
+Reference: Generalized category discovery with decoupled prototypical network
+Authors  : Wenbin An, Feng Tian, Qinghua Zheng, Wei Ding, QianYing Wang, Ping Chen
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2211.15115
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2211.15115
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/9a6f06a7a03380a09e7bee185054d9bac9c32ac9
+@inproceedings{an2022generalized,
+  title = {Generalized Category Discovery with Decoupled Prototypical Network},
+  author = {Wenbin An and Feng Tian and Qinghua Zheng and Wei Ding and Qianying Wang and Ping Chen},
+  year = {2022},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.48550/arxiv.2211.15115},
+  eprint = {2211.15115},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/9a6f06a7a03380a09e7bee185054d9bac9c32ac9},
+}
+
+======================================================================
+Reference: Claude
+Authors  : Anthropic
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2503.04761
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2310.19181
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.19181v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/aa946ea1c76a8ddd93282ad868fe61a72b02db94
+@misc{roy2023from,
+  title = {From Chatbots to PhishBots? -- Preventing Phishing scams created using ChatGPT, Google Bard and Claude},
+  author = {Sayak Saha Roy and Poojitha Thota and Krishna Vamsi Naragam and Shirin Nilizadeh},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2503.04761},
+  eprint = {2310.19181},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.19181v2},
+}
+
+======================================================================
+Reference: Supervised clustering loss for clustering-friendly sentence embeddings: An application to intent clustering
+Authors  : Giorgio Barnabo, Antonio Uva, Sandro Pollastrini, Chiara Rubagotti, Davide Bernardi
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2023.findings-ijcnlp.36
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4603fa0fe87c2fc9aa8eba4e506d19610d79d5b7
+@inproceedings{barnabò2023supervised,
+  title = {Supervised Clustering Loss for Clustering-Friendly Sentence Embeddings: an Application to Intent Clustering},
+  author = {Giorgio Barnabò and Antonio Uva and Sandro Pollastrini and Chiara Rubagotti and Davide Bernardi},
+  year = {2023},
+  booktitle = {International Joint Conference on Natural Language Processing},
+  doi = {10.18653/v1/2023.findings-ijcnlp.36},
+  url = {https://www.semanticscholar.org/paper/4603fa0fe87c2fc9aa8eba4e506d19610d79d5b7},
+}
+
+======================================================================
+Reference: Scaling instruction-finetuned language models
+Authors  : Hyung Won Chung, Le Hou, Shayne Longpre, Barret Zoph, Yi Tay, William Fedus, Yunxuan Li, Xuezhi Wang, Mostafa Dehghani, Siddhartha Brahma, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Journal of machine learning research' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Journal of machine learning research.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2210.11416
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 35.
+      Suggestion: List all 35 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2210.11416v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/cdbd4f9b6ab2e2fd1ddf5400d5ed2c18960635d1
+@article{chung2022scaling,
+  title = {Scaling Instruction-Finetuned Language Models},
+  author = {Hyung Won Chung and Le Hou and Shayne Longpre and Barret Zoph and Yi Tay and William Fedus and Yunxuan Li and Xuezhi Wang and Mostafa Dehghani and Siddhartha Brahma and Albert Webson and Shixiang Shane Gu and Zhuyun Dai and Mirac Suzgun and Xinyun Chen and Aakanksha Chowdhery and Alex Castro-Ros and Marie Pellat and Kevin Robinson and Dasha Valter and Sharan Narang and Gaurav Mishra and Adams Yu and Vincent Zhao and Yanping Huang and Andrew Dai and Hongkun Yu and Slav Petrov and Ed H. Chi and Jeff Dean and Jacob Devlin and Adam Roberts and Denny Zhou and Quoc V. Le and Jason Wei},
+  year = {2022},
+  journal = {Journal of machine learning research},
+  doi = {10.48550/arxiv.2210.11416},
+  eprint = {2210.11416},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2210.11416v5},
+}
+
+======================================================================
+Reference: Supervised k-means clustering
+Authors  : Thomas Finley, Thorsten Joachims
+Year     : 2008
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-030-02804-6_27
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4c8263354c6379eb436a96a83971de75e028a7d2
+@article{guo2018active,
+  title = {Active Semi-supervised K-Means Clustering Based on Silhouette Coefficient},
+  author = {Hongchen Guo and J. Ma and Zhiqiang Li},
+  year = {2018},
+  journal = {Advances in Intelligent, Interactive Systems and Applications},
+  doi = {10.1007/978-3-030-02804-6_27},
+  url = {https://www.semanticscholar.org/paper/4c8263354c6379eb436a96a83971de75e028a7d2},
+}
+
+======================================================================
+Reference: Reformer: The efficient transformer
+Authors  : Nikita Kitaev, Lukasz Kaiser, Anselm Levskaya
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2001.04451
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2001.04451v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/055fd6a9f7293269f1b22c1470e63bd02d8d9500
+@inproceedings{kitaev2020reformer,
+  title = {Reformer: The Efficient Transformer},
+  author = {Nikita Kitaev and Łukasz Kaiser and Anselm Levskaya},
+  year = {2020},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2001.04451},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2001.04451v2},
+}
+
+======================================================================
+Reference: Text is all you need: Learning language representations for sequential recommendation
+Authors  : Jiacheng Li, Ming Wang, Jin Li, Jinmiao Fu, Xin Shen, Jingbo Shang, Julian J. McAuley
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2305.13731
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2305.13731v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c551ef5a45f72a689cbf02877290115606019106
+@article{li2023text,
+  title = {Text Is All You Need: Learning Language Representations for Sequential Recommendation},
+  author = {Jiacheng Li and Ming Wang and Jin Li and Jinmiao Fu and Xin Shen and Jingbo Shang and Julian McAuley},
+  year = {2023},
+  journal = {Knowledge Discovery and Data Mining},
+  doi = {10.1145/3580305.3599519},
+  eprint = {2305.13731},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2305.13731v2},
+}
+
+======================================================================
+Reference: Discovering new intents via constrained deep adaptive clustering with cluster refinement
+Authors  : Ting-En Lin, Hua Xu, Hanlei Zhang
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v34i05.6353
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1911.08891
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4910fec58496606b1723308c31e9faf53bee787b
+@inproceedings{lin2019discovering,
+  title = {Discovering New Intents via Constrained Deep Adaptive Clustering with Cluster Refinement},
+  author = {Ting-En Lin and Hua Xu and Hanlei Zhang},
+  year = {2019},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v34i05.6353},
+  eprint = {1911.08891},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/4910fec58496606b1723308c31e9faf53bee787b},
+}
+
+======================================================================
+Reference: Topic discovery via latent space clustering of pretrained language model representations
+Authors  : Yu Meng, Yunyi Zhang, Jiaxin Huang, Yu Zhang, Jiawei Han
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2202.04582
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2202.04582v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/424b08ba24a7c3a23d877d61eb02c184e6cc50c9
+@inproceedings{meng2022topic,
+  title = {Topic Discovery via Latent Space Clustering of Pretrained Language Model Representations},
+  author = {Yu Meng and Yunyi Zhang and Jiaxin Huang and Yu Zhang and Jiawei Han},
+  year = {2022},
+  booktitle = {The Web Conference},
+  doi = {10.1145/3485447.3512034},
+  eprint = {2202.04582},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2202.04582v1},
+}
+
+======================================================================
+Reference: Using LLM for improving key event discovery: Temporal-guided news stream clustering with event summaries
+Authors  : Nishanth Sridhar Nakshatri, Siyi Liu, Sihao Chen, Dan Roth, Dan Goldwasser, Daniel Hopkins
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2023.findings-emnlp.274
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/28e3574077e26cdf6b913474351a5bf261bcd6b1
+@inproceedings{nakshatri2023using,
+  title = {Using LLM for Improving Key Event Discovery: Temporal-Guided News Stream Clustering with Event Summaries},
+  author = {Nishanth Nakshatri and Siyi Liu and Sihao Chen and Dan Roth and Dan Goldwasser and Daniel J. Hopkins},
+  year = {2023},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/2023.findings-emnlp.274},
+  url = {https://www.semanticscholar.org/paper/28e3574077e26cdf6b913474351a5bf261bcd6b1},
+}
+
+======================================================================
+Reference: Justifying recommendations using distantly-labeled reviews and fine-grained aspects
+Authors  : Jianmo Ni, Jiacheng Li, Julian McAuley
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d19-1018
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/41d49ec6f73ab5621ab8e8cb5ddb677a886ccc76
+@inproceedings{ni2019justifying,
+  title = {Justifying Recommendations using Distantly-Labeled Reviews and Fine-Grained Aspects},
+  author = {Jianmo Ni and Jiacheng Li and Julian McAuley},
+  year = {2019},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d19-1018},
+  url = {https://www.semanticscholar.org/paper/41d49ec6f73ab5621ab8e8cb5ddb677a886ccc76},
+}
+
+======================================================================
+Reference: Scikit-learn: Machine learning in Python
+Authors  : F. Pedregosa, G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O. Grisel, M. Blondel, P. Prettenhofer, R. Weiss, V. Dubourg, J. Vanderplas, A. Passos, D. Cournapeau, M. Brucher, M. Perrot, E. Duchesnay
+Year     : 2011
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.5555/1953048.2078195
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1201.0490
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ad4fd2c149f220a62441576af92a8a669fe81246
+@article{pedregosa2011scikitlearn,
+  title = {Scikit-learn: Machine Learning in Python},
+  author = {Fabian Pedregosa and G. Varoquaux and Alexandre Gramfort and V. Michel and B. Thirion and O. Grisel and Mathieu Blondel and Gilles Louppe and P. Prettenhofer and Ron Weiss and Ron J. Weiss and J. Vanderplas and Alexandre Passos and D. Cournapeau and M. Brucher and M. Perrot and E. Duchesnay},
+  year = {2011},
+  journal = {Journal of machine learning research},
+  doi = {10.5555/1953048.2078195},
+  eprint = {1201.0490},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/ad4fd2c149f220a62441576af92a8a669fe81246},
+}
+
+======================================================================
+Reference: Facenet: A unified embedding for face recognition and clustering
+Authors  : Florian Schroff, Dmitry Kalenichenko, James Philbin
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1503.03832
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1503.03832v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5aa26299435bdf7db874ef1640a6c3b5a4a2c394
+@article{schroff2015facenet,
+  title = {FaceNet: A Unified Embedding for Face Recognition and Clustering},
+  author = {Florian Schroff and Dmitry Kalenichenko and James Philbin},
+  year = {2015},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2015.7298682},
+  eprint = {1503.03832},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1503.03832v3},
+}
+
+======================================================================
+Reference: Text data augmentation for deep learning
+Authors  : Connor Shorten, Taghi M Khoshgoftaar, Borko Furht
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1186/s40537-021-00492-0
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/31852f9fc732c0868af12d631c72693702d80521
+@article{shorten2021text,
+  title = {Text Data Augmentation for Deep Learning},
+  author = {Connor Shorten and T. Khoshgoftaar and B. Furht},
+  year = {2021},
+  journal = {Journal of Big Data},
+  doi = {10.1186/s40537-021-00492-0},
+  url = {https://www.semanticscholar.org/paper/31852f9fc732c0868af12d631c72693702d80521},
+}
+
+======================================================================
+Reference: Information theoretic measures for clusterings comparison: is a correction for chance necessary?
+Authors  : Nguyen Xuan Vinh, Julien Epps, James Bailey
+Year     : 2009
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/1553374.1553511
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/35c15d7dfa1fddd2c0292146412ebbec704e8be9
+@inproceedings{nguyen2009information,
+  title = {Information theoretic measures for clusterings comparison: is a correction for chance necessary?},
+  author = {X. Nguyen and J. Epps and J. Bailey},
+  year = {2009},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.1145/1553374.1553511},
+  url = {https://www.semanticscholar.org/paper/35c15d7dfa1fddd2c0292146412ebbec704e8be9},
+}
+
+======================================================================
+Reference: Large language models enable few-shot clustering
+Authors  : Vijay Viswanathan, Kiril Gashteovski, Carolin Lawrence, Tongshuang Wu, Graham Neubig
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Transactions of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Transactions of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/tacl_a_00648
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2307.00524v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/8e8a1489bf4d782d2435cdeb93f7d1f165747c63
+@article{viswanathan2023large,
+  title = {Large Language Models Enable Few-Shot Clustering},
+  author = {Vijay Viswanathan and Kiril Gashteovski and Carolin Lawrence and Tongshuang Wu and Graham Neubig},
+  year = {2023},
+  journal = {Transactions of the Association for Computational Linguistics},
+  doi = {10.1162/tacl_a_00648},
+  eprint = {2307.00524},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2307.00524v1},
+}
+
+======================================================================
+Reference: Supporting clustering with contrastive learning
+Authors  : Dejiao Zhang, Feng Nan, Xiaokai Wei, Shang-Wen Li, Henghui Zhu, Kathleen R. McKeown, Ramesh Nallapati, Andrew O. Arnold, Bing Xiang
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2103.12953
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2103.12953v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4d1ab60f309629241a00b71190d338ab27c40170
+@article{zhang2021supporting,
+  title = {Supporting Clustering with Contrastive Learning},
+  author = {Dejiao Zhang and Feng Nan and Xiaokai Wei and Shangwen Li and Henghui Zhu and Kathleen McKeown and Ramesh Nallapati and Andrew Arnold and Bing Xiang},
+  year = {2021},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2021.naacl-main.427},
+  eprint = {2103.12953},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2103.12953v2},
+}
+
+======================================================================
+Reference: Discovering new intents with deep aligned clustering
+Authors  : Hanlei Zhang, Hua Xu, Ting-En Lin, Rui Lyu
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v35i16.17689
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2012.08987
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/00372193b6a5844c274c8d97097589c7d6a412c4
+@inproceedings{zhang2020discovering,
+  title = {Discovering New Intents with Deep Aligned Clustering},
+  author = {Hanlei Zhang and Hua Xu and Ting-En Lin and Rui Lv},
+  year = {2020},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v35i16.17689},
+  eprint = {2012.08987},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/00372193b6a5844c274c8d97097589c7d6a412c4},
+}
+
+======================================================================
+Reference: Short text clustering with a deep multi-embedded self-supervised model
+Authors  : Kai Zhang, Zheng Lian, Jiangmeng Li, Haichang Li, Xiaohui Hu
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-030-86383-8_12
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/58cd72a032fcf71be7051d36af72ed80ed1eea72
+@inproceedings{zhang2021short,
+  title = {Short Text Clustering with a Deep Multi-embedded Self-supervised Model},
+  author = {Kai Zhang and Zheng Lian and Jiangmeng Li and Haichang Li and Xiaohui Hu},
+  year = {2021},
+  booktitle = {International Conference on Artificial Neural Networks},
+  doi = {10.1007/978-3-030-86383-8_12},
+  url = {https://www.semanticscholar.org/paper/58cd72a032fcf71be7051d36af72ed80ed1eea72},
+}
+
+======================================================================
+Reference: New intent discovery with pre-training and contrastive learning
+Authors  : Yuwei Zhang, Haode Zhang, Li-Ming Zhan, Xiao-Ming Wu, Albert Y. S. Lam
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2205.12914
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2205.12914v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4df0f9503cea90e9535d0d4e3ae55fb422a3fd5b
+@inproceedings{zhang2022intent,
+  title = {New Intent Discovery with Pre-training and Contrastive Learning},
+  author = {Yuwei Zhang and Haode Zhang and Li-Ming Zhan and Albert Y. S. Lam and Xiao-Ming Wu},
+  year = {2022},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2205.12914},
+  eprint = {2205.12914},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2205.12914v2},
+}
+
+======================================================================
+Reference: ClusterLLM: Large language models as a guide for text clustering
+Authors  : Yuwei Zhang, Zihan Wang, Jingbo Shang
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2305.14871
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2305.14871v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a7beaf4ad0c59ad6c91a03af6eceaafd2d44cef9
+@inproceedings{zhang2023clusterllm,
+  title = {ClusterLLM: Large Language Models as a Guide for Text Clustering},
+  author = {Yuwei Zhang and Zihan Wang and Jingbo Shang},
+  year = {2023},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2305.14871},
+  eprint = {2305.14871},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2305.14871v2},
+}

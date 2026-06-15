@@ -1,0 +1,827 @@
+======================================================================
+Reference: Revisiting batch normalization for improving corruption robustness
+Authors  : Philipp Benz, Chaoning Zhang, Adil Karjauv, In So Kweon
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/wacv48630.2021.00054
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2010.03630
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/639b07626d140513a2aeac68ff52c3bb6db90bed
+@inproceedings{benz2020revisiting,
+  title = {Revisiting Batch Normalization for Improving Corruption Robustness},
+  author = {Philipp Benz and Chaoning Zhang and Adil Karjauv and I. Kweon},
+  year = {2020},
+  booktitle = {IEEE Workshop/Winter Conference on Applications of Computer Vision},
+  doi = {10.1109/wacv48630.2021.00054},
+  eprint = {2010.03630},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/639b07626d140513a2aeac68ff52c3bb6db90bed},
+}
+
+======================================================================
+Reference: Parameter-free online test-time adaptation
+Authors  : Malik Boudiaf, Romain Mueller, Ismail Ben Ayed, Luca Bertinetto
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52688.2022.00816
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2201.05718
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2201.05718v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/170676e3d7a8cd5606a7643ff72948e502af0e49
+@article{boudiaf2022parameterfree,
+  title = {Parameter-free Online Test-time Adaptation},
+  author = {Malik Boudiaf and Romain Mueller and Ismail Ben Ayed and Luca Bertinetto},
+  year = {2022},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52688.2022.00816},
+  eprint = {2201.05718},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2201.05718v2},
+}
+
+======================================================================
+Reference: Robustbench: a standardized adversarial robustness benchmark
+Authors  : Francesco Croce, Maksym Andriushchenko, Vikash Sehwag, Edoardo Debenedetti, Nicolas Flammarion, Mung Chiang, Prateek Mittal, Matthias Hein
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'NeurIPS Datasets and Benchmarks' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: NeurIPS Datasets and Benchmarks.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2010.09670v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/2aab97e35c43d961d645e650808d5b052ec180ab
+@article{croce2020robustbench,
+  title = {RobustBench: a standardized adversarial robustness benchmark},
+  author = {Francesco Croce and Maksym Andriushchenko and Vikash Sehwag and Edoardo Debenedetti and Nicolas Flammarion and Mung Chiang and Prateek Mittal and Matthias Hein},
+  year = {2020},
+  journal = {NeurIPS Datasets and Benchmarks},
+  eprint = {2010.09670},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2010.09670v3},
+}
+
+======================================================================
+Reference: NOTE: Robust continual test-time adaptation against temporal correlation
+Authors  : Taesik Gong, Jongheon Jeong, Taewon Kim, Yewon Kim, Jinwoo Shin, Sung-Ju Lee
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/068431-1976
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2208.05117
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2208.05117v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/62c29e503d18ac3a6a08aef4d4f076621a99504a
+@article{gong2022note,
+  title = {NOTE: Robust Continual Test-time Adaptation Against Temporal Correlation},
+  author = {Taesik Gong and Jongheon Jeong and Taewon Kim and Yewon Kim and Jinwoo Shin and Sung-Ju Lee},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/068431-1976},
+  eprint = {2208.05117},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2208.05117v3},
+}
+
+======================================================================
+Reference: Ranked entropy minimization for continual test-time adaptation
+Authors  : Jisu Han, Jaemin Na, Wonjun Hwang
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2505.16441
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2505.16441
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2505.16441v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/38a76481679d4e150548394a1e8550fd7b833991
+@inproceedings{han2025ranked,
+  title = {Ranked Entropy Minimization for Continual Test-Time Adaptation},
+  author = {Jisu Han and Jaemin Na and Wonjun Hwang},
+  year = {2025},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2505.16441},
+  eprint = {2505.16441},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2505.16441v1},
+}
+
+======================================================================
+Reference: Benchmarking neural network robustness to common corruptions and perturbations
+Authors  : Dan Hendrycks, Thomas Dietterich
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1903.12261
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1903.12261v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/49b64383fe36268410c430352637ed23b16820c5
+@inproceedings{hendrycks2019benchmarking,
+  title = {Benchmarking Neural Network Robustness to Common Corruptions and Perturbations},
+  author = {Dan Hendrycks and Thomas Dietterich},
+  year = {2019},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1903.12261},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1903.12261v1},
+}
+
+======================================================================
+Reference: Persistent test-time adaptation in recurring testing scenarios
+Authors  : Trung-Hieu Hoang, Duc Minh V o, Minh N. Do
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/079017-3923
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2311.18193
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/41dd8090dc589d0a5b2f7f0237bd41bbbc13caa5
+@article{hoang2023persistent,
+  title = {Persistent Test-time Adaptation in Recurring Testing Scenarios},
+  author = {Trung-Hieu Hoang and M. Vo and Minh N. Do},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/079017-3923},
+  eprint = {2311.18193},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/41dd8090dc589d0a5b2f7f0237bd41bbbc13caa5},
+}
+
+======================================================================
+Reference: Arbitrary style transfer in real-time with adaptive instance normalization
+Authors  : Xun Huang, Serge Belongie
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv.2017.167
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1703.06868
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICCV' may be an abbreviation of 'IEEE International Conference on Computer Vision'.
+      Suggestion: Use the full venue name: IEEE International Conference on Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1703.06868v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/be0ef77fb0345c5851bb5d297f3ed84ae3c581ee
+@inproceedings{huang2017arbitrary,
+  title = {Arbitrary Style Transfer in Real-time with Adaptive Instance Normalization},
+  author = {Xun Huang and Serge Belongie},
+  year = {2017},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv.2017.167},
+  eprint = {1703.06868},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1703.06868v2},
+}
+
+======================================================================
+Reference: Membn: Robust test-time adaptation via batch norm with statistics memory
+Authors  : Juwon Kang, Nayeong Kim, Jungseul Ok, Suha Kwak
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-031-73390-1_27
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d4ef77301e135e808d5cc8e7fb7def8f09d48871
+@inproceedings{kang2024membn,
+  title = {MemBN: Robust Test-Time Adaptation via Batch Norm with Statistics Memory},
+  author = {Juwon Kang and Nayeong Kim and Jungseul Ok and S. Kwak},
+  year = {2024},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-031-73390-1_27},
+  url = {https://www.semanticscholar.org/paper/d4ef77301e135e808d5cc8e7fb7def8f09d48871},
+}
+
+======================================================================
+Reference: Retrieval-augmented generation for knowledge-intensive nlp tasks
+Authors  : Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, et al.
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2005.11401
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 12.
+      Suggestion: List all 12 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2005.11401v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/659bf9ce7175e1ec266ff54359e2bd76e0b7ff31
+@article{lewis2020retrievalaugmented,
+  title = {Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks},
+  author = {Patrick Lewis and Ethan Perez and Aleksandra Piktus and Fabio Petroni and Vladimir Karpukhin and Naman Goyal and Heinrich Küttler and Mike Lewis and Wen-tau Yih and Tim Rocktäschel and Sebastian Riedel and Douwe Kiela},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2005.11401},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2005.11401v4},
+}
+
+======================================================================
+Reference: Do we really need to access the source data? source hypothesis transfer for unsupervised domain adaptation
+Authors  : Jian Liang, Dapeng Hu, Jiashi Feng
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2002.08546
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2002.08546v6
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/6e1bb490ae54b42f13d14d69b2012edda4664949
+@inproceedings{liang2020really,
+  title = {Do We Really Need to Access the Source Data? Source Hypothesis Transfer for Unsupervised Domain Adaptation},
+  author = {Jian Liang and Dapeng Hu and Jiashi Feng},
+  year = {2020},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2002.08546},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2002.08546v6},
+}
+
+======================================================================
+Reference: ViDA: Homeostatic visual domain adapter for continual test time adaptation
+Authors  : Jiaming Liu, Senqiao Yang, Peidong Jia, Renrui Zhang, Ming Lu, Yandong Guo, Wei Xue, Shanghang Zhang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2306.04344
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2306.04344
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/44375d0996ef965e9555e1a0d12e150a8e864a04
+@inproceedings{liu2023vida,
+  title = {ViDA: Homeostatic Visual Domain Adapter for Continual Test Time Adaptation},
+  author = {Jiaming Liu and Senqiao Yang and Peidong Jia and Ming Lu and Yandong Guo and Wei Xue and Shanghang Zhang},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2306.04344},
+  eprint = {2306.04344},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/44375d0996ef965e9555e1a0d12e150a8e864a04},
+}
+
+======================================================================
+Reference: Garmentlab: A unified simulation and benchmark for garment manipulation
+Authors  : Haoran Lu, Ruihai Wu, Yitong Li, Sijie Li, Ziyu Zhu, Chuanruo Ning, Yan Zhao, Longzan Luo, Yuanpei Chen, Hao Dong
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2411.01200
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2411.01200
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2411.01200v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b1c48a0383423c8090fec89e332554eb3a84fc34
+@article{lu2024garmentlab,
+  title = {GarmentLab: A Unified Simulation and Benchmark for Garment Manipulation},
+  author = {Haoran Lu and Ruihai Wu and Yitong Li and Sijie Li and Ziyu Zhu and Chuanruo Ning and Yan Shen and Longzan Luo and Yuanpei Chen and Hao Dong},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2411.01200},
+  eprint = {2411.01200},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2411.01200v3},
+}
+
+======================================================================
+Reference: Universal test-time adaptation through weight ensembling, diversity weighting, and prior correction
+Authors  : Robert A Marsden, Mario Döbler, Bin Yang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/wacv57701.2024.00254
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2306.00650
+  - [warning/incomplete/abbreviated_venue] Cited venue 'WACV' may be an abbreviation of 'IEEE Workshop/Winter Conference on Applications of Computer Vision'.
+      Suggestion: Use the full venue name: IEEE Workshop/Winter Conference on Applications of Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/639a0a95a6f81d89cfa7d30238fd58b2fcd87d20
+@inproceedings{marsden2023universal,
+  title = {Universal Test-time Adaptation through Weight Ensembling, Diversity Weighting, and Prior Correction},
+  author = {Robert A. Marsden and Mario Döbler and Bin Yang},
+  year = {2023},
+  booktitle = {IEEE Workshop/Winter Conference on Applications of Computer Vision},
+  doi = {10.1109/wacv57701.2024.00254},
+  eprint = {2306.00650},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/639a0a95a6f81d89cfa7d30238fd58b2fcd87d20},
+}
+
+======================================================================
+Reference: Memory-augmented transformers: A systematic review from neuroscience principles to technical solutions
+Authors  : Parsa Omidi, Xingshuai Huang, Axel Laborieux, Bahareh Nikpour, Tianyu Shi, Armaghan Eshaghi
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2508.10824
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.67).
+      Suggestion: Use canonical title: Memory-Augmented Transformers: A Systematic Review from Neuroscience Principles to Enhanced Model Architectures
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2508.10824v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d5df3249a372fcd7994fa43fa48a94d322b43161
+@misc{omidi2025memoryaugmented,
+  title = {Memory-Augmented Transformers: A Systematic Review from Neuroscience Principles to Enhanced Model Architectures},
+  author = {Parsa Omidi and Xingshuai Huang and Axel Laborieux and Bahareh Nikpour and Tianyu Shi and Armaghan Eshaghi},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2508.10824},
+  eprint = {2508.10824},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2508.10824v2},
+}
+
+======================================================================
+Reference: On estimation of a probability density function and mode
+Authors  : Emanuel Parzen
+Year     : 1962
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1214/aoms/1177704472
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/de28c165623adabcdba0fdb18b65eba685aaf31d
+@article{parzen1962estimation,
+  title = {On Estimation of a Probability Density Function and Mode},
+  author = {E. Parzen},
+  year = {1962},
+  journal = {Annals of Mathematical Statistics},
+  doi = {10.1214/aoms/1177704472},
+  url = {https://www.semanticscholar.org/paper/de28c165623adabcdba0fdb18b65eba685aaf31d},
+}
+
+======================================================================
+Reference: Moment matching for multi-source domain adaptation
+Authors  : Xingchao Peng, Qinxun Bai, Xide Xia, Zijun Huang, Kate Saenko, Bo Wang
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv.2019.00149
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1812.01754
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/3217278e346fefbd34f0727321059c7ea5792612
+@inproceedings{peng2018moment,
+  title = {Moment Matching for Multi-Source Domain Adaptation},
+  author = {Xingchao Peng and Qinxun Bai and Xide Xia and Zijun Huang and Kate Saenko and Bo Wang},
+  year = {2018},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv.2019.00149},
+  eprint = {1812.01754},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/3217278e346fefbd34f0727321059c7ea5792612},
+}
+
+======================================================================
+Reference: RDumb: A simple approach that questions our progress in continual test-time adaptation
+Authors  : Ori Press, Steffen Schneider, Matthias Kuemmerer, Matthias Bethge
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2306.05401
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2306.05401
+  - [warning/incomplete/abbreviated_venue] Cited venue 'NeurIPS' may be an abbreviation of 'Neural Information Processing Systems'.
+      Suggestion: Use the full venue name: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/3fe8b8c3476dcbfeb7592366ae4118f4581be9ee
+@article{press2023rdumb,
+  title = {RDumb: A simple approach that questions our progress in continual test-time adaptation},
+  author = {O. Press and Steffen Schneider and Matthias Kümmerer and M. Bethge},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2306.05401},
+  eprint = {2306.05401},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/3fe8b8c3476dcbfeb7592366ae4118f4581be9ee},
+}
+
+======================================================================
+Reference: Autonomous manipulation learning for similar deformable objects via only one demonstration
+Authors  : Yu Ren, Ronghan Chen, Yang Cong
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52729.2023.01637
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/72136fe0034591f6715a4f4d72b67044a6023c05
+@article{ren2023autonomous,
+  title = {Autonomous Manipulation Learning for Similar Deformable Objects via Only One Demonstration},
+  author = {Yu Ren and Ronghan Chen and Yang Cong},
+  year = {2023},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52729.2023.01637},
+  url = {https://www.semanticscholar.org/paper/72136fe0034591f6715a4f4d72b67044a6023c05},
+}
+
+======================================================================
+Reference: Experience replay for continual learning
+Authors  : David Rolnick, Arun Ahuja, Jonathan Schwarz, Timothy Lillicrap, Gregory Wayne
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1811.11682
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/d9ff7a9344dd5d6653bd7a02bfd704422bb29951
+@article{rolnick2018experience,
+  title = {Experience Replay for Continual Learning},
+  author = {David Rolnick and Arun Ahuja and Jonathan Schwarz and T. Lillicrap and Greg Wayne},
+  year = {2018},
+  journal = {Neural Information Processing Systems},
+  eprint = {1811.11682},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/d9ff7a9344dd5d6653bd7a02bfd704422bb29951},
+}
+
+======================================================================
+Reference: Moviechat: From dense token to sparse memory for long video understanding
+Authors  : Enxin Song, Wenhao Chai, Guanhong Wang, Yucheng Zhang, Haoyang Zhou, Feiyang Wu, Haozhe Chi, Xun Guo, Tian Ye, Yanting Zhang, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52733.2024.01725
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2307.16449
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/6f9b7c8cde1be2e62a503c31cac883c6d44c9d0d
+@article{song2023moviechat,
+  title = {MovieChat: From Dense Token to Sparse Memory for Long Video Understanding},
+  author = {Enxin Song and Wenhao Chai and Guanhong Wang and Yucheng Zhang and Haoyang Zhou and Feiyang Wu and Xun Guo and Tianbo Ye and Yang Lu and Jenq-Neng Hwang and Gaoang Wang},
+  year = {2023},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52733.2024.01725},
+  eprint = {2307.16449},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/6f9b7c8cde1be2e62a503c31cac883c6d44c9d0d},
+}
+
+======================================================================
+Reference: Ecotta: Memory-efficient continual test-time adaptation via self-distilled regularization
+Authors  : Junha Song, Jungsoo Lee, In So Kweon, Sungha Choi
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52729.2023.01147
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.01904
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.01904v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f37fae71760834924f287b71ad8f7bbd026ee95b
+@article{song2023ecotta,
+  title = {EcoTTA: Memory-Efficient Continual Test-time Adaptation via Self-distilled Regularization},
+  author = {Junha Song and Jungsoo Lee and In So Kweon and Sungha Choi},
+  year = {2023},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52729.2023.01147},
+  eprint = {2303.01904},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.01904v4},
+}
+
+======================================================================
+Reference: Towards real-world test-time adaptation: Tri-net self-training with balanced normalization
+Authors  : Yongyi Su, Xun Xu, Kui Jia
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2309.14949
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2309.14949
+  - [warning/incomplete/abbreviated_venue] Cited venue 'AAAI' may be an abbreviation of 'AAAI Conference on Artificial Intelligence'.
+      Suggestion: Use the full venue name: AAAI Conference on Artificial Intelligence.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/aef70e95752ec9948a0e4631dbd780dbd1f82224
+@inproceedings{su2023towards,
+  title = {Towards Real-World Test-Time Adaptation: Tri-Net Self-Training with Balanced Normalization},
+  author = {Yongyi Su and Xun Xu and Kui Jia},
+  year = {2023},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.48550/arxiv.2309.14949},
+  eprint = {2309.14949},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/aef70e95752ec9948a0e4631dbd780dbd1f82224},
+}
+
+======================================================================
+Reference: Mean teachers are better role models: Weight-averaged consistency targets improve semi-supervised deep learning results
+Authors  : Antti Tarvainen, Harri Valpola
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1703.01780
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1703.01780v6
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/7493389667058116dbc7e808987f129325ee60d7
+@article{tarvainen2017mean,
+  title = {Mean teachers are better role models: Weight-averaged consistency targets improve semi-supervised deep learning results},
+  author = {Antti Tarvainen and Harri Valpola},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1703.01780},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1703.01780v6},
+}
+
+======================================================================
+Reference: Un-mixing test-time normalization statistics: Combatting label temporal correlation
+Authors  : Devavrat Tomar, Guillaume Vray, Jean-Philippe Thiran, Behzad Bozorgtabar
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2401.08328
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2401.08328
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2401.08328v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/91fca17867fa08cc3cb21591efc8537b829019e1
+@inproceedings{tomar2024unmixing,
+  title = {Un-Mixing Test-Time Normalization Statistics: Combatting Label Temporal Correlation},
+  author = {Devavrat Tomar and Guillaume Vray and Jean-Philippe Thiran and Behzad Bozorgtabar},
+  year = {2024},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2401.08328},
+  eprint = {2401.08328},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2401.08328v2},
+}
+
+======================================================================
+Reference: Memory-augmented re-completion for 3d semantic scene completion
+Authors  : Yu-Wen Tseng, Sheng-Ping Yang, Jhih-Ciang Wu, I-Bin Liao, Yung-Hui Li, Hong-Han Shuai, Wen-Huang Cheng
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v39i7.32801
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/7723bd7d8177cd188defe0c792d09284ed1d6b5a
+@inproceedings{tseng2025memoryaugmented,
+  title = {Memory-Augmented Re-Completion for 3D Semantic Scene Completion},
+  author = {Yu-Wen Tseng and Sheng-Ping Yang and Jhih-Ciang Wu and I-Bin Liao and Yung-Hui Li and Hong-Han Shuai and Wen-Huang Cheng},
+  year = {2025},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v39i7.32801},
+  url = {https://www.semanticscholar.org/paper/7723bd7d8177cd188defe0c792d09284ed1d6b5a},
+}
+
+======================================================================
+Reference: Continual test-time domain adaptation
+Authors  : Qin Wang, Olga Fink, Luc Van Gool, Dengxin Dai
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52688.2022.00706
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2203.13591
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2203.13591v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0430dbcbfed0a737881d22340fb044028ed851a9
+@article{wang2022continual,
+  title = {Continual Test-Time Domain Adaptation},
+  author = {Qin Wang and Olga Fink and Luc Van Gool and Dengxin Dai},
+  year = {2022},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52688.2022.00706},
+  eprint = {2203.13591},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2203.13591v1},
+}
+
+======================================================================
+Reference: Searching for best practices in retrieval-augmented generation
+Authors  : Xiaohua Wang, Zhenghua Wang, Xuan Gao, Feiran Zhang, Yixin Wu, Zhibo Xu, Tianyuan Shi, Zhengyuan Wang, Shizheng Li, Qi Qian, Ruicheng Yin, Changze Lv, Xiaoqing Zheng, Xuanjing Huang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.01219
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2407.01219
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.01219v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/9a946c503b6e799b3d57375b6edfaf4e24febcea
+@inproceedings{wang2024searching,
+  title = {Searching for Best Practices in Retrieval-Augmented Generation},
+  author = {Xiaohua Wang and Zhenghua Wang and Xuan Gao and Feiran Zhang and Yixin Wu and Zhibo Xu and Tianyuan Shi and Zhengyuan Wang and Shizheng Li and Qi Qian and Ruicheng Yin and Changze Lv and Xiaoqing Zheng and Xuanjing Huang},
+  year = {2024},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2407.01219},
+  eprint = {2407.01219},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.01219v1},
+}
+
+======================================================================
+Reference: Memvit: Memory-augmented multiscale vision transformer for efficient long-term video recognition
+Authors  : Chao-Yuan Wu, Yanghao Li, Karttikeya Mangalam, Haoqi Fan, Bo Xiong, Jitendra Malik, Christoph Feichtenhofer
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52688.2022.01322
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2201.08383
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2201.08383v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b51fa25bf1ce7fd18737a36b72e80f8e5808973e
+@article{wu2022memvit,
+  title = {MeMViT: Memory-Augmented Multiscale Vision Transformer for Efficient Long-Term Video Recognition},
+  author = {Chao-Yuan Wu and Yanghao Li and Karttikeya Mangalam and Haoqi Fan and Bo Xiong and Jitendra Malik and Christoph Feichtenhofer},
+  year = {2022},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52688.2022.01322},
+  eprint = {2201.08383},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2201.08383v2},
+}
+
+======================================================================
+Reference: Aggregated residual transformations for deep neural networks
+Authors  : Saining Xie, Ross Girshick, Piotr Dollar, Zhuowen Tu, Kaiming He
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2017.634
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1611.05431
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f6e0856b4a9199fa968ac00da612a9407b5cb85c
+@article{xie2016aggregated,
+  title = {Aggregated Residual Transformations for Deep Neural Networks},
+  author = {Saining Xie and Ross B. Girshick and Piotr Dollár and Z. Tu and Kaiming He},
+  year = {2016},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2017.634},
+  eprint = {1611.05431},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/f6e0856b4a9199fa968ac00da612a9407b5cb85c},
+}
+
+======================================================================
+Reference: Roca: Robust cross-domain end-to-end autonomous driving
+Authors  : Rajeev Yasarla, Shizhong Han, Hsin-Pai Cheng, Litian Liu, Shweta Mahajan, Apratim Bhattacharyya, Yunxiao Shi, Risheek Garrepalli, Hong Cai, Fatih Porikli
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2506.10145
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2506.10145v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e927ad0614312ca1eaec0e8165f037a639cf2fc0
+@misc{yasarla2025roca,
+  title = {RoCA: Robust Cross-Domain End-to-End Autonomous Driving},
+  author = {Rajeev Yasarla and Shizhong Han and Hsin-Pai Cheng and Apratim Bhattacharyya and Shweta Mahajan and Litian Liu and Yunxiao Shi and Risheek Garrepalli and Hong Cai and Fatih Porikli},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2506.10145},
+  eprint = {2506.10145},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2506.10145v3},
+}
+
+======================================================================
+Reference: Robust test-time adaptation in dynamic scenarios
+Authors  : Longhui Yuan, Binhui Xie, Shuang Li
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52729.2023.01528
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.13899
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.13899v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e6357834e6145b607c350b92238b5bc4d662e920
+@article{yuan2023robust,
+  title = {Robust Test-Time Adaptation in Dynamic Scenarios},
+  author = {Longhui Yuan and Binhui Xie and Shuang Li},
+  year = {2023},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52729.2023.01528},
+  eprint = {2303.13899},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.13899v1},
+}
+
+======================================================================
+Reference: Wide residual networks
+Authors  : Sergey Zagoruyko, Nikos Komodakis
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1605.07146
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1605.07146v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1c4e9156ca07705531e45960b7a919dc473abb51
+@inproceedings{zagoruyko2016wide,
+  title = {Wide Residual Networks},
+  author = {Sergey Zagoruyko and Nikos Komodakis},
+  year = {2016},
+  booktitle = {British Machine Vision Conference},
+  doi = {10.5244/c.30.87},
+  eprint = {1605.07146},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1605.07146v4},
+}
+
+======================================================================
+Reference: Resilient test-time adaptation by mitigating batch-normalization overfitting
+Authors  : Xingzhi Zhou, Boyang Zhang, Zhiliang Tian, Yibo Zhang, Xin Niu, Ka Chun Cheung, Simon See, Nevin L Zhang
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/icassp49660.2025.10888647
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8168a9bba8de311eb64241e3c51ff4f2a60e15e4
+@inproceedings{zhou2025resilient,
+  title = {Resilient Test-Time Adaptation by Mitigating Batch-Normalization Overfitting},
+  author = {Xingzhi Zhou and Boyang Zhang and Zhiliang Tian and Yibo Zhang and Xin-Yi Niu and Ka Chun Cheung and Simon See and N. L. Zhang},
+  year = {2025},
+  booktitle = {IEEE International Conference on Acoustics, Speech, and Signal Processing},
+  doi = {10.1109/icassp49660.2025.10888647},
+  url = {https://www.semanticscholar.org/paper/8168a9bba8de311eb64241e3c51ff4f2a60e15e4},
+}
+
+======================================================================
+Reference: Reshaping the online data buffering and organizing mechanism for continual test-time adaptation
+Authors  : Zhilin Zhu, Xiaopeng Hong, Zhiheng Ma, Weijun Zhuang, Yaohui Ma, Yong Dai, Yaowei Wang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.09367
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2407.09367
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.09367v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/255e2aee4d754b98a3c9ead9618e48e3d9906ffe
+@inproceedings{zhu2024reshaping,
+  title = {Reshaping the Online Data Buffering and Organizing Mechanism for Continual Test-Time Adaptation},
+  author = {Zhilin Zhu and Xiaopeng Hong and Zhiheng Ma and Weijun Zhuang and Yaohui Ma and Yong Dai and Yaowei Wang},
+  year = {2024},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.48550/arxiv.2407.09367},
+  eprint = {2407.09367},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.09367v2},
+}

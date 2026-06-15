@@ -1,0 +1,175 @@
+======================================================================
+Reference: Comparison of classifiers in high dimensional settings
+Authors  : Stefan Aeberhard, Dionysius Coomans, Olivier de Vel
+Year     : 1991
+Verdict  : unverified
+
+======================================================================
+Reference: Uncertainty Sets for Image Classifiers using Conformal Prediction
+Authors  : Anastasios Angelopoulos, Stephen Bates, Jitendra Malik, Michael I. Jordan
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2009.14193
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Learning Representations
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/9cd7c6d19dedc5395155492e0193f399bbabec49
+@inproceedings{angelopoulos2020uncertainty,
+  title = {Uncertainty Sets for Image Classifiers using Conformal Prediction},
+  author = {Anastasios Nikolas Angelopoulos and Stephen Bates and J. Malik and Michael I. Jordan},
+  year = {2020},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2009.14193},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/9cd7c6d19dedc5395155492e0193f399bbabec49},
+}
+
+======================================================================
+Reference: Explainability of Possibilistic and Fuzzy Rule-Based Systems
+Authors  : Ismaïl Baaj
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.70675/a0a60f05z4d42z4169z92cfz1b841e53be1a
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.85).
+      Suggestion: Use canonical title: Explainability of possibilistic and fuzzy rule-based systems. (Explicabilité des systèmes à base de règles possibilistes et floues)
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, year — https://www.semanticscholar.org/paper/6b8ab08d01f39c7001f61707c7c4a014be6bba9d
+@article{baaj2022explainability,
+  title = {Explainability of possibilistic and fuzzy rule-based systems. (Explicabilité des systèmes à base de règles possibilistes et floues)},
+  author = {Ismaïl Baaj},
+  year = {2022},
+  doi = {10.70675/a0a60f05z4d42z4169z92cfz1b841e53be1a},
+  url = {https://www.semanticscholar.org/paper/6b8ab08d01f39c7001f61707c7c4a014be6bba9d},
+}
+
+======================================================================
+Reference: How to Explain Individual Classification Decisions
+Authors  : David Baehrens, Timon Schroeter, Stefan Harmeling, Motoaki Kawanabe, Katja Hansen, Klaus-Robert Müller
+Year     : 2010
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.5555/1756006.1859912
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 0912.1128
+  - [warning/incomplete/abbreviated_venue] Cited venue 'J. Mach. Learn. Res.' may be an abbreviation of 'Journal of machine learning research'.
+      Suggestion: Use the full venue name: Journal of machine learning research.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4e6238c8613b5b81f81552939bce33296aedfbfe
+@article{baehrens2009explain,
+  title = {How to Explain Individual Classification Decisions},
+  author = {D. Baehrens and T. Schroeter and S. Harmeling and M. Kawanabe and K. Hansen and K. Müller},
+  year = {2009},
+  journal = {Journal of machine learning research},
+  doi = {10.5555/1756006.1859912},
+  eprint = {0912.1128},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/4e6238c8613b5b81f81552939bce33296aedfbfe},
+}
+
+======================================================================
+Reference: How to find a good explanation for clustering?
+Authors  : Sayan Bandyapadhyay, Fedor V. Fomin, Petr A. Golovach, William Lochet, Nidhi Purohit, Kirill Simonov
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2112.06580
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Artificial Intelligence' may be an abbreviation of 'AAAI Conference on Artificial Intelligence'.
+      Suggestion: Use the full venue name: AAAI Conference on Artificial Intelligence.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e7906710360fe56a0bdc6a14313329d0c31c1b10
+@inproceedings{bandyapadhyay2021find,
+  title = {How to Find a Good Explanation for Clustering?},
+  author = {Sayan Bandyapadhyay and F. Fomin and P. Golovach and William Lochet and Nidhi Purohit and Kirill Simonov},
+  year = {2021},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v36i4.20306},
+  eprint = {2112.06580},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/e7906710360fe56a0bdc6a14313329d0c31c1b10},
+}
+
+======================================================================
+Reference: Explainable Artificial Intelligence (XAI): Concepts, taxonomies, opportunities and challenges toward responsible AI
+Authors  : Alejandro Barredo Arrieta, Natalia Díaz-Rodríguez, Javier Del Ser, Adrien Bennetot, Siham Tabik, Alberto Barbado, Salvador Garcia, Sergio Gil-Lopez, Daniel Molina, Richard Benjamins, Raja Chatila, Francisco Herrera
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1910.10045
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/530a059cb48477ad1e3d4f8f4b153274c8997332
+@article{arrieta2019explainable,
+  title = {Explainable Artificial Intelligence (XAI): Concepts, Taxonomies, Opportunities and Challenges toward Responsible AI},
+  author = {Alejandro Barredo Arrieta and Natalia Díaz Rodríguez and J. Ser and Adrien Bennetot and S. Tabik and A. Barbado and S. García and S. Gil-Lopez and D. Molina and Richard Benjamins and Raja Chatila and Francisco Herrera},
+  year = {2019},
+  journal = {Information Fusion},
+  doi = {10.1016/j.inffus.2019.12.012},
+  eprint = {1910.10045},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/530a059cb48477ad1e3d4f8f4b153274c8997332},
+}
+
+======================================================================
+Reference: Pitfalls of Epistemic Uncertainty Quantification through Loss Minimisation
+Authors  : Viktor Bengs, Eyke Hüllermeier, Willem Waegeman
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/068431-2118
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2203.06102
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2203.06102v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4e70f6cb2bed6fb67d15d088df4399aee008a58d
+@article{bengs2022pitfalls,
+  title = {Pitfalls of Epistemic Uncertainty Quantification through Loss Minimisation},
+  author = {Viktor Bengs and Eyke Hüllermeier and Willem Waegeman},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/068431-2118},
+  eprint = {2203.06102},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2203.06102v2},
+}
+
+======================================================================
+Reference: Machine Learning Interpretability:
+Authors  : Diogo V. Carvalho, Eduardo M. Pereira, Jaime S. Cardoso
+Year     : 
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-031-96997-3_13
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2110.03063
+  - [warning/incomplete/missing_year] Citation is missing a year.
+      Suggestion: Add year: 2021
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Communication Systems and Applications
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2110.03063v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/eefc978b8132bdcc6a700e9daa7f0c050f5b265f
+@article{watson2021interpretable,
+  title = {Interpretable Machine Learning for Genomics},
+  author = {David S. Watson},
+  year = {2021},
+  journal = {Communication Systems and Applications},
+  doi = {10.1007/978-3-031-96997-3_13},
+  eprint = {2110.03063},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2110.03063v1},
+}

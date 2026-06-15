@@ -1,0 +1,983 @@
+======================================================================
+Reference: Understanding intermediate layers using linear classifier probes
+Authors  : Guillaume Alain, Yoshua Bengio
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1610.01644v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/5e23a28063b395bdaf784dc548a046885cb90cf2
+@inproceedings{alain2016understanding,
+  title = {Understanding intermediate layers using linear classifier probes},
+  author = {Guillaume Alain and Yoshua Bengio},
+  year = {2016},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1610.01644},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1610.01644v4},
+}
+
+======================================================================
+Reference: Refusal in Language Models Is Mediated by a Single Direction
+Authors  : Andy Arditi, Oscar Obeso, Aaquib Syed, Daniel Paleka, Nina Panickssery, Wes Gurnee, Neel Nanda
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2406.11717
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2406.11717v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/88f9af8b0a28e14c42d4f70ce2d911b51a06cd16
+@article{arditi2024refusal,
+  title = {Refusal in Language Models Is Mediated by a Single Direction},
+  author = {Andy Arditi and Oscar Obeso and Aaquib Syed and Daniel Paleka and Nina Panickssery and Wes Gurnee and Neel Nanda},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2406.11717},
+  eprint = {2406.11717},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2406.11717v3},
+}
+
+======================================================================
+Reference: If Influence Functions are the Answer, Then What is the Question?
+Authors  : Juhan Bae, Nathan Ng, Alston Lo, Marzyeh Ghassemi, Roger B. Grosse
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2209.05364
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2209.05364
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8dd8ca953961b5311575b4364652689465f49b08
+@article{bae2022influence,
+  title = {If Influence Functions are the Answer, Then What is the Question?},
+  author = {Juhan Bae and Nathan Ng and Alston Lo and M. Ghassemi and R. Grosse},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2209.05364},
+  eprint = {2209.05364},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/8dd8ca953961b5311575b4364652689465f49b08},
+}
+
+======================================================================
+Reference: Training Data Attribution via Approximate Unrolling
+Authors  : Juhan Bae, Wu Lin, Jonathan Lorraine, Roger Baker Grosse
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/079017-2129
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2405.12186
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.69).
+      Suggestion: Use canonical title: Training Data Attribution via Approximate Unrolled Differentiation
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.12186v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d5488c7af6faab82599e5b857e28a4ff49b10a53
+@article{bae2024training,
+  title = {Training Data Attribution via Approximate Unrolled Differentiation},
+  author = {Juhan Bae and Wu Lin and Jonathan Lorraine and Roger Grosse},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/079017-2129},
+  eprint = {2405.12186},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.12186v2},
+}
+
+======================================================================
+Reference: Influence Functions in Deep Learning Are Fragile
+Authors  : Samyadeep Basu, Phil Pope, Soheil Feizi
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2006.14651
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2006.14651v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/098076a2c90e42c81b843bf339446427c2ff02ed
+@inproceedings{basu2020influence,
+  title = {Influence Functions in Deep Learning Are Fragile},
+  author = {Samyadeep Basu and Philip Pope and Soheil Feizi},
+  year = {2020},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2006.14651},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2006.14651v2},
+}
+
+======================================================================
+Reference: An Exact Kernel Equivalence for Finite Classification Models
+Authors  : Brian Bell, Michael Geyer, David Glickenstein, Amanda Fernandez, Juston Moore
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'TAG-ML' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: TAG-ML.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2308.00824
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2308.00824v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a74c83543c743c86162e9314ea6062102ad3bae5
+@article{bell2023exact,
+  title = {An Exact Kernel Equivalence for Finite Classification Models},
+  author = {Brian Bell and Michael Geyer and David Glickenstein and Amanda Fernandez and Juston Moore},
+  year = {2023},
+  journal = {TAG-ML},
+  doi = {10.48550/arxiv.2308.00824},
+  eprint = {2308.00824},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2308.00824v3},
+}
+
+======================================================================
+Reference: Layer-wise Relevance Propagation for Neural Networks with Local Renormalization Layers
+Authors  : Alexander Binder, Grégoire Montavon, Sebastian Bach, Klaus-Robert Müller, Wojciech Samek
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Artificial Neural Networks' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Artificial Neural Networks.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-319-44781-0_8
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1604.00825v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d7192b47b259a249f055cd448f6381088601354d
+@inproceedings{binder2016layerwise,
+  title = {Layer-wise Relevance Propagation for Neural Networks with Local Renormalization Layers},
+  author = {Alexander Binder and Grégoire Montavon and Sebastian Bach and Klaus-Robert Müller and Wojciech Samek},
+  year = {2016},
+  booktitle = {International Conference on Artificial Neural Networks},
+  doi = {10.1007/978-3-319-44781-0_8},
+  eprint = {1604.00825},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1604.00825v1},
+}
+
+======================================================================
+Reference: HYDRA: Hypergradient Data Relevance Analysis for Interpreting Deep Neural Networks
+Authors  : Yuanyuan Chen, Boyang Li, Han Yu, Pengcheng Wu, Chunyan Miao
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'AAAI Conference on Artificial Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: AAAI Conference on Artificial Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v35i8.16871
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2102.02515v7
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2850efc4ee32fc09b73730fa796c107e99e8b41b
+@inproceedings{chen2021hydra,
+  title = {HYDRA: Hypergradient Data Relevance Analysis for Interpreting Deep Neural Networks},
+  author = {Yuanyuan Chen and Boyang Li and Han Yu and Pengcheng Wu and Chunyan Miao},
+  year = {2021},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v35i8.16871},
+  eprint = {2102.02515},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2102.02515v7},
+}
+
+======================================================================
+Reference: Every Model Learned by Gradient Descent Is Approximately a Kernel Machine
+Authors  : Pedro Domingos
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'arXiv' may be an abbreviation of 'arXiv.org'.
+      Suggestion: Use the full venue name: arXiv.org.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2012.00152v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/b9ae7ac5a072962c3a0a86946058d6f0cb205ee1
+@misc{domingos2020every,
+  title = {Every Model Learned by Gradient Descent Is Approximately a Kernel Machine},
+  author = {Pedro Domingos},
+  year = {2020},
+  journal = {arXiv.org},
+  eprint = {2012.00152},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2012.00152v1},
+}
+
+======================================================================
+Reference: Towards A Rigorous Science of Interpretable Machine Learning
+Authors  : Finale Doshi-Velez, Been Kim
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'arXiv: Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: arXiv: Machine Learning.
+  - [warning/incomplete/abbreviated_venue] Cited venue 'arXiv' may be an abbreviation of 'arXiv: Machine Learning'.
+      Suggestion: Use the full venue name: arXiv: Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1702.08608v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/5c39e37022661f81f79e481240ed9b175dec6513
+@article{doshivelez2017towards,
+  title = {Towards A Rigorous Science of Interpretable Machine Learning},
+  author = {Finale Doshi-Velez and Been Kim},
+  year = {2017},
+  journal = {arXiv: Machine Learning},
+  eprint = {1702.08608},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1702.08608v2},
+}
+
+======================================================================
+Reference: Toy Models of Superposition
+Authors  : Nelson Elhage, Tristan Hume, Catherine Olsson, Nicholas Schiefer, Tom Henigha, Shauna Kravec, Zac Hatfield-Dodds, Robert Lasenby, Dawn Drain, Carol Chen, Roger Grosse, Sam McCandlish, Jared Kaplan, Dario Amodei, Martin Wattenberg, Christopher Olah
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2209.10652
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2209.10652
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2209.10652v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/9d125f45b1d2dea01f05281470bc08e12b6c7cba
+@misc{elhage2022models,
+  title = {Toy Models of Superposition},
+  author = {Nelson Elhage and Tristan Hume and Catherine Olsson and Nicholas Schiefer and Tom Henighan and Shauna Kravec and Zac Hatfield-Dodds and Robert Lasenby and Dawn Drain and Carol Chen and Roger Grosse and Sam McCandlish and Jared Kaplan and Dario Amodei and Martin Wattenberg and Christopher Olah},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2209.10652},
+  eprint = {2209.10652},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2209.10652v1},
+}
+
+======================================================================
+Reference: Data Shapley: Equitable Valuation of Data for Machine Learning
+Authors  : Amirata Ghorbani, James Zou
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1904.02868
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1904.02868v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/b7a717233ec3ff37385ab1b06816d0ca375f5bb3
+@inproceedings{ghorbani2019data,
+  title = {Data Shapley: Equitable Valuation of Data for Machine Learning},
+  author = {Amirata Ghorbani and James Zou},
+  year = {2019},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1904.02868},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1904.02868v2},
+}
+
+======================================================================
+Reference: Studying Large Language Model Generalization with Influence Functions
+Authors  : Roger Grosse, Juhan Bae, Cem Anil, Nelson Elhage, Alex Tamkin, Amirhossein Tajdini, Benoit Steiner, Dustin Li, Esin Durmus, Ethan Perez, Evan Hubinger, Kamilė Lukošiūtė, Karina Nguyen, Nicholas Joseph, Sam McCandlish, Jared Kaplan, Samuel R. Bowman
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2308.03296
+  - [warning/incomplete/abbreviated_venue] Cited venue 'arXiv' may be an abbreviation of 'arXiv.org'.
+      Suggestion: Use the full venue name: arXiv.org.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2308.03296v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/04a96b66705858c988edfcb73191c1da7d54abfb
+@misc{grosse2023studying,
+  title = {Studying Large Language Model Generalization with Influence Functions},
+  author = {Roger Grosse and Juhan Bae and Cem Anil and Nelson Elhage and Alex Tamkin and Amirhossein Tajdini and Benoit Steiner and Dustin Li and Esin Durmus and Ethan Perez and Evan Hubinger and Kamilė Lukošiūtė and Karina Nguyen and Nicholas Joseph and Sam McCandlish and Jared Kaplan and Samuel R. Bowman},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2308.03296},
+  eprint = {2308.03296},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2308.03296v1},
+}
+
+======================================================================
+Reference: Deep residual learning for image recognition
+Authors  : Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1512.03385
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2c03df8b48bf3fa39054345bafabfeff15bfd11d
+@article{he2015deep,
+  title = {Deep Residual Learning for Image Recognition},
+  author = {Kaiming He and X. Zhang and Shaoqing Ren and Jian Sun},
+  year = {2015},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2016.90},
+  eprint = {1512.03385},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/2c03df8b48bf3fa39054345bafabfeff15bfd11d},
+}
+
+======================================================================
+Reference: Unified View of Grokking, Double Descent and Emergent Abilities: A Perspective from Circuits Competition
+Authors  : Yufei Huang, Shengding Hu, Xu Han, Zhiyuan Liu, Maosong Sun
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.15175
+  - [warning/incomplete/abbreviated_venue] Cited venue 'arXiv' may be an abbreviation of 'arXiv.org'.
+      Suggestion: Use the full venue name: arXiv.org.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.15175v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/7d417465bdf254f8b4491c0e4adbace8f49010ab
+@misc{huang2024unified,
+  title = {Unified View of Grokking, Double Descent and Emergent Abilities: A Perspective from Circuits Competition},
+  author = {Yufei Huang and Shengding Hu and Xu Han and Zhiyuan Liu and Maosong Sun},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2402.15175},
+  eprint = {2402.15175},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.15175v2},
+}
+
+======================================================================
+Reference: Datamodels: Predicting Predictions from Training Data
+Authors  : Andrew Ilyas, Sung Min Park, Logan Engstrom, Guillaume Leclerc, Aleksander Madry
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'arXiv' may be an abbreviation of 'arXiv.org'.
+      Suggestion: Use the full venue name: arXiv.org.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2202.00622v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/2a7a6648563e6a09e6fea6dd96e68e0563216dcb
+@misc{ilyas2022datamodels,
+  title = {Datamodels: Predicting Predictions from Training Data},
+  author = {Andrew Ilyas and Sung Min Park and Logan Engstrom and Guillaume Leclerc and Aleksander Madry},
+  year = {2022},
+  journal = {arXiv.org},
+  eprint = {2202.00622},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2202.00622v1},
+}
+
+======================================================================
+Reference: Neural Tangent Kernel: Convergence and Generalization in Neural Networks
+Authors  : Arthur Jacot, Franck Gabriel, Clement Hongler
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1806.07572
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1806.07572v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/7a84a692327534fd227fa1e07fcb3816b633c591
+@article{jacot2018neural,
+  title = {Neural Tangent Kernel: Convergence and Generalization in Neural Networks},
+  author = {Arthur Jacot and Franck Gabriel and Clément Hongler},
+  year = {2018},
+  journal = {Neural Information Processing Systems},
+  eprint = {1806.07572},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1806.07572v4},
+}
+
+======================================================================
+Reference: Towards Faithfully Interpretable NLP Systems: How Should We Define and Evaluate Faithfulness?
+Authors  : Alon Jacovi, Yoav Goldberg
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2004.03685
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.03685v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/579476d19566efc842929ea6bdd18ab760c8cfa2
+@inproceedings{jacovi2020towards,
+  title = {Towards Faithfully Interpretable NLP Systems: How should we define and evaluate faithfulness?},
+  author = {Alon Jacovi and Yoav Goldberg},
+  year = {2020},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2020.acl-main.386},
+  eprint = {2004.03685},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.03685v3},
+}
+
+======================================================================
+Reference: Understanding Black-box Predictions via Influence Functions
+Authors  : Pang Wei Koh, Percy Liang
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1703.04730
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1703.04730v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/08ad8fad21f6ec4cda4d56be1ca5e146b7c913a1
+@inproceedings{koh2017understanding,
+  title = {Understanding Black-box Predictions via Influence Functions},
+  author = {Pang Wei Koh and Percy Liang},
+  year = {2017},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1703.04730},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1703.04730v3},
+}
+
+======================================================================
+Reference: Pruning Filters for Efficient ConvNets
+Authors  : Hao Li, Asim Kadav, Igor Durdanovic, Hanan Samet, Hans Peter Graf
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1608.08710v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/c2a1cb1612ba21e067a5c3ba478a8d73b796b77a
+@inproceedings{li2016pruning,
+  title = {Pruning Filters for Efficient ConvNets},
+  author = {Hao Li and Asim Kadav and Igor Durdanovic and Hanan Samet and Hans Peter Graf},
+  year = {2016},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1608.08710},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1608.08710v3},
+}
+
+======================================================================
+Reference: OLMoTrace: Tracing Language Model Outputs Back to Trillions of Training Tokens
+Authors  : Jiacheng Liu, Taylor Blanton, Yanai Elazar, Sewon Min, YenSung Chen, Arnavi Chheda-Kothary, Huy Tran, Byron Bischoff, Eric Marsh, Michael Schmitz, Cassidy Trier, Aaron Sarnat, Jenna James, Jon Borchardt, Bailey Kuehl, Evie Cheng, Karen Farley, Sruthi Sreeram, Taira Anderson, David Albright, Carissa Schoenick, Luca Soldaini, Dirk Groeneveld, Rock Yuren Pang, Pang Wei Koh, Noah A. Smith, Sophie Lebrecht, Yejin Choi, Hannaneh Hajishirzi, Ali Farhadi, Jesse Dodge
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2504.07096
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2504.07096v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6626f77dfaccd58f88d27a98784e0dd442d6c889
+@inproceedings{liu2025olmotrace,
+  title = {OLMoTrace: Tracing Language Model Outputs Back to Trillions of Training Tokens},
+  author = {Jiacheng Liu and Taylor Blanton and Yanai Elazar and Sewon Min and YenSung Chen and Arnavi Chheda-Kothary and Huy Tran and Byron Bischoff and Eric Marsh and Michael Schmitz and Cassidy Trier and Aaron Sarnat and Jenna James and Jon Borchardt and Bailey Kuehl and Evie Cheng and Karen Farley and Sruthi Sreeram and Taira Anderson and David Albright and Carissa Schoenick and Luca Soldaini and Dirk Groeneveld and Rock Yuren Pang and Pang Wei Koh and Noah A. Smith and Sophie Lebrecht and Yejin Choi and Hannaneh Hajishirzi and Ali Farhadi and Jesse Dodge},
+  year = {2025},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2504.07096},
+  eprint = {2504.07096},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2504.07096v2},
+}
+
+======================================================================
+Reference: Omnigrok: Grokking Beyond Algorithmic Data
+Authors  : Ziming Liu, Eric J. Michaud, Max Tegmark
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2210.01117
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2210.01117v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/ad065eed8e1f727a8b0d8675802e4ffb1fcb87b4
+@inproceedings{liu2022omnigrok,
+  title = {Omnigrok: Grokking Beyond Algorithmic Data},
+  author = {Ziming Liu and Eric J. Michaud and Max Tegmark},
+  year = {2022},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2210.01117},
+  eprint = {2210.01117},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2210.01117v2},
+}
+
+======================================================================
+Reference: Decoupled Weight Decay Regularization
+Authors  : Ilya Loshchilov, Frank Hutter
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'arXiv' may be an abbreviation of 'arXiv.org'.
+      Suggestion: Use the full venue name: arXiv.org.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1711.05101v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/45dfef0cc1ed96558c1c650432ce39d6a1050b6a
+@misc{loshchilov2017decoupled,
+  title = {Decoupled Weight Decay Regularization},
+  author = {Ilya Loshchilov and Frank Hutter},
+  year = {2017},
+  journal = {arXiv.org},
+  eprint = {1711.05101},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1711.05101v3},
+}
+
+======================================================================
+Reference: A Unified Approach to Interpreting Model Predictions
+Authors  : Scott Lundberg, Su-In Lee
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1705.07874v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/442e10a3c6640ded9408622005e3c2a8906ce4c2
+@article{lundberg2017unified,
+  title = {A Unified Approach to Interpreting Model Predictions},
+  author = {Scott Lundberg and Su-In Lee},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1705.07874},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1705.07874v2},
+}
+
+======================================================================
+Reference: Subspace Chronicles: How Linguistic Information Emerges, Shifts and Interacts during Language Model Training
+Authors  : Max Müller-Eberstein, Rob van der Goot, Barbara Plank, Ivan Titov
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.16484
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.16484v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/3749d7dc47fe4af5bb7d53a0cf67ef99a4f798f8
+@inproceedings{müllereberstein2023subspace,
+  title = {Subspace Chronicles: How Linguistic Information Emerges, Shifts and Interacts during Language Model Training},
+  author = {Max Müller-Eberstein and Rob van der Goot and Barbara Plank and Ivan Titov},
+  year = {2023},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2310.16484},
+  eprint = {2310.16484},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.16484v1},
+}
+
+======================================================================
+Reference: Attribution Patching: Activation Patching At Industrial Scale
+Authors  : Neel Nanda
+Year     : 2023
+Verdict  : unverified
+
+======================================================================
+Reference: Progress measures for grokking via mechanistic interpretability
+Authors  : Neel Nanda, Lawrence Chan, Tom Lieberum, Jess Smith, Jacob Steinhardt
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2301.05217
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2301.05217v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f680d47a51a0e470fcb228bf0110c026535ead1b
+@inproceedings{nanda2023progress,
+  title = {Progress measures for grokking via mechanistic interpretability},
+  author = {Neel Nanda and Lawrence Chan and Tom Lieberum and Jess Smith and Jacob Steinhardt},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2301.05217},
+  eprint = {2301.05217},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2301.05217v3},
+}
+
+======================================================================
+Reference: TRAK: Attributing Model Behavior at Scale
+Authors  : Sung Min Park, Kristian Georgiev, Andrew Ilyas, Guillaume Leclerc, Aleksander Madry
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2303.14186
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.14186v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4f2ae5fa2dc74af9c36ee57b359a4b3241006a92
+@inproceedings{park2023trak,
+  title = {TRAK: Attributing Model Behavior at Scale},
+  author = {Sung Min Park and Kristian Georgiev and Andrew Ilyas and Guillaume Leclerc and Aleksander Madry},
+  year = {2023},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2303.14186},
+  eprint = {2303.14186},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.14186v2},
+}
+
+======================================================================
+Reference: Grokking: Generalization Beyond Overfitting on Small Algorithmic Datasets
+Authors  : Alethea Power, Yuri Burda, Harri Edwards, Igor Babuschkin, Vedant Misra
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'arXiv' may be an abbreviation of 'arXiv.org'.
+      Suggestion: Use the full venue name: arXiv.org.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2201.02177v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/a1d1983a7b19845141e6505bd32dc395e5a136ba
+@misc{power2022grokking,
+  title = {Grokking: Generalization Beyond Overfitting on Small Algorithmic Datasets},
+  author = {Alethea Power and Yuri Burda and Harri Edwards and Igor Babuschkin and Vedant Misra},
+  year = {2022},
+  journal = {arXiv.org},
+  eprint = {2201.02177},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2201.02177v1},
+}
+
+======================================================================
+Reference: Fine-Tuning Enhances Existing Mechanisms: A Case Study on Entity Tracking
+Authors  : Nikhil Prakash, Tamar Rott Shaham, Tal Haklay, Yonatan Belinkov, David Bau
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.14811
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.14811v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0edcd3f065caa1d9e2dad4458f5b2f56efa3162b
+@inproceedings{prakash2024finetuning,
+  title = {Fine-Tuning Enhances Existing Mechanisms: A Case Study on Entity Tracking},
+  author = {Nikhil Prakash and Tamar Rott Shaham and Tal Haklay and Yonatan Belinkov and David Bau},
+  year = {2024},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2402.14811},
+  eprint = {2402.14811},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.14811v1},
+}
+
+======================================================================
+Reference: Estimating Training Data Influence by Tracing Gradient Descent
+Authors  : Garima Pruthi, Frederick Liu, Mukund Sundararajan, Satyen Kale
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2002.08484v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/c94e49617f569204f989643e5462691b9b3a482b
+@article{pruthi2020estimating,
+  title = {Estimating Training Data Influence by Tracing Gradient Descent},
+  author = {Garima Pruthi and Frederick Liu and Mukund Sundararajan and Satyen Kale},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2002.08484},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2002.08484v3},
+}
+
+======================================================================
+Reference: A Practical Review of Mechanistic Interpretability for Transformer-Based Language Models
+Authors  : Daking Rai, Yilun Zhou, Shi Feng, Abulhair Saparov, Ziyu Yao
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.02646
+  - [warning/incomplete/abbreviated_venue] Cited venue 'arXiv' may be an abbreviation of 'arXiv.org'.
+      Suggestion: Use the full venue name: arXiv.org.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.02646v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2ac231b9cff4f5f9054d86c9b540429d4dd687f4
+@misc{rai2024practical,
+  title = {A Practical Review of Mechanistic Interpretability for Transformer-Based Language Models},
+  author = {Daking Rai and Yilun Zhou and Shi Feng and Abulhair Saparov and Ziyu Yao},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2407.02646},
+  eprint = {2407.02646},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.02646v4},
+}
+
+======================================================================
+Reference: "Why Should I Trust You?": Explaining the Predictions of Any Classifier
+Authors  : Marco Tulio Ribeiro, Sameer Singh, Carlos Guestrin
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/2939672.2939778
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1602.04938v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c0883f5930a232a9c1ad601c978caede29155979
+@article{ribeiro2016should,
+  title = {"Why Should I Trust You?": Explaining the Predictions of Any Classifier},
+  author = {Marco Tulio Ribeiro and Sameer Singh and Carlos Guestrin},
+  year = {2016},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.1145/2939672.2939778},
+  eprint = {1602.04938},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1602.04938v3},
+}
+
+======================================================================
+Reference: Interpretable Machine Learning: Fundamental Principles and 10 Grand Challenges
+Authors  : Cynthia Rudin, Chaofan Chen, Zhi Chen, Haiyang Huang, Lesia Semenova, Chudi Zhong
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Statistics Survey' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Statistics Survey.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1214/21-ss133
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2103.11251v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/256db9dba1978f004a67c86ffc321563b1aee79a
+@article{rudin2021interpretable,
+  title = {Interpretable Machine Learning: Fundamental Principles and 10 Grand Challenges},
+  author = {Cynthia Rudin and Chaofan Chen and Zhi Chen and Haiyang Huang and Lesia Semenova and Chudi Zhong},
+  year = {2021},
+  journal = {Statistics Survey},
+  doi = {10.1214/21-ss133},
+  eprint = {2103.11251},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2103.11251v2},
+}
+
+======================================================================
+Reference: Mechanistic?
+Authors  : Naomi Saphra, Sarah Wiegreffe
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'BlackboxNLP Workshop on Analyzing and Interpreting Neural Networks for NLP' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: BlackboxNLP Workshop on Analyzing and Interpreting Neural Networks for NLP.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2410.09087
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2410.09087v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6a821e1e9f43d440de3db97415d1947d5e89d406
+@inproceedings{saphra2024mechanistic,
+  title = {Mechanistic?},
+  author = {Naomi Saphra and Sarah Wiegreffe},
+  year = {2024},
+  booktitle = {BlackboxNLP Workshop on Analyzing and Interpreting Neural Networks for NLP},
+  doi = {10.48550/arxiv.2410.09087},
+  eprint = {2410.09087},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2410.09087v1},
+}
+
+======================================================================
+Reference: Language-Specific Neurons: The Key to Multilingual Capabilities in Large Language Models
+Authors  : Tianyi Tang, Wenyang Luo, Haoyang Huang, Dongdong Zhang, Xiaolei Wang, Xin Zhao, Furu Wei, Ji-Rong Wen
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2402.16438
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.16438v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/96edfa3441bb3624ea2b8bdfc5eec2c87efa9637
+@inproceedings{tang2024languagespecific,
+  title = {Language-Specific Neurons: The Key to Multilingual Capabilities in Large Language Models},
+  author = {Tianyi Tang and Wenyang Luo and Haoyang Huang and Dongdong Zhang and Xiaolei Wang and Xin Zhao and Furu Wei and Ji-Rong Wen},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2402.16438},
+  eprint = {2402.16438},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.16438v2},
+}
+
+======================================================================
+Reference: BERT Rediscovers the Classical NLP Pipeline
+Authors  : Ian Tenney, Dipanjan Das, Ellie Pavlick
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1905.05950
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.05950v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/97906df07855b029b7aae7c2a1c6c5e8df1d531c
+@inproceedings{tenney2019bert,
+  title = {BERT Rediscovers the Classical NLP Pipeline},
+  author = {Ian Tenney and Dipanjan Das and Ellie Pavlick},
+  year = {2019},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/p19-1452},
+  eprint = {1905.05950},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.05950v2},
+}
+
+======================================================================
+Reference: LLM Circuit Analyses Are Consistent Across Training and Scale
+Authors  : Curt Tigges, Michael Hanna, Qinan Yu, Stella Biderman
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.10827
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2407.10827
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.10827v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/00c4d56adbebdb45658c27961113536afa91b138
+@inproceedings{tigges2024circuit,
+  title = {LLM Circuit Analyses Are Consistent Across Training and Scale},
+  author = {Curt Tigges and Michael Hanna and Qinan Yu and Stella Biderman},
+  year = {2024},
+  booktitle = {Workshop on Representation Learning for NLP},
+  doi = {10.48550/arxiv.2407.10827},
+  eprint = {2407.10827},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.10827v2},
+}
+
+======================================================================
+Reference: Explaining grokking through circuit efficiency
+Authors  : Vikrant Varma, Rohin Shah, Zachary Kenton, János Kramár, Ramana Kumar
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2309.02390
+  - [warning/incomplete/abbreviated_venue] Cited venue 'arXiv' may be an abbreviation of 'arXiv.org'.
+      Suggestion: Use the full venue name: arXiv.org.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2309.02390v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/77b603850094ff749c9040772f8169a75145d506
+@misc{varma2023explaining,
+  title = {Explaining grokking through circuit efficiency},
+  author = {Vikrant Varma and Rohin Shah and Zachary Kenton and János Kramár and Ramana Kumar},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2309.02390},
+  eprint = {2309.02390},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2309.02390v1},
+}
+
+======================================================================
+Reference: Attention Is All You Need
+Authors  : Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1706.03762v7
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/204e3073870fae3d05bcbc2f6a8e263d9b72e776
+@article{vaswani2017attention,
+  title = {Attention Is All You Need},
+  author = {Ashish Vaswani and Noam Shazeer and Niki Parmar and Jakob Uszkoreit and Llion Jones and Aidan N. Gomez and Lukasz Kaiser and Illia Polosukhin},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1706.03762},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1706.03762v7},
+}
+
+======================================================================
+Reference: Grokked Transformers are Implicit Reasoners: A Mechanistic Journey to the Edge of Generalization
+Authors  : Boshi Wang, Xiang Yue, Yu Su, Huan Sun
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2405.15071
+  - [warning/incomplete/abbreviated_venue] Cited venue 'arXiv' may be an abbreviation of 'arXiv.org'.
+      Suggestion: Use the full venue name: arXiv.org.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.15071v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5b1120f547d3969afc49b4a094e874d568e53aca
+@misc{wang2024grokked,
+  title = {Grokked Transformers are Implicit Reasoners: A Mechanistic Journey to the Edge of Generalization},
+  author = {Boshi Wang and Xiang Yue and Yu Su and Huan Sun},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2405.15071},
+  eprint = {2405.15071},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.15071v3},
+}
+
+======================================================================
+Reference: Grokking of Implicit Reasoning in Transformers:
+Authors  : Boshi Wang, Xiang Yue, Yu Su, Huan Sun
+Year     : 
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/079017-3017
+  - [warning/incomplete/missing_year] Citation is missing a year.
+      Suggestion: Add year: 2024
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Neural Information Processing Systems
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.85).
+      Suggestion: Use canonical title: Grokking of Implicit Reasoning in Transformers: A Mechanistic Journey to the Edge of Generalization
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0334c287e165a3dc84a09486751be26325342339
+@article{wang2024grokking,
+  title = {Grokking of Implicit Reasoning in Transformers: A Mechanistic Journey to the Edge of Generalization},
+  author = {Boshi Wang and Xiang Yue and Yu Su and Huan Sun},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/079017-3017},
+  url = {https://www.semanticscholar.org/paper/0334c287e165a3dc84a09486751be26325342339},
+}

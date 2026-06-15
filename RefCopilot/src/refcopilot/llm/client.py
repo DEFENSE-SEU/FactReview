@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import os
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -52,4 +53,15 @@ def call_json(prompt: str, system: str, *, provider: str = "", model: str = "") 
     """
     _load_factreview_llm()
     cfg = _RESOLVE_LLM_CONFIG(provider=provider, model=model)  # type: ignore[misc]
-    return _LLM_JSON(prompt=prompt, system=system, cfg=cfg)  # type: ignore[misc]
+    attempts = max(1, int(os.environ.get("REFCOPILOT_LLM_RETRIES", "4") or "4"))
+    delay = max(0.0, float(os.environ.get("REFCOPILOT_LLM_RETRY_DELAY_SEC", "3") or "3"))
+    last: dict[str, Any] = {}
+    for attempt in range(1, attempts + 1):
+        payload = _LLM_JSON(prompt=prompt, system=system, cfg=cfg)  # type: ignore[misc]
+        if not isinstance(payload, dict) or payload.get("status") not in ("error", "unknown"):
+            return payload
+        last = payload
+        if attempt < attempts:
+            time.sleep(delay * attempt)
+    last["_retry_attempts"] = attempts
+    return last

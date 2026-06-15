@@ -1,0 +1,1542 @@
+======================================================================
+Reference: 3D convolutional neural networks for human action recognition
+Authors  : S. Ji, W. Xu, M. Yang, K. Yu
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.85).
+      Suggestion: Use canonical title: Ieee Transactions on Pattern Analysis and Machine Intelligence 1 3d Convolutional Neural Networks for Human Action Recognition
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title — https://www.semanticscholar.org/paper/52dfa20f6fdfcda8c11034e3d819f4bd47e6207d
+@article{jiieee,
+  title = {Ieee Transactions on Pattern Analysis and Machine Intelligence 1 3d Convolutional Neural Networks for Human Action Recognition},
+  author = {Shuiwang Ji and W. Xu and Ming Yang and Kai Yu},
+  url = {https://www.semanticscholar.org/paper/52dfa20f6fdfcda8c11034e3d819f4bd47e6207d},
+}
+
+======================================================================
+Reference: Sequential deep learning for human action recognition
+Authors  : M. Baccouche, F. Mamalet, C. Wolf, C. Garcia, A. Baskurt
+Year     : 2011
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-642-25446-8_4
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/12b6551a0f9f5aa62f7d37f03ebc66631e529c4b
+@inproceedings{baccouche2011sequential,
+  title = {Sequential Deep Learning for Human Action Recognition},
+  author = {M. Baccouche and Franck Mamalet and Christian Wolf and Christophe Garcia and A. Baskurt},
+  year = {2011},
+  booktitle = {International Workshop on Human Behavior Unterstanding},
+  doi = {10.1007/978-3-642-25446-8_4},
+  url = {https://www.semanticscholar.org/paper/12b6551a0f9f5aa62f7d37f03ebc66631e529c4b},
+}
+
+======================================================================
+Reference: Large-scale video classification with convolutional neural networks
+Authors  : A. Karpathy, G. Toderici, S. Shetty, T. Leung, R. Sukthankar, L. Fei-Fei
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2014.223
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of '2014 IEEE Conference on Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: 2014 IEEE Conference on Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/6d4c9c923e9f145d1c01a2de2afc38ec23c44253
+@inproceedings{karpathy2014largescale,
+  title = {Large-Scale Video Classification with Convolutional Neural Networks},
+  author = {A. Karpathy and G. Toderici and Sanketh Shetty and Thomas Leung and R. Sukthankar and Li Fei-Fei},
+  year = {2014},
+  booktitle = {2014 IEEE Conference on Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2014.223},
+  url = {https://www.semanticscholar.org/paper/6d4c9c923e9f145d1c01a2de2afc38ec23c44253},
+}
+
+======================================================================
+Reference: Two-stream convolutional networks for action recognition in videos
+Authors  : K. Simonyan, A. Zisserman
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1406.2199
+  - [warning/incomplete/abbreviated_venue] Cited venue 'NIPS' may be an abbreviation of 'Neural Information Processing Systems'.
+      Suggestion: Use the full venue name: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1406.2199v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/67dccc9a856b60bdc4d058d83657a089b8ad4486
+@article{simonyan2014twostream,
+  title = {Two-Stream Convolutional Networks for Action Recognition in Videos},
+  author = {Karen Simonyan and Andrew Zisserman},
+  year = {2014},
+  journal = {Neural Information Processing Systems},
+  eprint = {1406.2199},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1406.2199v2},
+}
+
+======================================================================
+Reference: Learning internal representations by error propagation
+Authors  : D. E. Rumelhart, G. E. Hinton, R. J. Williams
+Year     : 1985
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/b978-1-4832-1446-7.50035-2
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, year — https://www.semanticscholar.org/paper/319f22bd5abfd67ac15988aa5c7f705f018c3ccd
+@article{rumelhart1986learning,
+  title = {Learning internal representations by error propagation},
+  author = {D. Rumelhart and Geoffrey E. Hinton and Ronald J. Williams},
+  year = {1986},
+  doi = {10.1016/b978-1-4832-1446-7.50035-2},
+  url = {https://www.semanticscholar.org/paper/319f22bd5abfd67ac15988aa5c7f705f018c3ccd},
+}
+
+======================================================================
+Reference: A learning algorithm for continually running fully recurrent neural networks
+Authors  : R. J. Williams, D. Zipser
+Year     : 1989
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/neco.1989.1.2.270
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ce9a21b93ba29d4145a8ef6bf401e77f261848de
+@article{williams1989learning,
+  title = {A Learning Algorithm for Continually Running Fully Recurrent Neural Networks},
+  author = {Ronald J. Williams and D. Zipser},
+  year = {1989},
+  journal = {Neural Computation},
+  doi = {10.1162/neco.1989.1.2.270},
+  url = {https://www.semanticscholar.org/paper/ce9a21b93ba29d4145a8ef6bf401e77f261848de},
+}
+
+======================================================================
+Reference: Long short-term memory
+Authors  : S. Hochreiter, J. Schmidhuber
+Year     : 1997
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/neco.1997.9.8.1735
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2e9d221c206e9503ceb452302d68d10e293f2a10
+@article{hochreiter1997long,
+  title = {Long Short-Term Memory},
+  author = {Sepp Hochreiter and J. Schmidhuber},
+  year = {1997},
+  journal = {Neural Computation},
+  doi = {10.1162/neco.1997.9.8.1735},
+  url = {https://www.semanticscholar.org/paper/2e9d221c206e9503ceb452302d68d10e293f2a10},
+}
+
+======================================================================
+Reference: Towards end-to-end speech recognition with recurrent neural networks
+Authors  : A. Graves, N. Jaitly
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICML' may be an abbreviation of 'International Conference on Machine Learning'.
+      Suggestion: Use the full venue name: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/0fa553cfa0cf3cbdf7a913aa2ae789a757dfb32f
+@inproceedings{graves2014towards,
+  title = {Towards End-To-End Speech Recognition with Recurrent Neural Networks},
+  author = {Alex Graves and N. Jaitly},
+  year = {2014},
+  booktitle = {International Conference on Machine Learning},
+  url = {https://www.semanticscholar.org/paper/0fa553cfa0cf3cbdf7a913aa2ae789a757dfb32f},
+}
+
+======================================================================
+Reference: Sequence to sequence learning with neural networks
+Authors  : I. Sutskever, O. Vinyals, Q. V. Le
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1409.3215
+  - [warning/incomplete/abbreviated_venue] Cited venue 'NIPS' may be an abbreviation of 'Neural Information Processing Systems'.
+      Suggestion: Use the full venue name: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1409.3215v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/cea967b59209c6be22829699f05b8b1ac4dc092d
+@article{sutskever2014sequence,
+  title = {Sequence to Sequence Learning with Neural Networks},
+  author = {Ilya Sutskever and Oriol Vinyals and Quoc V. Le},
+  year = {2014},
+  journal = {Neural Information Processing Systems},
+  eprint = {1409.3215},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1409.3215v3},
+}
+
+======================================================================
+Reference: On the properties of neural machine translation: Encoder-decoder approaches
+Authors  : K. Cho, B. van Merriënboer, D. Bahdanau, Y. Bengio
+Year     : 2014
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'SSST Workshop', but a full version appears at 'SSST@EMNLP'.
+      Suggestion: Cite the full version at SSST@EMNLP.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/v1/w14-4012
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1409.1259
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1409.1259v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1eb09fecd75eb27825dce4f964b97f4f5cc399d7
+@article{cho2014properties,
+  title = {On the Properties of Neural Machine Translation: Encoder-Decoder Approaches},
+  author = {Kyunghyun Cho and Bart van Merrienboer and Dzmitry Bahdanau and Yoshua Bengio},
+  year = {2014},
+  journal = {SSST@EMNLP},
+  doi = {10.3115/v1/w14-4012},
+  eprint = {1409.1259},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1409.1259v2},
+}
+
+======================================================================
+Reference: Translating video content to natural language descriptions
+Authors  : M. Rohrbach, W. Qiu, I. Titov, S. Thater, M. Pinkal, B. Schiele
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv.2013.61
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICCV' may be an abbreviation of 'IEEE International Conference on Computer Vision'.
+      Suggestion: Use the full venue name: IEEE International Conference on Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e8cd37fbd8bd5e690eef5861cf92af8e002d4533
+@inproceedings{rohrbach2013translating,
+  title = {Translating Video Content to Natural Language Descriptions},
+  author = {Marcus Rohrbach and Wei Qiu and Ivan Titov and Stefan Thater and Manfred Pinkal and B. Schiele},
+  year = {2013},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv.2013.61},
+  url = {https://www.semanticscholar.org/paper/e8cd37fbd8bd5e690eef5861cf92af8e002d4533},
+}
+
+======================================================================
+Reference: Caffe: Convolutional architecture for fast feature embedding
+Authors  : Y. Jia, E. Shelhamer, J. Donahue, S. Karayev, J. Long, R. Girshick, S. Guadarrama, T. Darrell
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/2647868.2654889
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1408.5093
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ACM MM' may be an abbreviation of 'ACM Multimedia'.
+      Suggestion: Use the full venue name: ACM Multimedia.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1408.5093v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6bdb186ec4726e00a8051119636d4df3b94043b5
+@article{jia2014caffe,
+  title = {Caffe: Convolutional Architecture for Fast Feature Embedding},
+  author = {Yangqing Jia and Evan Shelhamer and Jeff Donahue and Sergey Karayev and Jonathan Long and Ross Girshick and Sergio Guadarrama and Trevor Darrell},
+  year = {2014},
+  journal = {ACM Multimedia},
+  doi = {10.1145/2647868.2654889},
+  eprint = {1408.5093},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1408.5093v1},
+}
+
+======================================================================
+Reference: Revisiting recurrent neural networks for robust ASR
+Authors  : O. Vinyals, S. V. Ravuri, D. Povey
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/icassp.2012.6288816
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICASSP' may be an abbreviation of 'IEEE International Conference on Acoustics, Speech, and Signal Processing'.
+      Suggestion: Use the full venue name: IEEE International Conference on Acoustics, Speech, and Signal Processing.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/dbee79ac1865cd42780215d8fb2da4bc2ab7f381
+@inproceedings{vinyals2012revisiting,
+  title = {Revisiting Recurrent Neural Networks for robust ASR},
+  author = {O. Vinyals and Suman V. Ravuri and Daniel Povey},
+  year = {2012},
+  booktitle = {IEEE International Conference on Acoustics, Speech, and Signal Processing},
+  doi = {10.1109/icassp.2012.6288816},
+  url = {https://www.semanticscholar.org/paper/dbee79ac1865cd42780215d8fb2da4bc2ab7f381},
+}
+
+======================================================================
+Reference: Generating text with recurrent neural networks
+Authors  : I. Sutskever, J. Martens, G. E. Hinton
+Year     : 2011
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICML' may be an abbreviation of 'International Conference on Machine Learning'.
+      Suggestion: Use the full venue name: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/93c20e38c85b69fc2d2eb314b3c1217913f7db11
+@inproceedings{sutskever2011generating,
+  title = {Generating Text with Recurrent Neural Networks},
+  author = {I. Sutskever and James Martens and Geoffrey E. Hinton},
+  year = {2011},
+  booktitle = {International Conference on Machine Learning},
+  url = {https://www.semanticscholar.org/paper/93c20e38c85b69fc2d2eb314b3c1217913f7db11},
+}
+
+======================================================================
+Reference: ImageNet classification with deep convolutional neural networks
+Authors  : A. Krizhevsky, I. Sutskever, G. E. Hinton
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3065386
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/abd1c342495432171beb7ca8fd9551ef13cbd0ff
+@article{krizhevsky2012imagenet,
+  title = {ImageNet classification with deep convolutional neural networks},
+  author = {A. Krizhevsky and I. Sutskever and Geoffrey E. Hinton},
+  year = {2012},
+  journal = {Communications of the ACM},
+  doi = {10.1145/3065386},
+  url = {https://www.semanticscholar.org/paper/abd1c342495432171beb7ca8fd9551ef13cbd0ff},
+}
+
+======================================================================
+Reference: Very deep convolutional networks for large-scale image recognition
+Authors  : K. Simonyan, A. Zisserman
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1409.1556
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICLR' may be an abbreviation of 'International Conference on Learning Representations'.
+      Suggestion: Use the full venue name: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/eb42cf88027de515750f230b23b1a057dc782108
+@inproceedings{simonyan2014very,
+  title = {Very Deep Convolutional Networks for Large-Scale Image Recognition},
+  author = {K. Simonyan and Andrew Zisserman},
+  year = {2014},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1409.1556},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/eb42cf88027de515750f230b23b1a057dc782108},
+}
+
+======================================================================
+Reference: Going deeper with convolutions
+Authors  : C. Szegedy, W. Liu, Y. Jia, P. Sermanet, S. Reed, D. Anguelov, D. Erhan, V. Vanhoucke, A. Rabinovich
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2015.7298594
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1409.4842
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e15cf50aa89fee8535703b9f9512fca5bfc43327
+@article{szegedy2014going,
+  title = {Going deeper with convolutions},
+  author = {Christian Szegedy and Wei Liu and Yangqing Jia and P. Sermanet and Scott E. Reed and Dragomir Anguelov and D. Erhan and Vincent Vanhoucke and A. Rabinovich},
+  year = {2014},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2015.7298594},
+  eprint = {1409.4842},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/e15cf50aa89fee8535703b9f9512fca5bfc43327},
+}
+
+======================================================================
+Reference: Learning phrase representations using rnn encoder-decoder for statistical machine translation
+Authors  : K. Cho, B. van Merrienboer, C. Gulcehre, F. Bougares, H. Schwenk, Y. Bengio
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/v1/d14-1179
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1406.1078
+  - [warning/incomplete/abbreviated_venue] Cited venue 'EMNLP' may be an abbreviation of 'Conference on Empirical Methods in Natural Language Processing'.
+      Suggestion: Use the full venue name: Conference on Empirical Methods in Natural Language Processing.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1406.1078v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0b544dfe355a5070b60986319a3f51fb45d1348e
+@inproceedings{cho2014learning,
+  title = {Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation},
+  author = {Kyunghyun Cho and Bart van Merrienboer and Caglar Gulcehre and Dzmitry Bahdanau and Fethi Bougares and Holger Schwenk and Yoshua Bengio},
+  year = {2014},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.3115/v1/d14-1179},
+  eprint = {1406.1078},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1406.1078v3},
+}
+
+======================================================================
+Reference: High accuracy optical flow estimation based on a theory for warping
+Authors  : T. Brox, A. Bruhn, N. Papenberg, J. Weickert
+Year     : 2004
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-540-24673-2_3
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ECCV' may be an abbreviation of 'European Conference on Computer Vision'.
+      Suggestion: Use the full venue name: European Conference on Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/91228e00fe33ed6072cfe849ab9e98160461549d
+@inproceedings{brox2004high,
+  title = {High Accuracy Optical Flow Estimation Based on a Theory for Warping},
+  author = {T. Brox and Andrés Bruhn and N. Papenberg and J. Weickert},
+  year = {2004},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-540-24673-2_3},
+  url = {https://www.semanticscholar.org/paper/91228e00fe33ed6072cfe849ab9e98160461549d},
+}
+
+======================================================================
+Reference: Visualizing and understanding convolutional networks
+Authors  : M. D. Zeiler, R. Fergus
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-319-10590-1_53
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1311.2901
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ECCV' may be an abbreviation of 'European Conference on Computer Vision'.
+      Suggestion: Use the full venue name: European Conference on Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/1a2a770d23b4a171fa81de62a78a3deb0588f238
+@inproceedings{zeiler2013visualizing,
+  title = {Visualizing and Understanding Convolutional Networks},
+  author = {Matthew D. Zeiler and R. Fergus},
+  year = {2013},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-319-10590-1_53},
+  eprint = {1311.2901},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/1a2a770d23b4a171fa81de62a78a3deb0588f238},
+}
+
+======================================================================
+Reference: ImageNet Large Scale Visual Recognition Challenge
+Authors  : O. Russakovsky, J. Deng, H. Su, J. Krause, S. Satheesh, S. Ma, Z. Huang, A. Karpathy, A. Khosla, M. Bernstein, A. C. Berg, L. Fei-Fei
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s11263-015-0816-y
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1409.0575
+  - [warning/incomplete/abbreviated_venue] Cited venue 'IJCV' may be an abbreviation of 'International Journal of Computer Vision'.
+      Suggestion: Use the full venue name: International Journal of Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e74f9b7f8eec6ba4704c206b93bc8079af3da4bd
+@article{russakovsky2014imagenet,
+  title = {ImageNet Large Scale Visual Recognition Challenge},
+  author = {Olga Russakovsky and Jia Deng and Hao Su and J. Krause and S. Satheesh and Sean Ma and Zhiheng Huang and A. Karpathy and A. Khosla and Michael S. Bernstein and A. Berg and Li Fei-Fei},
+  year = {2014},
+  journal = {International Journal of Computer Vision},
+  doi = {10.1007/s11263-015-0816-y},
+  eprint = {1409.0575},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/e74f9b7f8eec6ba4704c206b93bc8079af3da4bd},
+}
+
+======================================================================
+Reference: ImageNet: A large-scale hierarchical image database
+Authors  : J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, L. Fei-Fei
+Year     : 2009
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2009.5206848
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of '2009 IEEE Conference on Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: 2009 IEEE Conference on Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d2c733e34d48784a37d717fe43d9e93277a8c53e
+@inproceedings{deng2009imagenet,
+  title = {ImageNet: A large-scale hierarchical image database},
+  author = {Jia Deng and Wei Dong and R. Socher and Li-Jia Li and K. Li and Li Fei-Fei},
+  year = {2009},
+  booktitle = {2009 IEEE Conference on Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2009.5206848},
+  url = {https://www.semanticscholar.org/paper/d2c733e34d48784a37d717fe43d9e93277a8c53e},
+}
+
+======================================================================
+Reference: UCF101: A dataset of 101 human actions classes from videos in the wild
+Authors  : K. Soomro, A. R. Zamir, M. Shah
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1212.0402
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1212.0402v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/da9e411fcf740569b6b356f330a1d0fc077c8d7c
+@misc{soomro2012dataset,
+  title = {UCF101: A Dataset of 101 Human Actions Classes From Videos in The Wild},
+  author = {Khurram Soomro and Amir Roshan Zamir and Mubarak Shah},
+  year = {2012},
+  journal = {arXiv.org},
+  eprint = {1212.0402},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1212.0402v1},
+}
+
+======================================================================
+Reference: Framing image description as a ranking task: Data, models and evaluation metrics
+Authors  : P. Y. Micah Hodosh, J. Hockenmaier
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1613/jair.3994
+  - [warning/incomplete/abbreviated_venue] Cited venue 'JAIR' may be an abbreviation of 'Journal of Artificial Intelligence Research'.
+      Suggestion: Use the full venue name: Journal of Artificial Intelligence Research.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/9814df8bd00ba999c4d1e305a7e9bca579dc7c75
+@article{hodosh2013framing,
+  title = {Framing Image Description as a Ranking Task: Data, Models and Evaluation Metrics},
+  author = {Micah Hodosh and Peter Young and J. Hockenmaier},
+  year = {2013},
+  journal = {Journal of Artificial Intelligence Research},
+  doi = {10.1613/jair.3994},
+  url = {https://www.semanticscholar.org/paper/9814df8bd00ba999c4d1e305a7e9bca579dc7c75},
+}
+
+======================================================================
+Reference: Deep captioning with multimodal recurrent neural networks (m-RNN)
+Authors  : J. Mao, W. Xu, Y. Yang, J. Wang, A. Yuille
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1412.6632
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICLR' may be an abbreviation of 'International Conference on Learning Representations'.
+      Suggestion: Use the full venue name: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/54b2b6f35f1b5704dddfaa3a137a2f4ad3dfe745
+@inproceedings{mao2014deep,
+  title = {Deep Captioning with Multimodal Recurrent Neural Networks (m-RNN)},
+  author = {Junhua Mao and W. Xu and Yi Yang and Jiang Wang and A. Yuille},
+  year = {2014},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1412.6632},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/54b2b6f35f1b5704dddfaa3a137a2f4ad3dfe745},
+}
+
+======================================================================
+Reference: Deep fragment embeddings for bidirectional image sentence mapping
+Authors  : A. Karpathy, A. Joulin, L. Fei-Fei
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1406.5679
+  - [warning/incomplete/abbreviated_venue] Cited venue 'NIPS' may be an abbreviation of 'Neural Information Processing Systems'.
+      Suggestion: Use the full venue name: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1406.5679v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/7f1b111f0bb703b0bd97aba505728a9b0d9b2a54
+@article{karpathy2014deep,
+  title = {Deep Fragment Embeddings for Bidirectional Image Sentence Mapping},
+  author = {Andrej Karpathy and Armand Joulin and Li Fei-Fei},
+  year = {2014},
+  journal = {Neural Information Processing Systems},
+  eprint = {1406.5679},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1406.5679v1},
+}
+
+======================================================================
+Reference: Grounded compositional semantics for finding and describing images with sentences
+Authors  : R. Socher, A. Karpathy, Q. V. Le, C. D. Manning, A. Y. Ng
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/tacl_a_00177
+  - [warning/incomplete/abbreviated_venue] Cited venue 'TACL' may be an abbreviation of 'Transactions of the Association for Computational Linguistics'.
+      Suggestion: Use the full venue name: Transactions of the Association for Computational Linguistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0ca7d208ff8d81377e0eaa9723820aeae7a7322d
+@article{socher2014grounded,
+  title = {Grounded Compositional Semantics for Finding and Describing Images with Sentences},
+  author = {R. Socher and A. Karpathy and Quoc V. Le and Christopher D. Manning and A. Ng},
+  year = {2014},
+  journal = {Transactions of the Association for Computational Linguistics},
+  doi = {10.1162/tacl_a_00177},
+  url = {https://www.semanticscholar.org/paper/0ca7d208ff8d81377e0eaa9723820aeae7a7322d},
+}
+
+======================================================================
+Reference: Devise: A deep visual-semantic embedding model
+Authors  : A. Frome, G. S. Corrado, J. Shlens, S. Bengio, J. Dean, T. Mikolov, et al.
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'NIPS' may be an abbreviation of 'Neural Information Processing Systems'.
+      Suggestion: Use the full venue name: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/4aa4069693bee00d1b0759ca3df35e59284e9845
+@article{frome2013devise,
+  title = {DeViSE: A Deep Visual-Semantic Embedding Model},
+  author = {Andrea Frome and G. Corrado and Jonathon Shlens and Samy Bengio and J. Dean and Marc'Aurelio Ranzato and Tomas Mikolov},
+  year = {2013},
+  journal = {Neural Information Processing Systems},
+  url = {https://www.semanticscholar.org/paper/4aa4069693bee00d1b0759ca3df35e59284e9845},
+}
+
+======================================================================
+Reference: Unifying visual-semantic embeddings with multimodal neural language models
+Authors  : R. Kiros, R. Salakhuditnov, R. S. Zemel
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1411.2539
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/2e36ea91a3c8fbff92be2989325531b4002e2afc
+@misc{kiros2014unifying,
+  title = {Unifying Visual-Semantic Embeddings with Multimodal Neural Language Models},
+  author = {Ryan Kiros and R. Salakhutdinov and R. Zemel},
+  year = {2014},
+  journal = {arXiv.org},
+  eprint = {1411.2539},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/2e36ea91a3c8fbff92be2989325531b4002e2afc},
+}
+
+======================================================================
+Reference: From image descriptions to visual denotations: New similarity metrics for semantic inference over event descriptions
+Authors  : M. H. Peter Young, Alice Lai, J. Hockenmaier
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/tacl_a_00166
+  - [warning/incomplete/abbreviated_venue] Cited venue 'TACL' may be an abbreviation of 'Transactions of the Association for Computational Linguistics'.
+      Suggestion: Use the full venue name: Transactions of the Association for Computational Linguistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/44040913380206991b1991daf1192942e038fe31
+@article{young2014from,
+  title = {From image descriptions to visual denotations: New similarity metrics for semantic inference over event descriptions},
+  author = {Peter Young and Alice Lai and Micah Hodosh and J. Hockenmaier},
+  year = {2014},
+  journal = {Transactions of the Association for Computational Linguistics},
+  doi = {10.1162/tacl_a_00166},
+  url = {https://www.semanticscholar.org/paper/44040913380206991b1991daf1192942e038fe31},
+}
+
+======================================================================
+Reference: Microsoft COCO: Common objects in context
+Authors  : T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár, C. L. Zitnick
+Year     : 2014
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'European Conference on Computer Vision' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: European Conference on Computer Vision.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-319-10602-1_48
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1405.0312v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/71b7178df5d2b112d07e45038cb5637208659ff7
+@inproceedings{lin2014microsoft,
+  title = {Microsoft COCO: Common Objects in Context},
+  author = {Tsung-Yi Lin and Michael Maire and Serge Belongie and Lubomir Bourdev and Ross Girshick and James Hays and Pietro Perona and Deva Ramanan and C. Lawrence Zitnick and Piotr Dollár},
+  year = {2014},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-319-10602-1_48},
+  eprint = {1405.0312},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1405.0312v3},
+}
+
+======================================================================
+Reference: BLEU: a method for automatic evaluation of machine translation
+Authors  : K. Papineni, S. Roukos, T. Ward, W.-J. Zhu
+Year     : 2002
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/1073083.1073135
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ACL' may be an abbreviation of 'Annual Meeting of the Association for Computational Linguistics'.
+      Suggestion: Use the full venue name: Annual Meeting of the Association for Computational Linguistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d7da009f457917aa381619facfa5ffae9329a6e9
+@inproceedings{papineni2002bleu,
+  title = {Bleu: a Method for Automatic Evaluation of Machine Translation},
+  author = {Kishore Papineni and Salim Roukos and T. Ward and Wei-Jing Zhu},
+  year = {2002},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.3115/1073083.1073135},
+  url = {https://www.semanticscholar.org/paper/d7da009f457917aa381619facfa5ffae9329a6e9},
+}
+
+======================================================================
+Reference: CIDEr: Consensus-based image description evaluation
+Authors  : R. Vedantam, C. L. Zitnick, D. Parikh
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2015.7299087
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1411.5726
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/258986132bf17755fe8263e42429fe73218c1534
+@article{vedantam2014cider,
+  title = {CIDEr: Consensus-based image description evaluation},
+  author = {Ramakrishna Vedantam and C. L. Zitnick and Devi Parikh},
+  year = {2014},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2015.7299087},
+  eprint = {1411.5726},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/258986132bf17755fe8263e42429fe73218c1534},
+}
+
+======================================================================
+Reference: METEOR: An automatic metric for MT evaluation with improved correlation with human judgments
+Authors  : S. Banerjee, A. Lavie
+Year     : 2005
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Proceedings of the ACL Workshop on Intrinsic and Extrinsic Evaluation Measures for Machine Translation and/or Summarization', but a full version appears at 'IEEvaluation@ACL'.
+      Suggestion: Cite the full version at IEEvaluation@ACL.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/7533d30329cfdbf04ee8ee82bfef792d08015ee5
+@article{banerjee2005meteor,
+  title = {METEOR: An Automatic Metric for MT Evaluation with Improved Correlation with Human Judgments},
+  author = {Satanjeev Banerjee and A. Lavie},
+  year = {2005},
+  journal = {IEEvaluation@ACL},
+  url = {https://www.semanticscholar.org/paper/7533d30329cfdbf04ee8ee82bfef792d08015ee5},
+}
+
+======================================================================
+Reference: Rouge: A package for automatic evaluation of summaries
+Authors  : C.-Y. Lin
+Year     : 2004
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Text Summarization Branches Out: Proceedings of the ACL-04 Workshop', but a full version appears at 'Annual Meeting of the Association for Computational Linguistics'.
+      Suggestion: Cite the full version at Annual Meeting of the Association for Computational Linguistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/60b05f32c32519a809f21642ef1eb3eaf3848008
+@inproceedings{lin2004rouge,
+  title = {ROUGE: A Package for Automatic Evaluation of Summaries},
+  author = {Chin-Yew Lin},
+  year = {2004},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  url = {https://www.semanticscholar.org/paper/60b05f32c32519a809f21642ef1eb3eaf3848008},
+}
+
+======================================================================
+Reference: Show and tell: A neural image caption generator
+Authors  : O. Vinyals, A. Toshev, S. Bengio, D. Erhan
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2015.7298935
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1502.03044
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1502.03044v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d4dc1012d780e8e2547237eb5a6dc7b1bf47d2f0
+@article{xu2015show,
+  title = {Show, Attend and Tell: Neural Image Caption Generation with Visual Attention},
+  author = {Kelvin Xu and Jimmy Ba and Ryan Kiros and Kyunghyun Cho and Aaron Courville and Ruslan Salakhutdinov and Richard Zemel and Yoshua Bengio},
+  year = {2015},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2015.7298935},
+  eprint = {1502.03044},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1502.03044v3},
+}
+
+======================================================================
+Reference: Language models for image captioning: The quirks and what works
+Authors  : J. Devlin, H. Cheng, H. Fang, S. Gupta, L. Deng, X. He, G. Zweig, M. Mitchell
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/v1/p15-2017
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1505.01809
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ACL' may be an abbreviation of 'Annual Meeting of the Association for Computational Linguistics'.
+      Suggestion: Use the full venue name: Annual Meeting of the Association for Computational Linguistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1505.01809v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f142c849ffef66f7520aff4e0b40ac964ccb8cc1
+@inproceedings{devlin2015language,
+  title = {Language Models for Image Captioning: The Quirks and What Works},
+  author = {Jacob Devlin and Hao Cheng and Hao Fang and Saurabh Gupta and Li Deng and Xiaodong He and Geoffrey Zweig and Margaret Mitchell},
+  year = {2015},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.3115/v1/p15-2017},
+  eprint = {1505.01809},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1505.01809v3},
+}
+
+======================================================================
+Reference: Learning like a child: Fast novel visual concept learning from sentence descriptions of images
+Authors  : J. Mao, W. Xu, Y. Yang, J. Wang, Z. Huang, A. Yuille
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv.2015.291
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1504.06692
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICCV' may be an abbreviation of 'IEEE International Conference on Computer Vision'.
+      Suggestion: Use the full venue name: IEEE International Conference on Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1504.06692v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/eb847564774394c484e701437dbcffbf040ff3cc
+@inproceedings{mao2015learning,
+  title = {Learning like a Child: Fast Novel Visual Concept Learning from Sentence Descriptions of Images},
+  author = {Junhua Mao and Wei Xu and Yi Yang and Jiang Wang and Zhiheng Huang and Alan Yuille},
+  year = {2015},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv.2015.291},
+  eprint = {1504.06692},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1504.06692v2},
+}
+
+======================================================================
+Reference: From captions to visual concepts and back
+Authors  : H. Fang, S. Gupta, F. Iandola, R. Srivastava, L. Deng, P. Dollár, J. Gao, X. He, M. Mitchell, J. Platt, et al.
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2015.7298754
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1411.4952
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 12.
+      Suggestion: List all 12 authors.
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/15f102c3c9f4d4fe6ba105e221df48c6e8902b3b
+@article{fang2014from,
+  title = {From captions to visual concepts and back},
+  author = {Hao Fang and Saurabh Gupta and F. Iandola and R. Srivastava and L. Deng and Piotr Dollár and Jianfeng Gao and Xiaodong He and Margaret Mitchell and John C. Platt and C. L. Zitnick and G. Zweig},
+  year = {2014},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2015.7298754},
+  eprint = {1411.4952},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/15f102c3c9f4d4fe6ba105e221df48c6e8902b3b},
+}
+
+======================================================================
+Reference: Long-term recurrent convolutional networks for visual recognition and description
+Authors  : J. Donahue, L. A. Hendricks, S. Guadarrama, M. Rohrbach, S. Venugopalan, K. Saenko, T. Darrell
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2015.7298878
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1411.4389
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f01fc808592ea7c473a69a6e7484040a435f36d9
+@article{donahue2014longterm,
+  title = {Long-term recurrent convolutional networks for visual recognition and description},
+  author = {Jeff Donahue and Lisa Anne Hendricks and Marcus Rohrbach and Subhashini Venugopalan and S. Guadarrama and Kate Saenko and Trevor Darrell},
+  year = {2014},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2015.7298878},
+  eprint = {1411.4389},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/f01fc808592ea7c473a69a6e7484040a435f36d9},
+}
+
+======================================================================
+Reference: Show, attend and tell: Neural image caption generation with visual attention
+Authors  : K. Xu, J. Ba, R. Kiros, A. Courville, R. Salakhutdinov, R. Zemel, Y. Bengio
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1502.03044
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICML' may be an abbreviation of 'International Conference on Machine Learning'.
+      Suggestion: Use the full venue name: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1502.03044v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/4d8f2d14af5991d4f0d050d22216825cac3157bd
+@inproceedings{xu2015show,
+  title = {Show, Attend and Tell: Neural Image Caption Generation with Visual Attention},
+  author = {Kelvin Xu and Jimmy Ba and Ryan Kiros and Kyunghyun Cho and Aaron Courville and Ruslan Salakhutdinov and Richard Zemel and Yoshua Bengio},
+  year = {2015},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1502.03044},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1502.03044v3},
+}
+
+======================================================================
+Reference: Deep visual-semantic alignments for generating image descriptions
+Authors  : A. Karpathy, L. Fei-Fei
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2015.7298932
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1412.2306
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/55e022fb7581bb9e1fce678d21fb25ffbb3fbb88
+@article{karpathy2014deep,
+  title = {Deep visual-semantic alignments for generating image descriptions},
+  author = {A. Karpathy and Li Fei-Fei},
+  year = {2014},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2015.7298932},
+  eprint = {1412.2306},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/55e022fb7581bb9e1fce678d21fb25ffbb3fbb88},
+}
+
+======================================================================
+Reference: TreeTalk: Composition and compression of trees for image descriptions
+Authors  : P. Kuznetsova, V. Ordonez, T. L. Berg, U. C. Hill, Y. Choi
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/tacl_a_00188
+  - [warning/incomplete/abbreviated_venue] Cited venue 'TACL' may be an abbreviation of 'Transactions of the Association for Computational Linguistics'.
+      Suggestion: Use the full venue name: Transactions of the Association for Computational Linguistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/59927ded86ab4f7253fc32efb351e5a13e746ead
+@article{kuznetsova2014treetalk,
+  title = {TreeTalk: Composition and Compression of Trees for Image Descriptions},
+  author = {Polina Kuznetsova and Vicente Ordonez and Tamara L. Berg and Yejin Choi},
+  year = {2014},
+  journal = {Transactions of the Association for Computational Linguistics},
+  doi = {10.1162/tacl_a_00188},
+  url = {https://www.semanticscholar.org/paper/59927ded86ab4f7253fc32efb351e5a13e746ead},
+}
+
+======================================================================
+Reference: Moses: Open source toolkit for statistical machine translation
+Authors  : P. Koehn, H. Hoang, A. Birch, C. Callison-Burch, M. Federico, N. Bertoldi, B. Cowan, W. Shen, C. Moran, R. Zens, C. Dyer, O. Bojar, A. Constantin, E. Herbst
+Year     : 2007
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/1557769.1557821
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ACL' may be an abbreviation of 'Annual Meeting of the Association for Computational Linguistics'.
+      Suggestion: Use the full venue name: Annual Meeting of the Association for Computational Linguistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4ee2eab4c298c1824a9fb8799ad8eed21be38d21
+@inproceedings{koehn2007moses,
+  title = {Moses: Open Source Toolkit for Statistical Machine Translation},
+  author = {Philipp Koehn and Hieu T. Hoang and Alexandra Birch and Chris Callison-Burch and Marcello Federico and N. Bertoldi and B. Cowan and Wade Shen and C. Moran and Richard Zens and Chris Dyer and Ondrej Bojar and Alexandra Constantin and Evan Herbst},
+  year = {2007},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.3115/1557769.1557821},
+  url = {https://www.semanticscholar.org/paper/4ee2eab4c298c1824a9fb8799ad8eed21be38d21},
+}
+
+======================================================================
+Reference: Coherent multi-sentence video description with variable level of detail
+Authors  : A. Rohrbach, M. Rohrbach, W. Qiu, A. Friedrich, M. Pinkal, B. Schiele
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-319-11752-2_15
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1403.6173
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1403.6173v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/889e723cd6d581e120ee6776b231fdf69707ab50
+@inproceedings{senina2014coherent,
+  title = {Coherent Multi-Sentence Video Description with Variable Level of Detail},
+  author = {Anna Senina and Marcus Rohrbach and Wei Qiu and Annemarie Friedrich and Sikandar Amin and Mykhaylo Andriluka and Manfred Pinkal and Bernt Schiele},
+  year = {2014},
+  booktitle = {German Conference on Pattern Recognition},
+  doi = {10.1007/978-3-319-11752-2_15},
+  eprint = {1403.6173},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1403.6173v1},
+}
+
+======================================================================
+Reference: Dense trajectories and motion boundary descriptors for action recognition
+Authors  : H. Wang, A. Kläser, C. Schmid, C. Liu
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s11263-012-0594-8
+  - [warning/incomplete/abbreviated_venue] Cited venue 'IJCV' may be an abbreviation of 'International Journal of Computer Vision'.
+      Suggestion: Use the full venue name: International Journal of Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/bbe0819a47a9f3f11dd34bb3ab44a997ef111088
+@article{wang2013dense,
+  title = {Dense Trajectories and Motion Boundary Descriptors for Action Recognition},
+  author = {Heng Wang and Alexander Kläser and C. Schmid and Chenglin Liu},
+  year = {2013},
+  journal = {International Journal of Computer Vision},
+  doi = {10.1007/s11263-012-0594-8},
+  url = {https://www.semanticscholar.org/paper/bbe0819a47a9f3f11dd34bb3ab44a997ef111088},
+}
+
+======================================================================
+Reference: HMDB: a large video database for human motion recognition
+Authors  : H. Kuehne, H. Jhuang, E. Garrote, T. Poggio, T. Serre
+Year     : 2011
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv.2011.6126543
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8b3b8848a311c501e704c45c6d50430ab7068956
+@article{kuehne2011hmdb,
+  title = {HMDB: A large video database for human motion recognition},
+  author = {Hilde Kuehne and Hueihan Jhuang and Estíbaliz Garrote and T. Poggio and Thomas Serre},
+  year = {2011},
+  journal = {Vision},
+  doi = {10.1109/iccv.2011.6126543},
+  url = {https://www.semanticscholar.org/paper/8b3b8848a311c501e704c45c6d50430ab7068956},
+}
+
+======================================================================
+Reference: Action classification in soccer videos with long short-term memory recurrent neural networks
+Authors  : M. Baccouche, F. Mamalet, C. Wolf, C. Garcia, A. Baskurt
+Year     : 2010
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-642-15822-3_20
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f45a2f4591cd2975cf2e5e7c9097a2dc4584284e
+@inproceedings{baccouche2010action,
+  title = {Action Classification in Soccer Videos with Long Short-Term Memory Recurrent Neural Networks},
+  author = {M. Baccouche and Franck Mamalet and Christian Wolf and Christophe Garcia and A. Baskurt},
+  year = {2010},
+  booktitle = {International Conference on Artificial Neural Networks},
+  doi = {10.1007/978-3-642-15822-3_20},
+  url = {https://www.semanticscholar.org/paper/f45a2f4591cd2975cf2e5e7c9097a2dc4584284e},
+}
+
+======================================================================
+Reference: Every picture tells a story: Generating sentences from images
+Authors  : A. Farhadi, M. Hejrati, M. Sadeghi, P. Young, C. Rashtchian, J. Hockenmaier, D. Forsyth
+Year     : 2010
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-642-15561-1_2
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ECCV' may be an abbreviation of 'European Conference on Computer Vision'.
+      Suggestion: Use the full venue name: European Conference on Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/eaaed23a2d94feb2f1c3ff22a25777c7a78f3141
+@inproceedings{farhadi2010every,
+  title = {Every Picture Tells a Story: Generating Sentences from Images},
+  author = {Ali Farhadi and M. Hejrati and M. Sadeghi and Peter Young and Cyrus Rashtchian and J. Hockenmaier and D. Forsyth},
+  year = {2010},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-642-15561-1_2},
+  url = {https://www.semanticscholar.org/paper/eaaed23a2d94feb2f1c3ff22a25777c7a78f3141},
+}
+
+======================================================================
+Reference: Baby talk: Understanding and generating simple image descriptions
+Authors  : G. Kulkarni, V. Premraj, S. Dhar, S. Li, Y. Choi, A. C. Berg, T. L. Berg
+Year     : 2011
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2011.5995466
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/169b847e69c35cfd475eb4dcc561a24de11762ca
+@article{kulkarni2011baby,
+  title = {Baby talk: Understanding and generating simple image descriptions},
+  author = {Girish Kulkarni and Visruth Premraj and Sagnik Dhar and Siming Li and Yejin Choi and Alexander C. Berg and Tamara L. Berg},
+  year = {2011},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2011.5995466},
+  url = {https://www.semanticscholar.org/paper/169b847e69c35cfd475eb4dcc561a24de11762ca},
+}
+
+======================================================================
+Reference: Corpus-guided sentence generation of natural images
+Authors  : Y. Yang, C. L. Teo, H. Daumé III, Y. Aloimonos
+Year     : 2011
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'EMNLP' may be an abbreviation of 'Conference on Empirical Methods in Natural Language Processing'.
+      Suggestion: Use the full venue name: Conference on Empirical Methods in Natural Language Processing.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/76a1dca3a9c2b0229c1b12c95752dcf40dc95a11
+@inproceedings{yang2011corpusguided,
+  title = {Corpus-Guided Sentence Generation of Natural Images},
+  author = {Yezhou Yang and C. L. Teo and Hal Daumé and Y. Aloimonos},
+  year = {2011},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  url = {https://www.semanticscholar.org/paper/76a1dca3a9c2b0229c1b12c95752dcf40dc95a11},
+}
+
+======================================================================
+Reference: Collective generation of natural image descriptions
+Authors  : P. Kuznetsova, V. Ordonez, A. C. Berg, T. L. Berg, Y. Choi
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ACL' may be an abbreviation of 'Annual Meeting of the Association for Computational Linguistics'.
+      Suggestion: Use the full venue name: Annual Meeting of the Association for Computational Linguistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/2a0d0f6c5a69b264710df0230696f47c5918e2f2
+@inproceedings{kuznetsova2012collective,
+  title = {Collective Generation of Natural Image Descriptions},
+  author = {Polina Kuznetsova and Vicente Ordonez and A. Berg and Tamara L. Berg and Yejin Choi},
+  year = {2012},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  url = {https://www.semanticscholar.org/paper/2a0d0f6c5a69b264710df0230696f47c5918e2f2},
+}
+
+======================================================================
+Reference: Multimodal neural language models
+Authors  : R. Kiros, R. Salakhutdinov, R. Zemel
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1411.2539
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.85).
+      Suggestion: Use canonical title: Unifying Visual-Semantic Embeddings with Multimodal Neural Language Models
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1411.2539v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/2e36ea91a3c8fbff92be2989325531b4002e2afc
+@misc{kiros2014unifying,
+  title = {Unifying Visual-Semantic Embeddings with Multimodal Neural Language Models},
+  author = {Ryan Kiros and Ruslan Salakhutdinov and Richard S. Zemel},
+  year = {2014},
+  journal = {arXiv.org},
+  eprint = {1411.2539},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1411.2539v1},
+}
+
+======================================================================
+Reference: YouTube2Text: Recognizing and describing arbitrary activities using semantic hierarchies and zero-shoot recognition
+Authors  : S. Guadarrama, N. Krishnamoorthy, G. Malkarnenkar, S. Venugopalan, R. Mooney, T. Darrell, K. Saenko
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv.2013.337
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICCV' may be an abbreviation of 'IEEE International Conference on Computer Vision'.
+      Suggestion: Use the full venue name: IEEE International Conference on Computer Vision.
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.88).
+      Suggestion: Use canonical title: YouTube2Text: Recognizing and Describing Arbitrary Activities Using Semantic Hierarchies and Zero-Shot Recognition
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d6a7a563640bf53953c4fda0997e4db176488510
+@inproceedings{guadarrama2013youtubetext,
+  title = {YouTube2Text: Recognizing and Describing Arbitrary Activities Using Semantic Hierarchies and Zero-Shot Recognition},
+  author = {S. Guadarrama and N. Krishnamoorthy and Girish Malkarnenkar and Subhashini Venugopalan and R. Mooney and Trevor Darrell and Kate Saenko},
+  year = {2013},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv.2013.337},
+  url = {https://www.semanticscholar.org/paper/d6a7a563640bf53953c4fda0997e4db176488510},
+}
+
+======================================================================
+Reference: Human focused video description
+Authors  : M. U. G. Khan, L. Zhang, Y. Gotoh
+Year     : 2011
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'ICCV Workshops', but a full version appears at 'IEEE International Conference on Computer Vision'.
+      Suggestion: Cite the full version at IEEE International Conference on Computer Vision.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccvw.2011.6130425
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/fbadf89b990acedf23e1df03d4869010d2dbc59e
+@inproceedings{khan2011human,
+  title = {Human Focused Video Description},
+  author = {Muhammad Usman Ghani Khan and Lei Zhang and Y. Gotoh},
+  year = {2011},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccvw.2011.6130425},
+  url = {https://www.semanticscholar.org/paper/fbadf89b990acedf23e1df03d4869010d2dbc59e},
+}
+
+======================================================================
+Reference: Video in sentences out
+Authors  : A. Barbu, A. Bridge, Z. Burchill, D. Coroian, S. Dickinson, S. Fidler, A. Michaux, S. Mussman, S. Narayanaswamy, D. Salvi, L. Schmidt, J. Shangguan, J. M. Siskind, J. Waggoner, S. Wang, J. Wei, Y. Yin, Z. Zhang
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1204.2742
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1204.2742v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/793c1c908672ea71aef9e1b41a46272aa27598f7
+@inproceedings{barbu2012video,
+  title = {Video In Sentences Out},
+  author = {Andrei Barbu and Alexander Bridge and Zachary Burchill and Dan Coroian and Sven Dickinson and Sanja Fidler and Aaron Michaux and Sam Mussman and Siddharth Narayanaswamy and Dhaval Salvi and Lara Schmidt and Jiangnan Shangguan and Jeffrey Mark Siskind and Jarrell Waggoner and Song Wang and Jinlian Wei and Yifan Yin and Zhiqi Zhang},
+  year = {2012},
+  booktitle = {Conference on Uncertainty in Artificial Intelligence},
+  eprint = {1204.2742},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1204.2742v1},
+}
+
+======================================================================
+Reference: Thousand frames in just a few words: Lingual description of videos through latent topics and sparse object stitching
+Authors  : P. Das, C. Xu, R. Doell, J. Corso
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2013.340
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of '2013 IEEE Conference on Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: 2013 IEEE Conference on Computer Vision and Pattern Recognition.
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 1.00).
+      Suggestion: Use canonical title: A Thousand Frames in Just a Few Words: Lingual Description of Videos through Latent Topics and Sparse Object Stitching
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a23ab0fb7d9e9961e92d704ed71e3dbc15c0d908
+@inproceedings{das2013thousand,
+  title = {A Thousand Frames in Just a Few Words: Lingual Description of Videos through Latent Topics and Sparse Object Stitching},
+  author = {Pradipto Das and Chenliang Xu and Richard F. Doell and Jason J. Corso},
+  year = {2013},
+  booktitle = {2013 IEEE Conference on Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2013.340},
+  url = {https://www.semanticscholar.org/paper/a23ab0fb7d9e9961e92d704ed71e3dbc15c0d908},
+}
+
+======================================================================
+Reference: Towards textually describing complex video contents with audio-visual concept classifiers
+Authors  : C. C. Tan, Y.-G. Jiang, C.-W. Ngo
+Year     : 2011
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/2072298.2072411
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ACM MM' may be an abbreviation of 'ACM Multimedia'.
+      Suggestion: Use the full venue name: ACM Multimedia.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/261ae2f6f426b5efd32ea5b981751d1c63c5309d
+@article{tan2011towards,
+  title = {Towards textually describing complex video contents with audio-visual concept classifiers},
+  author = {Chun-Chet Tan and Yu-Gang Jiang and C. Ngo},
+  year = {2011},
+  journal = {ACM Multimedia},
+  doi = {10.1145/2072298.2072411},
+  url = {https://www.semanticscholar.org/paper/261ae2f6f426b5efd32ea5b981751d1c63c5309d},
+}
+
+======================================================================
+Reference: Sequence discriminative distributed training of long short-term memory recurrent neural networks
+Authors  : H. Sak, O. Vinyals, G. Heigold, A. Senior, E. McDermott, R. Monga, M. Mao
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.21437/interspeech.2014-305
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/965c9aec5e68d49142c5af6a9f0a984f6c2c743a
+@article{sak2014sequence,
+  title = {Sequence discriminative distributed training of long short-term memory recurrent neural networks},
+  author = {Hasim Sak and O. Vinyals and G. Heigold and A. Senior and E. McDermott and R. Monga and Mark Z. Mao},
+  year = {2014},
+  journal = {Interspeech},
+  doi = {10.21437/interspeech.2014-305},
+  url = {https://www.semanticscholar.org/paper/965c9aec5e68d49142c5af6a9f0a984f6c2c743a},
+}
+
+======================================================================
+Reference: Beyond short snippets: Deep networks for video classification
+Authors  : J. Y.-H. Ng, M. Hausknecht, S. Vijayanarasimhan, O. Vinyals, R. Monga, G. Toderici
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2015.7299101
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1503.08909
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1503.08909v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5418b2a482720e013d487a385c26fae0f017c6a6
+@article{ng2015beyond,
+  title = {Beyond Short Snippets: Deep Networks for Video Classification},
+  author = {Joe Yue-Hei Ng and Matthew Hausknecht and Sudheendra Vijayanarasimhan and Oriol Vinyals and Rajat Monga and George Toderici},
+  year = {2015},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2015.7299101},
+  eprint = {1503.08909},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1503.08909v2},
+}
+
+======================================================================
+Reference: Every moment counts: Dense detailed labeling of actions in complex videos
+Authors  : S. Yeung, O. Russakovsky, N. Jin, M. Andriluka, G. Mori, L. Fei-Fei
+Year     : 2015
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Journal of Computer Vision' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Journal of Computer Vision.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s11263-017-1013-y
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1507.05738v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/aa2d1dac4e27aebfb759d6e0b41b8a8ab1b01406
+@article{yeung2015every,
+  title = {Every Moment Counts: Dense Detailed Labeling of Actions in Complex Videos},
+  author = {Serena Yeung and Olga Russakovsky and Ning Jin and Mykhaylo Andriluka and Greg Mori and Li Fei-Fei},
+  year = {2015},
+  journal = {International Journal of Computer Vision},
+  doi = {10.1007/s11263-017-1013-y},
+  eprint = {1507.05738},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1507.05738v3},
+}
+
+======================================================================
+Reference: Deep compositional captioning: Describing novel object categories without paired training data
+Authors  : L. A. Hendricks, S. Venugopalan, M. Rohrbach, R. Mooney, K. Saenko, T. Darrell
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2016.8
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1511.05284
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e516d22697bad6d0f7956b0e8bfa93d6eb0b2f17
+@article{hendricks2015deep,
+  title = {Deep Compositional Captioning: Describing Novel Object Categories without Paired Training Data},
+  author = {Lisa Anne Hendricks and Subhashini Venugopalan and Marcus Rohrbach and R. Mooney and Kate Saenko and Trevor Darrell},
+  year = {2015},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2016.8},
+  eprint = {1511.05284},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/e516d22697bad6d0f7956b0e8bfa93d6eb0b2f17},
+}
+
+======================================================================
+Reference: Translating videos to natural language using deep recurrent neural networks
+Authors  : S. Venugopalan, H. Xu, J. Donahue, M. Rohrbach, R. Mooney, K. Saenko
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/v1/n15-1173
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1412.4729
+  - [warning/incomplete/abbreviated_venue] Cited venue 'NAACL' may be an abbreviation of 'North American Chapter of the Association for Computational Linguistics'.
+      Suggestion: Use the full venue name: North American Chapter of the Association for Computational Linguistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/43795b7bac3d921c4e579964b54187bdbf6c6330
+@article{venugopalan2014translating,
+  title = {Translating Videos to Natural Language Using Deep Recurrent Neural Networks},
+  author = {Subhashini Venugopalan and Huijuan Xu and Jeff Donahue and Marcus Rohrbach and Raymond J. Mooney and Kate Saenko},
+  year = {2014},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.3115/v1/n15-1173},
+  eprint = {1412.4729},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/43795b7bac3d921c4e579964b54187bdbf6c6330},
+}
+
+======================================================================
+Reference: Sequence to sequence–video to text
+Authors  : S. Venugopalan, M. Rohrbach, J. Donahue, R. Mooney, T. Darrell, K. Saenko
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv.2015.515
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1505.00487
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICCV' may be an abbreviation of 'IEEE International Conference on Computer Vision'.
+      Suggestion: Use the full venue name: IEEE International Conference on Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1505.00487v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e58a110fa1e4ddf247d5c614d117d64bfbe135c4
+@inproceedings{venugopalan2015sequence,
+  title = {Sequence to Sequence -- Video to Text},
+  author = {Subhashini Venugopalan and Marcus Rohrbach and Jeff Donahue and Raymond Mooney and Trevor Darrell and Kate Saenko},
+  year = {2015},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv.2015.515},
+  eprint = {1505.00487},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1505.00487v3},
+}
+
+======================================================================
+Reference: Describing videos by exploiting temporal structure
+Authors  : L. Yao, A. Torabi, K. Cho, N. Ballas, C. Pal, H. Larochelle, A. Courville
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv.2015.512
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1502.08029
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1502.08029v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5f425b7abf2ed3172ed060df85bb1885860a297e
+@inproceedings{yao2015describing,
+  title = {Describing Videos by Exploiting Temporal Structure},
+  author = {Li Yao and Atousa Torabi and Kyunghyun Cho and Nicolas Ballas and Christopher Pal and Hugo Larochelle and Aaron Courville},
+  year = {2015},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv.2015.512},
+  eprint = {1502.08029},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1502.08029v5},
+}
+
+======================================================================
+Reference: Grounding of textual phrases in images by reconstruction
+Authors  : A. Rohrbach, M. Rohrbach, R. Hu, T. Darrell, B. Schiele
+Year     : 2015
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'European Conference on Computer Vision' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: European Conference on Computer Vision.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-319-46448-0_49
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1511.03745v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/14c2321851fb5ae580a19726dd2753a525d6ad76
+@inproceedings{rohrbach2015grounding,
+  title = {Grounding of Textual Phrases in Images by Reconstruction},
+  author = {Anna Rohrbach and Marcus Rohrbach and Ronghang Hu and Trevor Darrell and Bernt Schiele},
+  year = {2015},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-319-46448-0_49},
+  eprint = {1511.03745},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1511.03745v4},
+}
+
+======================================================================
+Reference: Natural language object retrieval
+Authors  : R. Hu, H. Xu, M. Rohrbach, J. Feng, K. Saenko, T. Darrell
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2016.493
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1511.04164
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d696a1923288e6c15422660de9553f6fdb6a4fae
+@article{hu2015natural,
+  title = {Natural Language Object Retrieval},
+  author = {Ronghang Hu and Huazhe Xu and Marcus Rohrbach and Jiashi Feng and Kate Saenko and Trevor Darrell},
+  year = {2015},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2016.493},
+  eprint = {1511.04164},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/d696a1923288e6c15422660de9553f6fdb6a4fae},
+}

@@ -1,0 +1,1018 @@
+======================================================================
+Reference: Fast scalable and accurate discovery of DAGs using the best order score search and grow shrink trees
+Authors  : Bryan Andrews, Joseph Ramsey, Ruben Sanchez Romero, Jazmin Camchong, Erich Kummerfeld
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.17679
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2310.17679
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.17679v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0ce38b197ac87bad0dcb28d3f83630c0524d0e86
+@article{andrews2023fast,
+  title = {Fast Scalable and Accurate Discovery of DAGs Using the Best Order Score Search and Grow-Shrink Trees},
+  author = {Bryan Andrews and Joseph Ramsey and Ruben Sanchez-Romero and Jazmin Camchong and Erich Kummerfeld},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2310.17679},
+  eprint = {2310.17679},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.17679v1},
+}
+
+======================================================================
+Reference: Zero-shot causal graph extrapolation from text via llms
+Authors  : Alessandro Antonucci, Gregorio Piqué, Marco Zaffalon
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2312.14670
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2312.14670v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e9273e5c14343c0b34010bbf2e2aada57d5f6bcf
+@misc{antonucci2023zeroshot,
+  title = {Zero-shot Causal Graph Extrapolation from Text via LLMs},
+  author = {Alessandro Antonucci and Gregorio Piqué and Marco Zaffalon},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2312.14670},
+  eprint = {2312.14670},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2312.14670v1},
+}
+
+======================================================================
+Reference: From query tools to causal architects: Harnessing large language models for advanced causal discovery from data
+Authors  : Taiyu Ban, Lyvzhou Chen, Xiangyu Wang, Huanhuan Chen
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'IEEE Transactions on Artificial Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: IEEE Transactions on Artificial Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tai.2025.3560927
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: IEEE Transactions on Artificial Intelligence
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2306.16902v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/37a25ec621139e98498252874b142c6ef3730e2a
+@article{ban2023integrating,
+  title = {Integrating Large Language Model for Improved Causal Discovery},
+  author = {Taiyu Ban and Lyuzhou Chen and Derui Lyu and Xiangyu Wang and Qinrui Zhu and Qiang Tu and Huanhuan Chen},
+  year = {2023},
+  journal = {IEEE Transactions on Artificial Intelligence},
+  doi = {10.1109/tai.2025.3560927},
+  eprint = {2306.16902},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2306.16902v2},
+}
+
+======================================================================
+Reference: DAGMA: Learning DAGs via M-matrices and a Log-Determinant Acyclicity Characterization
+Authors  : Kevin Bello, Bryon Aragam, Pradeep Ravikumar
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2209.08037
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2209.08037
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2209.08037v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c7d7ad1eb52247c9c54a97fa83087d49070156a1
+@article{bello2022dagma,
+  title = {DAGMA: Learning DAGs via M-matrices and a Log-Determinant Acyclicity Characterization},
+  author = {Kevin Bello and Bryon Aragam and Pradeep Ravikumar},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2209.08037},
+  eprint = {2209.08037},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2209.08037v3},
+}
+
+======================================================================
+Reference: Differentiable causal discovery from interventional data
+Authors  : Philippe Brouillard, Sébastien Lachapelle, Alexandre Lacoste, Simon Lacoste-Julien, Alexandre Drouin
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Neural Information Processing Systems
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2007.01754v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/0da0af5ed59661fe4f901cf330a851e95eac7ea4
+@article{brouillard2020differentiable,
+  title = {Differentiable Causal Discovery from Interventional Data},
+  author = {Philippe Brouillard and Sébastien Lachapelle and Alexandre Lacoste and Simon Lacoste-Julien and Alexandre Drouin},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2007.01754},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2007.01754v2},
+}
+
+======================================================================
+Reference: Mitigating prior errors in causal structure learning: Towards llm driven prior knowledge
+Authors  : Lyuzhou Chen, Taiyu Ban, Xiangyu Wang, Derui Lyu, Huanhuan Chen
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'IEEE Transactions on Pattern Analysis and Machine Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: IEEE Transactions on Pattern Analysis and Machine Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tpami.2025.3594755
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: IEEE Transactions on Pattern Analysis and Machine Intelligence
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.50).
+      Suggestion: Use canonical title: Mitigating Prior Errors in Causal Structure Learning: A Resilient Approach via Bayesian Networks
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2306.07032v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/ef69750d874a1f3c81c25fffd2e6874d10250afa
+@article{chen2023mitigating,
+  title = {Mitigating Prior Errors in Causal Structure Learning: A Resilient Approach via Bayesian Networks},
+  author = {Lyuzhou Chen and Taiyu Ban and Xiangyu Wang and Derui Lyu and Huanhuan Chen},
+  year = {2023},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  doi = {10.1109/tpami.2025.3594755},
+  eprint = {2306.07032},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2306.07032v2},
+}
+
+======================================================================
+Reference: Human-in-the-loop causal discovery under latent confounding using ancestral gflownets
+Authors  : Tiago da Silva, Eliezer Silva, António Góis, Dominik Heider, Samuel Kaski, Diego Mesquita, Adèle Ribeiro
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CoRR 2023' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CoRR 2023.
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: CoRR 2023
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2309.12032v4
+%   openreview: venue — https://openreview.net/forum?id=TB1BfXKZCl
+@article{silva2023expertaided,
+  title = {Expert-Aided Causal Discovery of Ancestral Graphs},
+  author = {Tiago da Silva and Bruna Bazaluk and Eliezer de Souza da Silva and António Góis and Salem Lahlou and Dominik Heider and Samuel Kaski and Diego Mesquita and Adèle Helena Ribeiro},
+  year = {2023},
+  journal = {CoRR 2023},
+  eprint = {2309.12032},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2309.12032v4},
+}
+
+======================================================================
+Reference: Dcilp: A distributed approach for large-scale causal structure learning
+Authors  : Shuyu Dong, Michèle Sebag, Kento Uemura, Akito Fujii, Shuang Chang, Yusuke Koyanagi, Koji Maruhashi
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'AAAI Conference on Artificial Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: AAAI Conference on Artificial Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v39i15.33795
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: AAAI Conference on Artificial Intelligence
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2406.10481v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/72fdcfc6b5ec9e63a2a124faab28802c53955018
+@inproceedings{dong2024dcilp,
+  title = {DCILP: A Distributed Approach for Large-Scale Causal Structure Learning},
+  author = {Shuyu Dong and Michèle Sebag and Kento Uemura and Akito Fujii and Shuang Chang and Yusuke Koyanagi and Koji Maruhashi},
+  year = {2024},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v39i15.33795},
+  eprint = {2406.10481},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2406.10481v2},
+}
+
+======================================================================
+Reference: Talk like a graph: Encoding graphs for large language models
+Authors  : Bahare Fatemi, Jonathan Halcrow, Bryan Perozzi
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.04560
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Learning Representations
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.04560v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/9283b8c7e6ad6ae86be059a26595de0d7a427a10
+@inproceedings{fatemi2023talk,
+  title = {Talk like a Graph: Encoding Graphs for Large Language Models},
+  author = {Bahare Fatemi and Jonathan Halcrow and Bryan Perozzi},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2310.04560},
+  eprint = {2310.04560},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.04560v1},
+}
+
+======================================================================
+Reference: On the unlikelihood of d-separation
+Authors  : Itai Feigenbaum, Huan Wang, Shelby Heinecke, Juan Carlos Niebles, Weiran Yao, Caiming Xiong, Devansh Arpit
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'European Workshop on Probabilistic Graphical Models' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: European Workshop on Probabilistic Graphical Models.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2303.05628
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: European Workshop on Probabilistic Graphical Models
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.05628v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/378ab7bf92fb24d7352a8a0772e69d6112518e48
+@inproceedings{feigenbaum2023unlikelihood,
+  title = {On the Unlikelihood of D-Separation},
+  author = {Itai Feigenbaum and Huan Wang and Shelby Heinecke and Juan Carlos Niebles and Weiran Yao and Caiming Xiong and Devansh Arpit},
+  year = {2023},
+  booktitle = {European Workshop on Probabilistic Graphical Models},
+  doi = {10.48550/arxiv.2303.05628},
+  eprint = {2303.05628},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.05628v2},
+}
+
+======================================================================
+Reference: Probability inequalities for sums of bounded random variables
+Authors  : Wassily Hoeffding
+Year     : 1963
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-1-4612-0865-5_47
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, year — https://www.semanticscholar.org/paper/30ffd4a8e479d04b1dea5749eac4a466dccde64b
+@article{fisher1994probability,
+  title = {Probability Inequalities for Sums of Bounded Random Variables},
+  author = {N. Fisher and P. Sen},
+  year = {1994},
+  doi = {10.1007/978-1-4612-0865-5_47},
+  url = {https://www.semanticscholar.org/paper/30ffd4a8e479d04b1dea5749eac4a466dccde64b},
+}
+
+======================================================================
+Reference: Causal identification under markov equivalence
+Authors  : Amin Jaber, Jiji Zhang, Elias Bareinboim
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Uncertainty in Artificial Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Uncertainty in Artificial Intelligence.
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference on Uncertainty in Artificial Intelligence
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1812.06209v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/f6958b948961c80272a421eb27b715c1f3b49a06
+@inproceedings{jaber2018causal,
+  title = {Causal Identification under Markov Equivalence},
+  author = {Amin Jaber and Jiji Zhang and Elias Bareinboim},
+  year = {2018},
+  booktitle = {Conference on Uncertainty in Artificial Intelligence},
+  eprint = {1812.06209},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1812.06209v1},
+}
+
+======================================================================
+Reference: Cladder: Assessing causal reasoning in language models
+Authors  : Zhijing Jin, Yuen Chen, Felix Leeb, Luigi Gresele, Ojasv Kamal, Zhiheng Lyu, Kevin Blin, Fernando Gonzalez Adauto, Max Kleiman-Weiner, Mrinmaya Sachan, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/075280-1353
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2312.04350
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2312.04350v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6ac627f57b26354ab537734d820da4a6a7dde2c6
+@article{jin2023cladder,
+  title = {CLadder: Assessing Causal Reasoning in Language Models},
+  author = {Zhijing Jin and Yuen Chen and Felix Leeb and Luigi Gresele and Ojasv Kamal and Zhiheng Lyu and Kevin Blin and Fernando Gonzalez Adauto and Max Kleiman-Weiner and Mrinmaya Sachan and Bernhard Schölkopf},
+  year = {2023},
+  journal = {Advances in Neural Information Processing Systems 36},
+  doi = {10.52202/075280-1353},
+  eprint = {2312.04350},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2312.04350v3},
+}
+
+======================================================================
+Reference: Efficient causal graph discovery using large language models
+Authors  : Thomas Jiralerspong, Xiaoyin Chen, Yash More, Vedant Shah, Yoshua Bengio
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.01207
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.01207v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1a2026ea7736c999bd43afc5b1eddf75aa351189
+@misc{jiralerspong2024efficient,
+  title = {Efficient Causal Graph Discovery Using Large Language Models},
+  author = {Thomas Jiralerspong and Xiaoyin Chen and Yash More and Vedant Shah and Yoshua Bengio},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2402.01207},
+  eprint = {2402.01207},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.01207v5},
+}
+
+======================================================================
+Reference: Decomposed prompting: A modular approach for solving complex tasks
+Authors  : Tushar Khot, Harsh Trivedi, Matthew Finlayson, Yao Fu, Kyle Richardson, Peter Clark, Ashish Sabharwal
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2210.02406
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Learning Representations
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2210.02406v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/07955e96cbd778d0ae2a68f09d073b866dd84c2a
+@inproceedings{khot2022decomposed,
+  title = {Decomposed Prompting: A Modular Approach for Solving Complex Tasks},
+  author = {Tushar Khot and Harsh Trivedi and Matthew Finlayson and Yao Fu and Kyle Richardson and Peter Clark and Ashish Sabharwal},
+  year = {2022},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2210.02406},
+  eprint = {2210.02406},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2210.02406v2},
+}
+
+======================================================================
+Reference: Causal reasoning and large language models: Opening a new frontier for causality
+Authors  : Emre Kiciman, Robert Ness, Amit Sharma, Chenhao Tan
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2305.00050
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2305.00050
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/10632e0a667cbc3c52cc8f11a46d8e8e9c7739e3
+@article{kıcıman2023causal,
+  title = {Causal Reasoning and Large Language Models: Opening a New Frontier for Causality},
+  author = {Emre Kıcıman and R. Ness and Amit Sharma and Chenhao Tan},
+  year = {2023},
+  journal = {Trans. Mach. Learn. Res.},
+  doi = {10.48550/arxiv.2305.00050},
+  eprint = {2305.00050},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/10632e0a667cbc3c52cc8f11a46d8e8e9c7739e3},
+}
+
+======================================================================
+Reference: Causal discovery using dynamically requested knowledge
+Authors  : Neville K Kitson, Anthony C Constantinou
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Knowledge-Based Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Knowledge-Based Systems.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.11154
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Knowledge-Based Systems
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.11154v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/18e0392e8eeaa23ffe65a53889419ef883ce05f5
+@article{kitson2023causal,
+  title = {Causal discovery using dynamically requested knowledge},
+  author = {Neville K Kitson and Anthony C Constantinou},
+  year = {2023},
+  journal = {Knowledge-Based Systems},
+  doi = {10.48550/arxiv.2310.11154},
+  eprint = {2310.11154},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.11154v1},
+}
+
+======================================================================
+Reference: Gradient-based neural DAG learning
+Authors  : Sébastien Lachapelle, Philippe Brouillard, Tristan Deleu, Simon Lacoste-Julien
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1906.02226
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/ae39e54c451897999032cde7d3e1c33139d7fdc3
+@inproceedings{lachapelle2019gradientbased,
+  title = {Gradient-Based Neural DAG Learning},
+  author = {Sébastien Lachapelle and P. Brouillard and T. Deleu and Simon Lacoste-Julien},
+  year = {2019},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1906.02226},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/ae39e54c451897999032cde7d3e1c33139d7fdc3},
+}
+
+======================================================================
+Reference: Multi-agent causal discovery using large language models
+Authors  : Hao Duong Le, Xin Xia, Zhang Chen
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.15073
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.15073v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4461be68040b0088332d59c1a36d7e8be8e2f086
+@misc{le2024multiagent,
+  title = {Multi-Agent Causal Discovery Using Large Language Models},
+  author = {Hao Duong Le and Xin Xia and Haijie Xu and Chen Zhang},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2407.15073},
+  eprint = {2407.15073},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.15073v4},
+}
+
+======================================================================
+Reference: Causal discovery from observational and interventional data across multiple environments
+Authors  : Adam Li, Amin Jaber, Elias Bareinboim
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/075280-0741
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/013b1e73a335ad3874b52075546c3e9f108480d6
+@article{li2023causal,
+  title = {Causal discovery from observational and interventional data across multiple environments},
+  author = {Adam Li and Amin Jaber and E. Bareinboim},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/075280-0741},
+  url = {https://www.semanticscholar.org/paper/013b1e73a335ad3874b52075546c3e9f108480d6},
+}
+
+======================================================================
+Reference: Extremely greedy equivalence search
+Authors  : Achille Nazaret, David Blei
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2502.19551
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2502.19551
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/347ef1fd9aab64f4427689b0baef576c3bf1dbe8
+@inproceedings{nazaret2025extremely,
+  title = {Extremely Greedy Equivalence Search},
+  author = {Achille Nazaret and David M. Blei},
+  year = {2025},
+  booktitle = {Conference on Uncertainty in Artificial Intelligence},
+  doi = {10.48550/arxiv.2502.19551},
+  eprint = {2502.19551},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/347ef1fd9aab64f4427689b0baef576c3bf1dbe8},
+}
+
+======================================================================
+Reference: Causal discovery with prior information
+Authors  : R. T. O’Donnell, A. E. Nicholson, B. Han, K. B. Korb, M. J. Alam, L. R. Hope
+Year     : 2006
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/11941439_141
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8a3a834cb79321ad8b86fc6eff61d77645e7873f
+@inproceedings{odonnell2006causal,
+  title = {Causal Discovery with Prior Information},
+  author = {R. T. O'Donnell and A. Nicholson and B. Han and K. Korb and Md. jahangir Alam and L. R. Hope},
+  year = {2006},
+  booktitle = {Australian Conference on Artificial Intelligence},
+  doi = {10.1007/11941439_141},
+  url = {https://www.semanticscholar.org/paper/8a3a834cb79321ad8b86fc6eff61d77645e7873f},
+}
+
+======================================================================
+Reference: Causality
+Authors  : Judea Pearl
+Year     : 2009
+Verdict  : error
+  - [error/retracted/is_retracted] The cited paper has been retracted (or withdrawn by the author).
+      Suggestion: Remove this citation or replace it with a non-retracted source. Verify the retraction notice on the publisher's site.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.7551/mitpress/11578.003.0012
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 0904.1919
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/0904.1919v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f6e6c948a2074e38e0a4e9099c0f63773c6013dd
+@article{novikovborodin2009physics,
+  title = {Physics beyond Causality},
+  author = {A. V. Novikov-Borodin},
+  year = {2009},
+  journal = {Mind and the Present},
+  doi = {10.7551/mitpress/11578.003.0012},
+  eprint = {0904.1919},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/0904.1919v4},
+}
+
+======================================================================
+Reference: Qwen3: Think deeper, act faster
+Authors  : Qwen
+Year     : 2025
+Verdict  : unverified
+
+======================================================================
+Reference: Iterative causal discovery in the possible presence of latent confounders and selection bias
+Authors  : Raanan Y. Rohekar, Shami Nisimov, Yaniv Gurwicz, Gal Novik
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Neural Information Processing Systems
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2111.04095v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/5f5f05ac8acc7af95635a992f2186483a01c6b12
+@article{rohekar2021iterative,
+  title = {Iterative Causal Discovery in the Possible Presence of Latent Confounders and Selection Bias},
+  author = {Raanan Y. Rohekar and Shami Nisimov and Yaniv Gurwicz and Gal Novik},
+  year = {2021},
+  journal = {Neural Information Processing Systems},
+  eprint = {2111.04095},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2111.04095v2},
+}
+
+======================================================================
+Reference: Diffusion models for causal discovery via topological ordering
+Authors  : Pedro Sanchez, Xiao Liu, Alison Q O’Neil, Sotirios A. Tsaftaris
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2210.06201
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2210.06201
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/1ffd02a5ef1ecd0321df2c3265234eee8bc3d151
+@inproceedings{sanchez2022diffusion,
+  title = {Diffusion Models for Causal Discovery via Topological Ordering},
+  author = {Pedro Sanchez and Xiao Liu and Alison Q. O'Neil and S. Tsaftaris},
+  year = {2022},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2210.06201},
+  eprint = {2210.06201},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/1ffd02a5ef1ecd0321df2c3265234eee8bc3d151},
+}
+
+======================================================================
+Reference: Causalgraph2llm: Evaluating llms for causal queries
+Authors  : Ivaxi Sheth, Bahare Fatemi, Mario Fritz
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2410.15939
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: North American Chapter of the Association for Computational Linguistics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2410.15939v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a14bd91f984036d7c381dd86b765f8eef4d838c3
+@article{sheth2024causalgraphllm,
+  title = {CausalGraph2LLM: Evaluating LLMs for Causal Queries},
+  author = {Ivaxi Sheth and Bahare Fatemi and Mario Fritz},
+  year = {2024},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2410.15939},
+  eprint = {2410.15939},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2410.15939v2},
+}
+
+======================================================================
+Reference: Directlingam: A direct method for learning a linear non-gaussian structural equation model
+Authors  : Shohei Shimizu, Takanori Inazumi, Yasuhiro Sogawa, Aapo Hyvarinen, Yoshinobu Kawahara, Takashi Washio, Patrik O. Hoyer, Kenneth Bollen
+Year     : 2011
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Journal of machine learning research' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Journal of machine learning research.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.5555/1953048.2021040
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Journal of machine learning research
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1101.2489v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/bce96c1dcbebb26cb945664faf2415e5384b766c
+@article{shimizu2011directlingam,
+  title = {DirectLiNGAM: A direct method for learning a linear non-Gaussian structural equation model},
+  author = {Shohei Shimizu and Takanori Inazumi and Yasuhiro Sogawa and Aapo Hyvarinen and Yoshinobu Kawahara and Takashi Washio and Patrik O. Hoyer and Kenneth Bollen},
+  year = {2011},
+  journal = {Journal of machine learning research},
+  doi = {10.5555/1953048.2021040},
+  eprint = {1101.2489},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1101.2489v3},
+}
+
+======================================================================
+Reference: An anytime algorithm for causal inference
+Authors  : Peter Spirtes
+Year     : 2001
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Proceedings of the Eighth International Workshop on Artificial Intelligence and Statistics', but a full version appears at 'International Conference on Artificial Intelligence and Statistics'.
+      Suggestion: Cite the full version at International Conference on Artificial Intelligence and Statistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/af4c6643fa5b41f009efc173801f24c1fdc2cac0
+@inproceedings{spirtes2001anytime,
+  title = {An Anytime Algorithm for Causal Inference},
+  author = {P. Spirtes},
+  year = {2001},
+  booktitle = {International Conference on Artificial Intelligence and Statistics},
+  url = {https://www.semanticscholar.org/paper/af4c6643fa5b41f009efc173801f24c1fdc2cac0},
+}
+
+======================================================================
+Reference: Causalman: A physics-based simulator for large-scale causality
+Authors  : Nicholas Tagliapietra, Juergen Luettin, Lavdim Halilaj, Moritz Willig, Tim Pychynski, Kristian Kersting
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2502.12707
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2502.12707v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/59711bd70fab45e889cc10341fec6899a6882cfd
+@misc{tagliapietra2025causalman,
+  title = {CausalMan: A physics-based simulator for large-scale causality},
+  author = {Nicholas Tagliapietra and Juergen Luettin and Lavdim Halilaj and Moritz Willig and Tim Pychynski and Kristian Kersting},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2502.12707},
+  eprint = {2502.12707},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2502.12707v1},
+}
+
+======================================================================
+Reference: Integrating large language models in causal discovery: A statistical causal approach
+Authors  : Masayuki Takayama, Tadahisa Okuda, Thong Pham, Tatsuyoshi Ikenoue, Shingo Fukuma, Shohei Shimizu, Akiyoshi Sannai
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Trans. Mach. Learn. Res.' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Trans. Mach. Learn. Res..
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.01454
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Trans. Mach. Learn. Res.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.01454v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c213737923f58ad6c4cd18a8c17bca6522d7f4c6
+@article{takayama2024integrating,
+  title = {Integrating Large Language Models in Causal Discovery: A Statistical Causal Approach},
+  author = {Masayuki Takayama and Tadahisa Okuda and Thong Pham and Tatsuyoshi Ikenoue and Shingo Fukuma and Shohei Shimizu and Akiyoshi Sannai},
+  year = {2024},
+  journal = {Trans. Mach. Learn. Res.},
+  doi = {10.48550/arxiv.2402.01454},
+  eprint = {2402.01454},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.01454v5},
+}
+
+======================================================================
+Reference: Neuropathic pain diagnosis simulator for causal discovery algorithm evaluation
+Authors  : Ruibo Tu, Kun Zhang, Bo Christer Bertilson, Hedvig Kjellström, Cheng Zhang
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Neural Information Processing Systems
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1906.01732v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/9f1e2407cce09219fae2fbcd67d0e91bd3135932
+@article{tu2019neuropathic,
+  title = {Neuropathic Pain Diagnosis Simulator for Causal Discovery Algorithm Evaluation},
+  author = {Ruibo Tu and Kun Zhang and Bo Christer Bertilson and Hedvig Kjellström and Cheng Zhang},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1906.01732},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1906.01732v3},
+}
+
+======================================================================
+Reference: Causal-discovery performance of chatgpt in the context of neuropathic pain diagnosis
+Authors  : Ruibo Tu, Chao Ma, Cheng Zhang
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2301.13819
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2301.13819v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/8d43f788a863258dc0a34e05f4a0c9f434be7829
+@misc{tu2023causaldiscovery,
+  title = {Causal-Discovery Performance of ChatGPT in the context of Neuropathic Pain Diagnosis},
+  author = {Ruibo Tu and Chao Ma and Cheng Zhang},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2301.13819},
+  eprint = {2301.13819},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2301.13819v2},
+}
+
+======================================================================
+Reference: Teaching transformers causal reasoning through axiomatic training
+Authors  : Aniket Vashishtha, Abhinav Kumar, Abbavaram Gowtham Reddy, Vineeth N Balasubramanian, Amit Sharma
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.07612
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Machine Learning
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.07612v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/dc2858166d68e29288fd3d6a25c4b62ef23e24f9
+@inproceedings{vashishtha2024teaching,
+  title = {Teaching Transformers Causal Reasoning through Axiomatic Training},
+  author = {Aniket Vashishtha and Abhinav Kumar and Atharva Pandey and Abbavaram Gowtham Reddy and Kabir Ahuja and Vineeth N Balasubramanian and Amit Sharma},
+  year = {2024},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2407.07612},
+  eprint = {2407.07612},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.07612v3},
+}
+
+======================================================================
+Reference: Causal-copilot: An autonomous causal analysis agent
+Authors  : Xinyue Wang, Kun Zhou, Wenyi Wu, Har Simrat Singh, Fang Nan, Songyao Jin, Aryan Philip, Saloni Patnaik, Hou Zhu, Shivam Singh, Parjanya Prashant, Qian Shen, Biwei Huang
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2504.13263
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2504.13263v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/9a2024c0f862b6b5ec71691debb7eaa7517ae6fc
+@misc{wang2025causalcopilot,
+  title = {Causal-Copilot: An Autonomous Causal Analysis Agent},
+  author = {Xinyue Wang and Kun Zhou and Wenyi Wu and Har Simrat Singh and Fang Nan and Songyao Jin and Aryan Philip and Saloni Patnaik and Hou Zhu and Shivam Singh and Parjanya Prashant and Qian Shen and Biwei Huang},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2504.13263},
+  eprint = {2504.13263},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2504.13263v2},
+}
+
+======================================================================
+Reference: Can foundation models talk causality?
+Authors  : Moritz Willig, Matej Zečević, Devendra Singh Dhami, Kristian Kersting
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2206.10591
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2206.10591v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6745381bfa99a3b979766cca05e91559f1b770e3
+@misc{willig2022foundation,
+  title = {Can Foundation Models Talk Causality?},
+  author = {Moritz Willig and Matej Zečević and Devendra Singh Dhami and Kristian Kersting},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2206.10591},
+  eprint = {2206.10591},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2206.10591v2},
+}
+
+======================================================================
+Reference: Sample, estimate, aggregate: A recipe for causal discovery foundation models
+Authors  : Menghua Wu, Yujia Bao, Regina Barzilay, Tommi Jaakkola
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Trans. Mach. Learn. Res.' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Trans. Mach. Learn. Res..
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.01929
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Trans. Mach. Learn. Res.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.01929v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a8232bcaaff260e8b61e51253bf5cedbd08cc89a
+@article{wu2024sample,
+  title = {Sample, estimate, aggregate: A recipe for causal discovery foundation models},
+  author = {Menghua Wu and Yujia Bao and Regina Barzilay and Tommi Jaakkola},
+  year = {2024},
+  journal = {Trans. Mach. Learn. Res.},
+  doi = {10.48550/arxiv.2402.01929},
+  eprint = {2402.01929},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.01929v3},
+}
+
+======================================================================
+Reference: Causal parrots: Large language models may talk causality but are not causal
+Authors  : Matej Zečević, Moritz Willig, Devendra Singh Dhami, Kristian Kersting
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Trans. Mach. Learn. Res.' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Trans. Mach. Learn. Res..
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2308.13067
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Trans. Mach. Learn. Res.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2308.13067v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b9672ac98913c43fcb996b3def314789d1cc0cf4
+@article{zečević2023causal,
+  title = {Causal Parrots: Large Language Models May Talk Causality But Are Not Causal},
+  author = {Matej Zečević and Moritz Willig and Devendra Singh Dhami and Kristian Kersting},
+  year = {2023},
+  journal = {Trans. Mach. Learn. Res.},
+  doi = {10.48550/arxiv.2308.13067},
+  eprint = {2308.13067},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2308.13067v1},
+}
+
+======================================================================
+Reference: Causal reasoning with ancestral graphs
+Authors  : Jiji Zhang
+Year     : 2008
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.5555/1390681.1442780
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a81b41d9c1874f307d950ccd877b88b7bee19a71
+@article{zhang2008causal,
+  title = {Causal Reasoning with Ancestral Graphs},
+  author = {Jiji Zhang},
+  year = {2008},
+  journal = {Journal of machine learning research},
+  doi = {10.5555/1390681.1442780},
+  url = {https://www.semanticscholar.org/paper/a81b41d9c1874f307d950ccd877b88b7bee19a71},
+}
+
+======================================================================
+Reference: On the identifiability of the post-nonlinear causal model
+Authors  : Kun Zhang, Aapo Hyvarinen
+Year     : 2012
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Uncertainty in Artificial Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Uncertainty in Artificial Intelligence.
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference on Uncertainty in Artificial Intelligence
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1205.2599v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/65b16fd413a3daddc0c8e2bd67945d39de53a8f8
+@inproceedings{zhang2012identifiability,
+  title = {On the Identifiability of the Post-Nonlinear Causal Model},
+  author = {Kun Zhang and Aapo Hyvarinen},
+  year = {2012},
+  booktitle = {Conference on Uncertainty in Artificial Intelligence},
+  eprint = {1205.2599},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1205.2599v1},
+}
+
+======================================================================
+Reference: Local causal discovery with background knowledge
+Authors  : Qingyuan Zheng, Yue Liu, Yangbo He
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'IEEE Transactions on Pattern Analysis and Machine Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: IEEE Transactions on Pattern Analysis and Machine Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tpami.2026.3667409
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: IEEE Transactions on Pattern Analysis and Machine Intelligence
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2408.07890v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/27c43ac244ee0bad2d6d841af0b3308599a9b95b
+@article{zheng2024local,
+  title = {Local Causal Discovery with Background Knowledge},
+  author = {Qingyuan Zheng and Yue Liu and Yangbo He},
+  year = {2024},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  doi = {10.1109/tpami.2026.3667409},
+  eprint = {2408.07890},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2408.07890v1},
+}
+
+======================================================================
+Reference: Dags with no tears: Continuous optimization for structure learning
+Authors  : Xun Zheng, Bryon Aragam, Pradeep K Ravikumar, Eric P Xing
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1803.01422
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/8ef09697eca6a3201b1703a5a21722159cf64fcd
+@article{zheng2018dags,
+  title = {DAGs with NO TEARS: Continuous Optimization for Structure Learning},
+  author = {Xun Zheng and Bryon Aragam and Pradeep Ravikumar and E. Xing},
+  year = {2018},
+  journal = {Neural Information Processing Systems},
+  eprint = {1803.01422},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/8ef09697eca6a3201b1703a5a21722159cf64fcd},
+}
