@@ -160,7 +160,9 @@ def _extract_chunk(chunk: str) -> list[dict[str, Any]]:
         system=SYSTEM_PROMPT,
     )
 
-    if not isinstance(payload, dict) or payload.get("status") in ("error", "unknown"):
+    if not isinstance(payload, dict):
+        raise RuntimeError(f"LLM returned unusable payload: non-dict {type(payload).__name__}")
+    if payload.get("status") in ("error", "unknown"):
         detail = payload.get("error") or payload.get("raw") or ""
         raise RuntimeError(f"LLM returned unusable payload: status={payload.get('status')} {detail}")
 

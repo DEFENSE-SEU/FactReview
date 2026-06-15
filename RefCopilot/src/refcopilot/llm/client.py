@@ -6,11 +6,14 @@ Imports FactReview's :mod:`llm.client` lazily so callers can monkey-patch
 
 from __future__ import annotations
 
+import logging
 import os
 import sys
 import time
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 _LLM_JSON = None
 _RESOLVE_LLM_CONFIG = None
@@ -53,15 +56,40 @@ def call_json(prompt: str, system: str, *, provider: str = "", model: str = "") 
     """
     _load_factreview_llm()
     cfg = _RESOLVE_LLM_CONFIG(provider=provider, model=model)  # type: ignore[misc]
-    attempts = max(1, int(os.environ.get("REFCOPILOT_LLM_RETRIES", "4") or "4"))
-    delay = max(0.0, float(os.environ.get("REFCOPILOT_LLM_RETRY_DELAY_SEC", "3") or "3"))
+    attempts = max(1, _env_int("REFCOPILOT_LLM_RETRIES", 4))
+    delay = max(0.0, _env_float("REFCOPILOT_LLM_RETRY_DELAY_SEC", 3.0))
     last: dict[str, Any] = {}
     for attempt in range(1, attempts + 1):
         payload = _LLM_JSON(prompt=prompt, system=system, cfg=cfg)  # type: ignore[misc]
-        if not isinstance(payload, dict) or payload.get("status") not in ("error", "unknown"):
-            return payload
-        last = payload
+        if isinstance(payload, dict):
+            if payload.get("status") not in ("error", "unknown"):
+                return payload
+            last = dict(payload)
+        else:
+            last = {"status": "unknown", "raw": payload}
         if attempt < attempts:
             time.sleep(delay * attempt)
     last["_retry_attempts"] = attempts
     return last
+
+
+def _env_float(name: str, default: float) -> float:
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        logger.warning("invalid %s=%r; using default %s", name, raw, default)
+        return default
+
+
+def _env_int(name: str, default: int) -> int:
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        return int(raw)
+    except ValueError:
+        logger.warning("invalid %s=%r; using default %s", name, raw, default)
+        return default

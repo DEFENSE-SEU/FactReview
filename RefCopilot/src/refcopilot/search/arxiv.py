@@ -59,12 +59,12 @@ class ArxivBackend:
     ) -> None:
         self.cache = cache
         if rate_limiter is None:
-            interval = float(os.environ.get("REFCOPILOT_ARXIV_INTERVAL_SEC", "5") or "5")
+            interval = _env_float("REFCOPILOT_ARXIV_INTERVAL_SEC", 5.0)
             rate_limiter = ArxivRateLimiter(min_interval_seconds=interval)
         self.rate_limiter = rate_limiter
         self._http_get = http_get
         self.timeout = timeout
-        self.max_retries = max(0, int(os.environ.get("REFCOPILOT_ARXIV_RETRIES", "4") or "4"))
+        self.max_retries = max(0, _env_int("REFCOPILOT_ARXIV_RETRIES", 4))
 
     def lookup(self, ref: Reference) -> list[ExternalRecord]:
         if ref.arxiv_id:
@@ -152,8 +152,30 @@ class ArxivBackend:
 
 
 def _arxiv_backoff(attempt: int) -> float:
-    base = float(os.environ.get("REFCOPILOT_ARXIV_BACKOFF_SEC", "10") or "10")
+    base = _env_float("REFCOPILOT_ARXIV_BACKOFF_SEC", 10.0)
     return max(1.0, base * (attempt + 1))
+
+
+def _env_float(name: str, default: float) -> float:
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        logger.warning("invalid %s=%r; using default %s", name, raw, default)
+        return default
+
+
+def _env_int(name: str, default: int) -> int:
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        return int(raw)
+    except ValueError:
+        logger.warning("invalid %s=%r; using default %s", name, raw, default)
+        return default
 
 
 _MAX_TITLE_TOKENS = 6
