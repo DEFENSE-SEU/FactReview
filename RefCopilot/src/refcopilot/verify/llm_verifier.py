@@ -1,10 +1,9 @@
 """LLM-driven secondary verification for uncertain references.
 
-When the heuristic :func:`refcopilot.verify.hallucination.pre_screen` returns
-``UNCERTAIN`` or ``LIKELY``, this module asks the LLM whether the citation
-plausibly refers to the same work as one of the retrieved candidates. The LLM
-has broad academic knowledge from pretraining, which is a useful extra signal
-for ambiguous cases.
+The pipeline consults this module only when the exact title+authors comparison
+cannot decide: the cited title looks garbled (``UNCERTAIN``) or no backend
+returned any candidate. The LLM has broad academic knowledge from pretraining,
+which is a useful extra signal in those cases.
 
 The LLM returns a strict JSON object::
 

@@ -8,9 +8,104 @@ import unicodedata
 from rapidfuzz.fuzz import ratio
 
 from refcopilot.verify.thresholds import (
+    ET_AL_VARIANTS,
     LOWERCASE_HEAD_STOPWORDS,
     MAX_AUTHORS_TO_COMPARE,
 )
+
+
+# ---------------------------------------------------------------------------
+# Strict citation-vs-record comparison
+# ---------------------------------------------------------------------------
+
+
+def titles_match(cited: str | None, retrieved: str | None) -> bool:
+    """Exact title equality, ignoring only case, accents, punctuation and spacing."""
+    a = _strict_title_key(cited)
+    b = _strict_title_key(retrieved)
+    return bool(a) and a == b
+
+
+def authors_match(cited: list[str], retrieved: list[str]) -> bool:
+    """True if the cited author list is the retrieved one, name by name, in order.
+
+    If the citation truncates its list ("others" / "et al." / "etc."), the
+    authors it does list must be the leading authors of the retrieved list.
+    A citation listing no authors has nothing to contradict and matches.
+    """
+    truncated = False
+    listed: list[str] = []
+    for name in cited:
+        if is_et_al(name):
+            truncated = True
+            break
+        if name and name.strip():
+            listed.append(name)
+
+    if not listed:
+        return True
+    if truncated:
+        if len(listed) > len(retrieved):
+            return False
+    elif len(listed) != len(retrieved):
+        return False
+    return all(_same_author(c, r) for c, r in zip(listed, retrieved, strict=False))
+
+
+def is_et_al(name: str | None) -> bool:
+    s = re.sub(r"\s+", " ", (name or "").strip().lower()).rstrip(".").strip()
+    return s in ET_AL_VARIANTS
+
+
+def _same_author(cited: str, retrieved: str) -> bool:
+    c_given, c_last = _name_parts(cited)
+    r_given, r_last = _name_parts(retrieved)
+    if not c_last or not r_last:
+        return False
+    # A single-token name on either side (surname-only, or a team like
+    # "DeepSeek-AI") must equal the other's surname or its whole name.
+    if not c_given or not r_given:
+        return c_last == r_last or "".join(c_given) + c_last == "".join(r_given) + r_last
+    if c_last != r_last:
+        return False
+    a, b = c_given[0], r_given[0]
+    if len(a) == 1 or len(b) == 1:
+        return a[0] == b[0]
+    # Full given names on both sides: allow short forms (Sam / Samuel) only.
+    return a.startswith(b) or b.startswith(a)
+
+
+_NAME_SUFFIXES = frozenset({"jr", "sr", "ii", "iii", "iv"})
+
+
+def _name_parts(name: str) -> tuple[list[str], str]:
+    """``(given_name_tokens, surname)``, folded to plain lowercase ASCII-ish."""
+    s = unicodedata.normalize("NFKC", name or "").strip()
+    if "," in s:
+        last, _, first = s.partition(",")
+        if last.strip() and first.strip():
+            s = f"{first} {last}"
+    tokens = [t.replace("-", "") for t in re.split(r"[^\w\-]+", _fold(s))]
+    tokens = [t for t in tokens if t]
+    while len(tokens) > 1 and tokens[-1] in _NAME_SUFFIXES:
+        tokens.pop()
+    if not tokens:
+        return [], ""
+    return tokens[:-1], tokens[-1]
+
+
+def _strict_title_key(text: str | None) -> str:
+    return "".join(c for c in _fold(text or "") if c.isalnum())
+
+
+# Letters NFKD does not decompose into a base letter + accent.
+_FOLD_TABLE = str.maketrans({"ł": "l", "ø": "o", "đ": "d", "ß": "ss", "æ": "ae", "œ": "oe", "ı": "i"})
+
+
+def _fold(text: str) -> str:
+    decomposed = unicodedata.normalize("NFKD", text)
+    stripped = "".join(c for c in decomposed if not unicodedata.combining(c))
+    return stripped.lower().translate(_FOLD_TABLE)
 
 
 # ---------------------------------------------------------------------------

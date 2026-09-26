@@ -34,12 +34,24 @@ class _FakeBackend:
         return []
 
 
+_ATTENTION_AUTHORS = [
+    "Ashish Vaswani",
+    "Noam Shazeer",
+    "Niki Parmar",
+    "Jakob Uszkoreit",
+    "Llion Jones",
+    "Aidan N. Gomez",
+    "Lukasz Kaiser",
+    "Illia Polosukhin",
+]
+
+
 def _attention_arxiv(**kw) -> ExternalRecord:
     base = dict(
         backend=Backend.ARXIV,
         record_id="1706.03762",
         title="Attention Is All You Need",
-        authors=["Ashish Vaswani"],
+        authors=_ATTENTION_AUTHORS,
         year=2017,
         arxiv_id="1706.03762",
         latest_arxiv_version=7,
@@ -54,7 +66,7 @@ def _attention_s2(**kw) -> ExternalRecord:
         backend=Backend.SEMANTIC_SCHOLAR,
         record_id="abc",
         title="Attention Is All You Need",
-        authors=["Ashish Vaswani"],
+        authors=_ATTENTION_AUTHORS,
         year=2017,
         venue="NeurIPS",
         publication_venue="NeurIPS",
@@ -142,7 +154,7 @@ def test_retracted_reference_is_flagged_as_error(tmp_path) -> None:
 def test_outdated_arxiv_reference_emits_published_warning(tmp_path) -> None:
     bib = """
     @misc{vas,
-      author = {A. Vaswani},
+      author = {A. Vaswani and others},
       title  = {Attention Is All You Need},
       year   = {2017},
       eprint = {1706.03762},
@@ -163,7 +175,7 @@ def test_outdated_arxiv_reference_emits_published_warning(tmp_path) -> None:
 def test_incomplete_reference_missing_doi_is_warning(tmp_path) -> None:
     bib = """
     @inproceedings{vas,
-      author = {A. Vaswani},
+      author = {A. Vaswani and others},
       title  = {Attention Is All You Need},
       booktitle = {NeurIPS},
       year   = {2017},

@@ -14,14 +14,7 @@ from refcopilot.models import (
     Reference,
     Severity,
 )
-from refcopilot.verify.text_match import (
-    _normalize_for_match,
-    author_overlap,
-    normalize_arxiv_id,
-    normalize_doi,
-    title_similarity,
-)
-from refcopilot.verify.thresholds import ET_AL_VARIANTS, TITLE_MISMATCH_MIN_SIM
+from refcopilot.verify.text_match import is_et_al, normalize_arxiv_id, normalize_doi
 
 
 def detect(
@@ -72,7 +65,7 @@ def detect(
         )
 
     if _truncated_authors(reference, merged):
-        cited_count = len([a for a in reference.authors if not _is_et_al(a)])
+        cited_count = len([a for a in reference.authors if not is_et_al(a)])
         retrieved_count = len(merged.authors)
         issues.append(
             Issue(
@@ -102,10 +95,6 @@ def detect(
                 confidence=0.6,
             )
         )
-
-    title_issue = _check_canonical_title(reference, merged)
-    if title_issue is not None:
-        issues.append(title_issue)
 
     return issues
 
@@ -153,53 +142,11 @@ def _check_cited_ids(
     return issues
 
 
-def _check_canonical_title(reference: Reference, merged: MergedRecord) -> Issue | None:
-    """Warn when the cited title clearly refers to ``merged`` but spells it differently.
-
-    Fires when a backend record was matched (so we know the paper is real) and
-    the cited title differs from the canonical one by more than just casing /
-    punctuation that the normalizer already collapses. Examples:
-    ``Math-arena`` vs ``MathArena``, ``LLMs`` vs ``Large Language Models`` in
-    a subtitle, etc. Requires non-trivial author overlap to avoid flagging
-    same-titled-but-different-paper coincidences.
-    """
-    cited = reference.title or ""
-    canonical = merged.title or ""
-    if not cited.strip() or not canonical.strip():
-        return None
-    if _normalize_for_match(cited) == _normalize_for_match(canonical):
-        return None
-
-    sim = title_similarity(cited, canonical)
-    if sim < TITLE_MISMATCH_MIN_SIM:
-        return None
-
-    overlap = author_overlap(reference.authors, merged.authors)
-    if overlap < 0.5:
-        return None
-
-    return Issue(
-        severity=Severity.WARNING,
-        category=IssueCategory.INCOMPLETE,
-        code="canonical_title_mismatch",
-        message=(
-            f"Cited title differs from the canonical record "
-            f"(similarity {sim:.2f})."
-        ),
-        suggestion=f"Use canonical title: {canonical}",
-        confidence=0.75,
-    )
-
-
-def _is_et_al(value: str) -> bool:
-    return value.strip().lower() in {v.lower() for v in ET_AL_VARIANTS}
-
-
 def _truncated_authors(reference: Reference, merged: MergedRecord) -> bool:
     if not reference.authors or not merged.authors:
         return False
-    has_et_al = any(_is_et_al(a) for a in reference.authors)
-    cited_real = [a for a in reference.authors if not _is_et_al(a)]
+    has_et_al = any(is_et_al(a) for a in reference.authors)
+    cited_real = [a for a in reference.authors if not is_et_al(a)]
     if not has_et_al:
         return False
     return len(merged.authors) >= len(cited_real) + 2

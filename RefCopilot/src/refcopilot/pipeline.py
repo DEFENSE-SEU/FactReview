@@ -239,7 +239,9 @@ class RefCopilotPipeline:
         retry_openalex_count: int | None = None
         retry_used = False
 
-        if self.use_llm_verify and verdict != HallucinationVerdict.UNLIKELY:
+        # With candidates in hand, the exact title+authors comparison is final;
+        # the LLM only weighs in on garbled titles or when retrieval found nothing.
+        if self.use_llm_verify and (verdict == HallucinationVerdict.UNCERTAIN or not matches):
             llm_result = llm_verifier.verify(ref, matches, initial=verdict)
             llm_verdict = llm_result.verdict
             verdict = llm_result.verdict

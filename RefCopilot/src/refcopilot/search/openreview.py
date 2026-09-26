@@ -278,7 +278,13 @@ def _note_to_record(note: dict[str, Any]) -> ExternalRecord | None:
         return None
 
     authors_raw = _content_value(content, "authors") or []
-    authors = [str(a).strip() for a in authors_raw if a]
+    # Some notes list authors as {"fullname": ..., "username": ...} dicts.
+    authors = [
+        str(a.get("fullname") or "").strip() if isinstance(a, dict) else str(a).strip()
+        for a in authors_raw
+        if a
+    ]
+    authors = [a for a in authors if a]
 
     venue_raw = (_content_value(content, "venue") or "").strip() or None
     venueid = (_content_value(content, "venueid") or "").strip() or None

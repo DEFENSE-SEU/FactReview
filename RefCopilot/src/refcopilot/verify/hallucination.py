@@ -21,14 +21,9 @@ from refcopilot.models import (
     Severity,
 )
 from refcopilot.verify.text_match import (
-    author_overlap,
     is_garbled_title,
     title_similarity,
-)
-from refcopilot.verify.thresholds import (
-    AUTHOR_FAKE_THRESHOLD,
-    TITLE_FAKE_THRESHOLD,
-    TITLE_SIMILARITY_THRESHOLD,
+    titles_match,
 )
 
 
@@ -40,41 +35,19 @@ def pre_screen(
     """Return a tentative verdict before any LLM call.
 
     ``anchor`` is the record :func:`refcopilot.verify.matching.find_anchor`
-    picked for this reference (title and authors jointly consistent) — the
-    author and TITLE_FAKE gates already happened there, so this only needs to
-    judge how close the match is.
+    picked for this reference (exact title and ordered authors). With
+    candidates retrieved, the verdict is decided: an anchor means real, no
+    anchor means fake.
     """
+    if anchor is not None:
+        return HallucinationVerdict.UNLIKELY
+
     if is_garbled_title(reference.title, reference.raw):
         return HallucinationVerdict.UNCERTAIN
 
-    if not matches:
-        # No candidates from any backend. If the cited paper has a working URL,
-        # we treat as UNCERTAIN; otherwise LIKELY fake.
-        if reference.url:
-            return HallucinationVerdict.UNCERTAIN
-        return HallucinationVerdict.LIKELY
-
-    if anchor is None:
-        return HallucinationVerdict.LIKELY
-
-    sim = title_similarity(reference.title, anchor.title)
-    if sim >= TITLE_SIMILARITY_THRESHOLD:
-        return HallucinationVerdict.UNLIKELY
-
-    return HallucinationVerdict.UNCERTAIN
-
-
-def _best_by_title_similarity(title: str | None, matches: list):
-    if not title or not matches:
-        return None
-    best = None
-    best_sim = -1.0
-    for m in matches:
-        sim = title_similarity(title, getattr(m, "title", None))
-        if sim > best_sim:
-            best_sim = sim
-            best = m
-    return best
+    if not matches and reference.url:
+        return HallucinationVerdict.UNCERTAIN
+    return HallucinationVerdict.LIKELY
 
 
 def to_issue(verdict: HallucinationVerdict, reference: Reference, matches: list) -> Issue | None:
@@ -92,40 +65,26 @@ def to_issue(verdict: HallucinationVerdict, reference: Reference, matches: list)
             confidence=0.9,
         )
 
-    best = _best_by_title_similarity(reference.title, matches)
-    sim = title_similarity(reference.title, best.title if best else None)
-    overlap = author_overlap(reference.authors, best.authors if best else [])
-
-    if sim < TITLE_FAKE_THRESHOLD:
-        return Issue(
-            severity=Severity.ERROR,
-            category=IssueCategory.FAKE,
-            code="title_mismatch",
-            message=(
-                f"Cited title does not match any retrieved record "
-                f"(best similarity {sim:.2f} < {TITLE_FAKE_THRESHOLD})."
-            ),
-            suggestion=f"Closest match: {(best.title if best else 'n/a')[:160]}",
-            confidence=0.9,
-        )
-
-    if overlap <= AUTHOR_FAKE_THRESHOLD:
+    same_title = next((m for m in matches if titles_match(reference.title, m.title)), None)
+    if same_title is not None:
         return Issue(
             severity=Severity.ERROR,
             category=IssueCategory.FAKE,
             code="author_mismatch",
             message=(
-                f"Cited authors do not overlap with the retrieved record "
-                f"(overlap {overlap:.2f} ≤ {AUTHOR_FAKE_THRESHOLD})."
+                "A paper with this title exists, but no retrieved version has the "
+                "cited author list (names and order)."
             ),
-            suggestion=f"Retrieved authors: {', '.join((best.authors if best else [])[:5])}",
+            suggestion=f"Retrieved authors: {', '.join(same_title.authors[:10])}",
             confidence=0.85,
         )
 
+    closest = max(matches, key=lambda m: title_similarity(reference.title, m.title))
     return Issue(
         severity=Severity.ERROR,
         category=IssueCategory.FAKE,
-        code="hallucination",
-        message="Reference appears to be a hallucination.",
-        confidence=0.7,
+        code="title_mismatch",
+        message="No retrieved record has the cited title.",
+        suggestion=f"Closest match: {closest.title[:160]}",
+        confidence=0.9,
     )

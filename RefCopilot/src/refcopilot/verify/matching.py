@@ -1,9 +1,12 @@
 """Shared "is this citation matched, and by which records" decision.
 
 A citation is MATCHED when there is a single retrieved candidate whose title
-and authors are both consistent with the citation (the "anchor"). Fields are
-never pooled across different candidates to decide this — if no single
-candidate satisfies both at once, the citation is unmatched (fake).
+is exactly the cited title and whose author list is exactly the cited one, in
+order (the "anchor"); a citation truncated with "others" / "et al." only needs
+its listed authors to be the candidate's leading authors. Retrieval is loose,
+this decision is strict. Fields are never pooled across different candidates
+— if no single candidate satisfies both at once, the citation is unmatched
+(fake).
 
 Cited identifiers (doi/arxiv_id) deliberately play no part in this decision:
 a paper can carry several DOIs (arXiv DataCite, conference, journal) while
@@ -28,37 +31,28 @@ from __future__ import annotations
 from refcopilot.models import ExternalRecord, Reference
 from refcopilot.verify.text_match import (
     author_overlap,
+    authors_match,
     normalize_arxiv_id,
     normalize_doi,
     title_similarity,
+    titles_match,
 )
 from refcopilot.verify.thresholds import (
-    AUTHOR_FAKE_THRESHOLD,
     SAME_PAPER_AUTHOR_OVERLAP_MIN,
     SAME_PAPER_TITLE_SIM_THRESHOLD,
-    TITLE_FAKE_THRESHOLD,
 )
 
 
 def find_anchor(reference: Reference, matches: list[ExternalRecord]) -> ExternalRecord | None:
-    """Return the best candidate whose title and authors are both consistent
-    with ``reference``, or ``None`` if no candidate qualifies.
+    """Return the first candidate whose title and ordered authors exactly match
+    ``reference``, or ``None`` if no candidate does.
     """
-    if not matches or not reference.title:
+    if not reference.title:
         return None
-
-    best: ExternalRecord | None = None
-    best_sim = -1.0
     for m in matches:
-        sim = title_similarity(reference.title, m.title)
-        if sim < TITLE_FAKE_THRESHOLD:
-            continue
-        if _author_conflicts(reference, m):
-            continue
-        if sim > best_sim:
-            best_sim = sim
-            best = m
-    return best
+        if titles_match(reference.title, m.title) and authors_match(reference.authors, m.authors):
+            return m
+    return None
 
 
 def build_paper_cluster(
@@ -85,11 +79,6 @@ def resolve_cluster(
     if anchor is None:
         return None, []
     return anchor, build_paper_cluster(anchor, matches)
-
-
-def _author_conflicts(reference: Reference, candidate: ExternalRecord) -> bool:
-    overlap = author_overlap(reference.authors, candidate.authors)
-    return overlap <= AUTHOR_FAKE_THRESHOLD and not reference.url
 
 
 def _same_paper(a: ExternalRecord, b: ExternalRecord) -> bool:

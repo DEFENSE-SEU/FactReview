@@ -2,27 +2,18 @@
 
 from __future__ import annotations
 
-# Author-overlap fraction below which a citation is treated as a fake.
-AUTHOR_FAKE_THRESHOLD = 0.10
-
-# Title-similarity thresholds: at or above SIMILARITY → real; below FAKE → fake.
-TITLE_SIMILARITY_THRESHOLD = 0.75
-TITLE_FAKE_THRESHOLD = 0.25
-
-# Lower bound for the "real paper, but cited title differs from canonical"
-# warning. Set below TITLE_SIMILARITY_THRESHOLD so it covers the whole
-# matched-but-typo range; the check additionally requires author overlap.
-TITLE_MISMATCH_MIN_SIM = 0.50
+# Whether a citation matches a candidate is NOT threshold-based: it requires an
+# exact title and an exact ordered author list (text_match.titles_match /
+# authors_match). The thresholds below only govern recall and clustering.
 
 # "Same real-world paper" clustering thresholds (verify/matching.py). These
 # decide whether two already-retrieved CANDIDATE RECORDS (clean metadata,
 # compared to each other) represent the same paper when they don't share a
-# doi/arxiv_id — a different question from TITLE_SIMILARITY_THRESHOLD
-# (citation text vs. one candidate) and from SEARCH_RESULT_MIN_TITLE_SIM
+# doi/arxiv_id — a different question from SEARCH_RESULT_MIN_TITLE_SIM
 # (backend recall gate below). Starting point only; expect to tune
 # empirically once we see real clustering behavior (some papers' versions
 # genuinely differ in title more than this allows).
-SAME_PAPER_TITLE_SIM_THRESHOLD = TITLE_SIMILARITY_THRESHOLD
+SAME_PAPER_TITLE_SIM_THRESHOLD = 0.75
 SAME_PAPER_AUTHOR_OVERLAP_MIN = 0.5
 
 # Backends rank title searches by relevance, so unrelated papers that share
@@ -64,5 +55,5 @@ LOWERCASE_HEAD_STOPWORDS = frozenset(
 # Venues that should be treated as arXiv aliases (not "real" published venues).
 ARXIV_VENUE_ALIASES = frozenset({"arxiv", "arxiv.org", "preprint", "corr", "arxiv preprint"})
 
-# Truncated-author signals
-ET_AL_VARIANTS = ("et al.", "et al", "and others")
+# Truncated-author sentinels, lowercased with any trailing "." removed.
+ET_AL_VARIANTS = frozenset({"et al", "et. al", "and et al", "others", "and others", "etc"})
