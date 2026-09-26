@@ -27,6 +27,7 @@ from refcopilot.inputs.detector import detect
 from refcopilot.merge import merge_records
 from refcopilot.models import (
     CheckedReference,
+    FoundBy,
     HallucinationVerdict,
     Issue,
     IssueCategory,
@@ -35,6 +36,7 @@ from refcopilot.models import (
     ReportSummary,
     SourceFormat,
     Verdict,
+    tag_found_by,
 )
 from refcopilot.search.arxiv import ArxivBackend
 from refcopilot.search.openalex import OpenAlexBackend
@@ -267,11 +269,12 @@ class RefCopilotPipeline:
                 retry_openalex_count = (
                     len(retry_openalex) if self.openalex is not None else None
                 )
-                new_matches = (
+                new_matches = tag_found_by(
                     list(retry_arxiv)
                     + list(retry_s2)
                     + list(retry_openreview)
-                    + list(retry_openalex)
+                    + list(retry_openalex),
+                    FoundBy.LLM_SUGGESTION,
                 )
                 if new_matches:
                     matches = new_matches

@@ -22,7 +22,7 @@ from urllib.parse import parse_qs, urlparse
 import httpx
 
 from refcopilot.cache.disk_cache import DiskCache
-from refcopilot.models import Backend, ExternalRecord, Reference
+from refcopilot.models import Backend, ExternalRecord, FoundBy, Reference, tag_found_by
 from refcopilot.ratelimit.openreview import OpenReviewRateLimiter
 from refcopilot.ratelimit.semantic_scholar import parse_retry_after
 from refcopilot.verify.text_match import title_similarity
@@ -76,9 +76,9 @@ class OpenReviewBackend:
         if forum_id:
             rec = self.lookup_by_id(forum_id)
             if rec:
-                return [rec]
+                return tag_found_by([rec], FoundBy.OPENREVIEW_ID)
         if ref.title:
-            return self.search_by_title(ref.title, year=ref.year, max_results=5)
+            return tag_found_by(self.search_by_title(ref.title, year=ref.year, max_results=5), FoundBy.TITLE)
         return []
 
     def lookup_by_id(self, forum_id: str) -> ExternalRecord | None:
