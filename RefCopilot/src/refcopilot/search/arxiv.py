@@ -65,8 +65,16 @@ class ArxivBackend:
         self._http_get = http_get
         self.timeout = timeout
         self.max_retries = max(0, _env_int("REFCOPILOT_ARXIV_RETRIES", 4))
+        # Persistent failure (network down, persistent error status/406).
+        # Once set, all subsequent lookups in this run short-circuit to [].
+        # arXiv is a secondary source (Semantic Scholar / OpenAlex are the
+        # primary ones), so once it's confirmed unreachable we warn once
+        # instead of paying the full retry+backoff cost on every reference.
+        self._failed = False
 
     def lookup(self, ref: Reference) -> list[ExternalRecord]:
+        if self._failed:
+            return []
         if ref.arxiv_id:
             rec = self.lookup_by_id(ref.arxiv_id)
             return tag_found_by([rec], FoundBy.ARXIV_ID) if rec else []
@@ -120,7 +128,10 @@ class ArxivBackend:
         try:
             xml = self._call_api(params)
         except RuntimeError as exc:
-            logger.warning("arxiv api failed (%s); not caching", exc)
+            logger.warning(
+                "arxiv api unreachable (%s); disabling arxiv lookups for the rest of this run", exc
+            )
+            self._failed = True
             return ""
         if self.cache:
             self.cache.set_api(self.name, cache_key, {"xml": xml})

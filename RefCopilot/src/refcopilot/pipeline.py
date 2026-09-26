@@ -78,7 +78,7 @@ class RefCopilotPipeline:
         openreview_backend: OpenReviewBackend | None = None,
         openalex_backend: OpenAlexBackend | None = None,
         use_llm_verify: bool = True,
-        max_workers: int = 4,
+        max_workers: int = 16,
     ) -> None:
         env_cache_dir = os.environ.get("REFCOPILOT_CACHE_DIR")
         self.cache = DiskCache(
