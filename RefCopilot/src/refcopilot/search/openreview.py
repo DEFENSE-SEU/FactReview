@@ -22,7 +22,7 @@ from urllib.parse import parse_qs, urlparse
 import httpx
 
 from refcopilot.cache.disk_cache import DiskCache
-from refcopilot.models import Backend, ExternalRecord, Reference
+from refcopilot.models import Backend, ExternalRecord, FoundBy, Reference, tag_found_by
 from refcopilot.ratelimit.openreview import OpenReviewRateLimiter
 from refcopilot.ratelimit.semantic_scholar import parse_retry_after
 from refcopilot.verify.text_match import title_similarity
@@ -76,9 +76,9 @@ class OpenReviewBackend:
         if forum_id:
             rec = self.lookup_by_id(forum_id)
             if rec:
-                return [rec]
+                return tag_found_by([rec], FoundBy.OPENREVIEW_ID)
         if ref.title:
-            return self.search_by_title(ref.title, year=ref.year, max_results=5)
+            return tag_found_by(self.search_by_title(ref.title, year=ref.year, max_results=5), FoundBy.TITLE)
         return []
 
     def lookup_by_id(self, forum_id: str) -> ExternalRecord | None:
@@ -187,6 +187,22 @@ class OpenReviewBackend:
                 time.sleep(wait)
                 attempt += 1
                 continue
+
+            if resp.status_code in (401, 403):
+                # Auth / anti-bot challenge. OpenReview now answers /notes?id=
+                # with 403 ChallengeRequiredError, which is per-IP / rate-based
+                # and intermittent — NOT a sign the whole backend is down
+                # (/notes/search still returns 200). Treat as a transient miss
+                # for this one lookup so the caller falls through to title search
+                # and later references keep querying, instead of poisoning the
+                # backend via `_failed` and disabling OpenReview for the run.
+                logger.info(
+                    "openreview %d (auth/challenge) for %s — skipping this lookup, not poisoning backend",
+                    resp.status_code,
+                    path,
+                )
+                self._last_was_transient = True
+                return None
 
             logger.warning(
                 "openreview unexpected status %d for %s", resp.status_code, path

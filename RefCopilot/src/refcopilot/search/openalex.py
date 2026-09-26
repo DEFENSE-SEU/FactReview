@@ -23,7 +23,7 @@ from typing import Any, Callable, Protocol
 import httpx
 
 from refcopilot.cache.disk_cache import DiskCache
-from refcopilot.models import Backend, ExternalRecord, Reference
+from refcopilot.models import Backend, ExternalRecord, FoundBy, Reference, tag_found_by
 from refcopilot.ratelimit.openalex import OpenAlexRateLimiter
 from refcopilot.ratelimit.semantic_scholar import parse_retry_after
 from refcopilot.verify.text_match import title_similarity
@@ -85,9 +85,9 @@ class OpenAlexBackend:
         if ref.doi:
             rec = self.lookup_by_doi(ref.doi)
             if rec:
-                return [rec]
+                return tag_found_by([rec], FoundBy.DOI)
         if ref.title:
-            return self.search_by_title(ref.title, year=ref.year, max_results=5)
+            return tag_found_by(self.search_by_title(ref.title, year=ref.year, max_results=5), FoundBy.TITLE)
         return []
 
     def lookup_by_doi(self, doi: str) -> ExternalRecord | None:

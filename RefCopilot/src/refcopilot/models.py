@@ -71,6 +71,17 @@ class Backend(str, Enum):
     OPENALEX = "openalex"
 
 
+class FoundBy(str, Enum):
+    """How a backend retrieved a record. Informational only — never used for
+    verdicts; lets reports show where each candidate came from."""
+
+    ARXIV_ID = "arxiv_id"
+    DOI = "doi"
+    OPENREVIEW_ID = "openreview_id"
+    TITLE = "title"
+    LLM_SUGGESTION = "llm_suggestion"  # second-chance lookup with the LLM's suggested metadata
+
+
 class ExternalRecord(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -90,6 +101,12 @@ class ExternalRecord(BaseModel):
     s2_paper_id: str | None = None
     url: str = ""
     raw: dict[str, Any] = Field(default_factory=dict)
+    found_by: FoundBy | None = None
+
+
+def tag_found_by(records: list[ExternalRecord], how: FoundBy) -> list[ExternalRecord]:
+    """Copies of ``records`` marked with how they were retrieved."""
+    return [r.model_copy(update={"found_by": how}) for r in records]
 
 
 class MergedRecord(BaseModel):
@@ -131,6 +148,9 @@ class ReportSummary(BaseModel):
     errors: int = 0
     warnings: int = 0
     unverified: int = 0
+    # References found in the input, before any ``max_refs`` cut-off
+    # (``total_refs`` counts only the ones actually checked).
+    refs_found: int = 0
     by_category: dict[str, int] = Field(default_factory=dict)
 
 

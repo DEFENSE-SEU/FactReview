@@ -18,7 +18,7 @@ from typing import Callable, Protocol
 import httpx
 
 from refcopilot.cache.disk_cache import DiskCache
-from refcopilot.models import Backend, ExternalRecord, Reference
+from refcopilot.models import Backend, ExternalRecord, FoundBy, Reference, tag_found_by
 from refcopilot.ratelimit.arxiv import ArxivRateLimiter
 from refcopilot.ratelimit.semantic_scholar import parse_retry_after
 from refcopilot.verify.text_match import _normalize_for_match, _STOPWORDS, title_similarity
@@ -69,9 +69,9 @@ class ArxivBackend:
     def lookup(self, ref: Reference) -> list[ExternalRecord]:
         if ref.arxiv_id:
             rec = self.lookup_by_id(ref.arxiv_id)
-            return [rec] if rec else []
+            return tag_found_by([rec], FoundBy.ARXIV_ID) if rec else []
         if ref.title:
-            return self.search_by_title(ref.title, year=ref.year, max_results=5)
+            return tag_found_by(self.search_by_title(ref.title, year=ref.year, max_results=5), FoundBy.TITLE)
         return []
 
     def lookup_by_id(self, arxiv_id: str) -> ExternalRecord | None:

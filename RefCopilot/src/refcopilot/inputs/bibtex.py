@@ -6,11 +6,13 @@ parsing in a lenient mode and skipping bad blocks.
 
 from __future__ import annotations
 
+import codecs
 import logging
 import re
 from io import StringIO
 from pathlib import Path
 
+import latexcodec  # noqa: F401  (registers the "ulatex" codec; a pybtex dependency)
 from pybtex.database.input.bibtex import Parser as BibtexParser
 
 from refcopilot.models import Reference, SourceFormat
@@ -78,7 +80,9 @@ def _split_at_blocks(text: str) -> list[str]:
 
 def _entry_to_reference(bibkey: str, entry, raw_text: str) -> Reference:
     fields = {k.lower(): v for k, v in entry.fields.items()}
-    persons = entry.persons.get("author", []) + entry.persons.get("editor", [])
+    # Editors only stand in when there are no authors (e.g. an edited volume);
+    # mixing them in makes them look like extra, unknown authors.
+    persons = entry.persons.get("author") or entry.persons.get("editor", [])
     authors = [_format_person(p) for p in persons]
 
     title = _strip_braces(fields.get("title"))
@@ -113,8 +117,17 @@ def _format_person(p) -> str:
     first = " ".join(p.first_names + p.middle_names).strip()
     last = " ".join(p.prelast_names + p.last_names + p.lineage_names).strip()
     if first and last:
-        return f"{first} {last}".strip()
-    return last or first or " ".join(getattr(p, "_first_names", [])) or str(p)
+        return _decode_latex(f"{first} {last}".strip())
+    return _decode_latex(last or first or " ".join(getattr(p, "_first_names", [])) or str(p))
+
+
+def _decode_latex(name: str) -> str:
+    """``Sch{\\"o}lkopf`` → ``Schölkopf``, so names compare against API records."""
+    try:
+        name = codecs.decode(name, "ulatex")
+    except Exception:
+        return name
+    return name.replace("{", "").replace("}", "")
 
 
 def _strip_braces(value) -> str | None:

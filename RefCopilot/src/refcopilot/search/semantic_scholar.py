@@ -21,7 +21,7 @@ from typing import Any, Callable, Protocol
 import httpx
 
 from refcopilot.cache.disk_cache import DiskCache
-from refcopilot.models import Backend, ExternalRecord, Reference
+from refcopilot.models import Backend, ExternalRecord, FoundBy, Reference, tag_found_by
 from refcopilot.ratelimit.semantic_scholar import (
     SemanticScholarRateLimiter,
     parse_retry_after,
@@ -86,18 +86,18 @@ class SemanticScholarBackend:
         if ref.doi:
             rec = self._fetch_by_id("DOI", ref.doi)
             if rec:
-                return [rec]
+                return tag_found_by([rec], FoundBy.DOI)
 
         if ref.arxiv_id:
             rec = self._fetch_by_id("ARXIV", ref.arxiv_id)
             if rec:
-                return [rec]
+                return tag_found_by([rec], FoundBy.ARXIV_ID)
 
         if ref.title:
             rec = self._search_match(ref.title, year=ref.year)
             if rec:
-                return [rec]
-            return self._search_relevance(ref.title, year=ref.year)
+                return tag_found_by([rec], FoundBy.TITLE)
+            return tag_found_by(self._search_relevance(ref.title, year=ref.year), FoundBy.TITLE)
 
         return []
 

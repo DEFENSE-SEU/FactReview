@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -26,6 +27,7 @@ from refcopilot.inputs.detector import detect
 from refcopilot.merge import merge_records
 from refcopilot.models import (
     CheckedReference,
+    FoundBy,
     HallucinationVerdict,
     Issue,
     IssueCategory,
@@ -34,6 +36,7 @@ from refcopilot.models import (
     ReportSummary,
     SourceFormat,
     Verdict,
+    tag_found_by,
 )
 from refcopilot.search.arxiv import ArxivBackend
 from refcopilot.search.openalex import OpenAlexBackend
@@ -47,6 +50,11 @@ from refcopilot.verify import outdated as outdated_verify
 from refcopilot.verify import retraction as retraction_verify
 
 logger = logging.getLogger(__name__)
+
+# Called with (checked_so_far, total) as references are checked: once with
+# (0, total) when extraction is done, then after each reference. Optional;
+# lets integrators render real "X of N" progress. Never affects verdicts.
+ProgressCallback = Callable[[int, int], None]
 
 
 _DEFAULT_CACHE_DIR = Path.home() / ".cache" / "refcopilot"
@@ -110,13 +118,17 @@ class RefCopilotPipeline:
         *,
         input_type: SourceFormat | None = None,
         max_refs: int | None = None,
+        on_progress: ProgressCallback | None = None,
     ) -> Report:
         kind = input_type or detect(spec)
         references = self._extract_references(spec, kind)
+        refs_found = len(references)
         if max_refs and len(references) > max_refs:
             references = references[:max_refs]
-        checked = self._check_all(references)
-        return self._build_report(spec, kind, checked)
+        checked = self._check_all(references, on_progress=on_progress)
+        report = self._build_report(spec, kind, checked)
+        report.summary.refs_found = refs_found
+        return report
 
     # ------------------------------------------------------------------
     # Stage 1: input → references
@@ -148,13 +160,36 @@ class RefCopilotPipeline:
     # Stage 2: search + verify per reference
     # ------------------------------------------------------------------
 
-    def _check_all(self, references: list[Reference]) -> list[CheckedReference]:
+    def _check_all(
+        self,
+        references: list[Reference],
+        on_progress: ProgressCallback | None = None,
+    ) -> list[CheckedReference]:
+        total = len(references)
         if not references:
             return []
-        if self.max_workers <= 1 or len(references) == 1:
-            return [self._check_one(r) for r in references]
 
-        results: list[CheckedReference | None] = [None] * len(references)
+        # A progress callback must never break the check. `done` is only ever
+        # touched from the calling thread (the serial loop or the as_completed
+        # loop), so no lock is needed.
+        def _report(done: int) -> None:
+            if on_progress is None:
+                return
+            try:
+                on_progress(done, total)
+            except Exception as exc:
+                logger.warning("on_progress callback raised: %s", exc)
+
+        _report(0)
+        if self.max_workers <= 1 or total == 1:
+            out: list[CheckedReference] = []
+            for i, r in enumerate(references, start=1):
+                out.append(self._check_one(r))
+                _report(i)
+            return out
+
+        results: list[CheckedReference | None] = [None] * total
+        done = 0
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             futures = {executor.submit(self._check_one, ref): i for i, ref in enumerate(references)}
             for fut in as_completed(futures):
@@ -164,6 +199,8 @@ class RefCopilotPipeline:
                 except Exception as exc:
                     logger.warning("check_one failed for ref %d: %s", idx, exc)
                     results[idx] = CheckedReference(reference=references[idx], verdict=Verdict.UNVERIFIED)
+                done += 1
+                _report(done)
         return [r for r in results if r is not None]
 
     def _check_one(self, ref: Reference) -> CheckedReference:
@@ -232,11 +269,12 @@ class RefCopilotPipeline:
                 retry_openalex_count = (
                     len(retry_openalex) if self.openalex is not None else None
                 )
-                new_matches = (
+                new_matches = tag_found_by(
                     list(retry_arxiv)
                     + list(retry_s2)
                     + list(retry_openreview)
-                    + list(retry_openalex)
+                    + list(retry_openalex),
+                    FoundBy.LLM_SUGGESTION,
                 )
                 if new_matches:
                     matches = new_matches

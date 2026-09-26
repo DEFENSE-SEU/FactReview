@@ -85,7 +85,11 @@ _MAX_WORKERS = 4
 _REF_NUMBER_BOUNDARY = re.compile(r"\n\[(\d{1,4})\]")
 
 _PROMPT_ECHO_PATTERNS = ("extraction rules:", "output format (mandatory):", "split by numbered markers")
-_PROSE_TITLE_PREFIXES = ("this ", "the ", "based on ", "here are ")
+# Only phrases that start the model's own commentary. Plain "the " / "this "
+# would drop real titles ("The Lottery Ticket Hypothesis", "This Looks Like
+# That"); commentary without authors/year/id is already removed by
+# _is_complete_enough.
+_PROSE_TITLE_PREFIXES = ("based on ", "here are ")
 
 
 def extract_references(bibliography: str, *, source_format: SourceFormat) -> list[Reference]:
