@@ -7,6 +7,7 @@ when a field is missing from the citation but present in the retrieved record.
 from __future__ import annotations
 
 from refcopilot.models import (
+    ExternalRecord,
     Issue,
     IssueCategory,
     MergedRecord,
@@ -16,15 +17,23 @@ from refcopilot.models import (
 from refcopilot.verify.text_match import (
     _normalize_for_match,
     author_overlap,
+    normalize_arxiv_id,
+    normalize_doi,
     title_similarity,
 )
 from refcopilot.verify.thresholds import ET_AL_VARIANTS, TITLE_MISMATCH_MIN_SIM
 
 
-def detect(reference: Reference, merged: MergedRecord | None) -> list[Issue]:
+def detect(
+    reference: Reference,
+    merged: MergedRecord | None,
+    matches: list[ExternalRecord],
+) -> list[Issue]:
     issues: list[Issue] = []
     if merged is None:
         return issues
+
+    issues.extend(_check_cited_ids(reference, merged, matches))
 
     if not reference.doi and merged.doi:
         issues.append(
@@ -110,6 +119,49 @@ def detect(reference: Reference, merged: MergedRecord | None) -> list[Issue]:
     if title_issue is not None:
         issues.append(title_issue)
 
+    return issues
+
+
+def _check_cited_ids(
+    reference: Reference, merged: MergedRecord, matches: list[ExternalRecord]
+) -> list[Issue]:
+    """Warn when a cited doi/arxiv_id is shown to belong to a different paper.
+
+    Evidence is a retrieved record carrying that id which is not in the
+    matched paper's cluster (``merged.sources``). An id no record carries is
+    unverifiable, not wrong — e.g. an arXiv DataCite DOI on a paper whose
+    backend records only expose the publisher DOI.
+    """
+    issues: list[Issue] = []
+    checks = (
+        ("doi", "DOI", normalize_doi(reference.doi), merged.doi, lambda r: normalize_doi(r.doi)),
+        (
+            "arxiv_id",
+            "arXiv ID",
+            normalize_arxiv_id(reference.arxiv_id),
+            merged.arxiv_id,
+            lambda r: normalize_arxiv_id(r.arxiv_id),
+        ),
+    )
+    for field, label, cited, correct, key in checks:
+        if not cited:
+            continue
+        owners = [r for r in matches if key(r) == cited]
+        if not owners or any(r is s for r in owners for s in merged.sources):
+            continue
+        issues.append(
+            Issue(
+                severity=Severity.WARNING,
+                category=IssueCategory.INCOMPLETE,
+                code=f"{field}_mismatch",
+                message=(
+                    f"Cited {label} {cited} belongs to a different paper: "
+                    f"'{owners[0].title[:120]}'."
+                ),
+                suggestion=f"Use {label}: {correct}" if correct else f"Remove or correct the {label}.",
+                confidence=0.85,
+            )
+        )
     return issues
 
 

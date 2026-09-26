@@ -26,7 +26,7 @@ from refcopilot.cache.disk_cache import DiskCache
 from refcopilot.models import Backend, ExternalRecord, FoundBy, Reference, tag_found_by
 from refcopilot.ratelimit.openalex import OpenAlexRateLimiter
 from refcopilot.ratelimit.semantic_scholar import parse_retry_after
-from refcopilot.verify.text_match import title_similarity
+from refcopilot.verify.text_match import normalize_doi, title_similarity
 from refcopilot.verify.thresholds import SEARCH_RESULT_MIN_TITLE_SIM
 
 logger = logging.getLogger(__name__)
@@ -91,7 +91,7 @@ class OpenAlexBackend:
         return []
 
     def lookup_by_doi(self, doi: str) -> ExternalRecord | None:
-        clean_doi = _normalize_doi(doi)
+        clean_doi = normalize_doi(doi)
         if not clean_doi:
             return None
         cache_key = f"doi_{clean_doi.replace('/', '_')}"
@@ -237,20 +237,6 @@ def _filter_safe(text: str) -> str:
     return _FILTER_SPECIAL_CHARS.sub(" ", text).strip()
 
 
-_DOI_URL_PREFIXES = ("https://doi.org/", "http://doi.org/", "doi:")
-
-
-def _normalize_doi(doi: str | None) -> str | None:
-    if not doi:
-        return None
-    s = doi.strip()
-    for prefix in _DOI_URL_PREFIXES:
-        if s.lower().startswith(prefix):
-            s = s[len(prefix):]
-            break
-    return s.strip().lower() or None
-
-
 # OpenAlex returns work IDs as full URLs like ``https://openalex.org/W12345``.
 _OPENALEX_ID_RE = re.compile(r"/(W\d+)$", re.IGNORECASE)
 
@@ -294,7 +280,7 @@ def _work_to_record(work: dict[str, Any]) -> ExternalRecord | None:
     if not isinstance(year, int):
         year = None
 
-    doi = _normalize_doi(work.get("doi"))
+    doi = normalize_doi(work.get("doi"))
 
     venue: str | None = None
     primary = work.get("primary_location") or {}

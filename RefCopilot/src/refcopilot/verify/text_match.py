@@ -184,6 +184,38 @@ def _parse_author(name: str) -> tuple[str, str]:
 
 
 # ---------------------------------------------------------------------------
+# Identifier normalization
+# ---------------------------------------------------------------------------
+
+
+_DOI_URL_PREFIXES = ("https://doi.org/", "http://doi.org/", "doi:")
+
+
+def normalize_doi(doi: str | None) -> str | None:
+    """Strip a doi.org URL / ``doi:`` prefix and lowercase, for comparison."""
+    if not doi:
+        return None
+    s = doi.strip()
+    for prefix in _DOI_URL_PREFIXES:
+        if s.lower().startswith(prefix):
+            s = s[len(prefix) :]
+            break
+    return s.strip().lower() or None
+
+
+def normalize_arxiv_id(arxiv_id: str | None) -> str | None:
+    """Lowercase and drop a trailing ``vN`` version suffix, for comparison."""
+    if not arxiv_id:
+        return None
+    s = arxiv_id.strip().lower()
+    if "v" in s:
+        head, _, tail = s.rpartition("v")
+        if tail.isdigit() and head:
+            s = head
+    return s or None
+
+
+# ---------------------------------------------------------------------------
 # Garbled / OCR-noise detection
 # ---------------------------------------------------------------------------
 

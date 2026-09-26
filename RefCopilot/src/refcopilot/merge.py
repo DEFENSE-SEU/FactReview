@@ -1,4 +1,10 @@
-"""Merge :class:`ExternalRecord` results from multiple backends into one :class:`MergedRecord`.
+"""Merge a paper cluster of :class:`ExternalRecord` objects into one :class:`MergedRecord`.
+
+Callers must pass a pre-filtered cluster of records already confirmed to
+represent the SAME paper (see :func:`refcopilot.verify.matching.resolve_cluster`)
+— not the raw, unfiltered candidate pool returned by the search backends.
+Passing the raw pool defeats the field-priority logic below: it would happily
+merge fields from unrelated papers that merely share a few title words.
 
 Field priority (first non-empty wins) — earlier backends in each list are
 considered more authoritative for that field:

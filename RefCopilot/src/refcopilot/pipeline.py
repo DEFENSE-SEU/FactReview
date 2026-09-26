@@ -4,7 +4,8 @@ Tying together:
   inputs (detector / bibtex / pdf / url / plain_text)
     → extract (LLM-only)
     → search (arxiv + semantic_scholar + openreview [+ openalex])
-    → merge
+    → matching (find the anchor record + its paper cluster, verify.matching)
+    → merge (cluster only, never the raw candidate pool)
     → verify (hallucination → optional LLM verifier → outdated → completeness)
     → report
 """
@@ -45,6 +46,7 @@ from refcopilot.search.semantic_scholar import SemanticScholarBackend
 from refcopilot.verify import completeness as completeness_verify
 from refcopilot.verify import hallucination as hallu_verify
 from refcopilot.verify import llm_verifier
+from refcopilot.verify import matching
 from refcopilot.verify import non_academic
 from refcopilot.verify import outdated as outdated_verify
 from refcopilot.verify import retraction as retraction_verify
@@ -214,7 +216,8 @@ class RefCopilotPipeline:
             + list(openreview_records)
             + list(openalex_records)
         )
-        merged = merge_records(matches) if matches else None
+        anchor, cluster = matching.resolve_cluster(ref, matches)
+        merged = merge_records(cluster) if cluster else None
 
         initial_arxiv_count = len(arxiv_records)
         initial_s2_count = len(s2_records)
@@ -226,7 +229,7 @@ class RefCopilotPipeline:
             len(openalex_records) if self.openalex is not None else None
         )
 
-        pre_verdict = hallu_verify.pre_screen(ref, matches, merged)
+        pre_verdict = hallu_verify.pre_screen(ref, matches, anchor)
         verdict = pre_verdict
         llm_verdict: HallucinationVerdict | None = None
         suggestion: llm_verifier.LLMSuggestion | None = None
@@ -278,12 +281,13 @@ class RefCopilotPipeline:
                 )
                 if new_matches:
                     matches = new_matches
-                    merged = merge_records(matches)
+                    anchor, cluster = matching.resolve_cluster(ref, matches)
+                    merged = merge_records(cluster) if cluster else None
                     # Re-evaluate the heuristic against the new evidence.
                     # We deliberately skip llm_verifier on the retry path —
                     # the LLM already gave its opinion and we don't want to
                     # spend another call (or risk drifting).
-                    verdict = hallu_verify.pre_screen(ref, matches, merged)
+                    verdict = hallu_verify.pre_screen(ref, matches, anchor)
 
         issues: list[Issue] = []
         fake_issue = hallu_verify.to_issue(verdict, ref, matches)
@@ -304,7 +308,7 @@ class RefCopilotPipeline:
         )
         if not suppress_metadata_checks:
             issues.extend(outdated_verify.detect(ref, merged))
-            issues.extend(completeness_verify.detect(ref, merged))
+            issues.extend(completeness_verify.detect(ref, merged, matches))
 
         final = _verdict_from_issues(issues, has_match=merged is not None)
         trace = _build_verification_trace(
@@ -320,6 +324,8 @@ class RefCopilotPipeline:
             retry_s2_count=retry_s2_count,
             retry_openreview_count=retry_openreview_count,
             retry_openalex_count=retry_openalex_count,
+            cluster_size=len(cluster) if matches else None,
+            match_pool_size=len(matches),
         )
         return CheckedReference(
             reference=ref,
@@ -439,6 +445,8 @@ def _build_verification_trace(
     retry_s2_count: int | None,
     retry_openreview_count: int | None,
     retry_openalex_count: int | None,
+    cluster_size: int | None,
+    match_pool_size: int,
 ) -> str:
     """Single-line summary of which sources were tried and what they said."""
     parts = [
@@ -464,4 +472,6 @@ def _build_verification_trace(
         parts.append(
             f"retry with LLM suggestion '{title_short}' → {retry_summary}"
         )
+    if cluster_size is not None:
+        parts.append(f"cluster: {cluster_size}/{match_pool_size}")
     return "; ".join(parts)

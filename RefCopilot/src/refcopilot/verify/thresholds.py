@@ -14,6 +14,17 @@ TITLE_FAKE_THRESHOLD = 0.25
 # matched-but-typo range; the check additionally requires author overlap.
 TITLE_MISMATCH_MIN_SIM = 0.50
 
+# "Same real-world paper" clustering thresholds (verify/matching.py). These
+# decide whether two already-retrieved CANDIDATE RECORDS (clean metadata,
+# compared to each other) represent the same paper when they don't share a
+# doi/arxiv_id — a different question from TITLE_SIMILARITY_THRESHOLD
+# (citation text vs. one candidate) and from SEARCH_RESULT_MIN_TITLE_SIM
+# (backend recall gate below). Starting point only; expect to tune
+# empirically once we see real clustering behavior (some papers' versions
+# genuinely differ in title more than this allows).
+SAME_PAPER_TITLE_SIM_THRESHOLD = TITLE_SIMILARITY_THRESHOLD
+SAME_PAPER_AUTHOR_OVERLAP_MIN = 0.5
+
 # Backends rank title searches by relevance, so unrelated papers that share
 # a few topic words (or even none, when authors prompt-engineer the cited
 # title) can rank near the top — Semantic Scholar's relevance fallback and

@@ -121,6 +121,9 @@ class MergedRecord(BaseModel):
     is_retracted: bool = False
     url: str = ""
     provenance: dict[str, Backend] = Field(default_factory=dict)
+    # ``sources[0]`` is always the anchor record that matched the citation
+    # (see refcopilot.verify.matching.build_paper_cluster) — the rest are its
+    # confirmed same-paper siblings.
     sources: list[ExternalRecord] = Field(default_factory=list)
 
 

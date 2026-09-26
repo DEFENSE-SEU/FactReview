@@ -2,8 +2,9 @@
 
 Two-stage:
 
-1.  :func:`pre_screen` — heuristic verdict (no LLM call) based on title
-    similarity, author overlap, and OCR-garbled-title detection.
+1.  :func:`pre_screen` — heuristic verdict (no LLM call) based on the shared
+    anchor found by :mod:`refcopilot.verify.matching`, plus OCR-garbled-title
+    detection.
 2.  :func:`to_issue` — given a final verdict, emit an :class:`Issue` only when
     the verdict is ``LIKELY``. ``UNLIKELY`` and ``UNCERTAIN`` produce no
     issue, so we never accuse a reference of being fake without confidence.
@@ -12,10 +13,10 @@ Two-stage:
 from __future__ import annotations
 
 from refcopilot.models import (
+    ExternalRecord,
     HallucinationVerdict,
     Issue,
     IssueCategory,
-    MergedRecord,
     Reference,
     Severity,
 )
@@ -34,9 +35,15 @@ from refcopilot.verify.thresholds import (
 def pre_screen(
     reference: Reference,
     matches: list,
-    merged: MergedRecord | None,
+    anchor: ExternalRecord | None,
 ) -> HallucinationVerdict:
-    """Return a tentative verdict before any LLM call."""
+    """Return a tentative verdict before any LLM call.
+
+    ``anchor`` is the record :func:`refcopilot.verify.matching.find_anchor`
+    picked for this reference (title and authors jointly consistent) — the
+    author and TITLE_FAKE gates already happened there, so this only needs to
+    judge how close the match is.
+    """
     if is_garbled_title(reference.title, reference.raw):
         return HallucinationVerdict.UNCERTAIN
 
@@ -47,19 +54,10 @@ def pre_screen(
             return HallucinationVerdict.UNCERTAIN
         return HallucinationVerdict.LIKELY
 
-    # We have at least one match; pick the best by title similarity.
-    best = _best_by_title_similarity(reference.title, matches)
-    if best is None:
-        return HallucinationVerdict.UNCERTAIN
-
-    sim = title_similarity(reference.title, best.title)
-    if sim < TITLE_FAKE_THRESHOLD:
+    if anchor is None:
         return HallucinationVerdict.LIKELY
 
-    overlap = author_overlap(reference.authors, best.authors)
-    if overlap <= AUTHOR_FAKE_THRESHOLD and not reference.url:
-        return HallucinationVerdict.LIKELY
-
+    sim = title_similarity(reference.title, anchor.title)
     if sim >= TITLE_SIMILARITY_THRESHOLD:
         return HallucinationVerdict.UNLIKELY
 
