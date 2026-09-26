@@ -188,6 +188,22 @@ class OpenReviewBackend:
                 attempt += 1
                 continue
 
+            if resp.status_code in (401, 403):
+                # Auth / anti-bot challenge. OpenReview now answers /notes?id=
+                # with 403 ChallengeRequiredError, which is per-IP / rate-based
+                # and intermittent — NOT a sign the whole backend is down
+                # (/notes/search still returns 200). Treat as a transient miss
+                # for this one lookup so the caller falls through to title search
+                # and later references keep querying, instead of poisoning the
+                # backend via `_failed` and disabling OpenReview for the run.
+                logger.info(
+                    "openreview %d (auth/challenge) for %s — skipping this lookup, not poisoning backend",
+                    resp.status_code,
+                    path,
+                )
+                self._last_was_transient = True
+                return None
+
             logger.warning(
                 "openreview unexpected status %d for %s", resp.status_code, path
             )
