@@ -1,0 +1,694 @@
+======================================================================
+Reference: Ablooper: Fast accurate antibody cdr loop structure prediction with accuracy estimation
+Authors  : Brennan Abanades, Guy Georges, Alexander Bujotzek, Charlotte M Deane
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1101/2021.07.26.453747
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/be5606bcb2a984c7988f69f30ce074bb49af2e67
+@article{abanades2021ablooper,
+  title = {ABlooper: fast accurate antibody CDR loop structure prediction with accuracy estimation},
+  author = {Brennan Abanades and G. Georges and A. Bujotzek and C. Deane},
+  year = {2021},
+  journal = {bioRxiv},
+  doi = {10.1101/2021.07.26.453747},
+  url = {https://www.semanticscholar.org/paper/be5606bcb2a984c7988f69f30ce074bb49af2e67},
+}
+
+======================================================================
+Reference: OpenFold
+Authors  : Gustaf Ahdritz, Nazim Bouatta, Sachin Kadyan, Qinghui Xia, William Gerecke, Mohammed AlQuraishi
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41592-024-02272-z
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: bioRxiv
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.85).
+      Suggestion: Use canonical title: OpenFold: retraining AlphaFold2 yields new insights into its learning mechanisms and capacity for generalization
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/c51192d7440807dc98cc4374fb5d919390d70b0b
+@article{ahdritz2023openfold,
+  title = {OpenFold: retraining AlphaFold2 yields new insights into its learning mechanisms and capacity for generalization},
+  author = {Gustaf Ahdritz and N. Bouatta and Sachin Kadyan and Qinghui Xia and William Gerecke and Tim O’Donnell and Daniel Berenberg and Ian Fisk and Niccoló Zanichelli and Bo Zhang and Arkadiusz Nowaczynski and Bei Wang and Marta M. Stepniewska-Dziubinska and Shang Zhang and Adegoke A. Ojewole and M. Guney and Stella Biderman and A. Watkins and Stephen Ra and P. R. Lorenzo and L. Nivón and Brian D. Weitzner and Y. A. Ban and P. Sorger and Emad Mostaque and Zhao Zhang and Richard Bonneau and Mohammed Alquraishi},
+  year = {2023},
+  journal = {bioRxiv},
+  doi = {10.1038/s41592-024-02272-z},
+  url = {https://www.semanticscholar.org/paper/c51192d7440807dc98cc4374fb5d919390d70b0b},
+}
+
+======================================================================
+Reference: Principles that govern the folding of protein chains
+Authors  : Christian B Anfinsen
+Year     : 1973
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1126/science.181.4096.223
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/36e091c47b2330acf77f16205ad0d599cb190e82
+@article{anfinsen1973principles,
+  title = {Principles that govern the folding of protein chains.},
+  author = {C. Anfinsen},
+  year = {1973},
+  journal = {Science},
+  doi = {10.1126/science.181.4096.223},
+  url = {https://www.semanticscholar.org/paper/36e091c47b2330acf77f16205ad0d599cb190e82},
+}
+
+======================================================================
+Reference: Accurate prediction of protein structures and interactions using a three-track neural network
+Authors  : Minkyung Baek, Frank DiMaio, Ivan Anishchenko, Justas Dauparas, Sergey Ovchinnikov, Gyu Rie Lee, Jue Wang, Qian Cong, Lisa N Kinch, R Dustin Schaeffer, et al.
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3410/f.740477162.793587584
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/5c84ffe8bb0da3e359cc71a9a08d5379ff5eac12
+@article{makhatadze2021faculty,
+  title = {Faculty Opinions recommendation of Accurate prediction of protein structures and interactions using a three-track neural network.},
+  author = {G. Makhatadze},
+  year = {2021},
+  journal = {Faculty Opinions – Post-Publication Peer Review of the Biomedical Literature},
+  doi = {10.3410/f.740477162.793587584},
+  url = {https://www.semanticscholar.org/paper/5c84ffe8bb0da3e359cc71a9a08d5379ff5eac12},
+}
+
+======================================================================
+Reference: Artificial intelligence for antibody reading comprehension: Antiberta
+Authors  : Yoonjoo Choi
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.patter.2022.100535
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/89232bf02b189b76858c88cea09662ed14f3e250
+@article{choi2022artificial,
+  title = {Artificial intelligence for antibody reading comprehension: AntiBERTa},
+  author = {Yoonjoo Choi},
+  year = {2022},
+  journal = {Patterns},
+  doi = {10.1016/j.patter.2022.100535},
+  url = {https://www.semanticscholar.org/paper/89232bf02b189b76858c88cea09662ed14f3e250},
+}
+
+======================================================================
+Reference: Single-sequence protein structure prediction using language models from deep learning
+Authors  : Ratul Chowdhury, Nazim Bouatta, Surojit Biswas, Charlotte Rochereau, George M Church, Peter K Sorger, Mohammed AlQuraishi
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1101/2021.08.02.454840
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4c67b079e9154b85dd8486050ef2d98fd8c626d7
+@article{chowdhury2021singlesequence,
+  title = {Single-sequence protein structure prediction using language models from deep learning},
+  author = {Ratul Chowdhury and N. Bouatta and Surojit Biswas and Charlotte Rochereau and G. Church and P. Sorger and Mohammed Alquraishi},
+  year = {2021},
+  journal = {bioRxiv},
+  doi = {10.1101/2021.08.02.454840},
+  url = {https://www.semanticscholar.org/paper/4c67b079e9154b85dd8486050ef2d98fd8c626d7},
+}
+
+======================================================================
+Reference: Prottrans: Toward understanding the language of life through self-supervised learning
+Authors  : Ahmed Elnaggar, Michael Heinzinger, Christian Dallago, Ghalia Rehawi, Yu Wang, Llion Jones, Tom Gibbs, Tamas Feher, Christoph Angerer, Martin Steinegger, Debsindhu Bhowmik, Burkhard Rost
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2007.06225
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.53).
+      Suggestion: Use canonical title: ProtTrans: Towards Cracking the Language of Life’s Code Through Self-Supervised Deep Learning and High Performance Computing
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ca9b4fc03ad3ea4680ab2204ecf215f333c616a4
+@article{elnaggar2020prottrans,
+  title = {ProtTrans: Towards Cracking the Language of Life’s Code Through Self-Supervised Deep Learning and High Performance Computing},
+  author = {Ahmed Elnaggar and M. Heinzinger and Christian Dallago and G. Rehawi and Yu Wang and Llion Jones and Tom Gibbs and Tamas B. Fehér and Christoph Angerer and Martin Steinegger and D. Bhowmik and B. Rost},
+  year = {2020},
+  journal = {bioRxiv},
+  doi = {10.1109/tpami.2021.3095381},
+  eprint = {2007.06225},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/ca9b4fc03ad3ea4680ab2204ecf215f333c616a4},
+}
+
+======================================================================
+Reference: Helixfold-single: Msa-free protein structure prediction by using protein language model as an alternative
+Authors  : Xiaomin Fang, Fan Wang, Lihang Liu, Jingzhou He, Dayong Lin, Yingfei Xiang, Xiaonan Zhang, Hua Wu, Hui Li, Le Song
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Nature Machine Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Nature Machine Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s42256-023-00721-6
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2207.13921v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e4bb31168472e7f2b391a6c17ebe3171592713f3
+@article{fang2022helixfoldsingle,
+  title = {HelixFold-Single: MSA-free Protein Structure Prediction by Using Protein Language Model as an Alternative},
+  author = {Xiaomin Fang and Fan Wang and Lihang Liu and Jingzhou He and Dayong Lin and Yingfei Xiang and Xiaonan Zhang and Hua Wu and Hui Li and Le Song},
+  year = {2022},
+  journal = {Nature Machine Intelligence},
+  doi = {10.1038/s42256-023-00721-6},
+  eprint = {2207.13921},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2207.13921v3},
+}
+
+======================================================================
+Reference: Learning the language of viral evolution and escape
+Authors  : Brian Hie, Ellen D Zhong, Bonnie Berger, Bryan Bryson
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3410/f.739360850.793582588
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/40558e802642e0d1cdfbaaaec1be339c129e5dfc
+@article{elofsson2021faculty,
+  title = {Faculty Opinions recommendation of Learning the language of viral evolution and escape.},
+  author = {A. Elofsson},
+  year = {2021},
+  journal = {Faculty Opinions – Post-Publication Peer Review of the Biomedical Literature},
+  doi = {10.3410/f.739360850.793582588},
+  url = {https://www.semanticscholar.org/paper/40558e802642e0d1cdfbaaaec1be339c129e5dfc},
+}
+
+======================================================================
+Reference: A-prot: protein structure modeling using msa transformer
+Authors  : Yiyu Hong, Juyong Lee, Junsu Ko
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1186/s12859-022-04628-8
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/6f63c7e3c3bdab3a3a97f2aae6c7cc0652959156
+@article{hong2021aprot,
+  title = {A-Prot: protein structure modeling using MSA transformer},
+  author = {Yiyu Hong and Juyong Lee and Junsu Ko},
+  year = {2021},
+  journal = {BMC Bioinformatics},
+  doi = {10.1186/s12859-022-04628-8},
+  url = {https://www.semanticscholar.org/paper/6f63c7e3c3bdab3a3a97f2aae6c7cc0652959156},
+}
+
+======================================================================
+Reference: Representation learning applications in biological sequence analysis
+Authors  : Hitoshi Iuchi, Taro Matsutani, Keisuke Yamada, Natsuki Iwano, Shunsuke Sumi, Shion Hosoda, Shitao Zhao, Tsukasa Fukunaga, Michiaki Hamada
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1101/2021.02.26.433129
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/7038a6b7070d2ffff88e8b12d43a1e185d739884
+@article{iuchi2021representation,
+  title = {Representation learning applications in biological sequence analysis},
+  author = {Hitoshi Iuchi and Taro Matsutani and Keisuke Yamada and Natsuki Iwano and Shunsuke Sumi and S. Hosoda and Shitao Zhao and Tsukasa Fukunaga and Michiaki Hamada},
+  year = {2021},
+  journal = {bioRxiv},
+  doi = {10.1101/2021.02.26.433129},
+  url = {https://www.semanticscholar.org/paper/7038a6b7070d2ffff88e8b12d43a1e185d739884},
+}
+
+======================================================================
+Reference: Highly accurate protein structure prediction with alphafold
+Authors  : John Jumper, Richard Evans, Alexander Pritzel, Tim Green, Michael Figurnov, Olaf Ronneberger, Kathryn Tunyasuvunakool, Russ Bates, Augustin Žídek, Anna Potapenko, et al.
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41586-021-03819-2
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 34.
+      Suggestion: List all 34 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/dc32a984b651256a8ec282be52310e6bd33d9815
+@article{jumper2021highly,
+  title = {Highly accurate protein structure prediction with AlphaFold},
+  author = {J. Jumper and Richard Evans and A. Pritzel and Tim Green and Michael Figurnov and O. Ronneberger and Kathryn Tunyasuvunakool and Russ Bates and Augustin Žídek and Anna Potapenko and Alex Bridgland and Clemens Meyer and Simon A A Kohl and Andy Ballard and A. Cowie and B. Romera-Paredes and Stanislav Nikolov and Rishub Jain and J. Adler and T. Back and Stig Petersen and D. Reiman and Ellen Clancy and Michal Zielinski and Martin Steinegger and Michalina Pacholska and Tamas Berghammer and Sebastian Bodenstein and David Silver and O. Vinyals and A. Senior and K. Kavukcuoglu and Pushmeet Kohli and D. Hassabis},
+  year = {2021},
+  journal = {Nature},
+  doi = {10.1038/s41586-021-03819-2},
+  url = {https://www.semanticscholar.org/paper/dc32a984b651256a8ec282be52310e6bd33d9815},
+}
+
+======================================================================
+Reference: Adam: A method for stochastic optimization
+Authors  : Diederik P Kingma, Jimmy Ba
+Year     : 2014
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1412.6980v9
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/a6cb366736791bcccc5c8639de5a8f9636bf87e8
+@inproceedings{kingma2014adam,
+  title = {Adam: A Method for Stochastic Optimization},
+  author = {Diederik P. Kingma and Jimmy Ba},
+  year = {2014},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1412.6980},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1412.6980v9},
+}
+
+======================================================================
+Reference: Unifold: An open-source platform for developing protein folding models beyond alphafold
+Authors  : Ziyao Li, Xuyang Liu, Weijie Chen, Fan Shen, Hangrui Bi, Guolin Ke, Linfeng Zhang
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1101/2022.08.04.502811
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.82).
+      Suggestion: Use canonical title: Uni-Fold: An Open-Source Platform for Developing Protein Folding Models beyond AlphaFold
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/79198b4009b375ae3746b7331a57f2aef54a456c
+@article{li2022unifold,
+  title = {Uni-Fold: An Open-Source Platform for Developing Protein Folding Models beyond AlphaFold},
+  author = {Ziyao Li and Xuyang Liu and Weijie Chen and Fan Shen and Hangrui Bi and Guolin Ke and Linfeng Zhang},
+  year = {2022},
+  journal = {bioRxiv},
+  doi = {10.1101/2022.08.04.502811},
+  url = {https://www.semanticscholar.org/paper/79198b4009b375ae3746b7331a57f2aef54a456c},
+}
+
+======================================================================
+Reference: Language models of protein sequences at the scale of evolution enable accurate structure prediction
+Authors  : Zeming Lin, Halil Akin, Roshan Rao, Brian Hie, Zhongkai Zhu, Wenting Lu, Allan dos Santos Costa, Maryam Fazel-Zarandi, Tom Sercu, Sal Candido, et al.
+Year     : 2022
+Verdict  : unverified
+
+======================================================================
+Reference: Language models enable zero-shot prediction of the effects of mutations on protein function
+Authors  : Joshua Meier, Roshan Rao, Robert Verkuil, Jason Liu, Tom Sercu, Alex Rives
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1101/2021.07.09.450648
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0cfce36622a017a86c2248ebe5dfdd0f8d643df7
+@article{meier2021language,
+  title = {Language models enable zero-shot prediction of the effects of mutations on protein function},
+  author = {Joshua Meier and Roshan Rao and Robert Verkuil and Jason Liu and Tom Sercu and Alexander Rives},
+  year = {2021},
+  journal = {bioRxiv},
+  doi = {10.1101/2021.07.09.450648},
+  url = {https://www.semanticscholar.org/paper/0cfce36622a017a86c2248ebe5dfdd0f8d643df7},
+}
+
+======================================================================
+Reference: Observed antibody space: A diverse database of cleaned, annotated, and translated unpaired and paired antibody sequences
+Authors  : Tobias H Olsen, Fergus Boyles, Charlotte M Deane
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1002/pro.4205
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/38d19ec08df4f01987e0c537760d34abe9676007
+@article{olsen2021observed,
+  title = {Observed Antibody Space: A diverse database of cleaned, annotated, and translated unpaired and paired antibody sequences},
+  author = {T. H. Olsen and Fergus Boyles and C. Deane},
+  year = {2021},
+  journal = {Protein Science},
+  doi = {10.1002/pro.4205},
+  url = {https://www.semanticscholar.org/paper/38d19ec08df4f01987e0c537760d34abe9676007},
+}
+
+======================================================================
+Reference: Ablang: An antibody language model for completing antibody sequences
+Authors  : Tobias H Olsen, Iain H Moal, Charlotte M Deane
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1093/bioadv/vbac046
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/95a3237bfbde1d312e943ab965351537c46643f7
+@article{olsen2022ablang,
+  title = {AbLang: an antibody language model for completing antibody sequences},
+  author = {T. H. Olsen and I. Moal and C. Deane},
+  year = {2022},
+  journal = {bioRxiv},
+  doi = {10.1093/bioadv/vbac046},
+  url = {https://www.semanticscholar.org/paper/95a3237bfbde1d312e943ab965351537c46643f7},
+}
+
+======================================================================
+Reference: Biophi: A platform for antibody design, humanization, and humanness evaluation based on natural antibody repertoires and deep learning
+Authors  : David Prihoda, Jad Maamary, Andrew Waight, Veronica Juan, Laurence Fayadat-Dilman, Daniel Svozil, Danny A Bitton
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1080/19420862.2021.2020203
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8300adff16716c99e24b847445b5fda90770dc4f
+@article{prihoda2021biophi,
+  title = {BioPhi: A platform for antibody design, humanization, and humanness evaluation based on natural antibody repertoires and deep learning},
+  author = {David Prihoda and Jad Maamary and A. Waight and Verónica Juan and Laurence Fayadat-Dilman and D. Svozil and Danny A. Bitton},
+  year = {2021},
+  journal = {bioRxiv},
+  doi = {10.1080/19420862.2021.2020203},
+  url = {https://www.semanticscholar.org/paper/8300adff16716c99e24b847445b5fda90770dc4f},
+}
+
+======================================================================
+Reference: Transformer protein language models are unsupervised structure learners
+Authors  : Roshan Rao, Joshua Meier, Tom Sercu, Sergey Ovchinnikov, Alexander Rives
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1101/2020.12.15.422761
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/043e5e0cf3129284683260976c10d98c7f121f35
+@article{rao2020transformer,
+  title = {Transformer protein language models are unsupervised structure learners},
+  author = {Roshan Rao and Joshua Meier and Tom Sercu and S. Ovchinnikov and Alexander Rives},
+  year = {2020},
+  journal = {bioRxiv},
+  doi = {10.1101/2020.12.15.422761},
+  url = {https://www.semanticscholar.org/paper/043e5e0cf3129284683260976c10d98c7f121f35},
+}
+
+======================================================================
+Reference: Msa transformer
+Authors  : Roshan M Rao, Jason Liu, Robert Verkuil, Joshua Meier, John Canny, Pieter Abbeel, Tom Sercu, Alexander Rives
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1101/2021.02.12.430858
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/deee48c5e0ac0407a1e002905caaf2b174bdb0e6
+@article{rao2021transformer,
+  title = {MSA Transformer},
+  author = {Roshan Rao and Jason Liu and Robert Verkuil and Joshua Meier and J. Canny and P. Abbeel and Tom Sercu and Alexander Rives},
+  year = {2021},
+  journal = {bioRxiv},
+  doi = {10.1101/2021.02.12.430858},
+  url = {https://www.semanticscholar.org/paper/deee48c5e0ac0407a1e002905caaf2b174bdb0e6},
+}
+
+======================================================================
+Reference: Hhblits: lightning-fast iterative protein sequence searching by hmm-hmm alignment
+Authors  : Michael Remmert, Andreas Biegert, Andreas Hauser, Johannes Söding
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/nmeth.1818
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/40fbeff6d93623672ef693f513f37697820f02e2
+@article{remmert2011hhblits,
+  title = {HHblits: lightning-fast iterative protein sequence searching by HMM-HMM alignment},
+  author = {M. Remmert and Andreas Biegert and A. Hauser and J. Söding},
+  year = {2011},
+  journal = {Nature Methods},
+  doi = {10.1038/nmeth.1818},
+  url = {https://www.semanticscholar.org/paper/40fbeff6d93623672ef693f513f37697820f02e2},
+}
+
+======================================================================
+Reference: Biological structure and function emerge from scaling unsupervised learning to 250 million protein sequences
+Authors  : Alexander Rives, Joshua Meier, Tom Sercu, Siddharth Goyal, Zeming Lin, Jason Liu, Demi Guo, Myle Ott, C Lawrence Zitnick, Jerry Ma, et al.
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1101/622803
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Proceedings of the National Academy of Sciences' may be an abbreviation of 'Proceedings of the National Academy of Sciences of the United States of America'.
+      Suggestion: Use the full venue name: Proceedings of the National Academy of Sciences of the United States of America.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/18a93dc1558bf9d7534d0b416633cebaf75c1145
+@inproceedings{rives2019biological,
+  title = {Biological structure and function emerge from scaling unsupervised learning to 250 million protein sequences},
+  author = {Alexander Rives and Siddharth Goyal and Joshua Meier and Demi Guo and Myle Ott and C. L. Zitnick and Jerry Ma and R. Fergus},
+  year = {2019},
+  booktitle = {Proceedings of the National Academy of Sciences of the United States of America},
+  doi = {10.1101/622803},
+  url = {https://www.semanticscholar.org/paper/18a93dc1558bf9d7534d0b416633cebaf75c1145},
+}
+
+======================================================================
+Reference: Fast, accurate antibody structure prediction from deep learning on massive set of natural antibodies
+Authors  : Jeffrey A Ruffolo, Jeffrey J Gray
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41467-023-38063-x
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/81e20d4641b6261c23184f98fd1585d64c85eb40
+@article{ruffolo2022fast,
+  title = {Fast, accurate antibody structure prediction from deep learning on massive set of natural antibodies},
+  author = {Jeffrey A. Ruffolo and Lee-Shin Chu and S. Mahajan and Jeffrey J. Gray},
+  year = {2022},
+  journal = {bioRxiv},
+  doi = {10.1038/s41467-023-38063-x},
+  url = {https://www.semanticscholar.org/paper/81e20d4641b6261c23184f98fd1585d64c85eb40},
+}
+
+======================================================================
+Reference: Antibody structure prediction using interpretable deep learning
+Authors  : Jeffrey A Ruffolo, Jeremias Sulam, Jeffrey J Gray
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.patter.2021.100406
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f98fe34a45494ca2d19bec6e98baf5ce59833fd5
+@article{ruffolo2021antibody,
+  title = {Antibody structure prediction using interpretable deep learning},
+  author = {Jeffrey A. Ruffolo and Jeremias Sulam and Jeffrey J. Gray},
+  year = {2021},
+  journal = {bioRxiv},
+  doi = {10.1016/j.patter.2021.100406},
+  url = {https://www.semanticscholar.org/paper/f98fe34a45494ca2d19bec6e98baf5ce59833fd5},
+}
+
+======================================================================
+Reference: Protein structure prediction using multiple deep neural networks in the 13th critical assessment of protein structure prediction (casp13)
+Authors  : Andrew W Senior, Richard Evans, John Jumper, James Kirkpatrick, Laurent Sifre, Tim Green, Chongli Qin, Augustin Žídek, Alexander WR Nelson, Alex Bridgland, et al.
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1002/prot.25834
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 19.
+      Suggestion: List all 19 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/055d5bc085978bc8f0774459d3edc9e99918b9b3
+@article{senior2019protein,
+  title = {Protein structure prediction using multiple deep neural networks in the 13th Critical Assessment of Protein Structure Prediction (CASP13)},
+  author = {A. Senior and Richard Evans and J. Jumper and J. Kirkpatrick and L. Sifre and Tim Green and Chongli Qin and Augustin Žídek and A. Nelson and Alex Bridgland and Hugo Penedones and Stig Petersen and K. Simonyan and Steve Crossan and Pushmeet Kohli and David T. Jones and David Silver and K. Kavukcuoglu and D. Hassabis},
+  year = {2019},
+  journal = {Proteins: Structure, Function, and Bioinformatics},
+  doi = {10.1002/prot.25834},
+  url = {https://www.semanticscholar.org/paper/055d5bc085978bc8f0774459d3edc9e99918b9b3},
+}
+
+======================================================================
+Reference: Improved protein structure prediction using potentials from deep learning
+Authors  : Andrew W Senior, Richard Evans, John Jumper, James Kirkpatrick, Laurent Sifre, Tim Green, Chongli Qin, Augustin Žídek, Alexander WR Nelson, Alex Bridgland, et al.
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41586-019-1923-7
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 19.
+      Suggestion: List all 19 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/3a083d843f891b3574494c385699c21766ce8b7a
+@article{senior2020improved,
+  title = {Improved protein structure prediction using potentials from deep learning},
+  author = {A. Senior and Richard Evans and J. Jumper and J. Kirkpatrick and L. Sifre and Tim Green and Chongli Qin and Augustin Žídek and A. Nelson and Alex Bridgland and Hugo Penedones and Stig Petersen and K. Simonyan and Steve Crossan and Pushmeet Kohli and David T. Jones and David Silver and K. Kavukcuoglu and D. Hassabis},
+  year = {2020},
+  journal = {Nature},
+  doi = {10.1038/s41586-019-1923-7},
+  url = {https://www.semanticscholar.org/paper/3a083d843f891b3574494c385699c21766ce8b7a},
+}
+
+======================================================================
+Reference: Mmseqs2 enables sensitive protein sequence searching for the analysis of massive data sets
+Authors  : Martin Steinegger, Johannes Söding
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/nbt.3988
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8d5b967fca549dad50e2ac7b6643fb504cfeb554
+@article{steinegger2017mmseqs,
+  title = {MMseqs2 enables sensitive protein sequence searching for the analysis of massive data sets},
+  author = {Martin Steinegger and J. Söding},
+  year = {2017},
+  journal = {Nature Biotechnology},
+  doi = {10.1038/nbt.3988},
+  url = {https://www.semanticscholar.org/paper/8d5b967fca549dad50e2ac7b6643fb504cfeb554},
+}
+
+======================================================================
+Reference: Hh-suite3 for fast remote homology detection and deep protein annotation
+Authors  : Martin Steinegger, Markus Meier, Milot Mirdita, Harald Vöhringer, Stephan J Haunsberger, Johannes Söding
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1186/s12859-019-3019-7
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e1e5929fd511548d4ff081444b64da87c9c9dbe3
+@article{steinegger2019hhsuite,
+  title = {HH-suite3 for fast remote homology detection and deep protein annotation},
+  author = {Martin Steinegger and Markus Meier and M. Mirdita and Harald Voehringer and Stephan J. Haunsberger and J. Soeding},
+  year = {2019},
+  journal = {BMC Bioinformatics},
+  doi = {10.1186/s12859-019-3019-7},
+  url = {https://www.semanticscholar.org/paper/e1e5929fd511548d4ff081444b64da87c9c9dbe3},
+}
+
+======================================================================
+Reference: Attention is all you need
+Authors  : Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, Illia Polosukhin
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1706.03762
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1706.03762v7
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/204e3073870fae3d05bcbc2f6a8e263d9b72e776
+@article{vaswani2017attention,
+  title = {Attention Is All You Need},
+  author = {Ashish Vaswani and Noam Shazeer and Niki Parmar and Jakob Uszkoreit and Llion Jones and Aidan N. Gomez and Lukasz Kaiser and Illia Polosukhin},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1706.03762},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1706.03762v7},
+}
+
+======================================================================
+Reference: Protein structure alignment beyond spatial proximity
+Authors  : Sheng Wang, Jianzhu Ma, Jian Peng, Jinbo Xu
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/srep01448
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4a80413b090a3bb4e60c2bebdeb5ee8695a2e6ad
+@article{wang2013protein,
+  title = {Protein structure alignment beyond spatial proximity},
+  author = {Sheng Wang and Jianzhu Ma and Jian Peng and Jinbo Xu},
+  year = {2013},
+  journal = {Scientific Reports},
+  doi = {10.1038/srep01448},
+  url = {https://www.semanticscholar.org/paper/4a80413b090a3bb4e60c2bebdeb5ee8695a2e6ad},
+}
+
+======================================================================
+Reference: High-resolution de novo structure prediction from primary sequence
+Authors  : Ruidong Wu, Fan Ding, Rui Wang, Rui Shen, Xiwen Zhang, Shitong Luo, Chenpeng Su, Zuofan Wu, Qi Xie, Bonnie Berger, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1101/2022.07.21.500999
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 12.
+      Suggestion: List all 12 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/867d80c8779e1d301a5fc6e267e263f7e4c4c5c7
+@article{wu2022highresolution,
+  title = {High-resolution de novo structure prediction from primary sequence},
+  author = {R. Wu and Fan Ding and Rui Wang and Rui Shen and Xiwen Zhang and Shitong Luo and Chenpeng Su and Zuofan Wu and Qi Xie and B. Berger and Jianzhu Ma and Jian Peng},
+  year = {2022},
+  journal = {bioRxiv},
+  doi = {10.1101/2022.07.21.500999},
+  url = {https://www.semanticscholar.org/paper/867d80c8779e1d301a5fc6e267e263f7e4c4c5c7},
+}
+
+======================================================================
+Reference: Processing and analysis of casp3 protein structure predictions
+Authors  : Adam Zemla, Česlovas Venclovas, John Moult, Krzysztof Fidelis
+Year     : 1999
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1002/(sici)1097-0134(1999)37:3+<22::aid-prot5>3.0.co;2-w
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/9afdfd4a076b934a014aa822027ddcd21a6ea020
+@article{zemla1999processing,
+  title = {Processing and analysis of CASP3 protein structure predictions},
+  author = {A. Zemla and Č. Venclovas and J. Moult and K. Fidelis},
+  year = {1999},
+  journal = {Proteins: Structure, Function, and Bioinformatics},
+  doi = {10.1002/(sici)1097-0134(1999)37:3+<22::aid-prot5>3.0.co;2-w},
+  url = {https://www.semanticscholar.org/paper/9afdfd4a076b934a014aa822027ddcd21a6ea020},
+}
+
+======================================================================
+Reference: Scoring function for automated assessment of protein structure template quality
+Authors  : Yang Zhang, Jeffrey Skolnick
+Year     : 2004
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1002/prot.20264
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/c80520d6ef977f440775f2a3ceb256a3c0530056
+@article{zhang2004scoring,
+  title = {Scoring function for automated assessment of protein structure template quality},
+  author = {Yang Zhang and J. Skolnick},
+  year = {2004},
+  journal = {Proteins: Structure, Function, and Bioinformatics},
+  doi = {10.1002/prot.20264},
+  url = {https://www.semanticscholar.org/paper/c80520d6ef977f440775f2a3ceb256a3c0530056},
+}

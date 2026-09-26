@@ -1,0 +1,958 @@
+======================================================================
+Reference: Self-labelling via simultaneous clustering and representation learning
+Authors  : Yuki M. Asano, Christian Rupprecht, Andrea Vedaldi
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1911.05371
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/87045bfc6f8036d032ab6ad1ebeb0377db05da9a
+@inproceedings{asano2019selflabelling,
+  title = {Self-labelling via simultaneous clustering and representation learning},
+  author = {Yuki M. Asano and C. Rupprecht and A. Vedaldi},
+  year = {2019},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1911.05371},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/87045bfc6f8036d032ab6ad1ebeb0377db05da9a},
+}
+
+======================================================================
+Reference: UniLMv2: Pseudo-masked language models for unified language model pre-training
+Authors  : Hangbo Bao, Li Dong, Furu Wei, Wenhui Wang, Nan Yang, Xiaodong Liu, Yu Wang, Jianfeng Gao, Songhao Piao, Ming Zhou, Hsiao-Wuen Hon
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2002.12804
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2002.12804v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/f64e1d6bc13aae99aab5449fc9ae742a9ba7761e
+@inproceedings{bao2020unilmv,
+  title = {UniLMv2: Pseudo-Masked Language Models for Unified Language Model Pre-Training},
+  author = {Hangbo Bao and Li Dong and Furu Wei and Wenhui Wang and Nan Yang and Xiaodong Liu and Yu Wang and Songhao Piao and Jianfeng Gao and Ming Zhou and Hsiao-Wuen Hon},
+  year = {2020},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2002.12804},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2002.12804v1},
+}
+
+======================================================================
+Reference: Learning representations by maximizing mutual information across views
+Authors  : Philip Bachman, R Devon Hjelm, William Buchwalter
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1906.00910
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1906.00910v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/9b09d296059909490096e34e9df2d95314787ad5
+@article{bachman2019learning,
+  title = {Learning Representations by Maximizing Mutual Information Across Views},
+  author = {Philip Bachman and R Devon Hjelm and William Buchwalter},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1906.00910},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1906.00910v2},
+}
+
+======================================================================
+Reference: Deep clustering for unsupervised learning of visual features
+Authors  : Mathilde Caron, Piotr Bojanowski, Armand Joulin, Matthijs Douze
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-030-01264-9_9
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1807.05520
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1807.05520v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1d033b30f38642e4b6dd146bb8b464bfb58aad96
+@inproceedings{caron2018deep,
+  title = {Deep Clustering for Unsupervised Learning of Visual Features},
+  author = {Mathilde Caron and Piotr Bojanowski and Armand Joulin and Matthijs Douze},
+  year = {2018},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-030-01264-9_9},
+  eprint = {1807.05520},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1807.05520v2},
+}
+
+======================================================================
+Reference: Exploring simple siamese representation learning
+Authors  : Xinlei Chen, Kaiming He
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Computer Vision and Pattern Recognition' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Computer Vision and Pattern Recognition.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr46437.2021.01549
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2011.10566v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0e23d2f14e7e56e81538f4a63e11689d8ac1eb9d
+@article{chen2020exploring,
+  title = {Exploring Simple Siamese Representation Learning},
+  author = {Xinlei Chen and Kaiming He},
+  year = {2020},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr46437.2021.01549},
+  eprint = {2011.10566},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2011.10566v1},
+}
+
+======================================================================
+Reference: A simple framework for contrastive learning of visual representations
+Authors  : Ting Chen, Simon Kornblith, Mohammad Norouzi, Geoffrey Hinton
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2002.05709v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/7af72a461ed7cda180e7eab878efd5f35d79bbf4
+@inproceedings{chen2020simple,
+  title = {A Simple Framework for Contrastive Learning of Visual Representations},
+  author = {Ting Chen and Simon Kornblith and Mohammad Norouzi and Geoffrey Hinton},
+  year = {2020},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2002.05709},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2002.05709v3},
+}
+
+======================================================================
+Reference: Unsupervised learning of visual features by contrasting cluster assignments
+Authors  : Mathilde Caron, Ishan Misra, Julien Mairal, Priya Goyal, Piotr Bojanowski, Armand Joulin
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2006.09882
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2006.09882v5
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/1e1e10d75c4ebabdbfb7912ca4cc06a27ffa85af
+@article{caron2020unsupervised,
+  title = {Unsupervised Learning of Visual Features by Contrasting Cluster Assignments},
+  author = {Mathilde Caron and Ishan Misra and Julien Mairal and Priya Goyal and Piotr Bojanowski and Armand Joulin},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2006.09882},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2006.09882v5},
+}
+
+======================================================================
+Reference: Emerging properties in self-supervised vision transformers
+Authors  : Mathilde Caron, Hugo Touvron, Ishan Misra, Hervé Jégou, Julien Mairal, Piotr Bojanowski, Armand Joulin
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'IEEE International Conference on Computer Vision' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: IEEE International Conference on Computer Vision.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv48922.2021.00951
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2104.14294v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/ad4a0938c48e61b7827869e4ac3baffd0aefab35
+@inproceedings{caron2021emerging,
+  title = {Emerging Properties in Self-Supervised Vision Transformers},
+  author = {Mathilde Caron and Hugo Touvron and Ishan Misra and Hervé Jégou and Julien Mairal and Piotr Bojanowski and Armand Joulin},
+  year = {2021},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv48922.2021.00951},
+  eprint = {2104.14294},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2104.14294v2},
+}
+
+======================================================================
+Reference: An empirical study of training self-supervised vision transformers
+Authors  : Xinlei Chen, Saining Xie, Kaiming He
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'IEEE International Conference on Computer Vision' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: IEEE International Conference on Computer Vision.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv48922.2021.00950
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2104.02057v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/739ceacfafb1c4eaa17509351b647c773270b3ae
+@inproceedings{chen2021empirical,
+  title = {An Empirical Study of Training Self-Supervised Vision Transformers},
+  author = {Xinlei Chen and Saining Xie and Kaiming He},
+  year = {2021},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv48922.2021.00950},
+  eprint = {2104.02057},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2104.02057v4},
+}
+
+======================================================================
+Reference: An image is worth 16x16 words: Transformers for image recognition at scale
+Authors  : Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al.
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 12.
+      Suggestion: List all 12 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2010.11929v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/268d347e8a55b5eb82fb5e7d2f800e33c75ab18a
+@inproceedings{dosovitskiy2020image,
+  title = {An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale},
+  author = {Alexey Dosovitskiy and Lucas Beyer and Alexander Kolesnikov and Dirk Weissenborn and Xiaohua Zhai and Thomas Unterthiner and Mostafa Dehghani and Matthias Minderer and Georg Heigold and Sylvain Gelly and Jakob Uszkoreit and Neil Houlsby},
+  year = {2020},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2010.11929},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2010.11929v2},
+}
+
+======================================================================
+Reference: BERT: pre-training of deep bidirectional transformers for language understanding
+Authors  : Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/n19-1423
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1810.04805
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/df2b0e26d0599ce3e70df8a9da02e51594e0e992
+@article{devlin2019bert,
+  title = {BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  author = {Jacob Devlin and Ming-Wei Chang and Kenton Lee and Kristina Toutanova},
+  year = {2019},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/n19-1423},
+  eprint = {1810.04805},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/df2b0e26d0599ce3e70df8a9da02e51594e0e992},
+}
+
+======================================================================
+Reference: Bootstrap your own latent: A new approach to self-supervised learning
+Authors  : Jean-Bastien Grill, Florian Strub, Florent Altché, Corentin Tallec, Pierre H Richemond, Elena Buchatskaya, Carl Doersch, Bernardo Avila Pires, Zhaohan Daniel Guo, Mohammad Gheshlaghi Azar, Bilal Piot, Koray Kavukcuoglu, Rémi Munos, Michal Valko
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2006.07733
+  - [warning/incomplete/abbreviated_venue] Cited venue 'NeurIPS' may be an abbreviation of 'Neural Information Processing Systems'.
+      Suggestion: Use the full venue name: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2006.07733v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/38f93092ece8eee9771e61c1edaf11b1293cae1b
+@article{grill2020bootstrap,
+  title = {Bootstrap your own latent: A new approach to self-supervised Learning},
+  author = {Jean-Bastien Grill and Florian Strub and Florent Altché and Corentin Tallec and Pierre H. Richemond and Elena Buchatskaya and Carl Doersch and Bernardo Avila Pires and Zhaohan Daniel Guo and Mohammad Gheshlaghi Azar and Bilal Piot and Koray Kavukcuoglu and Rémi Munos and Michal Valko},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2006.07733},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2006.07733v3},
+}
+
+======================================================================
+Reference: Self-attention attribution: Interpreting information interactions inside Transformer
+Authors  : Yaru Hao, Li Dong, Furu Wei, Ke Xu
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'AAAI Conference on Artificial Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: AAAI Conference on Artificial Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v35i14.17533
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.11207v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1686203adc5f2dbc18627ce64f66d33eb81432a5
+@inproceedings{hao2020selfattention,
+  title = {Self-Attention Attribution: Interpreting Information Interactions Inside Transformer},
+  author = {Yaru Hao and Li Dong and Furu Wei and Ke Xu},
+  year = {2020},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v35i14.17533},
+  eprint = {2004.11207},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.11207v2},
+}
+
+======================================================================
+Reference: Learning deep representations by mutual information estimation and maximization
+Authors  : R Devon Hjelm, Alex Fedorov, Samuel Lavoie-Marchildon, Karan Grewal, Phil Bachman, Adam Trischler, Yoshua Bengio
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1808.06670
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/af3825437b627db1a99f946f7aa773ba8b03befd
+@inproceedings{hjelm2018learning,
+  title = {Learning deep representations by mutual information estimation and maximization},
+  author = {R. Devon Hjelm and A. Fedorov and Samuel Lavoie-Marchildon and Karan Grewal and Adam Trischler and Yoshua Bengio},
+  year = {2018},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1808.06670},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/af3825437b627db1a99f946f7aa773ba8b03befd},
+}
+
+======================================================================
+Reference: Momentum contrast for unsupervised visual representation learning
+Authors  : Kaiming He, Haoqi Fan, Yuxin Wu, Saining Xie, Ross Girshick
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr42600.2020.00975
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1911.05722
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/add2f205338d70e10ce5e686df4a690e2851bdfc
+@article{he2019momentum,
+  title = {Momentum Contrast for Unsupervised Visual Representation Learning},
+  author = {Kaiming He and Haoqi Fan and Yuxin Wu and Saining Xie and Ross B. Girshick},
+  year = {2019},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr42600.2020.00975},
+  eprint = {1911.05722},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/add2f205338d70e10ce5e686df4a690e2851bdfc},
+}
+
+======================================================================
+Reference: Deep networks with stochastic depth
+Authors  : Gao Huang, Yu Sun, Zhuang Liu, Daniel Sedra, Kilian Q. Weinberger
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-319-46493-0_39
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1603.09382
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1603.09382v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/51db1f3c8dfc7d4077da39c96bb90a6358128111
+@inproceedings{huang2016deep,
+  title = {Deep Networks with Stochastic Depth},
+  author = {Gao Huang and Yu Sun and Zhuang Liu and Daniel Sedra and Kilian Weinberger},
+  year = {2016},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-319-46493-0_39},
+  eprint = {1603.09382},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1603.09382v3},
+}
+
+======================================================================
+Reference: SpanBERT: Improving pre-training by representing and predicting spans
+Authors  : Mandar Joshi, Danqi Chen, Yinhan Liu, Daniel S. Weld, Luke Zettlemoyer, Omer Levy
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/tacl_a_00300
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1907.10529
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/81f5810fbbab9b7203b9556f4ce3c741875407bc
+@article{joshi2019spanbert,
+  title = {SpanBERT: Improving Pre-training by Representing and Predicting Spans},
+  author = {Mandar Joshi and Danqi Chen and Yinhan Liu and Daniel S. Weld and Luke Zettlemoyer and Omer Levy},
+  year = {2019},
+  journal = {Transactions of the Association for Computational Linguistics},
+  doi = {10.1162/tacl_a_00300},
+  eprint = {1907.10529},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/81f5810fbbab9b7203b9556f4ce3c741875407bc},
+}
+
+======================================================================
+Reference: Categorical reparameterization with gumbel-softmax
+Authors  : Eric Jang, Shixiang Gu, Ben Poole
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1611.01144
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/29e944711a354c396fad71936f536e83025b6ce0
+@inproceedings{jang2016categorical,
+  title = {Categorical Reparameterization with Gumbel-Softmax},
+  author = {Eric Jang and S. Gu and Ben Poole},
+  year = {2016},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1611.01144},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/29e944711a354c396fad71936f536e83025b6ce0},
+}
+
+======================================================================
+Reference: Unsupervised representation learning by predicting image rotations
+Authors  : Nikos Komodakis, Spyros Gidaris
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1803.07728
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1803.07728v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/aab368284210c1bb917ec2d31b84588e3d2d7eb4
+@inproceedings{gidaris2018unsupervised,
+  title = {Unsupervised Representation Learning by Predicting Image Rotations},
+  author = {Spyros Gidaris and Praveer Singh and Nikos Komodakis},
+  year = {2018},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1803.07728},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1803.07728v1},
+}
+
+======================================================================
+Reference: Swin Transformer: Hierarchical vision transformer using shifted windows
+Authors  : Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin, Baining Guo
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'IEEE International Conference on Computer Vision' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: IEEE International Conference on Computer Vision.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv48922.2021.00986
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2103.14030v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c8b25fab5608c3e033d34b4483ec47e68ba109b7
+@inproceedings{liu2021swin,
+  title = {Swin Transformer: Hierarchical Vision Transformer using Shifted Windows},
+  author = {Ze Liu and Yutong Lin and Yue Cao and Han Hu and Yixuan Wei and Zheng Zhang and Stephen Lin and Baining Guo},
+  year = {2021},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv48922.2021.00986},
+  eprint = {2103.14030},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2103.14030v2},
+}
+
+======================================================================
+Reference: Microsoft coco: Common objects in context
+Authors  : Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Dollár, C Lawrence Zitnick
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-319-10602-1_48
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1405.0312
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1405.0312v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/71b7178df5d2b112d07e45038cb5637208659ff7
+@inproceedings{lin2014microsoft,
+  title = {Microsoft COCO: Common Objects in Context},
+  author = {Tsung-Yi Lin and Michael Maire and Serge Belongie and Lubomir Bourdev and Ross Girshick and James Hays and Pietro Perona and Deva Ramanan and C. Lawrence Zitnick and Piotr Dollár},
+  year = {2014},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-319-10602-1_48},
+  eprint = {1405.0312},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1405.0312v3},
+}
+
+======================================================================
+Reference: Efficient training of visual transformers with small datasets
+Authors  : Yahui Liu, Enver Sangineto, Wei Bi, Nicu Sebe, Bruno Lepri, Marco De Nadai
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2106.03746
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2106.03746v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/2d98048c2d2fcd3f6b989d2a54003808906ab4b7
+@article{liu2021efficient,
+  title = {Efficient Training of Visual Transformers with Small Datasets},
+  author = {Yahui Liu and Enver Sangineto and Wei Bi and Nicu Sebe and Bruno Lepri and Marco De Nadai},
+  year = {2021},
+  journal = {Neural Information Processing Systems},
+  eprint = {2106.03746},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2106.03746v2},
+}
+
+======================================================================
+Reference: Prototypical contrastive learning of unsupervised representations
+Authors  : Junnan Li, Pan Zhou, Caiming Xiong, Steven Hoi
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2005.04966
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/8bf6c69bae0956db13aa9129fedc69fdc1256dce
+@inproceedings{li2020prototypical,
+  title = {Prototypical Contrastive Learning of Unsupervised Representations},
+  author = {Junnan Li and Pan Zhou and Caiming Xiong and R. Socher and S. Hoi},
+  year = {2020},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2005.04966},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/8bf6c69bae0956db13aa9129fedc69fdc1256dce},
+}
+
+======================================================================
+Reference: Unsupervised learning of visual representations by solving jigsaw puzzles
+Authors  : Mehdi Noroozi, Paolo Favaro
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-319-46466-4_5
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1603.09246
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1603.09246v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2ec8f7e0257a07d3914322b36072d1bbcd58a1e0
+@inproceedings{noroozi2016unsupervised,
+  title = {Unsupervised Learning of Visual Representations by Solving Jigsaw Puzzles},
+  author = {Mehdi Noroozi and Paolo Favaro},
+  year = {2016},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-319-46466-4_5},
+  eprint = {1603.09246},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1603.09246v3},
+}
+
+======================================================================
+Reference: Intermediate-task transfer learning with pretrained language models: When and why does it work?
+Authors  : Yada Pruksachatkun, Jason Phang, Haokun Liu, Phu Mon Htut, Xiaoyi Zhang, Richard Yuanzhe Pang, Clara Vania, Katharina Kann, Samuel R. Bowman
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.acl-main.467
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2005.00628
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.85).
+      Suggestion: Use canonical title: Intermediate-Task Transfer Learning with Pretrained Models for Natural Language Understanding: When and Why Does It Work?
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2005.00628v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/673e970fd835c7dd1bb1e071c5a37e9df99b7c8e
+@inproceedings{pruksachatkun2020intermediatetask,
+  title = {Intermediate-Task Transfer Learning with Pretrained Models for Natural Language Understanding: When and Why Does It Work?},
+  author = {Yada Pruksachatkun and Jason Phang and Haokun Liu and Phu Mon Htut and Xiaoyi Zhang and Richard Yuanzhe Pang and Clara Vania and Katharina Kann and Samuel R. Bowman},
+  year = {2020},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2020.acl-main.467},
+  eprint = {2005.00628},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2005.00628v2},
+}
+
+======================================================================
+Reference: Imagenet large scale visual recognition challenge
+Authors  : Olga Russakovsky, Jia Deng, Hao Su, Jonathan Krause, Sanjeev Satheesh, Sean Ma, Zhiheng Huang, Andrej Karpathy, Aditya Khosla, Michael Bernstein, Alexander C Berg, Li Fei-Fei
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s11263-015-0816-y
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1409.0575
+  - [warning/incomplete/abbreviated_venue] Cited venue 'IJCV' may be an abbreviation of 'International Journal of Computer Vision'.
+      Suggestion: Use the full venue name: International Journal of Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e74f9b7f8eec6ba4704c206b93bc8079af3da4bd
+@article{russakovsky2014imagenet,
+  title = {ImageNet Large Scale Visual Recognition Challenge},
+  author = {Olga Russakovsky and Jia Deng and Hao Su and J. Krause and S. Satheesh and Sean Ma and Zhiheng Huang and A. Karpathy and A. Khosla and Michael S. Bernstein and A. Berg and Li Fei-Fei},
+  year = {2014},
+  journal = {International Journal of Computer Vision},
+  doi = {10.1007/s11263-015-0816-y},
+  eprint = {1409.0575},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/e74f9b7f8eec6ba4704c206b93bc8079af3da4bd},
+}
+
+======================================================================
+Reference: Zero-shot text-to-image generation
+Authors  : A. Ramesh, Mikhail Pavlov, Gabriel Goh, Scott Gray, Chelsea Voss, Alec Radford, Mark Chen, Ilya Sutskever
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2102.12092v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/2cd605106b88c85d7d8b865b1ef0f8c8293debf1
+@inproceedings{ramesh2021zeroshot,
+  title = {Zero-Shot Text-to-Image Generation},
+  author = {Aditya Ramesh and Mikhail Pavlov and Gabriel Goh and Scott Gray and Chelsea Voss and Alec Radford and Mark Chen and Ilya Sutskever},
+  year = {2021},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2102.12092},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2102.12092v2},
+}
+
+======================================================================
+Reference: Exploring the limits of transfer learning with a unified text-to-text transformer
+Authors  : Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, Peter J. Liu
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1910.10683
+  - [warning/incomplete/abbreviated_venue] Cited venue 'J. Mach. Learn. Res.' may be an abbreviation of 'Journal of machine learning research'.
+      Suggestion: Use the full venue name: Journal of machine learning research.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/6c4b76232bb72897685d19b3d264c6ee3005bc2b
+@article{raffel2019exploring,
+  title = {Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer},
+  author = {Colin Raffel and Noam Shazeer and Adam Roberts and Katherine Lee and Sharan Narang and Michael Matena and Yanqi Zhou and Wei Li and Peter J. Liu},
+  year = {2019},
+  journal = {Journal of machine learning research},
+  eprint = {1910.10683},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/6c4b76232bb72897685d19b3d264c6ee3005bc2b},
+}
+
+======================================================================
+Reference: Generating diverse high-fidelity images with VQ-VAE-2
+Authors  : Ali Razavi, Aaron van den Oord, Oriol Vinyals
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1906.00446
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1906.00446v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/6be216d93421bf19c1659e7721241ae73d483baf
+@article{razavi2019generating,
+  title = {Generating Diverse High-Fidelity Images with VQ-VAE-2},
+  author = {Ali Razavi and Aaron van den Oord and Oriol Vinyals},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1906.00446},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1906.00446v1},
+}
+
+======================================================================
+Reference: Neural machine translation of rare words with subword units
+Authors  : Rico Sennrich, Barry Haddow, Alexandra Birch
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/p16-1162
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1508.07909
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/1518039b5001f1836565215eb047526b3ac7f462
+@inproceedings{sennrich2015neural,
+  title = {Neural Machine Translation of Rare Words with Subword Units},
+  author = {Rico Sennrich and B. Haddow and Alexandra Birch},
+  year = {2015},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/p16-1162},
+  eprint = {1508.07909},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/1518039b5001f1836565215eb047526b3ac7f462},
+}
+
+======================================================================
+Reference: Training data-efficient image transformers & distillation through attention
+Authors  : Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles, Hervé Jégou
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2012.12877v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/ad7ddcc14984caae308c397f1a589aae75d4ab71
+@inproceedings{touvron2020training,
+  title = {Training data-efficient image transformers & distillation through attention},
+  author = {Hugo Touvron and Matthieu Cord and Matthijs Douze and Francisco Massa and Alexandre Sablayrolles and Hervé Jégou},
+  year = {2020},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2012.12877},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2012.12877v2},
+}
+
+======================================================================
+Reference: Going deeper with image transformers
+Authors  : Hugo Touvron, Matthieu Cord, Alexandre Sablayrolles, Gabriel Synnaeve, Hervé Jégou
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'IEEE International Conference on Computer Vision' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: IEEE International Conference on Computer Vision.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv48922.2021.00010
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2103.17239v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b364cdb02d18b9d9a3c097f5ea446f7e9ab10325
+@inproceedings{touvron2021going,
+  title = {Going deeper with Image Transformers},
+  author = {Hugo Touvron and Matthieu Cord and Alexandre Sablayrolles and Gabriel Synnaeve and Hervé Jégou},
+  year = {2021},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv48922.2021.00010},
+  eprint = {2103.17239},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2103.17239v2},
+}
+
+======================================================================
+Reference: Neural discrete representation learning
+Authors  : Aaron van den Oord, Oriol Vinyals, Koray Kavukcuoglu
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1711.00937
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1711.00937v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/f466157848d1a7772fb6d02cdac9a7a5e7ef982e
+@article{oord2017neural,
+  title = {Neural Discrete Representation Learning},
+  author = {Aaron van den Oord and Oriol Vinyals and Koray Kavukcuoglu},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1711.00937},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1711.00937v2},
+}
+
+======================================================================
+Reference: Attention is all you need
+Authors  : Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1706.03762
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1706.03762v7
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/204e3073870fae3d05bcbc2f6a8e263d9b72e776
+@article{vaswani2017attention,
+  title = {Attention Is All You Need},
+  author = {Ashish Vaswani and Noam Shazeer and Niki Parmar and Jakob Uszkoreit and Llion Jones and Aidan N. Gomez and Lukasz Kaiser and Illia Polosukhin},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1706.03762},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1706.03762v7},
+}
+
+======================================================================
+Reference: Unsupervised feature learning via non-parametric instance discrimination
+Authors  : Zhirong Wu, Yuanjun Xiong, Stella X Yu, Dahua Lin
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2018.00393
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1805.01978
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of '2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition.
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.89).
+      Suggestion: Use canonical title: Unsupervised Feature Learning via Non-Parametric Instance-level Discrimination
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1805.01978v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/155b7782dbd713982a4133df3aee7adfd0b6b304
+@inproceedings{wu2018unsupervised,
+  title = {Unsupervised Feature Learning via Non-Parametric Instance-level Discrimination},
+  author = {Zhirong Wu and Yuanjun Xiong and Stella Yu and Dahua Lin},
+  year = {2018},
+  booktitle = {2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2018.00393},
+  eprint = {1805.01978},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1805.01978v1},
+}
+
+======================================================================
+Reference: Unified perceptual parsing for scene understanding
+Authors  : Tete Xiao, Yingcheng Liu, Bolei Zhou, Yuning Jiang, Jian Sun
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-030-01228-1_26
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1807.10221
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ECCV' may be an abbreviation of 'European Conference on Computer Vision'.
+      Suggestion: Use the full venue name: European Conference on Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1807.10221v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/aaab0bd4d79d4f19109bab0fbcdb05070fb0edd1
+@inproceedings{xiao2018unified,
+  title = {Unified Perceptual Parsing for Scene Understanding},
+  author = {Tete Xiao and Yingcheng Liu and Bolei Zhou and Yuning Jiang and Jian Sun},
+  year = {2018},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-030-01228-1_26},
+  eprint = {1807.10221},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1807.10221v1},
+}
+
+======================================================================
+Reference: Colorful image colorization
+Authors  : Richard Zhang, Phillip Isola, Alexei A Efros
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-319-46487-9_40
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1603.08511
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ECCV' may be an abbreviation of 'European Conference on Computer Vision'.
+      Suggestion: Use the full venue name: European Conference on Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1603.08511v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/8201e6e687f2de477258e9be53ba7b73ee30d7de
+@inproceedings{zhang2016colorful,
+  title = {Colorful Image Colorization},
+  author = {Richard Zhang and Phillip Isola and Alexei A. Efros},
+  year = {2016},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-319-46487-9_40},
+  eprint = {1603.08511},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1603.08511v5},
+}
+
+======================================================================
+Reference: Scaling vision transformers
+Authors  : Xiaohua Zhai, Alexander Kolesnikov, Neil Houlsby, Lucas Beyer
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Computer Vision and Pattern Recognition' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Computer Vision and Pattern Recognition.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52688.2022.01179
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2106.04560v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2a805d0e1b067444a554c5169d189fa1f649f411
+@article{zhai2021scaling,
+  title = {Scaling Vision Transformers},
+  author = {Xiaohua Zhai and Alexander Kolesnikov and Neil Houlsby and Lucas Beyer},
+  year = {2021},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52688.2022.01179},
+  eprint = {2106.04560},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2106.04560v2},
+}
+
+======================================================================
+Reference: Rethinking semantic segmentation from a sequence-to-sequence perspective with transformers
+Authors  : Sixiao Zheng, Jiachen Lu, Hengshuang Zhao, Xiatian Zhu, Zekun Luo, Yabiao Wang, Yanwei Fu, Jianfeng Feng, Tao Xiang, Philip H. S. Torr, Li Zhang
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Computer Vision and Pattern Recognition' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Computer Vision and Pattern Recognition.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr46437.2021.00681
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CoRR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2012.15840v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d29430adccb805ab57b349afa8553954347b3197
+@article{zheng2020rethinking,
+  title = {Rethinking Semantic Segmentation from a Sequence-to-Sequence Perspective with Transformers},
+  author = {Sixiao Zheng and Jiachen Lu and Hengshuang Zhao and Xiatian Zhu and Zekun Luo and Yabiao Wang and Yanwei Fu and Jianfeng Feng and Tao Xiang and Philip H. S. Torr and Li Zhang},
+  year = {2020},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr46437.2021.00681},
+  eprint = {2012.15840},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2012.15840v3},
+}
+
+======================================================================
+Reference: Semantic understanding of scenes through the ADE20K dataset
+Authors  : Bolei Zhou, Hang Zhao, Xavier Puig, Tete Xiao, Sanja Fidler, Adela Barriuso, Antonio Torralba
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s11263-018-1140-0
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1608.05442
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Int. J. Comput. Vis.' may be an abbreviation of 'International Journal of Computer Vision'.
+      Suggestion: Use the full venue name: International Journal of Computer Vision.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/88512be44744615f4baa8e14f600f036db4c2433
+@article{zhou2016semantic,
+  title = {Semantic Understanding of Scenes Through the ADE20K Dataset},
+  author = {Bolei Zhou and Hang Zhao and Xavier Puig and S. Fidler and Adela Barriuso and A. Torralba},
+  year = {2016},
+  journal = {International Journal of Computer Vision},
+  doi = {10.1007/s11263-018-1140-0},
+  eprint = {1608.05442},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/88512be44744615f4baa8e14f600f036db4c2433},
+}

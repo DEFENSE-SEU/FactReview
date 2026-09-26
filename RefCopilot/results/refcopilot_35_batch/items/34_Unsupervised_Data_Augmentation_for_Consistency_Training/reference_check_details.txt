@@ -1,0 +1,1292 @@
+======================================================================
+Reference: There are many consistent explanations of unlabeled data: Why you should average
+Authors  : Ben Athiwaratkun, Marc Finzi, Pavel Izmailov, Andrew Gordon Wilson
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1806.05594
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ICLR' may be an abbreviation of 'International Conference on Learning Representations'.
+      Suggestion: Use the full venue name: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/98286df6d923d787f26e034bbaf3a5a64ac29cb1
+@inproceedings{athiwaratkun2018there,
+  title = {There Are Many Consistent Explanations of Unlabeled Data: Why You Should Average},
+  author = {Ben Athiwaratkun and Marc Finzi and Pavel Izmailov and A. Wilson},
+  year = {2018},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1806.05594},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/98286df6d923d787f26e034bbaf3a5a64ac29cb1},
+}
+
+======================================================================
+Reference: Learning with pseudo-ensembles
+Authors  : Philip Bachman, Ouais Alsharif, Doina Precup
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1412.4864
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1412.4864v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/03cd6f2297637a322bdd4519b8cee331ef42984b
+@article{bachman2014learning,
+  title = {Learning with Pseudo-Ensembles},
+  author = {Philip Bachman and Ouais Alsharif and Doina Precup},
+  year = {2014},
+  journal = {Neural Information Processing Systems},
+  eprint = {1412.4864},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1412.4864v1},
+}
+
+======================================================================
+Reference: Mixmatch: A holistic approach to semi-supervised learning
+Authors  : David Berthelot, Nicholas Carlini, Ian Goodfellow, Nicolas Papernot, Avital Oliver, Colin Raffel
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.02249v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/c42816f497d663c681df20d48a6e66a5632600d8
+@article{berthelot2019mixmatch,
+  title = {MixMatch: A Holistic Approach to Semi-Supervised Learning},
+  author = {David Berthelot and Nicholas Carlini and Ian Goodfellow and Nicolas Papernot and Avital Oliver and Colin Raffel},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1905.02249},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.02249v2},
+}
+
+======================================================================
+Reference: Unlabeled data improves adversarial robustness
+Authors  : Yair Carmon, Aditi Raghunathan, Ludwig Schmidt, Percy Liang, John C Duchi
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.13736v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/b3f1aa12dde233aaf543bb9ccb27213c494e0fd5
+@article{carmon2019unlabeled,
+  title = {Unlabeled Data Improves Adversarial Robustness},
+  author = {Yair Carmon and Aditi Raghunathan and Ludwig Schmidt and Percy Liang and John C. Duchi},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1905.13736},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.13736v4},
+}
+
+======================================================================
+Reference: Xception: Deep learning with depthwise separable convolutions
+Authors  : François Chollet
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2017.195
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1610.02357
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/5b6ec746d309b165f9f9def873a2375b6fb40f3d
+@article{chollet2016xception,
+  title = {Xception: Deep Learning with Depthwise Separable Convolutions},
+  author = {François Chollet},
+  year = {2016},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2017.195},
+  eprint = {1610.02357},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/5b6ec746d309b165f9f9def873a2375b6fb40f3d},
+}
+
+======================================================================
+Reference: Semi-supervised sequence modeling with cross-view training
+Authors  : Kevin Clark, Minh-Thang Luong, Christopher D Manning, Quoc V Le
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d18-1217
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1809.08370v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0c47cad9729c38d9db1f75491b1ee4bd883a5d4e
+@inproceedings{clark2018semisupervised,
+  title = {Semi-Supervised Sequence Modeling with Cross-View Training},
+  author = {Kevin Clark and Minh-Thang Luong and Christopher D. Manning and Quoc V. Le},
+  year = {2018},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d18-1217},
+  eprint = {1809.08370},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1809.08370v1},
+}
+
+======================================================================
+Reference: A unified architecture for natural language processing: Deep neural networks with multitask learning
+Authors  : Ronan Collobert, Jason Weston
+Year     : 2008
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/1390156.1390177
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/57458bc1cffe5caa45a885af986d70f723f406b4
+@inproceedings{collobert2008unified,
+  title = {A unified architecture for natural language processing: deep neural networks with multitask learning},
+  author = {R. Collobert and J. Weston},
+  year = {2008},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.1145/1390156.1390177},
+  url = {https://www.semanticscholar.org/paper/57458bc1cffe5caa45a885af986d70f723f406b4},
+}
+
+======================================================================
+Reference: Randaugment: Practical data augmentation with no separate search
+Authors  : Ekin D Cubuk, Barret Zoph, Jonathon Shlens, Quoc V Le
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue '2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW)' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW).
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvprw50498.2020.00359
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.59).
+      Suggestion: Use canonical title: RandAugment: Practical automated data augmentation with a reduced search space
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1909.13719v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/87f6a7c014ce206ac5b57299c07e10667d194b39
+@inproceedings{cubuk2019randaugment,
+  title = {RandAugment: Practical automated data augmentation with a reduced search space},
+  author = {Ekin D. Cubuk and Barret Zoph and Jonathon Shlens and Quoc V. Le},
+  year = {2019},
+  booktitle = {2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW)},
+  doi = {10.1109/cvprw50498.2020.00359},
+  eprint = {1909.13719},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1909.13719v2},
+}
+
+======================================================================
+Reference: Semi-supervised sequence learning
+Authors  : Andrew M Dai, Quoc V Le
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1511.01432
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1511.01432v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/4aa9f5150b46320f534de4747a2dd0cd7f3fe292
+@article{dai2015semisupervised,
+  title = {Semi-supervised Sequence Learning},
+  author = {Andrew M. Dai and Quoc V. Le},
+  year = {2015},
+  journal = {Neural Information Processing Systems},
+  eprint = {1511.01432},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1511.01432v1},
+}
+
+======================================================================
+Reference: Good semi-supervised learning that requires a bad gan
+Authors  : Zihang Dai, Zhilin Yang, Fan Yang, William W Cohen, Ruslan R Salakhutdinov
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1705.09783
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/3c57a1aa483d8bffe1339914b80d2913f2dc8376
+@article{dai2017good,
+  title = {Good Semi-supervised Learning That Requires a Bad GAN},
+  author = {Zihang Dai and Zhilin Yang and Fan Yang and William W. Cohen and R. Salakhutdinov},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1705.09783},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/3c57a1aa483d8bffe1339914b80d2913f2dc8376},
+}
+
+======================================================================
+Reference: Imagenet: A large-scale hierarchical image database
+Authors  : Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, Li Fei-Fei
+Year     : 2009
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2009.5206848
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d2c733e34d48784a37d717fe43d9e93277a8c53e
+@inproceedings{deng2009imagenet,
+  title = {ImageNet: A large-scale hierarchical image database},
+  author = {Jia Deng and Wei Dong and R. Socher and Li-Jia Li and K. Li and Li Fei-Fei},
+  year = {2009},
+  booktitle = {2009 IEEE Conference on Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2009.5206848},
+  url = {https://www.semanticscholar.org/paper/d2c733e34d48784a37d717fe43d9e93277a8c53e},
+}
+
+======================================================================
+Reference: Bert: Pre-training of deep bidirectional transformers for language understanding
+Authors  : Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/n19-1423
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1810.04805v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/df2b0e26d0599ce3e70df8a9da02e51594e0e992
+@article{devlin2018bert,
+  title = {BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  author = {Jacob Devlin and Ming-Wei Chang and Kenton Lee and Kristina Toutanova},
+  year = {2018},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/n19-1423},
+  eprint = {1810.04805},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1810.04805v2},
+}
+
+======================================================================
+Reference: Deep residual learning for image recognition
+Authors  : Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2016.90
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1512.03385
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2c03df8b48bf3fa39054345bafabfeff15bfd11d
+@article{he2015deep,
+  title = {Deep Residual Learning for Image Recognition},
+  author = {Kaiming He and X. Zhang and Shaoqing Ren and Jian Sun},
+  year = {2015},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2016.90},
+  eprint = {1512.03385},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/2c03df8b48bf3fa39054345bafabfeff15bfd11d},
+}
+
+======================================================================
+Reference: Sequence to sequence mixture model for diverse machine translation
+Authors  : Xuanli He, Gholamreza Haffari, Mohammad Norouzi
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Computational Natural Language Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Computational Natural Language Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/k18-1056
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1810.07391v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/01ea10284faa0a173e553588a857a44e101d920b
+@inproceedings{he2018sequence,
+  title = {Sequence to Sequence Mixture Model for Diverse Machine Translation},
+  author = {Xuanli He and Gholamreza Haffari and Mohammad Norouzi},
+  year = {2018},
+  booktitle = {Conference on Computational Natural Language Learning},
+  doi = {10.18653/v1/k18-1056},
+  eprint = {1810.07391},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1810.07391v1},
+}
+
+======================================================================
+Reference: Data-efficient image recognition with contrastive predictive coding
+Authors  : Olivier J Hénaff, Ali Razavi, Carl Doersch, SM Eslami, Aaron van den Oord
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.09272v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/1cae417456711c4da184f5efcd1b7464a7a0661a
+@inproceedings{hénaff2019dataefficient,
+  title = {Data-Efficient Image Recognition with Contrastive Predictive Coding},
+  author = {Olivier J. Hénaff and Aravind Srinivas and Jeffrey De Fauw and Ali Razavi and Carl Doersch and S. M. Ali Eslami and Aaron van den Oord},
+  year = {2019},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1905.09272},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.09272v3},
+}
+
+======================================================================
+Reference: Universal language model fine-tuning for text classification
+Authors  : Jeremy Howard, Sebastian Ruder
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/p18-1031
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1801.06146
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1801.06146v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1e077413b25c4d34945cc2707e17e46ed4fe784a
+@inproceedings{howard2018universal,
+  title = {Universal Language Model Fine-tuning for Text Classification},
+  author = {Jeremy Howard and Sebastian Ruder},
+  year = {2018},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/p18-1031},
+  eprint = {1801.06146},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1801.06146v5},
+}
+
+======================================================================
+Reference: Learning discrete representations via information maximizing self-augmented training
+Authors  : Weihua Hu, Takeru Miyato, Seiya Tokui, Eiichi Matsumoto, Masashi Sugiyama
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1702.08720
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1702.08720v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/c2280e7b4391748ef6decdb16b07cfe68a68d685
+@inproceedings{hu2017learning,
+  title = {Learning Discrete Representations via Information Maximizing Self-Augmented Training},
+  author = {Weihua Hu and Takeru Miyato and Seiya Tokui and Eiichi Matsumoto and Masashi Sugiyama},
+  year = {2017},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1702.08720},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1702.08720v3},
+}
+
+======================================================================
+Reference: Deep pyramid convolutional neural networks for text categorization
+Authors  : Rie Johnson, Tong Zhang
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/p17-1052
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/718e1b453fe9dce79458e0db035091db603775fb
+@inproceedings{johnson2017deep,
+  title = {Deep Pyramid Convolutional Neural Networks for Text Categorization},
+  author = {Rie Johnson and Tong Zhang},
+  year = {2017},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/p17-1052},
+  url = {https://www.semanticscholar.org/paper/718e1b453fe9dce79458e0db035091db603775fb},
+}
+
+======================================================================
+Reference: Semi-supervised learning with deep generative models
+Authors  : Durk P Kingma, Shakir Mohamed, Danilo Jimenez Rezende, Max Welling
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1406.5298
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1406.5298v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/66ad2fbc8b73242a889699868611fcf239e3435d
+@article{kingma2014semisupervised,
+  title = {Semi-Supervised Learning with Deep Generative Models},
+  author = {Diederik P. Kingma and Danilo J. Rezende and Shakir Mohamed and Max Welling},
+  year = {2014},
+  journal = {Neural Information Processing Systems},
+  eprint = {1406.5298},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1406.5298v2},
+}
+
+======================================================================
+Reference: Semi-supervised classification with graph convolutional networks
+Authors  : Thomas N Kipf, Max Welling
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1609.02907v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/36eff562f65125511b5dfab68ce7f7a943c27478
+@inproceedings{kipf2016semisupervised,
+  title = {Semi-Supervised Classification with Graph Convolutional Networks},
+  author = {Thomas N. Kipf and Max Welling},
+  year = {2016},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1609.02907},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1609.02907v4},
+}
+
+======================================================================
+Reference: Stochastic beams and where to find them: The gumbel-top-k trick for sampling sequences without replacement
+Authors  : Wouter Kool, Herke van Hoof, Max Welling
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1903.06059v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/b462bd9e3c4c991722b77fe696fda0a0372bf6dd
+@inproceedings{kool2019stochastic,
+  title = {Stochastic Beams and Where to Find Them: The Gumbel-Top-k Trick for Sampling Sequences Without Replacement},
+  author = {Wouter Kool and Herke van Hoof and Max Welling},
+  year = {2019},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1903.06059},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1903.06059v2},
+}
+
+======================================================================
+Reference: Imagenet classification with deep convolutional neural networks
+Authors  : Alex Krizhevsky, Ilya Sutskever, Geoffrey E Hinton
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3065386
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/abd1c342495432171beb7ca8fd9551ef13cbd0ff
+@article{krizhevsky2012imagenet,
+  title = {ImageNet classification with deep convolutional neural networks},
+  author = {A. Krizhevsky and I. Sutskever and Geoffrey E. Hinton},
+  year = {2012},
+  journal = {Communications of the ACM},
+  doi = {10.1145/3065386},
+  url = {https://www.semanticscholar.org/paper/abd1c342495432171beb7ca8fd9551ef13cbd0ff},
+}
+
+======================================================================
+Reference: Temporal ensembling for semi-supervised learning
+Authors  : Samuli Laine, Timo Aila
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1610.02242v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/d2e4587744a89bad95fea69e08842cad6c8ff0dd
+@inproceedings{laine2016temporal,
+  title = {Temporal Ensembling for Semi-Supervised Learning},
+  author = {Samuli Laine and Timo Aila},
+  year = {2016},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1610.02242},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1610.02242v3},
+}
+
+======================================================================
+Reference: Learning noise-invariant representations for robust speech recognition
+Authors  : Davis Liang, Zhiheng Huang, Zachary C Lipton
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/slt.2018.8639575
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1807.06610
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1807.06610v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/dfd4beb1ecf70b07eb4a52e6ae58f3357e66f478
+@inproceedings{liang2018learning,
+  title = {Learning Noise-Invariant Representations for Robust Speech Recognition},
+  author = {Davis Liang and Zhiheng Huang and Zachary C. Lipton},
+  year = {2018},
+  booktitle = {Spoken Language Technology Workshop},
+  doi = {10.1109/slt.2018.8639575},
+  eprint = {1807.06610},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1807.06610v1},
+}
+
+======================================================================
+Reference: Smooth neighbors on teacher graphs for semi-supervised learning
+Authors  : Yucen Luo, Jun Zhu, Mengxi Li, Yong Ren, Bo Zhang
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2018.00927
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1711.00258
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/90bdcd465ea88f6fe19039f142871cc9a3500c99
+@inproceedings{luo2017smooth,
+  title = {Smooth Neighbors on Teacher Graphs for Semi-Supervised Learning},
+  author = {Yucen Luo and Jun Zhu and Mengxi Li and Yong Ren and Bo Zhang},
+  year = {2017},
+  booktitle = {2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2018.00927},
+  eprint = {1711.00258},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/90bdcd465ea88f6fe19039f142871cc9a3500c99},
+}
+
+======================================================================
+Reference: Auxiliary deep generative models
+Authors  : Lars Maaløe, Casper Kaae Sønderby, Søren Kaae Sønderby, Ole Winther
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1602.05473v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/729b18d8d91035f4bb84bf2e61b0517824e5d31b
+@inproceedings{maaløe2016auxiliary,
+  title = {Auxiliary Deep Generative Models},
+  author = {Lars Maaløe and Casper Kaae Sønderby and Søren Kaae Sønderby and Ole Winther},
+  year = {2016},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1602.05473},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1602.05473v4},
+}
+
+======================================================================
+Reference: Image-based recommendations on styles and substitutes
+Authors  : Julian McAuley, Christopher Targett, Qinfeng Shi, Anton Van Den Hengel
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/2766462.2767755
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1506.04757
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1506.04757v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/fab4d19ed77dad7c437d885eceb8aa65fae5a783
+@inproceedings{mcauley2015imagebased,
+  title = {Image-based Recommendations on Styles and Substitutes},
+  author = {Julian McAuley and Christopher Targett and Qinfeng Shi and Anton van den Hengel},
+  year = {2015},
+  booktitle = {Annual International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  doi = {10.1145/2766462.2767755},
+  eprint = {1506.04757},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1506.04757v1},
+}
+
+======================================================================
+Reference: Distributed representations of words and phrases and their compositionality
+Authors  : Tomas Mikolov, Ilya Sutskever, Kai Chen, Greg S Corrado, Jeff Dean
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1310.4546
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/87f40e6f3022adbc1f1905e3e506abad05a9964f
+@article{mikolov2013distributed,
+  title = {Distributed Representations of Words and Phrases and their Compositionality},
+  author = {Tomas Mikolov and I. Sutskever and Kai Chen and G. Corrado and J. Dean},
+  year = {2013},
+  journal = {Neural Information Processing Systems},
+  eprint = {1310.4546},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/87f40e6f3022adbc1f1905e3e506abad05a9964f},
+}
+
+======================================================================
+Reference: Adversarial training methods for semi-supervised text classification
+Authors  : Takeru Miyato, Andrew M Dai, Ian Goodfellow
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1605.07725v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/2cd55ded95d5d13430edfa223ba591b514ebe8a5
+@inproceedings{miyato2016adversarial,
+  title = {Adversarial Training Methods for Semi-Supervised Text Classification},
+  author = {Takeru Miyato and Andrew M. Dai and Ian Goodfellow},
+  year = {2016},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1605.07725},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1605.07725v4},
+}
+
+======================================================================
+Reference: Virtual adversarial training: a regularization method for supervised and semi-supervised learning
+Authors  : Takeru Miyato, Shin-ichi Maeda, Shin Ishii, Masanori Koyama
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tpami.2018.2858821
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1704.03976
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4b1c6f6521da545892f3f5dc39461584d4a27ec0
+@article{miyato2017virtual,
+  title = {Virtual Adversarial Training: A Regularization Method for Supervised and Semi-Supervised Learning},
+  author = {Takeru Miyato and S. Maeda and Masanori Koyama and S. Ishii},
+  year = {2017},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  doi = {10.1109/tpami.2018.2858821},
+  eprint = {1704.03976},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/4b1c6f6521da545892f3f5dc39461584d4a27ec0},
+}
+
+======================================================================
+Reference: Robustness to adversarial perturbations in learning from incomplete data
+Authors  : Amir Najafi, Shin-ichi Maeda, Masanori Koyama, Takeru Miyato
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.13021v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/3f7bc67330b3eff749459568e7995f0017dfe645
+@article{najafi2019robustness,
+  title = {Robustness to Adversarial Perturbations in Learning from Incomplete Data},
+  author = {Amir Najafi and Shin-ichi Maeda and Masanori Koyama and Takeru Miyato},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1905.13021},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.13021v1},
+}
+
+======================================================================
+Reference: Realistic evaluation of deep semi-supervised learning algorithms
+Authors  : Avital Oliver, Augustus Odena, Colin A Raffel, Ekin Dogus Cubuk, Ian Goodfellow
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1804.09170
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1804.09170v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/99039a54fa3ee3aed9bb3781621068680be5cc3d
+@inproceedings{oliver2018realistic,
+  title = {Realistic Evaluation of Deep Semi-Supervised Learning Algorithms},
+  author = {Avital Oliver and Augustus Odena and Colin Raffel and Ekin D. Cubuk and Ian J. Goodfellow},
+  year = {2018},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1804.09170},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1804.09170v4},
+}
+
+======================================================================
+Reference: Specaugment: A simple data augmentation method for automatic speech recognition
+Authors  : Daniel S Park, William Chan, Yu Zhang, Chung-Cheng Chiu, Barret Zoph, Ekin D Cubuk, Quoc V Le
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Interspeech' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Interspeech.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.21437/interspeech.2019-2680
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1904.08779v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b0fae9fbb4e580d92395eabafe73e317ae6510e3
+@article{park2019specaugment,
+  title = {SpecAugment: A Simple Data Augmentation Method for Automatic Speech Recognition},
+  author = {Daniel S. Park and William Chan and Yu Zhang and Chung-Cheng Chiu and Barret Zoph and Ekin D. Cubuk and Quoc V. Le},
+  year = {2019},
+  journal = {Interspeech},
+  doi = {10.21437/interspeech.2019-2680},
+  eprint = {1904.08779},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1904.08779v3},
+}
+
+======================================================================
+Reference: Glove: Global vectors for word representation
+Authors  : Jeffrey Pennington, Richard Socher, Christopher Manning
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/v1/d14-1162
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f37e1b62a767a307c046404ca96bc140b3e68cb5
+@inproceedings{pennington2014glove,
+  title = {GloVe: Global Vectors for Word Representation},
+  author = {Jeffrey Pennington and R. Socher and Christopher D. Manning},
+  year = {2014},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.3115/v1/d14-1162},
+  url = {https://www.semanticscholar.org/paper/f37e1b62a767a307c046404ca96bc140b3e68cb5},
+}
+
+======================================================================
+Reference: Deep contextualized word representations
+Authors  : Matthew E Peters, Mark Neumann, Mohit Iyyer, Matt Gardner, Christopher Clark, Kenton Lee, Luke Zettlemoyer
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/n18-1202
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1802.05365v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/3febb2bed8865945e7fddc99efd791887bb7e14f
+@article{peters2018deep,
+  title = {Deep contextualized word representations},
+  author = {Matthew E. Peters and Mark Neumann and Mohit Iyyer and Matt Gardner and Christopher Clark and Kenton Lee and Luke Zettlemoyer},
+  year = {2018},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/n18-1202},
+  eprint = {1802.05365},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1802.05365v2},
+}
+
+======================================================================
+Reference: Semi-supervised learning with ladder networks
+Authors  : Antti Rasmus, Mathias Berglund, Mikko Honkala, Harri Valpola, Tapani Raiko
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1507.02672
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1507.02672v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/cddf8a10c7f48df67a797808a615be0d4acf9a8e
+@article{rasmus2015semisupervised,
+  title = {Semi-Supervised Learning with Ladder Networks},
+  author = {Antti Rasmus and Harri Valpola and Mikko Honkala and Mathias Berglund and Tapani Raiko},
+  year = {2015},
+  journal = {Neural Information Processing Systems},
+  eprint = {1507.02672},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1507.02672v2},
+}
+
+======================================================================
+Reference: Revisiting lstm networks for semi-supervised text classification via mixed objective function
+Authors  : Devendra Singh Sachan, Manzil Zaheer, Ruslan Salakhutdinov
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v33i01.33016940
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2009.04007
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: AAAI Conference on Artificial Intelligence
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/c3f89364aecd661eb032840d2fe3efd0f6d1698c
+@inproceedings{sachan2019revisiting,
+  title = {Revisiting LSTM Networks for Semi-Supervised Text Classification via Mixed Objective Function},
+  author = {Devendra Singh Sachan and M. Zaheer and R. Salakhutdinov},
+  year = {2019},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v33i01.33016940},
+  eprint = {2009.04007},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/c3f89364aecd661eb032840d2fe3efd0f6d1698c},
+}
+
+======================================================================
+Reference: Regularization with stochastic transformations and perturbations for deep semi-supervised learning
+Authors  : Mehdi Sajjadi, Mehran Javanmardi, Tolga Tasdizen
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1606.04586
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1606.04586v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/4c20e7f95448ca3c1042a6d7fa5fa15ec27e9aeb
+@article{sajjadi2016regularization,
+  title = {Regularization With Stochastic Transformations and Perturbations for Deep Semi-Supervised Learning},
+  author = {Mehdi Sajjadi and Mehran Javanmardi and Tolga Tasdizen},
+  year = {2016},
+  journal = {Neural Information Processing Systems},
+  eprint = {1606.04586},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1606.04586v1},
+}
+
+======================================================================
+Reference: Invariant representation learning for robust deep networks
+Authors  : Julian Salazar, Davis Liang, Zhiheng Huang, Zachary C Lipton
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Workshop on Integration of Deep Learning Theories, NeurIPS', but a full version appears at 'Handbook of Deep Learning Applications 2019'.
+      Suggestion: Cite the full version at Handbook of Deep Learning Applications 2019.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   openreview: venue — https://openreview.net/forum?id=4wTy4tNSF8
+%   semantic_scholar: authors, title, year — https://www.semanticscholar.org/paper/05f4c2371fda536630ea55073f19aa13f9625fc6
+@article{salazar2018invariant,
+  title = {Invariant representation learning for robust deep networks},
+  author = {Julian Salazar},
+  year = {2018},
+  journal = {Handbook of Deep Learning Applications 2019},
+  url = {https://www.semanticscholar.org/paper/05f4c2371fda536630ea55073f19aa13f9625fc6},
+}
+
+======================================================================
+Reference: Improved techniques for training gans
+Authors  : Tim Salimans, Ian Goodfellow, Wojciech Zaremba, Vicki Cheung, Alec Radford, Xi Chen
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1606.03498
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1606.03498v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/571b0750085ae3d939525e62af510ee2cee9d5ea
+@article{salimans2016improved,
+  title = {Improved Techniques for Training GANs},
+  author = {Tim Salimans and Ian Goodfellow and Wojciech Zaremba and Vicki Cheung and Alec Radford and Xi Chen},
+  year = {2016},
+  journal = {Neural Information Processing Systems},
+  eprint = {1606.03498},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1606.03498v1},
+}
+
+======================================================================
+Reference: Improving neural machine translation models with monolingual data
+Authors  : Rico Sennrich, Barry Haddow, Alexandra Birch
+Year     : 2015
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/p16-1009
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1511.06709v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f3b96ef2dc1fc5e14982f1b963db8db6a54183bb
+@inproceedings{sennrich2015improving,
+  title = {Improving Neural Machine Translation Models with Monolingual Data},
+  author = {Rico Sennrich and Barry Haddow and Alexandra Birch},
+  year = {2015},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/p16-1009},
+  eprint = {1511.06709},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1511.06709v4},
+}
+
+======================================================================
+Reference: Mixture models for diverse machine translation: Tricks of the trade
+Authors  : Tianxiao Shen, Myle Ott, Michael Auli, Marc’Aurelio Ranzato
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1902.07816v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/3360768fcb265a8b7c1ee5ba7cfe03de0e2fad62
+@inproceedings{shen2019mixture,
+  title = {Mixture Models for Diverse Machine Translation: Tricks of the Trade},
+  author = {Tianxiao Shen and Myle Ott and Michael Auli and Marc'Aurelio Ranzato},
+  year = {2019},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1902.07816},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1902.07816v2},
+}
+
+======================================================================
+Reference: Transformation invariance in pattern recognition—tangent distance and tangent propagation
+Authors  : Patrice Y Simard, Yann A LeCun, John S Denker, Bernard Victorri
+Year     : 1998
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/3-540-49430-8_13
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/153f64ab7c1c24b1b136d8da2f36c6333b8dbfdd
+@article{simard1996transformation,
+  title = {Transformation Invariance in Pattern Recognition-Tangent Distance and Tangent Propagation},
+  author = {P. Simard and Yann LeCun and J. Denker and B. Victorri},
+  year = {1996},
+  journal = {Neural Networks},
+  doi = {10.1007/3-540-49430-8_13},
+  url = {https://www.semanticscholar.org/paper/153f64ab7c1c24b1b136d8da2f36c6333b8dbfdd},
+}
+
+======================================================================
+Reference: Are labels required for improving adversarial robustness?
+Authors  : Robert Stanforth, Alhussein Fawzi, Pushmeet Kohli, et al.
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+  - [warning/incomplete/truncated_authors] Citation lists 3 authors with et al.; the published record has 6.
+      Suggestion: List all 6 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.13725v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/6d12401822a24b2ff5542a7fa72158d891960c62
+@article{uesato2019labels,
+  title = {Are Labels Required for Improving Adversarial Robustness?},
+  author = {Jonathan Uesato and Jean-Baptiste Alayrac and Po-Sen Huang and Robert Stanforth and Alhussein Fawzi and Pushmeet Kohli},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1905.13725},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.13725v4},
+}
+
+======================================================================
+Reference: Mean teachers are better role models: Weight-averaged consistency targets improve semi-supervised deep learning results
+Authors  : Antti Tarvainen, Harri Valpola
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1703.01780
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1703.01780v6
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/7493389667058116dbc7e808987f129325ee60d7
+@article{tarvainen2017mean,
+  title = {Mean teachers are better role models: Weight-averaged consistency targets improve semi-supervised deep learning results},
+  author = {Antti Tarvainen and Harri Valpola},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1703.01780},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1703.01780v6},
+}
+
+======================================================================
+Reference: Interpolation consistency training for semi-supervised learning
+Authors  : Vikas Verma, Alex Lamb, Juho Kannala, Yoshua Bengio, David Lopez-Paz
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Joint Conference on Artificial Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Joint Conference on Artificial Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.neunet.2021.10.008
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1903.03825v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/743ce0d2c9d86caa5a570fec36e8d2378d031b3f
+@inproceedings{verma2019interpolation,
+  title = {Interpolation Consistency Training for Semi-Supervised Learning},
+  author = {Vikas Verma and Kenji Kawaguchi and Alex Lamb and Juho Kannala and Arno Solin and Yoshua Bengio and David Lopez-Paz},
+  year = {2019},
+  booktitle = {International Joint Conference on Artificial Intelligence},
+  doi = {10.1016/j.neunet.2021.10.008},
+  eprint = {1903.03825},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1903.03825v5},
+}
+
+======================================================================
+Reference: Switchout: an efficient data augmentation algorithm for neural machine translation
+Authors  : Xinyi Wang, Hieu Pham, Zihang Dai, Graham Neubig
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d18-1100
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1808.07512v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0ee468b9b709a2610c4b574d67218e7960350224
+@inproceedings{wang2018switchout,
+  title = {SwitchOut: an Efficient Data Augmentation Algorithm for Neural Machine Translation},
+  author = {Xinyi Wang and Hieu Pham and Zihang Dai and Graham Neubig},
+  year = {2018},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d18-1100},
+  eprint = {1808.07512},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1808.07512v2},
+}
+
+======================================================================
+Reference: Deep learning via semi-supervised embedding
+Authors  : Jason Weston, Frédéric Ratle, Hossein Mobahi, Ronan Collobert
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/1390156.1390303
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/7ee368e60d0b826e78f965aad8d6c7d406127104
+@inproceedings{weston2008deep,
+  title = {Deep learning via semi-supervised embedding},
+  author = {J. Weston and F. Ratle and H. Mobahi and R. Collobert},
+  year = {2008},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.1145/1390156.1390303},
+  url = {https://www.semanticscholar.org/paper/7ee368e60d0b826e78f965aad8d6c7d406127104},
+}
+
+======================================================================
+Reference: Revisiting semi-supervised learning with graph embeddings
+Authors  : Zhilin Yang, William W Cohen, Ruslan Salakhutdinov
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1603.08861v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/3d846cb01f6a975554035d2210b578ca61344b22
+@inproceedings{yang2016revisiting,
+  title = {Revisiting Semi-Supervised Learning with Graph Embeddings},
+  author = {Zhilin Yang and William W. Cohen and Ruslan Salakhutdinov},
+  year = {2016},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1603.08861},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1603.08861v2},
+}
+
+======================================================================
+Reference: Semi-supervised qa with generative domain-adaptive nets
+Authors  : Zhilin Yang, Junjie Hu, Ruslan Salakhutdinov, William W Cohen
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/p17-1096
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1702.02206v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/807e421679d4a9d629d2fad1f60f28787dca60e7
+@inproceedings{yang2017semisupervised,
+  title = {Semi-Supervised QA with Generative Domain-Adaptive Nets},
+  author = {Zhilin Yang and Junjie Hu and Ruslan Salakhutdinov and William W. Cohen},
+  year = {2017},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/p17-1096},
+  eprint = {1702.02206},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1702.02206v2},
+}
+
+======================================================================
+Reference: Unsupervised embedding learning via invariant and spreading instance feature
+Authors  : Mang Ye, Xu Zhang, Pong C Yuen, Shih-Fu Chang
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2019.00637
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1904.03436
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1904.03436v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e4bde6fe33b6c2cf9d1647ac0b041f7d1ba29c5b
+@article{ye2019unsupervised,
+  title = {Unsupervised Embedding Learning via Invariant and Spreading Instance Feature},
+  author = {Mang Ye and Xu Zhang and Pong C. Yuen and Shih-Fu Chang},
+  year = {2019},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2019.00637},
+  eprint = {1904.03436},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1904.03436v1},
+}
+
+======================================================================
+Reference: Qanet: Combining local convolution with global self-attention for reading comprehension
+Authors  : Adams Wei Yu, David Dohan, Minh-Thang Luong, Rui Zhao, Kai Chen, Mohammad Norouzi, Quoc V Le
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1804.09541v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/8c1b00128e74f1cd92aede3959690615695d5101
+@inproceedings{yu2018qanet,
+  title = {QANet: Combining Local Convolution with Global Self-Attention for Reading Comprehension},
+  author = {Adams Wei Yu and David Dohan and Minh-Thang Luong and Rui Zhao and Kai Chen and Mohammad Norouzi and Quoc V. Le},
+  year = {2018},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1804.09541},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1804.09541v1},
+}
+
+======================================================================
+Reference: Wide residual networks
+Authors  : Sergey Zagoruyko, Nikos Komodakis
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.5244/c.30.87
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1605.07146
+  - [warning/incomplete/abbreviated_venue] Cited venue 'BMVC' may be an abbreviation of 'British Machine Vision Conference'.
+      Suggestion: Use the full venue name: British Machine Vision Conference.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1605.07146v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1c4e9156ca07705531e45960b7a919dc473abb51
+@inproceedings{zagoruyko2016wide,
+  title = {Wide Residual Networks},
+  author = {Sergey Zagoruyko and Nikos Komodakis},
+  year = {2016},
+  booktitle = {British Machine Vision Conference},
+  doi = {10.5244/c.30.87},
+  eprint = {1605.07146},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1605.07146v4},
+}
+
+======================================================================
+Reference: S 4l: Self-supervised semi-supervised learning
+Authors  : Xiaohua Zhai, Avital Oliver, Alexander Kolesnikov, Lucas Beyer
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.74).
+      Suggestion: Use canonical title: S$^\mathbf{4}$L: Self-Supervised Semi-Supervised Learning
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, year — https://www.semanticscholar.org/paper/849a54bbc3a3edbdc192ff7fa60babba1bdb4be0
+@article{zhai2019smathbfl,
+  title = {S$^\mathbf{4}$L: Self-Supervised Semi-Supervised Learning},
+  author = {Xiaohua Zhai and Avital Oliver and Alexander Kolesnikov and Lucas Beyer},
+  year = {2019},
+  url = {https://www.semanticscholar.org/paper/849a54bbc3a3edbdc192ff7fa60babba1bdb4be0},
+}
+
+======================================================================
+Reference: mixup: Beyond empirical risk minimization
+Authors  : Hongyi Zhang, Moustapha Cisse, Yann N Dauphin, David Lopez-Paz
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1710.09412v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/4feef0fd284feb1233399b400eb897f59ec92755
+@inproceedings{zhang2017mixup,
+  title = {mixup: Beyond Empirical Risk Minimization},
+  author = {Hongyi Zhang and Moustapha Cisse and Yann N. Dauphin and David Lopez-Paz},
+  year = {2017},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1710.09412},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1710.09412v2},
+}
+
+======================================================================
+Reference: Character-level convolutional networks for text classification
+Authors  : Xiang Zhang, Junbo Zhao, Yann LeCun
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1509.01626
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1509.01626v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/51a55df1f023571a7e07e338ee45a3e3d66ef73e
+@article{zhang2015characterlevel,
+  title = {Character-level Convolutional Networks for Text Classification},
+  author = {Xiang Zhang and Junbo Zhao and Yann LeCun},
+  year = {2015},
+  journal = {Neural Information Processing Systems},
+  eprint = {1509.01626},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1509.01626v3},
+}
+
+======================================================================
+Reference: Semi-supervised learning using gaussian fields and harmonic functions
+Authors  : Xiaojin Zhu, Zoubin Ghahramani, John D Lafferty
+Year     : 2003
+Verdict  : warning
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.85).
+      Suggestion: Use canonical title: Combining active learning and semi-supervised learning using Gaussian fields and harmonic functions
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/125842668eab7decac136db8a59d392dc5e4e395
+@inproceedings{zhu2003combining,
+  title = {Combining active learning and semi-supervised learning using Gaussian fields and harmonic functions},
+  author = {Xiaojin Zhu and Zoubin Ghahramani and J. Lafferty},
+  year = {2003},
+  booktitle = {International Conference on Machine Learning},
+  url = {https://www.semanticscholar.org/paper/125842668eab7decac136db8a59d392dc5e4e395},
+}

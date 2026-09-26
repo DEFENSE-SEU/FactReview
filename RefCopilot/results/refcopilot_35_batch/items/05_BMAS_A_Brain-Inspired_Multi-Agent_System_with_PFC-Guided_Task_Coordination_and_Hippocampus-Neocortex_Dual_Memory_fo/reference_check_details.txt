@@ -1,0 +1,1039 @@
+======================================================================
+Reference: Knowledge graphs as context sources for llm-based explanations of learning recommendations
+Authors  : Hasan Abu-Rasheed, Christian Weber, Madjid Fathi
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/educon60312.2024.10578654
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2403.03008
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2403.03008v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/182921694e351be521fa895e6741287a1a1cbc78
+@inproceedings{aburasheed2024knowledge,
+  title = {Knowledge Graphs as Context Sources for LLM-Based Explanations of Learning Recommendations},
+  author = {Hasan Abu-Rasheed and Christian Weber and Madjid Fathi},
+  year = {2024},
+  booktitle = {IEEE Global Engineering Education Conference},
+  doi = {10.1109/educon60312.2024.10578654},
+  eprint = {2403.03008},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2403.03008v1},
+}
+
+======================================================================
+Reference: Prefrontal cortex and decision making in a mixed-strategy game
+Authors  : Dominic J Barraclough, Michelle L Conroy, Daeyeol Lee
+Year     : 2004
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/nn1209
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/9b8d5df729aad2e9fb9bcfaf931622afa4daa247
+@article{barraclough2004prefrontal,
+  title = {Prefrontal cortex and decision making in a mixed-strategy game},
+  author = {D. J. Barraclough and M. L. Conroy and Daeyeol Lee},
+  year = {2004},
+  journal = {Nature Neuroscience},
+  doi = {10.1038/nn1209},
+  url = {https://www.semanticscholar.org/paper/9b8d5df729aad2e9fb9bcfaf931622afa4daa247},
+}
+
+======================================================================
+Reference: System consolidation of memory during sleep
+Authors  : Jan Born, Ines Wilhelm
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s00426-011-0335-6
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/103e118bf922851be1bc2b3182875b0e414510b7
+@article{born2011system,
+  title = {System consolidation of memory during sleep},
+  author = {J. Born and Ines Wilhelm},
+  year = {2011},
+  journal = {Psychological Research},
+  doi = {10.1007/s00426-011-0335-6},
+  url = {https://www.semanticscholar.org/paper/103e118bf922851be1bc2b3182875b0e414510b7},
+}
+
+======================================================================
+Reference: Computational architecture of the parieto-frontal network underlying cognitive-motor control in monkeys
+Authors  : Roberto Caminiti, Elena Borra, Federica Visco-Comandini, Alexandra Battaglia-Mayer, Bruno B Averbeck, Giuseppe Luppino
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1523/eneuro.0306-16.2017
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f2cae54f97d22bbb63cae161f10a822910fc6449
+@article{caminiti2017computational,
+  title = {Computational Architecture of the Parieto-Frontal Network Underlying Cognitive-Motor Control in Monkeys},
+  author = {R. Caminiti and Elena Borra and Federica Visco-Comandini and A. Battaglia-Mayer and B. Averbeck and G. Luppino},
+  year = {2017},
+  journal = {eNeuro},
+  doi = {10.1523/eneuro.0306-16.2017},
+  url = {https://www.semanticscholar.org/paper/f2cae54f97d22bbb63cae161f10a822910fc6449},
+}
+
+======================================================================
+Reference: Why do multi-agent llm systems fail?
+Authors  : Mert Cemri, Melissa Z Pan, Shuyi Yang, Lakshya A Agrawal, Bhavya Chopra, Rishabh Tiwari, Kurt Keutzer, Aditya Parameswaran, Dan Klein, Kannan Ramchandran, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2503.13657
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 13.
+      Suggestion: List all 13 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2503.13657v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c83b6a023a5c5ec71b44920a41b41fc007266c44
+@misc{cemri2025multiagent,
+  title = {Why Do Multi-Agent LLM Systems Fail?},
+  author = {Mert Cemri and Melissa Z. Pan and Shuyi Yang and Lakshya A. Agrawal and Bhavya Chopra and Rishabh Tiwari and Kurt Keutzer and Aditya Parameswaran and Dan Klein and Kannan Ramchandran and Matei Zaharia and Joseph E. Gonzalez and Ion Stoica},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2503.13657},
+  eprint = {2503.13657},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2503.13657v3},
+}
+
+======================================================================
+Reference: Evaluating large language models trained on code
+Authors  : Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde De Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, et al.
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 58.
+      Suggestion: List all 58 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2107.03374v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/acbdbf49f9bc3f151b93d9ca9a06009f4f6eb269
+@misc{chen2021evaluating,
+  title = {Evaluating Large Language Models Trained on Code},
+  author = {Mark Chen and Jerry Tworek and Heewoo Jun and Qiming Yuan and Henrique Ponde de Oliveira Pinto and Jared Kaplan and Harri Edwards and Yuri Burda and Nicholas Joseph and Greg Brockman and Alex Ray and Raul Puri and Gretchen Krueger and Michael Petrov and Heidy Khlaaf and Girish Sastry and Pamela Mishkin and Brooke Chan and Scott Gray and Nick Ryder and Mikhail Pavlov and Alethea Power and Lukasz Kaiser and Mohammad Bavarian and Clemens Winter and Philippe Tillet and Felipe Petroski Such and Dave Cummings and Matthias Plappert and Fotios Chantzis and Elizabeth Barnes and Ariel Herbert-Voss and William Hebgen Guss and Alex Nichol and Alex Paino and Nikolas Tezak and Jie Tang and Igor Babuschkin and Suchir Balaji and Shantanu Jain and William Saunders and Christopher Hesse and Andrew N. Carr and Jan Leike and Josh Achiam and Vedant Misra and Evan Morikawa and Alec Radford and Matthew Knight and Miles Brundage and Mira Murati and Katie Mayer and Peter Welinder and Bob McGrew and Dario Amodei and Sam McCandlish and Ilya Sutskever and Wojciech Zaremba},
+  year = {2021},
+  journal = {arXiv.org},
+  eprint = {2107.03374},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2107.03374v2},
+}
+
+======================================================================
+Reference: Agentverse: Facilitating multi-agent collaboration and exploring emergent behaviors in agents
+Authors  : Weize Chen, Yusheng Su, Jingwei Zuo, Cheng Yang, Chenfei Yuan, Chen Qian, Chi-Min Chan, Yujia Qin, Yaxi Lu, Ruobing Xie, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2308.10848
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 16.
+      Suggestion: List all 16 authors.
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.89).
+      Suggestion: Use canonical title: AgentVerse: Facilitating Multi-Agent Collaboration and Exploring Emergent Behaviors
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2308.10848v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/ad97671a924a9b3a060fee857e561f140ec79dd7
+@inproceedings{chen2023agentverse,
+  title = {AgentVerse: Facilitating Multi-Agent Collaboration and Exploring Emergent Behaviors},
+  author = {Weize Chen and Yusheng Su and Jingwei Zuo and Cheng Yang and Chenfei Yuan and Chi-Min Chan and Heyang Yu and Yaxi Lu and Yi-Hsin Hung and Chen Qian and Yujia Qin and Xin Cong and Ruobing Xie and Zhiyuan Liu and Maosong Sun and Jie Zhou},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2308.10848},
+  eprint = {2308.10848},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2308.10848v3},
+}
+
+======================================================================
+Reference: Long-term working memory
+Authors  : K Anders Ericsson, Walter Kintsch
+Year     : 1995
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1037/0033-295x.102.2.211
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/9bb1d22898302da0bbd3eb90bd7e2db106460198
+@article{ericsson1995longterm,
+  title = {Long-term working memory.},
+  author = {K. Ericsson and W. Kintsch},
+  year = {1995},
+  journal = {Psychology Review},
+  doi = {10.1037/0033-295x.102.2.211},
+  url = {https://www.semanticscholar.org/paper/9bb1d22898302da0bbd3eb90bd7e2db106460198},
+}
+
+======================================================================
+Reference: Learning complex teamwork tasks using a given sub-task decomposition
+Authors  : Elliot Fosong, Arrasy Rahman, Ignacio Carlucho, Stefano V Albrecht
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Adaptive Agents and Multi-Agent Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Adaptive Agents and Multi-Agent Systems.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.5555/3635637.3662911
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2302.04944v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/01663392aed888bc09bff91b3aeb031254c86801
+@article{fosong2023learning,
+  title = {Learning Complex Teamwork Tasks Using a Given Sub-task Decomposition},
+  author = {Elliot Fosong and Arrasy Rahman and Ignacio Carlucho and Stefano V. Albrecht},
+  year = {2023},
+  journal = {Adaptive Agents and Multi-Agent Systems},
+  doi = {10.5555/3635637.3662911},
+  eprint = {2302.04944},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2302.04944v2},
+}
+
+======================================================================
+Reference: Prefrontal cortex and working memory processes
+Authors  : Shintaro Funahashi
+Year     : 2006
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.neuroscience.2005.07.003
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/bd48f405458bdc21c92c630f725dfe4e9b1c7c05
+@article{funahashi2006prefrontal,
+  title = {Prefrontal cortex and working memory processes.},
+  author = {S. Funahashi},
+  year = {2006},
+  journal = {Neuroscience},
+  doi = {10.1016/j.neuroscience.2005.07.003},
+  url = {https://www.semanticscholar.org/paper/bd48f405458bdc21c92c630f725dfe4e9b1c7c05},
+}
+
+======================================================================
+Reference: Prefrontal cortex and neural mechanisms of executive function
+Authors  : Shintaro Funahashi, Jorge Mario Andreau
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.jphysparis.2013.05.001
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0857194e958e8d1d7296b7ce6b4a5b4bfddc94e5
+@article{funahashi2013prefrontal,
+  title = {Prefrontal cortex and neural mechanisms of executive function.},
+  author = {S. Funahashi and J. M. Andreau},
+  year = {2013},
+  journal = {Journal of Physiology - Paris},
+  doi = {10.1016/j.jphysparis.2013.05.001},
+  url = {https://www.semanticscholar.org/paper/0857194e958e8d1d7296b7ce6b4a5b4bfddc94e5},
+}
+
+======================================================================
+Reference: In-context autoencoder for context compression in a large language model
+Authors  : Tao Ge, Jing Hu, Lei Wang, Xun Wang, Si-Qing Chen, Furu Wei
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2307.06945
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2307.06945v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/60b0476a97c00e355df28ba35422764a7fbe88e8
+@inproceedings{ge2023incontext,
+  title = {In-context Autoencoder for Context Compression in a Large Language Model},
+  author = {Tao Ge and Jing Hu and Lei Wang and Xun Wang and Si-Qing Chen and Furu Wei},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2307.06945},
+  eprint = {2307.06945},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2307.06945v4},
+}
+
+======================================================================
+Reference: Are the frontal lobes implicated in “planning” functions? interpreting data from the tower of hanoi
+Authors  : Vinod Goel, Jordan Grafman
+Year     : 1995
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/0028-3932(95)90866-p
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8636ef272e4f35b2b39452db2518198a01864e18
+@article{goel1995frontal,
+  title = {Are the frontal lobes implicated in "planning" functions? Interpreting data from the Tower of Hanoi.},
+  author = {V. Goel and J. Grafman},
+  year = {1995},
+  journal = {Neuropsychologia},
+  doi = {10.1016/0028-3932(95)90866-p},
+  url = {https://www.semanticscholar.org/paper/8636ef272e4f35b2b39452db2518198a01864e18},
+}
+
+======================================================================
+Reference: Uncertainty and anticipation in anxiety: an integrated neurobiological and psychological perspective
+Authors  : Dan W Grupe, Jack B Nitschke
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/nrn3524
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.85).
+      Suggestion: Use canonical title: Uncertainty and Anticipation in Anxiety
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/76c65983fa7dc2ad5afb5128da8f60ef082964b2
+@article{grupe2013uncertainty,
+  title = {Uncertainty and Anticipation in Anxiety},
+  author = {D. Grupe and J. Nitschke},
+  year = {2013},
+  journal = {Nature Reviews Neuroscience},
+  doi = {10.1038/nrn3524},
+  url = {https://www.semanticscholar.org/paper/76c65983fa7dc2ad5afb5128da8f60ef082964b2},
+}
+
+======================================================================
+Reference: Hmt: Hierarchical memory transformer for long context language processing
+Authors  : Zifan He, Zongyue Qin, Neha Prakriya, Yizhou Sun, Jason Cong
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2025.naacl-long.410
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2405.06067
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.89).
+      Suggestion: Use canonical title: HMT: Hierarchical Memory Transformer for Efficient Long Context Language Processing
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.06067v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d382fd06e12efe289869ea45d81c60b7a93a35aa
+@article{he2024hierarchical,
+  title = {HMT: Hierarchical Memory Transformer for Efficient Long Context Language Processing},
+  author = {Zifan He and Yingqi Cao and Zongyue Qin and Neha Prakriya and Yizhou Sun and Jason Cong},
+  year = {2024},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2025.naacl-long.410},
+  eprint = {2405.06067},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.06067v3},
+}
+
+======================================================================
+Reference: Measuring mathematical problem solving with the math dataset
+Authors  : Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, Jacob Steinhardt
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'NeurIPS Datasets and Benchmarks' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: NeurIPS Datasets and Benchmarks.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2103.03874v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/57d1e7ac339e783898f2c3b1af55737cbeee9fc5
+@article{hendrycks2021measuring,
+  title = {Measuring Mathematical Problem Solving With the MATH Dataset},
+  author = {Dan Hendrycks and Collin Burns and Saurav Kadavath and Akul Arora and Steven Basart and Eric Tang and Dawn Song and Jacob Steinhardt},
+  year = {2021},
+  journal = {NeurIPS Datasets and Benchmarks},
+  eprint = {2103.03874},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2103.03874v2},
+}
+
+======================================================================
+Reference: Metagpt: Meta programming for multi-agent collaborative framework
+Authors  : Sirui Hong, Xiawu Zheng, Jonathan Chen, Yuheng Cheng, Jinlin Wang, Ceyao Zhang, Zili Wang, Steven Ka Shing Yau, Zijuan Lin, Liyang Zhou, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2308.00352
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 15.
+      Suggestion: List all 15 authors.
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 1.00).
+      Suggestion: Use canonical title: MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2308.00352v7
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/703035b483c181953de1b55b5fd59cd4cd4cf211
+@misc{hong2023metagpt,
+  title = {MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework},
+  author = {Sirui Hong and Mingchen Zhuge and Jiaqi Chen and Xiawu Zheng and Yuheng Cheng and Ceyao Zhang and Jinlin Wang and Zili Wang and Steven Ka Shing Yau and Zijuan Lin and Liyang Zhou and Chenyu Ran and Lingfeng Xiao and Chenglin Wu and Jürgen Schmidhuber},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2308.00352},
+  eprint = {2308.00352},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2308.00352v7},
+}
+
+======================================================================
+Reference: Data interpreter: An llm agent for data science
+Authors  : Sirui Hong, Yizhang Lin, Bang Liu, Bangbang Liu, Binhao Wu, Ceyao Zhang, Chenxing Wei, Danyang Li, Jiaqi Chen, Jiayi Zhang, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.18679
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 27.
+      Suggestion: List all 27 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.18679v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/01e863776846ebd1a9a7acc4a9ca24217f953aa2
+@inproceedings{hong2024data,
+  title = {Data Interpreter: An LLM Agent For Data Science},
+  author = {Sirui Hong and Yizhang Lin and Bang Liu and Bangbang Liu and Binhao Wu and Ceyao Zhang and Chenxing Wei and Danyang Li and Jiaqi Chen and Jiayi Zhang and Jinlin Wang and Li Zhang and Lingyao Zhang and Min Yang and Mingchen Zhuge and Taicheng Guo and Tuo Zhou and Wei Tao and Xiangru Tang and Xiangtao Lu and Xiawu Zheng and Xinbing Liang and Yaying Fei and Yuheng Cheng and Zhibin Gou and Zongze Xu and Chenglin Wu},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2402.18679},
+  eprint = {2402.18679},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.18679v4},
+}
+
+======================================================================
+Reference: Identity prediction errors in the human midbrain update reward-identity expectations in the orbitofrontal cortex
+Authors  : James D Howard, Thorsten Kahnt
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41467-018-04055-5
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a3664e54228075a6317fda92ea6966b02f26eaa0
+@article{howard2018identity,
+  title = {Identity prediction errors in the human midbrain update reward-identity expectations in the orbitofrontal cortex},
+  author = {James D. Howard and T. Kahnt},
+  year = {2018},
+  journal = {Nature Communications},
+  doi = {10.1038/s41467-018-04055-5},
+  url = {https://www.semanticscholar.org/paper/a3664e54228075a6317fda92ea6966b02f26eaa0},
+}
+
+======================================================================
+Reference: Mapcoder: Multi-agent code generation for competitive problem solving
+Authors  : Md Ashraful Islam, Mohammed Eunus Ali, Md Rizwan Parvez
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2405.11403
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.11403v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e81c707040ce604c7102cfe14d78b72385c17b68
+@inproceedings{islam2024mapcoder,
+  title = {MapCoder: Multi-Agent Code Generation for Competitive Problem Solving},
+  author = {Md. Ashraful Islam and Mohammed Eunus Ali and Md Rizwan Parvez},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2405.11403},
+  eprint = {2405.11403},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.11403v1},
+}
+
+======================================================================
+Reference: Smart-llm: Smart multi-agent robot task planning using large language models
+Authors  : Shyam Sundar Kannan, Vishnunandan LN Venkatesh, Byung-Cheol Min
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iros58592.2024.10802322
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2309.10062
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/755853c6b30f5a186131e23a63c68a3f2737068e
+@inproceedings{kannan2023smartllm,
+  title = {SMART-LLM: Smart Multi-Agent Robot Task Planning using Large Language Models},
+  author = {S. S. Kannan and Vishnunandan L. N. Venkatesh and Byung-Cheol Min},
+  year = {2023},
+  booktitle = {IEEE/RJS International Conference on Intelligent RObots and Systems},
+  doi = {10.1109/iros58592.2024.10802322},
+  eprint = {2309.10062},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/755853c6b30f5a186131e23a63c68a3f2737068e},
+}
+
+======================================================================
+Reference: Camel: Communicative agents for” mind” exploration of large language model society
+Authors  : Guohao Li, Hasan Hammoud, Hani Itani, Dmitrii Khizbullin, Bernard Ghanem
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/075280-2264
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.17760
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.17760v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/7bf72a3b5fbac8bc0f461780810fbc781c28ef53
+@article{li2023camel,
+  title = {CAMEL: Communicative Agents for "Mind" Exploration of Large Language Model Society},
+  author = {Guohao Li and Hasan Abed Al Kader Hammoud and Hani Itani and Dmitrii Khizbullin and Bernard Ghanem},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/075280-2264},
+  eprint = {2303.17760},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.17760v2},
+}
+
+======================================================================
+Reference: A survey on llm-based multi-agent systems: workflow, infrastructure, and challenges
+Authors  : Xinyi Li, Sai Wang, Siqi Zeng, Yu Wu, Yi Yang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s44336-024-00009-2
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2412.17481
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2412.17481v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/fc8ce12d6186ddaa797e2b36d5e8eb7921425308
+@article{chen2024survey,
+  title = {A Survey on LLM-based Multi-Agent System: Recent Advances and New Frontiers in Application},
+  author = {Shuaihang Chen and Yuanxing Liu and Wei Han and Weinan Zhang and Ting Liu},
+  year = {2024},
+  journal = {Vicinagearth},
+  doi = {10.1007/s44336-024-00009-2},
+  eprint = {2412.17481},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2412.17481v2},
+}
+
+======================================================================
+Reference: Retrievalattention: Accelerating long-context llm inference via vector retrieval
+Authors  : Di Liu, Meng Chen, Baotong Lu, Huiqiang Jiang, Zhenhua Han, Qianxi Zhang, Qi Chen, Chengruidong Zhang, Bailu Ding, Kai Zhang, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2409.10516
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 14.
+      Suggestion: List all 14 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2409.10516v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/61166a7545c7cadb1ec79c4744c348bac7644d41
+@misc{liu2024retrievalattention,
+  title = {RetrievalAttention: Accelerating Long-Context LLM Inference via Vector Retrieval},
+  author = {Di Liu and Meng Chen and Baotong Lu and Huiqiang Jiang and Zhenhua Han and Qianxi Zhang and Qi Chen and Chengruidong Zhang and Bailu Ding and Kai Zhang and Chen Chen and Fan Yang and Yuqing Yang and Lili Qiu},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2409.10516},
+  eprint = {2409.10516},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2409.10516v3},
+}
+
+======================================================================
+Reference: Dynamic llm-agent network: An llm-agent collaboration framework with agent team optimization
+Authors  : Zijun Liu, Yanzhe Zhang, Peng Li, Yang Liu, Diyi Yang
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CoRR 2023' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CoRR 2023.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.02170v2
+%   openreview: venue — https://openreview.net/forum?id=TYIfkvitPt
+@article{liu2023dynamic,
+  title = {A Dynamic LLM-Powered Agent Network for Task-Oriented Agent Collaboration},
+  author = {Zijun Liu and Yanzhe Zhang and Peng Li and Yang Liu and Diyi Yang},
+  year = {2023},
+  journal = {CoRR 2023},
+  eprint = {2310.02170},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.02170v2},
+}
+
+======================================================================
+Reference: Interplay of hippocampus and prefrontal cortex in memory
+Authors  : Alison R Preston, Howard Eichenbaum
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.cub.2013.05.041
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/aa5b98f1e8773329a651b3ad7ca967880f6c4680
+@article{preston2013interplay,
+  title = {Interplay of hippocampus and prefrontal cortex in memory},
+  author = {A. Preston and H. Eichenbaum},
+  year = {2013},
+  journal = {Current Biology},
+  doi = {10.1016/j.cub.2013.05.041},
+  url = {https://www.semanticscholar.org/paper/aa5b98f1e8773329a651b3ad7ca967880f6c4680},
+}
+
+======================================================================
+Reference: Analyzing llm behavior in dialogue summarization: Unveiling circumstantial hallucination trends
+Authors  : Sanjana Ramprasad, Elisa Ferracane, Zachary C Lipton
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2406.03487
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2406.03487v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0b66b4398a0a768ca32ea23ae827a4b1fe9746ab
+@inproceedings{ramprasad2024analyzing,
+  title = {Analyzing LLM Behavior in Dialogue Summarization: Unveiling Circumstantial Hallucination Trends},
+  author = {Sanjana Ramprasad and Elisa Ferracane and Zachary C. Lipton},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2406.03487},
+  eprint = {2406.03487},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2406.03487v1},
+}
+
+======================================================================
+Reference: Ventrolateral prefrontal cortex and self-initiated semantic elaboration during memory retrieval
+Authors  : Ana Raposo, Sanghoon Han, Ian G Dobbins
+Year     : 2009
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.neuropsychologia.2008.10.024
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f7ace01dd13a22ae355ee81612c85d572a4dfe05
+@article{raposo2009ventrolateral,
+  title = {Ventrolateral prefrontal cortex and self-initiated semantic elaboration during memory retrieval.},
+  author = {Ana Raposo and Sanghoon Han and I. Dobbins},
+  year = {2009},
+  journal = {Neuropsychologia},
+  doi = {10.1016/j.neuropsychologia.2008.10.024},
+  url = {https://www.semanticscholar.org/paper/f7ace01dd13a22ae355ee81612c85d572a4dfe05},
+}
+
+======================================================================
+Reference: Learning, memory and consolidation mechanisms for behavioral control in hierarchically organized cortico-basal ganglia systems
+Authors  : Silviu I Rusu, Cyriel MA Pennartz
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1002/hipo.23167
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ff5e3bdfb3f009bcdea4bd1f740f6f2f98c1d201
+@article{rusu2019learning,
+  title = {Learning, memory and consolidation mechanisms for behavioral control in hierarchically organized cortico‐basal ganglia systems},
+  author = {S. I. Rusu and C. Pennartz},
+  year = {2019},
+  journal = {Hippocampus},
+  doi = {10.1002/hipo.23167},
+  url = {https://www.semanticscholar.org/paper/ff5e3bdfb3f009bcdea4bd1f740f6f2f98c1d201},
+}
+
+======================================================================
+Reference: Dualformer: Controllable fast and slow thinking by learning with randomized reasoning traces
+Authors  : DiJia Su, Sainbayar Sukhbaatar, Michael Rabbat, Yuandong Tian, Qinqing Zheng
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2410.09918
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2410.09918
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2410.09918v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/48472a217174053a146b0ebd3821e71b53f05a36
+@inproceedings{su2024dualformer,
+  title = {Dualformer: Controllable Fast and Slow Thinking by Learning with Randomized Reasoning Traces},
+  author = {DiJia Su and Sainbayar Sukhbaatar and Michael Rabbat and Yuandong Tian and Qinqing Zheng},
+  year = {2024},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2410.09918},
+  eprint = {2410.09918},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2410.09918v3},
+}
+
+======================================================================
+Reference: Atom of thoughts for markov llm test-time scaling
+Authors  : Fengwei Teng, Zhaoyang Yu, Quan Shi, Jiayi Zhang, Chenglin Wu, Yuyu Luo
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2502.12018
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2502.12018v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2a8b3b839f1c22270b0deab9fc75af6ac62ffb1a
+@misc{teng2025atom,
+  title = {Atom of Thoughts for Markov LLM Test-Time Scaling},
+  author = {Fengwei Teng and Quan Shi and Zhaoyang Yu and Jiayi Zhang and Yuyu Luo and Chenglin Wu and Zhijiang Guo},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2502.12018},
+  eprint = {2502.12018},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2502.12018v4},
+}
+
+======================================================================
+Reference: Hierarchical action encoding within the human brain
+Authors  : Luca Turella, Raffaella Rumiati, Angelika Lingnau
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1093/cercor/bhz284
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a897f8031b1ae35b192cc2aaa3cf8451473fe20d
+@article{turella2020hierarchical,
+  title = {Hierarchical Action Encoding Within the Human Brain.},
+  author = {L. Turella and R. Rumiati and A. Lingnau},
+  year = {2020},
+  journal = {Cerebral Cortex},
+  doi = {10.1093/cercor/bhz284},
+  url = {https://www.semanticscholar.org/paper/a897f8031b1ae35b192cc2aaa3cf8451473fe20d},
+}
+
+======================================================================
+Reference: Planning and problem solving: From neuropsychology to functional neuroimaging
+Authors  : Josef M Unterrainer, Adrian M Owen
+Year     : 2006
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.jphysparis.2006.03.014
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8fac1f407ef8caf925e654a984303629ffc7ea4c
+@article{unterrainer2006planning,
+  title = {Planning and problem solving: from neuropsychology to functional neuroimaging.},
+  author = {J. Unterrainer and A. Owen},
+  year = {2006},
+  journal = {Journal of Physiology - Paris},
+  doi = {10.1016/j.jphysparis.2006.03.014},
+  url = {https://www.semanticscholar.org/paper/8fac1f407ef8caf925e654a984303629ffc7ea4c},
+}
+
+======================================================================
+Reference: A survey on large language model based autonomous agents
+Authors  : Lei Wang, Chen Ma, Xueyang Feng, Zeyu Zhang, Hao Yang, Jingsen Zhang, Zhiyuan Chen, Jiakai Tang, Xu Chen, Yankai Lin, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s11704-024-40231-1
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2308.11432
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 13.
+      Suggestion: List all 13 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/28c6ac721f54544162865f41c5692e70d61bccab
+@article{wang2023survey,
+  title = {A survey on large language model based autonomous agents},
+  author = {Lei Wang and Chengbang Ma and Xueyang Feng and Zeyu Zhang and Hao-ran Yang and Jingsen Zhang and Zhi-Yang Chen and Jiakai Tang and Xu Chen and Yankai Lin and Wayne Xin Zhao and Zhewei Wei and Ji-rong Wen},
+  year = {2023},
+  journal = {Frontiers of Computer Science},
+  doi = {10.1007/s11704-024-40231-1},
+  eprint = {2308.11432},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/28c6ac721f54544162865f41c5692e70d61bccab},
+}
+
+======================================================================
+Reference: Talk structurally, act hierarchically: A collaborative framework for llm multi-agent systems
+Authors  : Zhao Wang, Sota Moriyama, Wei-Yao Wang, Briti Gangopadhyay, Shingo Takamatsu
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2502.11098
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2502.11098v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4abe77318558b94a5e9624ae5389cd3d5f775b10
+@misc{wang2025talk,
+  title = {Talk Structurally, Act Hierarchically: A Collaborative Framework for LLM Multi-Agent Systems},
+  author = {Zhao Wang and Sota Moriyama and Wei-Yao Wang and Briti Gangopadhyay and Shingo Takamatsu},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2502.11098},
+  eprint = {2502.11098},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2502.11098v1},
+}
+
+======================================================================
+Reference: Chain-of-thought prompting elicits reasoning in large language models
+Authors  : Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/068431-1800
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2201.11903
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2201.11903v6
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1b6e810ce0afd0dd093f789d2b2742d047e316d5
+@article{wei2022chainofthought,
+  title = {Chain-of-Thought Prompting Elicits Reasoning in Large Language Models},
+  author = {Jason Wei and Xuezhi Wang and Dale Schuurmans and Maarten Bosma and Brian Ichter and Fei Xia and Ed Chi and Quoc Le and Denny Zhou},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/068431-1800},
+  eprint = {2201.11903},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2201.11903v6},
+}
+
+======================================================================
+Reference: Memory formation and long-term retention in humans and animals: Convergence towards a transformation account of hippocampal–neocortical interactions
+Authors  : Gordon Winocur, Morris Moscovitch, Bruno Bontempi
+Year     : 2010
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.neuropsychologia.2010.04.016
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/df4f110103b55590fa5bccd5fc71505b0c0ed3ca
+@article{winocur2010memory,
+  title = {Memory formation and long-term retention in humans and animals: convergence towards a transformation account of hippocampal-neocortical interactions.},
+  author = {G. Winocur and M. Moscovitch and B. Bontempi},
+  year = {2010},
+  journal = {Neuropsychologia},
+  doi = {10.1016/j.neuropsychologia.2010.04.016},
+  url = {https://www.semanticscholar.org/paper/df4f110103b55590fa5bccd5fc71505b0c0ed3ca},
+}
+
+======================================================================
+Reference: Autogen: Enabling next-gen llm applications via multi-agent conversation
+Authors  : Qingyun Wu, Gagan Bansal, Jieyu Zhang, Yiran Wu, Beibin Li, Erkang Zhu, Li Jiang, Xiaoyun Zhang, Shaokun Zhang, Jiale Liu, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 14.
+      Suggestion: List all 14 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2308.08155v2
+@misc{wu2023autogen,
+  title = {AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation},
+  author = {Qingyun Wu and Gagan Bansal and Jieyu Zhang and Yiran Wu and Beibin Li and Erkang Zhu and Li Jiang and Xiaoyun Zhang and Shaokun Zhang and Jiale Liu and Ahmed Hassan Awadallah and Ryen W White and Doug Burger and Chi Wang},
+  year = {2023},
+  eprint = {2308.08155},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2308.08155v2},
+}
+
+======================================================================
+Reference: Mathchat: Converse to tackle challenging math problems with llm agents
+Authors  : Yiran Wu, Feiran Jia, Shaokun Zhang, Hangyu Li, Erkang Zhu, Yue Wang, Yin Tat Lee, Richard Peng, Qingyun Wu, Chi Wang
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'LLMAgents @ ICLR 2024 Poster' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: LLMAgents @ ICLR 2024 Poster.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2306.01337v3
+%   openreview: venue — https://openreview.net/forum?id=S7vIB7OGQe
+@article{wu2023mathchat,
+  title = {MathChat: Converse to Tackle Challenging Math Problems with LLM Agents},
+  author = {Yiran Wu and Feiran Jia and Shaokun Zhang and Hangyu Li and Erkang Zhu and Yue Wang and Yin Tat Lee and Richard Peng and Qingyun Wu and Chi Wang},
+  year = {2023},
+  journal = {LLMAgents @ ICLR 2024 Poster},
+  eprint = {2306.01337},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2306.01337v3},
+}
+
+======================================================================
+Reference: Beyond self-talk: A communication-centric survey of llm-based multi-agent systems
+Authors  : Bingyu Yan, Xiaoming Zhang, Litian Zhang, Lian Zhang, Ziyi Zhou, Dezhuang Miao, Chaozhuo Li
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s11704-026-50857-y
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2502.14321v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/77137fc47a569d66952cdf656ed6e99f3b027c26
+@misc{yan2025beyond,
+  title = {Beyond Self-Talk: A Communication-Centric Survey of LLM-Based Multi-Agent Systems},
+  author = {Bingyu Yan and Zhibo Zhou and Litian Zhang and Lian Zhang and Ziyi Zhou and Dezhuang Miao and Zhoujun Li and Chaozhuo Li and Xiaoming Zhang},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.1007/s11704-026-50857-y},
+  eprint = {2502.14321},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2502.14321v3},
+}
+
+======================================================================
+Reference: Tree of thoughts: Deliberate problem solving with large language models
+Authors  : Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Tom Griffiths, Yuan Cao, Karthik Narasimhan
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2305.10601
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2305.10601
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2305.10601v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2f3822eb380b5e753a6d579f31dfc3ec4c4a0820
+@article{yao2023tree,
+  title = {Tree of Thoughts: Deliberate Problem Solving with Large Language Models},
+  author = {Shunyu Yao and Dian Yu and Jeffrey Zhao and Izhak Shafran and Thomas L. Griffiths and Yuan Cao and Karthik Narasimhan},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2305.10601},
+  eprint = {2305.10601},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2305.10601v2},
+}
+
+======================================================================
+Reference: Synergistic multi-agent framework with trajectory learning for knowledge-intensive tasks
+Authors  : Shengbin Yue, Siyuan Wang, Wei Chen, Xuanjing Huang, Zhongyu Wei
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.09893
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2407.09893
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/9b82ff1a5fa0a9dac1d1a23e780fcd7b2cbe943e
+@inproceedings{yue2024synergistic,
+  title = {Synergistic Multi-Agent Framework with Trajectory Learning for Knowledge-Intensive Tasks},
+  author = {Shengbin Yue and Siyuan Wang and Wei Chen and Xuanjing Huang and Zhongyu Wei},
+  year = {2024},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.48550/arxiv.2407.09893},
+  eprint = {2407.09893},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/9b82ff1a5fa0a9dac1d1a23e780fcd7b2cbe943e},
+}
+
+======================================================================
+Reference: Aflow: Automating agentic workflow generation
+Authors  : Jiayi Zhang, Jinyu Xiang, Zhaoyang Yu, Fengwei Teng, Xionghui Chen, Jiaqi Chen, Mingchen Zhuge, Xin Cheng, Sirui Hong, Jinlin Wang, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2410.10762
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 14.
+      Suggestion: List all 14 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2410.10762v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/53132ea6c107479d4557631299d3ed525109b464
+@inproceedings{zhang2024aflow,
+  title = {AFlow: Automating Agentic Workflow Generation},
+  author = {Jiayi Zhang and Jinyu Xiang and Zhaoyang Yu and Fengwei Teng and Xionghui Chen and Jiaqi Chen and Mingchen Zhuge and Xin Cheng and Sirui Hong and Jinlin Wang and Bingnan Zheng and Bang Liu and Yuyu Luo and Chenglin Wu},
+  year = {2024},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2410.10762},
+  eprint = {2410.10762},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2410.10762v4},
+}
+
+======================================================================
+Reference: Lamma-p: Generalizable multi-agent long-horizon task allocation and planning with lm-driven pddl planner
+Authors  : Xiaopan Zhang, Hao Qin, Fuquan Wang, Yue Dong, Jiachen Li
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'IEEE International Conference on Robotics and Automation' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: IEEE International Conference on Robotics and Automation.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/icra55743.2025.11127951
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2409.20560v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/8c1138cba2032c79da540321e04890e9f7fe6b2c
+@inproceedings{zhang2024lammap,
+  title = {LaMMA-P: Generalizable Multi-Agent Long-Horizon Task Allocation and Planning with LM-Driven PDDL Planner},
+  author = {Xiaopan Zhang and Hao Qin and Fuquan Wang and Yue Dong and Jiachen Li},
+  year = {2024},
+  booktitle = {IEEE International Conference on Robotics and Automation},
+  doi = {10.1109/icra55743.2025.11127951},
+  eprint = {2409.20560},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2409.20560v2},
+}
+
+======================================================================
+Reference: Least-to-most prompting enables complex reasoning in large language models
+Authors  : Denny Zhou, Nathanael Sch¨arli, Le Hou, Jason Wei, Nathan Scales, Xuezhi Wang, Dale Schuurmans, Claire Cui, Olivier Bousquet, Quoc Le, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2205.10625
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2205.10625v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5437e8adab596d7294124c0e798708e050e25321
+@inproceedings{zhou2022leasttomost,
+  title = {Least-to-Most Prompting Enables Complex Reasoning in Large Language Models},
+  author = {Denny Zhou and Nathanael Schärli and Le Hou and Jason Wei and Nathan Scales and Xuezhi Wang and Dale Schuurmans and Claire Cui and Olivier Bousquet and Quoc Le and Ed Chi},
+  year = {2022},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2205.10625},
+  eprint = {2205.10625},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2205.10625v3},
+}

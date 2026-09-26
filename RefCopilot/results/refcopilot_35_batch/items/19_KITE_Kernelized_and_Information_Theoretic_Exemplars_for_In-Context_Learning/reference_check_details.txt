@@ -1,0 +1,1238 @@
+======================================================================
+Reference: Gpt-neo: Large scale autoregressive language modeling with mesh-tensorflow
+Authors  : Sid Black, Leo Gao, Phil Wang, Connor Leahy, Stella Biderman
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.5281/zenodo.5297715
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, year — https://www.semanticscholar.org/paper/7e5008713c404445dd8786753526f1a45b93de12
+@article{black2021gptneo,
+  title = {GPT-Neo: Large Scale Autoregressive Language Modeling with Mesh-Tensorflow},
+  author = {Sid Black and Leo Gao and Phil Wang and Connor Leahy and Stella Biderman},
+  year = {2021},
+  doi = {10.5281/zenodo.5297715},
+  url = {https://www.semanticscholar.org/paper/7e5008713c404445dd8786753526f1a45b93de12},
+}
+
+======================================================================
+Reference: Language models are few-shot learners
+Authors  : Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, et al., Amanda Askell
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Neural Information Processing Systems
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 31.
+      Suggestion: List all 31 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2005.14165v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/90abbc2cf38462b954ae1b772fac9532e2ccd8b0
+@article{brown2020language,
+  title = {Language Models are Few-Shot Learners},
+  author = {Tom B. Brown and Benjamin Mann and Nick Ryder and Melanie Subbiah and Jared Kaplan and Prafulla Dhariwal and Arvind Neelakantan and Pranav Shyam and Girish Sastry and Amanda Askell and Sandhini Agarwal and Ariel Herbert-Voss and Gretchen Krueger and Tom Henighan and Rewon Child and Aditya Ramesh and Daniel M. Ziegler and Jeffrey Wu and Clemens Winter and Christopher Hesse and Mark Chen and Eric Sigler and Mateusz Litwin and Scott Gray and Benjamin Chess and Jack Clark and Christopher Berner and Sam McCandlish and Alec Radford and Ilya Sutskever and Dario Amodei},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2005.14165},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2005.14165v4},
+}
+
+======================================================================
+Reference: Improving in-context few-shot learning via self-supervised training
+Authors  : Mingda Chen, Jingfei Du, Ramakanth Pasunuru, Todor Mihaylov, Srini Iyer, Veselin Stoyanov, Zornitsa Kozareva
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2205.01703
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2205.01703v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/81986b8a3d3fe6c5be06fc4527953fb514ad12e8
+@article{chen2022improving,
+  title = {Improving In-Context Few-Shot Learning via Self-Supervised Training},
+  author = {Mingda Chen and Jingfei Du and Ramakanth Pasunuru and Todor Mihaylov and Srini Iyer and Veselin Stoyanov and Zornitsa Kozareva},
+  year = {2022},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2205.01703},
+  eprint = {2205.01703},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2205.01703v2},
+}
+
+======================================================================
+Reference: Elements of information theory
+Authors  : Thomas M Cover
+Year     : 1999
+Verdict  : warning
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.85).
+      Suggestion: Use canonical title: Elements of information theory (2. ed.)
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, year — https://www.semanticscholar.org/paper/5387c0769d3d18ace289c5cb3dcf90231d9d425f
+@article{cover2006elements,
+  title = {Elements of information theory (2. ed.)},
+  author = {T. Cover and Joy A. Thomas},
+  year = {2006},
+  url = {https://www.semanticscholar.org/paper/5387c0769d3d18ace289c5cb3dcf90231d9d425f},
+}
+
+======================================================================
+Reference: Why can gpt learn in-context? language models implicitly perform gradient descent as meta-optimizers
+Authors  : Damai Dai, Yutao Sun, Li Dong, Yaru Hao, Shuming Ma, Zhifang Sui, Furu Wei
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'ACL (Findings) 2023' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: ACL (Findings) 2023.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2212.10559v3
+%   openreview: venue — https://openreview.net/forum?id=125Jq34K6S
+@article{dai2022learn,
+  title = {Why Can GPT Learn In-Context? Language Models Implicitly Perform Gradient Descent as Meta-Optimizers},
+  author = {Damai Dai and Yutao Sun and Li Dong and Yaru Hao and Shuming Ma and Zhifang Sui and Furu Wei},
+  year = {2022},
+  journal = {ACL (Findings) 2023},
+  eprint = {2212.10559},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2212.10559v3},
+}
+
+======================================================================
+Reference: Submodular meets spectral: Greedy algorithms for subset selection, sparse approximation and dictionary selection
+Authors  : Abhimanyu Das, David Kempe
+Year     : 2011
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1102.3975v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/ec94a1d967333b3a5663f581554ad11d278d3cf6
+@inproceedings{das2011submodular,
+  title = {Submodular meets Spectral: Greedy Algorithms for Subset Selection, Sparse Approximation and Dictionary Selection},
+  author = {Abhimanyu Das and David Kempe},
+  year = {2011},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1102.3975},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1102.3975v2},
+}
+
+======================================================================
+Reference: Bert: Pre-training of deep bidirectional transformers for language understanding
+Authors  : Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/n19-1423
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: North American Chapter of the Association for Computational Linguistics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1810.04805v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/df2b0e26d0599ce3e70df8a9da02e51594e0e992
+@article{devlin2018bert,
+  title = {BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  author = {Jacob Devlin and Ming-Wei Chang and Kenton Lee and Kristina Toutanova},
+  year = {2018},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/n19-1423},
+  eprint = {1810.04805},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1810.04805v2},
+}
+
+======================================================================
+Reference: Unsupervised construction of large paraphrase corpora: Exploiting massively parallel news sources
+Authors  : Bill Dolan, Chris Quirk, Chris Brockett
+Year     : 2004
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/1220355.1220406
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/7acfdc905f734abf966aed58abb983bc015ff7fe
+@inproceedings{dolan2004unsupervised,
+  title = {Unsupervised Construction of Large Paraphrase Corpora: Exploiting Massively Parallel News Sources},
+  author = {W. Dolan and Chris Quirk and Chris Brockett},
+  year = {2004},
+  booktitle = {International Conference on Computational Linguistics},
+  doi = {10.3115/1220355.1220406},
+  url = {https://www.semanticscholar.org/paper/7acfdc905f734abf966aed58abb983bc015ff7fe},
+}
+
+======================================================================
+Reference: A survey on in-context learning
+Authors  : Qingxiu Dong, Lei Li, Damai Dai, Ce Zheng, Jingyuan Ma, Rui Li, Heming Xia, Jingjing Xu, Zhiyong Wu, Tianyu Liu, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2024.emnlp-main.64
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 14.
+      Suggestion: List all 14 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2301.00234v6
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/30c0cdc414f68211d5d0514df027cec22e005174
+@inproceedings{dong2022survey,
+  title = {A Survey on In-context Learning},
+  author = {Qingxiu Dong and Lei Li and Damai Dai and Ce Zheng and Jingyuan Ma and Rui Li and Heming Xia and Jingjing Xu and Zhiyong Wu and Tianyu Liu and Baobao Chang and Xu Sun and Lei Li and Zhifang Sui},
+  year = {2022},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/2024.emnlp-main.64},
+  eprint = {2301.00234},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2301.00234v6},
+}
+
+======================================================================
+Reference: Realtoxicityprompts: Evaluating neural toxic degeneration in language models
+Authors  : Samuel Gehman, Suchin Gururangan, Maarten Sap, Yejin Choi, Noah A Smith
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Findings' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Findings.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.findings-emnlp.301
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2009.11462v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/399e7d8129c60818ee208f236c8dda17e876d21f
+@article{gehman2020realtoxicityprompts,
+  title = {RealToxicityPrompts: Evaluating Neural Toxic Degeneration in Language Models},
+  author = {Samuel Gehman and Suchin Gururangan and Maarten Sap and Yejin Choi and Noah A. Smith},
+  year = {2020},
+  journal = {Findings},
+  doi = {10.18653/v1/2020.findings-emnlp.301},
+  eprint = {2009.11462},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2009.11462v2},
+}
+
+======================================================================
+Reference: Promptrefine: Enhancing few-shot performance on low-resource indic languages with example selection from related example banks
+Authors  : Soumya Suvra Ghosal, Soumyabrata Pal, Koyel Mukherjee, Dinesh Manocha
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2412.05710
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2412.05710
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/be5f5df3cc820c9fc1c366edb4d9f8a4f936ae70
+@article{ghosal2024promptrefine,
+  title = {PromptRefine: Enhancing Few-Shot Performance on Low-Resource Indic Languages with Example Selection from Related Example Banks},
+  author = {Soumya Suvra Ghosal and Soumyabrata Pal and Koyel Mukherjee and Dinesh Manocha},
+  year = {2024},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2412.05710},
+  eprint = {2412.05710},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/be5f5df3cc820c9fc1c366edb4d9f8a4f936ae70},
+}
+
+======================================================================
+Reference: Relic: Enhancing reward model generalization for low-resource indic languages with few-shot examples
+Authors  : Soumya Suvra Ghosal, Vaibhav Singh, Akash Ghosh, Soumyabrata Pal, Subhadip Baidya, Sriparna Saha, Dinesh Manocha
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2506.16502
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2506.16502v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b68e715d48aa3b601b2a0bda5447a67fa49a3a1c
+@inproceedings{ghosal2025relic,
+  title = {Relic: Enhancing Reward Model Generalization for Low-Resource Indic Languages with Few-Shot Examples},
+  author = {Soumya Suvra Ghosal and Vaibhav Singh and Akash Ghosh and Soumyabrata Pal and Subhadip Baidya and Sriparna Saha and Dinesh Manocha},
+  year = {2025},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2506.16502},
+  eprint = {2506.16502},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2506.16502v1},
+}
+
+======================================================================
+Reference: Perplexity-based prompt selection for large language models
+Authors  : Hila Gonen, Jack Hosking, Isabelle Augenstein
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2404.02717
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2404.02717
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2f83650af54f632be8c1009cc89e1e2a62663a18
+@misc{do2024automatic,
+  title = {Automatic Prompt Selection for Large Language Models},
+  author = {Viet-Tung Do and Van-Khanh Hoang and Duy-Hung Nguyen and Shahab Sabahi and Jeff Yang and Hajime Hotta and M. Nguyen and Hung Le},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2404.02717},
+  eprint = {2404.02717},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/2f83650af54f632be8c1009cc89e1e2a62663a18},
+}
+
+======================================================================
+Reference: Qwen2.5-coder technical report
+Authors  : Binyuan Hui, Jian Yang, Zeyu Cui, Jiaxi Yang, Dayiheng Liu, Lei Zhang, Tianyu Liu, Jiajun Zhang, Bowen Yu, Keming Lu, Kai Dang, Yang Fan, Yichang Zhang, An Yang, Rui Men, Fei Huang, Bo Zheng, Yibo Miao, Shanghaoran Quan, Yunlong Feng, Xingzhang Ren, Xuancheng Ren, Jingren Zhou, Junyang Lin
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2409.12186v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/11dd2fc88747d20629f5aafab72ba649d93e969c
+@misc{hui2024qwencoder,
+  title = {Qwen2.5-Coder Technical Report},
+  author = {Binyuan Hui and Jian Yang and Zeyu Cui and Jiaxi Yang and Dayiheng Liu and Lei Zhang and Tianyu Liu and Jiajun Zhang and Bowen Yu and Keming Lu and Kai Dang and Yang Fan and Yichang Zhang and An Yang and Rui Men and Fei Huang and Bo Zheng and Yibo Miao and Shanghaoran Quan and Yunlong Feng and Xingzhang Ren and Xuancheng Ren and Jingren Zhou and Junyang Lin},
+  year = {2024},
+  journal = {arXiv.org},
+  eprint = {2409.12186},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2409.12186v3},
+}
+
+======================================================================
+Reference: An evaluation dataset for intent classification and out-of-scope prediction
+Authors  : Stefan Larson, Anish Mahendran, Joseph J Peper, Christopher Clarke, Andrew Lee, Parker Hill, Jonathan K Kummerfeld, Kevin Leach, Michael A Laurenzano, Lingjia Tang, et al.
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d19-1131
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1909.02027v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/499556c6ed1daec62e5a57456213cf4f921460f1
+@inproceedings{larson2019evaluation,
+  title = {An Evaluation Dataset for Intent Classification and Out-of-Scope Prediction},
+  author = {Stefan Larson and Anish Mahendran and Joseph J. Peper and Christopher Clarke and Andrew Lee and Parker Hill and Jonathan K. Kummerfeld and Kevin Leach and Michael A. Laurenzano and Lingjia Tang and Jason Mars},
+  year = {2019},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d19-1131},
+  eprint = {1909.02027},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1909.02027v1},
+}
+
+======================================================================
+Reference: Bandit algorithms
+Authors  : Tor Lattimore, Csaba Szepesvári
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1017/9781108571401
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2006.09255
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2006.09255v3
+%   semantic_scholar: doi — https://www.semanticscholar.org/paper/57ffba5ea5e602b5365752e19a6f85a716db1d8b
+@misc{arora2020corralling,
+  title = {Corralling Stochastic Bandit Algorithms},
+  author = {Raman Arora and Teodor V. Marinov and Mehryar Mohri},
+  year = {2020},
+  doi = {10.1017/9781108571401},
+  eprint = {2006.09255},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2006.09255v3},
+}
+
+======================================================================
+Reference: In-context learning demonstration selection via influence analysis
+Authors  : Linyuan Li, Ming Qiu
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.11750
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2402.11750
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f53730c7878d1b3c35f1bd17027c7657872e61de
+@misc{ms2024incontext,
+  title = {In-Context Learning Demonstration Selection via Influence Analysis},
+  author = {Vinay M.S. and Minh-Hao Van and Xintao Wu},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2402.11750},
+  eprint = {2402.11750},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/f53730c7878d1b3c35f1bd17027c7657872e61de},
+}
+
+======================================================================
+Reference: Unified demonstration retriever for in-context learning
+Authors  : Xiaonan Li, Kai Lv, Hang Yan, Tianyang Lin, Wei Zhu, Yuan Ni, Guotong Xie, Xiaoling Wang, Xipeng Qiu
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2305.04320
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2305.04320v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6a2d96d2a7adde6349f15c1e680b67d114e7b67c
+@inproceedings{li2023unified,
+  title = {Unified Demonstration Retriever for In-Context Learning},
+  author = {Xiaonan Li and Kai Lv and Hang Yan and Tianyang Lin and Wei Zhu and Yuan Ni and Guotong Xie and Xiaoling Wang and Xipeng Qiu},
+  year = {2023},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2305.04320},
+  eprint = {2305.04320},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2305.04320v2},
+}
+
+======================================================================
+Reference: Transformers as algorithms: Generalization and stability in in-context learning
+Authors  : Yingcong Li, Muhammed Emrullah Ildiz, Dimitris Papailiopoulos, Samet Oymak
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2301.07067
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2301.07067v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/a7fa71dc6856ebef79f354597128d1c68b19b6e4
+@inproceedings{li2023transformers,
+  title = {Transformers as Algorithms: Generalization and Stability in In-context Learning},
+  author = {Yingcong Li and M. Emrullah Ildiz and Dimitris Papailiopoulos and Samet Oymak},
+  year = {2023},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2301.07067},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2301.07067v2},
+}
+
+======================================================================
+Reference: What makes good in-context examples for gpt-3?
+Authors  : Jiachang Liu, Dinghan Shen, Yizhe Zhang, Bill Dolan, Lawrence Carin, Weizhu Chen
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Workshop on Knowledge Extraction and Integration for Deep Learning Architectures; Deep Learning Inside Out' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Workshop on Knowledge Extraction and Integration for Deep Learning Architectures; Deep Learning Inside Out.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2022.deelio-1.10
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2101.06804v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/59641c10ed7431a3cf841f308367dc2dc0281b74
+@inproceedings{liu2021what,
+  title = {What Makes Good In-Context Examples for GPT-$3$?},
+  author = {Jiachang Liu and Dinghan Shen and Yizhe Zhang and Bill Dolan and Lawrence Carin and Weizhu Chen},
+  year = {2021},
+  booktitle = {Workshop on Knowledge Extraction and Integration for Deep Learning Architectures; Deep Learning Inside Out},
+  doi = {10.18653/v1/2022.deelio-1.10},
+  eprint = {2101.06804},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2101.06804v1},
+}
+
+======================================================================
+Reference: What makes good in-context examples for gpt-3?
+Authors  : Jing Liu, Dinghan Shen, Yizhe Zhang, Bill Dolan, Lawrence Carin, Weizhu Chen
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2022.deelio-1.10
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2101.06804
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/59641c10ed7431a3cf841f308367dc2dc0281b74
+@inproceedings{liu2021what,
+  title = {What Makes Good In-Context Examples for GPT-3?},
+  author = {Jiachang Liu and Dinghan Shen and Yizhe Zhang and Bill Dolan and L. Carin and Weizhu Chen},
+  year = {2021},
+  booktitle = {Workshop on Knowledge Extraction and Integration for Deep Learning Architectures; Deep Learning Inside Out},
+  doi = {10.18653/v1/2022.deelio-1.10},
+  eprint = {2101.06804},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/59641c10ed7431a3cf841f308367dc2dc0281b74},
+}
+
+======================================================================
+Reference: Dr. icl: Demonstration-retrieved in-context learning
+Authors  : Man Luo, Xin Xu, Zhuyun Dai, Panupong Pasupat, Mehran Kazemi, Chitta Baral, Vaiva Imbrasaite, Vincent Y Zhao
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Data Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Data Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2305.14128
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2305.14128v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/18143a4c2da37444e06feed04cc9efeb0856352d
+@article{luo2023dricl,
+  title = {Dr.ICL: Demonstration-Retrieved In-context Learning},
+  author = {Man Luo and Xin Xu and Zhuyun Dai and Panupong Pasupat and Mehran Kazemi and Chitta Baral and Vaiva Imbrasaite and Vincent Y Zhao},
+  year = {2023},
+  journal = {Data Intelligence},
+  doi = {10.48550/arxiv.2305.14128},
+  eprint = {2305.14128},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2305.14128v1},
+}
+
+======================================================================
+Reference: In-context learning with retrieved demonstrations for language models: A survey
+Authors  : Man Luo, Xin Xu, Yue Liu, Panupong Pasupat, Mehran Kazemi
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Trans. Mach. Learn. Res.' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Trans. Mach. Learn. Res..
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2401.11624
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2401.11624v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b2f4d22fddf3619a38a1754d9497935aa0848426
+@article{luo2024incontext,
+  title = {In-context Learning with Retrieved Demonstrations for Language Models: A Survey},
+  author = {Man Luo and Xin Xu and Yue Liu and Panupong Pasupat and Mehran Kazemi},
+  year = {2024},
+  journal = {Trans. Mach. Learn. Res.},
+  doi = {10.48550/arxiv.2401.11624},
+  eprint = {2401.11624},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2401.11624v5},
+}
+
+======================================================================
+Reference: Metaicl: Learning to learn in context
+Authors  : Sewon Min, Mike Lewis, Luke Zettlemoyer, Hannaneh Hajishirzi
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2022.naacl-main.201
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2110.15943v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/47df3fd32d00220c85c2c51a571254fd99b2ecc7
+@article{min2021metaicl,
+  title = {MetaICL: Learning to Learn In Context},
+  author = {Sewon Min and Mike Lewis and Luke Zettlemoyer and Hannaneh Hajishirzi},
+  year = {2021},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2022.naacl-main.201},
+  eprint = {2110.15943},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2110.15943v2},
+}
+
+======================================================================
+Reference: Rethinking the role of demonstrations: What makes in-context learning work?
+Authors  : Sewon Min, Xin Lyu, Ariel Holtzman, Mikel Artetxe, Mike Lewis, Hannaneh Hajishirzi, Luke Zettlemoyer
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2022.emnlp-main.759
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2202.12837
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2202.12837v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f4df78183261538e718066331898ee5cad7cad05
+@inproceedings{min2022rethinking,
+  title = {Rethinking the Role of Demonstrations: What Makes In-Context Learning Work?},
+  author = {Sewon Min and Xinxi Lyu and Ari Holtzman and Mikel Artetxe and Mike Lewis and Hannaneh Hajishirzi and Luke Zettlemoyer},
+  year = {2022},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/2022.emnlp-main.759},
+  eprint = {2202.12837},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2202.12837v2},
+}
+
+======================================================================
+Reference: In-context learning and induction heads
+Authors  : Catherine Olsson, Nelson Elhage, Neel Nanda, Nicholas Joseph, Nova DasSarma, Tom Henighan, Ben Mann, Amanda Askell, Yuntao Bai, Anna Chen, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2209.11895
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 26.
+      Suggestion: List all 26 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2209.11895v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c90a99eeb57019732a6cc996bb9eaf13faedf00f
+@misc{olsson2022incontext,
+  title = {In-context Learning and Induction Heads},
+  author = {Catherine Olsson and Nelson Elhage and Neel Nanda and Nicholas Joseph and Nova DasSarma and Tom Henighan and Ben Mann and Amanda Askell and Yuntao Bai and Anna Chen and Tom Conerly and Dawn Drain and Deep Ganguli and Zac Hatfield-Dodds and Danny Hernandez and Scott Johnston and Andy Jones and Jackson Kernion and Liane Lovitt and Kamal Ndousse and Dario Amodei and Tom Brown and Jack Clark and Jared Kaplan and Sam McCandlish and Chris Olah},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2209.11895},
+  eprint = {2209.11895},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2209.11895v1},
+}
+
+======================================================================
+Reference: What in-context learning “learns” in-context: Disentangling task recognition and task learning
+Authors  : Jane Pan
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2305.09731
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2305.09731
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2305.09731v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/7fa85f9c0fe44f1bf9e58a55f0f009296578c2f0
+@inproceedings{pan2023what,
+  title = {What In-Context Learning "Learns" In-Context: Disentangling Task Recognition and Task Learning},
+  author = {Jane Pan and Tianyu Gao and Howard Chen and Danqi Chen},
+  year = {2023},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2305.09731},
+  eprint = {2305.09731},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2305.09731v1},
+}
+
+======================================================================
+Reference: Optimal design of experiments
+Authors  : Friedrich Pukelsheim
+Year     : 2006
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.5860/choice.31-0986
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/22241fb92ca49e3b66545a67c04e8a1f02d5892b
+@article{jackson1994optimal,
+  title = {Optimal Design of Experiments},
+  author = {M. Jackson},
+  year = {1994},
+  journal = {Journal of the Operational Research Society},
+  doi = {10.5860/choice.31-0986},
+  url = {https://www.semanticscholar.org/paper/22241fb92ca49e3b66545a67c04e8a1f02d5892b},
+}
+
+======================================================================
+Reference: Learning to retrieve prompts for in-context learning
+Authors  : Or Rubin, Jonathan Herzig, Jonathan Berant
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2022.naacl-main.191
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2112.08633
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f9838a3be5c94bb2674a0e224de349b50e18f3c4
+@article{rubin2021learning,
+  title = {Learning To Retrieve Prompts for In-Context Learning},
+  author = {Ohad Rubin and Jonathan Herzig and Jonathan Berant},
+  year = {2021},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2022.naacl-main.191},
+  eprint = {2112.08633},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/f9838a3be5c94bb2674a0e224de349b50e18f3c4},
+}
+
+======================================================================
+Reference: A mathematical exploration of why language models help solve downstream tasks
+Authors  : Nikunj Saunshi, Sadhika Malladi, Sanjeev Arora
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2010.03648v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/01400290c7db96c4d665d1c29519c42ba47401e0
+@inproceedings{saunshi2020mathematical,
+  title = {A Mathematical Exploration of Why Language Models Help Solve Downstream Tasks},
+  author = {Nikunj Saunshi and Sadhika Malladi and Sanjeev Arora},
+  year = {2020},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2010.03648},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2010.03648v2},
+}
+
+======================================================================
+Reference: Learning with kernels: support vector machines, regularization, optimization, and beyond
+Authors  : Bernhard Schölkopf, Alexander J Smola
+Year     : 2002
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1198/jasa.2003.s270
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/fc8cda36a0972e7de1ac3a7bcb81dc32da79bee4
+@article{williams2003learning,
+  title = {Learning with Kernels: Support Vector Machines, Regularization, Optimization, and Beyond},
+  author = {Christopher K. I. Williams},
+  year = {2003},
+  journal = {IEEE Transactions on Neural Networks},
+  doi = {10.1198/jasa.2003.s270},
+  url = {https://www.semanticscholar.org/paper/fc8cda36a0972e7de1ac3a7bcb81dc32da79bee4},
+}
+
+======================================================================
+Reference: On the effect of pretraining corpora on in-context learning by a large-scale language model
+Authors  : Seongjin Shin, Sang-Woo Lee, Hwijeen Ahn, Sungdong Kim, HyoungSeok Kim, Boseop Kim, Kyunghyun Cho, Gichang Lee, Woomyoung Park, Jung-Woo Ha, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2204.13509
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2204.13509v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1fafaccebc4a74898a74c606f846318c4c2c7536
+@article{shin2022effect,
+  title = {On the Effect of Pretraining Corpora on In-context Learning by a Large-scale Language Model},
+  author = {Seongjin Shin and Sang-Woo Lee and Hwijeen Ahn and Sungdong Kim and HyoungSeok Kim and Boseop Kim and Kyunghyun Cho and Gichang Lee and Woomyoung Park and Jung-Woo Ha and Nako Sung},
+  year = {2022},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2204.13509},
+  eprint = {2204.13509},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2204.13509v2},
+}
+
+======================================================================
+Reference: Recursive deep models for semantic compositionality over a sentiment treebank
+Authors  : Richard Socher, Alex Perelygin, Jean Wu, Jason Chuang, Christopher D. Manning, Andrew Ng, Christopher Potts
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d13-1170
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/687bac2d3320083eb4530bf18bb8f8f721477600
+@inproceedings{socher2013recursive,
+  title = {Recursive Deep Models for Semantic Compositionality Over a Sentiment Treebank},
+  author = {R. Socher and Alex Perelygin and Jean Wu and Jason Chuang and Christopher D. Manning and A. Ng and Christopher Potts},
+  year = {2013},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d13-1170},
+  url = {https://www.semanticscholar.org/paper/687bac2d3320083eb4530bf18bb8f8f721477600},
+}
+
+======================================================================
+Reference: Information-theoretic demonstration selection for few-shot prompting
+Authors  : Madeleine Sorensen, Nan Ding, Ming-Wei Chang
+Year     : 2022
+Verdict  : unverified
+
+======================================================================
+Reference: CommonsenseQA: A question answering challenge targeting commonsense knowledge
+Authors  : Alon Talmor, Jonathan Herzig, Nicholas Lourie, Jonathan Berant
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1811.00937
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/c21a4d70d83e0f6eb2a9e1c41d034842dd561e47
+@article{talmor2019commonsenseqa,
+  title = {CommonsenseQA: A Question Answering Challenge Targeting Commonsense Knowledge},
+  author = {Alon Talmor and Jonathan Herzig and Nicholas Lourie and Jonathan Berant},
+  year = {2019},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/n19-1421},
+  eprint = {1811.00937},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/c21a4d70d83e0f6eb2a9e1c41d034842dd561e47},
+}
+
+======================================================================
+Reference: GLUE: A multi-task benchmark and analysis platform for natural language understanding
+Authors  : Alex Wang, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, Samuel Bowman
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Proceedings of the 2018 EMNLP Workshop BlackboxNLP: Analyzing and Interpreting Neural Networks for NLP', but a full version appears at 'BlackboxNLP@EMNLP'.
+      Suggestion: Cite the full version at BlackboxNLP@EMNLP.
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1804.07461
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1804.07461v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/451d4a16e425ecbf38c4b1cca0dcf5d9bec8255c
+@article{wang2018glue,
+  title = {GLUE: A Multi-Task Benchmark and Analysis Platform for Natural Language Understanding},
+  author = {Alex Wang and Amanpreet Singh and Julian Michael and Felix Hill and Omer Levy and Samuel R. Bowman},
+  year = {2018},
+  journal = {BlackboxNLP@EMNLP},
+  doi = {10.18653/v1/w18-5446},
+  eprint = {1804.07461},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1804.07461v3},
+}
+
+======================================================================
+Reference: Superglue: A stickier benchmark for general-purpose language understanding systems
+Authors  : Alex Wang, Yada Pruksachatkun, Nikita Nangia, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, Samuel Bowman
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1905.00537
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.00537v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/d9f6ada77448664b71128bb19df15765336974a6
+@article{wang2019superglue,
+  title = {SuperGLUE: A Stickier Benchmark for General-Purpose Language Understanding Systems},
+  author = {Alex Wang and Yada Pruksachatkun and Nikita Nangia and Amanpreet Singh and Julian Michael and Felix Hill and Omer Levy and Samuel R. Bowman},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1905.00537},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.00537v3},
+}
+
+======================================================================
+Reference: A survey on table-and-text hybridqa: Concepts, methods, challenges and future directions
+Authors  : Dingzirui Wang, Longxu Dou, Wanxiang Che
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2212.13465
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2212.13465v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1278dc2e5077b9a0fe5266ae6850a59d8231b41f
+@misc{wang2022survey,
+  title = {A Survey on Table-and-Text HybridQA: Concepts, Methods, Challenges and Future Directions},
+  author = {Dingzirui Wang and Longxu Dou and Wanxiang Che},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2212.13465},
+  eprint = {2212.13465},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2212.13465v2},
+}
+
+======================================================================
+Reference: Parameter-efficient fine-tuning in large language models: a survey of methodologies
+Authors  : Luping Wang, Sheng Chen, Linnan Jiang, Shu Pan, Runze Cai, Sen Yang, Fei Yang
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s10462-025-11236-4
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2508.02711
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2508.02711v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d5c4c77fa4504873e7dad8f9e640b81a7161d5aa
+@article{chai2025bayesian,
+  title = {A Bayesian Hybrid Parameter-Efficient Fine-Tuning Method for Large Language Models},
+  author = {Yidong Chai and Yang Liu and Yonghang Zhou and Jiaheng Xie and Daniel Dajun Zeng},
+  year = {2025},
+  journal = {Artificial Intelligence Review},
+  doi = {10.1007/s10462-025-11236-4},
+  eprint = {2508.02711},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2508.02711v1},
+}
+
+======================================================================
+Reference: Large language models are latent variable models: Explaining and finding good demonstrations for in-context learning
+Authors  : Xinyi Wang, Wenxuan Zhu, Michael Saxon, Mark Steyvers, William Yang Wang
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/075280-0687
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2301.11916
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2301.11916v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/29bd550d0ab53296790ceba31dfe0a06754bcdde
+@article{wang2023large,
+  title = {Large Language Models Are Latent Variable Models: Explaining and Finding Good Demonstrations for In-Context Learning},
+  author = {Xinyi Wang and Wanrong Zhu and Michael Saxon and Mark Steyvers and William Yang Wang},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/075280-0687},
+  eprint = {2301.11916},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2301.11916v4},
+}
+
+======================================================================
+Reference: Emergent abilities of large language models
+Authors  : Jason Wei, Yi Tay, Rishi Bommasani, Colin Raffel, Barret Zoph, Sebastian Borgeaud, Dani Yogatama, Maarten Bosma, Denny Zhou, Donald Metzler, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Trans. Mach. Learn. Res.' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Trans. Mach. Learn. Res..
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2206.07682
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 16.
+      Suggestion: List all 16 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2206.07682v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/dac3a172b504f4e33c029655e9befb3386e5f63a
+@article{wei2022emergent,
+  title = {Emergent Abilities of Large Language Models},
+  author = {Jason Wei and Yi Tay and Rishi Bommasani and Colin Raffel and Barret Zoph and Sebastian Borgeaud and Dani Yogatama and Maarten Bosma and Denny Zhou and Donald Metzler and Ed H. Chi and Tatsunori Hashimoto and Oriol Vinyals and Percy Liang and Jeff Dean and William Fedus},
+  year = {2022},
+  journal = {Trans. Mach. Learn. Res.},
+  doi = {10.48550/arxiv.2206.07682},
+  eprint = {2206.07682},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2206.07682v2},
+}
+
+======================================================================
+Reference: Symbol tuning improves in-context learning in language models
+Authors  : Jerry Wei, Le Hou, Andrew Lampinen, Xiangning Chen, Da Huang, Yi Tay, Xinyun Chen, Yifeng Lu, Denny Zhou, Tengyu Ma, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2305.08298
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2305.08298v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/3db1219429c3f04e88347d41269bdc83c457fbf9
+@inproceedings{wei2023symbol,
+  title = {Symbol tuning improves in-context learning in language models},
+  author = {Jerry Wei and Le Hou and Andrew Lampinen and Xiangning Chen and Da Huang and Yi Tay and Xinyun Chen and Yifeng Lu and Denny Zhou and Tengyu Ma and Quoc V. Le},
+  year = {2023},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2305.08298},
+  eprint = {2305.08298},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2305.08298v2},
+}
+
+======================================================================
+Reference: Larger language models do in-context learning differently
+Authors  : Jerry Wei, Jason Wei, Yi Tay, Dustin Tran, Albert Webson, Yifeng Lu, Xinyun Chen, Hanxiao Liu, Da Huang, Denny Zhou, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2303.03846
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.03846v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/154493f69d7db3d49da0e51df0192c6ad5f1724a
+@misc{wei2023larger,
+  title = {Larger language models do in-context learning differently},
+  author = {Jerry Wei and Jason Wei and Yi Tay and Dustin Tran and Albert Webson and Yifeng Lu and Xinyun Chen and Hanxiao Liu and Da Huang and Denny Zhou and Tengyu Ma},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2303.03846},
+  eprint = {2303.03846},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.03846v2},
+}
+
+======================================================================
+Reference: A broad-coverage challenge corpus for sentence understanding through inference
+Authors  : Adina Williams, Nikita Nangia, Samuel R Bowman
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'North American Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/n18-1101
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1704.05426v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5ded2b8c64491b4a67f6d39ce473d4b9347a672e
+@article{williams2017broadcoverage,
+  title = {A Broad-Coverage Challenge Corpus for Sentence Understanding through Inference},
+  author = {Adina Williams and Nikita Nangia and Samuel R. Bowman},
+  year = {2017},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/n18-1101},
+  eprint = {1704.05426},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1704.05426v4},
+}
+
+======================================================================
+Reference: Self-adaptive in-context learning: An information compression perspective for in-context example selection and ordering
+Authors  : Zhiyong Wu, Yaoxiang Wang, Jiacheng Ye, Lingpeng Kong
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2212.10375
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2212.10375v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/3d5922d71a370f32b7f232a596def914f67eebd1
+@inproceedings{wu2022selfadaptive,
+  title = {Self-Adaptive In-Context Learning: An Information Compression Perspective for In-Context Example Selection and Ordering},
+  author = {Zhiyong Wu and Yaoxiang Wang and Jiacheng Ye and Lingpeng Kong},
+  year = {2022},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2212.10375},
+  eprint = {2212.10375},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2212.10375v2},
+}
+
+======================================================================
+Reference: An explanation of in-context learning as implicit bayesian inference
+Authors  : Sang Michael Xie, Aditi Raghunathan, Percy Liang, Tengyu Ma
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2111.02080v6
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/10bd4160b44803ada6a3d2e366c44b7e2a4ffe90
+@inproceedings{xie2021explanation,
+  title = {An Explanation of In-context Learning as Implicit Bayesian Inference},
+  author = {Sang Michael Xie and Aditi Raghunathan and Percy Liang and Tengyu Ma},
+  year = {2021},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2111.02080},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2111.02080v6},
+}
+
+======================================================================
+Reference: Representative demonstration selection for in-context learning with two-stage determinantal point process
+Authors  : Zihan Yang, Yijun Zhang, Dian Sui, Chang Liu, Jing Zhao, Kang Liu
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2023.emnlp-main.331
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d86b4712c1c64af64be5e693e796081c1a90e751
+@inproceedings{yang2023representative,
+  title = {Representative Demonstration Selection for In-Context Learning with Two-Stage Determinantal Point Process},
+  author = {Zhao Yang and Yuanzhe Zhang and Dianbo Sui and Cao Liu and Jun Zhao and Kang Liu},
+  year = {2023},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/2023.emnlp-main.331},
+  url = {https://www.semanticscholar.org/paper/d86b4712c1c64af64be5e693e796081c1a90e751},
+}
+
+======================================================================
+Reference: Compositional exemplars for in-context learning
+Authors  : Jiacheng Ye, Zhengyan Wu, Jiankang Feng, Tao Yu, Lingpeng Kong
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2302.05698
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2302.05698
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2302.05698v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/48abfc41a0abf023d2037ebb2f274835e0d322d0
+@inproceedings{ye2023compositional,
+  title = {Compositional Exemplars for In-context Learning},
+  author = {Jiacheng Ye and Zhiyong Wu and Jiangtao Feng and Tao Yu and Lingpeng Kong},
+  year = {2023},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2302.05698},
+  eprint = {2302.05698},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2302.05698v3},
+}
+
+======================================================================
+Reference: Ground-truth labels matter: A deeper look into input-label demonstrations
+Authors  : Kang Min Yoo, Junyeob Kim, Hyuhng Joon Kim, Hyunsoo Cho, Hwiyeol Jo, Sang-Woo Lee, Sang-goo Lee, Taeuk Kim
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2205.12685
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2205.12685v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/316206a2f89eb94ce02a81fba1dc304586f21b39
+@inproceedings{yoo2022groundtruth,
+  title = {Ground-Truth Labels Matter: A Deeper Look into Input-Label Demonstrations},
+  author = {Kang Min Yoo and Junyeob Kim and Hyuhng Joon Kim and Hyunsoo Cho and Hwiyeol Jo and Sang-Woo Lee and Sang-goo Lee and Taeuk Kim},
+  year = {2022},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2205.12685},
+  eprint = {2205.12685},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2205.12685v2},
+}
+
+======================================================================
+Reference: HellaSwag: Can a machine really finish your sentence?
+Authors  : Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali Farhadi, Yejin Choi
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1905.07830
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.07830v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/8b0f27bb594b1eaaf493eaf1e2ee723a2b0a19ad
+@inproceedings{zellers2019hellaswag,
+  title = {HellaSwag: Can a Machine Really Finish Your Sentence?},
+  author = {Rowan Zellers and Ari Holtzman and Yonatan Bisk and Ali Farhadi and Yejin Choi},
+  year = {2019},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/p19-1472},
+  eprint = {1905.07830},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.07830v1},
+}
+
+======================================================================
+Reference: Explain and predict, and then predict again
+Authors  : Zijian Zhang, Koustav Rudra, Avishek Anand
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3437963.3441758
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2101.04109
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ac15e6ae1ff5aa8b0d2a8294294fda2afee97bf4
+@article{zhang2021explain,
+  title = {Explain and Predict, and then Predict Again},
+  author = {Zijian Zhang and Koustav Rudra and Avishek Anand},
+  year = {2021},
+  journal = {Web Search and Data Mining},
+  doi = {10.1145/3437963.3441758},
+  eprint = {2101.04109},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/ac15e6ae1ff5aa8b0d2a8294294fda2afee97bf4},
+}
+
+======================================================================
+Reference: Calibrate before use: Improving few-shot performance of language models
+Authors  : Zihao Zhao, Eric Wallace, Shi Feng, Dan Klein, Sameer Singh
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2102.09690
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2102.09690v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/d7ac65d335b5d847f4f5826313a8732bc7abc7a8
+@inproceedings{zhao2021calibrate,
+  title = {Calibrate Before Use: Improving Few-Shot Performance of Language Models},
+  author = {Tony Z. Zhao and Eric Wallace and Shi Feng and Dan Klein and Sameer Singh},
+  year = {2021},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2102.09690},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2102.09690v2},
+}
+
+======================================================================
+Reference: Judging llm-as-a-judge with mt-bench and chatbot arena
+Authors  : Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric Xing, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/075280-2020
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2306.05685
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 13.
+      Suggestion: List all 13 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2306.05685v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a0a79dad89857a96f8f71b14238e5237cbfc4787
+@article{zheng2023judging,
+  title = {Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena},
+  author = {Lianmin Zheng and Wei-Lin Chiang and Ying Sheng and Siyuan Zhuang and Zhanghao Wu and Yonghao Zhuang and Zi Lin and Zhuohan Li and Dacheng Li and Eric P. Xing and Hao Zhang and Joseph E. Gonzalez and Ion Stoica},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/075280-2020},
+  eprint = {2306.05685},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2306.05685v4},
+}

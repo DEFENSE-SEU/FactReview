@@ -1,0 +1,532 @@
+======================================================================
+Reference: Publicly available clinical bert embeddings
+Authors  : Emily Alsentzer, John Murphy, William Boag, Wei-Hung Weng, Dakuo Jindi, Trish Naumann, M’air’ın B. McDermott
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/w19-1909
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1904.03323
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Proceedings of the 2nd Clinical Natural Language Processing Workshop
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1904.03323v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2a567ebd78939d0861d788f0fedff8d40ae62bf2
+@inproceedings{alsentzer2019publicly,
+  title = {Publicly Available Clinical BERT Embeddings},
+  author = {Emily Alsentzer and John R. Murphy and Willie Boag and Wei-Hung Weng and Di Jin and Tristan Naumann and Matthew B. A. McDermott},
+  year = {2019},
+  booktitle = {Proceedings of the 2nd Clinical Natural Language Processing Workshop},
+  doi = {10.18653/v1/w19-1909},
+  eprint = {1904.03323},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1904.03323v3},
+}
+
+======================================================================
+Reference: Random search for hyper-parameter optimization
+Authors  : James Bergstra, Yoshua Bengio
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.5555/2503308.2188395
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/188e247506ad992b8bc62d6c74789e89891a984f
+@article{bergstra2012random,
+  title = {Random Search for Hyper-Parameter Optimization},
+  author = {J. Bergstra and Yoshua Bengio},
+  year = {2012},
+  journal = {Journal of machine learning research},
+  doi = {10.5555/2503308.2188395},
+  url = {https://www.semanticscholar.org/paper/188e247506ad992b8bc62d6c74789e89891a984f},
+}
+
+======================================================================
+Reference: New tools help companies orchestrate strings of ai agents
+Authors  : Adrian Bridgwater
+Year     : 2025
+Verdict  : unverified
+
+======================================================================
+Reference: Matrix completion for imputation in healthcare data
+Authors  : Tianjian Cai, Ming Zhou, Lili Wang
+Year     : 2022
+Verdict  : error
+  - [error/fake/author_mismatch] Cited authors do not overlap with the retrieved record (overlap 0.00 ≤ 0.1).
+      Suggestion: Retrieved authors: Jicong Fan
+
+======================================================================
+Reference: Augmenting clinical reasoning through knowledge discovery systems
+Authors  : Subhrajit Chakraborty, Ravi Patel
+Year     : 2023
+Verdict  : error
+  - [error/fake/author_mismatch] Cited authors do not overlap with the retrieved record (overlap 0.00 ≤ 0.1).
+      Suggestion: Retrieved authors: Shuai Niu, Jing Ma, Liang Bai, Zhihua Wang, Yida Xu
+
+======================================================================
+Reference: Biomedparse: Biomedical data segmentation and annotation tool
+Authors  : Jie Chen, Yun Fu, Jia Xu, Kai Huang
+Year     : 2021
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: Retain: An interpretable predictive model for healthcare using reverse time attention mechanism
+Authors  : Edward Choi, Mohammad T. Bahadori, Aaron Schuetz, Walter F. Stewart, Jimeng Sun
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1608.05745
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/e8e9125704edbcf73999f2f452fe4a701163d6b6
+@article{choi2016retain,
+  title = {RETAIN: An Interpretable Predictive Model for Healthcare using Reverse Time Attention Mechanism},
+  author = {E. Choi and M. T. Bahadori and Jimeng Sun and Joshua A. Kulas and A. Schuetz and W. Stewart},
+  year = {2016},
+  journal = {Neural Information Processing Systems},
+  eprint = {1608.05745},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/e8e9125704edbcf73999f2f452fe4a701163d6b6},
+}
+
+======================================================================
+Reference: Trustworthy and explainable ai in clinical decision support
+Authors  : Bassam Elhaddad, Lei Wang, Rohan Kumar
+Year     : 2024
+Verdict  : error
+  - [error/fake/author_mismatch] Cited authors do not overlap with the retrieved record (overlap 0.00 ≤ 0.1).
+      Suggestion: Retrieved authors: Yen-Ku Liu, Yun-Cheng Tsai
+
+======================================================================
+Reference: Neurosymbolic approaches for knowledge-infused clinical reasoning in explainable artificial intelligence for differential diagnosis
+Authors  : Shalaka Gandhirajan
+Year     : 2025
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: Medpalm: Medical language models for clinical reasoning
+Authors  : Google Research
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41598-025-31010-4
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Scientific Reports
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/ecd2ba1361ff6e65d3b4f59c9eb67793118095f1
+@article{siam2025benchmarking,
+  title = {Benchmarking large language models on the United States medical licensing examination for clinical reasoning and medical licensing scenarios},
+  author = {Md Kamrul Siam and A. Varela and Md Jobair Hossain Faruk and Jerry Q. Cheng and Huanying Gu and A. Maruf and Zeyar Aung},
+  year = {2025},
+  journal = {Scientific Reports},
+  doi = {10.1038/s41598-025-31010-4},
+  url = {https://www.semanticscholar.org/paper/ecd2ba1361ff6e65d3b4f59c9eb67793118095f1},
+}
+
+======================================================================
+Reference: Amie: A research ai system for diagnostic medical reasoning and conversations
+Authors  : Google Research
+Year     : 2024
+Verdict  : unverified
+
+======================================================================
+Reference: Advancing medical ai with med-gemini
+Authors  : Google Research
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2405.03162
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2405.03162
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/cf4d2cc2270e9b48f5fc94ce26ee702697b9c79d
+@misc{yang2024advancing,
+  title = {Advancing Multimodal Medical Capabilities of Gemini},
+  author = {Lin Yang and Shawn Xu and Andrew B. Sellergren and Timo Kohlberger and Yuchen Zhou and Ira Ktena and A. Kiraly and Faruk Ahmed and F. Hormozdiari and Tiam Jaroensri and Eric Wang and Ellery Wulczyn and Fayaz Jamil and Theo Guidroz and Charles Lau and Siyuan Qiao and Yun Liu and A. Goel and Kendall Park and Arnav Agharwal and Nick George and Yang Wang and Ryutaro Tanno and David G. T. Barrett and Wei-Hung Weng and S. Mahdavi and Khaled Saab and Tao Tu and Sreenivasa Raju Kalidindi and M. Etemadi and Jorge A Cuadros and G. Sorensen and Yossi Matias and Katherine Chou and Greg C. Corrado and Joelle K. Barral and S. Shetty and David Fleet and S. Eslami and Daniel Tse and Shruthi Prabhakara and Cory Y. McLean and David Steiner and Rory Pilgrim and Christopher Kelly and Shekoofeh Azizi and Daniel Golden},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2405.03162},
+  eprint = {2405.03162},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/cf4d2cc2270e9b48f5fc94ce26ee702697b9c79d},
+}
+
+======================================================================
+Reference: A sharper bonferroni procedure for multiple tests of significance
+Authors  : Yosef Hochberg
+Year     : 1988
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1093/biomet/75.4.800
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/de5602faa7c79debc3b096b628cb468082a772a4
+@article{hochberg1988sharper,
+  title = {A sharper Bonferroni procedure for multiple tests of significance},
+  author = {Y. Hochberg},
+  year = {1988},
+  journal = {Biometrika},
+  doi = {10.1093/biomet/75.4.800},
+  url = {https://www.semanticscholar.org/paper/de5602faa7c79debc3b096b628cb468082a772a4},
+}
+
+======================================================================
+Reference: A study on neuro-symbolic artificial intelligence for reasoning under uncertainty in clinical decision support systems
+Authors  : D. Hossain, et al.
+Year     : 2025
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: A study on neuro-symbolic artificial intelligence: Healthcare perspectives
+Authors  : Delower Hossain, Jake Y . Chen
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2503.18213
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2503.18213v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5554216f5e1c15e6436f7c06794af8ce680b76ed
+@misc{hossain2025study,
+  title = {A Study on Neuro-Symbolic Artificial Intelligence: Healthcare Perspectives},
+  author = {Delower Hossain and Jake Y Chen},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2503.18213},
+  eprint = {2503.18213},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2503.18213v1},
+}
+
+======================================================================
+Reference: Clinicalbert: Modeling clinical notes and predicting hospital readmission
+Authors  : Kuang Huang, Jianguo Lee, Jeremy Pembroke, Dmitry Zheleznyakov, Jian Chen, David Ferrucci
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1904.05342
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1904.05342v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/b3c2c9f53ab130f3eb76eaaab3afa481c5a405eb
+@misc{huang2019clinicalbert,
+  title = {ClinicalBERT: Modeling Clinical Notes and Predicting Hospital Readmission},
+  author = {Kexin Huang and Jaan Altosaar and Rajesh Ranganath},
+  year = {2019},
+  journal = {arXiv.org},
+  eprint = {1904.05342},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1904.05342v3},
+}
+
+======================================================================
+Reference: Explainable ai techniques for medical applications: A comprehensive review
+Authors  : Meera Jain, Albert Chen
+Year     : 2024
+Verdict  : error
+  - [error/fake/author_mismatch] Cited authors do not overlap with the retrieved record (overlap 0.00 ≤ 0.1).
+      Suggestion: Retrieved authors: Yash Bhardwaj, P. Meshram
+
+======================================================================
+Reference: Mimic-iii, a freely accessible critical care database
+Authors  : Alistair E. W. Johnson, Tom J. Pollard, Lu Shen, Li-wei H. Lehman, Mengling Feng, Marzyeh Ghassemi, Benjamin Moody, Peter Szolovits, Leo Anthony Celi, Roger G. Mark
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/sdata.2016.35
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/95cd83603a0d2b6918a8e34a5637a8f382da96f5
+@article{johnson2016mimiciii,
+  title = {MIMIC-III, a freely accessible critical care database},
+  author = {A. Johnson and T. Pollard and Lu Shen and Li-wei H. Lehman and M. Feng and M. Ghassemi and Benjamin Moody and Peter Szolovits and L. Celi and R. Mark},
+  year = {2016},
+  journal = {Scientific Data},
+  doi = {10.1038/sdata.2016.35},
+  url = {https://www.semanticscholar.org/paper/95cd83603a0d2b6918a8e34a5637a8f382da96f5},
+}
+
+======================================================================
+Reference: Developing an lstm model to identify surgical site infections using electronic healthcare records
+Authors  : Alexandra C. Kiser, Kaitlyn Eilbeck, Brandon T. Bucher
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'AMIA Joint Summits on Translational Science Proceedings' may be an abbreviation of 'AMIA Joint Summits on Translational Science proceedings. AMIA Joint Summits on Translational Science'.
+      Suggestion: Use the full venue name: AMIA Joint Summits on Translational Science proceedings. AMIA Joint Summits on Translational Science.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, title, venue, year — https://www.semanticscholar.org/paper/55a9b3afd3ebce480dc2e94e3c0909d66a8c9158
+@inproceedings{kiser2023developing,
+  title = {Developing an LSTM Model to Identify Surgical Site Infections using Electronic Healthcare Records.},
+  author = {A. Kiser and K. Eilbeck and B. Bucher},
+  year = {2023},
+  booktitle = {AMIA Joint Summits on Translational Science proceedings. AMIA Joint Summits on Translational Science},
+  url = {https://www.semanticscholar.org/paper/55a9b3afd3ebce480dc2e94e3c0909d66a8c9158},
+}
+
+======================================================================
+Reference: Navigating ai regulations in healthcare: Ethical and legal perspectives
+Authors  : Anna Kowalski, David Thompson
+Year     : 2025
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: Agent-based clinical simulations for multi-agent decision-making
+Authors  : Rohit Kumar, Arjun Singh, Neha Gupta
+Year     : 2021
+Verdict  : error
+  - [error/fake/author_mismatch] Cited authors do not overlap with the retrieved record (overlap 0.00 ≤ 0.1).
+      Suggestion: Retrieved authors: Udeme Vincent Udok, U. Victor-Edema, M. Ijomah
+
+======================================================================
+Reference: Retrieval-augmented generation for knowledge-intensive nlp tasks
+Authors  : Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Daniel et al. Khashabi
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2005.11401
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2005.11401v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/659bf9ce7175e1ec266ff54359e2bd76e0b7ff31
+@article{lewis2020retrievalaugmented,
+  title = {Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks},
+  author = {Patrick Lewis and Ethan Perez and Aleksandra Piktus and Fabio Petroni and Vladimir Karpukhin and Naman Goyal and Heinrich Küttler and Mike Lewis and Wen-tau Yih and Tim Rocktäschel and Sebastian Riedel and Douwe Kiela},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2005.11401},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2005.11401v4},
+}
+
+======================================================================
+Reference: Statistical Analysis with Missing Data
+Authors  : Roderick J.A. Little, Donald B. Rubin
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.2307/2349029
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f13987663364e399e7d9890088122fe60278f681
+@article{gibson1989statistical,
+  title = {Statistical Analysis with Missing Data.},
+  author = {M. Gibson and R. Little and D. Rubin},
+  year = {1989},
+  journal = {The Statistician},
+  doi = {10.2307/2349029},
+  url = {https://www.semanticscholar.org/paper/f13987663364e399e7d9890088122fe60278f681},
+}
+
+======================================================================
+Reference: Explainable diagnosis prediction through neuro-symbolic integration
+Authors  : Qiuhao Lu, Rui Li, Elham Sagheb, Andrew Wen, Jinlian Wang, Liwei Wang, Jungwei W. Fan, Hongfang Liu
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'AMIA Joint Summits on Translational Science proceedings. AMIA Joint Summits on Translational Science' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: AMIA Joint Summits on Translational Science proceedings. AMIA Joint Summits on Translational Science.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2410.01855
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2410.01855v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/aa65fbe8eb5b750d151abcfe4715bbaf17c6b941
+@inproceedings{lu2024explainable,
+  title = {Explainable Diagnosis Prediction through Neuro-Symbolic Integration},
+  author = {Qiuhao Lu and Rui Li and Elham Sagheb and Andrew Wen and Jinlian Wang and Liwei Wang and Jungwei W. Fan and Hongfang Liu},
+  year = {2024},
+  booktitle = {AMIA Joint Summits on Translational Science proceedings. AMIA Joint Summits on Translational Science},
+  doi = {10.48550/arxiv.2410.01855},
+  eprint = {2410.01855},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2410.01855v2},
+}
+
+======================================================================
+Reference: Artificial intelligence in clinical decision support: Challenges for evaluating ai and practical needs
+Authors  : Stefano Montani, Riccardo Bellazzi
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1055/s-0039-1677903
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0dacda0904797da8ab3ccafb26547813baff729f
+@article{magrabi2019artificial,
+  title = {Artificial Intelligence in Clinical Decision Support: Challenges for Evaluating AI and Practical Implications},
+  author = {F. Magrabi and E. Ammenwerth and J. B. McNair and N. D. de Keizer and H. Hyppönen and P. Nykänen and M. Rigby and P. Scott and T. Vehko and Z. S. Wong and A. Georgiou},
+  year = {2019},
+  journal = {Yearbook of Medical Informatics},
+  doi = {10.1055/s-0039-1677903},
+  url = {https://www.semanticscholar.org/paper/0dacda0904797da8ab3ccafb26547813baff729f},
+}
+
+======================================================================
+Reference: Predictive modeling of patient outcomes through temporal reasoning
+Authors  : Siddharth Nair, Anand Kumar, Richa Gupta
+Year     : 2020
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: A review of neuro-symbolic ai integrating reasoning and learning
+Authors  : Uzma Nawaz
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.iswa.2025.200541
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/12a3400f5591441adbb9e08480ec045b7cc8d292
+@article{nawaz2025review,
+  title = {A review of neuro-symbolic AI integrating reasoning and learning for advanced cognitive systems},
+  author = {Uzma Nawaz and Mufti Anees-ur-Rahaman and Zubair Saeed},
+  year = {2025},
+  journal = {Intelligent Systems with Applications},
+  doi = {10.1016/j.iswa.2025.200541},
+  url = {https://www.semanticscholar.org/paper/12a3400f5591441adbb9e08480ec045b7cc8d292},
+}
+
+======================================================================
+Reference: Cudoctor: A fuzzy logic-based medical chatbot for patient support
+Authors  : Thanh Nguyen, Xuan Ding
+Year     : 2020
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: Scalable and accurate deep learning for electronic health records
+Authors  : Alvin Rajkomar, Eyal Oren, Kai Chen, Andrew M. Dai, Narges Hajaj, Moritz Hardt, Peter et al. Liu
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41746-018-0029-1
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1801.07860
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1801.07860v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1f7eec4c76963a4ba7516ca00e6a2f855667b3f2
+@article{rajkomar2018scalable,
+  title = {Scalable and accurate deep learning for electronic health records},
+  author = {Alvin Rajkomar and Eyal Oren and Kai Chen and Andrew M. Dai and Nissan Hajaj and Peter J. Liu and Xiaobing Liu and Mimi Sun and Patrik Sundberg and Hector Yee and Kun Zhang and Gavin E. Duggan and Gerardo Flores and Michaela Hardt and Jamie Irvine and Quoc Le and Kurt Litsch and Jake Marcus and Alexander Mossin and Justin Tansuwan and De Wang and James Wexler and Jimbo Wilson and Dana Ludwig and Samuel L. Volchenboum and Katherine Chou and Michael Pearson and Srinivasan Madabushi and Nigam H. Shah and Atul J. Butte and Michael Howell and Claire Cui and Greg Corrado and Jeff Dean},
+  year = {2018},
+  journal = {npj Digital Medicine},
+  doi = {10.1038/s41746-018-0029-1},
+  eprint = {1801.07860},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1801.07860v3},
+}
+
+======================================================================
+Reference: Learning a health knowledge graph from electronic medical records
+Authors  : Melissa Rotmensch, Yael Halpern, Ameet Tlimat, Steven Horng, David Sontag
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41598-017-05778-z
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8b0de2074bb42a55395efd7e95503bd74736cdd7
+@article{rotmensch2017learning,
+  title = {Learning a Health Knowledge Graph from Electronic Medical Records},
+  author = {Maya Rotmensch and Yoni Halpern and A. Tlimat and S. Horng and D. Sontag},
+  year = {2017},
+  journal = {Scientific Reports},
+  doi = {10.1038/s41598-017-05778-z},
+  url = {https://www.semanticscholar.org/paper/8b0de2074bb42a55395efd7e95503bd74736cdd7},
+}
+
+======================================================================
+Reference: Computer-based medical consultations: Mycin
+Authors  : Edward H. Shortliffe
+Year     : 1976
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.7326/0003-4819-85-6-831_1
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, year — https://www.semanticscholar.org/paper/c8e38cee27196aebba894bba680e74f23bf9c560
+@article{shortliffe1976computerbased,
+  title = {Computer-based medical consultations, MYCIN},
+  author = {E. Shortliffe},
+  year = {1976},
+  doi = {10.7326/0003-4819-85-6-831_1},
+  url = {https://www.semanticscholar.org/paper/c8e38cee27196aebba894bba680e74f23bf9c560},
+}
+
+======================================================================
+Reference: Managing clinical uncertainty: Practices and perspectives
+Authors  : Jane Smith, Alan Lee
+Year     : 2020
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: Incorporating causal reasoning in medical temporal models
+Authors  : Lei Wang, Min Zhao, Wei Chen
+Year     : 2023
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.
+
+======================================================================
+Reference: Sam: Semantic annotation for medical temporal data
+Authors  : Sarah Williams, John Lee, Hyun Park
+Year     : 2022
+Verdict  : error
+  - [error/fake/author_mismatch] Cited authors do not overlap with the retrieved record (overlap 0.00 ≤ 0.1).
+      Suggestion: Retrieved authors: P. Vcelak, M. Kryl, J. Klecková
+
+======================================================================
+Reference: Unbox the black-box for the medical explainable ai via multi-modal and multi-instance learning
+Authors  : Guang Yang, et al.
+Year     : 2022
+Verdict  : error
+  - [error/fake/title_mismatch] Cited title does not match any retrieved record (best similarity 0.00 < 0.25).
+      Suggestion: Closest match: Robust biometric system using session invariant multimodal EEG and keystroke dynamics by the ensemble of self-ONNs
+
+======================================================================
+Reference: Madip: Multi-agent decision infrastructure for healthcare
+Authors  : Yifan Zhang, Ming Chen, Hong Wang
+Year     : 2019
+Verdict  : error
+  - [error/fake/no_match] No matching paper found on arXiv or Semantic Scholar.
+      Suggestion: Verify the citation; it may be fabricated.

@@ -1,0 +1,360 @@
+======================================================================
+Reference: Timegpt-1
+Authors  : Azul Garza, Cristian Challu, Max Mergenthaler-Canseco
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2310.03589
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.03589v3
+@misc{garza2023timegpt,
+  title = {TimeGPT-1},
+  author = {Azul Garza and Cristian Challu and Max Mergenthaler-Canseco},
+  year = {2023},
+  eprint = {2310.03589},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.03589v3},
+}
+
+======================================================================
+Reference: A decoder-only foundation model for time-series forecasting
+Authors  : Abhimanyu Das, Weihao Kong, Rajat Sen, Yichen Zhou
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.10688
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2310.10688
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Machine Learning
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2310.10688v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f45f85fa1beaa795c24c4ff86f1f2deece72252f
+@inproceedings{das2023decoderonly,
+  title = {A decoder-only foundation model for time-series forecasting},
+  author = {Abhimanyu Das and Weihao Kong and Rajat Sen and Yichen Zhou},
+  year = {2023},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2310.10688},
+  eprint = {2310.10688},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2310.10688v4},
+}
+
+======================================================================
+Reference: Exploring kolmogorov-arnold networks for interpretable time series classification
+Authors  : Irina Barašin, Blaž Bertalanič, Mihael Mohorčič, Carolina Fortuna
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1155/int/9553189
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2411.14904
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Journal of Intelligent Systems
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2411.14904v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/7a99b0c7378a08928c56cf71cf6a58af11860de4
+@article{barašin2024exploring,
+  title = {Exploring Kolmogorov-Arnold Networks for Interpretable Time Series Classification},
+  author = {Irina Barašin and Blaž Bertalanič and Mihael Mohorčič and Carolina Fortuna},
+  year = {2024},
+  journal = {International Journal of Intelligent Systems},
+  doi = {10.1155/int/9553189},
+  eprint = {2411.14904},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2411.14904v3},
+}
+
+======================================================================
+Reference: Mamba: Linear-time sequence modeling with selective state spaces
+Authors  : Albert Gu, Tri Dao
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2312.00752
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2312.00752v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/7bbc7595196a0606a07506c4fb1473e5e87f6082
+@misc{gu2023mamba,
+  title = {Mamba: Linear-Time Sequence Modeling with Selective State Spaces},
+  author = {Albert Gu and Tri Dao},
+  year = {2023},
+  journal = {arXiv.org},
+  eprint = {2312.00752},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2312.00752v2},
+}
+
+======================================================================
+Reference: Bert: Pre-training of deep bidirectional transformers for language understanding
+Authors  : Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/n19-1423
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1810.04805
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: North American Chapter of the Association for Computational Linguistics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1810.04805v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/df2b0e26d0599ce3e70df8a9da02e51594e0e992
+@article{devlin2018bert,
+  title = {BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  author = {Jacob Devlin and Ming-Wei Chang and Kenton Lee and Kristina Toutanova},
+  year = {2018},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/n19-1423},
+  eprint = {1810.04805},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1810.04805v2},
+}
+
+======================================================================
+Reference: Attention is all you need
+Authors  : Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1706.03762
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Neural Information Processing Systems
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1706.03762v7
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/204e3073870fae3d05bcbc2f6a8e263d9b72e776
+@article{vaswani2017attention,
+  title = {Attention Is All You Need},
+  author = {Ashish Vaswani and Noam Shazeer and Niki Parmar and Jakob Uszkoreit and Llion Jones and Aidan N. Gomez and Lukasz Kaiser and Illia Polosukhin},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1706.03762},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1706.03762v7},
+}
+
+======================================================================
+Reference: Mixed precision training
+Authors  : Paulius Micikevicius, Sharan Narang, Jonah Alben, Gregory Diamos, Erich Elsen, David Garcia, Boris Ginsburg, Michael Houston, Oleksii Kuchaiev, Ganesh Venkatesh, Hao Wu
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1710.03740
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Learning Representations
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1710.03740v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/e7fd6848cb29ca221a7e17d823e06fb566f1f135
+@inproceedings{micikevicius2017mixed,
+  title = {Mixed Precision Training},
+  author = {Paulius Micikevicius and Sharan Narang and Jonah Alben and Gregory Diamos and Erich Elsen and David Garcia and Boris Ginsburg and Michael Houston and Oleksii Kuchaiev and Ganesh Venkatesh and Hao Wu},
+  year = {2017},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1710.03740},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1710.03740v3},
+}
+
+======================================================================
+Reference: On the difficulty of training recurrent neural networks
+Authors  : Razvan Pascanu, Tomas Mikolov, Yoshua Bengio
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1211.5063
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Machine Learning
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1211.5063v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/84069287da0a6b488b8c933f3cb5be759cb6237e
+@inproceedings{pascanu2012difficulty,
+  title = {On the difficulty of training Recurrent Neural Networks},
+  author = {Razvan Pascanu and Tomas Mikolov and Yoshua Bengio},
+  year = {2012},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1211.5063},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1211.5063v2},
+}
+
+======================================================================
+Reference: Deep time series forecasting models: A comprehensive survey
+Authors  : Xinhe Liu, Wenmin Wang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3390/math12101504
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d93c9854b0ec15d7272319e91ee9c2b294327e49
+@article{liu2024deep,
+  title = {Deep Time Series Forecasting Models: A Comprehensive Survey},
+  author = {Xinhe Liu and Wenmin Wang},
+  year = {2024},
+  journal = {Mathematics},
+  doi = {10.3390/math12101504},
+  url = {https://www.semanticscholar.org/paper/d93c9854b0ec15d7272319e91ee9c2b294327e49},
+}
+
+======================================================================
+Reference: Moment: A family of open time-series foundation models
+Authors  : Mononito Goswami, Konrad Szafer, Arjun Choudhry, Yifu Cai, Shuo Li, Artur Dubrawski
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.03885
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2402.03885
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Machine Learning
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.03885v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/aabfdbd9db5ce9b1d598eae44e0d6250e7f0fc00
+@inproceedings{goswami2024moment,
+  title = {MOMENT: A Family of Open Time-series Foundation Models},
+  author = {Mononito Goswami and Konrad Szafer and Arjun Choudhry and Yifu Cai and Shuo Li and Artur Dubrawski},
+  year = {2024},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2402.03885},
+  eprint = {2402.03885},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.03885v3},
+}
+
+======================================================================
+Reference: A survey of time series foundation models: Generalizing time series representation with large language model
+Authors  : Jiexia Ye, Weiqi Zhang, Ke Yi, Yongzi Yu, Ziyue Li, Jia Li, Fugee Tsung
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: CoRR 2024
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   openreview: authors, title, venue, year — https://openreview.net/forum?id=G7rJqiRG8L
+@article{ye2024survey,
+  title = {A Survey of Time Series Foundation Models: Generalizing Time Series Representation with Large Language Model},
+  author = {Jiexia Ye and Weiqi Zhang and Ke Yi and Yongzi Yu and Ziyue Li and Jia Li and Fugee Tsung},
+  year = {2024},
+  journal = {CoRR 2024},
+  url = {https://openreview.net/forum?id=G7rJqiRG8L},
+}
+
+======================================================================
+Reference: Time2vec: Learning a vector representation of time
+Authors  : Seyed Mehran Kazemi, Rishab Goel, Sepehr Eghbali, Janahan Ramanan, Jaspreet Sahota, Sanjay Thakur, Stella Wu, Cathal Smyth, Pascal Poupart, Marcus Brubaker
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1907.05321
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1907.05321v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/10ffbbcf23923ffef2b1ae78b516ec4329c78727
+@misc{kazemi2019timevec,
+  title = {Time2Vec: Learning a Vector Representation of Time},
+  author = {Seyed Mehran Kazemi and Rishab Goel and Sepehr Eghbali and Janahan Ramanan and Jaspreet Sahota and Sanjay Thakur and Stella Wu and Cathal Smyth and Pascal Poupart and Marcus Brubaker},
+  year = {2019},
+  journal = {arXiv.org},
+  eprint = {1907.05321},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1907.05321v1},
+}
+
+======================================================================
+Reference: Kolmogorov-arnold networks for time series: Bridging predictive power and interpretability
+Authors  : Kunpeng Xu, Lifei Chen, Shengrui Wang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2406.02496
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2406.02496
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2406.02496v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/10145b2238569436754c4d9be3f9c7db501cc65c
+@misc{xu2024kolmogorovarnold,
+  title = {Kolmogorov-Arnold Networks for Time Series: Bridging Predictive Power and Interpretability},
+  author = {Kunpeng Xu and Lifei Chen and Shengrui Wang},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2406.02496},
+  eprint = {2406.02496},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2406.02496v1},
+}
+
+======================================================================
+Reference: ms-mamba: Multi-scale mamba for time-series forecasting
+Authors  : Yusuf Meric Karadag, Sinan Kalkan, Ipek Gursel Dino
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2504.07654
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2504.07654
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Neurocomputing
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2504.07654v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/cfa51c4e9975850a452be2440d8148ddb15cd847
+@article{karadag2025msmamba,
+  title = {ms-Mamba: Multi-scale Mamba for Time-Series Forecasting},
+  author = {Yusuf Meric Karadag and Ismail Talaz and Ipek Gursel Dino and Sinan Kalkan},
+  year = {2025},
+  journal = {Neurocomputing},
+  doi = {10.48550/arxiv.2504.07654},
+  eprint = {2504.07654},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2504.07654v2},
+}
+
+======================================================================
+Reference: Intervention-aware forecasting: Breaking historical limits from a system perspective
+Authors  : Zhijian Xu, Hao Wang, Qiang Xu
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2405.13522
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.13522v3
+@misc{xu2024interventionaware,
+  title = {Intervention-Aware Forecasting: Breaking Historical Limits from a System Perspective},
+  author = {Zhijian Xu and Hao Wang and Qiang Xu},
+  year = {2024},
+  eprint = {2405.13522},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.13522v3},
+}

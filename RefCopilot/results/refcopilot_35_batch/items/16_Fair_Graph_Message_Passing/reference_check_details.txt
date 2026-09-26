@@ -1,0 +1,1111 @@
+======================================================================
+Reference: Towards a unified framework for fair and stable graph representation learning
+Authors  : Chirag Agarwal, Himabindu Lakkaraju, Marinka Zitnik
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Uncertainty in Artificial Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Uncertainty in Artificial Intelligence.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2102.13186v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/21b6b07688cf4531b2d7854064e2de5868e2ec4f
+@inproceedings{agarwal2021towards,
+  title = {Towards a Unified Framework for Fair and Stable Graph Representation Learning},
+  author = {Chirag Agarwal and Himabindu Lakkaraju and Marinka Zitnik},
+  year = {2021},
+  booktitle = {Conference on Uncertainty in Artificial Intelligence},
+  eprint = {2102.13186},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2102.13186v3},
+}
+
+======================================================================
+Reference: Laplacian eigenmaps and spectral techniques for embedding and clustering
+Authors  : Mikhail Belkin, Partha Niyogi
+Year     : 2001
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.7551/mitpress/1120.003.0080
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/9d16c547d15a08091e68c86a99731b14366e3f0d
+@article{belkin2001laplacian,
+  title = {Laplacian Eigenmaps and Spectral Techniques for Embedding and Clustering},
+  author = {Mikhail Belkin and P. Niyogi},
+  year = {2001},
+  journal = {Neural Information Processing Systems},
+  doi = {10.7551/mitpress/1120.003.0080},
+  url = {https://www.semanticscholar.org/paper/9d16c547d15a08091e68c86a99731b14366e3f0d},
+}
+
+======================================================================
+Reference: Compositional fairness constraints for graph embeddings
+Authors  : Avishek Bose, William Hamilton
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1905.10674
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.10674v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/a2c7d81e5956b38eb296b079ce4f116083d2bfd9
+@inproceedings{bose2019compositional,
+  title = {Compositional Fairness Constraints for Graph Embeddings},
+  author = {Avishek Joey Bose and William L. Hamilton},
+  year = {2019},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1905.10674},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.10674v4},
+}
+
+======================================================================
+Reference: Spectral networks and locally connected networks on graphs
+Authors  : Joan Bruna, Wojciech Zaremba, Arthur Szlam, Yann LeCun
+Year     : 2013
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1312.6203v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/5e925a9f1e20df61d1e860a7aa71894b35a1c186
+@inproceedings{bruna2013spectral,
+  title = {Spectral Networks and Locally Connected Networks on Graphs},
+  author = {Joan Bruna and Wojciech Zaremba and Arthur Szlam and Yann LeCun},
+  year = {2013},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1312.6203},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1312.6203v3},
+}
+
+======================================================================
+Reference: Debayes: a bayesian method for debiasing network embeddings
+Authors  : Maarten Buyl, Tijl De Bie
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2002.11442
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2002.11442v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/aac31850359dca92a9a84a3e74dcd0f98edd1e00
+@inproceedings{buyl2020debayes,
+  title = {DeBayes: a Bayesian Method for Debiasing Network Embeddings},
+  author = {Maarten Buyl and Tijl De Bie},
+  year = {2020},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2002.11442},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2002.11442v3},
+}
+
+======================================================================
+Reference: A primal–dual fixed point algorithm for convex separable minimization with applications to image restoration
+Authors  : Peijun Chen, Jianguo Huang, Xiaoqun Zhang
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1088/0266-5611/29/2/025011
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f2da676d4db106ef1f1ee11f33b662e928027ec9
+@article{chen2013primaldual,
+  title = {A primal–dual fixed point algorithm for convex separable minimization with applications to image restoration},
+  author = {Peijun Chen and J. Huang and Xiaoqun Zhang},
+  year = {2013},
+  journal = {Inverse Problems},
+  doi = {10.1088/0266-5611/29/2/025011},
+  url = {https://www.semanticscholar.org/paper/f2da676d4db106ef1f1ee11f33b662e928027ec9},
+}
+
+======================================================================
+Reference: Fair mixup: Fairness via interpolation
+Authors  : Ching-Yao Chuang, Youssef Mroueh
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2103.06503
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/3470256133fe185031791e600f84376262bd9015
+@inproceedings{chuang2021fair,
+  title = {Fair Mixup: Fairness via Interpolation},
+  author = {Ching-Yao Chuang and Youssef Mroueh},
+  year = {2021},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2103.06503},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/3470256133fe185031791e600f84376262bd9015},
+}
+
+======================================================================
+Reference: Flexibly fair representation learning by disentanglement
+Authors  : Elliot Creager, David Madras, Jörn-Henrik Jacobsen, Marissa Weis, Kevin Swersky, Toniann Pitassi, Richard Zemel
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1906.02589
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1906.02589v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/45a0936668026005beccf9009e8a555f96a50d7e
+@inproceedings{creager2019flexibly,
+  title = {Flexibly Fair Representation Learning by Disentanglement},
+  author = {Elliot Creager and David Madras and Jörn-Henrik Jacobsen and Marissa A. Weis and Kevin Swersky and Toniann Pitassi and Richard Zemel},
+  year = {2019},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1906.02589},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1906.02589v1},
+}
+
+======================================================================
+Reference: Say no to the discrimination: Learning fair graph neural networks with limited sensitive attribute information
+Authors  : Enyan Dai, Suhang Wang
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3437963.3441752
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2009.01454
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0b33c9c2eec5e7a71e1c051ec76e601e76152146
+@article{dai2020discrimination,
+  title = {Say No to the Discrimination: Learning Fair Graph Neural Networks with Limited Sensitive Attribute Information},
+  author = {Enyan Dai and Suhang Wang},
+  year = {2020},
+  journal = {Web Search and Data Mining},
+  doi = {10.1145/3437963.3441752},
+  eprint = {2009.01454},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/0b33c9c2eec5e7a71e1c051ec76e601e76152146},
+}
+
+======================================================================
+Reference: Convolutional neural networks on graphs with fast localized spectral filtering
+Authors  : Michaël Defferrard, Xavier Bresson, Pierre Vandergheynst
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1606.09375
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1606.09375v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/c41eb895616e453dcba1a70c9b942c5063cc656c
+@article{defferrard2016convolutional,
+  title = {Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering},
+  author = {Michaël Defferrard and Xavier Bresson and Pierre Vandergheynst},
+  year = {2016},
+  journal = {Neural Information Processing Systems},
+  eprint = {1606.09375},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1606.09375v3},
+}
+
+======================================================================
+Reference: Individual fairness for graph neural networks: A ranking based approach
+Authors  : Yushun Dong, Jian Kang, Hanghang Tong, Jundong Li
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3447548.3467266
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/fa98db551fdec0a4c5c1beb25f8aa3df378b8c02
+@article{dong2021individual,
+  title = {Individual Fairness for Graph Neural Networks: A Ranking based Approach},
+  author = {Yushun Dong and Jian Kang and H. Tong and Jundong Li},
+  year = {2021},
+  journal = {Knowledge Discovery and Data Mining},
+  doi = {10.1145/3447548.3467266},
+  url = {https://www.semanticscholar.org/paper/fa98db551fdec0a4c5c1beb25f8aa3df378b8c02},
+}
+
+======================================================================
+Reference: Edits: Modeling and mitigating data bias for graph neural networks
+Authors  : Yushun Dong, Ninghao Liu, Brian Jalaian, Jundong Li
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3485447.3512173
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2108.05233
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/cd551790992d16148fe2e5ff2cc76861195e2191
+@inproceedings{dong2021edits,
+  title = {EDITS: Modeling and Mitigating Data Bias for Graph Neural Networks},
+  author = {Yushun Dong and Ninghao Liu and B. Jalaeian and Jundong Li},
+  year = {2021},
+  booktitle = {The Web Conference},
+  doi = {10.1145/3485447.3512173},
+  eprint = {2108.05233},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/cd551790992d16148fe2e5ff2cc76861195e2191},
+}
+
+======================================================================
+Reference: Reliant: Fair knowledge distillation for graph neural networks
+Authors  : Yushun Dong, Binchi Zhang, Yiling Yuan, Na Zou, Qi Wang, Jundong Li
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'SDM' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: SDM.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2301.01150
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2301.01150v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/7ae864d1b0fc002055cddec4a56cc70b5a085f51
+@article{dong2023reliant,
+  title = {RELIANT: Fair Knowledge Distillation for Graph Neural Networks},
+  author = {Yushun Dong and Binchi Zhang and Yiling Yuan and Na Zou and Qi Wang and Jundong Li},
+  year = {2023},
+  journal = {SDM},
+  doi = {10.48550/arxiv.2301.01150},
+  eprint = {2301.01150},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2301.01150v2},
+}
+
+======================================================================
+Reference: Fairness via representation neutralization
+Authors  : Mengnan Du, Subhabrata Mukherjee, Guanchu Wang, Ruixiang Tang, Ahmed Hassan Awadallah, Xia Hu
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2106.12674v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/4c2e9b401e6fe3b3b81799ae0837048fccaef0a6
+@article{du2021fairness,
+  title = {Fairness via Representation Neutralization},
+  author = {Mengnan Du and Subhabrata Mukherjee and Guanchu Wang and Ruixiang Tang and Ahmed Hassan Awadallah and Xia Hu},
+  year = {2021},
+  journal = {Neural Information Processing Systems},
+  eprint = {2106.12674},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2106.12674v2},
+}
+
+======================================================================
+Reference: Certifying and removing disparate impact
+Authors  : Michael Feldman, Sorelle A Friedler, John Moeller, Carlos Scheidegger, Suresh Venkatasubramanian
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/2783258.2783311
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1412.3756
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0fee3b6c72f7676b4934651e517d0a328048c600
+@article{feldman2014certifying,
+  title = {Certifying and Removing Disparate Impact},
+  author = {Michael Feldman and Sorelle A. Friedler and John Moeller and C. Scheidegger and S. Venkatasubramanian},
+  year = {2014},
+  journal = {Knowledge Discovery and Data Mining},
+  doi = {10.1145/2783258.2783311},
+  eprint = {1412.3756},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/0fee3b6c72f7676b4934651e517d0a328048c600},
+}
+
+======================================================================
+Reference: Debiasing knowledge graph embeddings
+Authors  : Joseph Fisher, Arpit Mittal, Dave Palfrey, Christos Christodoulopoulos
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.emnlp-main.595
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2006.16309
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2006.16309v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2292c89ba08a5b5f1dde2bf4fa65241e2cd98fef
+@inproceedings{arduini2020adversarial,
+  title = {Adversarial Learning for Debiasing Knowledge Graph Embeddings},
+  author = {Mario Arduini and Lorenzo Noci and Federico Pirovano and Ce Zhang and Yash Raj Shrestha and Bibek Paudel},
+  year = {2020},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/2020.emnlp-main.595},
+  eprint = {2006.16309},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2006.16309v2},
+}
+
+======================================================================
+Reference: Large-scale learnable graph convolutional networks
+Authors  : Hongyang Gao, Zhengyang Wang, Shuiwang Ji
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3219819.3219947
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1808.03965
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1808.03965v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d5aefe86b1ba8c773a6bd0e84812ace161b8c0db
+@article{gao2018largescale,
+  title = {Large-Scale Learnable Graph Convolutional Networks},
+  author = {Hongyang Gao and Zhengyang Wang and Shuiwang Ji},
+  year = {2018},
+  journal = {Knowledge Discovery and Data Mining},
+  doi = {10.1145/3219819.3219947},
+  eprint = {1808.03965},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1808.03965v1},
+}
+
+======================================================================
+Reference: Optimal parameter selection for the alternating direction method of multipliers (admm): quadratic problems
+Authors  : Euhanna Ghadimi, André Teixeira, Iman Shames, Mikael Johansson
+Year     : 2014
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tac.2014.2354892
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1306.2454
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/14c0cd1288ecc2f8e388cf3fc105034fd6e651ef
+@article{ghadimi2013optimal,
+  title = {Optimal Parameter Selection for the Alternating Direction Method of Multipliers (ADMM): Quadratic Problems},
+  author = {E. Ghadimi and André Teixeira and I. Shames and M. Johansson},
+  year = {2013},
+  journal = {IEEE Transactions on Automatic Control},
+  doi = {10.1109/tac.2014.2354892},
+  eprint = {1306.2454},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/14c0cd1288ecc2f8e388cf3fc105034fd6e651ef},
+}
+
+======================================================================
+Reference: Knowledge transfer for out-of-knowledge-base entities: A graph neural network approach
+Authors  : Takuo Hamaguchi, Hidekazu Oiwa, Masashi Shimbo, Yuji Matsumoto
+Year     : 2017
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Joint Conference on Artificial Intelligence' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Joint Conference on Artificial Intelligence.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1527/tjsai.f-h72
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1706.05674v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a625dee1fb23d1c842a961bc354c0aef3a20c132
+@inproceedings{hamaguchi2017knowledge,
+  title = {Knowledge Transfer for Out-of-Knowledge-Base Entities: A Graph Neural Network Approach},
+  author = {Takuo Hamaguchi and Hidekazu Oiwa and Masashi Shimbo and Yuji Matsumoto},
+  year = {2017},
+  booktitle = {International Joint Conference on Artificial Intelligence},
+  doi = {10.1527/tjsai.f-h72},
+  eprint = {1706.05674},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1706.05674v2},
+}
+
+======================================================================
+Reference: Inductive representation learning on large graphs
+Authors  : William L Hamilton, Rex Ying, Jure Leskovec
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1706.02216
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1706.02216v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/6b7d6e6416343b2a122f8416e69059ce919026ef
+@article{hamilton2017inductive,
+  title = {Inductive Representation Learning on Large Graphs},
+  author = {William L. Hamilton and Rex Ying and Jure Leskovec},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1706.02216},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1706.02216v4},
+}
+
+======================================================================
+Reference: G-mixup: Graph data augmentation for graph classification
+Authors  : Xiaotian Han, Zhimeng Jiang, Ninghao Liu, Xia Hu
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2202.07179
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2202.07179v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/dd3367e8c6c98d0630eda10e1d0c7ced99a90969
+@inproceedings{han2022gmixup,
+  title = {G-Mixup: Graph Data Augmentation for Graph Classification},
+  author = {Xiaotian Han and Zhimeng Jiang and Ninghao Liu and Xia Hu},
+  year = {2022},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2202.07179},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2202.07179v2},
+}
+
+======================================================================
+Reference: Geometric graph representation learning via maximizing rate reduction
+Authors  : Xiaotian Han, Zhimeng Jiang, Ninghao Liu, Qingquan Song, Jundong Li, Xia Hu
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3485447.3512170
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2202.06241
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2202.06241v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/9765db741e4137b320c587057e0a56d0c88dee98
+@inproceedings{han2022geometric,
+  title = {Geometric Graph Representation Learning via Maximizing Rate Reduction},
+  author = {Xiaotian Han and Zhimeng Jiang and Ninghao Liu and Qingquan Song and Jundong Li and Xia Hu},
+  year = {2022},
+  booktitle = {The Web Conference},
+  doi = {10.1145/3485447.3512170},
+  eprint = {2202.06241},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2202.06241v1},
+}
+
+======================================================================
+Reference: Retiring∆ DP: New distribution-level metrics for demographic parity
+Authors  : Xiaotian Han, Zhimeng Jiang, Hongye Jin, Zirui Liu, Na Zou, Qifan Wang, Xia Hu
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Accepted by TMLR' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Accepted by TMLR.
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 1.00).
+      Suggestion: Use canonical title: Retiring $Δ$DP: New Distribution-Level Metrics for Demographic Parity
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2301.13443v3
+%   openreview: venue — https://openreview.net/forum?id=LjDFIWWVVa
+@article{han2023retiring,
+  title = {Retiring $Δ$DP: New Distribution-Level Metrics for Demographic Parity},
+  author = {Xiaotian Han and Zhimeng Jiang and Hongye Jin and Zirui Liu and Na Zou and Qifan Wang and Xia Hu},
+  year = {2023},
+  journal = {Accepted by TMLR},
+  eprint = {2301.13443},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2301.13443v3},
+}
+
+======================================================================
+Reference: Weight perturbation can help fairness under distribution shift
+Authors  : Zhimeng Jiang, Xiaotian Han, Hongye Jin, Guanchu Wang, Na Zou, Xia Hu
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/075280-2793
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.55).
+      Suggestion: Use canonical title: Chasing Fairness Under Distribution Shift: A Model Weight Perturbation Approach
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.03300v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/9bb9e291d4329e7370360efa8131df1d0e9493cc
+@article{jiang2023chasing,
+  title = {Chasing Fairness Under Distribution Shift: A Model Weight Perturbation Approach},
+  author = {Zhimeng Jiang and Xiaotian Han and Hongye Jin and Guanchu Wang and Rui Chen and Na Zou and Xia Hu},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/075280-2793},
+  eprint = {2303.03300},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.03300v2},
+}
+
+======================================================================
+Reference: How to learn a graph from smooth signals
+Authors  : Vassilis Kalofolias
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1601.02513
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Artificial Intelligence and Statistics' may be an abbreviation of 'International Conference on Artificial Intelligence and Statistics'.
+      Suggestion: Use the full venue name: International Conference on Artificial Intelligence and Statistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1601.02513v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/4fd5c4d2341d05ca9f1dc072e01f75b40876f521
+@inproceedings{kalofolias2016learn,
+  title = {How to learn a graph from smooth signals},
+  author = {Vassilis Kalofolias},
+  year = {2016},
+  booktitle = {International Conference on Artificial Intelligence and Statistics},
+  eprint = {1601.02513},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1601.02513v1},
+}
+
+======================================================================
+Reference: Semi-supervised classification with graph convolutional networks
+Authors  : Thomas N. Kipf, Max Welling
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1609.02907
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/36eff562f65125511b5dfab68ce7f7a943c27478
+@inproceedings{kipf2016semisupervised,
+  title = {Semi-Supervised Classification with Graph Convolutional Networks},
+  author = {Thomas Kipf and M. Welling},
+  year = {2016},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1609.02907},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/36eff562f65125511b5dfab68ce7f7a943c27478},
+}
+
+======================================================================
+Reference: Predict then propagate: Graph neural networks meet personalized pagerank
+Authors  : Johannes Klicpera, Aleksandar Bojchevski, Stephan Günnemann
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1810.05997
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/ac225094aab9e7b629bc5b3343e026dea0200c70
+@inproceedings{klicpera2018predict,
+  title = {Predict then Propagate: Graph Neural Networks meet Personalized PageRank},
+  author = {Johannes Klicpera and Aleksandar Bojchevski and Stephan Günnemann},
+  year = {2018},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1810.05997},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/ac225094aab9e7b629bc5b3343e026dea0200c70},
+}
+
+======================================================================
+Reference: All of the fairness for edge prediction with optimal transport
+Authors  : Charlotte Laclau, Ievgen Redko, Manvi Choudhary, Christine Largeron
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2010.16326
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/15f76137e61296e8facf17724c2e0924fc0f1dc7
+@inproceedings{laclau2020fairness,
+  title = {All of the Fairness for Edge Prediction with Optimal Transport},
+  author = {Charlotte Laclau and I. Redko and Manvi Choudhary and C. Largeron},
+  year = {2020},
+  booktitle = {International Conference on Artificial Intelligence and Statistics},
+  eprint = {2010.16326},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/15f76137e61296e8facf17724c2e0924fc0f1dc7},
+}
+
+======================================================================
+Reference: Elastic graph neural networks
+Authors  : Xiaorui Liu, Wei Jin, Yao Ma, Yaxin Li, Hua Liu, Yiqi Wang, Ming Yan, Jiliang Tang
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2107.06996
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2107.06996v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/140f168d8f4e5d110416eb23bf53be7ac4d090cd
+@inproceedings{liu2021elastic,
+  title = {Elastic Graph Neural Networks},
+  author = {Xiaorui Liu and Wei Jin and Yao Ma and Yaxin Li and Hua Liu and Yiqi Wang and Ming Yan and Jiliang Tang},
+  year = {2021},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2107.06996},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2107.06996v1},
+}
+
+======================================================================
+Reference: On a generalization of the iterative soft-thresholding algorithm for the case of non-separable penalty
+Authors  : Ignace Loris, Caroline Verhoeven
+Year     : 2011
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1088/0266-5611/27/12/125007
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1104.1087
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1104.1087v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a72aca42f7cd1065c654150161221a5b5f37cb5e
+@article{loris2011generalization,
+  title = {On a generalization of the iterative soft-thresholding algorithm for the case of non-separable penalty},
+  author = {Ignace Loris and Caroline Verhoeven},
+  year = {2011},
+  journal = {Inverse Problems},
+  doi = {10.1088/0266-5611/27/12/125007},
+  eprint = {1104.1087},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1104.1087v3},
+}
+
+======================================================================
+Reference: Subgroup generalization and fairness of graph neural networks
+Authors  : Jiaqi Ma, Junwei Deng, Qiaozhu Mei
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2106.15535
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2106.15535v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/86c4bb73bcc10a17faee13034a1742008cb001df
+@article{ma2021subgroup,
+  title = {Subgroup Generalization and Fairness of Graph Neural Networks},
+  author = {Jiaqi Ma and Junwei Deng and Qiaozhu Mei},
+  year = {2021},
+  journal = {Neural Information Processing Systems},
+  eprint = {2106.15535},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2106.15535v2},
+}
+
+======================================================================
+Reference: A unified view on graph neural networks as graph signal denoising
+Authors  : Yao Ma, Xiaorui Liu, Tong Zhao, Yozen Liu, Jiliang Tang, Neil Shah
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3459637.3482225
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2010.01777
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/7c882a945b51825417bafde8ab05163b443a1525
+@inproceedings{ma2020unified,
+  title = {A Unified View on Graph Neural Networks as Graph Signal Denoising},
+  author = {Yao Ma and Xiaorui Liu and Tong Zhao and Yozen Liu and Jiliang Tang and Neil Shah},
+  year = {2020},
+  booktitle = {International Conference on Information and Knowledge Management},
+  doi = {10.1145/3459637.3482225},
+  eprint = {2010.01777},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/7c882a945b51825417bafde8ab05163b443a1525},
+}
+
+======================================================================
+Reference: A survey on bias and fairness in machine learning
+Authors  : Ninareh Mehrabi, Fred Morstatter, Nripsuta Saxena, Kristina Lerman, Aram Galstyan
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3457607
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1908.09635
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0090023afc66cd2741568599057f4e82b566137c
+@article{mehrabi2019survey,
+  title = {A Survey on Bias and Fairness in Machine Learning},
+  author = {Ninareh Mehrabi and Fred Morstatter and N. Saxena and Kristina Lerman and A. Galstyan},
+  year = {2019},
+  journal = {ACM Computing Surveys},
+  doi = {10.1145/3457607},
+  eprint = {1908.09635},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/0090023afc66cd2741568599057f4e82b566137c},
+}
+
+======================================================================
+Reference: Geometric deep learning on graphs and manifolds using mixture model cnns
+Authors  : Federico Monti, Davide Boscaini, Jonathan Masci, Emanuele Rodola, Jan Svoboda, Michael M Bronstein
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2017.576
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1611.08402
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f09f7888aa5aeaf88a2a44aea768d9a8747e97d2
+@article{monti2016geometric,
+  title = {Geometric Deep Learning on Graphs and Manifolds Using Mixture Model CNNs},
+  author = {Federico Monti and Davide Boscaini and Jonathan Masci and E. Rodolà and Jan Svoboda and M. Bronstein},
+  year = {2016},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2017.576},
+  eprint = {1611.08402},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/f09f7888aa5aeaf88a2a44aea768d9a8747e97d2},
+}
+
+======================================================================
+Reference: Fairwalk: Towards fair graph embedding
+Authors  : Tahleen Rahman, Bartlomiej Surma, Michael Backes, Yang Zhang
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.24963/ijcai.2019/456
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Joint Conference on Artificial Intelligence
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/40e7cf66413c65a1ae500f4e4ed944a995064b16
+@inproceedings{rahman2019fairwalk,
+  title = {Fairwalk: Towards Fair Graph Embedding},
+  author = {Tahleen A. Rahman and Bartlomiej Surma and M. Backes and Yang Zhang},
+  year = {2019},
+  booktitle = {International Joint Conference on Artificial Intelligence},
+  doi = {10.24963/ijcai.2019/456},
+  url = {https://www.semanticscholar.org/paper/40e7cf66413c65a1ae500f4e4ed944a995064b16},
+}
+
+======================================================================
+Reference: Convex analysis
+Authors  : Ralph Tyrell Rockafellar
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1201/9780429332104-3
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1504.00183
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1504.00183v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/df379e8dc14830321347f4aa6d3a9b43f9053334
+@article{ahmadi2015convex,
+  title = {A Convex Approach to Hydrodynamic Analysis},
+  author = {Mohamadreza Ahmadi and Giorgio Valmorbida and Antonis Papachristodoulou},
+  year = {2015},
+  journal = {Stabilization Problems with Constraints},
+  doi = {10.1201/9780429332104-3},
+  eprint = {1504.00183},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1504.00183v1},
+}
+
+======================================================================
+Reference: A framework for understanding unintended consequences of machine learning
+Authors  : Harini Suresh, John V Guttag
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Equity and Access in Algorithms, Mechanisms, and Optimization' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Equity and Access in Algorithms, Mechanisms, and Optimization.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3465416.3483305
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1901.10002v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f4bc6b284bc4508856ddc10d60b30635de9cfb7f
+@inproceedings{suresh2019framework,
+  title = {A Framework for Understanding Sources of Harm throughout the Machine Learning Life Cycle},
+  author = {Harini Suresh and John V. Guttag},
+  year = {2019},
+  booktitle = {Conference on Equity and Access in Algorithms, Mechanisms, and Optimization},
+  doi = {10.1145/3465416.3483305},
+  eprint = {1901.10002},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1901.10002v5},
+}
+
+======================================================================
+Reference: Vector-valued graph trend filtering with non-convex penalties
+Authors  : Rohan Varma, Harlin Lee, Jelena Kovačević, Yuejie Chi
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tsipn.2019.2957717
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1905.12692
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.12692v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/09f3591d5373326ed333f38e9a7cfb5f38bcee38
+@article{varma2019vectorvalued,
+  title = {Vector-Valued Graph Trend Filtering with Non-Convex Penalties},
+  author = {Rohan Varma and Harlin Lee and Jelena Kovačević and Yuejie Chi},
+  year = {2019},
+  journal = {IEEE Transactions on Signal and Information Processing over Networks},
+  doi = {10.1109/tsipn.2019.2957717},
+  eprint = {1905.12692},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.12692v3},
+}
+
+======================================================================
+Reference: Graph attention networks
+Authors  : Petar Veličković, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Liò, Yoshua Bengio
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.17863/cam.48429
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1811.00181
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1811.00181v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/33998aff64ce51df8dee45989cdca4b6b1329ec4
+@inproceedings{shanthamallu2018regularized,
+  title = {A Regularized Attention Mechanism for Graph Attention Networks},
+  author = {Uday Shankar Shanthamallu and Jayaraman J. Thiagarajan and Andreas Spanias},
+  year = {2018},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.17863/cam.48429},
+  eprint = {1811.00181},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1811.00181v2},
+}
+
+======================================================================
+Reference: Simplifying graph convolutional networks
+Authors  : Felix Wu, Amauri Souza, Tianyi Zhang, Christopher Fifty, Tao Yu, Kilian Weinberger
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1902.07153
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1902.07153v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/7e71eedb078181873a56f2adcfef9dddaeb95602
+@inproceedings{wu2019simplifying,
+  title = {Simplifying Graph Convolutional Networks},
+  author = {Felix Wu and Tianyi Zhang and Amauri Holanda de Souza and Christopher Fifty and Tao Yu and Kilian Q. Weinberger},
+  year = {2019},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1902.07153},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1902.07153v2},
+}
+
+======================================================================
+Reference: Representation learning on graphs with jumping knowledge networks
+Authors  : Keyulu Xu, Chengtao Li, Yonglong Tian, Tomohiro Sonobe, Ken-ichi Kawarabayashi, Stefanie Jegelka
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1806.03536
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1806.03536v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/5aea95e1ae78a66474051a330ded374e199b658c
+@inproceedings{xu2018representation,
+  title = {Representation Learning on Graphs with Jumping Knowledge Networks},
+  author = {Keyulu Xu and Chengtao Li and Yonglong Tian and Tomohiro Sonobe and Ken-ichi Kawarabayashi and Stefanie Jegelka},
+  year = {2018},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1806.03536},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1806.03536v2},
+}
+
+======================================================================
+Reference: Graph convolutional neural networks for web-scale recommender systems
+Authors  : Rex Ying, Ruining He, Kaifeng Chen, Pong Eksombatchai, William L Hamilton, Jure Leskovec
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3219819.3219890
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1806.01973
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1806.01973v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6c96c2d4a3fbd572fef2d59cb856521ee1746789
+@article{ying2018graph,
+  title = {Graph Convolutional Neural Networks for Web-Scale Recommender Systems},
+  author = {Rex Ying and Ruining He and Kaifeng Chen and Pong Eksombatchai and William L. Hamilton and Jure Leskovec},
+  year = {2018},
+  journal = {Knowledge Discovery and Data Mining},
+  doi = {10.1145/3219819.3219890},
+  eprint = {1806.01973},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1806.01973v1},
+}
+
+======================================================================
+Reference: Sensei: Sensitive set invariance for enforcing individual fairness
+Authors  : Mikhail Yurochkin, Yuekai Sun
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2006.14168
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2006.14168v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/2c0f18df2f23207f2139140ab45819b0b23879be
+@inproceedings{yurochkin2020sensei,
+  title = {SenSeI: Sensitive Set Invariance for Enforcing Individual Fairness},
+  author = {Mikhail Yurochkin and Yuekai Sun},
+  year = {2020},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2006.14168},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2006.14168v2},
+}
+
+======================================================================
+Reference: Mitigating unwanted biases with adversarial learning
+Authors  : Brian Hu Zhang, Blake Lemoine, Margaret Mitchell
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3278721.3278779
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1801.07593
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1801.07593v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c7330852a07170cd0e6990f5fbde5fca12b6ccd6
+@inproceedings{zhang2018mitigating,
+  title = {Mitigating Unwanted Biases with Adversarial Learning},
+  author = {Brian Hu Zhang and Blake Lemoine and Margaret Mitchell},
+  year = {2018},
+  booktitle = {AAAI/ACM Conference on AI, Ethics, and Society},
+  doi = {10.1145/3278721.3278779},
+  eprint = {1801.07593},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1801.07593v1},
+}
+
+======================================================================
+Reference: Pairnorm: Tackling oversmoothing in gnns
+Authors  : Lingxiao Zhao, Leman Akoglu
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1909.12223v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/38293873cce681b857b3c1d73f5590f641f3dc42
+@inproceedings{zhao2019pairnorm,
+  title = {PairNorm: Tackling Oversmoothing in GNNs},
+  author = {Lingxiao Zhao and Leman Akoglu},
+  year = {2019},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1909.12223},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1909.12223v2},
+}
+
+======================================================================
+Reference: Interpreting and unifying graph neural networks with an optimization framework
+Authors  : Meiqi Zhu, Xiao Wang, Chuan Shi, Houye Ji, Peng Cui
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3442381.3449953
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2101.11859
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2101.11859v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4b776e7f26464e5b230c1679560f12618730dcc6
+@inproceedings{zhu2021interpreting,
+  title = {Interpreting and Unifying Graph Neural Networks with An Optimization Framework},
+  author = {Meiqi Zhu and Xiao Wang and Chuan Shi and Houye Ji and Peng Cui},
+  year = {2021},
+  booktitle = {The Web Conference},
+  doi = {10.1145/3442381.3449953},
+  eprint = {2101.11859},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2101.11859v1},
+}
+
+======================================================================
+Reference: Deep Graph Contrastive Representation Learning
+Authors  : Yanqiao Zhu, Yichen Xu, Feng Yu, Qiang Liu, Shu Wu, Liang Wang
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'ICML Workshop on Graph Representation Learning and Beyond', but a full version appears at 'arXiv.org'.
+      Suggestion: Cite the full version at arXiv.org.
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2006.04131
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2006.04131v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/4bf76588122827157c43a59e656dccc6b6a22e90
+@misc{zhu2020deep,
+  title = {Deep Graph Contrastive Representation Learning},
+  author = {Yanqiao Zhu and Yichen Xu and Feng Yu and Qiang Liu and Shu Wu and Liang Wang},
+  year = {2020},
+  journal = {arXiv.org},
+  eprint = {2006.04131},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2006.04131v2},
+}
+
+======================================================================
+Reference: Graph contrastive learning with adaptive augmentation
+Authors  : Yanqiao Zhu, Yichen Xu, Feng Yu, Qiang Liu, Shu Wu, Liang Wang
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3442381.3449802
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2010.14945
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0d67d3ddca1c4e370eaf1e99ec674f612c39c66c
+@inproceedings{zhu2020graph,
+  title = {Graph Contrastive Learning with Adaptive Augmentation},
+  author = {Yanqiao Zhu and Yichen Xu and Feng Yu and Q. Liu and Shu Wu and Liang Wang},
+  year = {2020},
+  booktitle = {The Web Conference},
+  doi = {10.1145/3442381.3449802},
+  eprint = {2010.14945},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/0d67d3ddca1c4e370eaf1e99ec674f612c39c66c},
+}

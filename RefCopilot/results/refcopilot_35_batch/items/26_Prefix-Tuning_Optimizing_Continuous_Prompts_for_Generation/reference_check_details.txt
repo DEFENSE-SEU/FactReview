@@ -1,0 +1,953 @@
+======================================================================
+Reference: Intrinsic dimensionality explains the effectiveness of language model fine-tuning
+Authors  : Armen Aghajanyan, Luke Zettlemoyer, Sonal Gupta
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2021.acl-long.568
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2012.13255
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Annual Meeting of the Association for Computational Linguistics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2012.13255v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e54ffc76d805c48660bb0fd20019ca82ac94ba0d
+@inproceedings{aghajanyan2020intrinsic,
+  title = {Intrinsic Dimensionality Explains the Effectiveness of Language Model Fine-Tuning},
+  author = {Armen Aghajanyan and Luke Zettlemoyer and Sonal Gupta},
+  year = {2020},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2021.acl-long.568},
+  eprint = {2012.13255},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2012.13255v1},
+}
+
+======================================================================
+Reference: Language models are few-shot learners
+Authors  : Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, Dario Amodei
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2005.14165
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Neural Information Processing Systems
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2005.14165v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/90abbc2cf38462b954ae1b772fac9532e2ccd8b0
+@article{brown2020language,
+  title = {Language Models are Few-Shot Learners},
+  author = {Tom B. Brown and Benjamin Mann and Nick Ryder and Melanie Subbiah and Jared Kaplan and Prafulla Dhariwal and Arvind Neelakantan and Pranav Shyam and Girish Sastry and Amanda Askell and Sandhini Agarwal and Ariel Herbert-Voss and Gretchen Krueger and Tom Henighan and Rewon Child and Aditya Ramesh and Daniel M. Ziegler and Jeffrey Wu and Clemens Winter and Christopher Hesse and Mark Chen and Eric Sigler and Mateusz Litwin and Scott Gray and Benjamin Chess and Jack Clark and Christopher Berner and Sam McCandlish and Alec Radford and Ilya Sutskever and Dario Amodei},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2005.14165},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2005.14165v4},
+}
+
+======================================================================
+Reference: Plug and play language models: A simple approach to controlled text generation
+Authors  : Sumanth Dathathri, Andrea Madotto, Janice Lan, Jane Hung, Eric Frank, Piero Molino, Jason Yosinski, Rosanne Liu
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1912.02164
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/e04a80263d252a3d8a382ba37a249b9345620570
+@inproceedings{dathathri2019plug,
+  title = {Plug and Play Language Models: A Simple Approach to Controlled Text Generation},
+  author = {Sumanth Dathathri and Andrea Madotto and Janice Lan and Jane Hung and Eric Frank and Piero Molino and J. Yosinski and Rosanne Liu},
+  year = {2019},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1912.02164},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/e04a80263d252a3d8a382ba37a249b9345620570},
+}
+
+======================================================================
+Reference: BERT: Pre-training of deep bidirectional transformers for language understanding
+Authors  : Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/n19-1423
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1810.04805
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/df2b0e26d0599ce3e70df8a9da02e51594e0e992
+@article{devlin2019bert,
+  title = {BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  author = {Jacob Devlin and Ming-Wei Chang and Kenton Lee and Kristina Toutanova},
+  year = {2019},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/n19-1423},
+  eprint = {1810.04805},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/df2b0e26d0599ce3e70df8a9da02e51594e0e992},
+}
+
+======================================================================
+Reference: Parameter-efficient transfer learning for NLP
+Authors  : Neil Houlsby, Andrei Giurgiu, Stanislaw Jastrzebski, Bruna Morrone, Quentin De Laroussilhe, Andrea Gesmundo, Mona Attariyan, Sylvain Gelly
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1902.00751
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1902.00751v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/29ddc1f43f28af7c846515e32cc167bc66886d0c
+@inproceedings{houlsby2019parameterefficient,
+  title = {Parameter-Efficient Transfer Learning for NLP},
+  author = {Neil Houlsby and Andrei Giurgiu and Stanislaw Jastrzebski and Bruna Morrone and Quentin de Laroussilhe and Andrea Gesmundo and Mona Attariyan and Sylvain Gelly},
+  year = {2019},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {1902.00751},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1902.00751v2},
+}
+
+======================================================================
+Reference: How can we know what language models know?
+Authors  : Zhengbao Jiang, Frank F. Xu, Jun Araki, Graham Neubig
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/tacl_a_00324
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1911.12543
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a75649771901a4881b44c0ceafa469fcc6e6f968
+@article{jiang2019know,
+  title = {How Can We Know What Language Models Know?},
+  author = {Zhengbao Jiang and Frank F. Xu and J. Araki and Graham Neubig},
+  year = {2019},
+  journal = {Transactions of the Association for Computational Linguistics},
+  doi = {10.1162/tacl_a_00324},
+  eprint = {1911.12543},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/a75649771901a4881b44c0ceafa469fcc6e6f968},
+}
+
+======================================================================
+Reference: Text-to-text pre-training for data-to-text tasks
+Authors  : Mihir Kale
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.inlg-1.14
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2005.10433
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Conference on Natural Language Generation
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2005.10433v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d7c4b8f15f82825de9edcf57e499b05256c7885d
+@inproceedings{kale2020texttotext,
+  title = {Text-to-Text Pre-Training for Data-to-Text Tasks},
+  author = {Mihir Kale and Abhinav Rastogi},
+  year = {2020},
+  booktitle = {International Conference on Natural Language Generation},
+  doi = {10.18653/v1/2020.inlg-1.14},
+  eprint = {2005.10433},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2005.10433v3},
+}
+
+======================================================================
+Reference: Ctrl: A conditional transformer language model for controllable generation
+Authors  : N. Keskar, B. McCann, L. R. Varshney, Caiming Xiong, R. Socher
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'ArXiv' may be an abbreviation of 'arXiv.org'.
+      Suggestion: Use the full venue name: arXiv.org.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1909.05858v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/75acc731bdd2b626edc74672a30da3bc51010ae8
+@misc{keskar2019ctrl,
+  title = {CTRL: A Conditional Transformer Language Model for Controllable Generation},
+  author = {Nitish Shirish Keskar and Bryan McCann and Lav R. Varshney and Caiming Xiong and Richard Socher},
+  year = {2019},
+  journal = {arXiv.org},
+  eprint = {1909.05858},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1909.05858v2},
+}
+
+======================================================================
+Reference: GeDi: Generative Discriminator Guided Sequence Generation
+Authors  : Ben Krause, Akhilesh Deepak Gotmare, Bryan McCann, Nitish Shirish Keskar, Shafiq Joty, Richard Socher, Nazneen Fatema Rajani
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2021.findings-emnlp.424
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2009.06367v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/07bcda1dff9bb696ea9cbc69303eee8bd3d85bd6
+@inproceedings{krause2020gedi,
+  title = {GeDi: Generative Discriminator Guided Sequence Generation},
+  author = {Ben Krause and Akhilesh Deepak Gotmare and Bryan McCann and Nitish Shirish Keskar and Shafiq Joty and Richard Socher and Nazneen Fatema Rajani},
+  year = {2020},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/2021.findings-emnlp.424},
+  eprint = {2009.06367},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2009.06367v2},
+}
+
+======================================================================
+Reference: Meteor: An automatic metric for mt evaluation with high levels of correlation with human judgments
+Authors  : Alon Lavie, Abhaya Agarwal
+Year     : 2007
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Proceedings of the Second Workshop on Statistical Machine Translation', but a full version appears at 'WMT@ACL'.
+      Suggestion: Cite the full version at WMT@ACL.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/1626355.1626389
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/34d7a07c493ca6336c92156806a2947e115caadc
+@article{lavie2007meteor,
+  title = {METEOR: An Automatic Metric for MT Evaluation with High Levels of Correlation with Human Judgments},
+  author = {A. Lavie and Abhaya Agarwal},
+  year = {2007},
+  journal = {WMT@ACL},
+  doi = {10.3115/1626355.1626389},
+  url = {https://www.semanticscholar.org/paper/34d7a07c493ca6336c92156806a2947e115caadc},
+}
+
+======================================================================
+Reference: BART: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension
+Authors  : Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Veselin Stoyanov, Luke Zettlemoyer
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.acl-main.703
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1910.13461
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/395de0bd3837fdf4b4b5e5f04835bcc69c279481
+@inproceedings{lewis2019bart,
+  title = {BART: Denoising Sequence-to-Sequence Pre-training for Natural Language Generation, Translation, and Comprehension},
+  author = {M. Lewis and Yinhan Liu and Naman Goyal and Marjan Ghazvininejad and Abdel-rahman Mohamed and Omer Levy and Veselin Stoyanov and Luke Zettlemoyer},
+  year = {2019},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2020.acl-main.703},
+  eprint = {1910.13461},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/395de0bd3837fdf4b4b5e5f04835bcc69c279481},
+}
+
+======================================================================
+Reference: Exploring versatile generative language model via parameter-efficient transfer learning
+Authors  : Zhaojiang Lin, Andrea Madotto, Pascale Fung
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.findings-emnlp.41
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2004.03829
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.03829v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1187c70c4011f935642084e84186284ac0add3d0
+@article{lin2020exploring,
+  title = {Exploring Versatile Generative Language Model Via Parameter-Efficient Transfer Learning},
+  author = {Zhaojiang Lin and Andrea Madotto and Pascale Fung},
+  year = {2020},
+  journal = {Findings},
+  doi = {10.18653/v1/2020.findings-emnlp.41},
+  eprint = {2004.03829},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.03829v2},
+}
+
+======================================================================
+Reference: Text summarization with pretrained encoders
+Authors  : Yang Liu, Mirella Lapata
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d19-1387
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1908.08345
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1908.08345v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/63748e59f4e106cbda6b65939b77589f40e48fcb
+@inproceedings{liu2019text,
+  title = {Text Summarization with Pretrained Encoders},
+  author = {Yang Liu and Mirella Lapata},
+  year = {2019},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d19-1387},
+  eprint = {1908.08345},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1908.08345v2},
+}
+
+======================================================================
+Reference: Multilingual denoising pre-training for neural machine translation
+Authors  : Yinhan Liu, Jiatao Gu, Naman Goyal, Xian Li, Sergey Edunov, Marjan Ghazvininejad, Mike Lewis, Luke Zettlemoyer
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/tacl_a_00343
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2001.08210
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Transactions of the Association for Computational Linguistics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2001.08210v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/495da6f19baa09c6db3697d839e10432cdc25934
+@article{liu2020multilingual,
+  title = {Multilingual Denoising Pre-training for Neural Machine Translation},
+  author = {Yinhan Liu and Jiatao Gu and Naman Goyal and Xian Li and Sergey Edunov and Marjan Ghazvininejad and Mike Lewis and Luke Zettlemoyer},
+  year = {2020},
+  journal = {Transactions of the Association for Computational Linguistics},
+  doi = {10.1162/tacl_a_00343},
+  eprint = {2001.08210},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2001.08210v2},
+}
+
+======================================================================
+Reference: Federated learning of deep networks using model averaging
+Authors  : H. Brendan McMahan, Eider Moore, Daniel Ramage, Blaise Agüera y Arcas
+Year     : 2016
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Artificial Intelligence and Statistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Artificial Intelligence and Statistics.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1602.05629v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/d1dbf643447405984eeef098b1b320dee0b3b8a7
+@inproceedings{mcmahan2016communicationefficient,
+  title = {Communication-Efficient Learning of Deep Networks from Decentralized Data},
+  author = {H. Brendan McMahan and Eider Moore and Daniel Ramage and Seth Hampson and Blaise Agüera y Arcas},
+  year = {2016},
+  booktitle = {International Conference on Artificial Intelligence and Statistics},
+  eprint = {1602.05629},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1602.05629v4},
+}
+
+======================================================================
+Reference: Don’t give me the details, just the summary! Topic-aware convolutional neural networks for extreme summarization
+Authors  : Shashi Narayan, Shay B. Cohen, Mirella Lapata
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d18-1206
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1808.08745
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/305b2cf37e5dece81e95c92883d5a6e28ac93b22
+@inproceedings{narayan2018dont,
+  title = {Don’t Give Me the Details, Just the Summary! Topic-Aware Convolutional Neural Networks for Extreme Summarization},
+  author = {Shashi Narayan and Shay B. Cohen and Mirella Lapata},
+  year = {2018},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d18-1206},
+  eprint = {1808.08745},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/305b2cf37e5dece81e95c92883d5a6e28ac93b22},
+}
+
+======================================================================
+Reference: Bleu: A method for automatic evaluation of machine translation
+Authors  : Kishore Papineni, Salim Roukos, Todd Ward, Wei-Jing Zhu
+Year     : 2002
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3115/1073083.1073135
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d7da009f457917aa381619facfa5ffae9329a6e9
+@inproceedings{papineni2002bleu,
+  title = {Bleu: a Method for Automatic Evaluation of Machine Translation},
+  author = {Kishore Papineni and Salim Roukos and T. Ward and Wei-Jing Zhu},
+  year = {2002},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.3115/1073083.1073135},
+  url = {https://www.semanticscholar.org/paper/d7da009f457917aa381619facfa5ffae9329a6e9},
+}
+
+======================================================================
+Reference: Adapterfusion: Non-destructive task composition for transfer learning
+Authors  : Jonas Pfeiffer, Aishwarya Kamath, Andreas Rücklé, Kyunghyun Cho, Iryna Gurevych
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2021.eacl-main.39
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2005.00247
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference of the European Chapter of the Association for Computational Linguistics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2005.00247v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/98ef0db84e62aef969629264c9de1f4d0013f3b9
+@inproceedings{pfeiffer2020adapterfusion,
+  title = {AdapterFusion: Non-Destructive Task Composition for Transfer Learning},
+  author = {Jonas Pfeiffer and Aishwarya Kamath and Andreas Rücklé and Kyunghyun Cho and Iryna Gurevych},
+  year = {2020},
+  booktitle = {Conference of the European Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2021.eacl-main.39},
+  eprint = {2005.00247},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2005.00247v3},
+}
+
+======================================================================
+Reference: Dart: Open-domain structured data record to text generation
+Authors  : Dragomir Radev, Rui Zhang, Amrit Rau, Abhinand Sivaprasad, Chiachun Hsieh, Nazneen Fatema Rajani, Xiangru Tang, Aadit Vyas, Neha Verma, Pranav Krishna, Yangxiaokang Liu, Nadia Irwanto, Jessica Pan, Faiaz Rahman, Ahmad Zaidi, Murori Mutuma, Yasin Tarabar, Ankit Gupta, Tao Yu, Yi Chern Tan, Xi Victoria Lin, Caiming Xiong, Richard Socher
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2021.naacl-main.37
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2007.02871
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: North American Chapter of the Association for Computational Linguistics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2007.02871v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6e3f8187f8fef3e11578a73f32da07d33dbf8235
+@article{nan2020dart,
+  title = {DART: Open-Domain Structured Data Record to Text Generation},
+  author = {Linyong Nan and Dragomir Radev and Rui Zhang and Amrit Rau and Abhinand Sivaprasad and Chiachun Hsieh and Xiangru Tang and Aadit Vyas and Neha Verma and Pranav Krishna and Yangxiaokang Liu and Nadia Irwanto and Jessica Pan and Faiaz Rahman and Ahmad Zaidi and Mutethia Mutuma and Yasin Tarabar and Ankit Gupta and Tao Yu and Yi Chern Tan and Xi Victoria Lin and Caiming Xiong and Richard Socher and Nazneen Fatema Rajani},
+  year = {2020},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2021.naacl-main.37},
+  eprint = {2007.02871},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2007.02871v2},
+}
+
+======================================================================
+Reference: How fine can fine-tuning be? learning efficient language models
+Authors  : Evani Radiya-Dixit, Xin Wang
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2004.14129
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.14129v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/5b4be79081e1d6eac83e8a9e7a38bd7c338a4c78
+@inproceedings{radiyadixit2020fine,
+  title = {How fine can fine-tuning be? Learning efficient language models},
+  author = {Evani Radiya-Dixit and Xin Wang},
+  year = {2020},
+  booktitle = {International Conference on Artificial Intelligence and Statistics},
+  eprint = {2004.14129},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.14129v1},
+}
+
+======================================================================
+Reference: Exploring the limits of transfer learning with a unified text-to-text transformer
+Authors  : Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, Peter J. Liu
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1910.10683
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/6c4b76232bb72897685d19b3d264c6ee3005bc2b
+@article{raffel2019exploring,
+  title = {Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer},
+  author = {Colin Raffel and Noam Shazeer and Adam Roberts and Katherine Lee and Sharan Narang and Michael Matena and Yanqi Zhou and Wei Li and Peter J. Liu},
+  year = {2019},
+  journal = {Journal of machine learning research},
+  eprint = {1910.10683},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/6c4b76232bb72897685d19b3d264c6ee3005bc2b},
+}
+
+======================================================================
+Reference: Learning multiple visual domains with residual adapters
+Authors  : Sylvestre-Alvise Rebuffi, Hakan Bilen, Andrea Vedaldi
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1705.08045
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1705.08045v5
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/d89ee98810039d2061ed42ee8026da49c503d16b
+@article{rebuffi2017learning,
+  title = {Learning multiple visual domains with residual adapters},
+  author = {Sylvestre-Alvise Rebuffi and Hakan Bilen and Andrea Vedaldi},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1705.08045},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1705.08045v5},
+}
+
+======================================================================
+Reference: Exploiting cloze questions for few shot text classification and natural language inference
+Authors  : Timo Schick, Hinrich Schütze
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2021.eacl-main.20
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2001.07676
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference of the European Chapter of the Association for Computational Linguistics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2001.07676v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/8ae9a17c87a4518b513e860683a0ef7824be994d
+@inproceedings{schick2020exploiting,
+  title = {Exploiting Cloze Questions for Few Shot Text Classification and Natural Language Inference},
+  author = {Timo Schick and Hinrich Schütze},
+  year = {2020},
+  booktitle = {Conference of the European Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2021.eacl-main.20},
+  eprint = {2001.07676},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2001.07676v3},
+}
+
+======================================================================
+Reference: BLEURT: Learning robust metrics for text generation
+Authors  : Thibault Sellam, Dipanjan Das, Ankur Parikh
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.acl-main.704
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2004.04696
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.04696v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4ae52766028e69186052ea8f33a137fbbbdb986a
+@inproceedings{sellam2020bleurt,
+  title = {BLEURT: Learning Robust Metrics for Text Generation},
+  author = {Thibault Sellam and Dipanjan Das and Ankur P. Parikh},
+  year = {2020},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2020.acl-main.704},
+  eprint = {2004.04696},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.04696v5},
+}
+
+======================================================================
+Reference: Pragmatically informative text generation
+Authors  : Sheng Shen, Daniel Fried, Jacob Andreas, Dan Klein
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/n19-1410
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1904.01301
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1904.01301v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/743d1aae44a12fb37b743ec947fad41cba9831b8
+@article{shen2019pragmatically,
+  title = {Pragmatically Informative Text Generation},
+  author = {Sheng Shen and Daniel Fried and Jacob Andreas and Dan Klein},
+  year = {2019},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/n19-1410},
+  eprint = {1904.01301},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1904.01301v2},
+}
+
+======================================================================
+Reference: Autoprompt: Eliciting knowledge from language models with automatically generated prompts
+Authors  : Taylor Shin, Yasaman Razeghi, Robert L. Logan IV au2, Eric Wallace, Sameer Singh
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.eswa.2023.122327
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2010.15980
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Expert systems with applications
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2010.15980v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/ebc373bd8f02d2320deaffc3955b74d8f88d8cb7
+@article{shin2020autoprompt,
+  title = {AutoPrompt: Eliciting Knowledge from Language Models with Automatically Generated Prompts},
+  author = {Taylor Shin and Yasaman Razeghi and Robert L. Logan and Eric Wallace and Sameer Singh},
+  year = {2020},
+  journal = {Expert systems with applications},
+  doi = {10.1016/j.eswa.2023.122327},
+  eprint = {2010.15980},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2010.15980v2},
+}
+
+======================================================================
+Reference: Privacy-preserving deep learning
+Authors  : Reza Shokri, Vitaly Shmatikov
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/2810103.2813687
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f2f8f7a2ec1b2ede48cbcd189b376ab9fa0735ef
+@inproceedings{shokri2015privacypreserving,
+  title = {Privacy-preserving deep learning},
+  author = {R. Shokri and Vitaly Shmatikov},
+  year = {2015},
+  booktitle = {Allerton Conference on Communication, Control, and Computing},
+  doi = {10.1145/2810103.2813687},
+  url = {https://www.semanticscholar.org/paper/f2f8f7a2ec1b2ede48cbcd189b376ab9fa0735ef},
+}
+
+======================================================================
+Reference: Recipes for adapting pre-trained monolingual and multilingual models to machine translation
+Authors  : Asa Cooper Stickland, Xian Li, Marjan Ghazvininejad
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2021.eacl-main.301
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2004.14911
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference of the European Chapter of the Association for Computational Linguistics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.14911v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/973173fd44df71ca3b5d337cf982cfd11bc7aa4a
+@inproceedings{stickland2020recipes,
+  title = {Recipes for Adapting Pre-trained Monolingual and Multilingual Models to Machine Translation},
+  author = {Asa Cooper Stickland and Xian Li and Marjan Ghazvininejad},
+  year = {2020},
+  booktitle = {Conference of the European Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2021.eacl-main.301},
+  eprint = {2004.14911},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.14911v2},
+}
+
+======================================================================
+Reference: Can unconditional language models recover arbitrary sentences?
+Authors  : Nishant Subramani, Samuel R. Bowman, Kyunghyun Cho
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1907.04944
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Neural Information Processing Systems
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/9e290730ab5fb48c5a43fbe4d10b238a425b7013
+@article{subramani2019unconditional,
+  title = {Can Unconditional Language Models Recover Arbitrary Sentences?},
+  author = {Nishant Subramani and Samuel R. Bowman and Kyunghyun Cho},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1907.04944},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/9e290730ab5fb48c5a43fbe4d10b238a425b7013},
+}
+
+======================================================================
+Reference: Conditioned natural language generation using only unconditioned language model: An exploration
+Authors  : Fan-Keng Sun, Cheng-I Lai
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2011.07347
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2011.07347v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/190ae853c9d5dbbdf41201eea6a44360d0c07f0e
+@misc{sun2020conditioned,
+  title = {Conditioned Natural Language Generation using only Unconditioned Language Model: An Exploration},
+  author = {Fan-Keng Sun and Cheng-I Lai},
+  year = {2020},
+  journal = {arXiv.org},
+  eprint = {2011.07347},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2011.07347v1},
+}
+
+======================================================================
+Reference: Attention is all you need
+Authors  : Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, Illia Polosukhin
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1706.03762
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1706.03762v7
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/204e3073870fae3d05bcbc2f6a8e263d9b72e776
+@article{vaswani2017attention,
+  title = {Attention Is All You Need},
+  author = {Ashish Vaswani and Noam Shazeer and Niki Parmar and Jakob Uszkoreit and Llion Jones and Aidan N. Gomez and Lukasz Kaiser and Illia Polosukhin},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1706.03762},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1706.03762v7},
+}
+
+======================================================================
+Reference: Cider: Consensus-based image description evaluation
+Authors  : Ramakrishna Vedantam, C. Lawrence Zitnick, Devi Parikh
+Year     : 2015
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr.2015.7299087
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1411.5726
+  - [warning/incomplete/abbreviated_venue] Cited venue 'CVPR' may be an abbreviation of 'Computer Vision and Pattern Recognition'.
+      Suggestion: Use the full venue name: Computer Vision and Pattern Recognition.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/258986132bf17755fe8263e42429fe73218c1534
+@article{vedantam2014cider,
+  title = {CIDEr: Consensus-based image description evaluation},
+  author = {Ramakrishna Vedantam and C. L. Zitnick and Devi Parikh},
+  year = {2014},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2015.7299087},
+  eprint = {1411.5726},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/258986132bf17755fe8263e42429fe73218c1534},
+}
+
+======================================================================
+Reference: Transformers: State-of-the-art natural language processing
+Authors  : Thomas Wolf, Lysandre Debut, Victor Sanh, Julien Chaumond, Clement Delangue, Anthony Moi, Pierric Cistac, Tim Rault, Rémi Louf, Morgan Funtowicz, Joe Davison, Sam Shleifer, Patrick von Platen, Clara Ma, Yacine Jernite, Julien Plu, Canwen Xu, Teven Le Scao, Sylvain Gugger, Mariama Drame, Quentin Lhoest, Alexander M. Rush
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.emnlp-demos.6
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4e561318668f0ae190217ffe82bf44c9c33b9c0d
+@inproceedings{wolf2020transformers,
+  title = {Transformers: State-of-the-Art Natural Language Processing},
+  author = {Thomas Wolf and Lysandre Debut and Victor Sanh and Julien Chaumond and C. Delangue and Anthony Moi and Pierric Cistac and Tim Rault and Rémi Louf and Morgan Funtowicz and Joe Davison and Sam Shleifer and Patrick von Platen and Clara Ma and Yacine Jernite and J. Plu and Canwen Xu and Teven Le Scao and Sylvain Gugger and Mariama Drame and Quentin Lhoest and Alexander M. Rush},
+  year = {2020},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/2020.emnlp-demos.6},
+  url = {https://www.semanticscholar.org/paper/4e561318668f0ae190217ffe82bf44c9c33b9c0d},
+}
+
+======================================================================
+Reference: Side-tuning: A baseline for network adaptation via additive side networks
+Authors  : Jeffrey O Zhang, Alexander Sax, Amir Zamir, Leonidas Guibas, Jitendra Malik
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-030-58580-8_41
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: European Conference on Computer Vision
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4287533d12143cdbc4948b60ecece28b6c750f17
+@inproceedings{zhang2019sidetuning,
+  title = {Side-Tuning: A Baseline for Network Adaptation via Additive Side Networks},
+  author = {Jeffrey O. Zhang and Alexander Sax and Amir Zamir and L. Guibas and J. Malik},
+  year = {2019},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-030-58580-8_41},
+  url = {https://www.semanticscholar.org/paper/4287533d12143cdbc4948b60ecece28b6c750f17},
+}
+
+======================================================================
+Reference: BERTScore: Evaluating text generation with bert
+Authors  : Tianyi Zhang, Varsha Kishore, Felix Wu, Kilian Q. Weinberger, Yoav Artzi
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1904.09675
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/295065d942abca0711300b2b4c39829551060578
+@inproceedings{zhang2019bertscore,
+  title = {BERTScore: Evaluating Text Generation with BERT},
+  author = {Tianyi Zhang and Varsha Kishore and Felix Wu and Kilian Q. Weinberger and Yoav Artzi},
+  year = {2019},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1904.09675},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/295065d942abca0711300b2b4c39829551060578},
+}
+
+======================================================================
+Reference: DIALOGPT : Large-scale generative pre-training for conversational response generation
+Authors  : Yizhe Zhang, Siqi Sun, Michel Galley, Yen-Chun Chen, Chris Brockett, Xiang Gao, Jianfeng Gao, Jingjing Liu, Bill Dolan
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.acl-demos.30
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1911.00536
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/388e2fcdcefbe0834e153ab2a0be127092f9674d
+@inproceedings{zhang2019dialogpt,
+  title = {DIALOGPT : Large-Scale Generative Pre-training for Conversational Response Generation},
+  author = {Yizhe Zhang and Siqi Sun and Michel Galley and Yen-Chun Chen and Chris Brockett and Xiang Gao and Jianfeng Gao and Jingjing Liu and W. Dolan},
+  year = {2019},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2020.acl-demos.30},
+  eprint = {1911.00536},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/388e2fcdcefbe0834e153ab2a0be127092f9674d},
+}
+
+======================================================================
+Reference: Masking as an efficient alternative to finetuning for pretrained language models
+Authors  : Mengjie Zhao, Tao Lin, Fei Mi, Martin Jaggi, Hinrich Schütze
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.emnlp-main.174
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2004.12406
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference on Empirical Methods in Natural Language Processing
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.12406v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/7fb301ea25f02dc7f4f7ee1360137503ee942c8c
+@inproceedings{zhao2020masking,
+  title = {Masking as an Efficient Alternative to Finetuning for Pretrained Language Models},
+  author = {Mengjie Zhao and Tao Lin and Fei Mi and Martin Jaggi and Hinrich Schütze},
+  year = {2020},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/2020.emnlp-main.174},
+  eprint = {2004.12406},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.12406v2},
+}
+
+======================================================================
+Reference: MoverScore: Text generation evaluating with contextualized embeddings and earth mover distance
+Authors  : Wei Zhao, Maxime Peyrard, Fei Liu, Yang Gao, Christian M. Meyer, Steffen Eger
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d19-1053
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1909.02622
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1909.02622v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/635cb6fb865e86c108c5d1d895aeac0e759eb199
+@inproceedings{zhao2019moverscore,
+  title = {MoverScore: Text Generation Evaluating with Contextualized Embeddings and Earth Mover Distance},
+  author = {Wei Zhao and Maxime Peyrard and Fei Liu and Yang Gao and Christian M. Meyer and Steffen Eger},
+  year = {2019},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d19-1053},
+  eprint = {1909.02622},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1909.02622v2},
+}
+
+======================================================================
+Reference: Extractive summarization as text matching
+Authors  : Ming Zhong, Pengfei Liu, Yiran Chen, Danqing Wang, Xipeng Qiu, Xuanjing Huang
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.acl-main.552
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2004.08795
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.08795v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/929b4775b6896634e11a8feb0ca4ca64ef7b3e24
+@inproceedings{zhong2020extractive,
+  title = {Extractive Summarization as Text Matching},
+  author = {Ming Zhong and Pengfei Liu and Yiran Chen and Danqing Wang and Xipeng Qiu and Xuanjing Huang},
+  year = {2020},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2020.acl-main.552},
+  eprint = {2004.08795},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.08795v1},
+}
+
+======================================================================
+Reference: Incorporating bert into neural machine translation
+Authors  : Jinhua Zhu, Yingce Xia, Lijun Wu, Di He, Tao Qin, Wengang Zhou, Houqiang Li, Tieyan Liu
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/taslp.2021.3076863
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/3cadeded3b1d4ec5f3146064c596c95a822e7e0f
+@article{guo2021adaptive,
+  title = {Adaptive Adapters: An Efficient Way to Incorporate BERT Into Neural Machine Translation},
+  author = {Junliang Guo and Zhirui Zhang and Linli Xu and Boxing Chen and Enhong Chen},
+  year = {2021},
+  journal = {IEEE/ACM Transactions on Audio Speech and Language Processing},
+  doi = {10.1109/taslp.2021.3076863},
+  url = {https://www.semanticscholar.org/paper/3cadeded3b1d4ec5f3146064c596c95a822e7e0f},
+}

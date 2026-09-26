@@ -1,0 +1,726 @@
+======================================================================
+Reference: Gpt-4 technical report
+Authors  : Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CoRR 2024' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CoRR 2024.
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 281.
+      Suggestion: List all 281 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.08774v6
+%   openreview: venue — https://openreview.net/forum?id=53paKRfmgs
+@article{openai2023technical,
+  title = {GPT-4 Technical Report},
+  author = {OpenAI and Josh Achiam and Steven Adler and Sandhini Agarwal and Lama Ahmad and Ilge Akkaya and Florencia Leoni Aleman and Diogo Almeida and Janko Altenschmidt and Sam Altman and Shyamal Anadkat and Red Avila and Igor Babuschkin and Suchir Balaji and Valerie Balcom and Paul Baltescu and Haiming Bao and Mohammad Bavarian and Jeff Belgum and Irwan Bello and Jake Berdine and Gabriel Bernadett-Shapiro and Christopher Berner and Lenny Bogdonoff and Oleg Boiko and Madelaine Boyd and Anna-Luisa Brakman and Greg Brockman and Tim Brooks and Miles Brundage and Kevin Button and Trevor Cai and Rosie Campbell and Andrew Cann and Brittany Carey and Chelsea Carlson and Rory Carmichael and Brooke Chan and Che Chang and Fotis Chantzis and Derek Chen and Sully Chen and Ruby Chen and Jason Chen and Mark Chen and Ben Chess and Chester Cho and Casey Chu and Hyung Won Chung and Dave Cummings and Jeremiah Currier and Yunxing Dai and Cory Decareaux and Thomas Degry and Noah Deutsch and Damien Deville and Arka Dhar and David Dohan and Steve Dowling and Sheila Dunning and Adrien Ecoffet and Atty Eleti and Tyna Eloundou and David Farhi and Liam Fedus and Niko Felix and Simón Posada Fishman and Juston Forte and Isabella Fulford and Leo Gao and Elie Georges and Christian Gibson and Vik Goel and Tarun Gogineni and Gabriel Goh and Rapha Gontijo-Lopes and Jonathan Gordon and Morgan Grafstein and Scott Gray and Ryan Greene and Joshua Gross and Shixiang Shane Gu and Yufei Guo and Chris Hallacy and Jesse Han and Jeff Harris and Yuchen He and Mike Heaton and Johannes Heidecke and Chris Hesse and Alan Hickey and Wade Hickey and Peter Hoeschele and Brandon Houghton and Kenny Hsu and Shengli Hu and Xin Hu and Joost Huizinga and Shantanu Jain and Shawn Jain and Joanne Jang and Angela Jiang and Roger Jiang and Haozhun Jin and Denny Jin and Shino Jomoto and Billie Jonn and Heewoo Jun and Tomer Kaftan and Łukasz Kaiser and Ali Kamali and Ingmar Kanitscheider and Nitish Shirish Keskar and Tabarak Khan and Logan Kilpatrick and Jong Wook Kim and Christina Kim and Yongjik Kim and Jan Hendrik Kirchner and Jamie Kiros and Matt Knight and Daniel Kokotajlo and Łukasz Kondraciuk and Andrew Kondrich and Aris Konstantinidis and Kyle Kosic and Gretchen Krueger and Vishal Kuo and Michael Lampe and Ikai Lan and Teddy Lee and Jan Leike and Jade Leung and Daniel Levy and Chak Ming Li and Rachel Lim and Molly Lin and Stephanie Lin and Mateusz Litwin and Theresa Lopez and Ryan Lowe and Patricia Lue and Anna Makanju and Kim Malfacini and Sam Manning and Todor Markov and Yaniv Markovski and Bianca Martin and Katie Mayer and Andrew Mayne and Bob McGrew and Scott Mayer McKinney and Christine McLeavey and Paul McMillan and Jake McNeil and David Medina and Aalok Mehta and Jacob Menick and Luke Metz and Andrey Mishchenko and Pamela Mishkin and Vinnie Monaco and Evan Morikawa and Daniel Mossing and Tong Mu and Mira Murati and Oleg Murk and David Mély and Ashvin Nair and Reiichiro Nakano and Rajeev Nayak and Arvind Neelakantan and Richard Ngo and Hyeonwoo Noh and Long Ouyang and Cullen O'Keefe and Jakub Pachocki and Alex Paino and Joe Palermo and Ashley Pantuliano and Giambattista Parascandolo and Joel Parish and Emy Parparita and Alex Passos and Mikhail Pavlov and Andrew Peng and Adam Perelman and Filipe de Avila Belbute Peres and Michael Petrov and Henrique Ponde de Oliveira Pinto and Michael and Pokorny and Michelle Pokrass and Vitchyr H. Pong and Tolly Powell and Alethea Power and Boris Power and Elizabeth Proehl and Raul Puri and Alec Radford and Jack Rae and Aditya Ramesh and Cameron Raymond and Francis Real and Kendra Rimbach and Carl Ross and Bob Rotsted and Henri Roussez and Nick Ryder and Mario Saltarelli and Ted Sanders and Shibani Santurkar and Girish Sastry and Heather Schmidt and David Schnurr and John Schulman and Daniel Selsam and Kyla Sheppard and Toki Sherbakov and Jessica Shieh and Sarah Shoker and Pranav Shyam and Szymon Sidor and Eric Sigler and Maddie Simens and Jordan Sitkin and Katarina Slama and Ian Sohl and Benjamin Sokolowsky and Yang Song and Natalie Staudacher and Felipe Petroski Such and Natalie Summers and Ilya Sutskever and Jie Tang and Nikolas Tezak and Madeleine B. Thompson and Phil Tillet and Amin Tootoonchian and Elizabeth Tseng and Preston Tuggle and Nick Turley and Jerry Tworek and Juan Felipe Cerón Uribe and Andrea Vallone and Arun Vijayvergiya and Chelsea Voss and Carroll Wainwright and Justin Jay Wang and Alvin Wang and Ben Wang and Jonathan Ward and Jason Wei and CJ Weinmann and Akila Welihinda and Peter Welinder and Jiayi Weng and Lilian Weng and Matt Wiethoff and Dave Willner and Clemens Winter and Samuel Wolrich and Hannah Wong and Lauren Workman and Sherwin Wu and Jeff Wu and Michael Wu and Kai Xiao and Tao Xu and Sarah Yoo and Kevin Yu and Qiming Yuan and Wojciech Zaremba and Rowan Zellers and Chong Zhang and Marvin Zhang and Shengjia Zhao and Tianhao Zheng and Juntang Zhuang and William Zhuk and Barret Zoph},
+  year = {2023},
+  journal = {CoRR 2024},
+  eprint = {2303.08774},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.08774v6},
+}
+
+======================================================================
+Reference: Graph of thoughts: Solving elaborate problems with large language models
+Authors  : Maciej Besta, Nils Blach, Ales Kubicek, Robert Gerstenberger, Michal Podstawski, Lukas Gianinazzi, Joanna Gajda, Tomasz Lehmann, Hubert Niewiadomski, Piotr Nyczyk, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v38i16.29720
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2308.09687
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/aade40af0d85b0b4fe15c97f6222d5c2e4d6d9b3
+@inproceedings{besta2023graph,
+  title = {Graph of Thoughts: Solving Elaborate Problems with Large Language Models},
+  author = {Maciej Besta and Nils Blach and Aleš Kubíček and Robert Gerstenberger and Lukas Gianinazzi and Joanna Gajda and Tomasz Lehmann and Michal Podstawski and H. Niewiadomski and Piotr Nyczyk and Torsten Hoefler},
+  year = {2023},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v38i16.29720},
+  eprint = {2308.09687},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/aade40af0d85b0b4fe15c97f6222d5c2e4d6d9b3},
+}
+
+======================================================================
+Reference: Language models are few-shot learners
+Authors  : Tom B Brown
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2005.14165v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/90abbc2cf38462b954ae1b772fac9532e2ccd8b0
+@article{brown2020language,
+  title = {Language Models are Few-Shot Learners},
+  author = {Tom B. Brown and Benjamin Mann and Nick Ryder and Melanie Subbiah and Jared Kaplan and Prafulla Dhariwal and Arvind Neelakantan and Pranav Shyam and Girish Sastry and Amanda Askell and Sandhini Agarwal and Ariel Herbert-Voss and Gretchen Krueger and Tom Henighan and Rewon Child and Aditya Ramesh and Daniel M. Ziegler and Jeffrey Wu and Clemens Winter and Christopher Hesse and Mark Chen and Eric Sigler and Mateusz Litwin and Scott Gray and Benjamin Chess and Jack Clark and Christopher Berner and Sam McCandlish and Alec Radford and Ilya Sutskever and Dario Amodei},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2005.14165},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2005.14165v4},
+}
+
+======================================================================
+Reference: Recurrent memory transformer
+Authors  : Aydar Bulatov, Yury Kuratov, Mikhail Burtsev
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2207.06881
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2207.06881
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2207.06881v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a8cf0f7a20f886acfb332071c2daaf58ba86a5ca
+@article{bulatov2022recurrent,
+  title = {Recurrent Memory Transformer},
+  author = {Aydar Bulatov and Yuri Kuratov and Mikhail S. Burtsev},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2207.06881},
+  eprint = {2207.06881},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2207.06881v2},
+}
+
+======================================================================
+Reference: Transformer-xl: Attentive language models beyond a fixed-length context
+Authors  : Zihang Dai, Zhilin Yang, Yiming Yang, Jaime Carbonell, Quoc V Le, Ruslan Salakhutdinov
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/p19-1285
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1901.02860v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c4744a7c2bb298e4a52289a1e085c71cc3d37bc6
+@inproceedings{dai2019transformerxl,
+  title = {Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context},
+  author = {Zihang Dai and Zhilin Yang and Yiming Yang and Jaime Carbonell and Quoc V. Le and Ruslan Salakhutdinov},
+  year = {2019},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/p19-1285},
+  eprint = {1901.02860},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1901.02860v3},
+}
+
+======================================================================
+Reference: Likelihood-based diffusion language models
+Authors  : Ishaan Gulrajani, Tatsunori B Hashimoto
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2305.18619
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2305.18619
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d9ffb44ee3c8ec0b6692df8a90451384c1edd89b
+@article{gulrajani2023likelihoodbased,
+  title = {Likelihood-Based Diffusion Language Models},
+  author = {Ishaan Gulrajani and Tatsunori Hashimoto},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2305.18619},
+  eprint = {2305.18619},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/d9ffb44ee3c8ec0b6692df8a90451384c1edd89b},
+}
+
+======================================================================
+Reference: Efficient diffusion training via min-snr weighting strategy
+Authors  : Tiankai Hang, Shuyang Gu, Chen Li, Jianmin Bao, Dong Chen, Han Hu, Xin Geng, Baining Guo
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv51070.2023.00684
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.09556
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.09556v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d37ee0c440e36df133722093f6a824f4964e8ae0
+@inproceedings{hang2023efficient,
+  title = {Efficient Diffusion Training via Min-SNR Weighting Strategy},
+  author = {Tiankai Hang and Shuyang Gu and Chen Li and Jianmin Bao and Dong Chen and Han Hu and Xin Geng and Baining Guo},
+  year = {2023},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv51070.2023.00684},
+  eprint = {2303.09556},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.09556v3},
+}
+
+======================================================================
+Reference: Diffusion-bert: Improving generative masked language models with diffusion models
+Authors  : Zhengfu He, Tianxiang Sun, Kuanning Wang, Xuanjing Huang, Xipeng Qiu
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2211.15029
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.82).
+      Suggestion: Use canonical title: DiffusionBERT: Improving Generative Masked Language Models with Diffusion Models
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2211.15029v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a979742220a88b1d32e1fbe72c41e8ba3007053c
+@inproceedings{he2022diffusionbert,
+  title = {DiffusionBERT: Improving Generative Masked Language Models with Diffusion Models},
+  author = {Zhengfu He and Tianxiang Sun and Kuanning Wang and Xuanjing Huang and Xipeng Qiu},
+  year = {2022},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2211.15029},
+  eprint = {2211.15029},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2211.15029v2},
+}
+
+======================================================================
+Reference: Classifier-free diffusion guidance
+Authors  : Jonathan Ho, Tim Salimans
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2207.12598
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2207.12598v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/af9f365ed86614c800f082bd8eb14be76072ad16
+@misc{ho2022classifierfree,
+  title = {Classifier-Free Diffusion Guidance},
+  author = {Jonathan Ho and Tim Salimans},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2207.12598},
+  eprint = {2207.12598},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2207.12598v1},
+}
+
+======================================================================
+Reference: Denoising diffusion probabilistic models
+Authors  : Jonathan Ho, Ajay Jain, Pieter Abbeel
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2006.11239
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2006.11239v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/5c126ae3421f05768d8edd97ecd44b1364e2c99a
+@article{ho2020denoising,
+  title = {Denoising Diffusion Probabilistic Models},
+  author = {Jonathan Ho and Ajay Jain and Pieter Abbeel},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2006.11239},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2006.11239v2},
+}
+
+======================================================================
+Reference: Towards reasoning in large language models: A survey
+Authors  : Jie Huang, Kevin Chen-Chuan Chang
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2212.10403
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2212.10403v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/db4ab91d5675c37795e719e997a2827d3d83cd45
+@inproceedings{huang2022towards,
+  title = {Towards Reasoning in Large Language Models: A Survey},
+  author = {Jie Huang and Kevin Chen-Chuan Chang},
+  year = {2022},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2212.10403},
+  eprint = {2212.10403},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2212.10403v2},
+}
+
+======================================================================
+Reference: Block-recurrent transformers
+Authors  : DeLesley Hutchins, Imanol Schlag, Yuhuai Wu, Ethan Dyer, Behnam Neyshabur
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2203.07852
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2203.07852
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2203.07852v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/db62b8d291f13d75cd3284a58a46e3afb9ad5289
+@article{hutchins2022blockrecurrent,
+  title = {Block-Recurrent Transformers},
+  author = {DeLesley Hutchins and Imanol Schlag and Yuhuai Wu and Ethan Dyer and Behnam Neyshabur},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2203.07852},
+  eprint = {2203.07852},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2203.07852v3},
+}
+
+======================================================================
+Reference: Step-dpo: Step-wise preference optimization for long-chain reasoning of llms
+Authors  : Xin Lai, Zhuotao Tian, Yukang Chen, Senqiao Yang, Xiangru Peng, Jiaya Jia
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2406.18629
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2406.18629v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/501f8a0200a12a6f3906c1e4f3f40715e0e7d23a
+@misc{lai2024stepdpo,
+  title = {Step-DPO: Step-wise Preference Optimization for Long-chain Reasoning of LLMs},
+  author = {Xin Lai and Zhuotao Tian and Yukang Chen and Senqiao Yang and Xiangru Peng and Jiaya Jia},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2406.18629},
+  eprint = {2406.18629},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2406.18629v1},
+}
+
+======================================================================
+Reference: Bart: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension
+Authors  : Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Ves Stoyanov, Luke Zettlemoyer
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2020.acl-main.703
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1910.13461v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/395de0bd3837fdf4b4b5e5f04835bcc69c279481
+@inproceedings{lewis2019bart,
+  title = {BART: Denoising Sequence-to-Sequence Pre-training for Natural Language Generation, Translation, and Comprehension},
+  author = {Mike Lewis and Yinhan Liu and Naman Goyal and Marjan Ghazvininejad and Abdelrahman Mohamed and Omer Levy and Ves Stoyanov and Luke Zettlemoyer},
+  year = {2019},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2020.acl-main.703},
+  eprint = {1910.13461},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1910.13461v1},
+}
+
+======================================================================
+Reference: Diffusion guided language modeling
+Authors  : Justin Lovelace, Varsha Kishore, Yiwei Chen, Kilian Q Weinberger
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2408.04220
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2408.04220v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/bd6dec82ad241d0079a76ef618e7670e2e1cc7aa
+@inproceedings{lovelace2024diffusion,
+  title = {Diffusion Guided Language Modeling},
+  author = {Justin Lovelace and Varsha Kishore and Yiwei Chen and Kilian Q. Weinberger},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2408.04220},
+  eprint = {2408.04220},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2408.04220v1},
+}
+
+======================================================================
+Reference: Latent diffusion for language generation
+Authors  : Justin Lovelace, Varsha Kishore, Chao Wan, Eliot Shekhtman, Kilian Q Weinberger
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2212.09462
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2403.07179
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2403.07179v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/23b7cde603b5ec8d5d13d46e1c453dc52d7c3f6c
+@article{zhu2024mdiffusion,
+  title = {3M-Diffusion: Latent Multi-Modal Diffusion for Language-Guided Molecular Structure Generation},
+  author = {Huaisheng Zhu and Teng Xiao and Vasant G Honavar},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2212.09462},
+  eprint = {2403.07179},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2403.07179v2},
+}
+
+======================================================================
+Reference: Glide: Towards photorealistic image generation and editing with text-guided diffusion models
+Authors  : Alex Nichol, Prafulla Dhariwal, Aditya Ramesh, Pranav Shyam, Pamela Mishkin, Bob McGrew, Ilya Sutskever, Mark Chen
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2112.10741v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/7002ae048e4b8c9133a55428441e8066070995cb
+@inproceedings{nichol2021glide,
+  title = {GLIDE: Towards Photorealistic Image Generation and Editing with Text-Guided Diffusion Models},
+  author = {Alex Nichol and Prafulla Dhariwal and Aditya Ramesh and Pranav Shyam and Pamela Mishkin and Bob McGrew and Ilya Sutskever and Mark Chen},
+  year = {2021},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2112.10741},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2112.10741v3},
+}
+
+======================================================================
+Reference: Improved denoising diffusion probabilistic models
+Authors  : Alexander Quinn Nichol, Prafulla Dhariwal
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2102.09672
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2102.09672v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/de18baa4964804cf471d85a5a090498242d2e79f
+@inproceedings{nichol2021improved,
+  title = {Improved Denoising Diffusion Probabilistic Models},
+  author = {Alex Nichol and Prafulla Dhariwal},
+  year = {2021},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2102.09672},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2102.09672v1},
+}
+
+======================================================================
+Reference: Scalable diffusion models with transformers
+Authors  : William Peebles, Saining Xie
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv51070.2023.00387
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2212.09748
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/736973165f98105fec3729b7db414ae4d80fcbeb
+@inproceedings{peebles2022scalable,
+  title = {Scalable Diffusion Models with Transformers},
+  author = {William S. Peebles and Saining Xie},
+  year = {2022},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv51070.2023.00387},
+  eprint = {2212.09748},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/736973165f98105fec3729b7db414ae4d80fcbeb},
+}
+
+======================================================================
+Reference: Direct preference optimization: Your language model is secretly a reward model
+Authors  : Rafael Rafailov, Archit Sharma, Eric Mitchell, Christopher D Manning, Stefano Ermon, Chelsea Finn
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/075280-2338
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2305.18290
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0d1c76d45afa012ded7ab741194baf142117c495
+@article{rafailov2023direct,
+  title = {Direct Preference Optimization: Your Language Model is Secretly a Reward Model},
+  author = {Rafael Rafailov and Archit Sharma and E. Mitchell and Stefano Ermon and Christopher D. Manning and Chelsea Finn},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/075280-2338},
+  eprint = {2305.18290},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/0d1c76d45afa012ded7ab741194baf142117c495},
+}
+
+======================================================================
+Reference: High-resolution image synthesis with latent diffusion models
+Authors  : Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52688.2022.01042
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2112.10752
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/c10075b3746a9f3dd5811970e93c8ca3ad39b39d
+@article{rombach2021highresolution,
+  title = {High-Resolution Image Synthesis with Latent Diffusion Models},
+  author = {Robin Rombach and A. Blattmann and Dominik Lorenz and Patrick Esser and B. Ommer},
+  year = {2021},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52688.2022.01042},
+  eprint = {2112.10752},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/c10075b3746a9f3dd5811970e93c8ca3ad39b39d},
+}
+
+======================================================================
+Reference: Progressive distillation for fast sampling of diffusion models
+Authors  : Tim Salimans, Jonathan Ho
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2403.01329
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2202.00512v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/3e47cdf1cd18467ac7aa2b66b04ad0d1afda1ae3
+@inproceedings{salimans2022progressive,
+  title = {Progressive Distillation for Fast Sampling of Diffusion Models},
+  author = {Tim Salimans and Jonathan Ho},
+  year = {2022},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2403.01329},
+  eprint = {2202.00512},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2202.00512v2},
+}
+
+======================================================================
+Reference: Arb: Advanced reasoning benchmark for large language models
+Authors  : Tomohiro Sawada, Daniel Paleka, Alexander Havrilla, Pranav Tadepalli, Paula Vidas, Alexander Kranias, John J Nay, Kshitij Gupta, Aran Komatsuzaki
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2307.13692
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2307.13692v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c29dbfbc17fa190b787a2662d49f08a38c8bd166
+@misc{sawada2023advanced,
+  title = {ARB: Advanced Reasoning Benchmark for Large Language Models},
+  author = {Tomohiro Sawada and Daniel Paleka and Alexander Havrilla and Pranav Tadepalli and Paula Vidas and Alexander Kranias and John J. Nay and Kshitij Gupta and Aran Komatsuzaki},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2307.13692},
+  eprint = {2307.13692},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2307.13692v2},
+}
+
+======================================================================
+Reference: Gemma: Open models based on gemini research and technology
+Authors  : Gemma Team, Thomas Mesnard, Cassidy Hardin, Robert Dadashi, Surya Bhupatiraju, Shreya Pathak, Laurent Sifre, Morgane Rivière, Mihir Sanjay Kale, Juliette Love, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2403.08295
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 108.
+      Suggestion: List all 108 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2403.08295v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b842b83a7ff5dff8e3b83915d8c15423b6085728
+@misc{team2024gemma,
+  title = {Gemma: Open Models Based on Gemini Research and Technology},
+  author = {Gemma Team and Thomas Mesnard and Cassidy Hardin and Robert Dadashi and Surya Bhupatiraju and Shreya Pathak and Laurent Sifre and Morgane Rivière and Mihir Sanjay Kale and Juliette Love and Pouya Tafti and Léonard Hussenot and Pier Giuseppe Sessa and Aakanksha Chowdhery and Adam Roberts and Aditya Barua and Alex Botev and Alex Castro-Ros and Ambrose Slone and Amélie Héliou and Andrea Tacchetti and Anna Bulanova and Antonia Paterson and Beth Tsai and Bobak Shahriari and Charline Le Lan and Christopher A. Choquette-Choo and Clément Crepy and Daniel Cer and Daphne Ippolito and David Reid and Elena Buchatskaya and Eric Ni and Eric Noland and Geng Yan and George Tucker and George-Christian Muraru and Grigory Rozhdestvenskiy and Henryk Michalewski and Ian Tenney and Ivan Grishchenko and Jacob Austin and James Keeling and Jane Labanowski and Jean-Baptiste Lespiau and Jeff Stanway and Jenny Brennan and Jeremy Chen and Johan Ferret and Justin Chiu and Justin Mao-Jones and Katherine Lee and Kathy Yu and Katie Millican and Lars Lowe Sjoesund and Lisa Lee and Lucas Dixon and Machel Reid and Maciej Mikuła and Mateo Wirth and Michael Sharman and Nikolai Chinaev and Nithum Thain and Olivier Bachem and Oscar Chang and Oscar Wahltinez and Paige Bailey and Paul Michel and Petko Yotov and Rahma Chaabouni and Ramona Comanescu and Reena Jana and Rohan Anil and Ross McIlroy and Ruibo Liu and Ryan Mullins and Samuel L Smith and Sebastian Borgeaud and Sertan Girgin and Sholto Douglas and Shree Pandya and Siamak Shakeri and Soham De and Ted Klimenko and Tom Hennigan and Vlad Feinberg and Wojciech Stokowiec and Yu-hui Chen and Zafarali Ahmed and Zhitao Gong and Tris Warkentin and Ludovic Peran and Minh Giang and Clément Farabet and Oriol Vinyals and Jeff Dean and Koray Kavukcuoglu and Demis Hassabis and Zoubin Ghahramani and Douglas Eck and Joelle Barral and Fernando Pereira and Eli Collins and Armand Joulin and Noah Fiedel and Evan Senter and Alek Andreev and Kathleen Kenealy},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2403.08295},
+  eprint = {2403.08295},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2403.08295v4},
+}
+
+======================================================================
+Reference: Toward self-improvement of llms via imagination, searching, and criticizing
+Authors  : Ye Tian, Baolin Peng, Linfeng Song, Lifeng Jin, Dian Yu, Haitao Mi, Dong Yu
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Neural Information Processing Systems' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Neural Information Processing Systems.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2404.12253
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Neural Information Processing Systems
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2404.12253v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/6c17de3e719c0f4d1df6a16f770c2a9a5f18206f
+@article{tian2024toward,
+  title = {Toward Self-Improvement of LLMs via Imagination, Searching, and Criticizing},
+  author = {Ye Tian and Baolin Peng and Linfeng Song and Lifeng Jin and Dian Yu and Haitao Mi and Dong Yu},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2404.12253},
+  eprint = {2404.12253},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2404.12253v2},
+}
+
+======================================================================
+Reference: Unbiased gradient estimation in unrolled computation graphs with persistent evolution strategies
+Authors  : Paul Vicol, Luke Metz, Jascha Sohl-Dickstein
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.24963/ijcai.2022/750
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2112.13835
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2112.13835v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0b0cd862d6820b24fc4e3ca1c42cbe557ca49d9c
+@inproceedings{vicol2021unbiased,
+  title = {Unbiased Gradient Estimation in Unrolled Computation Graphs with Persistent Evolution Strategies},
+  author = {Paul Vicol and Luke Metz and Jascha Sohl-Dickstein},
+  year = {2021},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.24963/ijcai.2022/750},
+  eprint = {2112.13835},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2112.13835v1},
+}
+
+======================================================================
+Reference: Chain-of-thought prompting elicits reasoning in large language models
+Authors  : Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/068431-1800
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2201.11903
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2201.11903v6
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1b6e810ce0afd0dd093f789d2b2742d047e316d5
+@article{wei2022chainofthought,
+  title = {Chain-of-Thought Prompting Elicits Reasoning in Large Language Models},
+  author = {Jason Wei and Xuezhi Wang and Dale Schuurmans and Maarten Bosma and Brian Ichter and Fei Xia and Ed Chi and Quoc Le and Denny Zhou},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/068431-1800},
+  eprint = {2201.11903},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2201.11903v6},
+}
+
+======================================================================
+Reference: Monte carlo tree search boosts reasoning via iterative preference learning
+Authors  : Yuxi Xie, Anirudh Goyal, Wenyue Zheng, Min-Yen Kan, Timothy P Lillicrap, Kenji Kawaguchi, Michael Shieh
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2405.00451
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.00451v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/38333f6e8f0388968edc4b2ea7a683ce69677e69
+@misc{xie2024monte,
+  title = {Monte Carlo Tree Search Boosts Reasoning via Iterative Preference Learning},
+  author = {Yuxi Xie and Anirudh Goyal and Wenyue Zheng and Min-Yen Kan and Timothy P. Lillicrap and Kenji Kawaguchi and Michael Shieh},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2405.00451},
+  eprint = {2405.00451},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.00451v2},
+}
+
+======================================================================
+Reference: Diffusion models: A comprehensive survey of methods and applications
+Authors  : Ling Yang, Zhilong Zhang, Yang Song, Shenda Hong, Runsheng Xu, Yue Zhao, Wentao Zhang, Bin Cui, Ming-Hsuan Yang
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3626235
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2209.00796
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/e342165a614588878ad0f4bc9bacf3905df34d08
+@article{yang2022diffusion,
+  title = {Diffusion Models: A Comprehensive Survey of Methods and Applications},
+  author = {Ling Yang and Zhilong Zhang and Shenda Hong and Runsheng Xu and Yue Zhao and Yingxia Shao and Wentao Zhang and Ming-Hsuan Yang and Bin Cui},
+  year = {2022},
+  journal = {ACM Computing Surveys},
+  doi = {10.1145/3626235},
+  eprint = {2209.00796},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/e342165a614588878ad0f4bc9bacf3905df34d08},
+}
+
+======================================================================
+Reference: Diffusion of thoughts: Chain-of-thought reasoning in diffusion language models
+Authors  : Jiacheng Ye, Shansan Gong, Liheng Chen, Lin Zheng, Jiahui Gao, Han Shi, Chuan Wu, Zhenguo Li, Wei Bi, Lingpeng Kong
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.07754
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.07754v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f54aa5a594d054e9564413ed4c30d18f2e747bc7
+@misc{ye2024diffusion,
+  title = {Diffusion of Thoughts: Chain-of-Thought Reasoning in Diffusion Language Models},
+  author = {Jiacheng Ye and Shansan Gong and Liheng Chen and Lin Zheng and Jiahui Gao and Han Shi and Chuan Wu and Xin Jiang and Zhenguo Li and Wei Bi and Lingpeng Kong},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2402.07754},
+  eprint = {2402.07754},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.07754v3},
+}

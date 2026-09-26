@@ -1,0 +1,1130 @@
+======================================================================
+Reference: Llava-next: Open large multimodal models
+Authors  : 
+Year     : 2024
+Verdict  : warning
+  - [warning/non_academic/non_academic::documentation] Reference is a non-academic source (documentation); no arXiv / Semantic Scholar record is expected.
+      Suggestion: The citation points to the official GitHub repository/documentation for the LLaVA-NeXT open multimodal model project.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.07895
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2407.07895
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2e230519ef242e592b3c19765639008c7046424f
+@misc{li2024llavanextinterleave,
+  title = {LLaVA-NeXT-Interleave: Tackling Multi-image, Video, and 3D in Large Multimodal Models},
+  author = {Feng Li and Renrui Zhang and Hao Zhang and Yuanhan Zhang and Bo Li and Wei Li and Zejun Ma and Chunyuan Li},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2407.07895},
+  eprint = {2407.07895},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/2e230519ef242e592b3c19765639008c7046424f},
+}
+
+======================================================================
+Reference: Flamingo: a visual language model for few-shot learning
+Authors  : Jean-Baptiste Alayrac, Jeff Donahue, Pauline Luc, Antoine Miech, Iain Barr, Yana Hasson, Karel Lenc, Arthur Mensch, Katherine Millican, Malcolm Reynolds, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/068431-1723
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2204.14198
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 27.
+      Suggestion: List all 27 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2204.14198v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/26218bdcc3945c7edae7aa2adbfba4cd820a2df3
+@article{alayrac2022flamingo,
+  title = {Flamingo: a Visual Language Model for Few-Shot Learning},
+  author = {Jean-Baptiste Alayrac and Jeff Donahue and Pauline Luc and Antoine Miech and Iain Barr and Yana Hasson and Karel Lenc and Arthur Mensch and Katie Millican and Malcolm Reynolds and Roman Ring and Eliza Rutherford and Serkan Cabi and Tengda Han and Zhitao Gong and Sina Samangooei and Marianne Monteiro and Jacob Menick and Sebastian Borgeaud and Andrew Brock and Aida Nematzadeh and Sahand Sharifzadeh and Mikolaj Binkowski and Ricardo Barreira and Oriol Vinyals and Andrew Zisserman and Karen Simonyan},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/068431-1723},
+  eprint = {2204.14198},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2204.14198v2},
+}
+
+======================================================================
+Reference: Affordances from human videos as a versatile representation for robotics
+Authors  : Shikhar Bahl, Russell Mendonca, Lili Chen, Unnat Jain, Deepak Pathak
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52729.2023.01324
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2304.08488
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Computer Vision and Pattern Recognition
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2304.08488v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/253b41369d003952874c6a47a6038277b165cfa0
+@article{bahl2023affordances,
+  title = {Affordances from Human Videos as a Versatile Representation for Robotics},
+  author = {Shikhar Bahl and Russell Mendonca and Lili Chen and Unnat Jain and Deepak Pathak},
+  year = {2023},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52729.2023.01324},
+  eprint = {2304.08488},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2304.08488v1},
+}
+
+======================================================================
+Reference: Human cognitive abilities: A survey of factor-analytic studies
+Authors  : John Bissell Carroll
+Year     : 1993
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1080/15332276.1998.11672894
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d8a7c3f71f364f0b96deede8d14694438873d04c
+@article{pyryt1998human,
+  title = {Human cognitive abilities: A survey of factor analytic studies},
+  author = {Michael C. Pyryt},
+  year = {1998},
+  journal = {Gifted and talented international},
+  doi = {10.1080/15332276.1998.11672894},
+  url = {https://www.semanticscholar.org/paper/d8a7c3f71f364f0b96deede8d14694438873d04c},
+}
+
+======================================================================
+Reference: Hourvideo: 1-hour video-language understanding
+Authors  : Keshigeyan Chandrasegaran, Agrim Gupta, Lea M Hadzic, Taran Kota, Jimming He, Cristóbal Eyzaguirre, Zane Durante, Manling Li, Jiajun Wu, Fei-Fei Li
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2411.04998
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2411.04998
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2411.04998v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/043f80aadcafb06ce393ad7f8621f0b79753f55f
+@article{chandrasegaran2024hourvideo,
+  title = {HourVideo: 1-Hour Video-Language Understanding},
+  author = {Keshigeyan Chandrasegaran and Agrim Gupta and Lea M. Hadzic and Taran Kota and Jimming He and Cristóbal Eyzaguirre and Zane Durante and Manling Li and Jiajun Wu and Li Fei-Fei},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2411.04998},
+  eprint = {2411.04998},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2411.04998v1},
+}
+
+======================================================================
+Reference: Physbench: Benchmarking and enhancing vision-language models for physical world understanding
+Authors  : Wei Chow, Jiageng Mao, Boyi Li, Daniel Seita, Vitor Guizilini, Yue Wang
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2501.16411
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2501.16411v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/5b92288640ff2288ea867e628f7d5f94065d90a9
+@inproceedings{chow2025physbench,
+  title = {PhysBench: Benchmarking and Enhancing Vision-Language Models for Physical World Understanding},
+  author = {Wei Chow and Jiageng Mao and Boyi Li and Daniel Seita and Vitor Guizilini and Yue Wang},
+  year = {2025},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2501.16411},
+  eprint = {2501.16411},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2501.16411v2},
+}
+
+======================================================================
+Reference: Dual-process theories of higher cognition: Advancing the debate
+Authors  : Jonathan St B. T. Evans, Keith E. Stanovich
+Year     : 2013
+Verdict  : warning
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.85).
+      Suggestion: Use canonical title: Dual-Process Theories of Higher Cognition
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/3ad8e10d867e7338195545780556fe695b85eccb
+@article{evans2013dualprocess,
+  title = {Dual-Process Theories of Higher Cognition},
+  author = {J. Evans and K. Stanovich},
+  year = {2013},
+  journal = {Perspectives on Psychological Science},
+  doi = {10.1177/1745691612460685},
+  url = {https://www.semanticscholar.org/paper/3ad8e10d867e7338195545780556fe695b85eccb},
+}
+
+======================================================================
+Reference: Video-mme: The first-ever comprehensive evaluation benchmark of multi-modal llms in video analysis
+Authors  : Chaoyou Fu, Yuhan Dai, Yongdong Luo, Lei Li, Shuhuai Ren, Renrui Zhang, Zihan Wang, Chenyu Zhou, Yunhang Shen, Mengdan Zhang, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Computer Vision and Pattern Recognition' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Computer Vision and Pattern Recognition.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52734.2025.02245
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 21.
+      Suggestion: List all 21 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.21075v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/22552dd0e7789f175a302055f06444a12e22b652
+@article{fu2024videomme,
+  title = {Video-MME: The First-Ever Comprehensive Evaluation Benchmark of Multi-modal LLMs in Video Analysis},
+  author = {Chaoyou Fu and Yuhan Dai and Yongdong Luo and Lei Li and Shuhuai Ren and Renrui Zhang and Zihan Wang and Chenyu Zhou and Yunhang Shen and Mengdan Zhang and Peixian Chen and Yanwei Li and Shaohui Lin and Sirui Zhao and Ke Li and Tong Xu and Xiawu Zheng and Enhong Chen and Caifeng Shan and Ran He and Xing Sun},
+  year = {2024},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52734.2025.02245},
+  eprint = {2405.21075},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.21075v3},
+}
+
+======================================================================
+Reference: Gemma 3 technical report
+Authors  : Gemma Team, Aishwarya Kamath, Johan Ferret, Shreya Pathak, Nino Vieillard, Ramona Merhej, Sarah Perrin, Tatiana Matejovicova, Alexandre Ramé, Morgane Rivière, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2503.19786
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 216.
+      Suggestion: List all 216 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2503.19786v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/adac25c0aebd013f1225ec02636edfcc0bf4cf7c
+@misc{team2025gemma,
+  title = {Gemma 3 Technical Report},
+  author = {Gemma Team and Aishwarya Kamath and Johan Ferret and Shreya Pathak and Nino Vieillard and Ramona Merhej and Sarah Perrin and Tatiana Matejovicova and Alexandre Ramé and Morgane Rivière and Louis Rouillard and Thomas Mesnard and Geoffrey Cideron and Jean-bastien Grill and Sabela Ramos and Edouard Yvinec and Michelle Casbon and Etienne Pot and Ivo Penchev and Gaël Liu and Francesco Visin and Kathleen Kenealy and Lucas Beyer and Xiaohai Zhai and Anton Tsitsulin and Robert Busa-Fekete and Alex Feng and Noveen Sachdeva and Benjamin Coleman and Yi Gao and Basil Mustafa and Iain Barr and Emilio Parisotto and David Tian and Matan Eyal and Colin Cherry and Jan-Thorsten Peter and Danila Sinopalnikov and Surya Bhupatiraju and Rishabh Agarwal and Mehran Kazemi and Dan Malkin and Ravin Kumar and David Vilar and Idan Brusilovsky and Jiaming Luo and Andreas Steiner and Abe Friesen and Abhanshu Sharma and Abheesht Sharma and Adi Mayrav Gilady and Adrian Goedeckemeyer and Alaa Saade and Alex Feng and Alexander Kolesnikov and Alexei Bendebury and Alvin Abdagic and Amit Vadi and András György and André Susano Pinto and Anil Das and Ankur Bapna and Antoine Miech and Antoine Yang and Antonia Paterson and Ashish Shenoy and Ayan Chakrabarti and Bilal Piot and Bo Wu and Bobak Shahriari and Bryce Petrini and Charlie Chen and Charline Le Lan and Christopher A. Choquette-Choo and CJ Carey and Cormac Brick and Daniel Deutsch and Danielle Eisenbud and Dee Cattle and Derek Cheng and Dimitris Paparas and Divyashree Shivakumar Sreepathihalli and Doug Reid and Dustin Tran and Dustin Zelle and Eric Noland and Erwin Huizenga and Eugene Kharitonov and Frederick Liu and Gagik Amirkhanyan and Glenn Cameron and Hadi Hashemi and Hanna Klimczak-Plucińska and Harman Singh and Harsh Mehta and Harshal Tushar Lehri and Hussein Hazimeh and Ian Ballantyne and Idan Szpektor and Ivan Nardini and Jean Pouget-Abadie and Jetha Chan and Joe Stanton and John Wieting and Jonathan Lai and Jordi Orbay and Joseph Fernandez and Josh Newlan and Ju-yeong Ji and Jyotinder Singh and Kat Black and Kathy Yu and Kevin Hui and Kiran Vodrahalli and Klaus Greff and Linhai Qiu and Marcella Valentine and Marina Coelho and Marvin Ritter and Matt Hoffman and Matthew Watson and Mayank Chaturvedi and Michael Moynihan and Min Ma and Nabila Babar and Natasha Noy and Nathan Byrd and Nick Roy and Nikola Momchev and Nilay Chauhan and Noveen Sachdeva and Oskar Bunyan and Pankil Botarda and Paul Caron and Paul Kishan Rubenstein and Phil Culliton and Philipp Schmid and Pier Giuseppe Sessa and Pingmei Xu and Piotr Stanczyk and Pouya Tafti and Rakesh Shivanna and Renjie Wu and Renke Pan and Reza Rokni and Rob Willoughby and Rohith Vallu and Ryan Mullins and Sammy Jerome and Sara Smoot and Sertan Girgin and Shariq Iqbal and Shashir Reddy and Shruti Sheth and Siim Põder and Sijal Bhatnagar and Sindhu Raghuram Panyam and Sivan Eiger and Susan Zhang and Tianqi Liu and Trevor Yacovone and Tyler Liechty and Uday Kalra and Utku Evci and Vedant Misra and Vincent Roseberry and Vlad Feinberg and Vlad Kolesnikov and Woohyun Han and Woosuk Kwon and Xi Chen and Yinlam Chow and Yuvein Zhu and Zichuan Wei and Zoltan Egyed and Victor Cotruta and Minh Giang and Phoebe Kirk and Anand Rao and Kat Black and Nabila Babar and Jessica Lo and Erica Moreira and Luiz Gustavo Martins and Omar Sanseviero and Lucas Gonzalez and Zach Gleicher and Tris Warkentin and Vahab Mirrokni and Evan Senter and Eli Collins and Joelle Barral and Zoubin Ghahramani and Raia Hadsell and Yossi Matias and D. Sculley and Slav Petrov and Noah Fiedel and Noam Shazeer and Oriol Vinyals and Jeff Dean and Demis Hassabis and Koray Kavukcuoglu and Clement Farabet and Elena Buchatskaya and Jean-Baptiste Alayrac and Rohan Anil and Dmitry and Lepikhin and Sebastian Borgeaud and Olivier Bachem and Armand Joulin and Alek Andreev and Cassidy Hardin and Robert Dadashi and Léonard Hussenot},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2503.19786},
+  eprint = {2503.19786},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2503.19786v1},
+}
+
+======================================================================
+Reference: Introducing gen-3 alpha: A new frontier for video generation
+Authors  : Anastasis Germanidis
+Year     : 2024
+Verdict  : unverified
+
+======================================================================
+Reference: Our next-generation model: Gemini 1.5
+Authors  : Google
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3390/educsci13080845
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Education sciences
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/42488c0689aa04f143dfb758700de269f7805a90
+@article{dede2023developing,
+  title = {Developing a Next-Generation Model for Massive Digital Learning},
+  author = {C. Dede and William Lidwell},
+  year = {2023},
+  journal = {Education sciences},
+  doi = {10.3390/educsci13080845},
+  url = {https://www.semanticscholar.org/paper/42488c0689aa04f143dfb758700de269f7805a90},
+}
+
+======================================================================
+Reference: Gemini 2.5: Our most intelligent ai model
+Authors  : Google
+Year     : 2025
+Verdict  : unverified
+
+======================================================================
+Reference: State-of-the-art video and image generation with veo 2 and imagen 3
+Authors  : Google DeepMind
+Year     : 2024
+Verdict  : unverified
+
+======================================================================
+Reference: Animated knots
+Authors  : Grog
+Year     : 2025
+Verdict  : unverified
+
+======================================================================
+Reference: Transform idea to visual with ai
+Authors  : Hailuo AI
+Year     : 2025
+Verdict  : warning
+  - [warning/non_academic/non_academic::other] Reference is a non-academic source (other); no arXiv / Semantic Scholar record is expected.
+      Suggestion: This is a vendor/product website for Hailuo AI rather than an academic publication.
+
+======================================================================
+Reference: Watch and match: Supercharging imitation with regularized optimal transport
+Authors  : Siddhant Haldar, Vaibhav Mathur, Denis Yarats, Lerrel Pinto
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2206.15469
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2206.15469
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference on Robot Learning
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2d5edc038a177bed2f58e5374f38a411d8538f0b
+@inproceedings{haldar2022watch,
+  title = {Watch and Match: Supercharging Imitation with Regularized Optimal Transport},
+  author = {Siddhant Haldar and Vaibhav Mathur and Denis Yarats and Lerrel Pinto},
+  year = {2022},
+  booktitle = {Conference on Robot Learning},
+  doi = {10.48550/arxiv.2206.15469},
+  eprint = {2206.15469},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/2d5edc038a177bed2f58e5374f38a411d8538f0b},
+}
+
+======================================================================
+Reference: Can mllms reason in multimodality? emma: An enhanced multimodal reasoning benchmark
+Authors  : Yunzhuo Hao, Jiawei Gu, Huichen Will Wang, Linjie Li, Zhengyuan Yang, Lijuan Wang, Yu Cheng
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2501.05444
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2501.05444
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2501.05444v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/23c3bf6a61ee9a1f03fa0f5e16ab286f7f040487
+@inproceedings{hao2025mllms,
+  title = {Can MLLMs Reason in Multimodality? EMMA: An Enhanced MultiModal ReAsoning Benchmark},
+  author = {Yunzhuo Hao and Jiawei Gu and Huichen Will Wang and Linjie Li and Zhengyuan Yang and Lijuan Wang and Yu Cheng},
+  year = {2025},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2501.05444},
+  eprint = {2501.05444},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2501.05444v1},
+}
+
+======================================================================
+Reference: Video-mmmu: Evaluating knowledge acquisition from multi-discipline professional videos
+Authors  : Kairui Hu, Penghao Wu, Fanyi Pu, Wang Xiao, Yuanhan Zhang, Xiang Yue, Bo Li, Ziwei Liu
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2501.13826
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2501.13826v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4e3d888abc01555feb92a60935c8e537abc4648a
+@misc{hu2025videommmu,
+  title = {Video-MMMU: Evaluating Knowledge Acquisition from Multi-Discipline Professional Videos},
+  author = {Kairui Hu and Penghao Wu and Fanyi Pu and Wang Xiao and Yuanhan Zhang and Xiang Yue and Bo Li and Ziwei Liu},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2501.13826},
+  eprint = {2501.13826},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2501.13826v1},
+}
+
+======================================================================
+Reference: Gpt-4o system card
+Authors  : Aaron Hurst, Adam Lerer, Adam P Goucher, Adam Perelman, Aditya Ramesh, Aidan Clark, AJ Ostrow, Akila Welihinda, Alan Hayes, Alec Radford, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 420.
+      Suggestion: List all 420 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2410.21276v1
+@misc{openai2024gpto,
+  title = {GPT-4o System Card},
+  author = {OpenAI and : and Aaron Hurst and Adam Lerer and Adam P. Goucher and Adam Perelman and Aditya Ramesh and Aidan Clark and AJ Ostrow and Akila Welihinda and Alan Hayes and Alec Radford and Aleksander Mądry and Alex Baker-Whitcomb and Alex Beutel and Alex Borzunov and Alex Carney and Alex Chow and Alex Kirillov and Alex Nichol and Alex Paino and Alex Renzin and Alex Tachard Passos and Alexander Kirillov and Alexi Christakis and Alexis Conneau and Ali Kamali and Allan Jabri and Allison Moyer and Allison Tam and Amadou Crookes and Amin Tootoochian and Amin Tootoonchian and Ananya Kumar and Andrea Vallone and Andrej Karpathy and Andrew Braunstein and Andrew Cann and Andrew Codispoti and Andrew Galu and Andrew Kondrich and Andrew Tulloch and Andrey Mishchenko and Angela Baek and Angela Jiang and Antoine Pelisse and Antonia Woodford and Anuj Gosalia and Arka Dhar and Ashley Pantuliano and Avi Nayak and Avital Oliver and Barret Zoph and Behrooz Ghorbani and Ben Leimberger and Ben Rossen and Ben Sokolowsky and Ben Wang and Benjamin Zweig and Beth Hoover and Blake Samic and Bob McGrew and Bobby Spero and Bogo Giertler and Bowen Cheng and Brad Lightcap and Brandon Walkin and Brendan Quinn and Brian Guarraci and Brian Hsu and Bright Kellogg and Brydon Eastman and Camillo Lugaresi and Carroll Wainwright and Cary Bassin and Cary Hudson and Casey Chu and Chad Nelson and Chak Li and Chan Jun Shern and Channing Conger and Charlotte Barette and Chelsea Voss and Chen Ding and Cheng Lu and Chong Zhang and Chris Beaumont and Chris Hallacy and Chris Koch and Christian Gibson and Christina Kim and Christine Choi and Christine McLeavey and Christopher Hesse and Claudia Fischer and Clemens Winter and Coley Czarnecki and Colin Jarvis and Colin Wei and Constantin Koumouzelis and Dane Sherburn and Daniel Kappler and Daniel Levin and Daniel Levy and David Carr and David Farhi and David Mely and David Robinson and David Sasaki and Denny Jin and Dev Valladares and Dimitris Tsipras and Doug Li and Duc Phong Nguyen and Duncan Findlay and Edede Oiwoh and Edmund Wong and Ehsan Asdar and Elizabeth Proehl and Elizabeth Yang and Eric Antonow and Eric Kramer and Eric Peterson and Eric Sigler and Eric Wallace and Eugene Brevdo and Evan Mays and Farzad Khorasani and Felipe Petroski Such and Filippo Raso and Francis Zhang and Fred von Lohmann and Freddie Sulit and Gabriel Goh and Gene Oden and Geoff Salmon and Giulio Starace and Greg Brockman and Hadi Salman and Haiming Bao and Haitang Hu and Hannah Wong and Haoyu Wang and Heather Schmidt and Heather Whitney and Heewoo Jun and Hendrik Kirchner and Henrique Ponde de Oliveira Pinto and Hongyu Ren and Huiwen Chang and Hyung Won Chung and Ian Kivlichan and Ian O'Connell and Ian O'Connell and Ian Osband and Ian Silber and Ian Sohl and Ibrahim Okuyucu and Ikai Lan and Ilya Kostrikov and Ilya Sutskever and Ingmar Kanitscheider and Ishaan Gulrajani and Jacob Coxon and Jacob Menick and Jakub Pachocki and James Aung and James Betker and James Crooks and James Lennon and Jamie Kiros and Jan Leike and Jane Park and Jason Kwon and Jason Phang and Jason Teplitz and Jason Wei and Jason Wolfe and Jay Chen and Jeff Harris and Jenia Varavva and Jessica Gan Lee and Jessica Shieh and Ji Lin and Jiahui Yu and Jiayi Weng and Jie Tang and Jieqi Yu and Joanne Jang and Joaquin Quinonero Candela and Joe Beutler and Joe Landers and Joel Parish and Johannes Heidecke and John Schulman and Jonathan Lachman and Jonathan McKay and Jonathan Uesato and Jonathan Ward and Jong Wook Kim and Joost Huizinga and Jordan Sitkin and Jos Kraaijeveld and Josh Gross and Josh Kaplan and Josh Snyder and Joshua Achiam and Joy Jiao and Joyce Lee and Juntang Zhuang and Justyn Harriman and Kai Fricke and Kai Hayashi and Karan Singhal and Katy Shi and Kavin Karthik and Kayla Wood and Kendra Rimbach and Kenny Hsu and Kenny Nguyen and Keren Gu-Lemberg and Kevin Button and Kevin Liu and Kiel Howe and Krithika Muthukumar and Kyle Luther and Lama Ahmad and Larry Kai and Lauren Itow and Lauren Workman and Leher Pathak and Leo Chen and Li Jing and Lia Guy and Liam Fedus and Liang Zhou and Lien Mamitsuka and Lilian Weng and Lindsay McCallum and Lindsey Held and Long Ouyang and Louis Feuvrier and Lu Zhang and Lukas Kondraciuk and Lukasz Kaiser and Luke Hewitt and Luke Metz and Lyric Doshi and Mada Aflak and Maddie Simens and Madelaine Boyd and Madeleine Thompson and Marat Dukhan and Mark Chen and Mark Gray and Mark Hudnall and Marvin Zhang and Marwan Aljubeh and Mateusz Litwin and Matthew Zeng and Max Johnson and Maya Shetty and Mayank Gupta and Meghan Shah and Mehmet Yatbaz and Meng Jia Yang and Mengchao Zhong and Mia Glaese and Mianna Chen and Michael Janner and Michael Lampe and Michael Petrov and Michael Wu and Michele Wang and Michelle Fradin and Michelle Pokrass and Miguel Castro and Miguel Oom Temudo de Castro and Mikhail Pavlov and Miles Brundage and Miles Wang and Minal Khan and Mira Murati and Mo Bavarian and Molly Lin and Murat Yesildal and Nacho Soto and Natalia Gimelshein and Natalie Cone and Natalie Staudacher and Natalie Summers and Natan LaFontaine and Neil Chowdhury and Nick Ryder and Nick Stathas and Nick Turley and Nik Tezak and Niko Felix and Nithanth Kudige and Nitish Keskar and Noah Deutsch and Noel Bundick and Nora Puckett and Ofir Nachum and Ola Okelola and Oleg Boiko and Oleg Murk and Oliver Jaffe and Olivia Watkins and Olivier Godement and Owen Campbell-Moore and Patrick Chao and Paul McMillan and Pavel Belov and Peng Su and Peter Bak and Peter Bakkum and Peter Deng and Peter Dolan and Peter Hoeschele and Peter Welinder and Phil Tillet and Philip Pronin and Philippe Tillet and Prafulla Dhariwal and Qiming Yuan and Rachel Dias and Rachel Lim and Rahul Arora and Rajan Troll and Randall Lin and Rapha Gontijo Lopes and Raul Puri and Reah Miyara and Reimar Leike and Renaud Gaubert and Reza Zamani and Ricky Wang and Rob Donnelly and Rob Honsby and Rocky Smith and Rohan Sahai and Rohit Ramchandani and Romain Huet and Rory Carmichael and Rowan Zellers and Roy Chen and Ruby Chen and Ruslan Nigmatullin and Ryan Cheu and Saachi Jain and Sam Altman and Sam Schoenholz and Sam Toizer and Samuel Miserendino and Sandhini Agarwal and Sara Culver and Scott Ethersmith and Scott Gray and Sean Grove and Sean Metzger and Shamez Hermani and Shantanu Jain and Shengjia Zhao and Sherwin Wu and Shino Jomoto and Shirong Wu and Shuaiqi and Xia and Sonia Phene and Spencer Papay and Srinivas Narayanan and Steve Coffey and Steve Lee and Stewart Hall and Suchir Balaji and Tal Broda and Tal Stramer and Tao Xu and Tarun Gogineni and Taya Christianson and Ted Sanders and Tejal Patwardhan and Thomas Cunninghman and Thomas Degry and Thomas Dimson and Thomas Raoux and Thomas Shadwell and Tianhao Zheng and Todd Underwood and Todor Markov and Toki Sherbakov and Tom Rubin and Tom Stasi and Tomer Kaftan and Tristan Heywood and Troy Peterson and Tyce Walters and Tyna Eloundou and Valerie Qi and Veit Moeller and Vinnie Monaco and Vishal Kuo and Vlad Fomenko and Wayne Chang and Weiyi Zheng and Wenda Zhou and Wesam Manassra and Will Sheu and Wojciech Zaremba and Yash Patil and Yilei Qian and Yongjik Kim and Youlong Cheng and Yu Zhang and Yuchen He and Yuchen Zhang and Yujia Jin and Yunxing Dai and Yury Malkov},
+  year = {2024},
+  eprint = {2410.21276},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2410.21276v1},
+}
+
+======================================================================
+Reference: A configurable library for generating and manipulating maze datasets
+Authors  : Michael Igorevich Ivanitskiy, Rusheb Shah, Alex F. Spies, Tilman Räuker, Dan Valentine, Can Rager, Lucia Quirke, Chris Mathwin, Guillaume Corlouer, Cecilia Diniz Behn, Samy Wu Fung
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2309.10498
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2309.10498
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2309.10498v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/bdabacc164b778c66ddbdee193349d7baf70d438
+@misc{ivanitskiy2023configurable,
+  title = {A Configurable Library for Generating and Manipulating Maze Datasets},
+  author = {Michael Igorevich Ivanitskiy and Rusheb Shah and Alex F. Spies and Tilman Räuker and Dan Valentine and Can Rager and Lucia Quirke and Chris Mathwin and Guillaume Corlouer and Cecilia Diniz Behn and Samy Wu Fung},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2309.10498},
+  eprint = {2309.10498},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2309.10498v2},
+}
+
+======================================================================
+Reference: Openai o1 system card
+Authors  : Aaron Jaech, Adam Kalai, Adam Lerer, Adam Richardson, Ahmed El-Kishky, Aiden Low, Alec Helyar, Aleksander Madry, Alex Beutel, Alex Carney, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CoRR 2024' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CoRR 2024.
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 265.
+      Suggestion: List all 265 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2412.16720v2
+%   openreview: venue — https://openreview.net/forum?id=WJe5NW1noE
+@article{openai2024openai,
+  title = {OpenAI o1 System Card},
+  author = {OpenAI and : and Aaron Jaech and Adam Kalai and Adam Lerer and Adam Richardson and Ahmed El-Kishky and Aiden Low and Alec Helyar and Aleksander Madry and Alex Beutel and Alex Carney and Alex Iftimie and Alex Karpenko and Alex Tachard Passos and Alexander Neitz and Alexander Prokofiev and Alexander Wei and Allison Tam and Ally Bennett and Ananya Kumar and Andre Saraiva and Andrea Vallone and Andrew Duberstein and Andrew Kondrich and Andrey Mishchenko and Andy Applebaum and Angela Jiang and Ashvin Nair and Barret Zoph and Behrooz Ghorbani and Bohan Zhang and Ben Rossen and Benjamin Sokolowsky and Boaz Barak and Bob McGrew and Borys Minaiev and Botao Hao and Bowen Baker and Brandon Houghton and Brandon McKinzie and Brydon Eastman and Camillo Lugaresi and Cary Bassin and Cary Hudson and Chak Ming Li and Charles de Bourcy and Chelsea Voss and Chen Shen and Chong Zhang and Chris Koch and Chris Orsinger and Christopher Hesse and Claudia Fischer and Clive Chan and Dan Roberts and Daniel Kappler and Daniel Levy and Daniel Selsam and David Dohan and David Farhi and David Mely and David Robinson and Dimitris Tsipras and Doug Li and Dragos Oprica and Eben Freeman and Eddie Zhang and Edmund Wong and Elizabeth Proehl and Enoch Cheung and Eric Mitchell and Eric Wallace and Erik Ritter and Evan Mays and Fan Wang and Felipe Petroski Such and Filippo Raso and Florencia Leoni and Foivos Tsimpourlas and Francis Song and Fred von Lohmann and Freddie Sulit and Geoff Salmon and Giambattista Parascandolo and Gildas Chabot and Grace Zhao and Greg Brockman and Guillaume Leclerc and Hadi Salman and Haiming Bao and Hao Sheng and Hart Andrin and Hessam Bagherinezhad and Hongyu Ren and Hunter Lightman and Hyung Won Chung and Ian Kivlichan and Ian O'Connell and Ian Osband and Ignasi Clavera Gilaberte and Ilge Akkaya and Ilya Kostrikov and Ilya Sutskever and Irina Kofman and Jakub Pachocki and James Lennon and Jason Wei and Jean Harb and Jerry Twore and Jiacheng Feng and Jiahui Yu and Jiayi Weng and Jie Tang and Jieqi Yu and Joaquin Quiñonero Candela and Joe Palermo and Joel Parish and Johannes Heidecke and John Hallman and John Rizzo and Jonathan Gordon and Jonathan Uesato and Jonathan Ward and Joost Huizinga and Julie Wang and Kai Chen and Kai Xiao and Karan Singhal and Karina Nguyen and Karl Cobbe and Katy Shi and Kayla Wood and Kendra Rimbach and Keren Gu-Lemberg and Kevin Liu and Kevin Lu and Kevin Stone and Kevin Yu and Lama Ahmad and Lauren Yang and Leo Liu and Leon Maksin and Leyton Ho and Liam Fedus and Lilian Weng and Linden Li and Lindsay McCallum and Lindsey Held and Lorenz Kuhn and Lukas Kondraciuk and Lukasz Kaiser and Luke Metz and Madelaine Boyd and Maja Trebacz and Manas Joglekar and Mark Chen and Marko Tintor and Mason Meyer and Matt Jones and Matt Kaufer and Max Schwarzer and Meghan Shah and Mehmet Yatbaz and Melody Y. Guan and Mengyuan Xu and Mengyuan Yan and Mia Glaese and Mianna Chen and Michael Lampe and Michael Malek and Michele Wang and Michelle Fradin and Mike McClay and Mikhail Pavlov and Miles Wang and Mingxuan Wang and Mira Murati and Mo Bavarian and Mostafa Rohaninejad and Nat McAleese and Neil Chowdhury and Neil Chowdhury and Nick Ryder and Nikolas Tezak and Noam Brown and Ofir Nachum and Oleg Boiko and Oleg Murk and Olivia Watkins and Patrick Chao and Paul Ashbourne and Pavel Izmailov and Peter Zhokhov and Rachel Dias and Rahul Arora and Randall Lin and Rapha Gontijo Lopes and Raz Gaon and Reah Miyara and Reimar Leike and Renny Hwang and Rhythm Garg and Robin Brown and Roshan James and Rui Shu and Ryan Cheu and Ryan Greene and Saachi Jain and Sam Altman and Sam Toizer and Sam Toyer and Samuel Miserendino and Sandhini Agarwal and Santiago Hernandez and Sasha Baker and Scott McKinney and Scottie Yan and Shengjia Zhao and Shengli Hu and Shibani Santurkar and Shraman Ray Chaudhuri and Shuyuan Zhang and Siyuan Fu and Spencer Papay and Steph Lin and Suchir Balaji and Suvansh Sanjeev and Szymon Sidor and Tal Broda and Aidan Clark and Tao Wang and Taylor Gordon and Ted Sanders and Tejal Patwardhan and Thibault Sottiaux and Thomas Degry and Thomas Dimson and Tianhao Zheng and Timur Garipov and Tom Stasi and Trapit Bansal and Trevor Creech and Troy Peterson and Tyna Eloundou and Valerie Qi and Vineet Kosaraju and Vinnie Monaco and Vitchyr Pong and Vlad Fomenko and Weiyi Zheng and Wenda Zhou and Wenting Zhan and Wes McCabe and Wojciech Zaremba and Yann Dubois and Yinghai Lu and Yining Chen and Young Cha and Yu Bai and Yuchen He and Yuchen Zhang and Yunyun Wang and Zheng Shao and Zhuohan Li},
+  year = {2024},
+  journal = {CoRR 2024},
+  eprint = {2412.16720},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2412.16720v2},
+}
+
+======================================================================
+Reference: Clevr: A diagnostic dataset for compositional language and elementary visual reasoning
+Authors  : Justin Johnson, Bharath Hariharan, Laurens van der Maaten, Li Fei-Fei, C Lawrence Zitnick, Ross Girshick
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1611.09960
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/6d41c14f50c4536a74c16cd831031b3afd0b7e0c
+@article{zhuang2016attend,
+  title = {Attend in Groups: A Weakly-Supervised Deep Learning Framework for Learning from Web Data},
+  author = {Bohan Zhuang and Lingqiao Liu and Yao Li and Chunhua Shen and I. Reid},
+  year = {2016},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2017.311},
+  eprint = {1611.09960},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/6d41c14f50c4536a74c16cd831031b3afd0b7e0c},
+}
+
+======================================================================
+Reference: Kling ai: Next-generation ai creative studio
+Authors  : Kling AI
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1080/17538947.2023.2278895
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2305.06453
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: International Journal of Digital Earth
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/7a6dc7071891cb3d658c93418801942a4c6ed373
+@article{li2023autonomous,
+  title = {Autonomous GIS: the next-generation AI-powered GIS},
+  author = {Zhenlong Li and H. Ning},
+  year = {2023},
+  journal = {International Journal of Digital Earth},
+  doi = {10.1080/17538947.2023.2278895},
+  eprint = {2305.06453},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/7a6dc7071891cb3d658c93418801942a4c6ed373},
+}
+
+======================================================================
+Reference: Blip-2: Bootstrapping language-image pre-training with frozen image encoders and large language models
+Authors  : Junnan Li, Dongxu Li, Silvio Savarese, Steven Hoi
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2301.12597
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2301.12597
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2301.12597v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/3f5b31c4f7350dc88002c121aecbdc82f86eb5bb
+@inproceedings{li2023blip,
+  title = {BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models},
+  author = {Junnan Li and Dongxu Li and Silvio Savarese and Steven Hoi},
+  year = {2023},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2301.12597},
+  eprint = {2301.12597},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2301.12597v3},
+}
+
+======================================================================
+Reference: Mvbench: A comprehensive multi-modal video understanding benchmark
+Authors  : Kunchang Li, Yali Wang, Yinan He, Yizhuo Li, Yi Wang, Yi Liu, Zun Wang, Jilan Xu, Guo Chen, Ping Luo, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2312.04563
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/521a982fb69c967166cc74d8c0af51b16025ecc5
+@article{wang2023vggsfm,
+  title = {VGGSfM: Visual Geometry Grounded Deep Structure from Motion},
+  author = {Jianyuan Wang and Nikita Karaev and Christian Rupprecht and David Novotný},
+  year = {2023},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52733.2024.02049},
+  eprint = {2312.04563},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/521a982fb69c967166cc74d8c0af51b16025ecc5},
+}
+
+======================================================================
+Reference: Learn from science textbooks: Retrieval-augmented science question answering
+Authors  : Pan Lu, Michel Galley, Hao Cheng, Kai-Wei Chang, Jianfeng Gao
+Year     : 2022
+Verdict  : error
+  - [error/fake/title_mismatch] Cited title does not match any retrieved record (best similarity 0.00 < 0.25).
+      Suggestion: Closest match: Size and depth of monotone neural networks: interpolation and approximation
+
+======================================================================
+Reference: Mathvista: Evaluating mathematical reasoning of foundation models in visual contexts
+Authors  : Pan Lu, Hritik Bansal, Tony Xia, Jiacheng Liu, Chunyuan Li, Hannaneh Hajishirzi, Hao Cheng, Kai-Wei Chang, Michel Galley, Jianfeng Gao
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2310.02255
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/8946891e94831adc8cddb0d32311cce2445c96d2
+@inproceedings{lu2023mathvista,
+  title = {MathVista: Evaluating Mathematical Reasoning of Foundation Models in Visual Contexts},
+  author = {Pan Lu and Hritik Bansal and Tony Xia and Jiacheng Liu and Chun-yue Li and Hannaneh Hajishirzi and Hao Cheng and Kai-Wei Chang and Michel Galley and Jianfeng Gao},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2310.02255},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/8946891e94831adc8cddb0d32311cce2445c96d2},
+}
+
+======================================================================
+Reference: Manim – mathematical animation framework
+Authors  : Manim Community
+Year     : 2025
+Verdict  : unverified
+
+======================================================================
+Reference: Ocr-vqa: Visual question answering by reading text in images
+Authors  : Ankush Mishra, Shashank Shekhar, Ajeet Kumar Singh, Anirban Chakraborty
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/icdar.2019.00156
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/1097cf8cf5961589ff693b069002e7181e24e631
+@inproceedings{mishra2019ocrvqa,
+  title = {OCR-VQA: Visual Question Answering by Reading Text in Images},
+  author = {Anand Mishra and Shashank Shekhar and A. Singh and Anirban Chakraborty},
+  year = {2019},
+  booktitle = {IEEE International Conference on Document Analysis and Recognition},
+  doi = {10.1109/icdar.2019.00156},
+  url = {https://www.semanticscholar.org/paper/1097cf8cf5961589ff693b069002e7181e24e631},
+}
+
+======================================================================
+Reference: Do generative video models understand physical principles?
+Authors  : Saman Motamed, Laura Culp, Kevin Swersky, Priyank Jaini, Robert Geirhos
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'IEEE Workshop/Winter Conference on Applications of Computer Vision' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: IEEE Workshop/Winter Conference on Applications of Computer Vision.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/wacv61042.2026.00099
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2501.09038v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0d2193f32bf5ed080a6edc7551c2628ffad7814e
+@inproceedings{motamed2025generative,
+  title = {Do generative video models understand physical principles?},
+  author = {Saman Motamed and Laura Culp and Kevin Swersky and Priyank Jaini and Robert Geirhos},
+  year = {2025},
+  booktitle = {IEEE Workshop/Winter Conference on Applications of Computer Vision},
+  doi = {10.1109/wacv61042.2026.00099},
+  eprint = {2501.09038},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2501.09038v3},
+}
+
+======================================================================
+Reference: Gpt-4 technical report
+Authors  : OpenAI
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CoRR 2024' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CoRR 2024.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.08774v6
+%   openreview: venue — https://openreview.net/forum?id=53paKRfmgs
+@article{openai2023technical,
+  title = {GPT-4 Technical Report},
+  author = {OpenAI and Josh Achiam and Steven Adler and Sandhini Agarwal and Lama Ahmad and Ilge Akkaya and Florencia Leoni Aleman and Diogo Almeida and Janko Altenschmidt and Sam Altman and Shyamal Anadkat and Red Avila and Igor Babuschkin and Suchir Balaji and Valerie Balcom and Paul Baltescu and Haiming Bao and Mohammad Bavarian and Jeff Belgum and Irwan Bello and Jake Berdine and Gabriel Bernadett-Shapiro and Christopher Berner and Lenny Bogdonoff and Oleg Boiko and Madelaine Boyd and Anna-Luisa Brakman and Greg Brockman and Tim Brooks and Miles Brundage and Kevin Button and Trevor Cai and Rosie Campbell and Andrew Cann and Brittany Carey and Chelsea Carlson and Rory Carmichael and Brooke Chan and Che Chang and Fotis Chantzis and Derek Chen and Sully Chen and Ruby Chen and Jason Chen and Mark Chen and Ben Chess and Chester Cho and Casey Chu and Hyung Won Chung and Dave Cummings and Jeremiah Currier and Yunxing Dai and Cory Decareaux and Thomas Degry and Noah Deutsch and Damien Deville and Arka Dhar and David Dohan and Steve Dowling and Sheila Dunning and Adrien Ecoffet and Atty Eleti and Tyna Eloundou and David Farhi and Liam Fedus and Niko Felix and Simón Posada Fishman and Juston Forte and Isabella Fulford and Leo Gao and Elie Georges and Christian Gibson and Vik Goel and Tarun Gogineni and Gabriel Goh and Rapha Gontijo-Lopes and Jonathan Gordon and Morgan Grafstein and Scott Gray and Ryan Greene and Joshua Gross and Shixiang Shane Gu and Yufei Guo and Chris Hallacy and Jesse Han and Jeff Harris and Yuchen He and Mike Heaton and Johannes Heidecke and Chris Hesse and Alan Hickey and Wade Hickey and Peter Hoeschele and Brandon Houghton and Kenny Hsu and Shengli Hu and Xin Hu and Joost Huizinga and Shantanu Jain and Shawn Jain and Joanne Jang and Angela Jiang and Roger Jiang and Haozhun Jin and Denny Jin and Shino Jomoto and Billie Jonn and Heewoo Jun and Tomer Kaftan and Łukasz Kaiser and Ali Kamali and Ingmar Kanitscheider and Nitish Shirish Keskar and Tabarak Khan and Logan Kilpatrick and Jong Wook Kim and Christina Kim and Yongjik Kim and Jan Hendrik Kirchner and Jamie Kiros and Matt Knight and Daniel Kokotajlo and Łukasz Kondraciuk and Andrew Kondrich and Aris Konstantinidis and Kyle Kosic and Gretchen Krueger and Vishal Kuo and Michael Lampe and Ikai Lan and Teddy Lee and Jan Leike and Jade Leung and Daniel Levy and Chak Ming Li and Rachel Lim and Molly Lin and Stephanie Lin and Mateusz Litwin and Theresa Lopez and Ryan Lowe and Patricia Lue and Anna Makanju and Kim Malfacini and Sam Manning and Todor Markov and Yaniv Markovski and Bianca Martin and Katie Mayer and Andrew Mayne and Bob McGrew and Scott Mayer McKinney and Christine McLeavey and Paul McMillan and Jake McNeil and David Medina and Aalok Mehta and Jacob Menick and Luke Metz and Andrey Mishchenko and Pamela Mishkin and Vinnie Monaco and Evan Morikawa and Daniel Mossing and Tong Mu and Mira Murati and Oleg Murk and David Mély and Ashvin Nair and Reiichiro Nakano and Rajeev Nayak and Arvind Neelakantan and Richard Ngo and Hyeonwoo Noh and Long Ouyang and Cullen O'Keefe and Jakub Pachocki and Alex Paino and Joe Palermo and Ashley Pantuliano and Giambattista Parascandolo and Joel Parish and Emy Parparita and Alex Passos and Mikhail Pavlov and Andrew Peng and Adam Perelman and Filipe de Avila Belbute Peres and Michael Petrov and Henrique Ponde de Oliveira Pinto and Michael and Pokorny and Michelle Pokrass and Vitchyr H. Pong and Tolly Powell and Alethea Power and Boris Power and Elizabeth Proehl and Raul Puri and Alec Radford and Jack Rae and Aditya Ramesh and Cameron Raymond and Francis Real and Kendra Rimbach and Carl Ross and Bob Rotsted and Henri Roussez and Nick Ryder and Mario Saltarelli and Ted Sanders and Shibani Santurkar and Girish Sastry and Heather Schmidt and David Schnurr and John Schulman and Daniel Selsam and Kyla Sheppard and Toki Sherbakov and Jessica Shieh and Sarah Shoker and Pranav Shyam and Szymon Sidor and Eric Sigler and Maddie Simens and Jordan Sitkin and Katarina Slama and Ian Sohl and Benjamin Sokolowsky and Yang Song and Natalie Staudacher and Felipe Petroski Such and Natalie Summers and Ilya Sutskever and Jie Tang and Nikolas Tezak and Madeleine B. Thompson and Phil Tillet and Amin Tootoonchian and Elizabeth Tseng and Preston Tuggle and Nick Turley and Jerry Tworek and Juan Felipe Cerón Uribe and Andrea Vallone and Arun Vijayvergiya and Chelsea Voss and Carroll Wainwright and Justin Jay Wang and Alvin Wang and Ben Wang and Jonathan Ward and Jason Wei and CJ Weinmann and Akila Welihinda and Peter Welinder and Jiayi Weng and Lilian Weng and Matt Wiethoff and Dave Willner and Clemens Winter and Samuel Wolrich and Hannah Wong and Lauren Workman and Sherwin Wu and Jeff Wu and Michael Wu and Kai Xiao and Tao Xu and Sarah Yoo and Kevin Yu and Qiming Yuan and Wojciech Zaremba and Rowan Zellers and Chong Zhang and Marvin Zhang and Shengjia Zhao and Tianhao Zheng and Juntang Zhuang and William Zhuk and Barret Zoph},
+  year = {2023},
+  journal = {CoRR 2024},
+  eprint = {2303.08774},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.08774v6},
+}
+
+======================================================================
+Reference: Sora is here
+Authors  : OpenAI
+Year     : 2024
+Verdict  : unverified
+
+======================================================================
+Reference: Introducing o3 and o4-mini
+Authors  : OpenAI
+Year     : 2025
+Verdict  : unverified
+
+======================================================================
+Reference: Visualcomet: Reasoning about the dynamic context of a still image
+Authors  : Jae Sung Park, Dong Huk Kim, Rowan Zellers, Yonatan Bisk, Ani Kembhavi, Yejin Choi
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-030-58558-7_30
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2004.10796
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.10796v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/f0d74a6a345cde53df29ec39d5aa9db294c660fd
+@inproceedings{park2020visualcomet,
+  title = {VisualCOMET: Reasoning about the Dynamic Context of a Still Image},
+  author = {Jae Sung Park and Chandra Bhagavatula and Roozbeh Mottaghi and Ali Farhadi and Yejin Choi},
+  year = {2020},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-030-58558-7_30},
+  eprint = {2004.10796},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.10796v3},
+}
+
+======================================================================
+Reference: Phybench: Holistic evaluation of physical perception and reasoning in large language models
+Authors  : Shi Qiu, Shaoyang Guo, Zhuo-Yang Song, Yunbo Sun, Zeyu Cai, Jiashen Wei, Tianyu Luo, Yixuan Yin, Haoxu Zhang, Yi Hu, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2504.16074
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 54.
+      Suggestion: List all 54 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2504.16074v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/3a29dc29c338a7a2ee22a2438982e93dbe58fa75
+@misc{qiu2025phybench,
+  title = {PHYBench: Holistic Evaluation of Physical Perception and Reasoning in Large Language Models},
+  author = {Shi Qiu and Shaoyang Guo and Zhuo-Yang Song and Yunbo Sun and Zeyu Cai and Jiashen Wei and Tianyu Luo and Yixuan Yin and Haoxu Zhang and Yi Hu and Chenyang Wang and Chencheng Tang and Haoling Chang and Qi Liu and Ziheng Zhou and Tianyu Zhang and Jingtian Zhang and Zhangyi Liu and Minghao Li and Yuku Zhang and Boxuan Jing and Xianqi Yin and Yutong Ren and Zizhuo Fu and Jiaming Ji and Weike Wang and Xudong Tian and Anqi Lv and Laifu Man and Jianxiang Li and Feiyu Tao and Qihua Sun and Zhou Liang and Yushu Mu and Zhongxuan Li and Jing-Jun Zhang and Shutao Zhang and Xiaotian Li and Xingqi Xia and Jiawei Lin and Zheyu Shen and Jiahang Chen and Qiuhao Xiong and Binran Wang and Fengyuan Wang and Ziyang Ni and Bohan Zhang and Fan Cui and Changkun Shao and Qing-Hong Cao and Ming-xing Luo and Yaodong Yang and Muhan Zhang and Hua Xing Zhu},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2504.16074},
+  eprint = {2504.16074},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2504.16074v2},
+}
+
+======================================================================
+Reference: Hugginggpt: Solving ai tasks with chatgpt and its friends in hugging face
+Authors  : Yongliang Shen, Kaitao Song, Xu Tan, Dongsheng Li, Weiming Lu, Yueting Zhuang
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2303.17580
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.17580
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.17580v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d1120d67b700e4dfe8b39eb1e48fbdea4e1a0c43
+@article{shen2023hugginggpt,
+  title = {HuggingGPT: Solving AI Tasks with ChatGPT and its Friends in Hugging Face},
+  author = {Yongliang Shen and Kaitao Song and Xu Tan and Dongsheng Li and Weiming Lu and Yueting Zhuang},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2303.17580},
+  eprint = {2303.17580},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.17580v4},
+}
+
+======================================================================
+Reference: Perceiver-actor: A multi-task transformer for robotic manipulation
+Authors  : Mohit Shridhar, Lucas Manuelli, Dieter Fox
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2209.05451
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2209.05451
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/60c8d0619481eaafdd1189af610d0e636271fed5
+@inproceedings{shridhar2022perceiveractor,
+  title = {Perceiver-Actor: A Multi-Task Transformer for Robotic Manipulation},
+  author = {Mohit Shridhar and Lucas Manuelli and D. Fox},
+  year = {2022},
+  booktitle = {Conference on Robot Learning},
+  doi = {10.48550/arxiv.2209.05451},
+  eprint = {2209.05451},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/60c8d0619481eaafdd1189af610d0e636271fed5},
+}
+
+======================================================================
+Reference: Textvqa: Towards image-text reasoning
+Authors  : Amanpreet Singh, Vivek Natarajan, Yu Jiang, Xinlei Chen, Marcus Rohrbach, Dhruv Batra, Devi Parikh
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1906.04375
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/6c9bd4d49d7bd70e1610c0f28fbd78ff97d0d0b5
+@article{zhang2019objectaware,
+  title = {Object-Aware Aggregation With Bidirectional Temporal Graph for Video Captioning},
+  author = {Junchao Zhang and Yuxin Peng},
+  year = {2019},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr.2019.00852},
+  eprint = {1906.04375},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/6c9bd4d49d7bd70e1610c0f28fbd78ff97d0d0b5},
+}
+
+======================================================================
+Reference: Wan: Open and advanced large-scale video generative models
+Authors  : Wan Team, Ang Wang, Baole Ai, Bin Wen, Chaojie Mao, Chen-Wei Xie, Di Chen, Feiwu Yu, Haiming Zhao, Jianxiao Yang, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2503.20314
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 62.
+      Suggestion: List all 62 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2503.20314v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/8877e9a5bf473404c35b758faa76905c202f0f36
+@misc{wan2025open,
+  title = {Wan: Open and Advanced Large-Scale Video Generative Models},
+  author = {Team Wan and Ang Wang and Baole Ai and Bin Wen and Chaojie Mao and Chen-Wei Xie and Di Chen and Feiwu Yu and Haiming Zhao and Jianxiao Yang and Jianyuan Zeng and Jiayu Wang and Jingfeng Zhang and Jingren Zhou and Jinkai Wang and Jixuan Chen and Kai Zhu and Kang Zhao and Keyu Yan and Lianghua Huang and Mengyang Feng and Ningyi Zhang and Pandeng Li and Pingyu Wu and Ruihang Chu and Ruili Feng and Shiwei Zhang and Siyang Sun and Tao Fang and Tianxing Wang and Tianyi Gui and Tingyu Weng and Tong Shen and Wei Lin and Wei Wang and Wei Wang and Wenmeng Zhou and Wente Wang and Wenting Shen and Wenyuan Yu and Xianzhong Shi and Xiaoming Huang and Xin Xu and Yan Kou and Yangyu Lv and Yifei Li and Yijing Liu and Yiming Wang and Yingya Zhang and Yitong Huang and Yong Li and You Wu and Yu Liu and Yulin Pan and Yun Zheng and Yuntao Hong and Yupeng Shi and Yutong Feng and Zeyinzi Jiang and Zhen Han and Zhi-Fan Wu and Ziyu Liu},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2503.20314},
+  eprint = {2503.20314},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2503.20314v2},
+}
+
+======================================================================
+Reference: Mimicplay: Long-horizon imitation learning by watching human play
+Authors  : Chen Wang, Linxi Fan, Jiankai Sun, Ruohan Zhang, Li Fei-Fei, Danfei Xu, Yuke Zhu, Anima Anandkumar
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2302.12422
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2302.12422
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Conference on Robot Learning
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2302.12422v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a68db57f08f6d72c0d3b22d451d2606dca880f94
+@inproceedings{wang2023mimicplay,
+  title = {MimicPlay: Long-Horizon Imitation Learning by Watching Human Play},
+  author = {Chen Wang and Linxi Fan and Jiankai Sun and Ruohan Zhang and Li Fei-Fei and Danfei Xu and Yuke Zhu and Anima Anandkumar},
+  year = {2023},
+  booktitle = {Conference on Robot Learning},
+  doi = {10.48550/arxiv.2302.12422},
+  eprint = {2302.12422},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2302.12422v2},
+}
+
+======================================================================
+Reference: Measuring multimodal mathematical reasoning with math-vision dataset
+Authors  : Ke Wang, Junting Pan, Weikang Shi, Zimu Lu, Houxing Ren, Aojun Zhou, Mingjie Zhan, Hongsheng Li
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.14804
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2402.14804
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.14804v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e96c86407b3acf09e5d7729bec201824b717b476
+@misc{wang2024measuring,
+  title = {Measuring Multimodal Mathematical Reasoning with MATH-Vision Dataset},
+  author = {Ke Wang and Junting Pan and Weikang Shi and Zimu Lu and Mingjie Zhan and Hongsheng Li},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2402.14804},
+  eprint = {2402.14804},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.14804v1},
+}
+
+======================================================================
+Reference: Mementos: A comprehensive benchmark for multimodal large language model reasoning over image sequences
+Authors  : Xiyao Wang, Yuhang Zhou, Xiaoyu Liu, Hongjin Lu, Yuancheng Xu, Feihong He, Jaehong Yoon, Taixi Lu, Gedas Bertasius, Mohit Bansal, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2401.10529
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 12.
+      Suggestion: List all 12 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2401.10529v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e0702a22e0841c54ab865b4996d7b07af192a3e1
+@inproceedings{wang2024mementos,
+  title = {Mementos: A Comprehensive Benchmark for Multimodal Large Language Model Reasoning over Image Sequences},
+  author = {Xiyao Wang and Yuhang Zhou and Xiaoyu Liu and Hongjin Lu and Yuancheng Xu and Feihong He and Jaehong Yoon and Taixi Lu and Gedas Bertasius and Mohit Bansal and Huaxiu Yao and Furong Huang},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2401.10529},
+  eprint = {2401.10529},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2401.10529v2},
+}
+
+======================================================================
+Reference: Longvideobench: A benchmark for long-context interleaved video-language understanding
+Authors  : Haoning Wu, Dongxu Li, Bei Chen, Junnan Li
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.15754
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2407.15754
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.15754v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2f9bcfe03ed3c5827036e7a7e672f952e2d1a382
+@article{wu2024longvideobench,
+  title = {LongVideoBench: A Benchmark for Long-context Interleaved Video-Language Understanding},
+  author = {Haoning Wu and Dongxu Li and Bei Chen and Junnan Li},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2407.15754},
+  eprint = {2407.15754},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.15754v1},
+}
+
+======================================================================
+Reference: Tidybot: personalized robot assistance with large language models
+Authors  : Jimmy Wu, Rika Antonova, Adam Kan, Marion Lepert, Andy Zeng, Shuran Song, Jeannette Bohg, Szymon Rusinkiewicz, Thomas Funkhouser
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2305.05658
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2305.05658v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e7a4e987dc250ac6a016ee2011bc7a552cfa8e8a
+@inproceedings{wu2023tidybot,
+  title = {TidyBot: Personalized Robot Assistance with Large Language Models},
+  author = {Jimmy Wu and Rika Antonova and Adam Kan and Marion Lepert and Andy Zeng and Shuran Song and Jeannette Bohg and Szymon Rusinkiewicz and Thomas Funkhouser},
+  year = {2023},
+  booktitle = {IEEE/RJS International Conference on Intelligent RObots and Systems},
+  doi = {10.1007/s10514-023-10139-z},
+  eprint = {2305.05658},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2305.05658v2},
+}
+
+======================================================================
+Reference: Robomind: Benchmark on multi-embodiment intelligence normative data for robot manipulation
+Authors  : Kun Wu, Chengkai Hou, Jiaming Liu, Zhengping Che, Xiaozhu Ju, Zhuqin Yang, Meng Li, Yinuo Zhao, Zhiyuan Xu, Guang Yang, Shichao Fan, Xinhua Wang, Fei Liao, Zhen Zhao, Guangyu Li, Zhao Jin, Lecheng Wang, Jilei Mao, Ning Liu, Pei Ren, Qiang Zhang, Yaoxu Lyu, Mengzhen Liu, Jingyang He, Yulin Luo, Zeyu Gao, Chenxuan Li, Chenyang Gu, Yankai Fu, Di Wu, Xingyu Wang, Sixiang Chen, Zhenyu Wang, Pengju An, Siyuan Qian, Shanghang Zhang, Jian Tang
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.15607/rss.2025.xxi.152
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2412.13877
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: Robotics
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a4af09dfbb5a302d22408628ea4ac1ca5dc7993c
+@article{wu2024robomind,
+  title = {RoboMIND: Benchmark on Multi-embodiment Intelligence Normative Data for Robot Manipulation},
+  author = {Kun Wu and Chengkai Hou and Jiaming Liu and Zhengping Che and Xiaozhu Ju and Zhuqin Yang and Meng Li and Yinuo Zhao and Zhiyuan Xu and Guang Yang and Zhen Zhao and Guangyu Li and Zhao Jin and Lecheng Wang and Jilei Mao and Xinhua Wang and Shichao Fan and Ning Liu and Peifeng Ren and Qiang Zhang and Yaoxu Lyu and Mengzhen Liu and Jingyang He and Yulin Luo and Zeyu Gao and Chen-Xi Li and Chenyang Gu and Yankai Fu and Disheng Wu and Xing Wang and Sixiang Chen and Zhenyu Wang and Pengju An and Siyuan Qian and Shan-Shan Zhang and Jianfeng Tang},
+  year = {2024},
+  journal = {Robotics},
+  doi = {10.15607/rss.2025.xxi.152},
+  eprint = {2412.13877},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/a4af09dfbb5a302d22408628ea4ac1ca5dc7993c},
+}
+
+======================================================================
+Reference: Seephys: Does seeing help thinking?–benchmarking vision-based physics reasoning
+Authors  : Kun Xiang, Heng Li, Terry Jingchen Zhang, Yinya Huang, Zirong Liu, Peixin Qu, Jixi He, Jiaqi Chen, Yu-Jie Yuan, Jianhua Han, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2505.19099
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 14.
+      Suggestion: List all 14 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2505.19099v8
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4a783247f1207cbc3ad6c08a2941e7e2b5661dfa
+@misc{xiang2025seephys,
+  title = {SeePhys: Does Seeing Help Thinking? -- Benchmarking Vision-Based Physics Reasoning},
+  author = {Kun Xiang and Heng Li and Terry Jingchen Zhang and Yinya Huang and Zirong Liu and Peixin Qu and Jixi He and Jiaqi Chen and Yu-Jie Yuan and Jianhua Han and Hang Xu and Hanhui Li and Mrinmaya Sachan and Xiaodan Liang},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2505.19099},
+  eprint = {2505.19099},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2505.19099v8},
+}
+
+======================================================================
+Reference: Qwen2.5-omni technical report
+Authors  : Jin Xu, Zhifang Guo, Jinzheng He, Hangrui Hu, Ting He, Shuai Bai, Keqin Chen, Jialin Wang, Yang Fan, Kai Dang, et al.
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2503.20215
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 14.
+      Suggestion: List all 14 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2503.20215v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2024e5247104cf2261314e813e0bf8d48467ec43
+@misc{xu2025qwenomni,
+  title = {Qwen2.5-Omni Technical Report},
+  author = {Jin Xu and Zhifang Guo and Jinzheng He and Hangrui Hu and Ting He and Shuai Bai and Keqin Chen and Jialin Wang and Yang Fan and Kai Dang and Bin Zhang and Xiong Wang and Yunfei Chu and Junyang Lin},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2503.20215},
+  eprint = {2503.20215},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2503.20215v1},
+}
+
+======================================================================
+Reference: Minicpm-v: A gpt-4v level mllm on your phone
+Authors  : Yuan Yao, Tianyu Yu, Ao Zhang, Chongyi Wang, Junbo Cui, Hongji Zhu, Tianchi Cai, Haoyu Li, Weilin Zhao, Zhihui He, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2408.01800
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 23.
+      Suggestion: List all 23 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2408.01800v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/bd0fae435b93819d407f36d9d52565d5dfb5f87c
+@misc{yao2024minicpmv,
+  title = {MiniCPM-V: A GPT-4V Level MLLM on Your Phone},
+  author = {Yuan Yao and Tianyu Yu and Ao Zhang and Chongyi Wang and Junbo Cui and Hongji Zhu and Tianchi Cai and Haoyu Li and Weilin Zhao and Zhihui He and Qianyu Chen and Huarong Zhou and Zhensheng Zou and Haoye Zhang and Shengding Hu and Zhi Zheng and Jie Zhou and Jie Cai and Xu Han and Guoyang Zeng and Dahai Li and Zhiyuan Liu and Maosong Sun},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2408.01800},
+  eprint = {2408.01800},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2408.01800v1},
+}
+
+======================================================================
+Reference: Mmmu: A massive multi-discipline multimodal understanding and reasoning benchmark for expert agi
+Authors  : Xiang Yue, Yuansheng Ni, Kai Zhang, Tianyu Zheng, Ruoqi Liu, Ge Zhang, Samuel Stevens, Dongfu Jiang, Weiming Ren, Yuxuan Sun, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Computer Vision and Pattern Recognition' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Computer Vision and Pattern Recognition.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52733.2024.00913
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 22.
+      Suggestion: List all 22 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2311.16502v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b50d19c5c298f6562c3b3c6c3822a351bdc89260
+@article{yue2023mmmu,
+  title = {MMMU: A Massive Multi-discipline Multimodal Understanding and Reasoning Benchmark for Expert AGI},
+  author = {Xiang Yue and Yuansheng Ni and Kai Zhang and Tianyu Zheng and Ruoqi Liu and Ge Zhang and Samuel Stevens and Dongfu Jiang and Weiming Ren and Yuxuan Sun and Cong Wei and Botao Yu and Ruibin Yuan and Renliang Sun and Ming Yin and Boyuan Zheng and Zhenzhu Yang and Yibo Liu and Wenhao Huang and Huan Sun and Yu Su and Wenhu Chen},
+  year = {2023},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52733.2024.00913},
+  eprint = {2311.16502},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2311.16502v4},
+}
+
+======================================================================
+Reference: Multimodal chain-of-thought reasoning in language models
+Authors  : Haotian Zhang, Jingyang Li, Zhiwei Li, Zhang Kanchor, Zhengkai Liu, Chen-Yu Lee, Chunyuan Su, Chunyuan Li, Percy Liang, Ahmed H. Awadallah
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Trans. Mach. Learn. Res.' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Trans. Mach. Learn. Res..
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2302.00923
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2302.00923v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/780a7f5e8ba9b4b451e3dfee1bcfb0f68aba5050
+@article{zhang2023multimodal,
+  title = {Multimodal Chain-of-Thought Reasoning in Language Models},
+  author = {Zhuosheng Zhang and Aston Zhang and Mu Li and Hai Zhao and George Karypis and Alex Smola},
+  year = {2023},
+  journal = {Trans. Mach. Learn. Res.},
+  doi = {10.48550/arxiv.2302.00923},
+  eprint = {2302.00923},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2302.00923v5},
+}
+
+======================================================================
+Reference: Internvl3: Exploring advanced training and test-time recipes for open-source multimodal models
+Authors  : Jinguo Zhu, Weiyun Wang, Zhe Chen, Zhaoyang Liu, Shenglong Ye, Lixin Gu, Yuchen Duan, Hao Tian, Weijie Su, Jie Shao, Zhangwei Gao, Erfei Cui, Yue Cao, Yangzhou Liu, Weiye Xu, Hao Li, Jiahao Wang, Han Lv, Dengnian Chen, Songze Li, Yinan He, Tan Jiang, Jiapeng Luo, Yi Wang, Conghui He, Botian Shi, Xingcheng Zhang, Wenqi Shao, Junjun He, Yingtong Xiong, Wenwen Qu, Peng Sun, Penglong Jiao, Lijun Wu, Kaipeng Zhang, Huipeng Deng, Jiaye Ge, Kai Chen, Limin Wang, Min Dou, Lewei Lu, Xizhou Zhu, Tong Lu, Dahua Lin, Yu Qiao, Jifeng Dai, Wenhai Wang
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2504.10479
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2504.10479v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/cddf14e5b97090111d3fa814c9aec60e2bf24b8a
+@misc{zhu2025internvl,
+  title = {InternVL3: Exploring Advanced Training and Test-Time Recipes for Open-Source Multimodal Models},
+  author = {Jinguo Zhu and Weiyun Wang and Zhe Chen and Zhaoyang Liu and Shenglong Ye and Lixin Gu and Hao Tian and Yuchen Duan and Weijie Su and Jie Shao and Zhangwei Gao and Erfei Cui and Xuehui Wang and Yue Cao and Yangzhou Liu and Xingguang Wei and Hongjie Zhang and Haomin Wang and Weiye Xu and Hao Li and Jiahao Wang and Nianchen Deng and Songze Li and Yinan He and Tan Jiang and Jiapeng Luo and Yi Wang and Conghui He and Botian Shi and Xingcheng Zhang and Wenqi Shao and Junjun He and Yingtong Xiong and Wenwen Qu and Peng Sun and Penglong Jiao and Han Lv and Lijun Wu and Kaipeng Zhang and Huipeng Deng and Jiaye Ge and Kai Chen and Limin Wang and Min Dou and Lewei Lu and Xizhou Zhu and Tong Lu and Dahua Lin and Yu Qiao and Jifeng Dai and Wenhai Wang},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2504.10479},
+  eprint = {2504.10479},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2504.10479v3},
+}
+
+======================================================================
+Reference: Viola: Imitation learning for vision-based manipulation with object proposal priors
+Authors  : Yifeng Zhu, Abhishek Joshi, Peter Stone, Yuke Zhu
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2210.11339
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2210.11339v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/95d90f6e0b2b8d2e44726b3389fd201f0df6199f
+@misc{zhu2022viola,
+  title = {VIOLA: Imitation Learning for Vision-Based Manipulation with Object Proposal Priors},
+  author = {Yifeng Zhu and Abhishek Joshi and Peter Stone and Yuke Zhu},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2210.11339},
+  eprint = {2210.11339},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2210.11339v2},
+}
+
+======================================================================
+Reference: Dynamath: A dynamic visual benchmark for evaluating mathematical reasoning robustness of vision language models
+Authors  : Chengke Zou, Xingang Guo, Rui Yang, Junyu Zhang, Bin Hu, Huan Zhang
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2411.00836
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2411.00836v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/8e35a4ac3378442c71d2b74b4958ca92c725eaa5
+@inproceedings{zou2024dynamath,
+  title = {DynaMath: A Dynamic Visual Benchmark for Evaluating Mathematical Reasoning Robustness of Vision Language Models},
+  author = {Chengke Zou and Xingang Guo and Rui Yang and Junyu Zhang and Bin Hu and Huan Zhang},
+  year = {2024},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2411.00836},
+  eprint = {2411.00836},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2411.00836v2},
+}

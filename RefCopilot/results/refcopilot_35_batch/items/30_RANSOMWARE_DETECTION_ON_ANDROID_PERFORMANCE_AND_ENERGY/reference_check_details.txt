@@ -1,0 +1,47 @@
+======================================================================
+Reference: Android ransomware detection using supervised machine learning techniques based on traffic analysis
+Authors  : Amnah Albin Ahmed, Afrah Shaahid, Fatima Alnasser, Shahad Alfaddagh, Shadha Binagag, Deemah Alqahtani
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Sensors' may be an abbreviation of 'Italian National Conference on Sensors'.
+      Suggestion: Use the full venue name: Italian National Conference on Sensors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/67acf4cf93ee9ff15f50405ee229c5e3762901ef
+@inproceedings{ahmed2023android,
+  title = {Android Ransomware Detection Using Supervised Machine Learning Techniques Based on Traffic Analysis},
+  author = {Amnah Albin Ahmed and Afrah Shaahid and Fatima Alnasser and Shahad Alfaddagh and Shadha Binagag and Deemah A. Alqahtani},
+  year = {2023},
+  booktitle = {Italian National Conference on Sensors},
+  doi = {10.3390/s24010189},
+  url = {https://www.semanticscholar.org/paper/67acf4cf93ee9ff15f50405ee229c5e3762901ef},
+}
+
+======================================================================
+Reference: Android ransomware detection
+Authors  : Subhajournal
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.31185/wjps.325
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f4863437fd07d1f56b770c009f326fef4aa989d2
+@article{farhan2024approach,
+  title = {An Approach to Android Ransomware Detection Using Deep Learning},
+  author = {Rawaa Ismael Farhan},
+  year = {2024},
+  journal = {Wasit Journal for Pure sciences},
+  doi = {10.31185/wjps.325},
+  url = {https://www.semanticscholar.org/paper/f4863437fd07d1f56b770c009f326fef4aa989d2},
+}
+
+======================================================================
+Reference: Droidevolver: A framework to co-evolve android malware and its detection features
+Authors  : Yegui Ye, Li Chen, Ding Wang, Tong Li, Qing Jiang, Ming Zhao
+Year     : 2017
+Verdict  : error
+  - [error/fake/title_mismatch] Cited title does not match any retrieved record (best similarity 0.00 < 0.25).
+      Suggestion: Closest match: An Experimental Security Analysis of an Industrial Robot Controller

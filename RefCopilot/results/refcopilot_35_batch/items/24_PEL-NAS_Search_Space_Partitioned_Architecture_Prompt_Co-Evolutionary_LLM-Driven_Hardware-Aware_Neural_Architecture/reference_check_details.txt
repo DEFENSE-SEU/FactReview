@@ -1,0 +1,750 @@
+======================================================================
+Reference: Gpt-4 technical report
+Authors  : Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al.
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CoRR 2024' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CoRR 2024.
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 281.
+      Suggestion: List all 281 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.08774v6
+%   openreview: venue — https://openreview.net/forum?id=53paKRfmgs
+@article{openai2023technical,
+  title = {GPT-4 Technical Report},
+  author = {OpenAI and Josh Achiam and Steven Adler and Sandhini Agarwal and Lama Ahmad and Ilge Akkaya and Florencia Leoni Aleman and Diogo Almeida and Janko Altenschmidt and Sam Altman and Shyamal Anadkat and Red Avila and Igor Babuschkin and Suchir Balaji and Valerie Balcom and Paul Baltescu and Haiming Bao and Mohammad Bavarian and Jeff Belgum and Irwan Bello and Jake Berdine and Gabriel Bernadett-Shapiro and Christopher Berner and Lenny Bogdonoff and Oleg Boiko and Madelaine Boyd and Anna-Luisa Brakman and Greg Brockman and Tim Brooks and Miles Brundage and Kevin Button and Trevor Cai and Rosie Campbell and Andrew Cann and Brittany Carey and Chelsea Carlson and Rory Carmichael and Brooke Chan and Che Chang and Fotis Chantzis and Derek Chen and Sully Chen and Ruby Chen and Jason Chen and Mark Chen and Ben Chess and Chester Cho and Casey Chu and Hyung Won Chung and Dave Cummings and Jeremiah Currier and Yunxing Dai and Cory Decareaux and Thomas Degry and Noah Deutsch and Damien Deville and Arka Dhar and David Dohan and Steve Dowling and Sheila Dunning and Adrien Ecoffet and Atty Eleti and Tyna Eloundou and David Farhi and Liam Fedus and Niko Felix and Simón Posada Fishman and Juston Forte and Isabella Fulford and Leo Gao and Elie Georges and Christian Gibson and Vik Goel and Tarun Gogineni and Gabriel Goh and Rapha Gontijo-Lopes and Jonathan Gordon and Morgan Grafstein and Scott Gray and Ryan Greene and Joshua Gross and Shixiang Shane Gu and Yufei Guo and Chris Hallacy and Jesse Han and Jeff Harris and Yuchen He and Mike Heaton and Johannes Heidecke and Chris Hesse and Alan Hickey and Wade Hickey and Peter Hoeschele and Brandon Houghton and Kenny Hsu and Shengli Hu and Xin Hu and Joost Huizinga and Shantanu Jain and Shawn Jain and Joanne Jang and Angela Jiang and Roger Jiang and Haozhun Jin and Denny Jin and Shino Jomoto and Billie Jonn and Heewoo Jun and Tomer Kaftan and Łukasz Kaiser and Ali Kamali and Ingmar Kanitscheider and Nitish Shirish Keskar and Tabarak Khan and Logan Kilpatrick and Jong Wook Kim and Christina Kim and Yongjik Kim and Jan Hendrik Kirchner and Jamie Kiros and Matt Knight and Daniel Kokotajlo and Łukasz Kondraciuk and Andrew Kondrich and Aris Konstantinidis and Kyle Kosic and Gretchen Krueger and Vishal Kuo and Michael Lampe and Ikai Lan and Teddy Lee and Jan Leike and Jade Leung and Daniel Levy and Chak Ming Li and Rachel Lim and Molly Lin and Stephanie Lin and Mateusz Litwin and Theresa Lopez and Ryan Lowe and Patricia Lue and Anna Makanju and Kim Malfacini and Sam Manning and Todor Markov and Yaniv Markovski and Bianca Martin and Katie Mayer and Andrew Mayne and Bob McGrew and Scott Mayer McKinney and Christine McLeavey and Paul McMillan and Jake McNeil and David Medina and Aalok Mehta and Jacob Menick and Luke Metz and Andrey Mishchenko and Pamela Mishkin and Vinnie Monaco and Evan Morikawa and Daniel Mossing and Tong Mu and Mira Murati and Oleg Murk and David Mély and Ashvin Nair and Reiichiro Nakano and Rajeev Nayak and Arvind Neelakantan and Richard Ngo and Hyeonwoo Noh and Long Ouyang and Cullen O'Keefe and Jakub Pachocki and Alex Paino and Joe Palermo and Ashley Pantuliano and Giambattista Parascandolo and Joel Parish and Emy Parparita and Alex Passos and Mikhail Pavlov and Andrew Peng and Adam Perelman and Filipe de Avila Belbute Peres and Michael Petrov and Henrique Ponde de Oliveira Pinto and Michael and Pokorny and Michelle Pokrass and Vitchyr H. Pong and Tolly Powell and Alethea Power and Boris Power and Elizabeth Proehl and Raul Puri and Alec Radford and Jack Rae and Aditya Ramesh and Cameron Raymond and Francis Real and Kendra Rimbach and Carl Ross and Bob Rotsted and Henri Roussez and Nick Ryder and Mario Saltarelli and Ted Sanders and Shibani Santurkar and Girish Sastry and Heather Schmidt and David Schnurr and John Schulman and Daniel Selsam and Kyla Sheppard and Toki Sherbakov and Jessica Shieh and Sarah Shoker and Pranav Shyam and Szymon Sidor and Eric Sigler and Maddie Simens and Jordan Sitkin and Katarina Slama and Ian Sohl and Benjamin Sokolowsky and Yang Song and Natalie Staudacher and Felipe Petroski Such and Natalie Summers and Ilya Sutskever and Jie Tang and Nikolas Tezak and Madeleine B. Thompson and Phil Tillet and Amin Tootoonchian and Elizabeth Tseng and Preston Tuggle and Nick Turley and Jerry Tworek and Juan Felipe Cerón Uribe and Andrea Vallone and Arun Vijayvergiya and Chelsea Voss and Carroll Wainwright and Justin Jay Wang and Alvin Wang and Ben Wang and Jonathan Ward and Jason Wei and CJ Weinmann and Akila Welihinda and Peter Welinder and Jiayi Weng and Lilian Weng and Matt Wiethoff and Dave Willner and Clemens Winter and Samuel Wolrich and Hannah Wong and Lauren Workman and Sherwin Wu and Jeff Wu and Michael Wu and Kai Xiao and Tao Xu and Sarah Yoo and Kevin Yu and Qiming Yuan and Wojciech Zaremba and Rowan Zellers and Chong Zhang and Marvin Zhang and Shengjia Zhao and Tianhao Zheng and Juntang Zhuang and William Zhuk and Barret Zoph},
+  year = {2023},
+  journal = {CoRR 2024},
+  eprint = {2303.08774},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.08774v6},
+}
+
+======================================================================
+Reference: Hardware-aware neural architecture search: Survey and taxonomy
+Authors  : Hadjer Benmeziane, Kaoutar El Maghraoui, Hamza Ouarnoughi, Smail Niar, Martin Wistuba, Naigang Wang
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.24963/ijcai.2021/592
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2101.09336
+  - [warning/incomplete/abbreviated_venue] Cited venue 'IJCAI' may be an abbreviation of 'International Joint Conference on Artificial Intelligence'.
+      Suggestion: Use the full venue name: International Joint Conference on Artificial Intelligence.
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.75).
+      Suggestion: Use canonical title: A Comprehensive Survey on Hardware-Aware Neural Architecture Search
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2101.09336v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/654c84b00777f690b3daadb1b0ed387803b5ac5c
+@inproceedings{benmeziane2021comprehensive,
+  title = {A Comprehensive Survey on Hardware-Aware Neural Architecture Search},
+  author = {Hadjer Benmeziane and Kaoutar El Maghraoui and Hamza Ouarnoughi and Smail Niar and Martin Wistuba and Naigang Wang},
+  year = {2021},
+  booktitle = {International Joint Conference on Artificial Intelligence},
+  doi = {10.24963/ijcai.2021/592},
+  eprint = {2101.09336},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2101.09336v1},
+}
+
+======================================================================
+Reference: Pareto rank-preserving supernetwork for hardware-aware neural architecture search
+Authors  : Hadjer Benmeziane, Kaoutar El Maghraoui, Hamza Ouarnoughi, Smail Niar
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.3233/faia230276
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a674c789a75ef84b58f84195d000efb753511b48
+@inproceedings{benmeziane2023pareto,
+  title = {Pareto Rank-Preserving Supernetwork for Hardware-Aware Neural Architecture Search},
+  author = {Hadjer Benmeziane and K. E. Maghraoui and Hamza Ouarnoughi and S. Niar},
+  year = {2023},
+  booktitle = {European Conference on Artificial Intelligence},
+  doi = {10.3233/faia230276},
+  url = {https://www.semanticscholar.org/paper/a674c789a75ef84b58f84195d000efb753511b48},
+}
+
+======================================================================
+Reference: Multi-objective evolutionary neural architecture search for recurrent neural networks
+Authors  : Reinhard Booysen, Anna Sergeevna Bosman
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s11063-024-11659-0
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2403.11173
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2403.11173v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/bbdababe3474ebef29165e4f1807406242516f3f
+@article{booysen2024multiobjective,
+  title = {Multi-Objective Evolutionary Neural Architecture Search for Recurrent Neural Networks},
+  author = {Reinhard Booysen and Anna Sergeevna Bosman},
+  year = {2024},
+  journal = {Neural Processing Letters},
+  doi = {10.1007/s11063-024-11659-0},
+  eprint = {2403.11173},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2403.11173v1},
+}
+
+======================================================================
+Reference: Once-for-all: Train one network and specialize it for efficient deployment
+Authors  : Han Cai, Chuang Gan, Tianzhe Wang, Zhekai Zhang, Song Han
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1908.09791v5
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/7823292e5c4b05c47af91ab6ddf671a0da709e82
+@inproceedings{cai2019onceforall,
+  title = {Once-for-All: Train One Network and Specialize it for Efficient Deployment},
+  author = {Han Cai and Chuang Gan and Tianzhe Wang and Zhekai Zhang and Song Han},
+  year = {2019},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1908.09791},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1908.09791v5},
+}
+
+======================================================================
+Reference: Autoformer: Searching transformers for visual recognition
+Authors  : Minghao Chen, Houwen Peng, Jianlong Fu, Haibin Ling
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv48922.2021.01205
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2107.00651
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2107.00651v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d645bd08fc19d52164695f9cd5ae863345459a06
+@inproceedings{chen2021autoformer,
+  title = {AutoFormer: Searching Transformers for Visual Recognition},
+  author = {Minghao Chen and Houwen Peng and Jianlong Fu and Haibin Ling},
+  year = {2021},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv48922.2021.01205},
+  eprint = {2107.00651},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2107.00651v1},
+}
+
+======================================================================
+Reference: Fairnas: Rethinking evaluation fairness of weight sharing neural architecture search
+Authors  : Xiangxiang Chu, Bo Zhang, Ruijun Xu
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccv48922.2021.01202
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1907.01845
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a7ce95c6f674b7b5b19a532491d160d142f8b2d6
+@inproceedings{chu2019fairnas,
+  title = {FairNAS: Rethinking Evaluation Fairness of Weight Sharing Neural Architecture Search},
+  author = {Xiangxiang Chu and Bo Zhang and Ruijun Xu and Jixiang Li},
+  year = {2019},
+  booktitle = {IEEE International Conference on Computer Vision},
+  doi = {10.1109/iccv48922.2021.01202},
+  eprint = {1907.01845},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/a7ce95c6f674b7b5b19a532491d160d142f8b2d6},
+}
+
+======================================================================
+Reference: Greenfactory: Ensembling zero-cost proxies to estimate performance of neural networks
+Authors  : Gabriel Cortês, Nuno Lourenço, Paolo Romano, Penousal Machado
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2505.09344
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2505.09344v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c6a2361ff81b563241244d572860980821959af7
+@misc{cortês2025greenfactory,
+  title = {GreenFactory: Ensembling Zero-Cost Proxies to Estimate Performance of Neural Networks},
+  author = {Gabriel Cortês and Nuno Lourenço and Paolo Romano and Penousal Machado},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2505.09344},
+  eprint = {2505.09344},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2505.09344v1},
+}
+
+======================================================================
+Reference: A fast and elitist multiobjective genetic algorithm: Nsga-ii
+Authors  : Kalyanmoy Deb, Amrit Pratap, Sameer Agarwal, TAMT Meyarivan
+Year     : 2002
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/4235.996017
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/6eddc19efa13f7e70301908d98e85a19d6f32a02
+@article{deb2002fast,
+  title = {A fast and elitist multiobjective genetic algorithm: NSGA-II},
+  author = {K. Deb and S. Agrawal and Amrit Pratap and T. Meyarivan},
+  year = {2002},
+  journal = {IEEE Transactions on Evolutionary Computation},
+  doi = {10.1109/4235.996017},
+  url = {https://www.semanticscholar.org/paper/6eddc19efa13f7e70301908d98e85a19d6f32a02},
+}
+
+======================================================================
+Reference: An image is worth 16x16 words: Transformers for image recognition at scale
+Authors  : Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al.
+Year     : 2020
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 12.
+      Suggestion: List all 12 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2010.11929v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/268d347e8a55b5eb82fb5e7d2f800e33c75ab18a
+@inproceedings{dosovitskiy2020image,
+  title = {An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale},
+  author = {Alexey Dosovitskiy and Lucas Beyer and Alexander Kolesnikov and Dirk Weissenborn and Xiaohua Zhai and Thomas Unterthiner and Mostafa Dehghani and Matthias Minderer and Georg Heigold and Sylvain Gelly and Jakob Uszkoreit and Neil Houlsby},
+  year = {2020},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2010.11929},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2010.11929v2},
+}
+
+======================================================================
+Reference: Robustifying and boosting training-free neural architecture search
+Authors  : Zhenfeng He, Yao Shu, Zhongxiang Dai, Bryan Kian Hsiang Low
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2403.07591
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2403.07591v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/47ade4b7a1fa6c67dc3bdc8879f3df5142cb9e79
+@inproceedings{he2024robustifying,
+  title = {Robustifying and Boosting Training-Free Neural Architecture Search},
+  author = {Zhenfeng He and Yao Shu and Zhongxiang Dai and Bryan Kian Hsiang Low},
+  year = {2024},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2403.07591},
+  eprint = {2403.07591},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2403.07591v1},
+}
+
+======================================================================
+Reference: Mode collapse in generative adversarial networks: An overview
+Authors  : Youssef Kossale, Mohammed Airaj, Aziz Darouichi
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/icoa55659.2022.9934291
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/0befed4e1ddd6edafc011a4d7ce34b4b6a9a8927
+@article{kossale2022mode,
+  title = {Mode Collapse in Generative Adversarial Networks: An Overview},
+  author = {Youssef Kossale and Mohammed Airaj and A. Darouichi},
+  year = {2022},
+  journal = {OPTIMA},
+  doi = {10.1109/icoa55659.2022.9934291},
+  url = {https://www.semanticscholar.org/paper/0befed4e1ddd6edafc011a4d7ce34b4b6a9a8927},
+}
+
+======================================================================
+Reference: Nas-bench-suite-zero: Accelerating research on zero cost proxies
+Authors  : Arjun Krishnakumar, Colin White, Arber Zela, Renbo Tu, Mahmoud Safari, Frank Hutter
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2210.03230
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2210.03230
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2210.03230v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4338eb1802db1a63c31cd2372e3730db9c9014e2
+@article{krishnakumar2022nasbenchsuitezero,
+  title = {NAS-Bench-Suite-Zero: Accelerating Research on Zero Cost Proxies},
+  author = {Arjun Krishnakumar and Colin White and Arber Zela and Renbo Tu and Mahmoud Safari and Frank Hutter},
+  year = {2022},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2210.03230},
+  eprint = {2210.03230},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2210.03230v1},
+}
+
+======================================================================
+Reference: Az-nas: Assembling zero-cost proxies for network architecture search
+Authors  : Junghyup Lee, Bumsub Ham
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/cvpr52733.2024.00563
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2403.19232
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2403.19232v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/870bd36e32295161952af7e3b7fa526c1673cf09
+@article{lee2024aznas,
+  title = {AZ-NAS: Assembling Zero-Cost Proxies for Network Architecture Search},
+  author = {Junghyup Lee and Bumsub Ham},
+  year = {2024},
+  journal = {Computer Vision and Pattern Recognition},
+  doi = {10.1109/cvpr52733.2024.00563},
+  eprint = {2403.19232},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2403.19232v1},
+}
+
+======================================================================
+Reference: Snip: Single-shot network pruning based on connection sensitivity
+Authors  : Namhoon Lee, Thalaiyasingam Ajanthan, Philip HS Torr
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1810.02340v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/cf440ccce4a7a8681e238b4f26d5b95109add55d
+@inproceedings{lee2018snip,
+  title = {SNIP: Single-shot Network Pruning based on Connection Sensitivity},
+  author = {Namhoon Lee and Thalaiyasingam Ajanthan and Philip H. S. Torr},
+  year = {2018},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1810.02340},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1810.02340v2},
+}
+
+======================================================================
+Reference: Hw-nas-bench: Hardware-aware neural architecture search benchmark
+Authors  : Chaojian Li, Zhongzhi Yu, Yonggan Fu, Yongan Zhang, Yang Zhao, Haoran You, Qixuan Yu, Yue Wang, Yingyan Lin
+Year     : 2021
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2103.10584v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/a10daed04b387cdb6b9c71a623994bc083599c84
+@inproceedings{li2021hwnasbenchhardwareaware,
+  title = {HW-NAS-Bench:Hardware-Aware Neural Architecture Search Benchmark},
+  author = {Chaojian Li and Zhongzhi Yu and Yonggan Fu and Yongan Zhang and Yang Zhao and Haoran You and Qixuan Yu and Yue Wang and Yingyan Celine Lin},
+  year = {2021},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2103.10584},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2103.10584v2},
+}
+
+======================================================================
+Reference: Zero-shot neural architecture search: Challenges, solutions, and opportunities
+Authors  : Guihong Li, Duc Hoang, Kartikeya Bhardwaj, Ming Lin, Zhangyang Wang, Radu Marculescu
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tpami.2024.3395423
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2307.01998
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/9cb56f779b747be8792b603eae47d02e293d7422
+@article{li2023zeroshot,
+  title = {Zero-Shot Neural Architecture Search: Challenges, Solutions, and Opportunities},
+  author = {Guihong Li and Duc-Tuong Hoang and Kartikeya Bhardwaj and Ming Lin and Zhangyang Wang and R. Marculescu},
+  year = {2023},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  doi = {10.1109/tpami.2024.3395423},
+  eprint = {2307.01998},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/9cb56f779b747be8792b603eae47d02e293d7422},
+}
+
+======================================================================
+Reference: Darts: Differentiable architecture search
+Authors  : Hanxiao Liu, Karen Simonyan, Yiming Yang
+Year     : 2018
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1806.09055v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/c1f457e31b611da727f9aef76c283a18157dfa83
+@inproceedings{liu2018darts,
+  title = {DARTS: Differentiable Architecture Search},
+  author = {Hanxiao Liu and Karen Simonyan and Yiming Yang},
+  year = {2018},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1806.09055},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1806.09055v2},
+}
+
+======================================================================
+Reference: Ns-ganetv2: Evolutionary multi-objective surrogate-assisted neural architecture search
+Authors  : Zhichao Lu, Kalyanmoy Deb, Erik Goodman, Wolfgang Banzhaf, Vishnu Naresh Boddeti
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-030-58452-8_3
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2007.10396
+  - [warning/incomplete/canonical_title_mismatch] Cited title differs from the canonical record (similarity 0.81).
+      Suggestion: Use canonical title: NSGANetV2: Evolutionary Multi-Objective Surrogate-Assisted Neural Architecture Search
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8054513b37839878c5ee9d541d228b0148bce306
+@inproceedings{lu2020nsganetv,
+  title = {NSGANetV2: Evolutionary Multi-Objective Surrogate-Assisted Neural Architecture Search},
+  author = {Zhichao Lu and K. Deb and E. Goodman and W. Banzhaf and Vishnu Naresh Boddeti},
+  year = {2020},
+  booktitle = {European Conference on Computer Vision},
+  doi = {10.1007/978-3-030-58452-8_3},
+  eprint = {2007.10396},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/8054513b37839878c5ee9d541d228b0148bce306},
+}
+
+======================================================================
+Reference: Neural architecture search without training
+Authors  : Joe Mellor, Jack Turner, Amos Storkey, Elliot J Crowley
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-030-86383-8_44
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2102.08099
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, doi, title, year — https://arxiv.org/abs/2102.08099v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/25c371d565b387dbf22207a954a9549557698c21
+@inproceedings{lopes2021epenas,
+  title = {EPE-NAS: Efficient Performance Estimation Without Training for Neural Architecture Search},
+  author = {Vasco Lopes and Saeid Alirezazadeh and Luís A. Alexandre},
+  year = {2021},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.1007/978-3-030-86383-8_44},
+  eprint = {2102.08099},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2102.08099v1},
+}
+
+======================================================================
+Reference: Llmatic: neural architecture search via large language models and quality diversity optimization
+Authors  : Muhammad Umair Nasir, Sam Earle, Julian Togelius, Steven James, Christopher Cleghorn
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3638529.3654017
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2306.01102
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/b842ec712ff4ac7793016c5d4c03c0b0b37b998b
+@inproceedings{nasir2023llmatic,
+  title = {LLMatic: Neural Architecture Search Via Large Language Models And Quality Diversity Optimization},
+  author = {Muhammad Umair Nasir and Sam Earle and Julian Togelius and Steven James and C. Cleghorn},
+  year = {2023},
+  booktitle = {Annual Conference on Genetic and Evolutionary Computation},
+  doi = {10.1145/3638529.3654017},
+  eprint = {2306.01102},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/b842ec712ff4ac7793016c5d4c03c0b0b37b998b},
+}
+
+======================================================================
+Reference: Fast data aware neural architecture search via supernet accelerated evaluation
+Authors  : Emil Njor, Colby Banbury, Xenofon Fafoutis
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2502.12690
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2502.12690
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2502.12690v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/9b5186e3304f7126ae896635e073c035da46b9a0
+@article{njor2025fast,
+  title = {Fast Data Aware Neural Architecture Search via Supernet Accelerated Evaluation},
+  author = {Emil Njor and Colby Banbury and Xenofon Fafoutis},
+  year = {2025},
+  journal = {Internet of Things},
+  doi = {10.48550/arxiv.2502.12690},
+  eprint = {2502.12690},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2502.12690v1},
+}
+
+======================================================================
+Reference: Detofa: efficient training of once-for-all networks for object detection using path filter
+Authors  : Yuiko Sakuma, Masato Ishii, Takuya Narihira
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/iccvw60793.2023.00143
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.13121
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.13121v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/99f8cb8371e781494f9328c6e0ee4d44eac7838e
+@inproceedings{sakuma2023detofa,
+  title = {DetOFA: Efficient Training of Once-for-All Networks for Object Detection Using Path Filter},
+  author = {Yuiko Sakuma and Masato Ishii and Takuya Narihira},
+  year = {2023},
+  booktitle = {2023 IEEE/CVF International Conference on Computer Vision Workshops (ICCVW)},
+  doi = {10.1109/iccvw60793.2023.00143},
+  eprint = {2303.13121},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.13121v3},
+}
+
+======================================================================
+Reference: Niching in evolutionary algorithms
+Authors  : Ofer M Shir
+Year     : 2012
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/978-3-540-92910-9_32
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4a859854553e2abf2cf419c7f16e2436fcb0c4af
+@article{shir2012niching,
+  title = {Niching in Evolutionary Algorithms},
+  author = {O. M. Shir},
+  year = {2012},
+  journal = {Handbook of Natural Computing},
+  doi = {10.1007/978-3-540-92910-9_32},
+  url = {https://www.semanticscholar.org/paper/4a859854553e2abf2cf419c7f16e2436fcb0c4af},
+}
+
+======================================================================
+Reference: Ai models collapse when trained on recursively generated data
+Authors  : Ilia Shumailov, Zakhar Shumaylov, Yiren Zhao, Nicolas Papernot, Ross Anderson, Yarin Gal
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s41586-024-07566-y
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2410.12954
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2410.12954v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/603d3f90fc40f79ff51258f0295de3ec5107f73e
+@article{borji2024note,
+  title = {A Note on Shumailov et al. (2024): `AI Models Collapse When Trained on Recursively Generated Data'},
+  author = {Ali Borji},
+  year = {2024},
+  journal = {Nature},
+  doi = {10.1038/s41586-024-07566-y},
+  eprint = {2410.12954},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2410.12954v2},
+}
+
+======================================================================
+Reference: Pruning neural networks without any data by iteratively conserving synaptic flow
+Authors  : Hidenori Tanaka, Daniel Kunin, Daniel L Yamins, Surya Ganguli
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2006.05467
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2006.05467v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/3b0fb765716ef6861a84abffcbe40643857c613b
+@article{tanaka2020pruning,
+  title = {Pruning neural networks without any data by iteratively conserving synaptic flow},
+  author = {Hidenori Tanaka and Daniel Kunin and Daniel L. K. Yamins and Surya Ganguli},
+  year = {2020},
+  journal = {Neural Information Processing Systems},
+  eprint = {2006.05467},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2006.05467v3},
+}
+
+======================================================================
+Reference: Training data-efficient image transformers & distillation through attention
+Authors  : Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles, Hervé Jégou
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2012.12877
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/ad7ddcc14984caae308c397f1a589aae75d4ab71
+@inproceedings{touvron2020training,
+  title = {Training data-efficient image transformers & distillation through attention},
+  author = {Hugo Touvron and M. Cord and Matthijs Douze and Francisco Massa and Alexandre Sablayrolles and Hervé Jégou},
+  year = {2020},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2012.12877},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/ad7ddcc14984caae308c397f1a589aae75d4ab71},
+}
+
+======================================================================
+Reference: Auto-prox: Training-free vision transformer architecture search via automatic proxy discovery
+Authors  : Zimian Wei, Peijie Dong, Zheng Hui, Anggeng Li, Lujun Li, Menglong Lu, Hengyue Pan, Dongsheng Li
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2312.09059
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2312.09059
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/289f07f6400f1f49ba8ac17abb5fa960ca82c3ac
+@misc{wei2023autoprox,
+  title = {Auto-Prox: Training-Free Vision Transformer Architecture Search via Automatic Proxy Discovery},
+  author = {Zimian Wei and Lujun Li and Peijie Dong and Zheng Hui and Anggeng Li and Menglong Lu and H. Pan and Zhiliang Tian and Dongsheng Li},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2312.09059},
+  eprint = {2312.09059},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/289f07f6400f1f49ba8ac17abb5fa960ca82c3ac},
+}
+
+======================================================================
+Reference: Bananas: Bayesian optimization with neural architectures for neural architecture search
+Authors  : Colin White, Willie Neiswanger, Yash Savani
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v35i12.17233
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1910.11858
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/013a741927569ae9b40875a9e58d2c5ba6dbb3a8
+@inproceedings{white2019bananas,
+  title = {BANANAS: Bayesian Optimization with Neural Architectures for Neural Architecture Search},
+  author = {Colin White and Willie Neiswanger and Yash Savani},
+  year = {2019},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v35i12.17233},
+  eprint = {1910.11858},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/013a741927569ae9b40875a9e58d2c5ba6dbb3a8},
+}
+
+======================================================================
+Reference: Zero-shot nas via the suppression of local entropy decrease
+Authors  : Ning Wu, Han Huang, Yueting Xu, Zhifeng Hao
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2411.06236
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2411.06236v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/888d9c876fffd30a26afb3aa9d5a52721cc479da
+@misc{wu2024zeroshot,
+  title = {Zero-Shot NAS via the Suppression of Local Entropy Decrease},
+  author = {Ning Wu and Han Huang and Yueting Xu and Zhifeng Hao},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2411.06236},
+  eprint = {2411.06236},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2411.06236v3},
+}
+
+======================================================================
+Reference: Noveltybench: Evaluating language models for humanlike diversity
+Authors  : Yiming Zhang, Harshita Diddee, Susan Holm, Hanchen Liu, Xinyue Liu, Vinay Samuel, Barry Wang, Daphne Ippolito
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2504.05228
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2504.05228v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/ef8d40aa7aa36cc9683b55e0285a33e02322b223
+@misc{zhang2025noveltybench,
+  title = {NoveltyBench: Evaluating Language Models for Humanlike Diversity},
+  author = {Yiming Zhang and Harshita Diddee and Susan Holm and Hanchen Liu and Xinyue Liu and Vinay Samuel and Barry Wang and Daphne Ippolito},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2504.05228},
+  eprint = {2504.05228},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2504.05228v4},
+}
+
+======================================================================
+Reference: Can gpt-4 perform neural architecture search?
+Authors  : Mingkai Zheng, Xiu Su, Shan You, Fei Wang, Chen Qian, Chang Xu, Samuel Albanie
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2304.10970
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2304.10970v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/7a12fe8bb115dfbf6c9ee889ecf005be5d6f555c
+@misc{zheng2023perform,
+  title = {Can GPT-4 Perform Neural Architecture Search?},
+  author = {Mingkai Zheng and Xiu Su and Shan You and Fei Wang and Chen Qian and Chang Xu and Samuel Albanie},
+  year = {2023},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2304.10970},
+  eprint = {2304.10970},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2304.10970v4},
+}

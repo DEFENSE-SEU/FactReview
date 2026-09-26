@@ -1,0 +1,281 @@
+======================================================================
+Reference: Experiment tracking with Weights and Biases
+Authors  : Lukas Biewald
+Year     : 2020
+Verdict  : unverified
+
+======================================================================
+Reference: Random forests
+Authors  : Leo Breiman
+Year     : 2001
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1023/a:1010933404324
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Machine learning' may be an abbreviation of 'Machine-mediated learning'.
+      Suggestion: Use the full venue name: Machine-mediated learning.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8e0be569ea77b8cb29bb0e8b031887630fe7a96c
+@article{breiman2001random,
+  title = {Random Forests},
+  author = {L. Breiman},
+  year = {2001},
+  journal = {Machine-mediated learning},
+  doi = {10.1023/a:1010933404324},
+  url = {https://www.semanticscholar.org/paper/8e0be569ea77b8cb29bb0e8b031887630fe7a96c},
+}
+
+======================================================================
+Reference: TensorBoard debugger plugin
+Authors  : Google
+Year     : 2019
+Verdict  : unverified
+
+======================================================================
+Reference: Efficiently modeling long sequences with structured state spaces
+Authors  : Albert Gu, Karan Goel, Christopher Ré
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2111.00396
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/ac2618b2ce5cdcf86f9371bcca98bc5e37e46f51
+@inproceedings{gu2021efficiently,
+  title = {Efficiently Modeling Long Sequences with Structured State Spaces},
+  author = {Albert Gu and Karan Goel and Christopher R'e},
+  year = {2021},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {2111.00396},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/ac2618b2ce5cdcf86f9371bcca98bc5e37e46f51},
+}
+
+======================================================================
+Reference: Explanation-based human debugging of NLP models: A survey
+Authors  : Piyawat Lertvittayakumjorn, Francesca Toni
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1162/tacl_a_00440
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2104.15135
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2104.15135v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/d84ed05ab860b75f9e6b28e717abf4bc12da03d7
+@article{lertvittayakumjorn2021explanationbased,
+  title = {Explanation-Based Human Debugging of NLP Models: A Survey},
+  author = {Piyawat Lertvittayakumjorn and Francesca Toni},
+  year = {2021},
+  journal = {Transactions of the Association for Computational Linguistics},
+  doi = {10.1162/tacl_a_00440},
+  eprint = {2104.15135},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2104.15135v3},
+}
+
+======================================================================
+Reference: Holistic evaluation of language models
+Authors  : Percy Liang, Rishi Bommasani, Tony Lee, Dimitris Tsipras, Dilara Soylu, Michihiro Yasunaga, Yian Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Kumar, et al.
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2211.09110
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 50.
+      Suggestion: List all 50 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2211.09110v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/29abcf865613287c661385c39401424f709a3fda
+@misc{liang2022holistic,
+  title = {Holistic Evaluation of Language Models},
+  author = {Percy Liang and Rishi Bommasani and Tony Lee and Dimitris Tsipras and Dilara Soylu and Michihiro Yasunaga and Yian Zhang and Deepak Narayanan and Yuhuai Wu and Ananya Kumar and Benjamin Newman and Binhang Yuan and Bobby Yan and Ce Zhang and Christian Cosgrove and Christopher D. Manning and Christopher Ré and Diana Acosta-Navas and Drew A. Hudson and Eric Zelikman and Esin Durmus and Faisal Ladhak and Frieda Rong and Hongyu Ren and Huaxiu Yao and Jue Wang and Keshav Santhanam and Laurel Orr and Lucia Zheng and Mert Yuksekgonul and Mirac Suzgun and Nathan Kim and Neel Guha and Niladri Chatterji and Omar Khattab and Peter Henderson and Qian Huang and Ryan Chi and Sang Michael Xie and Shibani Santurkar and Surya Ganguli and Tatsunori Hashimoto and Thomas Icard and Tianyi Zhang and Vishrav Chaudhary and William Wang and Xuechen Li and Yifan Mai and Yuhui Zhang and Yuta Koreeda},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2211.09110},
+  eprint = {2211.09110},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2211.09110v2},
+}
+
+======================================================================
+Reference: A unified approach to interpreting model predictions
+Authors  : Scott M Lundberg, Su-In Lee
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1705.07874
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1705.07874v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/442e10a3c6640ded9408622005e3c2a8906ce4c2
+@article{lundberg2017unified,
+  title = {A Unified Approach to Interpreting Model Predictions},
+  author = {Scott Lundberg and Su-In Lee},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1705.07874},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1705.07874v2},
+}
+
+======================================================================
+Reference: Machine learning and deep learning frameworks and libraries for large-scale data mining: A survey
+Authors  : Giang Nguyen, Stefan Dlugolinsky, Martin Bobák, Viet Tran, Álvaro López García, Ignacio Heredia, Peter Malík, Ladislav Hluchý
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s10462-018-09679-z
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/23bae60509630acda34cb1811125de3a0cb86cd7
+@article{nguyen2019machine,
+  title = {Machine Learning and Deep Learning frameworks and libraries for large-scale data mining: a survey},
+  author = {Giang Nguyen and Stefan Dlugolinsky and Martin Bobák and V. Tran and Álvaro López García and Ignacio Heredia and Peter Malík and L. Hluchý},
+  year = {2019},
+  journal = {Artificial Intelligence Review},
+  doi = {10.1007/s10462-018-09679-z},
+  url = {https://www.semanticscholar.org/paper/23bae60509630acda34cb1811125de3a0cb86cd7},
+}
+
+======================================================================
+Reference: Improving reproducibility in machine learning research: A report from the NeurIPS 2019 reproducibility program
+Authors  : Joelle Pineau, Philippe Vincent-Lamarre, Koustuv Sinha, Vincent Larivière, Alina Beygelzimer, Florence d’Alché Buc, Emily Fox, Hugo Larochelle
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2003.12206
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/5e331bf7887e2e634bf5b12788849d2d2b74bc7f
+@article{pineau2020improving,
+  title = {Improving Reproducibility in Machine Learning Research (A Report from the NeurIPS 2019 Reproducibility Program)},
+  author = {Joelle Pineau and Philippe Vincent-Lamarre and Koustuv Sinha and V. Larivière and A. Beygelzimer and Florence d'Alché-Buc and E. Fox and H. Larochelle},
+  year = {2020},
+  journal = {Journal of machine learning research},
+  eprint = {2003.12206},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/5e331bf7887e2e634bf5b12788849d2d2b74bc7f},
+}
+
+======================================================================
+Reference: “why should i trust you?”: Explaining the predictions of any classifier
+Authors  : Marco Tulio Ribeiro, Sameer Singh, Carlos Guestrin
+Year     : 2016
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/2939672.2939778
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1602.04938
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1602.04938v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/c0883f5930a232a9c1ad601c978caede29155979
+@article{ribeiro2016should,
+  title = {"Why Should I Trust You?": Explaining the Predictions of Any Classifier},
+  author = {Marco Tulio Ribeiro and Sameer Singh and Carlos Guestrin},
+  year = {2016},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.1145/2939672.2939778},
+  eprint = {1602.04938},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1602.04938v3},
+}
+
+======================================================================
+Reference: Cockpit: A practical debugging tool for the training of deep neural networks
+Authors  : Frank Schneider, Lukas Balles, Philipp Hennig
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2102.06604
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2102.06604v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/e1a49946720cb8fdbd45bd94ccbfb85b06093cfb
+@article{schneider2021cockpit,
+  title = {Cockpit: A Practical Debugging Tool for the Training of Deep Neural Networks},
+  author = {Frank Schneider and Felix Dangel and Philipp Hennig},
+  year = {2021},
+  journal = {Neural Information Processing Systems},
+  eprint = {2102.06604},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2102.06604v2},
+}
+
+======================================================================
+Reference: HiBug: On human-interpretable model debug
+Authors  : Yuning Tian, Marta Scudellari, Zeyi Liu, Antonio Emanuele Cinà, Yuxiao Cheng, Frank Hutter
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/075280-0212
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/3771e01db3ffc8ef8f20b3d21ecbc763c444244f
+@article{chen2023hibug,
+  title = {HiBug: On Human-Interpretable Model Debug},
+  author = {Mu-Hwa Chen and Yu Li and Qiang Xu},
+  year = {2023},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/075280-0212},
+  url = {https://www.semanticscholar.org/paper/3771e01db3ffc8ef8f20b3d21ecbc763c444244f},
+}
+
+======================================================================
+Reference: GLUE: A multi-task benchmark and analysis platform for natural language understanding
+Authors  : Alex Wang, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, Samuel R Bowman
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/w18-5446
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1804.07461
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1804.07461v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/451d4a16e425ecbf38c4b1cca0dcf5d9bec8255c
+@article{wang2018glue,
+  title = {GLUE: A Multi-Task Benchmark and Analysis Platform for Natural Language Understanding},
+  author = {Alex Wang and Amanpreet Singh and Julian Michael and Felix Hill and Omer Levy and Samuel R. Bowman},
+  year = {2018},
+  journal = {BlackboxNLP@EMNLP},
+  doi = {10.18653/v1/w18-5446},
+  eprint = {1804.07461},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1804.07461v3},
+}
+
+======================================================================
+Reference: SuperGLUE: A stickier benchmark for general-purpose language understanding systems
+Authors  : Alex Wang, Yada Pruksachatkun, Nikita Nangia, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, Samuel R Bowman
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1905.00537
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1905.00537v3
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/d9f6ada77448664b71128bb19df15765336974a6
+@article{wang2019superglue,
+  title = {SuperGLUE: A Stickier Benchmark for General-Purpose Language Understanding Systems},
+  author = {Alex Wang and Yada Pruksachatkun and Nikita Nangia and Amanpreet Singh and Julian Michael and Felix Hill and Omer Levy and Samuel R. Bowman},
+  year = {2019},
+  journal = {Neural Information Processing Systems},
+  eprint = {1905.00537},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1905.00537v3},
+}

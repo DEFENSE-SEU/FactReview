@@ -1,0 +1,713 @@
+======================================================================
+Reference: A self-presentational view of social phenomena
+Authors  : Roy F Baumeister
+Year     : 1982
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1037/0033-2909.91.1.3
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d7aa54300d03b3bd4805e170ad9214f2624cd689
+@article{baumeister1982selfpresentational,
+  title = {A SELF-PRESENTATIONAL VIEW OF SOCIAL PHENOMENA},
+  author = {R. Baumeister},
+  year = {1982},
+  journal = {Psychological Bulletin},
+  doi = {10.1037/0033-2909.91.1.3},
+  url = {https://www.semanticscholar.org/paper/d7aa54300d03b3bd4805e170ad9214f2624cd689},
+}
+
+======================================================================
+Reference: Can deception detection go deeper? dataset, evaluation, and benchmark for deception reasoning
+Authors  : Kang Chen, Zheng Lian, Haiyang Sun, Bin Liu, Jianhua Tao
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.11432
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.11432v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/8a0414576973c122f72b09a25ba88d494cc7e36e
+@misc{chen2024deception,
+  title = {Can Deception Detection Go Deeper? Dataset, Evaluation, and Benchmark for Deception Reasoning},
+  author = {Kang Chen and Zheng Lian and Haiyang Sun and Rui Liu and Jiangyan Yi and Bin Liu and Jianhua Tao},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2402.11432},
+  eprint = {2402.11432},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.11432v3},
+}
+
+======================================================================
+Reference: Chatlaw: A multi-agent collaborative legal assistant with knowledge graph enhanced mixture-of-experts large language model
+Authors  : Jiaxi Cui, Munan Ning, Zongjian Li, Bohua Chen, Yang Yan, Hao Li, Bin Ling, Yonghong Tian, Li Yuan
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Fundamental Research' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Fundamental Research.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.fmre.2026.03.026
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2306.16092v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/fa805d68bf940687b6a947bebe48b72ee90f6e45
+@article{cui2023chatlaw,
+  title = {Chatlaw: A Multi-Agent Legal Assistant based on a Role-Aligned Mixture-of-Experts Architecture},
+  author = {Jiaxi Cui and Munan Ning and Zongjian Li and Bohua Chen and Yang Yan and Hao Li and Bin Ling and Yonghong Tian and Li Yuan},
+  year = {2023},
+  journal = {Fundamental Research},
+  doi = {10.1016/j.fmre.2026.03.026},
+  eprint = {2306.16092},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2306.16092v3},
+}
+
+======================================================================
+Reference: Rlprompt: Optimizing discrete text prompts with reinforcement learning
+Authors  : Mingkai Deng, Jianyu Wang, Cheng-Ping Hsieh, Yihan Wang, Han Guo, Tianmin Shu, Meng Song, Eric P Xing, Zhiting Hu
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2205.12548
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2205.12548v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/07759a84f27e43cfa5bc8d579f8227c96e6ae1dc
+@inproceedings{deng2022rlprompt,
+  title = {RLPrompt: Optimizing Discrete Text Prompts with Reinforcement Learning},
+  author = {Mingkai Deng and Jianyu Wang and Cheng-Ping Hsieh and Yihan Wang and Han Guo and Tianmin Shu and Meng Song and Eric P. Xing and Zhiting Hu},
+  year = {2022},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2205.12548},
+  eprint = {2205.12548},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2205.12548v3},
+}
+
+======================================================================
+Reference: Cognitive dissonance
+Authors  : Leon Festinger
+Year     : 1962
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/b0-08-043076-7/01802-7
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/abf3f1333cff95d67edaa871d9aea717847e1e2e
+@article{ewoldsen2020cognitive,
+  title = {Cognitive Dissonance},
+  author = {D. Ewoldsen},
+  year = {2020},
+  journal = {The International Encyclopedia of Media Psychology},
+  doi = {10.1016/b0-08-043076-7/01802-7},
+  url = {https://www.semanticscholar.org/paper/abf3f1333cff95d67edaa871d9aea717847e1e2e},
+}
+
+======================================================================
+Reference: Clarq-llm: A benchmark for models clarifying and requesting information in task-oriented dialog
+Authors  : Yujian Gan, Changling Li, Jinxia Xie, Luou Wen, Matthew Purver, Massimo Poesio
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2409.06097
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2409.06097v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1cc89e35bcc0051cc0916f4b98e0c2f66202b979
+@misc{gan2024clarqllm,
+  title = {ClarQ-LLM: A Benchmark for Models Clarifying and Requesting Information in Task-Oriented Dialog},
+  author = {Yujian Gan and Changling Li and Jinxia Xie and Luou Wen and Matthew Purver and Massimo Poesio},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2409.06097},
+  eprint = {2409.06097},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2409.06097v2},
+}
+
+======================================================================
+Reference: Fal¨u zixun cel ¨ue yu jiqiao [Legal Consultation: Strategies and Skills]
+Authors  : Deyun Han, Yao Peng
+Year     : 2015
+Verdict  : unverified
+
+======================================================================
+Reference: Fal¨u zixun [Legal Consultation]
+Authors  : Deyun Han, Yao Peng
+Year     : 2024
+Verdict  : unverified
+
+======================================================================
+Reference: Adam: A method for stochastic optimization
+Authors  : Diederik P Kingma
+Year     : 2014
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1412.6980v9
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/a6cb366736791bcccc5c8639de5a8f9636bf87e8
+@inproceedings{kingma2014adam,
+  title = {Adam: A Method for Stochastic Optimization},
+  author = {Diederik P. Kingma and Jimmy Ba},
+  year = {2014},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1412.6980},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1412.6980v9},
+}
+
+======================================================================
+Reference: Generating usage-related questions for preference elicitation in conversational recommender systems
+Authors  : Ivica Kostric, Krisztian Balog, Filip Radlinski
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3629981
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2111.13463
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/4d4c5b5e9e8e99386f9c837460cfdc171cbe4b2c
+@article{kostric2021generating,
+  title = {Generating Usage-related Questions for Preference Elicitation in Conversational Recommender Systems},
+  author = {Ivica Kostric and K. Balog and Filip Radlinski},
+  year = {2021},
+  journal = {Trans. Recomm. Syst.},
+  doi = {10.1145/3629981},
+  eprint = {2111.13463},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/4d4c5b5e9e8e99386f9c837460cfdc171cbe4b2c},
+}
+
+======================================================================
+Reference: A survey on recent advances and challenges in reinforcement learning methods for task-oriented dialogue policy learning
+Authors  : Wai-Chung Kwan, Hong-Ru Wang, Hui-Min Wang, Kam-Fai Wong
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1007/s11633-022-1347-y
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2202.13675
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/cc6e9983b81c67245126235927d7d9e10fb9a1f5
+@article{kwan2022survey,
+  title = {A Survey on Recent Advances and Challenges in Reinforcement Learning Methods for Task-oriented Dialogue Policy Learning},
+  author = {Wai-Chung Kwan and Hongru Wang and Huimin Wang and Kam-Fai Wong},
+  year = {2022},
+  journal = {Machine Intelligence Research},
+  doi = {10.1007/s11633-022-1347-y},
+  eprint = {2202.13675},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/cc6e9983b81c67245126235927d7d9e10fb9a1f5},
+}
+
+======================================================================
+Reference: An interactive program fo conversational elicitation of decision structures
+Authors  : Antonio Leal, Judea Pearl
+Year     : 2007
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/tsmc.1977.4309725
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/233bbf756d4693ecf0572fb4e1b2cf684ebca9b1
+@article{leal1977interactive,
+  title = {An Interactive Program Fo Conversational Elicitation of Decision Structures},
+  author = {Antonio Leal and J. Pearl},
+  year = {1977},
+  journal = {IEEE Transactions on Systems, Man and Cybernetics},
+  doi = {10.1109/tsmc.1977.4309725},
+  url = {https://www.semanticscholar.org/paper/233bbf756d4693ecf0572fb4e1b2cf684ebca9b1},
+}
+
+======================================================================
+Reference: Impression management: A literature review and two-component model
+Authors  : Mark R Leary, Robin M Kowalski
+Year     : 1990
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1037/0033-2909.107.1.34
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/28f8dfae00c36fd9bbf1c9c417b3892af3d7935b
+@article{leary1990impression,
+  title = {Impression management: A literature review and two-component model.},
+  author = {M. Leary and Robin M. Kowalski},
+  year = {1990},
+  journal = {Psychological Bulletin},
+  doi = {10.1037/0033-2909.107.1.34},
+  url = {https://www.semanticscholar.org/paper/28f8dfae00c36fd9bbf1c9c417b3892af3d7935b},
+}
+
+======================================================================
+Reference: Legalagentbench: Evaluating llm agents in legal domain
+Authors  : Haitao Li, Junjie Chen, Jingli Yang, Qingyao Ai, Wei Jia, Youfeng Liu, Kai Lin, Yueyue Wu, Guozhi Yuan, Yiran Hu, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2412.17259
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 13.
+      Suggestion: List all 13 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2412.17259v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0eb229fd2e62bd62ddb894c4f8150eb9cb51d749
+@inproceedings{li2024legalagentbench,
+  title = {LegalAgentBench: Evaluating LLM Agents in Legal Domain},
+  author = {Haitao Li and Junjie Chen and Jingli Yang and Qingyao Ai and Wei Jia and Youfeng Liu and Kai Lin and Yueyue Wu and Guozhi Yuan and Yiran Hu and Wuyue Wang and Yiqun Liu and Minlie Huang},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2412.17259},
+  eprint = {2412.17259},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2412.17259v1},
+}
+
+======================================================================
+Reference: Investorbench: A benchmark for financial decision-making tasks with llm-based agent
+Authors  : Haohang Li, Yupeng Cao, Yangyang Yu, Shashidhar Reddy Javaji, Zhiyang Deng, Yueru He, Yuechen Jiang, Zining Zhu, Koduvayur Subbalakshmi, Guojun Xiong, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2412.18174
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 15.
+      Suggestion: List all 15 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2412.18174v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/74e898dbf4a82980d600828f6ffcb6cd1c4d1522
+@misc{li2024investorbench,
+  title = {INVESTORBENCH: A Benchmark for Financial Decision-Making Tasks with LLM-based Agent},
+  author = {Haohang Li and Yupeng Cao and Yangyang Yu and Shashidhar Reddy Javaji and Zhiyang Deng and Yueru He and Yuechen Jiang and Zining Zhu and Koduvayur Subbalakshmi and Guojun Xiong and Jimin Huang and Lingfei Qian and Xueqing Peng and Qianqian Xie and Jordan W. Suchow},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2412.18174},
+  eprint = {2412.18174},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2412.18174v1},
+}
+
+======================================================================
+Reference: Mediq: Question-asking llms and a benchmark for reliable interactive clinical reasoning
+Authors  : Stella Li, Vidhisha Balachandran, Shangbin Feng, Jonathan Ilgen, Emma Pierson, Pang Wei W Koh, Yulia Tsvetkov
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/079017-0908
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2406.00922
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2406.00922v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2a9a2e0e3cc82e8277d9daf824ac5ea6d6584b6f
+@article{li2024mediq,
+  title = {MediQ: Question-Asking LLMs and a Benchmark for Reliable Interactive Clinical Reasoning},
+  author = {Shuyue Stella Li and Vidhisha Balachandran and Shangbin Feng and Jonathan S. Ilgen and Emma Pierson and Pang Wei Koh and Yulia Tsvetkov},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/079017-0908},
+  eprint = {2406.00922},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2406.00922v3},
+}
+
+======================================================================
+Reference: Continuous control with deep reinforcement learning
+Authors  : Timothy P Lillicrap, Jonathan J Hunt, Alexander Pritzel, Nicolas Heess, Tom Erez, Yuval Tassa, David Silver, Daan Wierstra
+Year     : 2015
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1509.02971v6
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/024006d4c2a89f7acacc6e4438d156525b60a98f
+@inproceedings{lillicrap2015continuous,
+  title = {Continuous control with deep reinforcement learning},
+  author = {Timothy P. Lillicrap and Jonathan J. Hunt and Alexander Pritzel and Nicolas Heess and Tom Erez and Yuval Tassa and David Silver and Daan Wierstra},
+  year = {2015},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1509.02971},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1509.02971v6},
+}
+
+======================================================================
+Reference: Developing conversational virtual humans for social emotion elicitation based on large language models
+Authors  : Jose Llanes-Jurado, Luc´ıa G´omez-Zaragoz´a, Maria Eleonora Minissi, Mariano Alca ˜niz, Javier Mar´ın-Morales
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1016/j.eswa.2024.123261
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/df192c7ccd572b6d116ca4f977ad00139ae8f367
+@article{llanesjurado2024developing,
+  title = {Developing conversational Virtual Humans for social emotion elicitation based on large language models},
+  author = {Jose Llanes-Jurado and Lucía Gómez-Zaragozá and M. E. Minissi and Mariano Alcañiz and J. Marín-Morales},
+  year = {2024},
+  journal = {Expert systems with applications},
+  doi = {10.1016/j.eswa.2024.123261},
+  url = {https://www.semanticscholar.org/paper/df192c7ccd572b6d116ca4f977ad00139ae8f367},
+}
+
+======================================================================
+Reference: Empowering language models with active inquiry for deeper understanding
+Authors  : Jing-Cheng Pang, Heng-Bo Fan, Pengyuan Wang, Jia-Hao Xiao, Nan Tang, Si-Hang Yang, Chengxing Jia, Sheng-Jun Huang, Yang Yu
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2402.03719
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.03719v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/22b29b88c87333d4b324c8a0508429b611790278
+@misc{pang2024empowering,
+  title = {Empowering Language Models with Active Inquiry for Deeper Understanding},
+  author = {Jing-Cheng Pang and Heng-Bo Fan and Pengyuan Wang and Jia-Hao Xiao and Nan Tang and Si-Hang Yang and Chengxing Jia and Sheng-Jun Huang and Yang Yu},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2402.03719},
+  eprint = {2402.03719},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.03719v1},
+}
+
+======================================================================
+Reference: Grips: Gradient-free, edit-based instruction search for prompting large language models
+Authors  : Archiki Prasad, Peter Hase, Xiang Zhou, Mohit Bansal
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference of the European Chapter of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference of the European Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2203.07281
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2203.07281v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/cf934ddd3c852ba9c67cdfd21bf41e7723fc6d9e
+@inproceedings{prasad2022grips,
+  title = {GrIPS: Gradient-free, Edit-based Instruction Search for Prompting Large Language Models},
+  author = {Archiki Prasad and Peter Hase and Xiang Zhou and Mohit Bansal},
+  year = {2022},
+  booktitle = {Conference of the European Chapter of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2203.07281},
+  eprint = {2203.07281},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2203.07281v2},
+}
+
+======================================================================
+Reference: Llm-based agentic systems in medicine and healthcare
+Authors  : Jianing Qiu, Kyle Lam, Guohao Li, Amish Acharya, Tien Yin Wong, Ara Darzi, Wu Yuan, Eric J Topol
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1038/s42256-024-00944-1
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/118a7c1d7abde33903986eb4c7838a44da02a4e8
+@article{qiu2024llmbased,
+  title = {LLM-based agentic systems in medicine and healthcare},
+  author = {Jianing Qiu and K. Lam and Guohao Li and A. Acharya and T. Wong and Ara Darzi and Wu Yuan and E. Topol},
+  year = {2024},
+  journal = {Nature Machine Intelligence},
+  doi = {10.1038/s42256-024-00944-1},
+  url = {https://www.semanticscholar.org/paper/118a7c1d7abde33903986eb4c7838a44da02a4e8},
+}
+
+======================================================================
+Reference: Coached conversational preference elicitation: A case study in understanding movie preferences
+Authors  : Filip Radlinski, Krisztian Balog, Bill Byrne, Karthik Krishnamoorthi
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/w19-5941
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a330053177e7bcf0fafc6cf8266f4d150cdf3af0
+@inproceedings{radlinski2019coached,
+  title = {Coached Conversational Preference Elicitation: A Case Study in Understanding Movie Preferences},
+  author = {Filip Radlinski and K. Balog and B. Byrne and K. Krishnamoorthi},
+  year = {2019},
+  booktitle = {SIGDIAL Conferences},
+  doi = {10.18653/v1/w19-5941},
+  url = {https://www.semanticscholar.org/paper/a330053177e7bcf0fafc6cf8266f4d150cdf3af0},
+}
+
+======================================================================
+Reference: Sentence-bert: Sentence embeddings using siamese bert-networks
+Authors  : Nils Reimers, Iryna Gurevych
+Year     : 2019
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Conference on Empirical Methods in Natural Language Processing' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Conference on Empirical Methods in Natural Language Processing.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/d19-1410
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1908.10084v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/93d63ec754f29fa22572615320afe0521f7ec66d
+@inproceedings{reimers2019sentencebert,
+  title = {Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks},
+  author = {Nils Reimers and Iryna Gurevych},
+  year = {2019},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.18653/v1/d19-1410},
+  eprint = {1908.10084},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1908.10084v1},
+}
+
+======================================================================
+Reference: Lawluo: A chinese law firm co-run by llm agents
+Authors  : Jingyun Sun, Chengxiao Dai, Zhongze Luo, Yangbo Chang, Yang Li
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'CoRR 2024' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: CoRR 2024.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.16252v3
+%   openreview: venue — https://openreview.net/forum?id=VjPrPIY4Dn
+@article{sun2024lawluo,
+  title = {LawLuo: A Multi-Agent Collaborative Framework for Multi-Round Chinese Legal Consultation},
+  author = {Jingyun Sun and Chengxiao Dai and Zhongze Luo and Yangbo Chang and Yang Li},
+  year = {2024},
+  journal = {CoRR 2024},
+  eprint = {2407.16252},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.16252v3},
+}
+
+======================================================================
+Reference: User intention recognition and requirement elicitation method for conversational ai services
+Authors  : Junrui Tian, Zhiying Tu, Zhongjie Wang, Xiaofei Xu, Min Liu
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1109/icws49710.2020.00042
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2009.01509
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2009.01509v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/8dee87be4cdba3b6aed465174d354f33b04d3d6f
+@inproceedings{tian2020user,
+  title = {User Intention Recognition and Requirement Elicitation Method for Conversational AI Services},
+  author = {Junrui Tian and Zhiying Tu and Zhongjie Wang and Xiaofei Xu and Min Liu},
+  year = {2020},
+  booktitle = {2020 IEEE International Conference on Web Services (ICWS)},
+  doi = {10.1109/icws49710.2020.00042},
+  eprint = {2009.01509},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2009.01509v1},
+}
+
+======================================================================
+Reference: Give me a straight answer: Response ambiguity diminishes likability
+Authors  : Deming Wang, Ignazio Ziano
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1177/01461672231199161
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/7a6727dbaaa760fe811dcbc4155b4f4040185d5b
+@article{wang2023give,
+  title = {Give Me a Straight Answer: Response Ambiguity Diminishes Likability},
+  author = {Deming Wang and I. Ziano},
+  year = {2023},
+  journal = {Personality and Social Psychology Bulletin},
+  doi = {10.1177/01461672231199161},
+  url = {https://www.semanticscholar.org/paper/7a6727dbaaa760fe811dcbc4155b4f4040185d5b},
+}
+
+======================================================================
+Reference: Adaptive elicitation of latent information using natural language
+Authors  : Jimmy Wang, Thomas Zollo, Richard Zemel, Hongseok Namkoong
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Machine Learning' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Machine Learning.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2504.04204
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2504.04204v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/b47111f5cf2b544d29077282498a22bdaa647e16
+@inproceedings{wang2025adaptive,
+  title = {Adaptive Elicitation of Latent Information Using Natural Language},
+  author = {Jimmy Wang and Thomas Zollo and Richard Zemel and Hongseok Namkoong},
+  year = {2025},
+  booktitle = {International Conference on Machine Learning},
+  doi = {10.48550/arxiv.2504.04204},
+  eprint = {2504.04204},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2504.04204v2},
+}
+
+======================================================================
+Reference: Healthq: Unveiling questioning capabilities of llm chains in healthcare conversations
+Authors  : Ziyu Wang, Hao Li, Di Huang, Hye-Sung Kim, Chae-Won Shin, Amir M Rahmani
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2409.19487
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2409.19487
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/96cbeaad50e74be043bc1e9b7273ce6c2bed00e8
+@article{wang2024healthq,
+  title = {HealthQ: Unveiling Questioning Capabilities of LLM Chains in Healthcare Conversations},
+  author = {Ziyu Wang and Hao Li and Di Huang and Amir M. Rahmani},
+  year = {2024},
+  journal = {Smart Health},
+  doi = {10.48550/arxiv.2409.19487},
+  eprint = {2409.19487},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/96cbeaad50e74be043bc1e9b7273ce6c2bed00e8},
+}
+
+======================================================================
+Reference: Qwen2.5 technical report
+Authors  : An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu, Fei Huang, Haoran Wei, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2412.15115
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 44.
+      Suggestion: List all 44 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2412.15115v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/88aa6b1f37d1fd8e0a40499ce9bb87873f03aaa8
+@misc{qwen2024qwen,
+  title = {Qwen2.5 Technical Report},
+  author = {Qwen and : and An Yang and Baosong Yang and Beichen Zhang and Binyuan Hui and Bo Zheng and Bowen Yu and Chengyuan Li and Dayiheng Liu and Fei Huang and Haoran Wei and Huan Lin and Jian Yang and Jianhong Tu and Jianwei Zhang and Jianxin Yang and Jiaxi Yang and Jingren Zhou and Junyang Lin and Kai Dang and Keming Lu and Keqin Bao and Kexin Yang and Le Yu and Mei Li and Mingfeng Xue and Pei Zhang and Qin Zhu and Rui Men and Runji Lin and Tianhao Li and Tianyi Tang and Tingyu Xia and Xingzhang Ren and Xuancheng Ren and Yang Fan and Yang Su and Yichang Zhang and Yu Wan and Yuqiong Liu and Zeyu Cui and Zhenru Zhang and Zihan Qiu},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2412.15115},
+  eprint = {2412.15115},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2412.15115v2},
+}
+
+======================================================================
+Reference: Ying zai tan pan: Shangwu l ¨ushi de chenggong faze [Win in Negotiation: Success Principles for Business Lawyers]
+Authors  : Ying zai tan pan
+Year     : 2010
+Verdict  : unverified
+
+======================================================================
+Reference: Fincon: A synthesized llm multi-agent system with conceptual verbal reinforcement for enhanced financial decision making
+Authors  : Yangyang Yu, Zhiyuan Yao, Haohang Li, Zhiyang Deng, Yuechen Jiang, Yupeng Cao, Zhi Chen, Jordan Suchow, Zhenyu Cui, Rong Liu, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.06567
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2407.06567
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 17.
+      Suggestion: List all 17 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2407.06567v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0b41a6899c29a04e1217e6cc80a3d915ea18e2d8
+@article{yu2024fincon,
+  title = {FinCon: A Synthesized LLM Multi-Agent System with Conceptual Verbal Reinforcement for Enhanced Financial Decision Making},
+  author = {Yangyang Yu and Zhiyuan Yao and Haohang Li and Zhiyang Deng and Yupeng Cao and Zhi Chen and Jordan W. Suchow and Rong Liu and Zhenyu Cui and Zhaozhuo Xu and Denghui Zhang and Koduvayur Subbalakshmi and Guojun Xiong and Yueru He and Jimin Huang and Dong Li and Qianqian Xie},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2407.06567},
+  eprint = {2407.06567},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2407.06567v3},
+}
+
+======================================================================
+Reference: Tempera: Test-time prompting via reinforcement learning
+Authors  : Tianjun Zhang, Xuezhi Wang, Denny Zhou, Dale Schuurmans, Joseph E Gonzalez
+Year     : 2022
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'International Conference on Learning Representations' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: International Conference on Learning Representations.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2211.11890
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2211.11890v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/66c5a0fbde7e06bf0ef179e660b6a211bcd80aac
+@inproceedings{zhang2022tempera,
+  title = {TEMPERA: Test-Time Prompting via Reinforcement Learning},
+  author = {Tianjun Zhang and Xuezhi Wang and Denny Zhou and Dale Schuurmans and Joseph E. Gonzalez},
+  year = {2022},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2211.11890},
+  eprint = {2211.11890},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2211.11890v1},
+}
+
+======================================================================
+Reference: Hierarchical conversational preference elicitation with bandit feedback
+Authors  : Jinhang Zuo, Songwen Hu, Tong Yu, Shuai Li, Handong Zhao, Carlee Joe-Wong
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3511808.3557347
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2209.06129
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2209.06129v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/9cacab8d9f7275523df388426981f03477baf0e0
+@inproceedings{zuo2022hierarchical,
+  title = {Hierarchical Conversational Preference Elicitation with Bandit Feedback},
+  author = {Jinhang Zuo and Songwen Hu and Tong Yu and Shuai Li and Handong Zhao and Carlee Joe-Wong},
+  year = {2022},
+  booktitle = {International Conference on Information and Knowledge Management},
+  doi = {10.1145/3511808.3557347},
+  eprint = {2209.06129},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2209.06129v1},
+}

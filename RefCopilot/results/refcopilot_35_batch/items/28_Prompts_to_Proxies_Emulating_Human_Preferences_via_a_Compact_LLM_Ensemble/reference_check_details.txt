@@ -1,0 +1,1051 @@
+======================================================================
+Reference: Steerable pluralism: Pluralistic alignment via few-shot comparative regression
+Authors  : Jadie Adams, Brian Hu, Emily Veenhuis, David Joy, Bharadwaj Ravichandran, Aaron Bray, Anthony Hoogs, Arslan Basharat
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Proceedings of the AAAI/ACM Conference on AI, Ethics, and Society' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Proceedings of the AAAI/ACM Conference on AI, Ethics, and Society.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2508.08509
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2508.08509v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/94af13c6ad98ba03ed61e745e372c786ebbd20b4
+@inproceedings{adams2025steerable,
+  title = {Steerable Pluralism: Pluralistic Alignment via Few-Shot Comparative Regression},
+  author = {Jadie Adams and Brian Hu and Emily Veenhuis and David Joy and Bharadwaj Ravichandran and Aaron Bray and Anthony Hoogs and Arslan Basharat},
+  year = {2025},
+  booktitle = {Proceedings of the AAAI/ACM Conference on AI, Ethics, and Society},
+  doi = {10.48550/arxiv.2508.08509},
+  eprint = {2508.08509},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2508.08509v1},
+}
+
+======================================================================
+Reference: Out of one, many: Using language models to simulate human samples
+Authors  : Lisa P. Argyle, Ethan C. Busby, Nancy Fulda, Joshua R. Gubler, Christopher Rytting, David Wingate
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2209.06899
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/f4e612658bde9db88abfd455b99f181fdc536996
+@article{argyle2022many,
+  title = {Out of One, Many: Using Language Models to Simulate Human Samples},
+  author = {Lisa P. Argyle and E. Busby and Nancy Fulda and Joshua R Gubler and Christopher Rytting and David Wingate},
+  year = {2022},
+  journal = {Political Analysis},
+  doi = {10.1017/pan.2023.2},
+  eprint = {2209.06899},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/f4e612658bde9db88abfd455b99f181fdc536996},
+}
+
+======================================================================
+Reference: Partially observable cost-aware active-learning with large language models
+Authors  : Nicolás Astorga, Tennison Liu, Nabeel Seedat, Mihaela van der Schaar
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.52202/079017-0656
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/796f4f8476161f691dcbef86356ef944c966a7a5
+@article{astorga2024active,
+  title = {Active Learning with LLMs for Partially Observed and Cost-Aware Scenarios},
+  author = {N. Astorga and Tennison Liu and Nabeel Seedat and M. Schaar},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.52202/079017-0656},
+  url = {https://www.semanticscholar.org/paper/796f4f8476161f691dcbef86356ef944c966a7a5},
+}
+
+======================================================================
+Reference: Training a helpful and harmless assistant with reinforcement learning from human feedback
+Authors  : Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, Nicholas Joseph, Saurav Kadavath, Jackson Kernion, Tom Conerly, Sheer El-Showk, Nelson Elhage, Zac Hatfield-Dodds, Danny Hernandez, Tristan Hume, Scott Johnston, Shauna Kravec, Liane Lovitt, Neel Nanda, Catherine Olsson, Dario Amodei, Tom Brown, Jack Clark, Sam McCandlish, Chris Olah, Ben Mann, Jared Kaplan
+Year     : 2022
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2204.05862
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2204.05862v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/0286b2736a114198b25fb5553c671c33aed5d477
+@misc{bai2022training,
+  title = {Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback},
+  author = {Yuntao Bai and Andy Jones and Kamal Ndousse and Amanda Askell and Anna Chen and Nova DasSarma and Dawn Drain and Stanislav Fort and Deep Ganguli and Tom Henighan and Nicholas Joseph and Saurav Kadavath and Jackson Kernion and Tom Conerly and Sheer El-Showk and Nelson Elhage and Zac Hatfield-Dodds and Danny Hernandez and Tristan Hume and Scott Johnston and Shauna Kravec and Liane Lovitt and Neel Nanda and Catherine Olsson and Dario Amodei and Tom Brown and Jack Clark and Sam McCandlish and Chris Olah and Ben Mann and Jared Kaplan},
+  year = {2022},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2204.05862},
+  eprint = {2204.05862},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2204.05862v1},
+}
+
+======================================================================
+Reference: Specializing large language models to simulate survey response distributions for global populations
+Authors  : Yong Cao, Haijiang Liu, Arnav Arora, Isabelle Augenstein, Paul Röttger, Daniel Hershcovich
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2502.07068
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2502.07068v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e3f9b20c50a146fdaeb23873c5522adb40b7a9b3
+@article{cao2025specializing,
+  title = {Specializing Large Language Models to Simulate Survey Response Distributions for Global Populations},
+  author = {Yong Cao and Haijiang Liu and Arnav Arora and Isabelle Augenstein and Paul Röttger and Daniel Hershcovich},
+  year = {2025},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2025.naacl-long.162},
+  eprint = {2502.07068},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2502.07068v2},
+}
+
+======================================================================
+Reference: PERSONA: A reproducible testbed for pluralistic alignment
+Authors  : Louis Castricato, Nathan Lile, Rafael Rafailov, Jan-Philipp Fränken, Chelsea Finn
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2407.17387
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2407.17387
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/39fd3d41f5ab882eea29dbe27eef8d0954b29856
+@inproceedings{bai2024persona,
+  title = {PERSONA: A Reproducible Testbed for Pluralistic Alignment},
+  author = {Yuntao Bai and Andy Jones and Kamal Ndousse and Anna Askell and Dawn Chen and Stanislav Drain and Fort and Su Lin Blodgett and Solon Barocas and Hal Daumé and Louis Castricato and nathan lile and Suraj Anand and Souradip Chakraborty and Jiahao Qiu and Hui Yuan and Alec Kop-681 and Furong Huang and Dinesh Manocha and Amrit Singh and Bedi Mengdi and Wang and Maxmin-rlhf and Jiangjie Chen and Xintao Wang and Rui Xu and Siyu Yuan and Wei Zhang and Jian Shi and Shuang Xie and Ruihan Li and Yang and Tinghui Zhu and Aili Chen and Nianqi Li and Caiyu Lida Chen and S. Hu and Scott Wu and Z. Ren and Yang Fu and Ganqu Cui and Lifan Yuan and Ning Ding and Guanming Yao and Wei Zhu and Yuan Ni and Guotong Xie and Zhiyuan Liu and A. Schiefer and Anton Askell and Bakhtin and Carol and Zac S. C. Chen and Danny Hatfield-Dodds and Hernandez and Jan-Philipp Fränken and Sam Kwok and Peixuan Ye and Kanishk Gandhi and Dilip Arumugam and Jared Moore and Alex Tamkin and Tobias Gerstenberg and E. Zelikman and Rafael Rafailov and Kanishk Gandhi and Noah D Goodman. 2024 and Hannah Rose Kirk and Alexander Whitefield and Paul Röttger and Andrew M. Bean and Katerina Margatina and Juan Ciro and Rafael Mosquera and Max Bartolo and Adina Williams and Yaswanth Chittepu and Ryan Park and Harshit S. Sikchi and Joey Hejna and Bradley Knox and Chelsea Finn and S. Ramesh and Yifan Hu and Iason Chaimalas and Luca Rettenberger and M. Reischl and Mark Schutera and Shibani Santurkar and Esin Durmus and Faisal Ladhak and Cinoo Lee and Percy Liang and Tatsunori Hashimoto and Omar Shaikh and Michelle Lam and Y. Shao and Anand Siththaranjan and Cassidy Laidlaw and Taylor Sorensen and Jillian R. Fisher and Mitchell Gordon and Niloofar Mireshghallah and Michael Rytting and Andre Ye and Liwei Jiang and Ximing Lu and Nouha Dziri and Tim Althoff and Nisan Stiennon and O. Long and Jeffrey Wu and Ryan Ziegler and Chelsea Lowe and Alec Voss and Radford and Dario Amodei and Christiano. 2020. Learn-860 and Chenkai Sun and Revanth Ke Yang and G. Reddy and Hou Pong Chan and ChengXiang Zhai},
+  year = {2024},
+  booktitle = {International Conference on Computational Linguistics},
+  doi = {10.48550/arxiv.2407.17387},
+  eprint = {2407.17387},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/39fd3d41f5ab882eea29dbe27eef8d0954b29856},
+}
+
+======================================================================
+Reference: Spica: Retrieving scenarios for pluralistic in-context alignment
+Authors  : Quan Ze Chen, KJ Feng, Chan Young Park, Amy X Zhang
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/arxiv_published] Paper was published at venue 'Annual Meeting of the Association for Computational Linguistics' but cited as an arXiv preprint.
+      Suggestion: Cite the published version: Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.18653/v1/2025.findings-acl.41
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2411.10912v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a3d985fa54047b14bf5b3840080913f7432bfa3c
+@inproceedings{chen2024spica,
+  title = {SPICA: Retrieving Scenarios for Pluralistic In-Context Alignment},
+  author = {Quan Ze Chen and K. J. Kevin Feng and Chan Young Park and Amy X. Zhang},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.18653/v1/2025.findings-acl.41},
+  eprint = {2411.10912},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2411.10912v2},
+}
+
+======================================================================
+Reference: Deep reinforcement learning from human preferences
+Authors  : Paul F Christiano, Jan Leike, Tom Brown, Miljan Martic, Shane Legg, Dario Amodei
+Year     : 2017
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1706.03741
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1706.03741v4
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/5bbb6f9a8204eb13070b6f033e61c84ef8ee68dd
+@article{christiano2017deep,
+  title = {Deep reinforcement learning from human preferences},
+  author = {Paul Christiano and Jan Leike and Tom B. Brown and Miljan Martic and Shane Legg and Dario Amodei},
+  year = {2017},
+  journal = {Neural Information Processing Systems},
+  eprint = {1706.03741},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1706.03741v4},
+}
+
+======================================================================
+Reference: Selection via proxy: Efficient data selection for deep learning
+Authors  : Cody Coleman, Christopher Yeh, Stephen Mussmann, Baharan Mirzasoleiman, Peter Bailis, Percy Liang, Jure Leskovec, Matei Zaharia
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1906.11829
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/b06d260b504a20e90d07180aa3c4eaecb3b5cde5
+@inproceedings{coleman2019selection,
+  title = {Selection Via Proxy: Efficient Data Selection For Deep Learning},
+  author = {Cody A. Coleman and Christopher Yeh and Stephen O. Mussmann and Baharan Mirzasoleiman and Peter Bailis and Percy Liang and J. Leskovec and M. Zaharia},
+  year = {2019},
+  booktitle = {International Conference on Learning Representations},
+  eprint = {1906.11829},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/b06d260b504a20e90d07180aa3c4eaecb3b5cde5},
+}
+
+======================================================================
+Reference: Towards measuring the representation of subjective global opinions in language models
+Authors  : Esin Durmus, Karina Nguyen, Thomas I. Liao, Nicholas Schiefer, Amanda Askell, Anton Bakhtin, Carol Chen, Zac Hatfield-Dodds, Danny Hernandez, Nicholas Joseph, Liane Lovitt, Sam McCandlish, Orowa Sikder, Alex Tamkin, Janel Thamkul, Jared Kaplan, Jack Clark, Deep Ganguli
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2306.16388v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/534c58762e69d7afbcb0f6a7e53c07484f6d4891
+@misc{durmus2023towards,
+  title = {Towards Measuring the Representation of Subjective Global Opinions in Language Models},
+  author = {Esin Durmus and Karina Nguyen and Thomas I. Liao and Nicholas Schiefer and Amanda Askell and Anton Bakhtin and Carol Chen and Zac Hatfield-Dodds and Danny Hernandez and Nicholas Joseph and Liane Lovitt and Sam McCandlish and Orowa Sikder and Alex Tamkin and Janel Thamkul and Jared Kaplan and Jack Clark and Deep Ganguli},
+  year = {2023},
+  journal = {arXiv.org},
+  eprint = {2306.16388},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2306.16388v2},
+}
+
+======================================================================
+Reference: Mechanism design for large language models
+Authors  : Paul Dütting, Vahab Mirrokni, Renato Paes Leme, Haifeng Xu, Song Zuo
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2408.02087
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2408.02087v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/e3141e8be7d7cfd2223208413e82d97fd3abc39f
+@inproceedings{lu2024constructing,
+  title = {Constructing Mechanical Design Agent Based on Large Language Models},
+  author = {Jiaxing Lu and Heran Li and Fangwei Ning and Yixuan Wang and Xinze Li and Yan Shi},
+  year = {2024},
+  booktitle = {The Web Conference},
+  doi = {10.1145/3589334.3645511},
+  eprint = {2408.02087},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2408.02087v1},
+}
+
+======================================================================
+Reference: Policy prototyping for llms: Pluralistic alignment via interactive and collaborative policymaking
+Authors  : K. J. Kevin Feng, Inyoung Cheong, Quan Ze Chen, Amy X. Zhang
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2409.08622
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2409.08622v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/069066d40b1545a5c4ea0bbe2b069cf354a26dca
+@misc{feng2024policy,
+  title = {Policy Prototyping for LLMs: Pluralistic Alignment via Interactive and Collaborative Policymaking},
+  author = {K. J. Kevin Feng and Inyoung Cheong and Quan Ze Chen and Amy X. Zhang},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2409.08622},
+  eprint = {2409.08622},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2409.08622v2},
+}
+
+======================================================================
+Reference: Modular pluralism: Pluralistic alignment via multi-LLM collaboration
+Authors  : Shangbin Feng, Taylor Sorensen, Yuhan Liu, Jillian Fisher, Chan Young Park, Yejin Choi, Yulia Tsvetkov
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2406.15951
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2406.15951v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1b5811eafe28b50c08640189483e9b3ab46a10de
+@inproceedings{feng2024modular,
+  title = {Modular Pluralism: Pluralistic Alignment via Multi-LLM Collaboration},
+  author = {Shangbin Feng and Taylor Sorensen and Yuhan Liu and Jillian Fisher and Chan Young Park and Yejin Choi and Yulia Tsvetkov},
+  year = {2024},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2406.15951},
+  eprint = {2406.15951},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2406.15951v2},
+}
+
+======================================================================
+Reference: Scaling synthetic data creation with 1,000,000,000 personas
+Authors  : Tao Ge, Xin Chan, Xiaoyang Wang, Dian Yu, Haitao Mi, Dong Yu
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2406.20094
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2406.20094v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/203c7916b8fd7634f25f257e3a424a5b49d7ab5f
+@misc{ge2024scaling,
+  title = {Scaling Synthetic Data Creation with 1,000,000,000 Personas},
+  author = {Tao Ge and Xin Chan and Xiaoyang Wang and Dian Yu and Haitao Mi and Dong Yu},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2406.20094},
+  eprint = {2406.20094},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2406.20094v3},
+}
+
+======================================================================
+Reference: Shortcut learning in deep neural networks
+Authors  : Robert Geirhos, Jörn-Henrik Jacobsen, Claudio Michaelis, Richard Zemel, Wieland Brendel, Matthias Bethge, Felix A. Wichmann
+Year     : 2020
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2004.07780
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2004.07780v5
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/1b04936c2599e59b120f743fbb30df2eed3fd782
+@article{geirhos2020shortcut,
+  title = {Shortcut Learning in Deep Neural Networks},
+  author = {Robert Geirhos and Jörn-Henrik Jacobsen and Claudio Michaelis and Richard Zemel and Wieland Brendel and Matthias Bethge and Felix A. Wichmann},
+  year = {2020},
+  journal = {Nature Machine Intelligence},
+  doi = {10.1038/s42256-020-00257-z},
+  eprint = {2004.07780},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2004.07780v5},
+}
+
+======================================================================
+Reference: Large language models as simulated economic agents: What can we learn from homo silicus?
+Authors  : John J Horton
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1145/3670865.3673513
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2301.07543
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2301.07543v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/898842b1c1fb4689ffa2f20c0836961a962b7691
+@inproceedings{horton2023large,
+  title = {Large Language Models as Simulated Economic Agents: What Can We Learn from Homo Silicus?},
+  author = {John J. Horton and Apostolos Filippas and Benjamin S. Manning},
+  year = {2023},
+  booktitle = {ACM Conference on Economics and Computation},
+  doi = {10.1145/3670865.3673513},
+  eprint = {2301.07543},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2301.07543v2},
+}
+
+======================================================================
+Reference: Efficiently learning at test-time: Active fine-tuning of LLMs
+Authors  : Jonas Hübottter, Sascha Bongni, Ido Hakimi, Andreas Krause
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2410.08020
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2410.08020
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2339f1d1fd2a7cfdc0c06b12e47aeacb0c4175ec
+@misc{hübotter2024efficiently,
+  title = {Efficiently Learning at Test-Time: Active Fine-Tuning of LLMs},
+  author = {Jonas Hübotter and Sascha Bongni and Ido Hakimi and Andreas Krause},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2410.08020},
+  eprint = {2410.08020},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/2339f1d1fd2a7cfdc0c06b12e47aeacb0c4175ec},
+}
+
+======================================================================
+Reference: Survey response rates in european comparative surveys: a 20-year decline irrespective of sampling frames or survey modes
+Authors  : Piotr Jabkowski, Piotr Cichocki
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/abbreviated_venue] Cited venue 'Quality & Quantity' may be an abbreviation of 'Quality & Quantity: International Journal of Methodology'.
+      Suggestion: Use the full venue name: Quality & Quantity: International Journal of Methodology.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/31fced21f2d7a7ee7432e294f6ae8c9bfb39311e
+@article{jabkowski2024survey,
+  title = {Survey response rates in European comparative surveys: a 20-year decline irrespective of sampling frames or survey modes},
+  author = {Piotr Jabkowski and P. Cichocki},
+  year = {2024},
+  journal = {Quality & Quantity: International Journal of Methodology},
+  doi = {10.1007/s11135-024-01993-9},
+  url = {https://www.semanticscholar.org/paper/31fced21f2d7a7ee7432e294f6ae8c9bfb39311e},
+}
+
+======================================================================
+Reference: Building pew research center’s american trends panel
+Authors  : Courtney Kennedy
+Year     : 2015
+Verdict  : unverified
+
+======================================================================
+Reference: Response rates in telephone surveys have resumed their decline
+Authors  : Courtney Kennedy
+Year     : 2019
+Verdict  : unverified
+
+======================================================================
+Reference: Understanding the effects of RLHF on LLM generalisation and diversity
+Authors  : Robert Kirk, Ishita Mediratta, Christoforos Nalmpantis, Jelena Luketina, Eric Hambro, Edward Grefenstette, Roberta Raileanu
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.06452
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2310.06452
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/cb3968152f7d93f53d24b00279a90d5071ddc85a
+@inproceedings{kirk2023understanding,
+  title = {Understanding the Effects of RLHF on LLM Generalisation and Diversity},
+  author = {Robert Kirk and Ishita Mediratta and Christoforos Nalmpantis and Jelena Luketina and Eric Hambro and Edward Grefenstette and R. Raileanu},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2310.06452},
+  eprint = {2310.06452},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/cb3968152f7d93f53d24b00279a90d5071ddc85a},
+}
+
+======================================================================
+Reference: Hidden incentives for auto-induced distributional shift
+Authors  : David Krueger, Tegan Maharaj, Jan Leike
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2009.09153
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, title, venue, year — https://www.semanticscholar.org/paper/1f95b66969fc6c4c2efbd80439df7a3801baa1f8
+@misc{krueger2020hidden,
+  title = {Hidden Incentives for Auto-Induced Distributional Shift},
+  author = {David Krueger and Tegan Maharaj and Jan Leike},
+  year = {2020},
+  journal = {arXiv.org},
+  eprint = {2009.09153},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/1f95b66969fc6c4c2efbd80439df7a3801baa1f8},
+}
+
+======================================================================
+Reference: From distributional to overton pluralism: Investigating large language model alignment
+Authors  : Thom Lake, Eunsol Choi, Greg Durrett
+Year     : 2024
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Pluralistic Alignment Workshop at NeurIPS 2024', but a full version appears at 'North American Chapter of the Association for Computational Linguistics'.
+      Suggestion: Cite the full version at North American Chapter of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2406.17692
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2406.17692
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2406.17692v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/dff7a3989c41bd0200095e6560f73923b0f3bf32
+@article{lake2024from,
+  title = {From Distributional to Overton Pluralism: Investigating Large Language Model Alignment},
+  author = {Thom Lake and Eunsol Choi and Greg Durrett},
+  year = {2024},
+  journal = {North American Chapter of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2406.17692},
+  eprint = {2406.17692},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2406.17692v2},
+}
+
+======================================================================
+Reference: Unmasking clever hans predictors and assessing what machines really learn
+Authors  : Sebastian Lapuschkin, Stefan Wäldchen, Alexander Binder, Grégoire Montavon, Wojciech Samek, Klaus-Robert Müller
+Year     : 2019
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 1902.10178
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1902.10178v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4f51a64793d3b2a60e9e5846c31dae023cf5c69a
+@article{lapuschkin2019unmasking,
+  title = {Unmasking Clever Hans Predictors and Assessing What Machines Really Learn},
+  author = {Sebastian Lapuschkin and Stephan Wäldchen and Alexander Binder and Grégoire Montavon and Wojciech Samek and Klaus-Robert Müller},
+  year = {2019},
+  journal = {Nature Communications},
+  doi = {10.1038/s41467-019-08987-4},
+  eprint = {1902.10178},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1902.10178v1},
+}
+
+======================================================================
+Reference: Aligning to thousands of preferences via system message generalization
+Authors  : Seongyun Lee, Sue Hyun Park, Seungone Kim, Minjoon Seo
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2405.17977
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2405.17977
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2405.17977v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/2433170286f1adf55670dc68ce73d816e1ccb0be
+@article{lee2024aligning,
+  title = {Aligning to Thousands of Preferences via System Message Generalization},
+  author = {Seongyun Lee and Sue Hyun Park and Seungone Kim and Minjoon Seo},
+  year = {2024},
+  journal = {Neural Information Processing Systems},
+  doi = {10.48550/arxiv.2405.17977},
+  eprint = {2405.17977},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2405.17977v2},
+}
+
+======================================================================
+Reference: Scalable agent alignment via reward modeling: a research direction
+Authors  : Jan Leike, David Krueger, Tom Everitt, Miljan Martic, Vishal Maini, Shane Legg
+Year     : 2018
+Verdict  : warning
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/1811.07871v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/c6f913e4baa7f2c85363c0625c87003ad3b3a14c
+@misc{leike2018scalable,
+  title = {Scalable agent alignment via reward modeling: a research direction},
+  author = {Jan Leike and David Krueger and Tom Everitt and Miljan Martic and Vishal Maini and Shane Legg},
+  year = {2018},
+  journal = {arXiv.org},
+  eprint = {1811.07871},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/1811.07871v1},
+}
+
+======================================================================
+Reference: A survey on deep active learning: Recent advances and new frontiers
+Authors  : Dongyuan Li, Zhen Wang, Yankai Chen, Renhe Jiang, Weiping Ding, Manabu Okumura
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2405.00334
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/a2c46a9b173329796463a3408fd6b27992d463bb
+@article{li2024survey,
+  title = {A Survey on Deep Active Learning: Recent Advances and New Frontiers},
+  author = {Dongyuan Li and Zhen Wang and Yankai Chen and Renhe Jiang and Weiping Ding and Manabu Okumura},
+  year = {2024},
+  journal = {IEEE Transactions on Neural Networks and Learning Systems},
+  doi = {10.1109/tnnls.2024.3396463},
+  eprint = {2405.00334},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/a2c46a9b173329796463a3408fd6b27992d463bb},
+}
+
+======================================================================
+Reference: A theory of human motivation
+Authors  : Abraham H Maslow
+Year     : 1943
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1037/h0054346
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, year — https://www.semanticscholar.org/paper/1b0d55734c66b713477a4d1ef358ca1399ca0e69
+@article{maslow1943theory,
+  title = {A Theory of Human Motivation},
+  author = {A. Maslow},
+  year = {1943},
+  doi = {10.1037/h0054346},
+  url = {https://www.semanticscholar.org/paper/1b0d55734c66b713477a4d1ef358ca1399ca0e69},
+}
+
+======================================================================
+Reference: Group preference alignment: Customized llm response generation from in-situ conversations
+Authors  : Ishani Mondal, Jack W. Stokes, Sujay Kumar Jauhar, Longqi Yang, Mengting Wan, Xiaofeng Xu, Xia Song, Jennifer Neville
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2503.08035
+  - [warning/incomplete/missing_venue] Citation is missing a venue / journal.
+      Suggestion: Add venue: arXiv.org
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2503.08035v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/78d5f767622646492918a8f14368638b1ecf7cfd
+@misc{mondal2025group,
+  title = {Group Preference Alignment: Customized LLM Response Generation from In-Situ Conversations},
+  author = {Ishani Mondal and Jack W. Stokes and Sujay Kumar Jauhar and Longqi Yang and Mengting Wan and Xiaofeng Xu and Xia Song and Jennifer Neville},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2503.08035},
+  eprint = {2503.08035},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2503.08035v1},
+}
+
+======================================================================
+Reference: Why election polling has become less reliable
+Authors  : Allison Parshall
+Year     : 2024
+Verdict  : unverified
+
+======================================================================
+Reference: Deep learning on a data diet: Finding important examples early in training
+Authors  : Mansheej Paul, Surya Ganguli, Gintare Karolina Dziugaite
+Year     : 2021
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2107.07075
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2107.07075v2
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/a6e25ca9ee9d3e45c6d1957c0dc3324a9816c34e
+@article{paul2021deep,
+  title = {Deep Learning on a Data Diet: Finding Important Examples Early in Training},
+  author = {Mansheej Paul and Surya Ganguli and Gintare Karolina Dziugaite},
+  year = {2021},
+  journal = {Neural Information Processing Systems},
+  eprint = {2107.07075},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2107.07075v2},
+}
+
+======================================================================
+Reference: American trends panel: Wave 42 – trust in science
+Authors  : Pew Research Center
+Year     : 2019
+Verdict  : unverified
+
+======================================================================
+Reference: Personalizing large language models using retrieval augmented generation and knowledge graph
+Authors  : Deeksha Prahlad, Chanhee Lee, Dongha Kim, Hokeun Kim
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2505.09945
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2505.09945v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/246383c8831ad616211067be4e8e74690640bda2
+@inproceedings{prahlad2025personalizing,
+  title = {Personalizing Large Language Models using Retrieval Augmented Generation and Knowledge Graph},
+  author = {Deeksha Prahlad and Chanhee Lee and Dongha Kim and Hokeun Kim},
+  year = {2025},
+  booktitle = {The Web Conference},
+  doi = {10.1145/3701716.3715473},
+  eprint = {2505.09945},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2505.09945v1},
+}
+
+======================================================================
+Reference: Representation learning with large language models for recommendation
+Authors  : Xubin Ren, Wei Wei, Lianghao Xia, Lixin Su, Suqi Cheng, Junfeng Wang, Dawei Yin, Chao Huang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2409.16674
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2409.16674v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/4829b73a47be18f73e9e8d90f3c23c8f84d0fccb
+@inproceedings{chen2024promptingbased,
+  title = {A Prompting-Based Representation Learning Method for Recommendation with Large Language Models},
+  author = {Junyi Chen and Toyotaro Suzumura},
+  year = {2024},
+  booktitle = {The Web Conference},
+  doi = {10.1145/3589334.3645458},
+  eprint = {2409.16674},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2409.16674v3},
+}
+
+======================================================================
+Reference: A note on the pure theory of consumer’s behaviour
+Authors  : P. A. Samuelson
+Year     : 1938
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.2307/2548836
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: authors, doi, title, venue, year — https://www.semanticscholar.org/paper/1de2464829944076ef547f7a4f8b9aaa8dc871a0
+@article{samuelson1938note,
+  title = {A Note on the Pure Theory of Consumer's Behaviour},
+  author = {P. Samuelson},
+  year = {1938},
+  journal = {Economica},
+  doi = {10.2307/2548836},
+  url = {https://www.semanticscholar.org/paper/1de2464829944076ef547f7a4f8b9aaa8dc871a0},
+}
+
+======================================================================
+Reference: Whose opinions do language models reflect?
+Authors  : Shibani Santurkar, Esin Durmus, Faisal Ladhak, Cinoo Lee, Percy Liang, Tatsunori Hashimoto
+Year     : 2023
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2303.17548
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2303.17548v1
+%   semantic_scholar: venue — https://www.semanticscholar.org/paper/e38a29f6463f38f43797b128673b9e44d18a991e
+@inproceedings{santurkar2023whose,
+  title = {Whose Opinions Do Language Models Reflect?},
+  author = {Shibani Santurkar and Esin Durmus and Faisal Ladhak and Cinoo Lee and Percy Liang and Tatsunori Hashimoto},
+  year = {2023},
+  booktitle = {International Conference on Machine Learning},
+  eprint = {2303.17548},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2303.17548v1},
+}
+
+======================================================================
+Reference: Moral mimicry: Large language models produce moral rationalizations tailored to political identity
+Authors  : Gabriel Simmons
+Year     : 2023
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 4: Student Research Workshop)', but a full version appears at 'Annual Meeting of the Association for Computational Linguistics'.
+      Suggestion: Cite the full version at Annual Meeting of the Association for Computational Linguistics.
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2209.12106
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/bf72cfa87a5c55e430abf6d2a3d9b66eb9e1a717
+@inproceedings{simmons2022moral,
+  title = {Moral Mimicry: Large Language Models Produce Moral Rationalizations Tailored to Political Identity},
+  author = {Gabriel Simmons},
+  year = {2022},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2209.12106},
+  eprint = {2209.12106},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/bf72cfa87a5c55e430abf6d2a3d9b66eb9e1a717},
+}
+
+======================================================================
+Reference: Diverse preference learning for capabilities and alignment
+Authors  : Stewart Slocum, Asher Parker-Sartori, Dylan Hadfield-Menell
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2511.08594
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2511.08594
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2511.08594v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/18142a70b72cd70725f43316f31e904826d6db63
+@inproceedings{slocum2025diverse,
+  title = {Diverse Preference Learning for Capabilities and Alignment},
+  author = {Stewart Slocum and Asher Parker-Sartori and Dylan Hadfield-Menell},
+  year = {2025},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2511.08594},
+  eprint = {2511.08594},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2511.08594v1},
+}
+
+======================================================================
+Reference: Value kaleidoscope: Engaging ai with pluralistic human values, rights, and duties
+Authors  : Taylor Sorensen, Liwei Jiang, Jena D Hwang, Sydney Levine, Valentina Pyatkin, Peter West, Nouha Dziri, Ximing Lu, Kavel Rao, Chandra Bhagavatula, et al.
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.1609/aaai.v38i18.29970
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2309.00779
+  - [warning/incomplete/truncated_authors] Citation lists 10 authors with et al.; the published record has 13.
+      Suggestion: List all 13 authors.
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/d655f652d02251b45db43181c5e3c73dfc59cd51
+@inproceedings{sorensen2023value,
+  title = {Value Kaleidoscope: Engaging AI with Pluralistic Human Values, Rights, and Duties},
+  author = {Taylor Sorensen and Liwei Jiang and Jena D. Hwang and Sydney Levine and Valentina Pyatkin and Peter West and Nouha Dziri and Ximing Lu and Kavel Rao and Chandra Bhagavatula and Maarten Sap and J. Tasioulas and Yejin Choi},
+  year = {2023},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  doi = {10.1609/aaai.v38i18.29970},
+  eprint = {2309.00779},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/d655f652d02251b45db43181c5e3c73dfc59cd51},
+}
+
+======================================================================
+Reference: Position: a roadmap to pluralistic alignment
+Authors  : Taylor Sorensen, Jared Moore, Jillian Fisher, Mitchell Gordon, Niloofar Mireshghallah, Christopher Michael Rytting, Andre Ye, Liwei Jiang, Ximing Lu, Nouha Dziri, Tim Althoff, Yejin Choi
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2411.10654
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2411.10654
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/8649fa9b8ae3413f878334e851498845d8f3c2ec
+@misc{klassen2024pluralistic,
+  title = {Pluralistic Alignment Over Time},
+  author = {Toryn Q. Klassen and P. A. Alamdari and Sheila A. McIlraith},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2411.10654},
+  eprint = {2411.10654},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/8649fa9b8ae3413f878334e851498845d8f3c2ec},
+}
+
+======================================================================
+Reference: Pluralllm: Pluralistic alignment in llms via federated learning
+Authors  : Mahmoud Srewa, Tianyu Zhao, Salma Elmalaki
+Year     : 2025
+Verdict  : warning
+  - [warning/outdated/workshop_promoted] Cited workshop version 'Proceedings of the 3rd International Workshop on Human-Centered Sensing, Modeling, and Intelligent Systems', but a full version appears at 'HumanSys@SenSys'.
+      Suggestion: Cite the full version at HumanSys@SenSys.
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2503.09925
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2503.09925v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/a634d3d83d2254a078eeada6adf4b6f055d65087
+@article{srewa2025pluralllm,
+  title = {PluralLLM: Pluralistic Alignment in LLMs via Federated Learning},
+  author = {Mahmoud Srewa and Tianyu Zhao and Salma Elmalaki},
+  year = {2025},
+  journal = {HumanSys@SenSys},
+  doi = {10.1145/3722570.3726898},
+  eprint = {2503.09925},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2503.09925v1},
+}
+
+======================================================================
+Reference: Democratizing large language models via personalized parameter-efficient fine-tuning
+Authors  : Zhaoxuan Tan, Qingkai Zeng, Yijun Tian, Zheyuan Liu, Bing Yin, Meng Jiang
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2402.04401
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.04401v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/72d0be6c3e6db156530c73d750cf436b0c983be4
+@inproceedings{tan2024democratizing,
+  title = {Democratizing Large Language Models via Personalized Parameter-Efficient Fine-tuning},
+  author = {Zhaoxuan Tan and Qingkai Zeng and Yijun Tian and Zheyuan Liu and Bing Yin and Meng Jiang},
+  year = {2024},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2402.04401},
+  eprint = {2402.04401},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.04401v3},
+}
+
+======================================================================
+Reference: Two tales of persona in LLMs: A survey of role-playing and personalization
+Authors  : Yu-Min Tseng, Yu-Chao Huang, Teng-Yun Hsiao, Wei-Lin Chen, Chao-Wei Huang, Yu Meng, Yun-Nung Chen
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2406.01171
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2406.01171v3
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/394c1272a672ddbfdde581c677617b960029c253
+@inproceedings{tseng2024tales,
+  title = {Two Tales of Persona in LLMs: A Survey of Role-Playing and Personalization},
+  author = {Yu-Min Tseng and Yu-Chao Huang and Teng-Yun Hsiao and Wei-Lin Chen and Chao-Wei Huang and Yu Meng and Yun-Nung Chen},
+  year = {2024},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  doi = {10.48550/arxiv.2406.01171},
+  eprint = {2406.01171},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2406.01171v3},
+}
+
+======================================================================
+Reference: Household survey response rates, april 2015-april 2025
+Authors  : U.S. Bureau of Labor Statistics
+Year     : 2025
+Verdict  : unverified
+
+======================================================================
+Reference: “my answer is C”: First-token probabilities do not match text answers in instruction-tuned language models
+Authors  : Xinpeng Wang, Bolei Ma, Chengzhi Hu, Leon Weber-Genzel, Paul Röttger, Frauke Kreuter, Dirk Hovy, Barbara Plank
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2402.14499
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2402.14499v2
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/98901bfa8417edccf92c619592f36144e1256201
+@inproceedings{wang2024answer,
+  title = {"My Answer is C": First-Token Probabilities Do Not Match Text Answers in Instruction-Tuned Language Models},
+  author = {Xinpeng Wang and Bolei Ma and Chengzhi Hu and Leon Weber-Genzel and Paul Röttger and Frauke Kreuter and Dirk Hovy and Barbara Plank},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2402.14499},
+  eprint = {2402.14499},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2402.14499v2},
+}
+
+======================================================================
+Reference: Cultural palette: Pluralising culture alignment via multi-agent palette
+Authors  : Jiahao Yuan, Zixiang Di, Shangzixin Zhao, Zhiqing Cui, Hanqing Wang, Guisong Yang, Usman Naseem
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2412.11167
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2412.11167v4
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/27d0b912f68b8d5f78540025edc6fdbe43a565ad
+@misc{yuan2024cultural,
+  title = {Cultural Palette: Pluralising Culture Alignment via Multi-agent Palette},
+  author = {Jiahao Yuan and Zixiang Di and Shangzixin Zhao and Zhiqing Cui and Hanqing Wang and Guisong Yang and Usman Naseem},
+  year = {2024},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2412.11167},
+  eprint = {2412.11167},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2412.11167v4},
+}
+
+======================================================================
+Reference: Group preference optimization: Few-shot alignment of large language models
+Authors  : Siyan Zhao, John Dang, Aditya Grover
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2310.11523
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2310.11523
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/2be910eb19f2f8f2e8038d2a835bc48f868ccbf1
+@inproceedings{zhao2023group,
+  title = {Group Preference Optimization: Few-Shot Alignment of Large Language Models},
+  author = {Siyan Zhao and John Dang and Aditya Grover},
+  year = {2023},
+  booktitle = {International Conference on Learning Representations},
+  doi = {10.48550/arxiv.2310.11523},
+  eprint = {2310.11523},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/2be910eb19f2f8f2e8038d2a835bc48f868ccbf1},
+}
+
+======================================================================
+Reference: Fair-pp: A synthetic dataset for aligning llm with personalized preferences of social equity
+Authors  : Qi Zhou, Jie Zhang, Dongxia Wang, Qiang Liu, Tianlin Li, Jin Song Dong, Wenhai Wang, Qing Guo
+Year     : 2025
+Verdict  : warning
+  - [warning/incomplete/missing_doi] Citation is missing a DOI.
+      Suggestion: Add doi: 10.48550/arxiv.2505.11861
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   arxiv: arxiv_id, authors, title, year — https://arxiv.org/abs/2505.11861v1
+%   semantic_scholar: doi, venue — https://www.semanticscholar.org/paper/9d890998d5c36fc9ee145939f0661b6e8f6a312e
+@misc{zhou2025fairpp,
+  title = {Fair-PP: A Synthetic Dataset for Aligning LLM with Personalized Preferences of Social Equity},
+  author = {Qi Zhou and Jie Zhang and Dongxia Wang and Qiang Liu and Tianlin Li and Jin Song Dong and Wenhai Wang and Qing Guo},
+  year = {2025},
+  journal = {arXiv.org},
+  doi = {10.48550/arxiv.2505.11861},
+  eprint = {2505.11861},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2505.11861v1},
+}
+
+======================================================================
+Reference: bilities do not match text answers in instruction-tuned language models
+Authors  : 
+Year     : 2024
+Verdict  : warning
+  - [warning/incomplete/missing_arxiv_id] Citation is missing an arXiv ID.
+      Suggestion: Add arxiv: 2402.14499
+
+Suggested replacement:
+% Suggested by RefCopilot. Field provenance:
+%   semantic_scholar: arxiv_id, authors, doi, title, venue, year — https://www.semanticscholar.org/paper/98901bfa8417edccf92c619592f36144e1256201
+@inproceedings{wang2024answer,
+  title = {"My Answer is C": First-Token Probabilities Do Not Match Text Answers in Instruction-Tuned Language Models},
+  author = {Xinpeng Wang and Bolei Ma and Chengzhi Hu and Leon Weber-Genzel and Paul Röttger and Frauke Kreuter and Dirk Hovy and Barbara Plank},
+  year = {2024},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics},
+  doi = {10.48550/arxiv.2402.14499},
+  eprint = {2402.14499},
+  archivePrefix = {arXiv},
+  url = {https://www.semanticscholar.org/paper/98901bfa8417edccf92c619592f36144e1256201},
+}

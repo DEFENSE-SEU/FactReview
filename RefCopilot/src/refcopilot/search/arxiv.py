@@ -9,7 +9,9 @@ tests can pass a mock.
 from __future__ import annotations
 
 import logging
+import os
 import re
+import time
 import xml.etree.ElementTree as ET
 from typing import Callable, Protocol
 
@@ -18,6 +20,7 @@ import httpx
 from refcopilot.cache.disk_cache import DiskCache
 from refcopilot.models import Backend, ExternalRecord, Reference
 from refcopilot.ratelimit.arxiv import ArxivRateLimiter
+from refcopilot.ratelimit.semantic_scholar import parse_retry_after
 from refcopilot.verify.text_match import _normalize_for_match, _STOPWORDS, title_similarity
 from refcopilot.verify.thresholds import SEARCH_RESULT_MIN_TITLE_SIM
 
@@ -55,9 +58,13 @@ class ArxivBackend:
         timeout: float = 30.0,
     ) -> None:
         self.cache = cache
-        self.rate_limiter = rate_limiter or ArxivRateLimiter()
+        if rate_limiter is None:
+            interval = _env_float("REFCOPILOT_ARXIV_INTERVAL_SEC", 5.0)
+            rate_limiter = ArxivRateLimiter(min_interval_seconds=interval)
+        self.rate_limiter = rate_limiter
         self._http_get = http_get
         self.timeout = timeout
+        self.max_retries = max(0, _env_int("REFCOPILOT_ARXIV_RETRIES", 4))
 
     def lookup(self, ref: Reference) -> list[ExternalRecord]:
         if ref.arxiv_id:
@@ -120,14 +127,55 @@ class ArxivBackend:
         return xml
 
     def _call_api(self, params: dict[str, str]) -> str:
-        self.rate_limiter.acquire()
-        if self._http_get is not None:
-            resp = self._http_get(_ARXIV_API, params)
-        else:
-            resp = httpx.get(_ARXIV_API, params=params, timeout=self.timeout)
-        if resp.status_code != 200:
-            raise RuntimeError(f"arxiv api returned {resp.status_code}")
-        return resp.text
+        last_error = ""
+        for attempt in range(self.max_retries + 1):
+            self.rate_limiter.acquire()
+            try:
+                if self._http_get is not None:
+                    resp = self._http_get(_ARXIV_API, params)
+                else:
+                    resp = httpx.get(_ARXIV_API, params=params, timeout=self.timeout)
+            except Exception as exc:
+                last_error = str(exc)
+                if attempt >= self.max_retries:
+                    raise RuntimeError(last_error) from exc
+                time.sleep(_arxiv_backoff(attempt))
+                continue
+            if resp.status_code == 200:
+                return resp.text
+            last_error = f"arxiv api returned {resp.status_code}"
+            if attempt >= self.max_retries:
+                raise RuntimeError(last_error)
+            retry_after = parse_retry_after(resp.headers.get("Retry-After"))
+            time.sleep(retry_after if retry_after and retry_after > 0 else _arxiv_backoff(attempt))
+        raise RuntimeError(last_error or "arxiv api failed")
+
+
+def _arxiv_backoff(attempt: int) -> float:
+    base = _env_float("REFCOPILOT_ARXIV_BACKOFF_SEC", 10.0)
+    return max(1.0, base * (attempt + 1))
+
+
+def _env_float(name: str, default: float) -> float:
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        logger.warning("invalid %s=%r; using default %s", name, raw, default)
+        return default
+
+
+def _env_int(name: str, default: int) -> int:
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        return int(raw)
+    except ValueError:
+        logger.warning("invalid %s=%r; using default %s", name, raw, default)
+        return default
 
 
 _MAX_TITLE_TOKENS = 6
