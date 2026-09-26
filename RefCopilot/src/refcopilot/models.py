@@ -131,6 +131,9 @@ class ReportSummary(BaseModel):
     errors: int = 0
     warnings: int = 0
     unverified: int = 0
+    # References found in the input, before any ``max_refs`` cut-off
+    # (``total_refs`` counts only the ones actually checked).
+    refs_found: int = 0
     by_category: dict[str, int] = Field(default_factory=dict)
 
 
