@@ -50,6 +50,11 @@ refcopilot check <input>
 - an arXiv URL or paper URL (auto-downloaded)
 - plain bibliography text
 
+Example:
+```bash
+refcopilot check example.bib --output-dir out
+```
+
 Useful flags: `--output-dir DIR`, `--no-llm-verify`, `--no-cache`,
 `--cache-dir DIR`, `--cache-ttl-days N`, `--max-refs N`, `--debug`.
 Run `refcopilot check --help` for the full list.
