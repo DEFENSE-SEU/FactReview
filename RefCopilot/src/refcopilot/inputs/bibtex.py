@@ -121,8 +121,14 @@ def _format_person(p) -> str:
     return _decode_latex(last or first or " ".join(getattr(p, "_first_names", [])) or str(p))
 
 
+# An accent over a braced dotless i/j (``\`{\i}``) is not decoded by latexcodec,
+# which leaves a stray accent command behind; ``\`{i}`` decodes to the same letter.
+_ACCENTED_DOTLESS = re.compile(r"(\\(?:[`'^\"~=.]|[uvHcdbkrt](?![a-zA-Z])))\s*\{\s*\\([ij])\s*\}")
+
+
 def _decode_latex(name: str) -> str:
     """``Sch{\\"o}lkopf`` → ``Schölkopf``, so names compare against API records."""
+    name = _ACCENTED_DOTLESS.sub(r"\1{\2}", name)
     try:
         name = codecs.decode(name, "ulatex")
     except Exception:

@@ -20,7 +20,8 @@ from refcopilot.verify.thresholds import (
 
 
 def titles_match(cited: str | None, retrieved: str | None) -> bool:
-    """Exact title equality, ignoring only case, accents, punctuation and spacing."""
+    """Exact title equality, ignoring only case, accents, punctuation, spacing
+    and LaTeX styling commands."""
     a = _strict_title_key(cited)
     b = _strict_title_key(retrieved)
     return bool(a) and a == b
@@ -94,8 +95,20 @@ def _name_parts(name: str) -> tuple[list[str], str]:
     return tokens[:-1], tokens[-1]
 
 
+# LaTeX commands that only style their argument. The argument is title text;
+# the command name never is, but it is alphanumeric and would survive the
+# isalnum filter (DBLP writes a superscript as ``S\({}^{\mbox{3}}\)``).
+_LATEX_STYLE_COMMAND = re.compile(
+    r"\\(?:mbox|hbox|ensuremath|emph"
+    r"|text(?:rm|sf|tt|bf|it|sl|sc|up|normal)?"
+    r"|math(?:rm|sf|tt|bf|it|normal|cal|bb|frak|scr)"
+    r"|rm|sf|tt|bf|it|sl|sc|em)(?![a-zA-Z])"
+)
+
+
 def _strict_title_key(text: str | None) -> str:
-    return "".join(c for c in _fold(text or "") if c.isalnum())
+    text = _LATEX_STYLE_COMMAND.sub("", text or "")
+    return "".join(c for c in _fold(text) if c.isalnum())
 
 
 # Letters NFKD does not decompose into a base letter + accent.
