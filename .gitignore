@@ -58,4 +58,5 @@ demos/**/execution/
 
 # Project
 refcopilot-out/
+/RefCopilot/out/
 tmp

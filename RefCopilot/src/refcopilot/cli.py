@@ -12,10 +12,20 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from refcopilot.cache.disk_cache import DiskCache
 from refcopilot.models import SourceFormat
 from refcopilot.pipeline import RefCopilotPipeline
 from refcopilot.report import to_factreview_dict, to_markdown
+
+# RefCopilot lives inside the FactReview repo and shares its root ``.env``
+# (SEMANTIC_SCHOLAR_API_KEY, OPENALEX_API_KEY, ...). Unlike the main
+# pydantic-settings-based pipeline, this CLI reads plain os.environ, so
+# without this it only picks up keys exported by the calling shell (e.g.
+# ~/.zshrc, which non-interactive invocations never source). Existing shell
+# env vars still win — this only fills in what's missing.
+load_dotenv(Path(__file__).resolve().parents[3] / ".env", override=False)
 
 
 def main(argv: list[str] | None = None) -> int:
