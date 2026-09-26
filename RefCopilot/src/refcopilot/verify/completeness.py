@@ -47,18 +47,6 @@ def detect(
             )
         )
 
-    if not reference.arxiv_id and merged.arxiv_id:
-        issues.append(
-            Issue(
-                severity=Severity.WARNING,
-                category=IssueCategory.INCOMPLETE,
-                code="missing_arxiv_id",
-                message="Citation is missing an arXiv ID.",
-                suggestion=f"Add arxiv: {merged.arxiv_id}",
-                confidence=0.85,
-            )
-        )
-
     if not reference.year and merged.year:
         issues.append(
             Issue(

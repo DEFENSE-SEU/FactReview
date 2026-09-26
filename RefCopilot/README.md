@@ -11,7 +11,7 @@ OpenAlex, emitting:
   OpenAlex's `is_retracted` flag, plus arXiv author-withdrawn preprints).
 - **Warnings** for outdated references (an arXiv preprint that's since been
   published, an older arXiv version, workshop → full upgrades).
-- **Warnings** for incomplete references (missing DOI / arXiv ID / venue / year,
+- **Warnings** for incomplete references (missing DOI / venue / year,
   truncated authors, abbreviated venue names).
 
 For each warning where a verified record is available, RefCopilot also emits
