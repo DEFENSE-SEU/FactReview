@@ -1,9 +1,9 @@
 # FactReview v2 acceptance checks
 
-Checkpoint: Phases 0–5 complete, 2026-10-08 (Asia/Shanghai); independent automatic reviews.
+Checkpoint: Phases 0–6 complete, 2026-10-08 (Asia/Shanghai); independent automatic reviews.
 Specification: `docs/method_v2_spec.md`; procedure: `docs/refactor_v2_prompt.md`.
 Verdicts describe this checkpoint; passing rows must be revalidated after implementation.
-Phases 6–8 await their commits and final integration verification. The live baseline is blocked by missing MinerU credentials.
+Phases 7–8 await their commits and final integration verification. The live baseline is blocked by missing MinerU credentials.
 
 | requirement | verdict | evidence | correction |
 |---|---|---|---|
@@ -16,7 +16,7 @@ Phases 6–8 await their commits and final integration verification. The live ba
 | 7. Literature retrieval enforces cutoff, concurrent window, self-exclusion, no author search, no review pages. | pass | 61 Literature tests plus existing positioning tests; strict day cutoff, 3 calendar months, metadata self-filter before read, closed technical queries and review URL filtering. | Unknown dates/identity/completeness remain unresolved. Main CLI integration is tracked by check 2. |
 | 8. Only Experiments emits execution plans; plans are claim-linked with feasibility and priority. | pass | Experiments target/source tests and dispatcher rejection tests. Actual numeric binding; ambiguous targets and missing resources remain blocked. | Fixed whole-table wrong-dataset number assignment; retain blocker for L3. |
 | 9. L3 counts a run as evidence only when Aligned = 1; forbidden repairs are rejected; max round count equals the confirmed value. | pass | `tests/test_execution_v2.py`: 61 cases; `runs/v2_execution/pytest-review-round2.log`: 218 affected tests passed, 1 original live-Docker test deselected. Exact observed dataset/metric/settings, forbidden-edit rejection, approval/budget/order, 3-repair cap, released artifact recomputation and actual-output mapping tested. | Independent review (`integration_map`) closed expected-value mapping, failed-output and actual-metric conflict defects. Failed/unaligned runs produce explanations without judging the claim. |
-| 10. Assessment implements spec §6.3 exactly; every rule has a test. | unresolved | Deterministic assessment engine and ordered-rule tests pending. | Phase 6. |
+| 10. Assessment implements spec §6.3 exactly; every rule has a test. | pass | `src/assessment/rules.py`, `tests/test_assessment_v2.py`; `runs/v2_final/pytest-assessment.log`: 16 passed. Ordered conflict/flaw/concern/coverage/fallback rules, partial coverage, non-decisive notes and paper-internal support tested. | Independent review (`phase_reviewer`) passed. Unaligned execution evidence and unsupported provenance cannot create decisive flaws. |
 | 11. Statuses are only supported/flawed/questioned/unverified across schemas, report, and teaser. | unresolved | Canonical schemas expose only four v2 statuses. Explicit `legacy_claim.py`/`legacy_review.py` retain historical contracts; adapter tests verify `in_conflict` → `questioned`. | Complete report, teaser and assessment migration in Phases 6–7. |
 | 12. Report follows spec §7; contains no accept/reject recommendation. | unresolved | Four-part report and output tests pending. | Phase 7. |
 | 13. CompGCN end-to-end run completes (or blocker is reported); differences from baseline recorded. | unresolved | `runs/v2_baseline/preflight.json`: MinerU token absent, repository `.env` absent. `compgcn-baseline.txt`: authorized credential skip, no live request or parser fallback. `baseline-manifest.json`: hashes for 7 unchanged reference artifacts. | Configure MinerU locally for a fresh live baseline; Phase 8 run/comparison remains outstanding. Existing demo outputs do not establish a fresh baseline. |
@@ -26,7 +26,7 @@ Phase 0 review method: separate reviewer agent (`baseline_review`), inherited mo
 The original default suite deselects 2 `e2e` tests and 1 `requires_docker` test. No new skip, marker change,
 or weakened assertion was introduced. Reviewed selected paths use existing LLM/retrieval mocks;
 `baseline_isolation.py` supplies the missing indirect Docker/loopback mocks for this local baseline.
-This checkpoint records 9 pass / 5 unresolved; it does not authorize publishing the refactor.
+This checkpoint records 10 pass / 4 unresolved; it does not authorize publishing the refactor.
 
 Phase 1 review: `phase_reviewer` identified three schema/adapter defects, corrected with regression
 tests. `runs/v2_baseline/phase1-schema.log`: 62 passed; `phase1-import-tail.log`: 2 passed.
