@@ -3631,11 +3631,13 @@ def build_review_report_pdf(
         [
             Paragraph("<b>Token Usage</b>", styles["BodyTextEnterprise"]),
             Paragraph(
-                _escape(f"Input {token_input} | Output {token_output} | Total {token_total}"),
+                _escape("Unavailable" if token_payload.get("unavailable") else
+                        f"Input {token_input} | Output {token_output} | Total {token_total}"
+                        + (" (estimated)" if token_payload.get("estimated") else "")),
                 styles["BodyTextEnterprise"],
             ),
             Paragraph("<b>LLM Requests</b>", styles["BodyTextEnterprise"]),
-            Paragraph(_escape(str(token_requests)), styles["BodyTextEnterprise"]),
+            Paragraph(_escape("Unavailable" if token_payload.get("unavailable") else str(token_requests)), styles["BodyTextEnterprise"]),
         ],
         [
             Paragraph("<b>Generated At</b>", styles["BodyTextEnterprise"]),

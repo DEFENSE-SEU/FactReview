@@ -44,7 +44,7 @@ Open the documentation-only PR, then implement the authoritative v2 method speci
 - Phase 2 committed as `f15dbd7`.
 - Phase 3 complete: upfront claim extraction, writing/table/figure/reference checks, durable screening results, actual image transport for all three providers. Removed report-agent extraction/splitting/merging duties and the C1–C3 limit.
 - Phase 3 independent review (`phase_reviewer`) identified reference checks silently succeeding with zero processed entries and model failure payloads carrying empty findings. Fixed both with regression tests. `runs/v2_screening/pytest.log`: 45 passed; original retrieval-policy assertions preserved. Ruff passes on the new screening/image files.
-- Refactor branch remains local. Phases 0–6 are complete; independently prepared Phase 7–8 files await their separate commits and final integration checks.
+- Refactor branch remains local. Phases 0–7 are complete; Phase 8 awaits final integration verification and its separate commit.
 
 ### Baseline command
 
@@ -78,12 +78,12 @@ The first run used the same command without `--basetemp`. For a repeat, choose a
 - The actual historical experimental approval mode and training budget have not been supplied. Do not describe proposed defaults as historical experiment settings.
 - Live baseline unavailable until MinerU is configured locally. Never store credentials in tracked notes or ask for secret values in chat.
 - The durable Phase 4 pytest fixture now supplies fresh short Windows paths and isolates indirect Docker/socket probes; full-suite integration revalidation is in progress.
-- Phase 7–8 files are prepared and reviewed separately; their phase checkpoints and final integration validation remain due.
+- Phase 8 is prepared and reviewed separately; final validation and its phase checkpoint remain due.
 - Claim splitting tests validate the prompt contract, mocked model outputs and grounding. Live model semantic extraction accuracy is not established by these tests.
 
 ## Next action
 
-Commit the reviewed Phase 6 assessment checkpoint, then finish report and final integration checkpoints.
+Commit the reviewed Phase 7 report checkpoint, then finish integrated artifact/package validation and Phase 8.
 
 ## Phase 4 checkpoint
 
@@ -117,3 +117,13 @@ Next action: commit the reviewed assessment and report phases, finish integrated
 - Phase 7 report and Phase 8 integration are prepared separately and remain uncommitted.
 
 Next action: commit the reviewed Phase 7 report and teaser, then finish integration verification.
+
+## Phase 7 checkpoint
+
+- Phase 6 committed as `e2504db`.
+- `src/review/report/v2.py` deterministically produces the four-part report from assessed records. Evidence source types, pointers, conditions, questions, notes, issues and ledger are preserved. Claim order is flawed, questioned, unverified, supported, followed by importance. Existing PDF rendering is reused.
+- `src/review/teaser/v2.py` renders every claim and the four status counts to local SVG/JSON, with a saved optional image-authoring prompt. No image service is needed. Schema and textual publication-recommendation checks run before saving; literal Markdown escaping prevents injected headings/links.
+- Independent review (`phase_reviewer`) passed. `runs/v2_report/pytest.log`: **11 passed**. Review corrections cover recommendation variants across whitespace and source fields. PDF token display distinguishes actual/estimated/unavailable; absent measured usage is never invented. A PDF extraction whitespace assertion was normalized for physical wrapping while retaining its required text values.
+- Phase 8 default suite has passed **613 tests, 3 original deselections** (`runs/v2_final/pytest-full.log`); packaging, opt-in mocked legacy integration and final CompGCN comparison are being finalized.
+
+Next action: finish Phase 8 verification, update all 14 checks with final evidence, and commit the integration checkpoint.
