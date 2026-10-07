@@ -1,9 +1,9 @@
 # FactReview v2 acceptance checks
 
-Checkpoint: Phases 0–1 complete, 2026-10-08 (Asia/Shanghai); independent automatic review. Phase 2 underway.
+Checkpoint: Phases 0–2 complete, 2026-10-08 (Asia/Shanghai); independent automatic reviews. Phase 3 underway.
 Specification: `docs/method_v2_spec.md`; procedure: `docs/refactor_v2_prompt.md`.
 Verdicts describe this checkpoint; passing rows must be revalidated after implementation.
-Phases 2–8 remain outstanding. The live baseline is blocked by missing MinerU credentials.
+Phases 3–8 remain outstanding. The live baseline is blocked by missing MinerU credentials.
 
 | requirement | verdict | evidence | correction |
 |---|---|---|---|
@@ -12,7 +12,7 @@ Phases 2–8 remain outstanding. The live baseline is blocked by missing MinerU 
 | 3. Claims are extracted upfront; the report agent no longer extracts claims; C1–C3 cap and the merge-all-performance-claims rule are gone; the v2 splitting rule is tested. | unresolved | `src/agent_runtime/agent_prompt.py`; extraction tests pending. | Phase 3. |
 | 4. Every claim has `loc`, `conditions`, `needs`; every evidence item has a verifiable `pointer`. | unresolved | Phase 1 schema suite: 62 passed (`phase1-schema.log`); strict fields, coverage, source-specific pointer structure, exact finite plan targets. | Verify actual source existence in producer branches during Phases 2–4. |
 | 5. Dispatch sends a claim only to branches in its `needs`. | unresolved | L2 dispatcher and dispatch-matrix tests pending. | Phase 4. |
-| 6. Figure check input = crop + caption + referencing sentences; only the three categories are reported. | unresolved | Shared figure materials and L1 figure check pending. | Phases 2–3. |
+| 6. Figure check input = crop + caption + referencing sentences; only the three categories are reported. | unresolved | Shared figure inputs implemented: 25 material tests cover crops, printed dimensions, caption/ref links, missing inputs, appendix/list anchors and read-only indexing (`runs/v2_materials/pytest.log`). | Complete/review L1 figure categories and actual VLM transport in Phase 3. |
 | 7. Literature retrieval enforces cutoff, concurrent window, self-exclusion, no author search, no review pages. | unresolved | `src/util/cutoff_date.py`; v2 retrieval enforcement pending. Explicit submission deadline and 3-month concurrent window confirmed. | Implement in Phase 4. |
 | 8. Only Experiments emits execution plans; plans are claim-linked with feasibility and priority. | unresolved | Experiments branch and plan contracts pending. | Phases 1, 4–5. |
 | 9. L3 counts a run as evidence only when Aligned = 1; forbidden repairs are rejected; max round count equals the confirmed value. | unresolved | Generic alignment and repair allowlist pending. Repair default/cap 3, recorded approval modes, and configurable training budget default 0 runs confirmed. | Implement in Phase 5. |
@@ -32,3 +32,7 @@ Phase 1 review: `phase_reviewer` identified three schema/adapter defects, correc
 tests. `runs/v2_baseline/phase1-schema.log`: 62 passed; `phase1-import-tail.log`: 2 passed.
 The legacy tests retain all original assertions. Full-suite baseline remains recorded above;
 the final combined suite will be rerun after integration.
+
+Phase 2 review: `phase_reviewer` found appendix/Oxford-list anchor and list-item loss defects;
+both corrected with regression tests. `runs/v2_materials/pytest.log`: 25 passed. No demo,
+RefCopilot or LICENSE edits. The v2 entry point is ready for later main-pipeline integration.

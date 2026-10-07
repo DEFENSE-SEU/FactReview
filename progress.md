@@ -22,6 +22,7 @@ Open the documentation-only PR, then implement the authoritative v2 method speci
 - `runs/v2_baseline/baseline-manifest.json`: source commit identities and checksums of 7 unchanged demo reference artifacts.
 - Phase 1: `src/schemas/claim.py`, `review.py`, `__init__.py`, `legacy_claim.py`, `legacy_review.py`, `v1_adapter.py`; `tests/test_schemas_v2.py` and import-only legacy adjustments in `tests/test_schemas.py`.
 - Phase 1 evidence: `runs/v2_baseline/phase1-schema.log` (62 passed), `phase1-schema.exitcode` (0), `phase1-import-tail.log` (2 mocked legacy integration tests passed).
+- Phase 2: `src/preprocessing/materials.py`, `src/schemas/materials.py`, `tests/test_materials_v2.py`; `runs/v2_materials/pytest.log` (25 passed).
 
 ## Completed
 
@@ -37,7 +38,10 @@ Open the documentation-only PR, then implement the authoritative v2 method speci
 - Phase 1 complete: strict v2 claim/evidence/plan/finding/question schemas and v2 review container; historical schemas isolated in explicit legacy modules. Schema checks: 62 passed. Legacy stage-import/report-tail integration: 2 passed with mocked services. Existing schema assertions retained; only their legacy imports changed.
 - Phase 1 automatic review (`phase_reviewer`) found ambiguous execution target keys/non-finite targets and two legacy Markdown parsing defects. Corrections enforce exact condition-id targets with finite values, preserve escaped pipes, flag malformed rows, and normalize emphasized status labels. Regression tests cover every finding. Ruff passes on Phase 1 files.
 - Real CompGCN v1 `report.md` adapter smoke: 3 historical display records (`questioned`, `supported`, `supported`), zero issues. Historical labels remain explicitly unassessed; no new evidence or missing coordinates fabricated.
-- Refactor branch remains local. Phases 2–8 are outstanding; independent preparation of later-phase files is kept outside the Phase 1 commit.
+- Phase 1 committed as `f2888b0`.
+- Phase 2 complete: direct MinerU adapter entry, original Markdown/content list, located blocks, bibliography, 200 dpi pages/crops, 96 dpi printed crops and a read-only repository index. 25 fixture tests passed; Ruff check/format passed.
+- Phase 2 automatic review (`phase_reviewer`) found missing appendix/Oxford-list figure anchors and dropped MinerU list items. Both fixed with regression coverage; unrecognized parser content leaves explicit issues. Python 3.11 compatibility for junction checks verified. Printed crop dimensions use PDF physical dimensions; the initial clip-rounding failure was fixed without changing assertions.
+- Refactor branch remains local. Phases 3–8 are outstanding; independent preparation of later-phase files is kept outside earlier phase commits.
 
 ### Baseline command
 
@@ -61,6 +65,8 @@ The first run used the same command without `--basetemp`. For a repeat, choose a
 - The maintainer removed phase pauses on 2026-10-08. Documentation PR #12 was updated with automatic reviews; implementation continues immediately after each phase's review, checks and commit. Prepare independent components in parallel, keeping phase commits and integration validation in dependency order.
 - Canonical v2 schemas forbid unknown fields; evidence coverage and execution targets use stable condition IDs. Each target value is keyed by condition ID, so two datasets using the same metric remain distinct. New records require an actual page, section or character span; missing legacy coordinates stay missing in a separate historical envelope.
 - The v1 adapter migrates display labels conservatively and retains original records. Reading a historical artifact performs no v2 reassessment; the adapter never creates sufficient evidence from old prose. Unknown labels and malformed rows remain visible as issues.
+- Shared materials use the original MinerU adapter directly because the legacy parse stage also runs retrieval and report generation internally. Its old runtime remains available for compatibility; v2 integration will use the new material entry point.
+- Bounding-box units are explicit (`normalized_1000` by default, or `pdf_points`), with 1-based PDF page locations. Missing/invalid boxes and unmatched text remain visible issues. Figure checks receive the physically downscaled 96 dpi image. Repository indexing reads and hashes files without executing or modifying them; L3 creates a separate execution workspace.
 - **Maintainer-confirmed configuration (2026-10-08):** configurable repair limit defaults to 3, capped at 3 per spec; rule-based automatic approval by default with optional interactive approval and actual mode recorded; training budget defaults to **0 runs**, configurable, with training eligible only for high-priority plans within budget; explicit `--submission-deadline YYYY-MM-DD` with a 3-month concurrent window and no default arXiv-derived cutoff; existing per-metric tolerances centralized in one table; one-way v1 artifact adapter maps `in_conflict` to `questioned` unless re-assessed. The user confirmed the bundled choices in Chinese. These choices are authorized for later phases; no v2 behavior is implemented yet.
 
 ## Open issues
@@ -70,8 +76,8 @@ The first run used the same command without `--basetemp`. For a repeat, choose a
 - Live baseline unavailable until MinerU is configured locally. Never store credentials in tracked notes or ask for secret values in chat.
 - Four existing unit tests depend on short Windows temporary paths; the recorded baseline command passes with a short base-temp directory. Ordinary pytest using long default Windows paths still has the documented failures.
 - Baseline Docker/socket isolation lives in ignored local tooling. Make unit tests self-contained during subsequent relevant work while retaining their assertions.
-- Phases 2–8 remain outstanding.
+- Phases 3–8 remain outstanding; main-pipeline integration and remote repository material snapshots are still pending.
 
 ## Next action
 
-Complete Phase 2 shared materials: direct MinerU parsing, paper/page/figure/reference material and a read-only repository index. Review with the independent agent, verify fixtures, commit, and continue into Phase 3.
+Complete Phase 3 screening and upfront claim extraction, including actual VLM image transport and removal of report-agent extraction duties. Independently review, test and commit, then continue to the four L2 branches.
