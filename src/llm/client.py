@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import base64
 import json
+import mimetypes
 import os
 import re
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from common import run_stats
@@ -69,19 +72,25 @@ def resolve_llm_config(
         api_key = (os.getenv("DEEPSEEK_API_KEY") or "").strip() or None
         base = base_url or os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
         mdl = model or os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
-        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens)
+        return LLMConfig(
+            provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens
+        )
 
     if prov == "qwen":
         api_key = (os.getenv("QWEN_API_KEY") or "").strip() or None
         base = base_url or os.getenv("QWEN_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
         mdl = model or os.getenv("QWEN_MODEL", "qwen-3")
-        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens)
+        return LLMConfig(
+            provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens
+        )
 
     if prov == "claude":
         api_key = (os.getenv("CLAUDE_API_KEY") or "").strip() or None
         base = base_url or os.getenv("CLAUDE_BASE_URL", "https://api.anthropic.com")
         mdl = model or os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
-        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens)
+        return LLMConfig(
+            provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens
+        )
 
     if is_codex_provider(prov):
         return LLMConfig(
@@ -164,6 +173,7 @@ def llm_json(
     cfg: LLMConfig,
     *,
     module: str | None = None,
+    images: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     Minimal JSON response helper for the providers used in the execution stage.
@@ -172,6 +182,12 @@ def llm_json(
     usage: dict[str, Any] = {}
     text = ""
     try:
+        encoded_images = []
+        for image_path in images or []:
+            mime = mimetypes.guess_type(image_path)[0]
+            if mime not in {"image/png", "image/jpeg", "image/webp", "image/gif"}:
+                raise ValueError(f"unsupported image format: {image_path}")
+            encoded_images.append((mime, base64.b64encode(Path(image_path).read_bytes()).decode("ascii")))
         if cfg.provider == "claude":
             from anthropic import Anthropic
 
@@ -181,7 +197,23 @@ def llm_json(
                 max_tokens=cfg.max_tokens or 8192,
                 temperature=cfg.temperature,
                 system=system,
-                messages=[{"role": "user", "content": prompt}],
+                messages=[
+                    {
+                        "role": "user",
+                        "content": (
+                            [{"type": "text", "text": prompt}]
+                            + [
+                                {
+                                    "type": "image",
+                                    "source": {"type": "base64", "media_type": mime, "data": data},
+                                }
+                                for mime, data in encoded_images
+                            ]
+                            if encoded_images
+                            else prompt
+                        ),
+                    }
+                ],
             )
             text = ""
             try:
@@ -204,6 +236,11 @@ def llm_json(
                 model=cfg.model,
                 base_url=cfg.base_url or "https://chatgpt.com/backend-api/codex",
                 return_usage=True,
+                **(
+                    {"image_data": [f"data:{mime};base64,{data}" for mime, data in encoded_images]}
+                    if encoded_images
+                    else {}
+                ),
             )
             if isinstance(codex_result, tuple):
                 text, usage = codex_result
@@ -217,7 +254,21 @@ def llm_json(
                 "model": cfg.model,
                 "messages": [
                     {"role": "system", "content": system},
-                    {"role": "user", "content": prompt},
+                    {
+                        "role": "user",
+                        "content": (
+                            [{"type": "text", "text": prompt}]
+                            + [
+                                {
+                                    "type": "image_url",
+                                    "image_url": {"url": f"data:{mime};base64,{data}", "detail": "high"},
+                                }
+                                for mime, data in encoded_images
+                            ]
+                            if encoded_images
+                            else prompt
+                        ),
+                    },
                 ],
                 "temperature": cfg.temperature,
             }
