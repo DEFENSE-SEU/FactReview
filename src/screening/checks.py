@@ -3,11 +3,43 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from llm.client import llm_json, resolve_llm_config
 from schemas.claim import Evidence, EvidencePointer, Finding
 from schemas.materials import MaterialBlock, SharedMaterials
+
+
+def grounded_paper_pointer(materials: SharedMaterials, block: MaterialBlock, quote: str) -> EvidencePointer:
+    """Point to bytes a reviewer can open, retaining PDF pages for parser-only text."""
+    if block.loc is None or not quote.strip() or quote not in block.text:
+        raise ValueError("evidence must quote a located manuscript block")
+    markdown = Path(materials.markdown_path)
+    if quote in materials.markdown and markdown.is_file():
+        actual = markdown.read_text(encoding="utf-8")
+        start, end = block.loc.char_start, block.loc.char_end
+        if start is not None and actual[start:end] == block.text:
+            offset = start + block.text.index(quote)
+        else:
+            offset = actual.find(quote)
+            if offset >= 0 and actual.find(quote, offset + 1) >= 0:
+                offset = -1
+        if offset >= 0:
+            return EvidencePointer(
+                locator=str(markdown.resolve()),
+                quote=quote,
+                page=block.loc.page,
+                key=f"chars:{offset}-{offset + len(quote)}",
+            )
+    pdf = Path(materials.source_pdf)
+    if block.loc.page is not None and pdf.is_file():
+        from pypdf import PdfReader
+
+        with pdf.open("rb") as stream:
+            if block.loc.page <= len(PdfReader(stream).pages):
+                return EvidencePointer(locator=str(pdf.resolve()), quote=quote, page=block.loc.page)
+    raise ValueError("paper evidence has no existing artifact containing its quote or recorded PDF page")
 
 
 def ask(system: str, payload: dict[str, Any], *, module: str, call=None, images=None) -> dict:
@@ -30,8 +62,7 @@ def ask(system: str, payload: dict[str, Any], *, module: str, call=None, images=
 def paper_finding(
     materials: SharedMaterials, block: MaterialBlock, *, quote: str, text: str, kind: str, level: str
 ) -> Finding:
-    if block.loc is None or not quote.strip() or quote not in block.text:
-        raise ValueError("finding must quote a located manuscript block")
+    pointer = grounded_paper_pointer(materials, block, quote)
     loc = block.loc
     return Finding(
         kind=kind,
@@ -41,9 +72,7 @@ def paper_finding(
         evidence=[
             Evidence(
                 source="paper_internal",
-                pointer=EvidencePointer(
-                    locator=materials.markdown_path, quote=quote, page=loc.page, key=loc.section or block.id
-                ),
+                pointer=pointer,
                 covered=[],
                 direction="flaw",
                 sufficient=False,

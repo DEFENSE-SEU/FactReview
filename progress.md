@@ -85,3 +85,18 @@ The first run used the same command without `--basetemp`. For a repeat, choose a
 ## Next action
 
 Complete Phase 4 typed verification, exact needs dispatch and retrieval constraints. Independently review, test and commit, then integrate L3 execution. Phase 4 contracts and dispatch are being prepared separately from the Phase 3 commit.
+
+## Phase 4 checkpoint
+
+- Phase 3 committed as `f055600`.
+- Phase 4 implements four peer branches, exact multi-label dispatch, global uncited-work findings, and explicit day-level submission deadlines with a three-calendar-month concurrent window.
+- Independent review: `phase_reviewer`. Fixed invalid reader output upgrading abstracts to decisive evidence, failed reader containers, uncertain paper identity before reading, concurrent citation handling, malformed retrieval payloads, duplicate manuscript-quote locations, missing source artifacts, code indentation, ambiguous numeric target assignment, and numeric setting disambiguation.
+- `runs/v2_verification/pytest.log`: **202 passed** (schemas, all 16 dispatch combinations, literature, three other branches, screening regressions and legacy positioning). Ruff checks/format pass on the phase files.
+- Preserved initial command-path error as `pytest-command-error.log`; corrected `tests/stages/test_positioning.py`. Preserved initial unit isolation error as `pytest-isolation-error.log` (137 passed, 65 setup errors): blocking every socket connect prevented Windows asyncio from constructing its internal wakeup pair. The fixture now allows only the scoped internal socketpair connection; external connections remain blocked. Same assertions pass after this harness correction.
+- Durable `tests/conftest.py` isolation replaces the ignored baseline probe plugin for ordinary unit tests. Live-marked tests retain their explicit external boundary. Windows test temp roots now use fresh short paths inside `runs/pytest`; this retains the original production path-switch behavior and all original test assertions. Full original-suite revalidation remains due after integration.
+- Theory, Code and paper-only Experiments treat unresolved differences as explainable concerns (`overturnable=True`). No theorem prover or symbolic counterexample evaluator was added. Literature same-mechanism/same-setting evidence and verified author artifacts can still supply decisive flaws; the deterministic assessment layer handles its supplied evidence flags.
+- The default search adapter does not certify complete retrieval. Such runs retain the actual search scope and remain unverified for support-by-absence; actual read passages still support direct comparison. The restricted technical-query vocabulary deliberately leaves unknown domains unresolved instead of sending author-name queries.
+- Execution targets must bind a single paper value to the named dataset, metric and declared settings. Ambiguous whole-table values remain blocked, with the candidate and reason preserved for correction.
+- Phase 5 execution is implemented in separate uncommitted files and undergoing independent review by `integration_map`; Phase 6–8 preparation is also uncommitted. All phase commits stay local.
+
+Next action: finish Phase 5 independent review and execution verification, then commit it and continue through assessment, report and integration.

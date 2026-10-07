@@ -118,8 +118,9 @@ class Evidence(Contract):
                 r"(?i)(?:doi:)?10\.\d{4,9}/\S+|arxiv:(?:\d{4}\.\d{4,5}|[a-z.-]+/\d{7})(?:v\d+)?",
                 pointer.locator,
             )
-            if not (valid_url or valid_identifier):
-                raise ValueError("literature evidence requires a DOI, arXiv id, or URL locator")
+            search_audit = pointer.locator.lower().endswith(".json") and pointer.key == "search_scope"
+            if not (valid_url or valid_identifier or search_audit):
+                raise ValueError("literature evidence requires a DOI, arXiv id, URL, or saved search-scope audit")
             if not pointer.quote.strip():
                 raise ValueError("literature evidence requires the retrieved passage")
         elif self.source == "code" and pointer.line is None:

@@ -20,6 +20,7 @@ import re
 from calendar import monthrange
 from dataclasses import dataclass
 from datetime import date
+from typing import Literal
 from urllib.parse import urlparse
 
 # arXiv ID variants:
@@ -59,6 +60,58 @@ class CutoffDate:
 
     def to_metadata(self) -> dict[str, str]:
         return {"value": self.to_string(), "precision": self.precision}
+
+
+def parse_submission_deadline(token: str | None) -> CutoffDate:
+    """V2 requires an explicit venue deadline with day precision."""
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(token or "")):
+        raise ValueError("submission deadline must be supplied as YYYY-MM-DD")
+    cutoff = parse_cutoff(token)
+    assert cutoff is not None
+    return cutoff
+
+
+def concurrent_window_start(deadline: CutoffDate | date) -> date:
+    """Subtract three calendar months, clamping to the destination month's end."""
+    day = deadline.to_date() if isinstance(deadline, CutoffDate) else deadline
+    year, month_index = divmod(day.year * 12 + day.month - 1 - 3, 12)
+    month = month_index + 1
+    return date(year, month, min(day.day, monthrange(year, month)[1]))
+
+
+def publication_relation(
+    paper: dict, deadline: CutoffDate
+) -> Literal["prior", "concurrent", "post_cutoff", "unknown"]:
+    """Classify publication intervals conservatively when metadata is coarse.
+
+    A year/month spanning the concurrent boundary is unknown; it cannot become
+    decisive prior-art evidence. Revision dates never replace publication dates.
+    """
+    raw = str(
+        paper.get("published") or paper.get("publicationDate") or paper.get("publication_date") or ""
+    ).strip()
+    exact = _parse_iso_date(raw)
+    if exact:
+        first = last = exact
+    elif re.fullmatch(r"\d{4}-\d{2}", raw):
+        try:
+            year, month = map(int, raw.split("-"))
+            first, last = date(year, month, 1), date(year, month, monthrange(year, month)[1])
+        except ValueError:
+            return "unknown"
+    else:
+        year = _coerce_year(raw if re.fullmatch(r"\d{4}", raw) else paper.get("year"))
+        if year is None:
+            return "unknown"
+        first, last = date(year, 1, 1), date(year, 12, 31)
+    cutoff, concurrent = deadline.to_date(), concurrent_window_start(deadline)
+    if last < concurrent:
+        return "prior"
+    if first > cutoff:
+        return "post_cutoff"
+    if first >= concurrent and last <= cutoff:
+        return "concurrent"
+    return "unknown"
 
 
 def parse_cutoff(token: str | None) -> CutoffDate | None:
@@ -127,9 +180,7 @@ def derive_cutoff_from_source(source: str | None) -> CutoffDate | None:
     return CutoffDate(year=year, month=month, day=last_day, precision="month")
 
 
-def is_after_cutoff(
-    *, paper_year: object | None, paper_published: str | None, cutoff: CutoffDate
-) -> bool:
+def is_after_cutoff(*, paper_year: object | None, paper_published: str | None, cutoff: CutoffDate) -> bool:
     """Return ``True`` iff the paper is strictly later than ``cutoff``.
 
     Preference order:
@@ -148,9 +199,7 @@ def is_after_cutoff(
     return year_int > cutoff.year
 
 
-def filter_papers(
-    papers: list[dict] | None, cutoff: CutoffDate | None
-) -> tuple[list[dict], list[dict]]:
+def filter_papers(papers: list[dict] | None, cutoff: CutoffDate | None) -> tuple[list[dict], list[dict]]:
     """Split papers into ``(kept, dropped)`` by ``cutoff``.
 
     Non-dict entries are silently skipped. When ``cutoff`` is ``None`` every
@@ -164,9 +213,7 @@ def filter_papers(
     for row in papers or []:
         if not isinstance(row, dict):
             continue
-        published = (
-            str(row.get("published") or row.get("updated") or "").strip() or None
-        )
+        published = str(row.get("published") or row.get("updated") or "").strip() or None
         if is_after_cutoff(
             paper_year=row.get("year"),
             paper_published=published,
@@ -187,11 +234,11 @@ def _arxiv_id_from_token(token: str) -> str:
     # the entire string in .path, so strip a leading "arxiv.org/" if present.
     lowered = raw.lower().lstrip("/")
     if lowered.startswith("arxiv.org/"):
-        raw = raw[raw.lower().index("arxiv.org/") + len("arxiv.org/"):]
+        raw = raw[raw.lower().index("arxiv.org/") + len("arxiv.org/") :]
     path = raw.strip("/")
     for prefix in ("abs/", "pdf/"):
         if path.startswith(prefix):
-            path = path[len(prefix):]
+            path = path[len(prefix) :]
             break
     if path.lower().endswith(".pdf"):
         path = path[:-4]
