@@ -46,7 +46,7 @@ def load_codex_instructions() -> str:
         return "You are Codex, based on GPT-5. You are running as a coding agent on a user's computer."
 
 
-def _to_input_messages(system: str, prompt: str) -> list[dict[str, Any]]:
+def _to_input_messages(system: str, prompt: str, image_data: list[str] | None = None) -> list[dict[str, Any]]:
     messages: list[dict[str, Any]] = []
     if (system or "").strip():
         messages.append(
@@ -58,7 +58,8 @@ def _to_input_messages(system: str, prompt: str) -> list[dict[str, Any]]:
     messages.append(
         {
             "role": "user",
-            "content": [{"type": "input_text", "text": prompt}],
+            "content": [{"type": "input_text", "text": prompt}]
+            + [{"type": "input_image", "image_url": url, "detail": "high"} for url in (image_data or [])],
         }
     )
     return messages
@@ -153,11 +154,12 @@ def invoke_codex(
     model: str,
     base_url: str,
     return_usage: bool = False,
+    image_data: list[str] | None = None,
 ) -> str | tuple[str, dict[str, int]]:
     url = resolve_codex_base_url(base_url).rstrip("/") + "/responses"
     payload = {
         "model": resolve_codex_model(model),
-        "input": _to_input_messages(system=system, prompt=prompt),
+        "input": _to_input_messages(system=system, prompt=prompt, image_data=image_data),
         "instructions": load_codex_instructions(),
         "tools": [],
         "tool_choice": "auto",

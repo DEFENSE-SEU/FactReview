@@ -41,7 +41,10 @@ Open the documentation-only PR, then implement the authoritative v2 method speci
 - Phase 1 committed as `f2888b0`.
 - Phase 2 complete: direct MinerU adapter entry, original Markdown/content list, located blocks, bibliography, 200 dpi pages/crops, 96 dpi printed crops and a read-only repository index. 25 fixture tests passed; Ruff check/format passed.
 - Phase 2 automatic review (`phase_reviewer`) found missing appendix/Oxford-list figure anchors and dropped MinerU list items. Both fixed with regression coverage; unrecognized parser content leaves explicit issues. Python 3.11 compatibility for junction checks verified. Printed crop dimensions use PDF physical dimensions; the initial clip-rounding failure was fixed without changing assertions.
-- Refactor branch remains local. Phases 3–8 are outstanding; independent preparation of later-phase files is kept outside earlier phase commits.
+- Phase 2 committed as `f15dbd7`.
+- Phase 3 complete: upfront claim extraction, writing/table/figure/reference checks, durable screening results, actual image transport for all three providers. Removed report-agent extraction/splitting/merging duties and the C1–C3 limit.
+- Phase 3 independent review (`phase_reviewer`) identified reference checks silently succeeding with zero processed entries and model failure payloads carrying empty findings. Fixed both with regression tests. `runs/v2_screening/pytest.log`: 45 passed; original retrieval-policy assertions preserved. Ruff passes on the new screening/image files.
+- Refactor branch remains local. Phases 4–8 are outstanding; independent preparation of later-phase files is kept outside earlier phase commits.
 
 ### Baseline command
 
@@ -67,17 +70,18 @@ The first run used the same command without `--basetemp`. For a repeat, choose a
 - The v1 adapter migrates display labels conservatively and retains original records. Reading a historical artifact performs no v2 reassessment; the adapter never creates sufficient evidence from old prose. Unknown labels and malformed rows remain visible as issues.
 - Shared materials use the original MinerU adapter directly because the legacy parse stage also runs retrieval and report generation internally. Its old runtime remains available for compatibility; v2 integration will use the new material entry point.
 - Bounding-box units are explicit (`normalized_1000` by default, or `pdf_points`), with 1-based PDF page locations. Missing/invalid boxes and unmatched text remain visible issues. Figure checks receive the physically downscaled 96 dpi image. Repository indexing reads and hashes files without executing or modifying them; L3 creates a separate execution workspace.
-- **Maintainer-confirmed configuration (2026-10-08):** configurable repair limit defaults to 3, capped at 3 per spec; rule-based automatic approval by default with optional interactive approval and actual mode recorded; training budget defaults to **0 runs**, configurable, with training eligible only for high-priority plans within budget; explicit `--submission-deadline YYYY-MM-DD` with a 3-month concurrent window and no default arXiv-derived cutoff; existing per-metric tolerances centralized in one table; one-way v1 artifact adapter maps `in_conflict` to `questioned` unless re-assessed. The user confirmed the bundled choices in Chinese. These choices are authorized for later phases; no v2 behavior is implemented yet.
+- **Maintainer-confirmed configuration (2026-10-08):** configurable repair limit defaults to 3, capped at 3 per spec; rule-based automatic approval by default with optional interactive approval and actual mode recorded; training budget defaults to **0 runs**, configurable, with training eligible only for high-priority plans within budget; explicit `--submission-deadline YYYY-MM-DD` with a 3-month concurrent window and no default arXiv-derived cutoff; existing per-metric tolerances centralized in one table; one-way v1 artifact adapter maps `in_conflict` to `questioned` unless re-assessed. The user confirmed the bundled choices in Chinese. These choices are authorized for the corresponding implementation phases.
 
 ## Open issues
 
 - All five configuration choices and a default training budget of 0 runs are confirmed. Continue user-facing communication in Chinese.
-- No actual experimental approval mode or training budget has been supplied. Do not describe proposed defaults as historical experiment settings.
+- The actual historical experimental approval mode and training budget have not been supplied. Do not describe proposed defaults as historical experiment settings.
 - Live baseline unavailable until MinerU is configured locally. Never store credentials in tracked notes or ask for secret values in chat.
 - Four existing unit tests depend on short Windows temporary paths; the recorded baseline command passes with a short base-temp directory. Ordinary pytest using long default Windows paths still has the documented failures.
 - Baseline Docker/socket isolation lives in ignored local tooling. Make unit tests self-contained during subsequent relevant work while retaining their assertions.
-- Phases 3–8 remain outstanding; main-pipeline integration and remote repository material snapshots are still pending.
+- Phases 4–8 remain outstanding; main-pipeline integration and remote repository material snapshots are still pending.
+- Claim splitting tests validate the prompt contract, mocked model outputs and grounding. Live model semantic extraction accuracy is not established by these tests.
 
 ## Next action
 
-Complete Phase 3 screening and upfront claim extraction, including actual VLM image transport and removal of report-agent extraction duties. Independently review, test and commit, then continue to the four L2 branches.
+Complete Phase 4 typed verification, exact needs dispatch and retrieval constraints. Independently review, test and commit, then integrate L3 execution. Phase 4 contracts and dispatch are being prepared separately from the Phase 3 commit.
