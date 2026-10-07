@@ -7,6 +7,7 @@ from typing import Any
 
 from util.fs import ensure_dir, write_text
 
+from ..v2_config import TOLERANCES, metric_tolerance
 from .paper_tables import PaperMetricTarget, _metric_key, extract_paper_metric_targets
 
 
@@ -46,9 +47,9 @@ def _as_float(x: Any) -> float | None:
 
 @dataclass(frozen=True)
 class AlignmentTolerance:
-    mrr: float = 0.01
-    hits_at_10: float = 0.02
-    mr: float = 30.0
+    mrr: float = TOLERANCES["alignment"]["mrr"]
+    hits_at_10: float = TOLERANCES["alignment"]["rate"]
+    mr: float = TOLERANCES["alignment"]["mr"]
 
 
 @dataclass(frozen=True)
@@ -236,23 +237,7 @@ def _calc_delta(obs: dict[str, float], exp: dict[str, float]) -> dict[str, float
 
 
 def _within_tol(delta: dict[str, float], tol: AlignmentTolerance) -> dict[str, bool]:
-    out: dict[str, bool] = {}
-    for k, d in delta.items():
-        if k == "mrr":
-            out[k] = abs(d) <= float(tol.mrr)
-        elif k in {"hits@10", "hits@10."}:
-            out[k] = abs(d) <= float(tol.hits_at_10)
-        elif k == "mr":
-            out[k] = abs(d) <= float(tol.mr)
-        elif k.startswith("hits@") or k in {"accuracy", "f1", "precision", "recall", "auc", "map", "ndcg"}:
-            out[k] = abs(d) <= 0.02
-        elif k in {"bleu", "rouge-l", "rouge-1", "rouge-2"}:
-            out[k] = abs(d) <= (0.02 if abs(d) <= 1 else 2.0)
-        elif k in {"mae", "rmse", "mse", "perplexity", "loss", "fid"}:
-            out[k] = abs(d) <= max(0.05, abs(d) * 0.0 + 0.05)
-        else:
-            out[k] = abs(d) <= 0.05
-    return out
+    return {key: abs(value) <= _metric_tolerance(key, tol, delta=value) for key, value in delta.items()}
 
 
 def _metric_tolerance(metric: str, tol: AlignmentTolerance, *, delta: float | None = None) -> float:
@@ -263,16 +248,7 @@ def _metric_tolerance(metric: str, tol: AlignmentTolerance, *, delta: float | No
         return float(tol.hits_at_10)
     if key == "mr":
         return float(tol.mr)
-    if key.startswith("hits@") or key in {"accuracy", "f1", "precision", "recall", "auc", "map", "ndcg"}:
-        return 0.02
-    if key in {"bleu", "rouge-l", "rouge-1", "rouge-2"}:
-        try:
-            return 2.0 if delta is not None and abs(float(delta)) > 1 else 0.02
-        except Exception:
-            return 0.02
-    if key in {"mae", "rmse", "mse", "perplexity", "loss", "fid", "error_rate"}:
-        return 0.05
-    return 0.05
+    return metric_tolerance(key, profile="alignment", delta=delta)
 
 
 def _metric_direction(metric: str) -> str:

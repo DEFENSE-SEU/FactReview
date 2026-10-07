@@ -90,6 +90,10 @@ class ExecutionProvenance(Contract):
     run_id: str | None = None
     command: list[str] = Field(default_factory=list)
     runtime_conditions: list[Condition] = Field(default_factory=list)
+    artifact_path: str | None = None
+    artifact_sha256: str | None = None
+    repository: str | None = None
+    recomputation_pointer: str | None = None
 
 
 class Evidence(Contract):

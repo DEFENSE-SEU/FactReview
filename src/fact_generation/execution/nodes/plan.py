@@ -13,6 +13,7 @@ from util.recorder import append_event
 
 from ..tools.paper_tables import extract_paper_metric_targets
 from ..tools.task_infer import infer_tasks_heuristic, infer_tasks_llm
+from ..v2_config import metric_tolerance
 from .prepare import (
     _ensure_default_baseline,
     _read_text,
@@ -40,18 +41,7 @@ def _is_runtime_pip_install_cmd(cmd: Any) -> bool:
 
 
 def _default_tolerance(metric: str, expected: Any) -> float:
-    key = str(metric or "").strip().lower()
-    try:
-        exp = abs(float(expected))
-    except Exception:
-        exp = 0.0
-    if key == "mr":
-        return 30.0
-    if key.startswith("hits@") or key in {"mrr", "accuracy", "acc", "f1", "precision", "recall", "auc"}:
-        return 0.02 if exp <= 1.0 else 2.0
-    if key in {"bleu", "rouge-l", "rouge-1", "rouge-2"}:
-        return 0.02 if exp <= 1.0 else 2.0
-    return max(0.02, exp * 0.05)
+    return metric_tolerance(metric, expected, profile="legacy_plan")
 
 
 def _load_tasks_for_baseline(tasks_p: Path) -> list[dict[str, Any]]:
