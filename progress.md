@@ -44,7 +44,7 @@ Open the documentation-only PR, then implement the authoritative v2 method speci
 - Phase 2 committed as `f15dbd7`.
 - Phase 3 complete: upfront claim extraction, writing/table/figure/reference checks, durable screening results, actual image transport for all three providers. Removed report-agent extraction/splitting/merging duties and the C1–C3 limit.
 - Phase 3 independent review (`phase_reviewer`) identified reference checks silently succeeding with zero processed entries and model failure payloads carrying empty findings. Fixed both with regression tests. `runs/v2_screening/pytest.log`: 45 passed; original retrieval-policy assertions preserved. Ruff passes on the new screening/image files.
-- Refactor branch remains local. Phases 0–5 are complete; independently prepared Phase 6–8 files await their separate commits and final integration checks.
+- Refactor branch remains local. Phases 0–6 are complete; independently prepared Phase 7–8 files await their separate commits and final integration checks.
 
 ### Baseline command
 
@@ -78,12 +78,12 @@ The first run used the same command without `--basetemp`. For a repeat, choose a
 - The actual historical experimental approval mode and training budget have not been supplied. Do not describe proposed defaults as historical experiment settings.
 - Live baseline unavailable until MinerU is configured locally. Never store credentials in tracked notes or ask for secret values in chat.
 - The durable Phase 4 pytest fixture now supplies fresh short Windows paths and isolates indirect Docker/socket probes; full-suite integration revalidation is in progress.
-- Phase 6–8 files are prepared and reviewed separately; their phase checkpoints and final integration validation remain due.
+- Phase 7–8 files are prepared and reviewed separately; their phase checkpoints and final integration validation remain due.
 - Claim splitting tests validate the prompt contract, mocked model outputs and grounding. Live model semantic extraction accuracy is not established by these tests.
 
 ## Next action
 
-Commit the reviewed Phase 5 execution checkpoint, then commit and validate assessment, report and final integration in order.
+Commit the reviewed Phase 6 assessment checkpoint, then finish report and final integration checkpoints.
 
 ## Phase 4 checkpoint
 
@@ -108,3 +108,12 @@ Commit the reviewed Phase 5 execution checkpoint, then commit and validate asses
 - Raw JSON metric formats use selectors into actual output. Both legacy tolerance profiles remain in one table. Optional paper variance must match an exact paper quote and number; the operator confirms statistic type, units and condition binding. Automated branches leave this override empty.
 
 Next action: commit the reviewed assessment and report phases, finish integrated regression and the CompGCN comparison, then complete Phase 8.
+
+## Phase 6 checkpoint
+
+- Phase 5 committed as `4502aca`.
+- `src/assessment/rules.py` implements pure deterministic assessment, copying the input and applying the five rules in order. Coverage unions must include every condition; overlapping sufficient support/flaw wins before decisive flaw; explainable concerns remain questioned. Non-decisive concerns are idempotent notes. Execution evidence needs alignment, and decisive released-artifact flaws need provenance.
+- Independent review (`phase_reviewer`) passed. `runs/v2_final/pytest-assessment.log`: **16 passed** with no external services. Tests exercise every rule, conflicts, partial coverage, paper-only support, execution provenance and repeat assessment.
+- Phase 7 report and Phase 8 integration are prepared separately and remain uncommitted.
+
+Next action: commit the reviewed Phase 7 report and teaser, then finish integration verification.
