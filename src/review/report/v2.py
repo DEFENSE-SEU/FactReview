@@ -193,6 +193,8 @@ def write_review(
                 raw_output=None,
                 final_report_markdown=result.review_markdown,
                 agent_model="deterministic v2 report",
+                # Evidence paths and identifiers must survive PDF rendering literally.
+                implicit_math=False,
                 token_usage=token_usage if token_usage is not None else {"unavailable": True},
             )
             pdf = output_dir / "final_review.pdf"

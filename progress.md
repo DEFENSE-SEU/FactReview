@@ -2,128 +2,99 @@
 
 ## Task
 
-Open the documentation-only PR, then implement the authoritative v2 method specification through Phases 0–8 on `refactor/method-v2`. Use an independent agent to review each phase, address findings, verify and commit, then continue automatically. The maintainer removed the phase-pause requirement on 2026-10-08 and requested continuous work until completion or an explicit stop. Keep all 14 acceptance checks observable. Never weaken or add skips to tests. Unit tests must mock LLM, retrieval, and Docker. Do not modify RefCopilot internals, demo reference outputs, or LICENSE. Keep refactor commits local until all checks pass or the user explicitly requests a push; the adopted prompt also requires approval before publishing the refactor.
+Implement `docs/method_v2_spec.md` through Phases 0–8 on `refactor/method-v2`, following the adopted prompt and maintainer decisions. Use independent automatic review at each phase and continue without phase pauses. Preserve tests and mock LLM/retrieval/Docker in unit tests. Keep RefCopilot internals, demo reference outputs and LICENSE unchanged. The documentation PR is published; refactor commits remain local. Publishing this refactor would require the separate approval specified by the adopted prompt.
 
 ## Outputs
 
-- Documentation PR: https://github.com/DEFENSE-SEU/FactReview/pull/12
-- Documentation branch: `docs/method-v2-spec`; initial patch commit `ab983b9`, automatic-review amendment `281e0f5` (also applied to the refactor branch as `84c2aeb`).
-- Current branch: `refactor/method-v2`, created directly from the documentation branch.
-- `docs/method_v2_spec.md`: authoritative specification, unchanged from the patch.
-- `docs/refactor_v2_prompt.md`: adopted procedure, amended to use automatic phase reviews and continuous execution per the maintainer's request.
-- `checks.md`: all 14 acceptance requirements.
-- `progress.md`: this handoff.
-- `runs/v2_baseline/`: local baseline logs (ignored by Git).
-- `runs/v2_baseline/dependency-install.log`, `dependencies.txt`: installation output and exact installed versions.
-- `runs/v2_baseline/pytest-baseline.log`, `pytest-baseline.exitcode`: first baseline (exit 1).
-- `runs/v2_baseline/pytest-short-temp.log`, `pytest-short-temp.exitcode`: passing baseline retry (exit 0).
-- `runs/v2_baseline/baseline_isolation.py`: explicit local pytest plugin for indirect Docker and loopback probes.
-- `runs/v2_baseline/preflight.json`, `compgcn-baseline.txt`: credential readiness and live-demo skip reason.
-- `runs/v2_baseline/baseline-manifest.json`: source commit identities and checksums of 7 unchanged demo reference artifacts.
-- Phase 1: `src/schemas/claim.py`, `review.py`, `__init__.py`, `legacy_claim.py`, `legacy_review.py`, `v1_adapter.py`; `tests/test_schemas_v2.py` and import-only legacy adjustments in `tests/test_schemas.py`.
-- Phase 1 evidence: `runs/v2_baseline/phase1-schema.log` (62 passed), `phase1-schema.exitcode` (0), `phase1-import-tail.log` (2 mocked legacy integration tests passed).
-- Phase 2: `src/preprocessing/materials.py`, `src/schemas/materials.py`, `tests/test_materials_v2.py`; `runs/v2_materials/pytest.log` (25 passed).
+Workspace: `E:\kabuda\FactReview`.
+
+- Documentation PR: https://github.com/DEFENSE-SEU/FactReview/pull/12 — requested title/body, base `main`, exactly two documentation files.
+- Docs branch: `docs/method-v2-spec`, patch `ab983b9`, continuous automatic-review amendment `281e0f5`; amendment applied locally as `84c2aeb`.
+- Refactor branch: `refactor/method-v2`, created from docs branch. No remote branch or refactor PR has been created.
+- Authoritative specification and procedure: `docs/method_v2_spec.md`, `docs/refactor_v2_prompt.md`.
+- Final acceptance evidence: `checks.md`; durable handoff: this file.
+- Schemas/compatibility: `src/schemas/{claim,review,materials,legacy_claim,legacy_review,v1_adapter}.py`.
+- Shared materials: `src/preprocessing/materials.py`.
+- Screening: `src/screening/`; typed verification: `src/verification/`; assessment: `src/assessment/`.
+- Execution: `src/fact_generation/execution/{v2,v2_config,v2_outputs}.py` and reused Docker/alignment/plan infrastructure.
+- Report and teaser: `src/review/report/v2.py`, `src/review/teaser/v2.py`, existing PDF renderer.
+- Default entry: `src/pipeline_full.py` → `src/pipeline_v2.py`; `scripts/execute_review_pipeline.py` remains the CLI wrapper.
+- Integration fixture: `scripts/check_v2_compgcn.py`; regression tests under `tests/`, including `test_pipeline_v2.py` and `test_run_stats_v2.py`.
+- Local evidence: `runs/v2_baseline/`, `runs/v2_materials/`, `runs/v2_screening/`, `runs/v2_verification/`, `runs/v2_execution/`, `runs/v2_report/`, `runs/v2_final/`.
+- Current CompGCN fixture: `runs/v2_compgcn/compgcn_fixture_2026-10-08_050820_50ebee36/`, including `comparison.{json,md}`, `full_pipeline_summary.json`, `review/report/final_review.{json,md,pdf}`, `review/teaser/teaser.{json,svg}`.
+- Current wheel: `runs/v2_packaging_final/factreview-0.1.0-py3-none-any.whl`; final build includes the PDF literal-pointer correction.
+
+Logs and generated artifacts in `runs/` are local and ignored by Git. Saved commands and outcomes here allow another checkout to reproduce the verification.
 
 ## Completed
 
-- Fetched origin and fast-forwarded main from `87dad71` to `5dc71d9` before creating the documentation branch.
-- Applied the attached patch with `git am`; no fallback copying needed.
-- Pushed only the documentation branch and opened PR #12 with the requested title and attached `PR_DESCRIPTION.md` as the body. The PR changes exactly two documentation files.
-- Phase 0 complete: installed existing extras into `.venv` using Python 3.12.10. No application code, test assertions, or project configuration changed.
-- Initial baseline: 252 passed, 4 failed, 3 deselected in 29.41s (exit 1). Failures: `test_no_docker_host_venv_install_follows_nested_verify_missing_module`, `test_no_docker_host_venv_install_repairs_dgl_graphbolt_torch_pin`, `test_no_docker_host_venv_installs_pyg_native_package_from_torch_wheel_index`, `test_install_run_venv_jupyter_kernel_uses_run_local_prefix`.
-- Diagnosis: Windows default pytest temporary paths exceed 100 characters; `src/fact_generation/execution/nodes/fix.py::_host_venv_dir` then selects `C:\\frv-venvs/<hash>`, while these four tests expect run-local `.venv`. Preserved the initial failure output.
-- One environment correction: selected a new shorter pytest `--basetemp` under `runs/v2_baseline/t1`. Reran the same 256 selected tests with unchanged assertions: **256 passed, 3 deselected in 21.51s**, exit 0. The 3 default deselections are 2 `e2e` tests and 1 `requires_docker` test.
-- CompGCN live no-execution baseline: skipped under the prompt's explicit credential exception. `MINERU_API_TOKEN` and repository `.env` are absent; strict parsing requires the token (`src/preprocessing/parse/mineru_adapter.py:49–57`). No live pipeline request or parser fallback used. Codex cached credentials are present; validity/reachability remains untested. No external source reachability claim is made.
-- Independently reviewed the local harness, selected external-call paths, failure cause, checkpoint files, and all 7 unchanged artifact hashes with reviewer agent `baseline_review`.
-- Phase 1 complete: strict v2 claim/evidence/plan/finding/question schemas and v2 review container; historical schemas isolated in explicit legacy modules. Schema checks: 62 passed. Legacy stage-import/report-tail integration: 2 passed with mocked services. Existing schema assertions retained; only their legacy imports changed.
-- Phase 1 automatic review (`phase_reviewer`) found ambiguous execution target keys/non-finite targets and two legacy Markdown parsing defects. Corrections enforce exact condition-id targets with finite values, preserve escaped pipes, flag malformed rows, and normalize emphasized status labels. Regression tests cover every finding. Ruff passes on Phase 1 files.
-- Real CompGCN v1 `report.md` adapter smoke: 3 historical display records (`questioned`, `supported`, `supported`), zero issues. Historical labels remain explicitly unassessed; no new evidence or missing coordinates fabricated.
-- Phase 1 committed as `f2888b0`.
-- Phase 2 complete: direct MinerU adapter entry, original Markdown/content list, located blocks, bibliography, 200 dpi pages/crops, 96 dpi printed crops and a read-only repository index. 25 fixture tests passed; Ruff check/format passed.
-- Phase 2 automatic review (`phase_reviewer`) found missing appendix/Oxford-list figure anchors and dropped MinerU list items. Both fixed with regression coverage; unrecognized parser content leaves explicit issues. Python 3.11 compatibility for junction checks verified. Printed crop dimensions use PDF physical dimensions; the initial clip-rounding failure was fixed without changing assertions.
-- Phase 2 committed as `f15dbd7`.
-- Phase 3 complete: upfront claim extraction, writing/table/figure/reference checks, durable screening results, actual image transport for all three providers. Removed report-agent extraction/splitting/merging duties and the C1–C3 limit.
-- Phase 3 independent review (`phase_reviewer`) identified reference checks silently succeeding with zero processed entries and model failure payloads carrying empty findings. Fixed both with regression tests. `runs/v2_screening/pytest.log`: 45 passed; original retrieval-policy assertions preserved. Ruff passes on the new screening/image files.
-- Refactor branch remains local. Phases 0–7 are complete; Phase 8 awaits final integration verification and its separate commit.
+Fetched and fast-forwarded main from `87dad71` to `5dc71d9`, applied the attached patch with `git am`, then opened documentation PR #12 with `PR_DESCRIPTION.md`. No code is included in that PR. The maintainer replaced phase pauses with independent automatic review; that amendment is the only change to the supplied procedure.
 
-### Baseline command
+| Phase | Work and verification | Commit |
+|---|---|---|
+| 0 | Existing baseline: 256 passed, 3 original deselections after the Windows short-temp correction. Credential exception recorded for live CompGCN. Independent `baseline_review`. | `ac5840f` |
+| 1 | Strict claim/evidence/plan/finding/question contracts, four statuses, one-way historical adapter. 62 schema cases and 2 mocked legacy integration cases passed. Independent `phase_reviewer`. | `f2888b0` |
+| 2 | Direct MinerU materials, original text/blocks, page/figure rendering, reference links, bibliography and read-only repository index. 25 cases passed. Independent `phase_reviewer`. | `f15dbd7` |
+| 3 | Upfront claim extraction, writing/figure/reference checks and image transport. Removed report extraction duties and C1–C3 cap. 45 affected cases passed. Independent `phase_reviewer`. | `f055600` |
+| 4 | Exact needs dispatch, four parallel peer branches, global Literature findings and retrieval constraints. 202 affected cases passed. Durable offline/Windows pytest fixtures. Independent `phase_reviewer`. | `6fe09d2` |
+| 5 | Approved execution, ordering/budgets, exact observed alignment, bounded repairs, released artifact provenance, output normalization and ledger. 61 v2 cases; 218 affected cases passed with 1 original Docker deselection. Independent `integration_map`. | `4502aca` |
+| 6 | Pure ordered assessment, conflict/flaw/concern/coverage rules and non-decisive notes. 16 cases passed. Independent `phase_reviewer`. | `e2504db` |
+| 7 | Four-part report and all-claim four-status teaser, source/pointer preservation, recommendation guards and literal Markdown escaping. 11 cases passed at phase checkpoint. Independent `phase_reviewer`. | `32e1785` |
+| 8 | Default v2 integration, explicit deadline/config CLI, usage/error propagation, README, wheel packaging and CompGCN comparison. Final PDF pointer correction, full regression and independent artifact review passed. | Final Phase 8 checkpoint commit (`refactor(v2): phase 8 — integrate and verify the complete claim review pipeline`) |
 
-```powershell
-$env:PYTHONUTF8 = '1'
-$env:PYTHONPATH = "$PWD\src;$PWD\runs\v2_baseline"
-.\.venv\Scripts\python.exe -m pytest -p baseline_isolation --basetemp runs/v2_baseline/t1
-```
+Final full default suite: **615 passed, 3 original deselections, exit 0** in `runs/v2_final/pytest-full.log`. The two deselected legacy e2e cases passed separately (`pytest-legacy-e2e.log`); the remaining live Docker case was not run. No new skips or relaxed assertions. Statistics/pipeline focus: 18 passed. Ruff passed across new implementation modules and Phase 8 files. Formatting of three new Phase 8 files retained identical ASTs. The wheel contains both pipeline entry modules and all v2 packages; 110 packaged Python modules parsed with the Python 3.11 grammar, and required packaged files matched workspace bytes (`wheel-inspection.json`).
 
-The first run used the same command without `--basetemp`. For a repeat, choose a **new** short directory under `runs/v2_baseline/` and save a new log; pytest clears an existing explicit base-temp directory. Verify the resolved path stays within that baseline directory. Inspect previous results before repeating operations that could write outside `runs/`. The local ignored logs/plugin survive in this workspace; this tracked note preserves the command, outcomes, limitations, and next action for other checkouts.
+### Corrections and preserved failures
+
+- Phase 0: initial 252 passed/4 failed. Existing production logic routes long Windows venv paths to `C:\frv-venvs`, while four tests require a short run-local path. A fresh short `--basetemp` passed all original assertions. Phase 4 made that fixture durable under `runs/pytest/<unique-id>` without changing production behavior.
+- Phase 1: rejected ambiguous/non-finite execution targets; fixed historical Markdown escaped pipes, malformed rows and emphasized labels. The adapter never invents missing locations or sufficient evidence.
+- Phase 2: fixed appendix/Oxford-list figure references, list-item loss and crop rounding. Unknown parser content remains an explicit issue.
+- Phase 3: rejected zero-reference-processing success and model failure containers with empty findings. Original retrieval assertions retained.
+- Phase 4: fixed reader payloads promoting abstracts into sufficient evidence, unknown identity before reading, concurrent citations, malformed retrieval results, duplicate paper quotes, missing source files, code indentation and ambiguous numeric target binding. Initial network isolation blocked Windows asyncio's internal wakeup socketpair (137 passed/65 setup errors); the fixture now allows only that scoped internal connection. Same assertions passed. Logs retain initial command-path and isolation errors.
+- Phase 5: fixed expected/paper target selectors masquerading as runtime values, failed output containers/canonical rows, conflicting actual metric mappings and runtime selection of supposed author artifacts. Operator contracts are frozen before execution; tests reject each invalid path.
+- Phase 7: strengthened recommendation guards across fields/whitespace and preserved literal Markdown content. PDF extraction whitespace was normalized for line wrapping while retaining the required text values. Final artifact review found PDF implicit-formula detection corrupting Windows paths and snake_case identifiers. V2 now disables that heuristic for ordinary text and inline code; explicit formula tokens still render and v1 defaults stay unchanged. Two exact PDF/literal-mode regressions were added (13 report cases in the final suite; 28 report/legacy focused cases passed). The fresh five-page PDF preserves all evidence locator paths and claim IDs. Independent rendered-page inspection found no clipping/overlap; `runs/v2_final/pdf-literal-inspection.json` records the root-agent check. Acceptance check 12 passes.
+- Phase 8: corrected wheel entry-module omissions, outdated CLI help, failure statistics, explicit UTF-8 fixture reads and high-resolution timing for immediate failures. The 80-call parallel statistics test exposed a Windows replacement error: write locking alone and read locking did not cover public path resolution. The third correction puts `Path.resolve()` under the same RLock; original 80-request/160-input/240-output/400-total assertions and the full suite pass. No evidence assigns this failure to antivirus. Prior failures remain in `pytest-full-before-path-lock.log` and Phase 8 local logs.
+- Packaging: `python -m build` was unavailable; non-isolated pip build also lacked the hatchling backend. Existing pip isolated build installed declared build dependencies and passed. Both errors and successful output are saved separately. An unused test variable was renamed without changing assertions; final formatting was AST-equivalent.
 
 ## Decisions
 
-- Use per-command Git committer identity `ChaoqianO <224349230+ChaoqianO@users.noreply.github.com>`, derived from the authenticated GitHub account. Git had no configured identity; global Git configuration was left unchanged. Patch author/message retained by `git am`.
-- Use `.venv` for repository dependencies; preserve global Python packages. Install the existing runtime/dev/refcheck/positioning extras needed to collect and exercise the current suite.
-- Preserve the existing default pytest marker selection; record deselections explicitly. Phase 0 left tests unchanged. Phase 1 moved old schema imports to the explicit compatibility modules while preserving every assertion.
-- Apply the user's required unit-test mocks via the explicit local baseline plugin. A separate review found existing Docker argument-construction tests indirectly call `docker info` through `_docker_info_field`; the stale-loopback test calls `socket.create_connection`. The plugin mocks these two probes, preserving test-specific overrides. Existing selected LLM/retrieval paths were reviewed for their own mocks. The plugin is scoped baseline tooling and provides no universal network-access guarantee. Incorporate durable unit-test isolation in the affected implementation phase.
-- Use shorter test temporary paths for this Windows baseline. No production path handling or assertion was changed. The long-default-path failures remain documented as test portability work.
-- The directly requested root files `checks.md` and `progress.md`, plus explicitly requested baseline outputs in `runs/`, are authorized outputs alongside the prompt's source-path list.
-- Phase review uses a separate reviewer agent with inherited configured model/effort and no override. Exact runtime model/effort identifiers are unavailable to this task; no claim is made that prompt wording changes them.
-- The maintainer removed phase pauses on 2026-10-08. Documentation PR #12 was updated with automatic reviews; implementation continues immediately after each phase's review, checks and commit. Prepare independent components in parallel, keeping phase commits and integration validation in dependency order.
-- Canonical v2 schemas forbid unknown fields; evidence coverage and execution targets use stable condition IDs. Each target value is keyed by condition ID, so two datasets using the same metric remain distinct. New records require an actual page, section or character span; missing legacy coordinates stay missing in a separate historical envelope.
-- The v1 adapter migrates display labels conservatively and retains original records. Reading a historical artifact performs no v2 reassessment; the adapter never creates sufficient evidence from old prose. Unknown labels and malformed rows remain visible as issues.
-- Shared materials use the original MinerU adapter directly because the legacy parse stage also runs retrieval and report generation internally. Its old runtime remains available for compatibility; v2 integration will use the new material entry point.
-- Bounding-box units are explicit (`normalized_1000` by default, or `pdf_points`), with 1-based PDF page locations. Missing/invalid boxes and unmatched text remain visible issues. Figure checks receive the physically downscaled 96 dpi image. Repository indexing reads and hashes files without executing or modifying them; L3 creates a separate execution workspace.
-- **Maintainer-confirmed configuration (2026-10-08):** configurable repair limit defaults to 3, capped at 3 per spec; rule-based automatic approval by default with optional interactive approval and actual mode recorded; training budget defaults to **0 runs**, configurable, with training eligible only for high-priority plans within budget; explicit `--submission-deadline YYYY-MM-DD` with a 3-month concurrent window and no default arXiv-derived cutoff; existing per-metric tolerances centralized in one table; one-way v1 artifact adapter maps `in_conflict` to `questioned` unless re-assessed. The user confirmed the bundled choices in Chinese. These choices are authorized for the corresponding implementation phases.
+- Confirmed by the maintainer: repair default/cap **3** (initial run plus at most 3 repaired runs); default rule-based **auto** approval with optional interactive approval and the actual mode recorded; training budget **0 runs**, configurable, high-priority training only, retries counted.
+- Confirmed cutoff: explicit `--submission-deadline YYYY-MM-DD`, with **3 calendar months** before it labelled concurrent. No cutoff derived from the paper's own arXiv ID. No historical venue deadline is invented for the fixture.
+- Confirmed tolerances: central `v2_config.TOLERANCES` preserves both existing plan and alignment profiles, including their different MRR defaults.
+- Confirmed v1 compatibility: historical `in_conflict` maps to `questioned`; original records/labels are retained. Historical display does not reassess evidence or create a v2 claim lacking required locations.
+- `--execution-config` loads a validated `ExecutionConfig`; only explicitly supplied CLI options override corresponding fields, including an explicit zero budget. Unsupported legacy options produce recorded errors. Docker is required when execution is enabled.
+- Use the existing MinerU adapter directly for shared materials because the legacy parse runtime also performs downstream review/retrieval. Reuse RefCopilot, Docker helpers and PDF infrastructure. Legacy entry/functions remain isolated for compatibility.
+- Repository indexing is read-only and hashes actual files. Approved L3 execution creates a separate workspace; source mutations outside the allowlist are rejected and accepted repair diffs saved. Reproduction uses exact observed dataset/metric/settings.
+- Ambiguous paper targets remain blocked. Blocked plans attach explanatory evidence with `affects_claim=False`. Failed or unaligned attempts retain their ledger reasons and author questions without adding deciding execution evidence. Aligned mismatches normally remain explainable concerns.
+- A decisive released-artifact inconsistency requires a pre-run operator contract: indexed path, SHA-256, released data/log role, metadata selectors and deterministic recomputation. Runtime output cannot choose an artifact or replace its recomputed value. The operator confirms the artifact's role.
+- Optional `paper_variances` require a real block, exact quote and nonnegative value. The operator confirms statistic meaning, units and condition binding. These semantics are not established by quote matching; automatic branches leave this contract empty.
+- Theory, Code and paper-only Experiments retain explainable differences as concerns. No theorem prover was added. Default Literature retrieval does not certify complete search, so absence alone cannot support novelty; restricted technical vocabulary leaves uncovered domains visibly unresolved.
+- Figure boxes have explicit units; locations use 1-based PDF pages. Page/crop rendering uses 200 dpi, printed-size checks 96 dpi. Missing/invalid images remain issues. Tables use parsed text.
+- Reports consume deterministic assessed records. Teasers render locally to SVG; no image service. Unknown usage is marked unavailable; estimates are labelled. No claim is made about model semantic accuracy from mocked responses.
+- Independent agents inherit configured model/effort without overrides. Exact runtime identifiers were unavailable. Git commits use per-command identity `ChaoqianO <224349230+ChaoqianO@users.noreply.github.com>`, taken from the authenticated account; global Git config was unchanged. Dependencies are isolated in `.venv`.
 
-## Open issues
+## CompGCN comparison and open issues
 
-- All five configuration choices and a default training budget of 0 runs are confirmed. Continue user-facing communication in Chinese.
-- The actual historical experimental approval mode and training budget have not been supplied. Do not describe proposed defaults as historical experiment settings.
-- Live baseline unavailable until MinerU is configured locally. Never store credentials in tracked notes or ask for secret values in chat.
-- The durable Phase 4 pytest fixture now supplies fresh short Windows paths and isolates indirect Docker/socket probes; full-suite integration revalidation is in progress.
-- Phase 8 is prepared and reviewed separately; final validation and its phase checkpoint remain due.
-- Claim splitting tests validate the prompt contract, mocked model outputs and grounding. Live model semantic extraction accuracy is not established by these tests.
+The latest offline replay uses the real 15-page PDF and read-only released repository, with explicitly fixed parser/model/retrieval/Docker boundaries. All seven stages completed. It yields **2 supported, 1 unverified**; the historical adapter reads **2 supported, 1 questioned**. Claim sets differ, so these counts do not establish improved accuracy. The Theory fixture covers one explicit reduction; other conditions stay unverified. The multi-value results table remains blocked for L3: **zero Docker runner calls**, no independent numerical reproduction. Paper-internal support retains its source label. All 27 demo-tree file hashes and the Phase 0 seven reference hashes match. There are no Git changes to RefCopilot, demos or LICENSE.
+
+- **Live verification blocker:** repository `.env` and `MINERU_API_TOKEN` were absent at baseline and remain unconfigured. No successful live MinerU/LLM/retrieval/Docker run or live accuracy measurement is claimed. Criterion 13 explicitly permits a reported blocker. Configure credentials locally; do not put secrets in Git or chat.
+- Actual historical experiment approval mode/training budget were not supplied. Confirmed defaults describe new runs only.
+- Live extraction, figure/bibliography parsing and retrieval quality require a real-service run. The deterministic tests establish contracts, routing, aggregation and saved artifacts.
+- No implementation blocker remains. All 14 acceptance criteria pass, with the live-run exception explicitly recorded for criterion 13.
+
+## Reproduction commands
+
+```powershell
+$env:PYTHONUTF8 = '1'
+$env:PYTHONPATH = "$PWD\src"
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe -m pytest tests/test_e2e_pipeline.py -m e2e -q
+.\.venv\Scripts\python.exe scripts/check_v2_compgcn.py
+.\.venv\Scripts\python.exe -m pip wheel . --no-deps --wheel-dir runs/v2_packaging_final
+```
+
+Original Phase 0 command used the saved ignored plugin: `python -m pytest -p baseline_isolation --basetemp runs/v2_baseline/t1`, with `src` and `runs/v2_baseline` on PYTHONPATH. Never reuse that explicit directory blindly because pytest clears `--basetemp`; use a fresh verified path. Current durable fixtures choose fresh short paths automatically.
 
 ## Next action
 
-Commit the reviewed Phase 7 report checkpoint, then finish integrated artifact/package validation and Phase 8.
-
-## Phase 4 checkpoint
-
-- Phase 3 committed as `f055600`.
-- Phase 4 implements four peer branches, exact multi-label dispatch, global uncited-work findings, and explicit day-level submission deadlines with a three-calendar-month concurrent window.
-- Independent review: `phase_reviewer`. Fixed invalid reader output upgrading abstracts to decisive evidence, failed reader containers, uncertain paper identity before reading, concurrent citation handling, malformed retrieval payloads, duplicate manuscript-quote locations, missing source artifacts, code indentation, ambiguous numeric target assignment, and numeric setting disambiguation.
-- `runs/v2_verification/pytest.log`: **202 passed** (schemas, all 16 dispatch combinations, literature, three other branches, screening regressions and legacy positioning). Ruff checks/format pass on the phase files.
-- Preserved initial command-path error as `pytest-command-error.log`; corrected `tests/stages/test_positioning.py`. Preserved initial unit isolation error as `pytest-isolation-error.log` (137 passed, 65 setup errors): blocking every socket connect prevented Windows asyncio from constructing its internal wakeup pair. The fixture now allows only the scoped internal socketpair connection; external connections remain blocked. Same assertions pass after this harness correction.
-- Durable `tests/conftest.py` isolation replaces the ignored baseline probe plugin for ordinary unit tests. Live-marked tests retain their explicit external boundary. Windows test temp roots now use fresh short paths inside `runs/pytest`; this retains the original production path-switch behavior and all original test assertions. Full original-suite revalidation remains due after integration.
-- Theory, Code and paper-only Experiments treat unresolved differences as explainable concerns (`overturnable=True`). No theorem prover or symbolic counterexample evaluator was added. Literature same-mechanism/same-setting evidence and verified author artifacts can still supply decisive flaws; the deterministic assessment layer handles its supplied evidence flags.
-- The default search adapter does not certify complete retrieval. Such runs retain the actual search scope and remain unverified for support-by-absence; actual read passages still support direct comparison. The restricted technical-query vocabulary deliberately leaves unknown domains unresolved instead of sending author-name queries.
-- Execution targets must bind a single paper value to the named dataset, metric and declared settings. Ambiguous whole-table values remain blocked, with the candidate and reason preserved for correction.
-- Phase 4 committed as `6fe09d2`. Phase 6–8 preparation is uncommitted. All phase commits stay local.
-
-## Phase 5 checkpoint
-
-- Implemented `src/fact_generation/execution/v2.py`, `v2_config.py`, `v2_outputs.py`, generic alignment, shared legacy tolerance lookup, Docker helpers and execution provenance schema fields. `tests/test_execution_v2.py` contains 61 cases.
-- Independent review (`integration_map`) passed. `runs/v2_execution/pytest-review-round2.log`: **218 passed, 1 original live-Docker test deselected**. External service calls are mocked. Review corrections reject expected-value selectors, failed containers/canonical rows, conflicting mappings and output-controlled author-artifact selection.
-- Approval precedes workspace creation. Every ledger records the mode and budget. Ordering is priority, readiness, then evaluation/analysis before training. Training defaults to 0; positive budgets count retries. Default/cap is 3 accepted repairs, allowing the initial run plus 3 repaired runs. Source hashes and declarative infrastructure repairs protect model/loss/data/evaluation/baselines; accepted diffs are saved.
-- Only exact observed dataset, metric and settings permit execution judging. Aligned matches support; aligned mismatches become author-resolvable concerns. Failed, blocked or unaligned runs retain reasons with `affects_claim=False`; they do not supply deciding evidence.
-- Decisive author-artifact evidence requires a pre-run contract binding an indexed released data/log path, SHA-256, metadata and recomputation selector, with actual recomputation agreeing. Operator approval of the released artifact's role is an explicit trust boundary. Runtime output cannot choose the artifact or overwrite its value.
-- Raw JSON metric formats use selectors into actual output. Both legacy tolerance profiles remain in one table. Optional paper variance must match an exact paper quote and number; the operator confirms statistic type, units and condition binding. Automated branches leave this override empty.
-
-Next action: commit the reviewed assessment and report phases, finish integrated regression and the CompGCN comparison, then complete Phase 8.
-
-## Phase 6 checkpoint
-
-- Phase 5 committed as `4502aca`.
-- `src/assessment/rules.py` implements pure deterministic assessment, copying the input and applying the five rules in order. Coverage unions must include every condition; overlapping sufficient support/flaw wins before decisive flaw; explainable concerns remain questioned. Non-decisive concerns are idempotent notes. Execution evidence needs alignment, and decisive released-artifact flaws need provenance.
-- Independent review (`phase_reviewer`) passed. `runs/v2_final/pytest-assessment.log`: **16 passed** with no external services. Tests exercise every rule, conflicts, partial coverage, paper-only support, execution provenance and repeat assessment.
-- Phase 7 report and Phase 8 integration are prepared separately and remain uncommitted.
-
-Next action: commit the reviewed Phase 7 report and teaser, then finish integration verification.
-
-## Phase 7 checkpoint
-
-- Phase 6 committed as `e2504db`.
-- `src/review/report/v2.py` deterministically produces the four-part report from assessed records. Evidence source types, pointers, conditions, questions, notes, issues and ledger are preserved. Claim order is flawed, questioned, unverified, supported, followed by importance. Existing PDF rendering is reused.
-- `src/review/teaser/v2.py` renders every claim and the four status counts to local SVG/JSON, with a saved optional image-authoring prompt. No image service is needed. Schema and textual publication-recommendation checks run before saving; literal Markdown escaping prevents injected headings/links.
-- Independent review (`phase_reviewer`) passed. `runs/v2_report/pytest.log`: **11 passed**. Review corrections cover recommendation variants across whitespace and source fields. PDF token display distinguishes actual/estimated/unavailable; absent measured usage is never invented. A PDF extraction whitespace assertion was normalized for physical wrapping while retaining its required text values.
-- Phase 8 default suite has passed **613 tests, 3 original deselections** (`runs/v2_final/pytest-full.log`); packaging, opt-in mocked legacy integration and final CompGCN comparison are being finalized.
-
-Next action: finish Phase 8 verification, update all 14 checks with final evidence, and commit the integration checkpoint.
+The requested implementation and automatic reviews are complete. For additional live evidence, configure MinerU and the desired model/services locally, supply the actual venue submission deadline, and run the v2 CLI. Refactor publishing remains a separate approval boundary; all implementation commits stay local. The open documentation PR is ready for maintainer review.

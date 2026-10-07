@@ -91,6 +91,46 @@ def test_existing_pdf_renderer_can_render_v2_layout(tmp_path):
         assert heading in text
 
 
+def test_v2_pdf_preserves_windows_pointers_and_snake_case_identifiers(tmp_path):
+    record = review()
+    claim = record.claims[0]
+    claim.id = "claim_003"
+    claim.questions[0].claim_id = claim.id
+    claim.text = "The source_repo uses relation_update."
+    claim.loc.section = "method_details"
+    claim.conditions[0].id = "relation_update"
+    claim.evidence[0].covered = ["relation_update"]
+    pointer = claim.evidence[0].pointer
+    pointer.locator = r"C:\source_repo\model\compgcn_conv.py"
+    pointer.quote = "return self.act(out), self.w_rel"
+    output = write_review(record, tmp_path)
+    assert "pdf_error" not in output
+    text = "\n".join(page.extract_text() for page in PdfReader(output["pdf"]).pages)
+    for literal in (
+        pointer.locator,
+        pointer.quote,
+        claim.text,
+        claim.id,
+        claim.loc.section,
+        "relation_update",
+    ):
+        assert literal in text
+
+
+def test_literal_pdf_mode_preserves_code_and_keeps_explicit_math_and_legacy_default():
+    from review.report.pdf_renderer import _markdown_parser, _render_markdown_inline_children
+
+    source = r"ordinary_name and `C:\source_repo\model_file.py` with $x_y$"
+    children = _markdown_parser().parse(source)[1].children
+    literal = _render_markdown_inline_children(children, inline_code_font="Courier", implicit_math=False)
+    assert "ordinary_name" in literal
+    assert r"C:\source_repo\model_file.py" in literal
+    assert "x<sub>y</sub>" in literal
+    legacy = _render_markdown_inline_children(children, inline_code_font="Courier")
+    assert "ordinary<sub>n</sub>ame" in legacy
+    assert "x<sub>y</sub>" in legacy
+
+
 def test_teaser_preserves_four_status_counts_and_source_types(tmp_path):
     result = write_teaser(review(), tmp_path)
     payload = json.loads(Path(result["json"]).read_text())

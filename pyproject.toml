@@ -119,17 +119,24 @@ Homepage = "https://github.com/DEFENSE-SEU/FactReview"
 [tool.hatch.build.targets.wheel]
 packages = [
   "src/agent_runtime",
+  "src/assessment",
   "src/common",
   "src/fact_generation",
   "src/llm",
   "src/preprocessing",
   "src/review",
   "src/schemas",
+  "src/screening",
+  "src/verification",
   "src/util",
 ]
 
 [tool.hatch.build.targets.sdist]
 include = ["src", "demos", "README.md", "LICENSE"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/pipeline_full.py" = "pipeline_full.py"
+"src/pipeline_v2.py" = "pipeline_v2.py"
 
 # ── Ruff ──────────────────────────────────────────────────────────────────────
 [tool.ruff]
