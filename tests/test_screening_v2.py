@@ -13,6 +13,7 @@ from screening.writing import check_tables, check_writing
 @pytest.fixture
 def materials(tmp_path):
     text = "Our methods is fast. Figure 1 shows the model."
+    (tmp_path / "paper.md").write_text(text, encoding="utf-8")
     return SharedMaterials(
         paper_key="tiny",
         source_pdf=str(tmp_path / "paper.pdf"),
@@ -41,6 +42,24 @@ def test_writing_preserves_original_sentence_and_levels(materials):
     assert result[0].evidence[0].pointer.quote == "Our methods is fast."
     assert result[0].loc.page == 1
     assert result[0].level == "definite_error"
+
+
+def test_writing_requires_an_existing_grounded_artifact(materials):
+    Path(materials.markdown_path).unlink()
+    with pytest.raises(ValueError, match="existing artifact"):
+        check_writing(
+            materials,
+            call=lambda **kwargs: {
+                "findings": [
+                    {
+                        "block_id": "b1",
+                        "quote": "Our methods is fast.",
+                        "text": "Use plural agreement.",
+                        "level": "definite_error",
+                    }
+                ]
+            },
+        )
 
 
 @pytest.mark.parametrize("change", [{"quote": "Invented sentence"}, {"level": "aesthetics"}])
@@ -100,6 +119,8 @@ def test_table_checks_use_parsed_text_without_images(materials):
     materials.blocks.append(
         MaterialBlock(id="table1", text="Method | Time", kind="table", loc=ClaimLocation(page=2))
     )
+    materials.markdown += "\nMethod | Time"
+    Path(materials.markdown_path).write_text(materials.markdown, encoding="utf-8")
 
     def call(**kwargs):
         assert "images" not in kwargs
@@ -114,6 +135,8 @@ def test_reference_check_only_receives_bibliography(materials, tmp_path):
     materials.bibliography = [
         MaterialBlock(id="ref1", text="A. Author. Real Work. 2020.", loc=ClaimLocation(page=5))
     ]
+    materials.markdown += "\n" + materials.bibliography[0].text
+    Path(materials.markdown_path).write_text(materials.markdown, encoding="utf-8")
 
     def checker(*, paper):
         assert Path(paper).read_text(encoding="utf-8") == materials.bibliography[0].text

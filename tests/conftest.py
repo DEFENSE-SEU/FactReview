@@ -8,11 +8,60 @@ stage's test file instead.
 
 from __future__ import annotations
 
+import socket
+import sys
+import threading
+import uuid
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 
 from schemas.paper import Paper, PaperMetadata, Section, Table
+
+
+def pytest_configure(config):
+    # Production switches long Windows venv paths to a hashed fallback. Keep
+    # fixture paths short so the existing run-local assertions exercise their
+    # intended branch consistently across operating systems.
+    if sys.platform == "win32" and config.option.basetemp is None:
+        parent = Path(__file__).resolve().parents[1] / "runs" / "pytest"
+        parent.mkdir(parents=True, exist_ok=True)
+        target = (parent / uuid.uuid4().hex[:8]).resolve()
+        if not target.is_relative_to(parent.resolve()) or target.exists():
+            raise ValueError("pytest needs a fresh temporary directory inside runs/pytest")
+        config.option.basetemp = str(target)
+
+
+@pytest.fixture(autouse=True)
+def isolated_external_boundaries(monkeypatch, request):
+    if any(
+        request.node.get_closest_marker(marker)
+        for marker in ("requires_docker", "requires_llm", "requires_mineru")
+    ):
+        return
+    monkeypatch.setattr("fact_generation.execution.tools.docker._docker_info_field", Mock(return_value=""))
+    monkeypatch.setattr(
+        socket, "create_connection", Mock(side_effect=OSError("Unit-test network access disabled"))
+    )
+    original_pair, original_connect = socket.socketpair, socket.socket.connect
+    internal = threading.local()
+
+    def socket_pair(*args, **kwargs):
+        # Windows uses a loopback connection for asyncio's internal wakeup pair.
+        internal.socket_pair = True
+        try:
+            return original_pair(*args, **kwargs)
+        finally:
+            internal.socket_pair = False
+
+    def connect(sock, address):
+        if getattr(internal, "socket_pair", False) and address[0] in {"127.0.0.1", "::1"}:
+            return original_connect(sock, address)
+        raise OSError("Unit-test network access disabled")
+
+    monkeypatch.setattr(socket, "socketpair", socket_pair)
+    monkeypatch.setattr(socket.socket, "connect", connect)
 
 
 @pytest.fixture
