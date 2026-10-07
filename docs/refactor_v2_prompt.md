@@ -42,8 +42,11 @@ Source material: `docs/method_v2_spec.md` (authoritative); current code (see cod
 `demos/Graph/compgcn` for end-to-end checks.
 Allowed changes: `src/`, `scripts/`, `tests/`, `docs/`, `README.md`, `pyproject.toml`.
 Do not modify `RefCopilot/` internals (call it as a library), `demos/*/` reference outputs, or `LICENSE`.
-Run limit: stop after each phase in <layer_2_procedure> for review; at most 3 fix attempts per
-failing check before reporting it as a blocker.
+After each phase in <layer_2_procedure>, use a separate agent for automatic review, address its
+findings, run the affected checks, and commit. Continue directly to the next phase without waiting
+for maintainer review. Continue until the task is complete or the maintainer explicitly requests
+a stop. Report genuine blockers and continue all independent work; at most 3 fix attempts per
+failing check before recording that blocker.
 Fill any missing field before starting. If a missing detail changes the outcome, ask one focused question.
 </inputs>
 
