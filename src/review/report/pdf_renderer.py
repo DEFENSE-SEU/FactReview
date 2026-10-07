@@ -653,6 +653,7 @@ def _render_markdown_inline_children(
     inline_code_font: str,
     body_font: str | None = None,
     formula_font: str | None = None,
+    implicit_math: bool = True,
 ) -> str:
     if not children:
         return ""
@@ -678,9 +679,10 @@ def _render_markdown_inline_children(
         token_content = str(getattr(token, "content", "") or "")
 
         if token_type == "text":
-            escaped_text = _render_formula_aware_text(
-                token_content,
-                formula_font=effective_formula_font or None,
+            escaped_text = (
+                _render_formula_aware_text(token_content, formula_font=effective_formula_font or None)
+                if implicit_math
+                else _escape(token_content)
             )
             if strong_depth > 0 or italic_depth > 0:
                 emphasis_font = _resolve_markdown_emphasis_font(
@@ -707,7 +709,7 @@ def _render_markdown_inline_children(
             parts.append("<br/>")
             continue
         if token_type == "code_inline":
-            if _looks_like_formula_text(token_content):
+            if implicit_math and _looks_like_formula_text(token_content):
                 parts.append(
                     _apply_strike(
                         _render_formula_aware_text(
@@ -1336,7 +1338,9 @@ def _looks_like_ascii_tree(line: str) -> bool:
     return any(token in stripped for token in tree_tokens)
 
 
-def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) -> None:
+def _append_markdown_report(
+    story: list, styles: StyleSheet1, *, markdown: str, implicit_math: bool = True
+) -> None:
     clean = _normalize_newlines(str(markdown or "")).strip()
     if not clean:
         return
@@ -1511,6 +1515,7 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                                 else styles["MarkdownTableCell"].fontName
                             ),
                             formula_font=styles["MarkdownCode"].fontName,
+                            implicit_math=implicit_math,
                         )
                     inner_cursor += 1
                 current_row.append(cell_markup.strip())
@@ -1624,6 +1629,7 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                             inline_code_font=styles["MarkdownCode"].fontName,
                             body_font=list_style.fontName,
                             formula_font=styles["MarkdownCode"].fontName,
+                            implicit_math=implicit_math,
                         )
                         if markup:
                             item_paragraph_parts.append(markup)
@@ -1683,6 +1689,7 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                 inline_code_font=styles["MarkdownCode"].fontName,
                 body_font=heading_body_font,
                 formula_font=styles["MarkdownCode"].fontName,
+                implicit_math=implicit_math,
             )
 
             if level <= 1:
@@ -1727,6 +1734,7 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                     inline_code_font=styles["MarkdownCode"].fontName,
                     body_font=styles["BodyTextEnterprise"].fontName,
                     formula_font=styles["MarkdownCode"].fontName,
+                    implicit_math=implicit_math,
                 )
                 if paragraph_markup:
                     story.append(Paragraph(paragraph_markup, styles["BodyTextEnterprise"]))
@@ -1766,6 +1774,7 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                         inline_code_font=styles["MarkdownCode"].fontName,
                         body_font=styles["BodyTextEnterprise"].fontName,
                         formula_font=styles["MarkdownCode"].fontName,
+                        implicit_math=implicit_math,
                     )
                     if quote_markup:
                         quote_parts.append(quote_markup)
@@ -3562,6 +3571,7 @@ def build_review_report_pdf(
     owner_email: str | None = None,
     token_usage: dict[str, Any] | None = None,
     agent_model: str | None = None,
+    implicit_math: bool = True,
 ) -> bytes:
     fonts = _resolve_report_fonts()
     logo_path: Path | None = None
@@ -3687,7 +3697,7 @@ def build_review_report_pdf(
             title="Final Agent Report",
             subtitle="Structured markdown synthesized by the annotation agent.",
         )
-        _append_markdown_report(story, styles, markdown=final_report_text)
+        _append_markdown_report(story, styles, markdown=final_report_text, implicit_math=implicit_math)
 
     if source_pdf_bytes:
         story.append(PageBreak())

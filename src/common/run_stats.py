@@ -6,9 +6,11 @@ import json
 import math
 import os
 import sys
+import threading
 import time
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 try:
     import fcntl
@@ -31,15 +33,20 @@ _ACTIVE_MODULE: contextvars.ContextVar[str | None] = contextvars.ContextVar(
 _RUN_STATS_ENV = "FACTREVIEW_RUN_STATS_PATH"
 _ACTIVE_MODULE_ENV = "FACTREVIEW_ACTIVE_STATS_MODULE"
 _CLI_STATUS_ENV = "FACTREVIEW_CLI_STATUS"
+_UPDATE_LOCK = threading.RLock()
 
 
 def stats_path() -> Path | None:
-    token = str(os.getenv(_RUN_STATS_ENV) or "").strip()
-    return Path(token).expanduser().resolve() if token else None
+    # Windows resolution opens the target file. Serialize it with replacements,
+    # including callers that have not yet entered the update transaction.
+    with _UPDATE_LOCK:
+        token = str(os.getenv(_RUN_STATS_ENV) or "").strip()
+        return Path(token).expanduser().resolve() if token else None
 
 
 def set_stats_path(path: Path) -> None:
-    os.environ[_RUN_STATS_ENV] = str(path.expanduser().resolve())
+    with _UPDATE_LOCK:
+        os.environ[_RUN_STATS_ENV] = str(path.expanduser().resolve())
 
 
 def cli_status_enabled() -> bool:
@@ -57,6 +64,8 @@ def log_status(message: str) -> None:
 
 def validate_module(module: str) -> str:
     normalized = str(module or "").strip()
+    if normalized.startswith(("screening.", "screening_", "verification.", "verification_")):
+        normalized = "analysis"
     if normalized not in MODULE_ORDER:
         raise ValueError(f"unknown stats module: {module!r}")
     return normalized
@@ -161,6 +170,13 @@ def _normalize_payload(payload: Any) -> dict[str, Any]:
 
 @contextlib.contextmanager
 def _locked_payload(path: Path) -> Iterator[dict[str, Any]]:
+    # V2 peer branches issue model calls concurrently, including on Windows.
+    with _UPDATE_LOCK, _file_locked_payload(path) as payload:
+        yield payload
+
+
+@contextlib.contextmanager
+def _file_locked_payload(path: Path) -> Iterator[dict[str, Any]]:
     path.parent.mkdir(parents=True, exist_ok=True)
     lock_path = path.with_name(path.name + ".lock")
     lock_fh = lock_path.open("a+", encoding="utf-8")
@@ -194,6 +210,12 @@ def initialize(path: Path) -> dict[str, Any]:
 
 
 def read(path: Path | None = None) -> dict[str, Any]:
+    # On Windows an open reader can prevent the next atomic replacement.
+    with _UPDATE_LOCK:
+        return _read_unlocked(path)
+
+
+def _read_unlocked(path: Path | None = None) -> dict[str, Any]:
     target = path or stats_path()
     if target is None or not target.exists():
         return _normalize_payload({})
@@ -278,7 +300,7 @@ def estimate_tokens(text: str) -> int:
         return 0
     # Rough cross-provider approximation for auditability when a backend does
     # not return usage. The warning path always marks these totals as estimated.
-    return max(1, int(math.ceil(len(clean) / 4)))
+    return max(1, math.ceil(len(clean) / 4))
 
 
 def record_llm_call(
@@ -434,7 +456,7 @@ def format_summary_table(payload: dict[str, Any]) -> list[str]:
             notes.append("external/no own LLM")
         line = (
             f"  {module:<18}  "
-            f"{str(row.get('status') or 'pending'):<12}  "
+            f"{row.get('status') or 'pending'!s:<12}  "
             f"{format_seconds(row.get('duration_sec')):<9}  "
             f"{_fmt_int(usage.get('requests')):>8}  "
             f"{_fmt_int(usage.get('input_tokens')):>10}  "

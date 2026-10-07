@@ -22,7 +22,7 @@ from review.report.stage_runner import run_report_stage
 from review.teaser.stage_runner import run_teaser_stage
 from schemas.execution import ExecutionPayload
 from schemas.stage import StageResult
-from util.cutoff_date import CutoffDate, derive_cutoff_from_source, parse_cutoff
+from util.cutoff_date import CutoffDate, derive_cutoff_from_source, parse_cutoff, parse_submission_deadline
 from util.paper_input import infer_paper_key, materialize_paper_pdf
 from util.run_layout import build_run_dir, ensure_run_subdirs, make_run_id
 
@@ -117,23 +117,21 @@ def _apply_cli_env_overrides(args: argparse.Namespace) -> None:
 
 
 def _resolve_cutoff(*, args: argparse.Namespace, paper_source: str) -> CutoffDate | None:
-    """Pick the publication-date cutoff to apply to positioning retrieval.
-
-    Precedence:
-    1. ``--no-cutoff`` -> always None.
-    2. ``--cutoff-date`` -> parse as ``YYYY[-MM[-DD]]``.
-    3. arXiv URL/ID -> derive ``YYYY-MM`` from the ID prefix.
-    4. Otherwise -> None (no filter; current-date semantics).
-    """
+    """Resolve an explicit deadline; arXiv derivation requires an explicit opt-in."""
+    deadline = str(getattr(args, "submission_deadline", "") or "").strip()
+    if deadline:
+        return parse_submission_deadline(deadline)
     if bool(getattr(args, "no_cutoff", False)):
         return None
     explicit = str(getattr(args, "cutoff_date", "") or "").strip()
     if explicit:
         return parse_cutoff(explicit)
-    return derive_cutoff_from_source(paper_source)
+    return (
+        derive_cutoff_from_source(paper_source) if getattr(args, "derive_cutoff_from_arxiv", False) else None
+    )
 
 
-def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
+def run_legacy_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     pipeline_t0 = time.monotonic()
     repo_root = Path(__file__).resolve().parents[1]
     settings = get_settings()
@@ -269,7 +267,9 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             lambda: run_teaser_stage(run_dir=run_dir),
             stats_module="teaser_figure",
         )
-        teaser_info = teaser_result.extra.get("teaser_figure") if isinstance(teaser_result.extra, dict) else {}
+        teaser_info = (
+            teaser_result.extra.get("teaser_figure") if isinstance(teaser_result.extra, dict) else {}
+        )
         teaser_status = str((teaser_info or {}).get("status") or "").strip()
         if teaser_status:
             run_stats.record_module_status("teaser_figure", teaser_status)
@@ -373,12 +373,45 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     return summary
 
 
+def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
+    from pipeline_v2 import run_v2_pipeline
+
+    # Legacy cutoff flags are accepted only when explicitly requested. Day-level
+    # v2 retrieval still requires a concrete deadline; coarse cutoffs stay unresolved.
+    if not getattr(args, "submission_deadline", ""):
+        cutoff = _resolve_cutoff(args=args, paper_source=args.paper_pdf)
+        if cutoff and cutoff.precision == "day":
+            args.submission_deadline = cutoff.to_string()
+    return run_v2_pipeline(args)
+
+
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser("factreview_full_pipeline")
     p.add_argument("paper_pdf", type=str, help="Path or URL to a paper PDF")
     p.add_argument("--paper-key", type=str, default="")
     p.add_argument("--run-root", type=str, default="runs")
-    p.add_argument("--reuse-job-id", type=str, default="", help="Reuse an existing runtime job snapshot")
+    p.add_argument(
+        "--submission-deadline",
+        default="",
+        help="Venue submission deadline, YYYY-MM-DD; required for Literature assessment",
+    )
+    p.add_argument(
+        "--repository-root", default="", help="Read-only local snapshot of the released repository"
+    )
+    p.add_argument("--repository-url", default="", help="HTTPS URL of the released repository")
+    p.add_argument("--approval-mode", choices=("auto", "interactive"), default="auto")
+    p.add_argument("--training-budget", type=int, default=0, help="Maximum training runs, including retries")
+    p.add_argument(
+        "--execution-config",
+        default="",
+        help="JSON execution configuration: output mappings, frozen author artifacts, paper variances and policy",
+    )
+    p.add_argument(
+        "--derive-cutoff-from-arxiv",
+        action="store_true",
+        help="Explicit legacy cutoff derivation; provide a day-level submission deadline for v2",
+    )
+    p.add_argument("--reuse-job-id", type=str, default="", help="Legacy option; v2 reports job-snapshot reuse as unsupported")
     p.add_argument(
         "--llm-provider",
         type=str,
@@ -407,7 +440,7 @@ def parse_args() -> argparse.Namespace:
         "--teaser-mode",
         choices=("auto", "prompt", "api"),
         default="auto",
-        help="Teaser figure mode: auto attempts Gemini when a key exists, prompt saves/copies the prompt, api attempts the configured image API.",
+        help="V2 writes a local SVG and prompt in auto/prompt modes; legacy api mode is unsupported.",
     )
     p.add_argument(
         "--disable-semantic-scholar",
@@ -417,14 +450,16 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--enable-refcheck",
         action="store_true",
-        help="Run RefCopilot reference-accuracy validation and append fabricated-reference findings to the final report.",
+        help="Compatibility flag: v2 L1 always checks bibliography entries with RefCopilot.",
     )
     p.add_argument(
         "--run-execution",
         action="store_true",
         help="Run the repository execution stage. Disabled by default.",
     )
-    p.add_argument("--max-attempts", type=int, default=5, help="Execution-stage max fix loop attempts")
+    p.add_argument(
+        "--max-attempts", type=int, choices=range(4), default=3, help="Maximum repair rounds, capped at 3"
+    )
     p.add_argument(
         "--no-pdf-extract",
         action="store_true",
@@ -433,7 +468,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--execution-auto-tasks",
         action="store_true",
-        help="Let execution infer tasks.yaml from the repository/paper instead of requiring a fixture.",
+        help="Legacy option; v2 accepts only claim-linked Experiments plans and reports this option as unsupported.",
     )
     p.add_argument(
         "--execution-auto-tasks-mode",
@@ -444,27 +479,27 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--execution-auto-tasks-force",
         action="store_true",
-        help="Regenerate inferred execution tasks even when a tasks.yaml already exists.",
+        help="Legacy option; forced task invention is unsupported in v2.",
     )
     p.add_argument(
         "--execution-paper-budget-sec",
         type=int,
         default=0,
         help=(
-            "Optional soft per-paper execution budget. Disabled unless "
-            "EXECUTION_ENABLE_PAPER_BUDGET=1 is set; 0 disables the budget."
+            "Legacy per-paper time budget; nonzero values are unsupported in v2. "
+            "Use --execution-config for per-run timeout_seconds."
         ),
     )
     p.add_argument(
         "--execution-docker-build-timeout-sec",
         type=int,
         default=0,
-        help="Per-paper Docker image build timeout for execution; 0 disables the timeout.",
+        help="Docker image build timeout in seconds; 0 uses the v2 default of 3600 seconds.",
     )
     p.add_argument(
         "--execution-no-docker",
         action="store_true",
-        help="Run execution tasks on the host Python environment instead of Docker.",
+        help="Legacy option; enabled v2 execution requires Docker and rejects this flag.",
     )
     p.add_argument(
         "--execution-no-llm",
@@ -476,22 +511,22 @@ def parse_args() -> argparse.Namespace:
         type=str,
         default="",
         help=(
-            "Inclusive publication-date cutoff for positioning retrieval, "
-            "as YYYY, YYYY-MM, or YYYY-MM-DD. If omitted, an arXiv URL/ID is "
-            "used to auto-derive YYYY-MM; for non-arXiv inputs no cutoff is "
-            "applied (current-date semantics)."
+            "Explicit legacy cutoff; day-level values are accepted as a submission deadline. "
+            "Prefer --submission-deadline YYYY-MM-DD for v2."
         ),
     )
     p.add_argument(
         "--no-cutoff",
         action="store_true",
         help=(
-            "Disable publication-date cutoff entirely (overrides --cutoff-date "
-            "and arXiv auto-derivation). Useful for analysing how the paper "
-            "compares against later work."
+            "Legacy option; v2 records an unsupported-option error. Supply the actual submission deadline."
         ),
     )
-    return p.parse_args()
+    args = p.parse_args()
+    args._execution_overrides = {
+        token.split("=", 1)[0][2:].replace("-", "_") for token in sys.argv[1:] if token.startswith("--")
+    }
+    return args
 
 
 def main() -> None:
@@ -500,6 +535,8 @@ def main() -> None:
     _apply_cli_env_overrides(args)
     summary = run_full_pipeline(args)
     print(json.dumps(summary, ensure_ascii=False, indent=2))
+    if any(status == "failed" for status in summary.get("stages", {}).values()):
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

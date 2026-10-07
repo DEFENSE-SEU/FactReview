@@ -1,5 +1,77 @@
 # FactReview <a href="https://arxiv.org/abs/2604.04074"><img src="https://img.shields.io/badge/arXiv-2604.04074-b31b1b.svg" alt="Paper"></a> <img src="https://img.shields.io/badge/license-AGPL--3.0-green.svg" alt="License">
 
+## Method v2
+
+The default pipeline follows the [method specification](docs/method_v2_spec.md):
+
+`materials → L1 screening → L2 typed verification → L3 execution (optional) → assessment → report → teaser`
+
+Claims are extracted once before verification. Each records its paper location, conditions and evidence needs. Literature, Theory, Code and Experiments receive only the claims routed to them. The report consumes the assessed records and preserves their evidence sources.
+
+| Status | Evidence rule |
+|---|---|
+| `supported` | Sufficient support covers every condition, with no concern affecting the claim. |
+| `flawed` | Sufficient flaw evidence survives reasonable author explanations. |
+| `questioned` | An author-resolvable concern, or sufficient support and flaw evidence overlap. |
+| `unverified` | Available evidence cannot decide the claim. |
+
+Paper-internal support stays explicitly labelled. The report has four parts: Overview, Claim list, Other findings, Execution ledger. Claim order is flawed, questioned, unverified, supported. FactReview assists reviewers and provides no publication decision.
+
+### Run v2
+
+Use Python 3.11+ and the existing LLM and MinerU configuration. Install the runtime and reference-check dependencies:
+
+```bash
+pip install -e ".[runtime,refcheck,positioning,dev]"
+python scripts/execute_review_pipeline.py path/to/paper.pdf \
+  --paper-key my_paper --submission-deadline YYYY-MM-DD \
+  --repository-root path/to/released/repository
+```
+
+Replace `YYYY-MM-DD` with the target venue's actual submission deadline. Literature treats the preceding three calendar months as concurrent work. A missing deadline leaves Literature verification unresolved. The default never derives a date from the paper's arXiv ID. `--repository-url https://github.com/owner/repo` can supply a released repository snapshot; a single GitHub repository URL in the paper can also be discovered automatically.
+
+Add `--run-execution` for Docker verification. `--approval-mode auto` is the default; `--approval-mode interactive` displays each eligible plan and requests a decision. `--training-budget 0` permits no training runs. Positive budgets count every training run, including retries, and only high-priority training plans qualify. `--max-attempts 3` permits at most three accepted infrastructure repairs; accepted values are 0–3.
+
+L3 creates a separate workspace after approval. It checks actual runtime dataset, metric and settings before using a result. Repairs are limited to dependencies, paths, launch arguments and wrappers; the original model, loss, data, evaluation and baselines stay protected. Ambiguous paper targets and missing resources remain blocked with a recorded reason. Default metric tolerances are centralized in [`v2_config.py`](src/fact_generation/execution/v2_config.py), including both historical profiles.
+
+Use `--execution-config path/to/config.json` for an `ExecutionConfig` JSON document. Explicit CLI options override the corresponding file fields, including an explicit training budget of zero. Per-plan `output_mappings` select dataset, metric and settings from actual output. They cannot substitute expected paper values. Per-plan `author_artifacts` bind a released data/log file's path, SHA-256, metadata selectors and recomputation operation before execution; the operator must confirm its role as authors' released data or logs. Per-plan/per-condition `paper_variances` require an exact paper block, quotation and nonnegative value. The operator must confirm the statistic's meaning, units and condition binding; quotation validation alone does not establish those semantics. These optional contracts are empty by default.
+
+Outputs are saved under `runs/<paper-key>_<timestamp>_<unique-id>/`:
+
+- `materials/materials.json`: original parser content, page/figure images and repository index.
+- `screening/screening.json`, `verification/verification.json`: claims, findings, evidence, plans and unresolved issues.
+- `execution/`: per-run commands, output, approval, alignment and repair records when enabled.
+- `review/report/final_review.{json,md,pdf}`: canonical records and the rendered review.
+- `review/teaser/teaser.{json,svg}` and `teaser_prompt.md`: deterministic four-status summary and optional image-authoring prompt.
+- `full_pipeline_summary.json`, `run_stats.json`: stage results, errors and measured or explicitly estimated usage.
+
+The v2 teaser is rendered locally as SVG. The old Gemini teaser API, old runtime-job reuse, automatic task invention and the legacy per-paper time-budget flag are outside the v2 entry point; explicit unsupported options produce a recorded error. `--execution-docker-build-timeout-sec` controls Docker image-build timeout. Docker is required for enabled execution.
+
+### Verification and known limits
+
+```bash
+python -m pytest
+python scripts/check_v2_compgcn.py
+```
+
+Unit tests mock service boundaries and block external network connections. On Windows, the suite chooses a fresh short temporary path under `runs/pytest` to keep the original execution-path assertions portable. Existing live-test markers remain opt-in.
+
+The CompGCN check is an explicitly labelled offline fixture replay using the real PDF and repository. It saves its mocked-service boundaries and a historical-label comparison. A live MinerU/LLM/Docker result requires locally configured credentials and services.
+
+Literature records its search scope. An adapter that does not certify search completeness cannot support a novelty claim solely because no close work was returned. The technical query vocabulary leaves uncovered domains visibly unresolved. Theory and Code preserve questionable differences for author explanation; this implementation includes no automated theorem prover. Claim splitting semantics depend on the configured model, while source locations, exact quotations, routing and aggregation have deterministic checks.
+
+### Historical artifacts and RefCopilot
+
+Historical demo outputs remain unchanged. Read old JSON, Markdown or HTML claim artifacts through `schemas.v1_adapter.read_v1_artifact`; `in_conflict` becomes `questioned` for display and retains its original label. Reading an old artifact does not reassess its evidence.
+
+RefCopilot remains available independently; see its [README](RefCopilot/README.md). V2 L1 calls its entry-level bibliography checker; citation support is handled by the Literature branch.
+
+<details>
+<summary>Historical v1 guide and demo outputs</summary>
+
+The following guide describes the original v1 workflow and its saved demonstrations. Use the v2 instructions above for the current default entry point.
+
+
 <p align="center">
   <img src="demos/Graph/compgcn/teaser_figure.png" alt="A FactReview output for the CompGCN paper: technical positioning, claim verdicts, reproduced experimental numbers, strengths and weaknesses — all on one page." width="900">
 </p>
@@ -343,3 +415,5 @@ If FactReview helped your work, please ⭐ the repo and cite:
 ## License
 
 AGPL-3.0-only.
+
+</details>
