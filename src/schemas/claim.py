@@ -1,72 +1,222 @@
-"""Claim schemas used by the review and audit pipeline."""
+"""V2 claim, evidence, and handoff contracts (method specification §2 and §6)."""
 
 from __future__ import annotations
 
+import re
 from enum import StrEnum
+from typing import Annotated, Any, Literal, Self
+from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
-
-class ClaimType(StrEnum):
-    """Paper §3.1: claim taxonomy."""
-
-    EMPIRICAL = "empirical"
-    METHODOLOGICAL = "methodological"
-    THEORETICAL = "theoretical"
+NonEmpty = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+FiniteNumber = Annotated[float, Field(allow_inf_nan=False)]
 
 
-class ClaimLabel(StrEnum):
-    """The four verdicts for claim assessment."""
+class Contract(BaseModel):
+    model_config = ConfigDict(extra="forbid")
 
+
+class ClaimStatus(StrEnum):
     SUPPORTED = "supported"
-    PARTIALLY_SUPPORTED = "partially_supported"
-    INCONCLUSIVE = "inconclusive"
-    IN_CONFLICT = "in_conflict"
+    FLAWED = "flawed"
+    QUESTIONED = "questioned"
+    UNVERIFIED = "unverified"
 
 
-class ClaimLocation(BaseModel):
-    """Where in the paper a claim lives."""
-
-    section_id: str | None = None
-    table_id: str | None = None
-    figure_id: str | None = None
-    char_start: int | None = None
-    char_end: int | None = None
-    page: int | None = None
+class EvidenceNeed(StrEnum):
+    LITERATURE = "Literature"
+    THEORY = "Theory"
+    CODE = "Code"
+    EXPERIMENTS = "Experiments"
 
 
-class SubClaim(BaseModel):
-    """A decomposition of a broad claim by (task, dataset, metric).
+class ClaimLocation(Contract):
+    """One-based page, section anchor, and/or offsets into the parsed paper."""
 
-    Example: the CompGCN claim "outperforms prior work across link prediction,
-    node classification, and graph classification" decomposes into three
-    :class:`SubClaim` entries, one per task.
+    page: int | None = Field(default=None, ge=1)
+    section: str | None = None
+    char_start: int | None = Field(default=None, ge=0)
+    char_end: int | None = Field(default=None, ge=0)
+
+    @model_validator(mode="after")
+    def localizable(self) -> Self:
+        if (self.char_start is None) != (self.char_end is None):
+            raise ValueError("char_start and char_end must be supplied together")
+        if self.char_start is not None and self.char_end <= self.char_start:
+            raise ValueError("char_end must follow char_start")
+        if self.page is None and not (self.section or "").strip() and self.char_start is None:
+            raise ValueError("a claim location requires a page, section, or character span")
+        return self
+
+
+class Condition(Contract):
+    """A stable coverage unit; settings can include a task, split, model, or seed."""
+
+    id: NonEmpty
+    dataset: NonEmpty | None = None
+    metric: NonEmpty | None = None
+    settings: dict[str, Any] = Field(default_factory=dict)
+    description: str = ""
+
+    @model_validator(mode="after")
+    def specified(self) -> Self:
+        if not (self.dataset or self.metric or self.settings or self.description.strip()):
+            raise ValueError("a condition requires dataset, metric, settings, or a description")
+        return self
+
+
+class EvidencePointer(Contract):
+    """Checkable artifact locator and passage/line/output key.
+
+    Examples: paper.pdf + page/quote; arXiv/DOI URL + quote; config.yaml +
+    line; runs/eval/metrics.json + key. The producing branch checks existence;
+    this schema checks the information needed to locate the evidence.
     """
 
-    id: str  # stable id, e.g. "claim_01.sub_02"
-    text: str
-    task: str | None = None
-    dataset: str | None = None
-    metric: str | None = None
-    expected_value: float | None = None
-    expected_tolerance: float | None = None
+    locator: NonEmpty
+    quote: str = ""
+    page: int | None = Field(default=None, ge=1)
+    line: int | None = Field(default=None, ge=1)
+    key: str | None = None
 
 
-class Claim(BaseModel):
-    """A review-relevant claim extracted from the paper."""
+class ExecutionProvenance(Contract):
+    """Identify recomputation from the authors' released data or logs."""
 
-    model_config = ConfigDict(extra="ignore")
+    released_artifact: bool = False
+    artifact_kind: Literal["data", "logs", "other"] = "other"
+    environment_explanation_possible: bool = True
+    run_id: str | None = None
+    command: list[str] = Field(default_factory=list)
+    runtime_conditions: list[Condition] = Field(default_factory=list)
 
-    id: str  # stable within one paper, e.g. "claim_01"
-    text: str  # natural-language statement
-    type: ClaimType
-    scope: str = ""  # "broad" / "local" / free-form
-    datasets: list[str] = Field(default_factory=list)
-    baselines: list[str] = Field(default_factory=list)
-    metrics: list[str] = Field(default_factory=list)
-    importance: str = ""  # "primary" / "secondary" when supplied by the extractor.
-    location: ClaimLocation = Field(default_factory=ClaimLocation)
-    subclaims: list[SubClaim] = Field(default_factory=list)
-    evidence_targets: list[str] = Field(default_factory=list)
-    # What evidence MUST we produce to move this claim off Inconclusive?
-    # e.g. ["table_3.MRR.FB15k-237", "execution.eval_fb237_conve.mrr"]
+
+class Evidence(Contract):
+    source: Literal["paper_internal", "literature", "theory", "code", "execution"]
+    pointer: EvidencePointer
+    covered: list[NonEmpty] = Field(default_factory=list)
+    direction: Literal["support", "flaw"]
+    sufficient: bool = False
+    note: str = ""
+    concern: bool = False
+    affects_claim: bool = True
+    overturnable: bool = True
+    aligned: bool | None = None
+    provenance: ExecutionProvenance | None = None
+
+    @model_validator(mode="after")
+    def check_pointer_and_alignment(self) -> Self:
+        pointer = self.pointer
+        if self.source in {"paper_internal", "theory"}:
+            if not pointer.quote.strip() or not (pointer.page or (pointer.key or "").strip()):
+                raise ValueError("paper/theory evidence requires a quote and page or section key")
+        elif self.source == "literature":
+            url = urlsplit(pointer.locator)
+            valid_url = url.scheme in {"https", "http"} and bool(url.netloc)
+            valid_identifier = re.fullmatch(
+                r"(?i)(?:doi:)?10\.\d{4,9}/\S+|arxiv:(?:\d{4}\.\d{4,5}|[a-z.-]+/\d{7})(?:v\d+)?",
+                pointer.locator,
+            )
+            if not (valid_url or valid_identifier):
+                raise ValueError("literature evidence requires a DOI, arXiv id, or URL locator")
+            if not pointer.quote.strip():
+                raise ValueError("literature evidence requires the retrieved passage")
+        elif self.source == "code" and pointer.line is None:
+            raise ValueError("code evidence requires a source/config file and line")
+        elif self.source == "execution":
+            if not (pointer.key or "").strip():
+                raise ValueError("execution evidence requires a log/metric path and key")
+            if self.sufficient and self.aligned is not True:
+                raise ValueError("sufficient execution evidence must be aligned")
+        if len(self.covered) != len(set(self.covered)):
+            raise ValueError("evidence coverage ids must be unique")
+        if self.sufficient and not self.covered:
+            raise ValueError("sufficient evidence must identify covered conditions")
+        return self
+
+
+class AuthorQuestion(Contract):
+    text: NonEmpty
+    claim_id: str | None = None
+    reason: str = ""
+
+
+class Claim(Contract):
+    """The same record is enriched from extraction through final assessment."""
+
+    id: NonEmpty
+    text: NonEmpty
+    loc: ClaimLocation
+    conditions: list[Condition] = Field(min_length=1)
+    needs: list[EvidenceNeed]
+    importance: Literal["core", "secondary"] = "secondary"
+    questions: list[AuthorQuestion] = Field(default_factory=list)
+    evidence: list[Evidence] = Field(default_factory=list)
+    status: ClaimStatus = ClaimStatus.UNVERIFIED
+    notes: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def check_references(self) -> Self:
+        ids = [condition.id for condition in self.conditions]
+        if len(ids) != len(set(ids)):
+            raise ValueError("condition ids must be unique within a claim")
+        if len(self.needs) != len(set(self.needs)):
+            raise ValueError("needs must not contain duplicate branches")
+        for item in self.evidence:
+            if not set(item.covered).issubset(ids):
+                raise ValueError("evidence coverage must refer to this claim's condition ids")
+        for question in self.questions:
+            if question.claim_id is not None and question.claim_id != self.id:
+                raise ValueError("an author question must refer to its enclosing claim")
+        return self
+
+
+class ExecutionTask(Contract):
+    entry_script: str | None = None
+    config: str | None = None
+    command: list[str] = Field(default_factory=list)
+    workdir: str = "."
+    metric_output: str | None = None
+
+
+class ExecutionPlan(Contract):
+    id: NonEmpty
+    claim_id: NonEmpty
+    condition_ids: list[NonEmpty] = Field(min_length=1)
+    target_conditions: list[Condition] = Field(min_length=1)
+    task: ExecutionTask = Field(default_factory=ExecutionTask)
+    run_mode: Literal["evaluation", "analysis", "training"]
+    # Condition-id keys preserve two datasets reporting the same metric.
+    y_paper: dict[str, FiniteNumber] = Field(min_length=1)
+    feasibility: Literal["ready", "blocked"]
+    blocker: str = ""
+    priority: Literal["high", "medium", "low"]
+    estimated_cost: str = "unknown"
+
+    @model_validator(mode="after")
+    def check_feasibility_and_conditions(self) -> Self:
+        if self.feasibility == "blocked" and not self.blocker.strip():
+            raise ValueError("blocked plans require a blocker reason")
+        if self.feasibility == "ready" and self.blocker.strip():
+            raise ValueError("ready plans cannot have an unresolved blocker")
+        if self.feasibility == "ready" and not (self.task.entry_script or self.task.command):
+            raise ValueError("ready plans require a candidate script or command")
+        ids = [condition.id for condition in self.target_conditions]
+        if len(self.condition_ids) != len(set(self.condition_ids)) or len(ids) != len(set(ids)):
+            raise ValueError("plan condition ids must be unique")
+        if set(self.condition_ids) != set(ids):
+            raise ValueError("condition_ids must match target_conditions")
+        if set(self.y_paper) != set(ids):
+            raise ValueError("y_paper keys must match condition_ids")
+        if any(not condition.metric for condition in self.target_conditions):
+            raise ValueError("execution target conditions require a metric")
+        return self
+
+
+class Finding(Contract):
+    kind: Literal["writing", "figure", "reference", "related_work", "baseline", "table"]
+    loc: ClaimLocation
+    evidence: list[Evidence] = Field(min_length=1)
+    level: NonEmpty
+    text: NonEmpty

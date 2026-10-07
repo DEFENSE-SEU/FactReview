@@ -2,15 +2,15 @@
 
 ## Task
 
-Open the documentation-only PR, then implement the authoritative v2 method specification through Phases 0–8 on `refactor/method-v2`. Stop after each phase for review, as required by the adopted prompt. Keep all 14 acceptance checks observable. Never weaken or add skips to tests. Unit tests must mock LLM, retrieval, and Docker. Do not modify RefCopilot internals, demo reference outputs, or LICENSE. Keep refactor commits local until all checks pass or the user explicitly requests a push; the adopted prompt also requires approval before publishing the refactor.
+Open the documentation-only PR, then implement the authoritative v2 method specification through Phases 0–8 on `refactor/method-v2`. Use an independent agent to review each phase, address findings, verify and commit, then continue automatically. The maintainer removed the phase-pause requirement on 2026-10-08 and requested continuous work until completion or an explicit stop. Keep all 14 acceptance checks observable. Never weaken or add skips to tests. Unit tests must mock LLM, retrieval, and Docker. Do not modify RefCopilot internals, demo reference outputs, or LICENSE. Keep refactor commits local until all checks pass or the user explicitly requests a push; the adopted prompt also requires approval before publishing the refactor.
 
 ## Outputs
 
 - Documentation PR: https://github.com/DEFENSE-SEU/FactReview/pull/12
-- Documentation branch: `docs/method-v2-spec`; commit `ab983b99ff8e1134cf1b270196eac3d355008603`.
+- Documentation branch: `docs/method-v2-spec`; initial patch commit `ab983b9`, automatic-review amendment `281e0f5` (also applied to the refactor branch as `84c2aeb`).
 - Current branch: `refactor/method-v2`, created directly from the documentation branch.
 - `docs/method_v2_spec.md`: authoritative specification, unchanged from the patch.
-- `docs/refactor_v2_prompt.md`: adopted procedure, unchanged from the patch.
+- `docs/refactor_v2_prompt.md`: adopted procedure, amended to use automatic phase reviews and continuous execution per the maintainer's request.
 - `checks.md`: all 14 acceptance requirements.
 - `progress.md`: this handoff.
 - `runs/v2_baseline/`: local baseline logs (ignored by Git).
@@ -20,6 +20,8 @@ Open the documentation-only PR, then implement the authoritative v2 method speci
 - `runs/v2_baseline/baseline_isolation.py`: explicit local pytest plugin for indirect Docker and loopback probes.
 - `runs/v2_baseline/preflight.json`, `compgcn-baseline.txt`: credential readiness and live-demo skip reason.
 - `runs/v2_baseline/baseline-manifest.json`: source commit identities and checksums of 7 unchanged demo reference artifacts.
+- Phase 1: `src/schemas/claim.py`, `review.py`, `__init__.py`, `legacy_claim.py`, `legacy_review.py`, `v1_adapter.py`; `tests/test_schemas_v2.py` and import-only legacy adjustments in `tests/test_schemas.py`.
+- Phase 1 evidence: `runs/v2_baseline/phase1-schema.log` (62 passed), `phase1-schema.exitcode` (0), `phase1-import-tail.log` (2 mocked legacy integration tests passed).
 
 ## Completed
 
@@ -32,7 +34,10 @@ Open the documentation-only PR, then implement the authoritative v2 method speci
 - One environment correction: selected a new shorter pytest `--basetemp` under `runs/v2_baseline/t1`. Reran the same 256 selected tests with unchanged assertions: **256 passed, 3 deselected in 21.51s**, exit 0. The 3 default deselections are 2 `e2e` tests and 1 `requires_docker` test.
 - CompGCN live no-execution baseline: skipped under the prompt's explicit credential exception. `MINERU_API_TOKEN` and repository `.env` are absent; strict parsing requires the token (`src/preprocessing/parse/mineru_adapter.py:49–57`). No live pipeline request or parser fallback used. Codex cached credentials are present; validity/reachability remains untested. No external source reachability claim is made.
 - Independently reviewed the local harness, selected external-call paths, failure cause, checkpoint files, and all 7 unchanged artifact hashes with reviewer agent `baseline_review`.
-- `checks.md`: 2 pass / 12 unresolved at this checkpoint. Phases 1–8 remain unimplemented. Refactor branch has not been pushed.
+- Phase 1 complete: strict v2 claim/evidence/plan/finding/question schemas and v2 review container; historical schemas isolated in explicit legacy modules. Schema checks: 62 passed. Legacy stage-import/report-tail integration: 2 passed with mocked services. Existing schema assertions retained; only their legacy imports changed.
+- Phase 1 automatic review (`phase_reviewer`) found ambiguous execution target keys/non-finite targets and two legacy Markdown parsing defects. Corrections enforce exact condition-id targets with finite values, preserve escaped pipes, flag malformed rows, and normalize emphasized status labels. Regression tests cover every finding. Ruff passes on Phase 1 files.
+- Real CompGCN v1 `report.md` adapter smoke: 3 historical display records (`questioned`, `supported`, `supported`), zero issues. Historical labels remain explicitly unassessed; no new evidence or missing coordinates fabricated.
+- Refactor branch remains local. Phases 2–8 are outstanding; independent preparation of later-phase files is kept outside the Phase 1 commit.
 
 ### Baseline command
 
@@ -48,11 +53,14 @@ The first run used the same command without `--basetemp`. For a repeat, choose a
 
 - Use per-command Git committer identity `ChaoqianO <224349230+ChaoqianO@users.noreply.github.com>`, derived from the authenticated GitHub account. Git had no configured identity; global Git configuration was left unchanged. Patch author/message retained by `git am`.
 - Use `.venv` for repository dependencies; preserve global Python packages. Install the existing runtime/dev/refcheck/positioning extras needed to collect and exercise the current suite.
-- Preserve the existing default pytest marker selection; record deselections explicitly. No tests or test configuration have been edited.
+- Preserve the existing default pytest marker selection; record deselections explicitly. Phase 0 left tests unchanged. Phase 1 moved old schema imports to the explicit compatibility modules while preserving every assertion.
 - Apply the user's required unit-test mocks via the explicit local baseline plugin. A separate review found existing Docker argument-construction tests indirectly call `docker info` through `_docker_info_field`; the stale-loopback test calls `socket.create_connection`. The plugin mocks these two probes, preserving test-specific overrides. Existing selected LLM/retrieval paths were reviewed for their own mocks. The plugin is scoped baseline tooling and provides no universal network-access guarantee. Incorporate durable unit-test isolation in the affected implementation phase.
 - Use shorter test temporary paths for this Windows baseline. No production path handling or assertion was changed. The long-default-path failures remain documented as test portability work.
 - The directly requested root files `checks.md` and `progress.md`, plus explicitly requested baseline outputs in `runs/`, are authorized outputs alongside the prompt's source-path list.
 - Phase review uses a separate reviewer agent with inherited configured model/effort and no override. Exact runtime model/effort identifiers are unavailable to this task; no claim is made that prompt wording changes them.
+- The maintainer removed phase pauses on 2026-10-08. Documentation PR #12 was updated with automatic reviews; implementation continues immediately after each phase's review, checks and commit. Prepare independent components in parallel, keeping phase commits and integration validation in dependency order.
+- Canonical v2 schemas forbid unknown fields; evidence coverage and execution targets use stable condition IDs. Each target value is keyed by condition ID, so two datasets using the same metric remain distinct. New records require an actual page, section or character span; missing legacy coordinates stay missing in a separate historical envelope.
+- The v1 adapter migrates display labels conservatively and retains original records. Reading a historical artifact performs no v2 reassessment; the adapter never creates sufficient evidence from old prose. Unknown labels and malformed rows remain visible as issues.
 - **Maintainer-confirmed configuration (2026-10-08):** configurable repair limit defaults to 3, capped at 3 per spec; rule-based automatic approval by default with optional interactive approval and actual mode recorded; training budget defaults to **0 runs**, configurable, with training eligible only for high-priority plans within budget; explicit `--submission-deadline YYYY-MM-DD` with a 3-month concurrent window and no default arXiv-derived cutoff; existing per-metric tolerances centralized in one table; one-way v1 artifact adapter maps `in_conflict` to `questioned` unless re-assessed. The user confirmed the bundled choices in Chinese. These choices are authorized for later phases; no v2 behavior is implemented yet.
 
 ## Open issues
@@ -62,8 +70,8 @@ The first run used the same command without `--basetemp`. For a repeat, choose a
 - Live baseline unavailable until MinerU is configured locally. Never store credentials in tracked notes or ask for secret values in chat.
 - Four existing unit tests depend on short Windows temporary paths; the recorded baseline command passes with a short base-temp directory. Ordinary pytest using long default Windows paths still has the documented failures.
 - Baseline Docker/socket isolation lives in ignored local tooling. Make unit tests self-contained during subsequent relevant work while retaining their assertions.
-- Phases 1–8 remain unimplemented.
+- Phases 2–8 remain outstanding.
 
 ## Next action
 
-After the maintainer reviews Phase 0, begin Phase 1 using the confirmed choices: read the current schema consumers, implement the v2 schemas and explicit one-way artifact adapter, add schema round-trip tests, then independently review and commit. Stop at this checkpoint as required by `docs/refactor_v2_prompt.md` (inputs: "stop after each phase ... for review").
+Complete Phase 2 shared materials: direct MinerU parsing, paper/page/figure/reference material and a read-only repository index. Review with the independent agent, verify fixtures, commit, and continue into Phase 3.
