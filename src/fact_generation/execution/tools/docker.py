@@ -11,7 +11,7 @@ from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 from util.run_layout import slugify_run_key
-from util.subprocess_runner import run_command
+from util.subprocess_runner import persist_command_result, run_command
 
 
 def docker_cmd(args: list[str]) -> list[str]:
@@ -1133,6 +1133,21 @@ def docker_ensure_paper_image(
     The generated Dockerfile is stored under <paper_root>/deployment/Dockerfile (inside build context).
     """
     pr = Path(paper_root_host).resolve()
+    command_number = 0
+
+    def recorded_command(*args, **kwargs):
+        nonlocal command_number
+        result = run_command(*args, **kwargs)
+        log_dir = cfg.get("docker_build_log_dir")
+        if log_dir:
+            command_number += 1
+            target = Path(log_dir)
+            target.mkdir(parents=True, exist_ok=True)
+            persist_command_result(result, target, prefix=f"build_{command_number}")
+            with (target / "commands.jsonl").open("a", encoding="utf-8") as stream:
+                stream.write(json.dumps({"command": result.cmd, "returncode": result.returncode,
+                                         "cwd": result.cwd, "runtime_seconds": result.duration_sec}) + "\n")
+        return result
     if not pr.exists():
         return False, f"paper_root_not_found: {pr}"
     unavailable = _docker_preflight_unavailable()
@@ -1173,7 +1188,7 @@ def docker_ensure_paper_image(
 
     # Fast path: if image exists, skip build.
     docker_env = _docker_cli_env(cfg)
-    r = run_command(docker_cmd(["image", "inspect", image]), cwd=str(_repo_root()), timeout_sec=60, env=docker_env)
+    r = recorded_command(docker_cmd(["image", "inspect", image]), cwd=str(_repo_root()), timeout_sec=60, env=docker_env)
     if r.returncode == 0:
         return True, image
     if _docker_daemon_unavailable(r):
@@ -1202,7 +1217,7 @@ def docker_ensure_paper_image(
     except Exception:
         return False, f"write_dockerfile_failed: {dockerfile_path}"
 
-    build = run_command(
+    build = recorded_command(
         docker_cmd(["build", *_docker_build_args(cfg), "-t", image, "-f", str(dockerfile_path), "."]),
         cwd=str(pr),
         timeout_sec=timeout_sec,

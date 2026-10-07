@@ -44,7 +44,7 @@ Open the documentation-only PR, then implement the authoritative v2 method speci
 - Phase 2 committed as `f15dbd7`.
 - Phase 3 complete: upfront claim extraction, writing/table/figure/reference checks, durable screening results, actual image transport for all three providers. Removed report-agent extraction/splitting/merging duties and the C1–C3 limit.
 - Phase 3 independent review (`phase_reviewer`) identified reference checks silently succeeding with zero processed entries and model failure payloads carrying empty findings. Fixed both with regression tests. `runs/v2_screening/pytest.log`: 45 passed; original retrieval-policy assertions preserved. Ruff passes on the new screening/image files.
-- Refactor branch remains local. Phases 4–8 are outstanding; independent preparation of later-phase files is kept outside earlier phase commits.
+- Refactor branch remains local. Phases 0–5 are complete; independently prepared Phase 6–8 files await their separate commits and final integration checks.
 
 ### Baseline command
 
@@ -77,14 +77,13 @@ The first run used the same command without `--basetemp`. For a repeat, choose a
 - All five configuration choices and a default training budget of 0 runs are confirmed. Continue user-facing communication in Chinese.
 - The actual historical experimental approval mode and training budget have not been supplied. Do not describe proposed defaults as historical experiment settings.
 - Live baseline unavailable until MinerU is configured locally. Never store credentials in tracked notes or ask for secret values in chat.
-- Four existing unit tests depend on short Windows temporary paths; the recorded baseline command passes with a short base-temp directory. Ordinary pytest using long default Windows paths still has the documented failures.
-- Baseline Docker/socket isolation lives in ignored local tooling. Make unit tests self-contained during subsequent relevant work while retaining their assertions.
-- Phases 4–8 remain outstanding; main-pipeline integration and remote repository material snapshots are still pending.
+- The durable Phase 4 pytest fixture now supplies fresh short Windows paths and isolates indirect Docker/socket probes; full-suite integration revalidation is in progress.
+- Phase 6–8 files are prepared and reviewed separately; their phase checkpoints and final integration validation remain due.
 - Claim splitting tests validate the prompt contract, mocked model outputs and grounding. Live model semantic extraction accuracy is not established by these tests.
 
 ## Next action
 
-Complete Phase 4 typed verification, exact needs dispatch and retrieval constraints. Independently review, test and commit, then integrate L3 execution. Phase 4 contracts and dispatch are being prepared separately from the Phase 3 commit.
+Commit the reviewed Phase 5 execution checkpoint, then commit and validate assessment, report and final integration in order.
 
 ## Phase 4 checkpoint
 
@@ -97,6 +96,15 @@ Complete Phase 4 typed verification, exact needs dispatch and retrieval constrai
 - Theory, Code and paper-only Experiments treat unresolved differences as explainable concerns (`overturnable=True`). No theorem prover or symbolic counterexample evaluator was added. Literature same-mechanism/same-setting evidence and verified author artifacts can still supply decisive flaws; the deterministic assessment layer handles its supplied evidence flags.
 - The default search adapter does not certify complete retrieval. Such runs retain the actual search scope and remain unverified for support-by-absence; actual read passages still support direct comparison. The restricted technical-query vocabulary deliberately leaves unknown domains unresolved instead of sending author-name queries.
 - Execution targets must bind a single paper value to the named dataset, metric and declared settings. Ambiguous whole-table values remain blocked, with the candidate and reason preserved for correction.
-- Phase 5 execution is implemented in separate uncommitted files and undergoing independent review by `integration_map`; Phase 6–8 preparation is also uncommitted. All phase commits stay local.
+- Phase 4 committed as `6fe09d2`. Phase 6–8 preparation is uncommitted. All phase commits stay local.
 
-Next action: finish Phase 5 independent review and execution verification, then commit it and continue through assessment, report and integration.
+## Phase 5 checkpoint
+
+- Implemented `src/fact_generation/execution/v2.py`, `v2_config.py`, `v2_outputs.py`, generic alignment, shared legacy tolerance lookup, Docker helpers and execution provenance schema fields. `tests/test_execution_v2.py` contains 61 cases.
+- Independent review (`integration_map`) passed. `runs/v2_execution/pytest-review-round2.log`: **218 passed, 1 original live-Docker test deselected**. External service calls are mocked. Review corrections reject expected-value selectors, failed containers/canonical rows, conflicting mappings and output-controlled author-artifact selection.
+- Approval precedes workspace creation. Every ledger records the mode and budget. Ordering is priority, readiness, then evaluation/analysis before training. Training defaults to 0; positive budgets count retries. Default/cap is 3 accepted repairs, allowing the initial run plus 3 repaired runs. Source hashes and declarative infrastructure repairs protect model/loss/data/evaluation/baselines; accepted diffs are saved.
+- Only exact observed dataset, metric and settings permit execution judging. Aligned matches support; aligned mismatches become author-resolvable concerns. Failed, blocked or unaligned runs retain reasons with `affects_claim=False`; they do not supply deciding evidence.
+- Decisive author-artifact evidence requires a pre-run contract binding an indexed released data/log path, SHA-256, metadata and recomputation selector, with actual recomputation agreeing. Operator approval of the released artifact's role is an explicit trust boundary. Runtime output cannot choose the artifact or overwrite its value.
+- Raw JSON metric formats use selectors into actual output. Both legacy tolerance profiles remain in one table. Optional paper variance must match an exact paper quote and number; the operator confirms statistic type, units and condition binding. Automated branches leave this override empty.
+
+Next action: commit the reviewed assessment and report phases, finish integrated regression and the CompGCN comparison, then complete Phase 8.
