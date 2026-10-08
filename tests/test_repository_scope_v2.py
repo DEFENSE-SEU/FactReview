@@ -36,6 +36,8 @@ def inputs(tmp_path, monkeypatch):
         id="c1",
         text=paper,
         loc=ClaimLocation(page=1),
+        source_block_id="b1",
+        source_quote=paper,
         conditions=[Condition(id="optimizer", description="optimizer is Adam")],
         needs=["Code"],
         importance="core",
@@ -54,6 +56,30 @@ def test_scientific_language_sources_reach_code_branch_with_exact_bytes(inputs, 
 
     def model(**request):
         data = json.loads(request["prompt"])
+        if request["module"] == "verification.code.scope":
+            assert data["source_context"][path.name] == [{"line": 1, "text": "optimizer = Adam"}]
+            return {
+                "conditions": [
+                    {
+                        "condition_id": "optimizer",
+                        "required_facets": ["implementation"],
+                        "claim_source_ids": ["primary"],
+                        "rationale": "The paper claims the Adam optimizer.",
+                    }
+                ],
+                "items": [
+                    {
+                        "item_index": 0,
+                        "condition_id": "optimizer",
+                        "relation": "supports_implementation",
+                        "full_condition": True,
+                        "basis": "direct_source",
+                        "bridge_quotes": [],
+                        "missing_qualifiers": [],
+                        "rationale": "The indexed language file directly assigns Adam.",
+                    }
+                ],
+            }
         assert data["files"][path.name] == [{"line": 1, "text": "optimizer = Adam"}]
         return {
             "items": [

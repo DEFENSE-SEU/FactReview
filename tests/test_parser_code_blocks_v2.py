@@ -87,6 +87,29 @@ def test_code_rows_survive_materials_claim_extraction_and_code_verification(
             }
         payload = json.loads(kwargs["prompt"])
         assert next(b for b in payload["paper_blocks"] if b["id"] == block.id)["text"] == body
+        if kwargs["module"] == "verification.code.scope":
+            return {
+                "conditions": [
+                    {
+                        "condition_id": "setting",
+                        "required_facets": ["implementation"],
+                        "claim_source_ids": ["primary"],
+                        "rationale": "The original algorithm/example states this setting.",
+                    }
+                ],
+                "items": [
+                    {
+                        "item_index": 0,
+                        "condition_id": "setting",
+                        "relation": "supports_implementation",
+                        "full_condition": True,
+                        "basis": "direct_source",
+                        "bridge_quotes": [],
+                        "missing_qualifiers": [],
+                        "rationale": "The exact config implements the paper example setting.",
+                    }
+                ],
+            }
         return {
             "items": [
                 {

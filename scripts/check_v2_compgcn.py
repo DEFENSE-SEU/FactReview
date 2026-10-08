@@ -172,6 +172,34 @@ class CompGCNModelFixture:
                     }
                 ]
             }
+        if name == "verification.code.scope":
+            assert payload["claim_sources"][0]["quote"] == self.relation
+            assert {
+                "line": self.code_line,
+                "text": self.code_quote,
+            } in payload["source_context"]["model/compgcn_conv.py"]
+            return {
+                "conditions": [
+                    {
+                        "condition_id": "relation_update",
+                        "required_facets": ["implementation"],
+                        "claim_source_ids": ["primary"],
+                        "rationale": "The exact Equation 4 claim specifies the learned relation embedding transform.",
+                    }
+                ],
+                "items": [
+                    {
+                        "item_index": 0,
+                        "condition_id": "relation_update",
+                        "relation": "supports_implementation",
+                        "full_condition": True,
+                        "basis": "direct_source",
+                        "bridge_quotes": [],
+                        "missing_qualifiers": [],
+                        "rationale": "Fixture comparison confirms that the released forward pass applies w_rel to relation embeddings.",
+                    }
+                ],
+            }
         if name == "verification.theory":
             return {
                 "items": [

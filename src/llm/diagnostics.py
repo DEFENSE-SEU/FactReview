@@ -34,11 +34,22 @@ def redact_provider_details(value, cfg=None, *, base_url=None, secrets=()):
             replacements[credential] = "[redacted]"
             replacements[unquote(credential)] = "[redacted]"
 
+    # Short fixture/basic-auth credentials must not replace individual letters
+    # inside unrelated words. Full URLs and userinfo still match as a whole;
+    # a standalone secret (including a quoted or labelled value) is removed.
+    patterns = [
+        rf"(?<!\w){re.escape(original)}(?!\w)"
+        if len(original) < 4 and replacements[original] == "[redacted]"
+        else re.escape(original)
+        for original in sorted(replacements, key=len, reverse=True)
+    ]
+    pattern = re.compile("|".join(patterns)) if patterns else None
+
     def redact(item):
         if isinstance(item, str):
-            for original in sorted(replacements, key=len, reverse=True):
-                item = item.replace(original, replacements[original])
-            return item
+            # One substitution pass keeps replacement text (including a safe
+            # endpoint) from being rewritten by another credential match.
+            return pattern.sub(lambda match: replacements[match.group()], item) if pattern else item
         if isinstance(item, dict):
             return {key: redact(content) for key, content in item.items()}
         if isinstance(item, list):
@@ -48,5 +59,3 @@ def redact_provider_details(value, cfg=None, *, base_url=None, secrets=()):
         return item
 
     return redact(value)
-
-
