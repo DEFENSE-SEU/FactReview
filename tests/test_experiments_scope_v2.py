@@ -196,8 +196,168 @@ def test_causal_attribution_still_requires_component_ablation(paper):
 def test_small_comparative_gap_still_requires_statistics(paper):
     claim, materials = paper
     items = [item(materials, "small_gap_without_statistics")]
-    result = run(paper, items, scope(claim, items))
+    append(materials, "small_left", "D test A accuracy 90.1.")
+    append(materials, "small_right", "D test B accuracy 90.0.")
+    review = scope(claim, items)
+    review["items"][0]["comparisons"] = [
+        comparison(
+            materials,
+            left=number(materials, "small_left", "90.1"),
+            right=number(materials, "small_right", "90.0"),
+        )
+    ]
+    result = run(paper, items, review)
     assert result.evidence[0].sufficient and result.questions
+
+
+def statistical_case(paper, *, kind="small_gap_without_statistics", right="D test B accuracy 90.0."):
+    claim, materials = paper
+    text = "A consistently outperforms B on D test accuracy across random seeds."
+    append(materials, "statistical_claim", text)
+    claim.text = claim.source_quote = text
+    claim.source_block_id = "statistical_claim"
+    claim.conditions[0].settings.update(model="A", comparison="B")
+    append(materials, "statistical_left", "D test A accuracy 90.1.")
+    append(materials, "statistical_right", right)
+    protocol = "D test A and B accuracy was evaluated once with one fixed random seed; no multi-seed estimate is available."
+    append(materials, "statistics", protocol)
+    items = [
+        item(
+            materials,
+            kind,
+            block_id="statistics",
+            quote=protocol,
+            fully_supported_conditions=[],
+        )
+    ]
+    review = scope(claim, items, assertion="statistical_generalization", matched_controls_required=False)
+    review["items"][0]["comparisons"] = [
+        comparison(
+            materials,
+            left=number(materials, "statistical_left", "90.1"),
+            right=number(materials, "statistical_right", "90.0"),
+        )
+    ]
+    return items, review
+
+
+@pytest.mark.parametrize("kind", ["small_gap_without_statistics", "missing_statistic"])
+@pytest.mark.parametrize("invalid", ["comparator", "metric", "split", "operands", "relation"])
+def test_statistical_concern_requires_bound_comparison(paper, kind, invalid):
+    right = {
+        "comparator": "D test C accuracy 90.0.",
+        "metric": "D test B F1 90.0.",
+        "split": "D dev B accuracy 90.0.",
+    }.get(invalid, "D test B accuracy 90.0.")
+    items, review = statistical_case(paper, kind=kind, right=right)
+    if invalid == "operands":
+        review["items"][0]["comparisons"] = []
+    elif invalid == "relation":
+        review["conditions"][0]["relation"] = "none"
+        review["items"][0]["comparison_objects"] = "not_comparative"
+        review["items"][0]["comparisons"] = []
+    result = run(paper, items, review)
+    assert len(result.evidence) == 1
+    assert not result.evidence[0].sufficient and not result.evidence[0].concern
+    assert not result.questions and result.issues
+
+
+@pytest.mark.parametrize("kind", ["small_gap_without_statistics", "missing_statistic"])
+def test_exact_statistical_comparison_and_protocol_keep_applicable_concern(paper, kind):
+    items, review = statistical_case(paper, kind=kind)
+    result = run(paper, items, review)
+    assert result.evidence[0].sufficient and result.evidence[0].concern
+    assert result.questions and not result.issues
+
+
+def test_missing_statistic_for_single_model_seed_stability_needs_no_baseline(paper):
+    claim, materials = paper
+    claim.text = "A accuracy on D test is stable across random seeds."
+    claim.conditions[0].settings["model"] = "A"
+    protocol = "D test A accuracy was evaluated with one fixed seed only."
+    append(materials, "seed_protocol", protocol)
+    items = [item(materials, "missing_statistic", block_id="seed_protocol", quote=protocol)]
+    review = scope(
+        claim,
+        items,
+        assertion="statistical_generalization",
+        matched_controls_required=False,
+        relation="none",
+        comparator="",
+    )
+    review["items"][0]["comparison_objects"] = "not_comparative"
+    result = run(paper, items, review)
+    assert result.evidence[0].sufficient and result.evidence[0].concern
+    assert result.questions and not result.issues
+
+
+def test_small_gap_cannot_use_noncomparative_single_model_scope(paper):
+    claim, materials = paper
+    items = [item(materials, "small_gap_without_statistics")]
+    review = scope(claim, items, assertion="statistical_generalization", relation="none", comparator="")
+    review["items"][0]["comparison_objects"] = "not_comparative"
+    result = run(paper, items, review)
+    assert not result.evidence[0].sufficient and not result.questions
+    assert result.issues
+
+
+@pytest.mark.parametrize("assertion", ["descriptive", "statistical_generalization"])
+def test_statistical_scope_flags_do_not_change_descriptive_gate(paper, assertion):
+    items, review = statistical_case(paper)
+    review["conditions"][0]["assertion"] = assertion
+    result = run(paper, items, review)
+    assert result.evidence[0].sufficient is (assertion == "statistical_generalization")
+    assert bool(result.questions) is (assertion == "statistical_generalization")
+
+
+@pytest.mark.parametrize("right_token", ["90.1", "90.2"])
+def test_statistical_concern_does_not_require_claimed_score_direction_to_hold(paper, right_token):
+    items, review = statistical_case(paper, right=f"D test B accuracy {right_token}.")
+    review["items"][0]["comparisons"][0]["right"]["token"] = right_token
+    result = run(paper, items, review)
+    assert result.evidence[0].sufficient and result.questions
+
+
+def test_statistical_concern_can_identify_one_affected_joint_setting(paper):
+    claim, materials = paper
+    items, review = statistical_case(paper)
+    claim.conditions[0].settings["task"] = ["T1", "T2"]
+    append(materials, "task_left", "D test T1 A accuracy 90.1.")
+    append(materials, "task_right", "D test T1 B accuracy 90.0.")
+    review["conditions"][0]["required_cases"] = ["T1", "T2"]
+    review["items"][0]["comparisons"] = [
+        comparison(
+            materials,
+            case="T1",
+            settings={"task": "T1"},
+            left=number(materials, "task_left", "90.1"),
+            right=number(materials, "task_right", "90.0"),
+        )
+    ]
+    result = run(paper, items, review)
+    assert result.evidence[0].sufficient and result.questions
+
+
+@pytest.mark.parametrize("invalid", ["foreign_case", "duplicate_case", "foreign_setting"])
+def test_partial_statistical_concern_still_rejects_unbound_cases(paper, invalid):
+    claim, materials = paper
+    items, review = statistical_case(paper)
+    claim.conditions[0].settings["task"] = ["T1", "T2"]
+    selected = "T3" if invalid == "foreign_setting" else "T1"
+    append(materials, "case_left", f"D test {selected} A accuracy 90.1.")
+    append(materials, "case_right", f"D test {selected} B accuracy 90.0.")
+    review["conditions"][0]["required_cases"] = ["T1", "T2"]
+    comp = comparison(
+        materials,
+        case="foreign" if invalid == "foreign_case" else "T1",
+        settings={"task": selected},
+        left=number(materials, "case_left", "90.1"),
+        right=number(materials, "case_right", "90.0"),
+    )
+    review["items"][0]["comparisons"] = [comp, copy.deepcopy(comp)] if invalid == "duplicate_case" else [comp]
+    result = run(paper, items, review)
+    assert not result.evidence[0].sufficient and not result.questions
+    assert result.issues
 
 
 def test_original_improves_sentence_without_baseline_cannot_be_sufficient(paper):

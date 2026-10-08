@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import re
 from datetime import UTC, datetime
 from pathlib import Path
 
+from review.report.evidence_tables import table_passage_lines
 from schemas.claim import ClaimLocation, ClaimStatus, Evidence
 from schemas.review import FinalReview
 
@@ -53,7 +55,38 @@ def _location(loc: ClaimLocation) -> str:
     return "; ".join(parts)
 
 
-def _evidence(item: Evidence) -> list[str]:
+def _source_index(claims, findings):
+    sources, occurrences = {}, []
+    groups = [(claim.id, claim.evidence) for claim in claims]
+    groups += [(f"finding {index}", finding.evidence) for index, finding in enumerate(findings, 1)]
+    for owner, evidence in groups:
+        for ordinal, item in enumerate(evidence, 1):
+            pointer = item.pointer
+            key = (pointer.locator, pointer.page, pointer.line, pointer.key, pointer.quote)
+            occurrence = {
+                "anchor": f"factreview-evidence-{len(occurrences) + 1:06d}",
+                "label": f"E{len(occurrences) + 1:04d}",
+                "owner": f"{owner}, evidence {ordinal}",
+                "source": None,
+            }
+            if pointer.quote:
+                if key not in sources:
+                    digest = hashlib.sha256(
+                        json.dumps(key, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                    ).hexdigest()
+                    sources[key] = {
+                        "anchor": f"factreview-source-{digest}",
+                        "label": f"S{len(sources) + 1:04d}",
+                        "occurrences": [],
+                    }
+                source = sources[key]
+                occurrence["source"] = source
+                source["occurrences"].append(occurrence)
+            occurrences.append(occurrence)
+    return iter(occurrences)
+
+
+def _evidence(item: Evidence, occurrence=None) -> list[str]:
     pointer = item.pointer
     source = "paper-internal" if item.source == "paper_internal" else item.source
     location = [pointer.locator]
@@ -67,8 +100,29 @@ def _evidence(item: Evidence) -> list[str]:
         f"covers: {_text(', '.join(item.covered) or 'no claim conditions')}. "
         f"Pointer: {_text('; '.join(location))}."
     ]
-    if pointer.quote:
-        lines.append(f"  - Passage: {_text(pointer.quote)}")
+    source = occurrence["source"] if occurrence else None
+    if occurrence:
+        lines[0] += f' <a id="{occurrence["anchor"]}"></a>Evidence {occurrence["label"]}.'
+    repeated = source is not None and source["occurrences"][0] is not occurrence
+    if repeated:
+        lines.append(f"  - Passage: [Source {source['label']}](#{source['anchor']}) (same exact source).")
+    elif pointer.quote:
+        if source:
+            backlinks = ", ".join(
+                f"[{_text(row['owner'])} / {row['label']}](#{row['anchor']})" for row in source["occurrences"]
+            )
+            lines.append(
+                f'  - <a id="{source["anchor"]}"></a>Source {source["label"]}; occurrences: {backlinks}.'
+            )
+        if re.search(r"<(?:table|tr|td|th)\b", pointer.quote, re.I):
+            table_lines = table_passage_lines(pointer.quote, _text)
+            if table_lines is None:
+                lines.append("  - Table layout unavailable; original passage follows.")
+                lines.append(f"  - Passage: {_text(pointer.quote)}")
+            else:
+                lines.extend(table_lines)
+        else:
+            lines.append(f"  - Passage: {_text(pointer.quote)}")
     if item.note:
         lines.append(f"  - Detail: {_text(item.note)}")
     if item.source == "execution":
@@ -116,6 +170,7 @@ def render_markdown(
     review: FinalReview, *, issues: list[str] | None = None, figure_coverage=None, token_usage=None
 ) -> str:
     claims = ordered_claims(review)
+    occurrences = _source_index(claims, review.findings)
     lines = [
         f"# FactReview — {_text(review.paper_key)}",
         "",
@@ -167,7 +222,7 @@ def render_markdown(
         if not claim.evidence:
             lines.append("No evidence is available for assessment.")
         for item in claim.evidence:
-            lines.extend(_evidence(item))
+            lines.extend(_evidence(item, next(occurrences)))
         lines += ["", "Questions for authors:", ""]
         lines += [
             f"- {_text(question.text)} Reason: {_text(question.reason)}" for question in claim.questions
@@ -200,7 +255,7 @@ def render_markdown(
             "",
         ]
         for item in finding.evidence:
-            lines.extend(_evidence(item))
+            lines.extend(_evidence(item, next(occurrences)))
         lines.append("")
     limitations = verification_limitations(
         issues=issues, figure_coverage=figure_coverage, token_usage=token_usage

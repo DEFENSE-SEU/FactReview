@@ -603,6 +603,52 @@ def prose_case(tmp_path, left="D test A accuracy 90.", right="D test B accuracy 
     return paper, candidate, review
 
 
+@pytest.mark.parametrize("kind", ["missing_statistic", "small_gap_without_statistics"])
+@pytest.mark.parametrize("target", ["exact", "wrong_comparator", "wrong_metric", "wrong_split", "empty"])
+def test_catalog_statistical_concern_checks_the_selected_prose_comparison(tmp_path, kind, target):
+    right = {
+        "wrong_comparator": "D test C accuracy 90.0.",
+        "wrong_metric": "D test B F1 90.0.",
+        "wrong_split": "D dev B accuracy 90.0.",
+    }.get(target, "D test B accuracy 90.0.")
+    paper, candidate, review = prose_case(tmp_path, "D test A accuracy 90.1.", right)
+    claim, materials, _ = paper
+    assertion = append_block(
+        materials, "seed_claim", "A consistently outperforms B on D test accuracy across random seeds."
+    )
+    claim.text = claim.source_quote = assertion.text
+    claim.source_block_id = assertion.id
+    protocol = append_block(
+        materials, "seed_protocol", "D test A and B accuracy was evaluated once with one fixed random seed."
+    )
+    catalog = build_catalog(claim, materials)
+    paper = claim, materials, catalog
+    candidate.update(
+        kind=kind,
+        aspect="stability",
+        block_id=protocol.id,
+        quote=protocol.text,
+        fully_supported_conditions=[],
+    )
+    review["conditions"][0].update(
+        assertion="statistical_generalization", claim_quote=claim.text, uncertainty_sensitive=True
+    )
+    decision = review["items"][0]
+    decision["grounds_source_ids"] = [source(catalog, "seed_protocol"), source(catalog, "seed_claim")]
+    comp = decision["comparisons"][0]
+    comp.update(left_token="90.1", right_token="90.0")
+    if target == "empty":
+        decision["comparisons"] = []
+    result = run(paper, candidate, review)
+    assert result.evidence[0].sufficient is (target == "exact")
+    assert result.evidence[0].concern is (target == "exact")
+    assert bool(result.questions) is (target == "exact")
+    if target == "exact":
+        assert not result.issues
+    else:
+        assert result.issues
+
+
 def test_production_schema_offers_prose_selectors_and_derives_known_roles_and_endpoints(tmp_path):
     paper, candidate, review = prose_case(tmp_path)
     seen = []
@@ -613,15 +659,19 @@ def test_production_schema_offers_prose_selectors_and_derives_known_roles_and_en
         payload = json.loads(kwargs["prompt"])
         seen.append(payload)
         schemas = payload["output_schema"]["$defs"]
-        comparison_fields = schemas["CatalogComparison"]["properties"]
-        assert {
-            "left_source_id",
-            "right_source_id",
-            "left_token",
-            "right_token",
-            "left_value_context",
-            "right_value_context",
-        } <= comparison_fields.keys()
+        assert payload["output_schema"]["properties"]["schema_version"]["const"] == "catalog-v2"
+        comparison_fields = schemas["CatalogComparisonV2"]["properties"]
+        assert {"left", "right", "difference_number_id"} <= comparison_fields.keys()
+        assert (
+            not {"left_source_id", "left_token", "left_value_context", "difference_token"}
+            & comparison_fields.keys()
+        )
+        assert set(schemas["ProseOperand"]["properties"]) == {"kind", "number_id"}
+        assert "CatalogComparison" not in schemas
+        assert "numbers" in payload["catalog"]
+        assert not {"start", "end", "sentence_start", "sentence_end"} & set(
+            payload["catalog"]["number_fields"]
+        )
         assert not {"expected_left_token", "expected_right_token"} & comparison_fields.keys()
         assert (
             not {"endpoint_required", "subject_setting", "comparator_setting"}

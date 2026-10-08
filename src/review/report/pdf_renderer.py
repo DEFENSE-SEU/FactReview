@@ -739,6 +739,12 @@ def _render_markdown_inline_children(
             continue
         if token_type == "html_inline":
             raw_html = str(token_content or "").strip()
+            anchor = re.fullmatch(
+                r'<a id="(factreview-(?:source-[a-f0-9]{64}|evidence-[0-9]{6,}))">', raw_html
+            )
+            if anchor:
+                parts.append(f'<a name="{anchor.group(1)}"/>')
+                continue
             open_green = re.match(
                 r'^<span\s+style\s*=\s*"\s*color\s*:\s*(green|#16a34a)\s*;?\s*"\s*>$',
                 raw_html,
@@ -1338,6 +1344,34 @@ def _looks_like_ascii_tree(line: str) -> bool:
     return any(token in stripped for token in tree_tokens)
 
 
+class _AnchoredParagraph(Paragraph):
+    """Keep generated targets at the first laid-out fragment, including CJK text.
+
+    ReportLab's inline empty anchor fragments cannot wrap reliably in CJK mode.
+    Registering the bookmark when the paragraph is drawn also keeps a target on
+    its actual page when the layout moves or splits that paragraph.
+    """
+
+    _anchor = re.compile(r'<a name="(factreview-(?:source-[a-f0-9]{64}|evidence-[0-9]{6,}))"/>')
+
+    def __init__(self, text, *args, **kwargs):
+        self._report_targets = self._anchor.findall(text) if isinstance(text, str) else []
+        if self._report_targets:
+            text = self._anchor.sub("", text)
+        super().__init__(text, *args, **kwargs)
+
+    def split(self, availWidth, availHeight):
+        parts = super().split(availWidth, availHeight)
+        if parts:
+            parts[0]._report_targets = self._report_targets
+        return parts
+
+    def draw(self):
+        for target in self._report_targets:
+            self.canv.bookmarkHorizontal(target, 0, self.height)
+        super().draw()
+
+
 def _append_markdown_report(
     story: list, styles: StyleSheet1, *, markdown: str, implicit_math: bool = True
 ) -> None:
@@ -1407,9 +1441,9 @@ def _append_markdown_report(
         formula_font = str(styles["MarkdownCode"].fontName or "").strip()
         if _contains_non_ascii(formula):
             formula_font = str(styles["BodyTextEnterprise"].fontName or "").strip() or formula_font
-        story.append(Paragraph(_escape("Equation"), styles["LabelText"]))
+        story.append(_AnchoredParagraph(_escape("Equation"), styles["LabelText"]))
         story.append(
-            Paragraph(
+            _AnchoredParagraph(
                 _render_formula_chunk(
                     formula,
                     formula_font=formula_font or None,
@@ -1463,7 +1497,7 @@ def _append_markdown_report(
         normalized_lines = [str(line or "").rstrip() for line in lines if str(line or "").strip()]
         if not normalized_lines:
             return
-        story.append(Paragraph(_escape("Logic Tree"), styles["LabelText"]))
+        story.append(_AnchoredParagraph(_escape("Logic Tree"), styles["LabelText"]))
         story.append(
             Preformatted(
                 _wrap_markdown_code_lines(normalized_lines, width=94),
@@ -1546,7 +1580,7 @@ def _append_markdown_report(
                     for cell in padded:
                         style_name = "MarkdownTableHeader" if is_header else "MarkdownTableCell"
                         content = cell or "&nbsp;"
-                        row_flowables.append(Paragraph(content, styles[style_name]))
+                        row_flowables.append(_AnchoredParagraph(content, styles[style_name]))
                     table_data.append(row_flowables)
 
                 markdown_table = Table(
@@ -1613,7 +1647,7 @@ def _append_markdown_report(
                 prefix = f"{item_counter}. " if open_type == "ordered_list_open" else "• "  # noqa: B023 — closure is invoked synchronously within the iteration that defines it.
                 body = "<br/>".join(item_paragraph_parts).strip()
                 if body:
-                    story.append(Paragraph(f"{prefix}{body}", list_style))
+                    story.append(_AnchoredParagraph(f"{prefix}{body}", list_style))
                     item_rendered = True
                 item_paragraph_parts = []
 
@@ -1693,7 +1727,7 @@ def _append_markdown_report(
             )
 
             if level <= 1:
-                story.append(Paragraph(heading_text or "&nbsp;", styles["SectionTitle"]))
+                story.append(_AnchoredParagraph(heading_text or "&nbsp;", styles["SectionTitle"]))
                 story.append(
                     HRFlowable(
                         width="100%",
@@ -1705,9 +1739,9 @@ def _append_markdown_report(
                     )
                 )
             elif level == 2:
-                story.append(Paragraph(heading_text or "&nbsp;", styles["MarkdownHeadingL2"]))
+                story.append(_AnchoredParagraph(heading_text or "&nbsp;", styles["MarkdownHeadingL2"]))
             else:
-                story.append(Paragraph(heading_text or "&nbsp;", styles["MarkdownHeadingL3"]))
+                story.append(_AnchoredParagraph(heading_text or "&nbsp;", styles["MarkdownHeadingL3"]))
             cursor += 3
             continue
 
@@ -1737,7 +1771,7 @@ def _append_markdown_report(
                     implicit_math=implicit_math,
                 )
                 if paragraph_markup:
-                    story.append(Paragraph(paragraph_markup, styles["BodyTextEnterprise"]))
+                    story.append(_AnchoredParagraph(paragraph_markup, styles["BodyTextEnterprise"]))
             cursor += 3
             continue
 
@@ -1781,7 +1815,7 @@ def _append_markdown_report(
                 inner_cursor += 1
             if quote_parts:
                 story.append(
-                    Paragraph(
+                    _AnchoredParagraph(
                         f"❝ {'<br/>'.join(quote_parts)}",
                         styles["BodyTextEnterprise"],
                     )

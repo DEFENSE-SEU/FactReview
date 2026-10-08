@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -173,8 +174,27 @@ def test_source_markdown_cannot_add_headings_or_images(tmp_path):
     output = write_review(record, tmp_path, render_pdf=False)
     tokens = MarkdownIt().parse(Path(output["markdown"]).read_text(encoding="utf-8"))
     assert sum(token.type == "heading_open" and token.tag == "h2" for token in tokens) == 4
-    assert not any(
-        child.type in {"image", "link_open"} for token in tokens for child in (token.children or [])
+    children = [child for token in tokens for child in token.children or []]
+    assert not any(child.type == "image" for child in children)
+    targets = {
+        match.group(1)
+        for child in children
+        if child.type == "html_inline"
+        and (
+            match := re.fullmatch(
+                r'<a id="(factreview-(?:source-[a-f0-9]{64}|evidence-[0-9]{6,}))">', child.content
+            )
+        )
+    }
+    assert all(
+        child.attrGet("href") in {"#" + target for target in targets}
+        for child in children
+        if child.type == "link_open"
+    )
+    assert all(
+        "example.invalid" not in (child.attrGet("href") or "")
+        for child in children
+        if child.type == "link_open"
     )
 
 
