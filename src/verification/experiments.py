@@ -104,6 +104,52 @@ def _target_ambiguity(claim: Claim, target: PlanTarget, value: float) -> str:
     return ""
 
 
+def _comparison_units(number: PaperNumber, metric: str) -> set[str]:
+    """Retain explicit scales; do not guess a conversion for unlabelled values."""
+    aliases = {
+        "percent": "%",
+        "percentage": "%",
+        "second": "s",
+        "seconds": "s",
+        "sec": "s",
+        "millisecond": "ms",
+        "milliseconds": "ms",
+        "microsecond": "us",
+        "microseconds": "us",
+        "µs": "us",
+        "μs": "us",
+        "minute": "min",
+        "minutes": "min",
+        "hour": "h",
+        "hours": "h",
+    }
+    units = ["%"] if number.token.endswith("%") else []
+    # A narrowed value context may omit the table header. Keep every explicit
+    # scale for this metric from the grounded full quote.
+    units.extend(
+        unit.strip() for unit in re.findall(re.escape(metric) + r"\s*\(([^)]+)\)", number.quote, re.I)
+    )
+    suffixes = re.findall(
+        r"(?<![\w.])" + re.escape(number.token) + r"\s*(%|[A-Za-zµμ]+(?:/[A-Za-zµμ]+)?)(?!\w)",
+        number.quote,
+        re.I,
+    )
+    connective_words = {
+        "on",
+        "for",
+        "with",
+        "and",
+        "from",
+        "which",
+        "where",
+        "using",
+        "in",
+        "at",
+    }
+    units.extend(unit for unit in suffixes if unit.casefold() not in connective_words)
+    return {aliases.get(unit.casefold(), unit) for unit in units}
+
+
 class ExperimentItem(Contract):
     aspect: Literal["correspondence", "fairness", "isolation", "stability", "consistency"]
     kind: Literal[
@@ -232,7 +278,10 @@ def verify_experiments(claim: Claim, materials: SharedMaterials, *, call=None) -
             "and copy value_context verbatim from within quote. Preserve mathematical markup, whitespace, "
             "punctuation, and spelling exactly; do not normalize math, paraphrase, or join disjoint passages. "
             "large_gap_no_variance is a non-decisive note. text_table_contradiction requires two "
-            "quoted numerical passages for the same target condition and metric, on the same scale. "
+            "quoted numerical passages for the same target condition, dataset, metric, and every setting, "
+            "on the same scale. Each value_context must identify those labels and one unique numeric value; "
+            "preserve explicit units and percentage markers. Different splits/seeds/models, ambiguous "
+            "multi-value tables, or unresolved unit conversions do not establish a contradiction. "
             "For each target claim with re-obtainable reported numbers, emit one plan. "
             "A plan must use the exact metric named by its target condition. Never replace an abstract "
             "quality or qualitative condition with a different numerical metric such as MRR. When no "
@@ -279,13 +328,26 @@ def verify_experiments(claim: Claim, materials: SharedMaterials, *, call=None) -
                 raise ValueError("Text-table contradiction needs two values for one condition")
             left, right = [_number(materials, number) for number in item.comparison]
             condition = next(c for c in claim.conditions if c.id == covered[0])
-            for quoted in item.comparison:
-                if not _has_label(condition.metric, quoted.quote):
-                    raise ValueError("Contradictory passages must identify the same metric")
-                if condition.dataset and not _has_label(condition.dataset, quoted.quote):
-                    raise ValueError("Contradictory passages must identify the same dataset")
+            reasons = [
+                reason
+                for quoted, value in zip(item.comparison, (left, right), strict=True)
+                if (
+                    reason := _target_ambiguity(
+                        claim, PlanTarget(condition_id=condition.id, reported=quoted), value
+                    )
+                )
+            ]
+            if not reasons:
+                units = [_comparison_units(number, condition.metric) for number in item.comparison]
+                if any(len(unit) > 1 for unit in units) or units[0] != units[1]:
+                    reasons.append("Quoted values use different or incompletely specified units/scales")
             if left == right:
-                raise ValueError("Equal paper values cannot establish a text-table contradiction")
+                reasons.append("Equal paper values cannot establish a text-table contradiction")
+            if reasons:
+                result.issues.append(
+                    f"Text-table contradiction unconfirmed for {condition.id}: " + "; ".join(reasons)
+                )
+                continue
             # Different numbers alone can have rounding/protocol explanations;
             # preserve both pointers for the author to clarify the claim.
             detail = (

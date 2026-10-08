@@ -15,11 +15,12 @@ import re
 import shutil
 import statistics
 import time
+import uuid
 from pathlib import Path
 from typing import Any, Literal
 
 from langgraph.graph import END, START, StateGraph
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from schemas.claim import (
     AuthorQuestion,
@@ -33,9 +34,9 @@ from schemas.claim import (
     FiniteNumber,
 )
 from schemas.materials import SharedMaterials
-from util.subprocess_runner import persist_command_result, run_command
+from util.subprocess_runner import CommandResult, persist_command_result, run_command
 
-from .tools.docker import _IMPORT_TO_PIP, docker_ensure_paper_image, docker_run_paper_image
+from .tools.docker import _IMPORT_TO_PIP, docker_cmd, docker_ensure_paper_image, docker_run_paper_image
 from .tools.log_metrics import _iter_json_objects
 from .tools.paper_tables import _metric_key
 from .v2_config import ExecutionConfig, OutputMapping, metric_tolerance
@@ -59,6 +60,13 @@ class Observation(Contract):
     value: FiniteNumber
     reported_variance: FiniteNumber | None = Field(default=None, ge=0)
     released_recomputation: ReleasedRecomputation | None = None
+
+    @field_validator("value", "reported_variance", mode="before")
+    @classmethod
+    def numeric_observation(cls, value):
+        if isinstance(value, bool):
+            raise ValueError("runtime numeric observations cannot be boolean")
+        return value
 
 
 class RunOutcome(Contract):
@@ -188,7 +196,7 @@ def _refine(
     }
     command = list(plan.task.command)
     metric_output = plan.task.metric_output
-    if not command and plan.task.entry_script and not plan.task.config:
+    if not command and not config.refine_with_llm and plan.task.entry_script and not plan.task.config:
         suffix = Path(plan.task.entry_script).suffix.lower()
         relative = (
             _inside(workspace, plan.task.entry_script).relative_to(workspace / plan.task.workdir).as_posix()
@@ -264,6 +272,36 @@ def _refine(
     return command, metric_output, telemetry
 
 
+def _cleanup_container(name: str, run_dir: str, logs: Path) -> dict:
+    command = docker_cmd(["rm", "--force", name])
+    started = time.monotonic()
+    try:
+        result = run_command(command, cwd=run_dir, timeout_sec=30)
+    except Exception as exc:
+        result = CommandResult(
+            command, run_dir, 127, "", f"{type(exc).__name__}: {exc}", time.monotonic() - started
+        )
+    persist_command_result(result, logs, prefix="cleanup")
+    absent = bool(
+        re.fullmatch(
+            r"(?:Error response from daemon: )?No such container: " + re.escape(name),
+            result.stderr.strip(),
+            re.IGNORECASE,
+        )
+    )
+    audit = {
+        "container_name": name,
+        "status": "removed" if result.returncode == 0 else "absent" if absent else "failed",
+        "command": command,
+        "returncode": result.returncode,
+        "stdout": result.stdout,
+        "stderr": result.stderr,
+        "runtime_seconds": result.duration_sec,
+    }
+    _json(logs / "container_cleanup.json", audit)
+    return audit
+
+
 def docker_runner(request: RunRequest) -> RunOutcome:
     """Real Docker transport. A JSON output or stdout marker supplies observations.
 
@@ -307,6 +345,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             commands=build_commands,
             logs={"build": str(logs / "build")},
         )
+    container_name = "factreview-" + uuid.uuid4().hex
     command = docker_run_paper_image(
         image=image,
         paper_root_host=request.workspace,
@@ -316,6 +355,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
         env={"FACTREVIEW_REPAIR_ROUND": str(request.repair_round)},
         env_passthrough=[],
         gpus=options.get("docker_gpus"),
+        container_name=container_name,
     )
     # Force the fresh workspace mount regardless of legacy environment options.
     mount = f"{Path(request.workspace).resolve()}:/app"
@@ -327,7 +367,18 @@ def docker_runner(request: RunRequest) -> RunOutcome:
         else None
     )
     before_output = output_path.stat().st_mtime_ns if output_path and output_path.is_file() else None
-    result = run_command(command, cwd=request.run_dir, timeout_sec=request.config.timeout_seconds)
+    result = None
+    cleanup = None
+    try:
+        try:
+            result = run_command(command, cwd=request.run_dir, timeout_sec=request.config.timeout_seconds)
+        except Exception as exc:
+            result = CommandResult(
+                command, request.run_dir, 127, "", f"{type(exc).__name__}: {exc}", time.monotonic() - start
+            )
+    finally:
+        if result is None or result.returncode != 0:
+            cleanup = _cleanup_container(container_name, request.run_dir, logs)
     persist_command_result(result, logs, prefix="run")
     payload = None
     issue = ""
@@ -361,20 +412,32 @@ def docker_runner(request: RunRequest) -> RunOutcome:
     except (ValueError, OSError, TypeError, AttributeError) as exc:
         observations = []
         issue = f"invalid metric output: {exc}"
+    if cleanup and cleanup["status"] == "failed":
+        issue = (
+            f"Docker container cleanup failed for {container_name}; the container may still be running: "
+            f"{cleanup['stderr']}" + (f"; {issue}" if issue else "")
+        )
     return RunOutcome(
         returncode=result.returncode,
         stdout=result.stdout,
         stderr=result.stderr,
         observations=observations,
-        commands=[*build_commands, command],
+        commands=[*build_commands, command, *([cleanup["command"]] if cleanup else [])],
         logs={
             "stdout": str(logs / "run_stdout.log"),
             "stderr": str(logs / "run_stderr.log"),
             "build": str(logs / "build"),
             "raw_output": str(logs / "raw_output.json"),
             "output_mapping": str(logs / "output_mapping.json"),
+            **({"container_cleanup": str(logs / "container_cleanup.json")} if cleanup else {}),
         },
-        environment={"transport": "docker", "image": image, "python": request.config.python_version},
+        environment={
+            "transport": "docker",
+            "image": image,
+            "python": request.config.python_version,
+            "container_name": container_name,
+            **({"container_cleanup": cleanup} if cleanup else {}),
+        },
         runtime_seconds=time.monotonic() - start,
         issue=issue,
     )
@@ -536,6 +599,7 @@ def execute_plans(
     if len(by_id) != len(claims) or len({plan.id for plan in plans}) != len(plans):
         raise ValueError("duplicate claim or plan identifiers")
     training_budget = {"used": 0}
+    execution_blocker = ""
     order = {"high": 0, "medium": 1, "low": 2}
     ordered = sorted(
         plans, key=lambda p: (order[p.priority], p.feasibility != "ready", p.run_mode == "training")
@@ -563,7 +627,7 @@ def execute_plans(
             "config": config.model_dump(mode="json"),
         }
         result.ledger.append(row)
-        reason = plan.blocker if plan.feasibility == "blocked" else ""
+        reason = execution_blocker or (plan.blocker if plan.feasibility == "blocked" else "")
         if not reason and plan.run_mode == "training":
             if plan.priority != "high":
                 reason = "training requires high priority"
@@ -610,6 +674,11 @@ def execute_plans(
                 del claim.evidence[previous_evidence:]
                 reason = str(exc)
                 result.issues.append(f"{plan.id}: {reason}")
+        if any(
+            attempt.get("environment", {}).get("container_cleanup", {}).get("status") == "failed"
+            for attempt in row["attempts"]
+        ):
+            execution_blocker = f"execution stopped after {plan.id}: Docker container cleanup failed; remaining plans were not run"
         row["reason"] = reason
         if reason:
             claim.questions.append(
@@ -669,6 +738,10 @@ def _execute_graph(
             outcome = RunOutcome(
                 returncode=1, issue=f"runner error: {exc}", runtime_seconds=time.monotonic() - begin
             )
+        cleanup = outcome.environment.get("container_cleanup")
+        if isinstance(cleanup, dict) and cleanup.get("status") == "failed":
+            state["stop"] = True
+            issues.append(f"{request.plan.id}: {outcome.issue}")
         changed = protected_changes(request.workspace)
         if changed:
             outcome.returncode = 1

@@ -1316,6 +1316,7 @@ def docker_run_paper_image(
     gpus: str | None = None,
     shm_size: str | None = None,
     ipc: str | None = None,
+    container_name: str | None = None,
 ) -> list[str]:
     """
     Run a command inside a per-paper image.
@@ -1338,6 +1339,8 @@ def docker_run_paper_image(
         "run",
         "--rm",
     ]
+    if container_name:
+        args.extend(["--name", container_name])
     args.extend(_docker_run_user_args())
     if gpus:
         # e.g. "all" or "device=0"

@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 
+from common import run_stats
 from fact_generation.refcheck.refcheck import check_references
 from schemas.claim import Finding
 from schemas.materials import SharedMaterials
@@ -13,7 +14,19 @@ def check_bibliography(
     materials: SharedMaterials, output_dir: Path, *, checker=None
 ) -> tuple[list[Finding], list[str]]:
     if not materials.bibliography:
+        run_stats.record_module_status("reference_check", "skipped")
         return [], ["Reference check unavailable: parser supplied no bibliography entries."]
+    with run_stats.timed_module("reference_check"):
+        try:
+            findings, issues, status = _check_bibliography(materials, output_dir, checker=checker)
+        except Exception as exc:
+            run_stats.record_module_status("reference_check", "failed", warning=str(exc))
+            raise
+        run_stats.record_module_status("reference_check", status, warning="; ".join(issues))
+        return findings, issues
+
+
+def _check_bibliography(materials, output_dir, *, checker=None):
     output_dir.mkdir(parents=True, exist_ok=True)
     path = output_dir / "bibliography.txt"
     path.write_text("\n\n".join(b.text for b in materials.bibliography), encoding="utf-8")
@@ -21,11 +34,11 @@ def check_bibliography(
     result_path = output_dir / "reference_check.json"
     result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     if not result.get("ok"):
-        return [], [f"Reference check failed: {result.get('error_message', 'unknown error')}; {result_path}"]
+        return [], [f"Reference check failed: {result.get('error_message', 'unknown error')}; {result_path}"], "failed"
     if not isinstance(result.get("total_refs"), int) or result["total_refs"] <= 0:
-        return [], [f"Reference check incomplete: no processed bibliography entries; {result_path}"]
+        return [], [f"Reference check incomplete: no processed bibliography entries; {result_path}"], "failed"
     if not isinstance(result.get("issues"), list):
-        return [], [f"Reference check returned no valid issues list; {result_path}"]
+        return [], [f"Reference check returned no valid issues list; {result_path}"], "failed"
     findings, issues = [], []
     if result["total_refs"] != len(materials.bibliography):
         issues.append(
@@ -55,4 +68,4 @@ def check_bibliography(
                 level=str(row.get("severity") or "unverified"),
             )
         )
-    return findings, issues
+    return findings, issues, "ok"

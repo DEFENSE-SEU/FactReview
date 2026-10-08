@@ -24,7 +24,7 @@ Workspace: `E:\kabuda\FactReview`.
 - Integration fixture: `scripts/check_v2_compgcn.py`; regression tests under `tests/`, including `test_pipeline_v2.py` and `test_run_stats_v2.py`.
 - Local evidence: `runs/v2_baseline/`, `runs/v2_materials/`, `runs/v2_screening/`, `runs/v2_verification/`, `runs/v2_execution/`, `runs/v2_report/`, `runs/v2_final/`.
 - Current CompGCN fixture: `runs/v2_compgcn/compgcn_fixture_2026-10-08_050820_50ebee36/`, including `comparison.{json,md}`, `full_pipeline_summary.json`, `review/report/final_review.{json,md,pdf}`, `review/teaser/teaser.{json,svg}`.
-- Current wheel: `runs/v2_docker_recovery/dist/factreview-0.1.0-py3-none-any.whl`; includes the Docker dependency-scanner correction and is verified by `runs/v2_docker_recovery/wheel-inspection.json`.
+- Current wheel: `runs/v2_framework_audit/dist/factreview-0.1.0-py3-none-any.whl`; all 111 packaged modules match source and parse as Python 3.11 (`delivery-inspection.json`).
 
 Logs and generated artifacts in `runs/` are local and ignored by Git. Saved commands and outcomes here allow another checkout to reproduce the verification.
 
@@ -122,7 +122,34 @@ Original Phase 0 command used the saved ignored plugin: `python -m pytest -p bas
 
 ## Next action
 
-Continue framework-wide validation of stage contracts, evidence routing, execution safeguards and reporting across paper types and repository layouts. Prioritize reproducible framework defects and usability gaps found by independent review. Cover missing repositories/artifacts, ambiguous runtime metadata, branch failures and budget handling using complementary fixtures. Keep paper-specific resource requirements in their run records. The existing `scripts/validate_execution_real_repos.py` exercises the legacy execution entry; its results alone do not verify the v2 pipeline. Docker is available and verified after a normal Desktop restart. Training remains disabled by the confirmed zero budget. No refactor PR has been requested.
+The reviewed framework contract batch below is complete. The next validation increment is a cross-domain corpus through the current v2 entry, with separately labelled mocked boundaries and real repository executions. The existing `scripts/validate_execution_real_repos.py` exercises the legacy execution entry and cannot establish v2 coverage. Keep paper-specific resource requirements in their own run records. Training remains disabled by the confirmed zero budget. No refactor PR has been requested.
+
+## Framework contract follow-up — 2026-10-09
+
+Three parallel agents reviewed pipeline/statistics, evidence/assessment and execution, then cross-reviewed each other's changes. The root agent inspected their diffs and actual Docker records, integrated cutoff resolution and ran the final combined suite. The scope remains the overall framework.
+
+### Reproductions and corrections
+
+- Concurrent complete pipelines recorded token counts as 0/33 instead of 11/22 because the statistics destination lived in a process-wide environment variable. V2 now uses a ContextVar scope inherited by `asyncio.to_thread`; nested scopes and exceptions restore the caller. Legacy unscoped environment behavior is retained. Reference checks now record actual success/failure/skipped status, usage and duration; screening's module duration excludes that nested interval.
+- Experiments treated different splits and scales as numerical contradictions. Grounded numeric context now identifies the same dataset, metric and settings and uniquely binds the value. Explicit table-header and numeric-suffix units are retained from the full quote even when `value_context` is narrowed. Independent review found both unit-cropping edge cases; regressions retain both. Ambiguous/incompatible comparisons become issues while other validated support remains available. Same-condition, same-scale differences still produce an author-resolvable concern.
+- Literature's search-absence support could cover performance conditions merely because a claim contained `propose` or `new`. Novelty comparisons now bind explicitly described historical-novelty conditions; numeric metrics require their own evidence. Each supported novelty condition must be compared against every retrieved prior work. Mixed novelty/performance and partial comparison coverage are tested. This remains conservative semantic classification, without an accuracy claim.
+- Enabled L3 refinement skipped entry scripts without a separate config file, omitting required CLI arguments. Those candidates now reach refinement; explicitly disabled refinement retains direct launch. Canonical boolean observations previously became 1/0 and could create support; numeric values and variances reject booleans before coercion.
+- A real Docker client timeout returned 124 while its container continued running (`docker_timeout_running_before.json`). Every v2 attempt now has a unique container name. Failed/exceptional launches clean up only that container and retain cleanup commands, outputs and status. Unconfirmed cleanup stops retries and later plans, preserving their reasons. Normal successful `--rm` runs avoid redundant cleanup. Real default-builder/default-runner timeout and normal synthetic analyses confirm container absence afterward in `docker-cleanup-a8c8884a/`; training budget was 0. Desktop was initially closed; starting the installed application restored Engine 29.8.2 without another installation.
+- The explicit arXiv fallback previously produced only month precision, so v2 could never use it. `--derive-cutoff-from-arxiv` now resolves exact first-submission metadata; `--arxiv-id` binds a local PDF explicitly. A supplied day-level deadline wins. Identity/date errors remain visible while other stages continue. `cutoff.json`, the summary and report record fallback provenance and unknown venue deadline. Old archive IDs preserve their subject prefix. The [arXiv API manual](https://info.arxiv.org/help/api/user-manual.html#_entry_metadata) documents the first-submission meaning of `published`; `updated` and the ID month are excluded.
+
+### Verification and delivery
+
+All following paths are under `runs/v2_framework_audit/`:
+
+- `pytest-full.log` and exit code 0: **811 passed, 3 original deselections**. The first combined run, before the final suffix-unit regression, is retained as `pytest-full-before-unit-suffix.log` (809 passed). Existing assertions and markers were preserved; unit LLM/retrieval/Docker calls remain mocked.
+- `pytest-legacy-e2e.log`: **2 passed**. `pytest-docker.log`: **1 passed** with the real daemon. The real synthetic v2 Docker analyses are separate infrastructure checks and establish no scientific result.
+- `ruff.log` and `ruff-reused-modules.log`: all affected modules/tests pass. `git diff --check` passes.
+- `wheel-build.log`, exit 0, and `delivery-inspection.json`: wheel built; all 111 Python modules match source and Python 3.11 syntax. All 27 protected demo hashes match; RefCopilot, demos and LICENSE have no diff. `.env` stays ignored; locally configured API secrets are absent from tracked content.
+- `independent-execution-review.md`: execution reproductions plus independent review of statistics/reference/cutoff behavior. `independent-evidence-review.md`: independent review of numeric scope, units and novelty coverage. Agents inherited configured model/effort; exact runtime model IDs were unavailable.
+
+### Decisions and remaining limits
+
+Explicit arXiv fallback follows the maintainer's prior authorization and stays opt-in for other users. Cleanup failure conservatively halts remaining execution because resource release cannot be confirmed. Numeric novelty conditions, implicit novelty wording and unresolved unit conversions remain conservative issues. Literature search completeness and scientific judgment accuracy still require cross-paper evaluation. No new live LLM/retrieval benchmark or numerical scientific reproduction is claimed by this batch. All 14 acceptance criteria retain their stated scope; the code is delivered on the already authorized `refactor/method-v2` branch with no new PR.
 
 ## Preserved live diagnostics
 

@@ -30,6 +30,9 @@ MODULE_ORDER: tuple[str, ...] = (
 _ACTIVE_MODULE: contextvars.ContextVar[str | None] = contextvars.ContextVar(
     "factreview_active_stats_module", default=None
 )
+_ACTIVE_STATS_PATH: contextvars.ContextVar[Path | None] = contextvars.ContextVar(
+    "factreview_active_stats_path", default=None
+)
 _RUN_STATS_ENV = "FACTREVIEW_RUN_STATS_PATH"
 _ACTIVE_MODULE_ENV = "FACTREVIEW_ACTIVE_STATS_MODULE"
 _CLI_STATUS_ENV = "FACTREVIEW_CLI_STATUS"
@@ -40,6 +43,9 @@ def stats_path() -> Path | None:
     # Windows resolution opens the target file. Serialize it with replacements,
     # including callers that have not yet entered the update transaction.
     with _UPDATE_LOCK:
+        scoped = _ACTIVE_STATS_PATH.get()
+        if scoped is not None:
+            return scoped
         token = str(os.getenv(_RUN_STATS_ENV) or "").strip()
         return Path(token).expanduser().resolve() if token else None
 
@@ -85,27 +91,30 @@ def current_module() -> str | None:
 def module_scope(module: str) -> Iterator[None]:
     normalized = validate_module(module)
     token = _ACTIVE_MODULE.set(normalized)
+    export_legacy_environment = _ACTIVE_STATS_PATH.get() is None
     prior_env = os.environ.get(_ACTIVE_MODULE_ENV)
-    os.environ[_ACTIVE_MODULE_ENV] = normalized
+    if export_legacy_environment:
+        os.environ[_ACTIVE_MODULE_ENV] = normalized
     try:
         yield
     finally:
         _ACTIVE_MODULE.reset(token)
-        if prior_env is None:
-            os.environ.pop(_ACTIVE_MODULE_ENV, None)
-        else:
-            os.environ[_ACTIVE_MODULE_ENV] = prior_env
+        if export_legacy_environment:
+            if prior_env is None:
+                os.environ.pop(_ACTIVE_MODULE_ENV, None)
+            else:
+                os.environ[_ACTIVE_MODULE_ENV] = prior_env
 
 
 @contextlib.contextmanager
 def timed_module(module: str, *, status: str | None = None) -> Iterator[None]:
     normalized = validate_module(module)
-    start = time.monotonic()
+    start = time.perf_counter()
     try:
         with module_scope(normalized):
             yield
     finally:
-        record_duration(normalized, time.monotonic() - start)
+        record_duration(normalized, time.perf_counter() - start)
         if status:
             record_module_status(normalized, status)
 
@@ -201,12 +210,29 @@ def _file_locked_payload(path: Path) -> Iterator[dict[str, Any]]:
         lock_fh.close()
 
 
-def initialize(path: Path) -> dict[str, Any]:
-    set_stats_path(path)
+def initialize(path: Path, *, activate: bool = True) -> dict[str, Any]:
+    if activate:
+        set_stats_path(path)
     payload = _empty_payload()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     return payload
+
+
+@contextlib.contextmanager
+def run_scope(path: Path) -> Iterator[None]:
+    """Isolate one run's statistics, including tasks copied by asyncio.to_thread.
+
+    Legacy callers can continue exporting a process-wide path with initialize;
+    scoped runs leave that environment untouched and restore nested contexts.
+    """
+    target = path.expanduser().resolve()
+    token = _ACTIVE_STATS_PATH.set(target)
+    try:
+        initialize(target, activate=False)
+        yield
+    finally:
+        _ACTIVE_STATS_PATH.reset(token)
 
 
 def read(path: Path | None = None) -> dict[str, Any]:
@@ -503,6 +529,7 @@ __all__ = [
     "record_duration",
     "record_llm_call",
     "record_module_status",
+    "run_scope",
     "set_pipeline_duration",
     "set_stats_path",
     "stats_path",

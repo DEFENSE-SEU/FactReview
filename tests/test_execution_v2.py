@@ -389,6 +389,53 @@ def test_llm_refinement_uses_mock_and_existing_entry(inputs, tmp_path, monkeypat
     assert result.ledger[0]["refinement"]["mode"] == "llm"
 
 
+def test_entry_without_config_refines_required_launch_arguments(inputs, tmp_path, monkeypatch):
+    plan, _, materials = inputs
+    root = Path(materials.repository.root)
+    (root / "eval.py").write_text(
+        "import argparse\nparser = argparse.ArgumentParser()\n"
+        "parser.add_argument('--data', required=True)\nparser.parse_args()\n",
+        encoding="utf-8",
+    )
+    (root / "data.json").write_text("[]", encoding="utf-8")
+    materials.repository = index_repository(root)
+    plan.task.command = []
+    seen = []
+
+    def llm(prompt, system, cfg, module):
+        supplied = json.loads(prompt)
+        assert "required=True" in supplied["files"]["eval.py"]
+        seen.append(supplied)
+        return {"command": ["python", "eval.py", "--data", "data.json"], "metric_output": None}
+
+    def runner(request):
+        if request.command != ["python", "eval.py", "--data", "data.json"]:
+            return RunOutcome(returncode=2, stderr="the following arguments are required: --data")
+        return RunOutcome(returncode=0, observations=[observation()])
+
+    monkeypatch.setattr("llm.client.llm_json", llm)
+    result = run(inputs, tmp_path, runner)
+    assert len(seen) == 1
+    assert result.claims[0].evidence[0].sufficient
+    assert result.ledger[0]["refinement"]["mode"] == "llm"
+
+
+def test_disabled_refinement_keeps_direct_entry_fallback(inputs, tmp_path, monkeypatch):
+    inputs[0].task.command = []
+
+    def no_llm(*args, **kwargs):
+        raise AssertionError("disabled refinement must not call an LLM")
+
+    def runner(request):
+        assert request.command == ["python", "eval.py"]
+        return RunOutcome(returncode=0, observations=[observation()])
+
+    monkeypatch.setattr("llm.client.llm_json", no_llm)
+    result = run(inputs, tmp_path, runner, config={"refine_with_llm": False})
+    assert result.claims[0].evidence[0].sufficient
+    assert result.ledger[0]["refinement"]["mode"] == "deterministic"
+
+
 def test_llm_cannot_replace_script_with_inline_evaluation(inputs, tmp_path, monkeypatch):
     inputs[0].task.command = []
     inputs[0].task.config = "config.json"
@@ -746,3 +793,166 @@ def test_canonical_observation_conflict_with_actual_metric_is_rejected():
 
     with pytest.raises(ValueError, match="conflicts with an identified actual metric"):
         decode_output({"metrics": {"accuracy": 0.2}, "observations": [observation(value=0.9).model_dump()]})
+
+
+@pytest.mark.parametrize("value", [True, False])
+def test_canonical_boolean_metric_cannot_support_claim(inputs, tmp_path, monkeypatch, value):
+    inputs[0].y_paper = {"c1": float(value)}
+    monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "test-image:1"))
+    monkeypatch.setattr(
+        v2, "docker_run_paper_image", lambda **kwargs: ["docker", "run", "test-image:1", *kwargs["cmd"]]
+    )
+
+    def transport(command, cwd, timeout_sec):
+        raw = {**observation().model_dump(), "value": value}
+        return CommandResult(
+            command, cwd, 0, "FACTREVIEW_OBSERVATIONS=" + json.dumps({"observations": [raw]}), "", 0.1
+        )
+
+    monkeypatch.setattr(v2, "run_command", transport)
+    result = run(inputs, tmp_path, None)
+    assert not result.claims[0].evidence
+    assert "boolean" in result.ledger[0]["attempts"][0]["issue"]
+
+
+@pytest.mark.parametrize("field", ["value", "reported_variance"])
+@pytest.mark.parametrize("value", [True, False])
+def test_observation_rejects_boolean_numeric_fields(field, value):
+    with pytest.raises(ValidationError, match="boolean"):
+        Observation.model_validate({**observation().model_dump(), field: value})
+
+
+@pytest.mark.parametrize(
+    "failure,cleanup_status",
+    [("timeout", "removed"), ("exit", "absent"), ("launch", "absent"), ("exception", "removed")],
+)
+def test_failed_docker_attempt_cleans_only_its_named_container(
+    inputs, tmp_path, monkeypatch, failure, cleanup_status
+):
+    monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "test-image:1"))
+    containers, commands = [], []
+
+    def docker_command(**kwargs):
+        name = kwargs["container_name"]
+        containers.append(name)
+        return ["docker", "run", "--rm", "--name", name, "test-image:1", *kwargs["cmd"]]
+
+    def transport(command, cwd, timeout_sec):
+        commands.append(command)
+        if command[1] == "run":
+            if failure == "exception":
+                raise OSError("transport unavailable")
+            code = {"timeout": 124, "exit": 1, "launch": 127}[failure]
+            return CommandResult(command, cwd, code, "", failure, 0.1)
+        assert command == ["docker", "rm", "--force", containers[0]]
+        if cleanup_status == "absent":
+            return CommandResult(
+                command, cwd, 1, "", f"Error response from daemon: No such container: {containers[0]}", 0.1
+            )
+        return CommandResult(command, cwd, 0, containers[0], "", 0.1)
+
+    monkeypatch.setattr(v2, "docker_run_paper_image", docker_command)
+    monkeypatch.setattr(v2, "run_command", transport)
+    result = run(inputs, tmp_path, None, config={"max_attempts": 0})
+    assert len(containers) == 1 and len(commands) == 2
+    assert not result.claims[0].evidence
+    attempt = result.ledger[0]["attempts"][0]
+    assert attempt["commands"] == commands
+    audit = json.loads(Path(attempt["logs"]["container_cleanup"]).read_text(encoding="utf-8"))
+    assert audit["status"] == cleanup_status
+    assert audit["container_name"] == containers[0]
+    assert audit["command"] == commands[-1]
+    assert "cleanup failed" not in attempt["issue"]
+
+
+def test_successful_docker_run_does_not_issue_cleanup(inputs, tmp_path, monkeypatch):
+    monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "test-image:1"))
+    commands = []
+
+    def transport(command, cwd, timeout_sec):
+        commands.append(command)
+        assert command[1] == "run" and "--name" in command
+        payload = {"observations": [observation().model_dump()]}
+        return CommandResult(command, cwd, 0, json.dumps(payload), "", 0.1)
+
+    monkeypatch.setattr(v2, "run_command", transport)
+    result = run(inputs, tmp_path, None)
+    assert result.claims[0].evidence[0].sufficient
+    assert len(commands) == 1
+
+
+@pytest.mark.parametrize("cleanup_failure", ["daemon", "timeout", "exception"])
+def test_failed_container_cleanup_stops_repairs_and_records_issue(
+    inputs, tmp_path, monkeypatch, cleanup_failure
+):
+    monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "test-image:1"))
+    commands, repairs = [], []
+
+    def transport(command, cwd, timeout_sec):
+        commands.append(command)
+        if command[1] == "run":
+            return CommandResult(command, cwd, 124, "", "TimeoutExpired", 0.1)
+        if cleanup_failure == "exception":
+            raise OSError("daemon unavailable")
+        return CommandResult(
+            command, cwd, 124 if cleanup_failure == "timeout" else 1, "", "daemon unavailable", 0.1
+        )
+
+    monkeypatch.setattr(v2, "run_command", transport)
+    result = run(
+        inputs,
+        tmp_path,
+        None,
+        repairer=lambda *args: repairs.append(args) or Repair(dependencies=["numpy"], reason="dependency"),
+    )
+    assert not repairs
+    assert len(commands) == 2 and not result.claims[0].evidence
+    assert "container cleanup failed" in result.ledger[0]["reason"]
+    assert any("container cleanup failed" in issue for issue in result.issues)
+    attempt = result.ledger[0]["attempts"][0]
+    assert attempt["environment"]["container_cleanup"]["status"] == "failed"
+
+
+def test_docker_repair_uses_a_fresh_container_name(inputs, tmp_path, monkeypatch):
+    monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "test-image:1"))
+    names = []
+
+    def transport(command, cwd, timeout_sec):
+        if command[1] == "run":
+            name = command[command.index("--name") + 1]
+            names.append(name)
+            if len(names) == 1:
+                return CommandResult(command, cwd, 1, "", "missing dependency", 0.1)
+            return CommandResult(
+                command, cwd, 0, json.dumps({"observations": [observation().model_dump()]}), "", 0.1
+            )
+        assert command == ["docker", "rm", "--force", names[-1]]
+        return CommandResult(command, cwd, 0, names[-1], "", 0.1)
+
+    monkeypatch.setattr(v2, "run_command", transport)
+    result = run(
+        inputs, tmp_path, None, repairer=lambda *_: Repair(dependencies=["numpy"], reason="dependency")
+    )
+    assert result.claims[0].evidence[0].sufficient
+    assert len(names) == 2 and names[0] != names[1]
+
+
+def test_unresolved_container_cleanup_retains_remaining_plans_without_launching(inputs, tmp_path):
+    plan, claim, materials = inputs
+    second = plan.model_copy(update={"id": "p2"}, deep=True)
+    called = []
+
+    def runner(request):
+        called.append(request.plan.id)
+        return RunOutcome(
+            returncode=124,
+            issue="Docker container cleanup failed",
+            environment={"container_cleanup": {"status": "failed"}},
+        )
+
+    result = execute_plans([plan, second], [claim], materials, tmp_path / "out", runner=runner)
+    assert called == ["p1"]
+    assert len(result.ledger) == 2 and not result.claims[0].evidence
+    assert not result.ledger[1]["approved"] and not result.ledger[1]["attempts"]
+    assert "cleanup failed" in result.ledger[1]["reason"]
+    assert not (tmp_path / "out" / "run_0001" / "workspace").exists()

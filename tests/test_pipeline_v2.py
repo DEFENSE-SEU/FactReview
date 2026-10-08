@@ -7,15 +7,18 @@ import importlib.util
 import json
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Event
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 
 import pymupdf
 import pytest
 
 import pipeline_full
 import pipeline_v2
+from common import run_stats
 from fact_generation.execution.v2 import Observation, RunOutcome
 from llm.client import LLMConfig
 from preprocessing.parse.mineru_adapter import MineruParseResult
@@ -314,6 +317,12 @@ def test_real_v2_stages_with_mocked_external_services_render_pdf_and_svg(tiny_in
     assert set(summary["stages"].values()) == {"ok"}
     assert summary["stage_errors"] == {}
     assert summary["counts"] == {"supported": 4, "flawed": 0, "questioned": 0, "unverified": 0}
+    stats = summary["run_stats"]["modules"]
+    assert stats["reference_check"]["status"] == "ok"
+    assert stats["reference_check"]["duration_sec"] > 0
+    assert stats["analysis"]["duration_sec"] + stats["reference_check"]["duration_sec"] == pytest.approx(
+        sum(summary["stage_durations_sec"][stage] for stage in ("screening", "verification", "assessment"))
+    )
     assert summary["submission_deadline"] == "2021-01-31"
     assert summary["concurrent_start"] == "2020-10-31"
     assert len(tiny_inputs[1].calls) == 1 and runner.call_count == 1
@@ -399,6 +408,86 @@ def test_cli_cutoff_requires_explicit_deadline_and_never_defaults_to_arxiv(monke
     with pytest.raises(ValueError):
         args.submission_deadline = "2021-02-30"
         pipeline_full._resolve_cutoff(args=args, paper_source=source)
+
+
+def test_arxiv_fallback_reaches_retrieval_and_report_with_saved_provenance(tiny_inputs, monkeypatch):
+    from fact_generation.positioning.paper_search import PaperSearchAdapter
+
+    args, _ = tiny_inputs
+    args.submission_deadline = ""
+    args.derive_cutoff_from_arxiv = True
+    args.arxiv_id = "2101.01234v3"
+    lookup = AsyncMock(
+        return_value={
+            "success": True,
+            "paper": {
+                "arxiv_id": "2101.01234v4",
+                "published": "2021-01-07T00:00:00Z",
+                "updated": "2025-08-01T00:00:00Z",
+            },
+        }
+    )
+    monkeypatch.setattr(PaperSearchAdapter, "lookup_metadata", lookup)
+    summary, _, retrieval, _ = run_tiny(tiny_inputs, monkeypatch, render_pdf=False)
+    assert set(summary["stages"].values()) == {"ok"}
+    assert summary["submission_deadline"] == "2021-01-07"
+    assert summary["concurrent_start"] == "2020-10-07"
+    assert {date for _, date in retrieval.queries} == {"2021-01-07"}
+    lookup.assert_awaited_once_with(identifier="2101.01234")
+    assert json.loads(Path(summary["outputs"]["cutoff"]).read_text(encoding="utf-8")) == summary["cutoff"]
+    assert summary["cutoff"]["source"] == "arxiv_first_submission"
+    assert "venue deadline is unknown" in Path(summary["outputs"]["report_markdown"]).read_text(
+        encoding="utf-8"
+    )
+
+
+@pytest.mark.parametrize(
+    "explicit,expected,source",
+    [
+        ("submission_deadline", "2021-02-02", "submission_deadline"),
+        ("cutoff_date", "2021-03-04", "explicit_cutoff"),
+    ],
+)
+def test_explicit_cutoff_precedes_arxiv_fallback(tiny_inputs, monkeypatch, explicit, expected, source):
+    args, _ = tiny_inputs
+    args.submission_deadline = ""
+    setattr(args, explicit, expected)
+    args.derive_cutoff_from_arxiv = True
+    lookup = AsyncMock(side_effect=AssertionError("An explicit cutoff must prevent metadata lookup"))
+    monkeypatch.setattr(pipeline_v2, "resolve_arxiv_first_submission", lookup)
+    summary, _, _, _ = run_tiny(tiny_inputs, monkeypatch, render_pdf=False)
+    assert set(summary["stages"].values()) == {"ok"}
+    assert summary["cutoff"]["source"] == source
+    assert summary["submission_deadline"] == expected
+    lookup.assert_not_called()
+
+
+@pytest.mark.parametrize("opt_in", [True, False])
+def test_missing_cutoff_keeps_other_stages_and_reports_limits(tiny_inputs, monkeypatch, opt_in):
+    args, _ = tiny_inputs
+    args.submission_deadline = ""
+    args.derive_cutoff_from_arxiv = opt_in
+    lookup = AsyncMock(side_effect=RuntimeError("metadata unavailable"))
+    monkeypatch.setattr(pipeline_v2, "resolve_arxiv_first_submission", lookup)
+    summary, _, retrieval, _ = run_tiny(tiny_inputs, monkeypatch, render_pdf=False)
+    assert set(summary["stages"].values()) == {"ok"}
+    assert "submission_deadline" not in summary
+    assert summary["cutoff"]["source"] == "unresolved"
+    assert not retrieval.queries
+    assert lookup.await_count == int(opt_in)
+    assert any("Submission deadline missing" in issue for issue in summary["issues"])
+    if opt_in:
+        assert "metadata unavailable" in summary["cutoff"]["error"]
+
+
+def test_invalid_explicit_cutoff_is_a_durable_pipeline_failure(tiny_inputs, monkeypatch):
+    args, _ = tiny_inputs
+    args.submission_deadline = "2021-02-30"
+    summary, _, _, _ = run_tiny(tiny_inputs, monkeypatch, render_pdf=False)
+    assert summary["stages"]["materials"] == "failed"
+    assert all(value == "skipped" for name, value in summary["stages"].items() if name != "materials")
+    saved = json.loads((Path(summary["run_dir"]) / "full_pipeline_summary.json").read_text(encoding="utf-8"))
+    assert saved["stage_errors"] == summary["stage_errors"]
 
 
 def test_compgcn_fixture_replay_preserves_reference_artifacts_and_records_limits(tmp_path):
@@ -553,3 +642,69 @@ def test_missing_parser_failure_is_consistent_in_summary_and_stats(tiny_inputs, 
     assert summary["run_stats"]["modules"]["analysis"]["status"] == "skipped"
     assert summary["stage_durations_sec"]["materials"] > 0
     assert runner.call_count == 0
+
+
+@pytest.mark.parametrize("first_fails", [False, True])
+def test_concurrent_pipelines_keep_usage_and_parent_context_isolated(
+    tiny_inputs, monkeypatch, tmp_path, first_fails
+):
+    parent = tmp_path / "parent-stats.json"
+    parent.write_text('{"parent":true}', encoding="utf-8")
+    monkeypatch.setenv("FACTREVIEW_RUN_STATS_PATH", str(parent))
+    monkeypatch.setenv("FACTREVIEW_ACTIVE_STATS_MODULE", "parse")
+    first_parsing, second_parsing, first_finished = Event(), Event(), Event()
+    original_args, original_parser = tiny_inputs
+
+    def run(index):
+        args = SimpleNamespace(**vars(original_args))
+        args.paper_key = f"parallel-{index}"
+        args.run_execution = False
+        boundary = ModelBoundary()
+
+        class InterleavedParser:
+            async def parse_pdf(self, **kwargs):
+                if index == 11:
+                    first_parsing.set()
+                    assert second_parsing.wait(timeout=10)
+                else:
+                    second_parsing.set()
+                    assert first_finished.wait(timeout=20)
+                return original_parser.result
+
+        def model(**kwargs):
+            if kwargs["module"] == "screening.claims":
+                run_stats.record_llm_call(usage={"input_tokens": index}, model=f"run-{index}")
+                if first_fails and index == 11:
+                    return {"status": "error", "error": "intentional first-run failure"}
+            return boundary(**kwargs)
+
+        try:
+            return pipeline_v2.run_v2_pipeline(
+                args,
+                parser=InterleavedParser(),
+                call=model,
+                reference_checker=lambda **kwargs: {"ok": True, "total_refs": 1, "issues": []},
+                branches={name: lambda *args: {} for name in ("Literature", "Theory", "Code", "Experiments")},
+                global_literature=lambda *args: {},
+                render_pdf=False,
+            )
+        finally:
+            if index == 11:
+                first_finished.set()
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        first = pool.submit(run, 11)
+        assert first_parsing.wait(timeout=10)
+        second = pool.submit(run, 22)
+        results = (first.result(timeout=30), second.result(timeout=30))
+    for index, summary in zip((11, 22), results, strict=True):
+        assert summary["run_stats"]["total"]["token_usage"]["input_tokens"] == index
+        assert summary["run_stats"]["modules"]["analysis"]["models"] == {f"run-{index}": 1}
+        failed = first_fails and index == 11
+        assert summary["stages"]["screening"] == ("failed" if failed else "ok")
+        assert summary["stages"]["report"] == ("skipped" if failed else "ok")
+        if not failed:
+            assert Path(summary["outputs"]["report_json"]).is_file()
+    assert parent.read_text(encoding="utf-8") == '{"parent":true}'
+    assert os.environ["FACTREVIEW_RUN_STATS_PATH"] == str(parent)
+    assert os.environ["FACTREVIEW_ACTIVE_STATS_MODULE"] == "parse"

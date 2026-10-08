@@ -30,6 +30,8 @@ python scripts/execute_review_pipeline.py path/to/paper.pdf \
 
 Replace `YYYY-MM-DD` with the target venue's actual submission deadline. Literature treats the preceding three calendar months as concurrent work. A missing deadline leaves Literature verification unresolved. The default never derives a date from the paper's arXiv ID. `--repository-url https://github.com/owner/repo` can supply a released repository snapshot; a single GitHub repository URL in the paper can also be discovered automatically.
 
+When the venue deadline is unavailable, explicitly enable `--derive-cutoff-from-arxiv`. For a local PDF, also supply `--arxiv-id ID`. This resolves the first submission's exact `published` date through arXiv metadata and records the fallback in `cutoff.json`, the run summary and report limitations. An explicit deadline takes precedence. Unavailable or mismatched metadata leaves Literature unresolved; revision dates and the identifier's month never become a guessed day-level cutoff.
+
 Add `--run-execution` for Docker verification. `--approval-mode auto` is the default; `--approval-mode interactive` displays each eligible plan and requests a decision. `--training-budget 0` permits no training runs. Positive budgets count every training run, including retries, and only high-priority training plans qualify. `--max-attempts 3` permits at most three accepted infrastructure repairs; accepted values are 0–3.
 
 L3 creates a separate workspace after approval. It checks actual runtime dataset, metric and settings before using a result. Repairs are limited to dependencies, paths, launch arguments and wrappers; the original model, loss, data, evaluation and baselines stay protected. Ambiguous paper targets and missing resources remain blocked with a recorded reason. Default metric tolerances are centralized in [`v2_config.py`](src/fact_generation/execution/v2_config.py), including both historical profiles.
@@ -44,6 +46,7 @@ Outputs are saved under `runs/<paper-key>_<timestamp>_<unique-id>/`:
 - `review/report/final_review.{json,md,pdf}`: canonical records and the rendered review.
 - `review/teaser/teaser.{json,svg}` and `teaser_prompt.md`: deterministic four-status summary and optional image-authoring prompt.
 - `full_pipeline_summary.json`, `run_stats.json`: stage results, errors and measured or explicitly estimated usage.
+- `cutoff.json`: the date used for Literature, its provenance, or the reason it remains unresolved.
 
 The v2 teaser is rendered locally as SVG. The old Gemini teaser API, old runtime-job reuse, automatic task invention and the legacy per-paper time-budget flag are outside the v2 entry point; explicit unsupported options produce a recorded error. `--execution-docker-build-timeout-sec` controls Docker image-build timeout. Docker is required for enabled execution.
 
