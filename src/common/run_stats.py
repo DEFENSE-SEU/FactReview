@@ -136,6 +136,9 @@ def _empty_module_payload(status: str = "pending") -> dict[str, Any]:
         "llm_duration_sec": 0.0,
         "token_usage": _empty_token_usage(),
         "estimated": False,
+        "failed_requests": 0,
+        "unavailable_usage_requests": 0,
+        "image_count": 0,
         "providers": {},
         "models": {},
         "warnings": [],
@@ -167,6 +170,8 @@ def _normalize_payload(payload: Any) -> dict[str, Any]:
         base["duration_sec"] = float(base.get("duration_sec") or 0.0)
         base["llm_duration_sec"] = float(base.get("llm_duration_sec") or 0.0)
         base["estimated"] = bool(base.get("estimated"))
+        for key in ("failed_requests", "unavailable_usage_requests", "image_count"):
+            base[key] = max(0, int(base.get(key) or 0))
         base["providers"] = base.get("providers") if isinstance(base.get("providers"), dict) else {}
         base["models"] = base.get("models") if isinstance(base.get("models"), dict) else {}
         warnings = base.get("warnings") if isinstance(base.get("warnings"), list) else []
@@ -341,15 +346,34 @@ def record_llm_call(
     duration_sec: float = 0.0,
     estimated: bool | None = None,
     warning: str = "",
+    failed: bool = False,
+    image_count: int = 0,
 ) -> None:
+    """Record a call attempt, including local/provider failures and requested images.
+
+    Unknown usage on a failed attempt contributes no fabricated token estimate;
+    the separate unavailable counter and warning identify incomplete totals.
+    """
     resolved_module = module or current_module()
     if not resolved_module:
         raise RuntimeError("LLM usage recording requires an active stats module")
     normalized = validate_module(resolved_module)
 
     exact_usage = _coerce_usage(usage or {})
-    has_usage = any(exact_usage[key] > 0 for key in ("input_tokens", "output_tokens", "total_tokens"))
+    has_usage = any(
+        (usage or {}).get(key) is not None
+        for key in ("input_tokens", "prompt_tokens", "output_tokens", "completion_tokens", "total_tokens")
+    )
     is_estimated = (not has_usage) if estimated is None else bool(estimated)
+    if failed and not has_usage:
+        is_estimated = False
+    images = max(0, int(image_count))
+    additional_warnings = []
+    if failed and not has_usage:
+        additional_warnings.append(
+            f"Token totals are incomplete: failed request for provider={provider or 'unknown'} "
+            f"model={model or 'unknown'} returned no usage; its token cost is unavailable."
+        )
     if is_estimated:
         exact_usage = {
             "input_tokens": estimate_tokens("\n".join(part for part in (system, prompt) if part)),
@@ -362,11 +386,19 @@ def record_llm_call(
                 f"Estimated token usage for provider={provider or 'unknown'} "
                 f"model={model or 'unknown'} because the response did not include usage."
             )
+        if images:
+            additional_warnings.append(
+                f"Token totals are incomplete for provider={provider or 'unknown'} model={model or 'unknown'}: "
+                f"text-only token estimation excludes {images} image(s); image token cost is unknown."
+            )
 
     def apply(payload: dict[str, Any]) -> None:
         row = payload["modules"][normalized]
         token_usage = row["token_usage"]
         token_usage["requests"] += 1
+        row["failed_requests"] += int(failed)
+        row["unavailable_usage_requests"] += int(not has_usage)
+        row["image_count"] += images
         token_usage["input_tokens"] += exact_usage["input_tokens"]
         token_usage["output_tokens"] += exact_usage["output_tokens"]
         token_usage["total_tokens"] += exact_usage["total_tokens"]
@@ -380,6 +412,8 @@ def record_llm_call(
         _inc_counter(row["models"], model or "unknown")
         if warning:
             _append_warning(row, warning)
+        for additional_warning in additional_warnings:
+            _append_warning(row, additional_warning)
 
     update(apply)
 
@@ -431,6 +465,7 @@ def with_totals(payload: dict[str, Any]) -> dict[str, Any]:
     llm_duration = 0.0
     estimated = False
     warnings: list[str] = []
+    call_counts = {key: 0 for key in ("failed_requests", "unavailable_usage_requests", "image_count")}
     for module in MODULE_ORDER:
         row = data["modules"][module]
         usage = row["token_usage"]
@@ -440,12 +475,15 @@ def with_totals(payload: dict[str, Any]) -> dict[str, Any]:
         llm_duration += float(row.get("llm_duration_sec") or 0.0)
         estimated = estimated or bool(row.get("estimated"))
         warnings.extend(str(item) for item in row.get("warnings") or [] if str(item).strip())
+        for key in call_counts:
+            call_counts[key] += row[key]
     data["total"] = {
         "duration_sec": duration,
         "llm_duration_sec": llm_duration,
         "token_usage": total,
         "estimated": estimated,
         "warnings": warnings,
+        **call_counts,
     }
     return data
 
@@ -478,6 +516,12 @@ def format_summary_table(payload: dict[str, Any]) -> list[str]:
         notes: list[str] = []
         if row.get("estimated"):
             notes.append("estimated")
+        if row["failed_requests"]:
+            notes.append(f"failed={row['failed_requests']}")
+        if row["unavailable_usage_requests"]:
+            notes.append(f"usage unavailable={row['unavailable_usage_requests']}")
+        if row["image_count"]:
+            notes.append(f"images={row['image_count']}")
         if module == "parse" and int(usage.get("total_tokens") or 0) == 0:
             notes.append("external/no own LLM")
         line = (

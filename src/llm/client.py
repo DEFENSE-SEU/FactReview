@@ -6,7 +6,7 @@ import mimetypes
 import os
 import re
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -125,6 +125,62 @@ def resolve_llm_config(
     )
 
 
+def resolve_vlm_config(*, fallback: LLMConfig | None = None) -> LLMConfig:
+    """Resolve optional visual-model overrides without silently changing providers.
+
+    With no visual overrides the regular model configuration is inherited.
+    A different visual provider uses its own credentials and defaults; a key
+    belonging to the main provider must not be sent to another provider.
+    """
+    provider = (os.getenv("VLM_MODEL_PROVIDER") or "").strip()
+    model = (os.getenv("VLM_MODEL") or "").strip()
+    base_url = (os.getenv("VLM_BASE_URL") or "").strip()
+    api_key = (os.getenv("VLM_API_KEY") or "").strip()
+    if not any((provider, model, base_url, api_key)) and fallback is not None:
+        return fallback
+    requested = _resolve_provider(provider or (fallback.provider if fallback else ""))
+    if is_codex_provider(requested):
+        requested = "openai-codex"
+    if requested not in {"openai-codex", "openai", "claude", "deepseek", "qwen"}:
+        raise ValueError(f"unsupported visual model provider: {requested}")
+
+    main_config = fallback or resolve_llm_config()
+    fallback_provider = normalize_provider(main_config.provider)
+    if is_codex_provider(fallback_provider):
+        fallback_provider = "openai-codex"
+    inherited = (
+        main_config
+        if not provider or requested == fallback_provider
+        else resolve_llm_config(provider=provider)
+    )
+    if not any((provider, model, base_url, api_key)):
+        return inherited
+    if requested == "openai-codex":
+        if api_key:
+            raise ValueError("The openai-codex visual provider uses Codex login; VLM_API_KEY is unsupported")
+        return replace(inherited, model=model or inherited.model, base_url=base_url or inherited.base_url)
+
+    # Execution settings may describe the Codex backend. A separate OpenAI
+    # visual provider must use OpenAI's own connection and credentials.
+    # Preserve the legacy resolver's priorities when sharing the main provider.
+    if requested == "openai" and (requested != fallback_provider or inherited.provider != "openai"):
+        inherited = LLMConfig(
+            provider="openai",
+            model=(os.getenv("OPENAI_MODEL") or "").strip() or "gpt-5",
+            base_url=(os.getenv("OPENAI_BASE_URL") or "").strip() or "https://api.openai.com/v1",
+            api_key=(os.getenv("OPENAI_API_KEY") or "").strip() or None,
+        )
+    resolved = replace(
+        inherited,
+        model=model or inherited.model,
+        base_url=base_url or inherited.base_url,
+        api_key=api_key or inherited.api_key,
+    )
+    if not resolved.api_key:
+        raise ValueError(f"Visual model provider {requested} requires VLM_API_KEY or its provider API key")
+    return resolved
+
+
 def _parse_json_response(text: str) -> dict[str, Any]:
     try:
         data = json.loads(text)
@@ -191,7 +247,7 @@ def llm_json(
         if cfg.provider == "claude":
             from anthropic import Anthropic
 
-            client = Anthropic(api_key=cfg.api_key)
+            client = Anthropic(api_key=cfg.api_key, base_url=cfg.base_url)
             resp = client.messages.create(
                 model=cfg.model,
                 max_tokens=cfg.max_tokens or 8192,
@@ -222,11 +278,16 @@ def llm_json(
             except Exception:
                 text = str(resp).strip()
             raw_usage = getattr(resp, "usage", None)
-            usage = {
-                "input_tokens": int(getattr(raw_usage, "input_tokens", 0) or 0),
-                "output_tokens": int(getattr(raw_usage, "output_tokens", 0) or 0),
-            }
-            usage["total_tokens"] = int(usage["input_tokens"]) + int(usage["output_tokens"])
+            usage = (
+                {
+                    "input_tokens": int(getattr(raw_usage, "input_tokens", 0) or 0),
+                    "output_tokens": int(getattr(raw_usage, "output_tokens", 0) or 0),
+                }
+                if raw_usage is not None
+                else {}
+            )
+            if usage:
+                usage["total_tokens"] = int(usage["input_tokens"]) + int(usage["output_tokens"])
         elif cfg.provider == "openai-codex":
             auth = get_codex_auth(allow_browser_login=True)
             codex_result = invoke_codex(
@@ -277,12 +338,26 @@ def llm_json(
             resp = client.chat.completions.create(**kwargs)
             text = (resp.choices[0].message.content or "").strip()
             raw_usage = getattr(resp, "usage", None)
-            usage = {
-                "input_tokens": int(getattr(raw_usage, "prompt_tokens", 0) or 0),
-                "output_tokens": int(getattr(raw_usage, "completion_tokens", 0) or 0),
-                "total_tokens": int(getattr(raw_usage, "total_tokens", 0) or 0),
-            }
+            usage = (
+                {
+                    "input_tokens": int(getattr(raw_usage, "prompt_tokens", 0) or 0),
+                    "output_tokens": int(getattr(raw_usage, "completion_tokens", 0) or 0),
+                    "total_tokens": int(getattr(raw_usage, "total_tokens", 0) or 0),
+                }
+                if raw_usage is not None
+                else {}
+            )
     except Exception as e:
+        if run_stats.stats_path() is not None:
+            run_stats.record_llm_call(
+                module=module,
+                provider=cfg.provider,
+                model=cfg.model,
+                usage=usage,
+                duration_sec=time.monotonic() - t0,
+                failed=True,
+                image_count=len(images or []),
+            )
         return {
             "status": "error",
             "error": f"{type(e).__name__}: {e}",
@@ -301,6 +376,7 @@ def llm_json(
             system=system,
             response_text=text,
             duration_sec=time.monotonic() - t0,
+            image_count=len(images or []),
         )
 
     return _parse_json_response(text)

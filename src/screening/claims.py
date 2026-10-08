@@ -42,7 +42,8 @@ branches. importance is core for a central contribution, otherwise secondary.
 
 For each claim, choose a source_block_id from the supplied blocks and copy a unique
 verbatim source_quote from that block. The quote must support the extracted claim
-and include its qualifiers. Separate conclusions may quote the same sentence.
+and include its qualifiers and attached citation anchors, even when the extracted
+claim text omits those citations. Separate conclusions may quote the same sentence.
 Only use blocks with a recorded location. Location, claim id, evidence, and status
 are assigned by code; do not return those fields. Return JSON matching OUTPUT_SCHEMA.
 Return status='ok' and claims=[] only when the paper contains no eligible claims.
@@ -136,6 +137,8 @@ def extract_claims(
                     id=f"claim_{index:03d}",
                     text=item.text,
                     loc=location,
+                    source_block_id=item.source_block_id,
+                    source_quote=item.source_quote,
                     conditions=item.conditions,
                     needs=item.needs,
                     importance=item.importance,

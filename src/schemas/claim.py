@@ -153,6 +153,9 @@ class Claim(Contract):
     id: NonEmpty
     text: NonEmpty
     loc: ClaimLocation
+    # Optional for previously saved records; extraction retains these together.
+    source_block_id: NonEmpty | None = None
+    source_quote: str | None = None
     conditions: list[Condition] = Field(min_length=1)
     needs: list[EvidenceNeed]
     importance: Literal["core", "secondary"] = "secondary"
@@ -163,6 +166,10 @@ class Claim(Contract):
 
     @model_validator(mode="after")
     def check_references(self) -> Self:
+        if (self.source_block_id is None) != (self.source_quote is None):
+            raise ValueError("source_block_id and source_quote must be supplied together")
+        if self.source_quote is not None and not self.source_quote.strip():
+            raise ValueError("source_quote must contain original manuscript text")
         ids = [condition.id for condition in self.conditions]
         if len(ids) != len(set(ids)):
             raise ValueError("condition ids must be unique within a claim")

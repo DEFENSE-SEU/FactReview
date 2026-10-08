@@ -103,25 +103,29 @@ def _iter_sse_data(response) -> list[str]:
 def _coerce_usage(value: Any) -> dict[str, int]:
     if not isinstance(value, dict):
         return {}
-    input_tokens = value.get("input_tokens", value.get("prompt_tokens"))
-    output_tokens = value.get("output_tokens", value.get("completion_tokens"))
-    total_tokens = value.get("total_tokens")
-    try:
-        input_count = max(0, int(input_tokens or 0))
-    except Exception:
-        input_count = 0
-    try:
-        output_count = max(0, int(output_tokens or 0))
-    except Exception:
-        output_count = 0
-    try:
-        total_count = max(0, int(total_tokens or 0))
-    except Exception:
-        total_count = 0
+    counts = {}
+    for key, alias in (
+        ("input_tokens", "prompt_tokens"),
+        ("output_tokens", "completion_tokens"),
+        ("total_tokens", "total_tokens"),
+    ):
+        raw = value.get(key, value.get(alias))
+        if raw is None:
+            continue
+        try:
+            count = int(raw)
+        except (ValueError, TypeError, OverflowError):
+            return {}
+        if isinstance(raw, bool) or count < 0 or (isinstance(raw, float) and raw != count):
+            return {}
+        counts[key] = count
+    if not counts:
+        return {}
+    input_count = counts.get("input_tokens", 0)
+    output_count = counts.get("output_tokens", 0)
+    total_count = counts.get("total_tokens", 0)
     if total_count <= 0:
         total_count = input_count + output_count
-    if input_count <= 0 and output_count <= 0 and total_count <= 0:
-        return {}
     return {
         "input_tokens": input_count,
         "output_tokens": output_count,
@@ -190,6 +194,7 @@ def invoke_codex(
     chunks: list[str] = []
     last_payload: dict[str, Any] = {}
     usage: dict[str, int] = {}
+    completed = False
     for event in events:
         try:
             payload_item = json.loads(event)
@@ -202,6 +207,21 @@ def invoke_codex(
         if event_usage:
             usage = event_usage
         event_type = payload_item.get("type")
+        response_payload = payload_item.get("response")
+        response_status = response_payload.get("status") if isinstance(response_payload, dict) else None
+        if event_type in {"error", "response.failed", "response.incomplete", "response.cancelled"} or (
+            response_status in {"failed", "incomplete", "cancelled"}
+        ):
+            raise RuntimeError(f"Codex backend did not complete the response: {event_type or response_status}")
+        if event_type == "response.completed":
+            if response_status not in {None, "completed"}:
+                raise RuntimeError(f"Codex backend returned an invalid completion status: {response_status}")
+            completed = True
+            if isinstance(response_payload, dict):
+                final_text = _extract_output_text(response_payload)
+                if final_text:
+                    chunks = [final_text]
+            continue
         if event_type == "response.output_text.delta" and isinstance(payload_item.get("delta"), str):
             chunks.append(payload_item["delta"])
             continue
@@ -217,6 +237,8 @@ def invoke_codex(
         if fallback_text and not chunks:
             chunks.append(fallback_text)
 
+    if not completed:
+        raise RuntimeError("Codex backend stream ended before response.completed")
     text = "".join(chunks).strip()
     if text:
         if return_usage:

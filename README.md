@@ -38,6 +38,10 @@ L3 creates a separate workspace after approval. It checks actual runtime dataset
 
 Use `--execution-config path/to/config.json` for an `ExecutionConfig` JSON document. Explicit CLI options override the corresponding file fields, including an explicit training budget of zero. Per-plan `output_mappings` select dataset, metric and settings from actual output. They cannot substitute expected paper values. Per-plan `author_artifacts` bind a released data/log file's path, SHA-256, metadata selectors and recomputation operation before execution; the operator must confirm its role as authors' released data or logs. Per-plan/per-condition `paper_variances` require an exact paper block, quotation and nonnegative value. The operator must confirm the statistic's meaning, units and condition binding; quotation validation alone does not establish those semantics. These optional contracts are empty by default.
 
+Figure checks, writing-candidate confirmation and theorem-notation confirmation send actual image pixels to the configured multimodal model. By default they inherit the main model. Set `VLM_MODEL_PROVIDER`, `VLM_MODEL`, `VLM_BASE_URL` and `VLM_API_KEY` to override the visual route. A provider change uses that provider's configuration; `openai-codex` uses the local Codex login and accepts no `VLM_API_KEY`. The selected model must support images. Unsupported image requests and individual figure failures remain visible in screening records and report limitations. Figure input includes the caption, every linked body sentence and a crop rendered at 96 dpi for printed-size checks. Missing physical dimensions leave printed-size legibility unresolved.
+
+The read-only repository index includes Python, C/C++, CUDA, R, Julia, Java, Go, Rust, MATLAB, Fortran, Scala and existing JavaScript/TypeScript sources. Code verification admits complete source/config files within `CODE_SOURCE_MAX_BYTES` (default 200000 serialized UTF-8 bytes, including line metadata). Selection prioritizes claim-named paths, configs and entry scripts. Omitted files are explicit; this budget does not cover the paper text or constitute exhaustive repository review. The full selection manifest is saved locally, while model/report metadata uses bounded samples.
+
 Outputs are saved under `runs/<paper-key>_<timestamp>_<unique-id>/`:
 
 - `materials/materials.json`: original parser content, page/figure images and repository index.
@@ -47,6 +51,10 @@ Outputs are saved under `runs/<paper-key>_<timestamp>_<unique-id>/`:
 - `review/teaser/teaser.{json,svg}` and `teaser_prompt.md`: deterministic four-status summary and optional image-authoring prompt.
 - `full_pipeline_summary.json`, `run_stats.json`: stage results, errors and measured or explicitly estimated usage.
 - `cutoff.json`: the date used for Literature, its provenance, or the reason it remains unresolved.
+- `visual_calls/`: per-image-call model/provider, image hash and dimensions, input context, response or failure, and duration. Provider credentials are removed from diagnostics.
+- `code_scopes/`: complete selected/omitted source manifests for each Code inspection, including the configured source budget.
+
+The summary and report expose figure totals, checked/failed/unavailable counts, attempted/failed model calls and missing usage. Text estimates explicitly exclude unknown image token costs; failed calls with no reported usage do not acquire invented token estimates.
 
 The v2 teaser is rendered locally as SVG. The old Gemini teaser API, old runtime-job reuse, automatic task invention and the legacy per-paper time-budget flag are outside the v2 entry point; explicit unsupported options produce a recorded error. `--execution-docker-build-timeout-sec` controls Docker image-build timeout. Docker is required for enabled execution.
 
@@ -65,6 +73,10 @@ python -m pytest tests/stages/test_execution.py::test_docker_daemon_is_available
 ```
 
 The supplementary `python scripts/check_v2_compgcn.py` check is an explicitly labelled offline fixture replay using one real PDF and repository. It saves its mocked-service boundaries and a historical-label comparison. A live MinerU/LLM/Docker result requires locally configured credentials and services. Individual case results do not establish framework-wide review accuracy or repository compatibility.
+
+Run `python scripts/check_v2_visual.py` for an opt-in live visual probe. It generates two random codes present only in image pixels and three controlled PDF figures (consistent context, nonexistent panel reference, missing axis labels). It calls the actual configured visual model, saves the inputs and responses, and returns a failing exit code for failed checks. Figure parsing uses fixture content; these five probes establish limited integration behavior and provide no review-accuracy estimate. `--mode transport` and `--mode figures` select subsets. Results are saved under `runs/v2_visual/`.
+
+`python scripts/check_v2_framework.py` exercises five complementary full v2 scenarios with fixed external boundaries. Add `--scenario mapped_runtime --scenario mapped_runtime_misaligned --docker` for the actual Docker route through output mapping, alignment, assessment and the final report. See [framework validation](docs/framework_validation.md) for the matrix, commands, saved artifacts and interpretation limits. Training stays at zero.
 
 Literature records its search scope. An adapter that does not certify search completeness cannot support a novelty claim solely because no close work was returned. The technical query vocabulary leaves uncovered domains visibly unresolved. Theory and Code preserve questionable differences for author explanation; this implementation includes no automated theorem prover. Claim splitting semantics depend on the configured model, while source locations, exact quotations, routing and aggregation have deterministic checks.
 
