@@ -74,6 +74,65 @@ def materials(tmp_path: Path) -> SharedMaterials:
     return result
 
 
+@pytest.fixture
+def theory_claim(materials: SharedMaterials) -> Claim:
+    return Claim(
+        id="theorem_1",
+        text="The method converges under the stated assumption.",
+        loc=materials.blocks[0].loc,
+        source_block_id="main",
+        source_quote="Theorem 1: the method converges.",
+        conditions=[Condition(id="a", description="Convergence under the stated assumption")],
+        needs=["Theory"],
+        importance="core",
+    )
+
+
+@pytest.fixture
+def code_claim(materials: SharedMaterials) -> Claim:
+    return Claim(
+        id="optimizer_claim",
+        text="The method uses Adam.",
+        loc=materials.blocks[0].loc,
+        source_block_id="main",
+        source_quote="We use Adam.",
+        conditions=[Condition(id="a", description="The optimizer is Adam")],
+        needs=["Code"],
+        importance="core",
+    )
+
+
+def code_scope_response(kwargs):
+    data = json.loads(kwargs["prompt"])
+    return {
+        "conditions": [
+            {
+                "condition_id": condition["id"],
+                "required_facets": ["implementation"]
+                if not condition.get("metric")
+                else ["empirical_outcome"],
+                "claim_source_ids": ["primary"],
+                "rationale": "The fixture's exact source identifies the implementation requirement.",
+            }
+            for condition in data["claim"]["conditions"]
+        ],
+        "items": [
+            {
+                "item_index": index,
+                "condition_id": cid,
+                "relation": "supports_implementation",
+                "full_condition": cid in item["fully_supported_conditions"],
+                "basis": "direct_source",
+                "bridge_quotes": [],
+                "missing_qualifiers": [],
+                "rationale": "The fixture's actual implementation agrees with its stated optimizer.",
+            }
+            for index, item in enumerate(data["candidate_items"])
+            for cid in item["covered"]
+        ],
+    }
+
+
 def scope_response(kwargs):
     data = json.loads(kwargs["prompt"])
     # This shared fixture describes an absolute reported result. The dedicated
@@ -116,7 +175,11 @@ def scope_response(kwargs):
 
 def mock_response(payload: dict):
     return lambda **kwargs: (
-        scope_response(kwargs) if kwargs["module"] == "verification.experiments.scope" else payload
+        scope_response(kwargs)
+        if kwargs["module"] == "verification.experiments.scope"
+        else code_scope_response(kwargs)
+        if kwargs["module"] == "verification.code.scope"
+        else payload
     )
 
 
@@ -188,7 +251,7 @@ def experiments_response(**changes) -> dict:
 
 
 def test_theory_reads_main_before_requesting_relevant_appendix(
-    claim: Claim, materials: SharedMaterials
+    theory_claim: Claim, materials: SharedMaterials
 ) -> None:
     seen = []
 
@@ -203,7 +266,7 @@ def test_theory_reads_main_before_requesting_relevant_appendix(
         assert [b["id"] for b in payload["appendix_proofs"]] == ["appendix"]
         return {"items": [theory_item()]}
 
-    result = verify_theory(claim, materials, call=model)
+    result = verify_theory(theory_claim, materials, call=model)
     assert len(seen) == 2 and len(result.evidence) == 1
     assert result.evidence[0].source == "theory" and result.evidence[0].sufficient
     assert result.evidence[0].pointer.page == 8
@@ -211,10 +274,10 @@ def test_theory_reads_main_before_requesting_relevant_appendix(
 
 
 def test_theory_missing_proof_yields_question_without_support(
-    claim: Claim, materials: SharedMaterials
+    theory_claim: Claim, materials: SharedMaterials
 ) -> None:
     result = verify_theory(
-        claim,
+        theory_claim,
         materials,
         call=mock_response(
             {
@@ -245,16 +308,18 @@ def test_theory_missing_proof_yields_question_without_support(
     ],
 )
 def test_theory_rejects_fabricated_or_unloaded_references(
-    claim: Claim, materials: SharedMaterials, payload: dict
+    theory_claim: Claim, materials: SharedMaterials, payload: dict
 ) -> None:
     with pytest.raises(ValueError):
-        verify_theory(claim, materials, call=mock_response(payload))
+        verify_theory(theory_claim, materials, call=mock_response(payload))
 
 
-def test_theory_theorem_assertion_alone_cannot_be_support(claim: Claim, materials: SharedMaterials) -> None:
+def test_theory_theorem_assertion_alone_cannot_be_support(
+    theory_claim: Claim, materials: SharedMaterials
+) -> None:
     quote = "Theorem 1: the method converges."
     result = verify_theory(
-        claim,
+        theory_claim,
         materials,
         call=mock_response(
             {"items": [theory_item(block_id="main", quote=quote, step_quote=quote, main_block_id=None)]}
@@ -264,9 +329,9 @@ def test_theory_theorem_assertion_alone_cannot_be_support(claim: Claim, material
 
 
 def test_code_verifies_index_hash_and_exact_line_plus_paper_quote(
-    claim: Claim, materials: SharedMaterials
+    code_claim: Claim, materials: SharedMaterials
 ) -> None:
-    result = verify_code(claim, materials, call=mock_response({"items": [code_item()]}))
+    result = verify_code(code_claim, materials, call=mock_response({"items": [code_item()]}))
     evidence = result.evidence[0]
     assert evidence.source == "code" and evidence.pointer.locator == str(
         Path(materials.repository.root) / "eval.py"
@@ -308,13 +373,17 @@ def test_code_missing_repo_preserves_blocker_without_evidence(
     assert result.evidence == [] and result.issues and result.questions
 
 
-def test_code_preserves_indentation_in_exact_source_quote(claim: Claim, materials: SharedMaterials) -> None:
+def test_code_preserves_indentation_in_exact_source_quote(
+    code_claim: Claim, materials: SharedMaterials
+) -> None:
     text = "def train():\n    optimizer = 'Adam'\n"
     path = Path(materials.repository.root) / "eval.py"
     path.write_bytes(text.encode())
     materials.repository.files[0].sha256 = hashlib.sha256(text.encode()).hexdigest()
     result = verify_code(
-        claim, materials, call=mock_response({"items": [code_item(line=2, quote="    optimizer = 'Adam'")]})
+        code_claim,
+        materials,
+        call=mock_response({"items": [code_item(line=2, quote="    optimizer = 'Adam'")]}),
     )
     assert result.evidence[0].pointer.quote.startswith("    ")
 
@@ -1012,22 +1081,38 @@ def support_response(branch, **changes):
 
 @pytest.mark.parametrize("branch", [verify_code, verify_theory, verify_experiments])
 @pytest.mark.parametrize("full", [None, [], ["a"]])
-def test_positive_evidence_requires_explicit_full_condition_support(branch, full, claim, materials):
+def test_positive_evidence_requires_explicit_full_condition_support(
+    branch, full, claim, theory_claim, code_claim, materials
+):
     from assessment.rules import assess_claim
 
-    # Include a checkable derivation marker without changing the quoted experiment number.
+    if branch is verify_code:
+        claim = code_claim
     if branch is verify_theory:
-        materials.blocks[0].text = materials.markdown = "Therefore A test MRR is 0.4."
+        claim = theory_claim
+        materials.blocks[0].text = materials.markdown = (
+            "Theorem 1: the method converges.\n"
+            "Proof of Theorem 1. By the stated assumption, x = y; therefore convergence follows."
+        )
         Path(materials.markdown_path).write_text(materials.markdown, encoding="utf-8")
     response = support_response(branch, fully_supported_conditions=full or [])
     if branch is verify_theory:
-        response["items"][0]["quote"] = materials.markdown
+        response["items"][0].update(
+            quote="Proof of Theorem 1. By the stated assumption, x = y; therefore convergence follows.",
+            step_quote="x = y",
+        )
     if full is None:
         del response["items"][0]["fully_supported_conditions"]
 
     def model(**kwargs):
         assert "fully_supported_conditions" in kwargs["system"] and "ENTIRE" in kwargs["system"]
-        return scope_response(kwargs) if kwargs["module"] == "verification.experiments.scope" else response
+        return (
+            scope_response(kwargs)
+            if kwargs["module"] == "verification.experiments.scope"
+            else code_scope_response(kwargs)
+            if kwargs["module"] == "verification.code.scope"
+            else response
+        )
 
     result = branch(claim, materials, call=model)
     assert len(result.evidence) == 1

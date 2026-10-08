@@ -1,0 +1,544 @@
+{
+  "fixture_version": 1,
+  "purpose": "Minimal real-manuscript regression inputs for experimental source/operand/metric binding. Expected bindings are reviewer annotations; the copied claims and blocks remain original saved inputs.",
+  "location_policy": "Block and claim loc values preserve original manuscript locations. Consumers constructing a new local markdown document must separately preserve these original locations and compute any new local offsets. No reordered excerpt markdown is supplied.",
+  "hash_policy": "File hashes cover original bytes; text hashes cover UTF-8 text; canonical JSON hashes use ensure_ascii=False, sort_keys=True, separators=(comma,colon).",
+  "documents": {
+    "bert": {
+      "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+      "citation": {
+        "arxiv_id": "1810.04805",
+        "url": "https://arxiv.org/abs/1810.04805"
+      },
+      "source_materials_path": "runs/v2_cross_domain/bert_framework_2026-10-09_014934_be4796cb/materials/materials.json",
+      "source_materials_sha256": "2603213ce01402ff14e0b26bde6a7a598cea6f28ec67002c24c104bdddb99b71",
+      "source_markdown_utf8_sha256": "ae9a7a372a076f20eec2c649f2467ab0f9c4c5bf900716f79d7909766a83548d",
+      "source_pdf_path": "runs/v2_cross_domain/bert_framework_2026-10-09_014934_be4796cb/inputs/source_pdf/paper.pdf",
+      "source_pdf_sha256": "5692a5514787a8c6727b4ff3b726a3385798bc68e12138d1d4af83947e2acf6e",
+      "parser": "mineru_v4",
+      "provenance_note": "Exact parsed blocks from the saved real run. Original page/section/character offsets refer to that source document. No LLM responses or independently verified benchmark outcomes are embedded."
+    },
+    "beit": {
+      "title": "BEIT: BERT Pre-Training of Image Transformers",
+      "citation": {
+        "arxiv_id": "2106.08254",
+        "url": "https://arxiv.org/abs/2106.08254"
+      },
+      "source_materials_path": "runs/v2_cross_domain/beit_framework_repaired_2026-10-09_020201_3d5c748a/materials/materials.json",
+      "source_materials_sha256": "ff796d7e15b568896105123f00578f741ed22de7e11109d2be2169062c7811f8",
+      "source_markdown_utf8_sha256": "9bf271bc8c1f7d75a10fe7612954ba59f622777a34f3ddb6aed9783b8902f6d0",
+      "source_pdf_path": "runs/v2_cross_domain/beit_framework_repaired_2026-10-09_020201_3d5c748a/inputs/source_pdf/paper.pdf",
+      "source_pdf_sha256": "6455f47a0ad99294c9e1eb8a361da558f87f9e4446f5d6c0b02c20646a93741c",
+      "parser": "cached-real-MinerU",
+      "provenance_note": "Exact parsed blocks from the saved real run. Original page/section/character offsets refer to that source document. No LLM responses or independently verified benchmark outcomes are embedded."
+    }
+  },
+  "cases": [
+    {
+      "id": "beit_039",
+      "paper_id": "beit",
+      "claim": {
+        "id": "claim_039",
+        "text": "On ADE20K semantic segmentation, intermediate fine-tuning on ImageNet further improves BEIT.",
+        "loc": {
+          "page": 7,
+          "section": "section_16: 3.2 Semantic Segmentation",
+          "char_start": 30379,
+          "char_end": 30638
+        },
+        "source_block_id": "block_82",
+        "source_quote": "Moreover, we employ intermediate fine-tuning for BEIT on ImageNet, i.e., we first fine-tune pretrained BEIT on ImageNet, and then fine-tune the model on ADE20K. The results indicate that intermediate fine-tuning further improves BEIT on semantic segmentation.",
+        "source_refs": [],
+        "conditions": [
+          {
+            "id": "c1",
+            "dataset": "ADE20K",
+            "metric": "mIoU",
+            "settings": {
+              "method": "BEIT",
+              "intermediate_dataset": "ImageNet",
+              "procedure": "fine-tune pretrained BEIT on ImageNet, then fine-tune on ADE20K"
+            },
+            "description": "Intermediate fine-tuning improves ADE20K semantic segmentation."
+          }
+        ],
+        "needs": [
+          "Experiments"
+        ],
+        "importance": "core",
+        "questions": [],
+        "evidence": [],
+        "status": "unverified",
+        "notes": []
+      },
+      "blocks": [
+        {
+          "id": "block_78",
+          "text": "Table 2: Convergence curves of training DeiT from scratch and fine-tuning BEIT on ImageNet-1K.\nTable 3: Results of semantic segmentation on ADE20K. We use SETR-PUP [ZLZ<sup>+</sup>20] as the task layer and report results of single-scale inference.\n<table><tr><td>Models</td><td>ADE20K</td></tr><tr><td>Supervised Pre-Training on ImageNet</td><td>45.3</td></tr><tr><td>DINO [CTM+21]</td><td>44.1</td></tr><tr><td>BEiT (ours)</td><td>45.6</td></tr><tr><td>BEiT + Intermediate Fine-Tuning (ours)</td><td>47.7</td></tr></table>",
+          "kind": "table",
+          "loc": {
+            "page": 7,
+            "section": "block_65: 3.1 Image Classification",
+            "char_start": null,
+            "char_end": null
+          },
+          "citations": [
+            "[ZLZ<sup>+</sup>20]",
+            "[CTM+21]"
+          ]
+        },
+        {
+          "id": "block_81",
+          "text": "Semantic segmentation aims to predict a corresponding class for each pixel of the input image. We evaluate BEIT on the ADE20K benchmark $[ Z Z ^ { \\bullet + } 1 9 ]$ with 25K images and 150 semantic categories. We report the metric of mean Intersection of Union (mIoU) averaged over all semantic categories. As presented in Section 2.6, we directly follow the task layer and the most of hyperparameters described in SETR-PUP $[ Z \\mathrm { L } Z ^ { + } 2 0 ]$ . On ADE20K, we use Adam [LH19] as the optimizer. The learning rate is set to 1e-3 with layer-wise decay similar to image classification. We conduct fine-tuning for 160K steps. The batch size is 16. The detailed hyperparameters are described in Appendix I.",
+          "kind": "text",
+          "loc": {
+            "page": 7,
+            "section": "section_16: 3.2 Semantic Segmentation",
+            "char_start": 29395,
+            "char_end": 30112
+          },
+          "citations": [
+            "[ Z Z ^ { \\bullet + } 1 9 ]",
+            "[ Z \\mathrm { L } Z ^ { + } 2 0 ]",
+            "[LH19]"
+          ]
+        },
+        {
+          "id": "block_82",
+          "text": "As shown in Table 3, we compare BEIT with supervised pre-training that relies on labeled data of ImageNet. We find that our proposed method achieves better performance than supervised pretraining, although BEIT does not require manual annotations for pre-training. Moreover, we employ intermediate fine-tuning for BEIT on ImageNet, i.e., we first fine-tune pretrained BEIT on ImageNet, and then fine-tune the model on ADE20K. The results indicate that intermediate fine-tuning further improves BEIT on semantic segmentation.",
+          "kind": "text",
+          "loc": {
+            "page": 7,
+            "section": "section_16: 3.2 Semantic Segmentation",
+            "char_start": 30114,
+            "char_end": 30638
+          },
+          "citations": []
+        }
+      ],
+      "block_roles": {
+        "block_78": "reported_table_with_preserved_multiple_captions",
+        "block_81": "ADE20K_metric_definition_and_fine_tuning_protocol",
+        "block_82": "original_claim_passage"
+      },
+      "provenance": {
+        "claim_path": "runs/v2_cross_domain/experiment-scope-live-5c106674/claim_039/claim.json",
+        "claim_file_sha256": "e3e9f63a79468134ed68d1f677a186a79eae112673be61fc9cc6c3f3c66de786",
+        "claim_canonical_json_sha256": "47b5debc191c6bb403d2fd9c80a9e09364f3de3c8c5a59bb0fbdb2513577a51b",
+        "blocks": {
+          "block_78": {
+            "text_utf8_sha256": "fbf0e56dd0b1aeac301b2b0c1814fb1edf5d42d40be2798ed47bfb3e48261ce0",
+            "block_canonical_json_sha256": "6d360728932fe3ba4b6755ed5afa76607ab2eadb2a7bf0e8c27791ee8024a34c"
+          },
+          "block_81": {
+            "text_utf8_sha256": "e4b067c405a7f5eef12fa6bdffa76a46f52e00f468e821b0f0cde0024e3c4533",
+            "block_canonical_json_sha256": "1e0861e7f4a881f93159ad9e395a1a3d0b67ab35552313d3641e59a8c0c153f5"
+          },
+          "block_82": {
+            "text_utf8_sha256": "58521da3fb9982e6cb69a327c2feada525e9a1d561313e28b99cac9f73cc10c6",
+            "block_canonical_json_sha256": "6c2ea78bc3a16af540c074c0924540518f0585c27fb3b6352cc696ea51f523b8"
+          }
+        }
+      },
+      "expectations": {
+        "binding_targets": [
+          {
+            "condition_id": "c1",
+            "table_block_id": "block_78",
+            "dataset_label": "ADE20K",
+            "metric_context_block_ids": [
+              "block_81"
+            ],
+            "subject_row": "BEiT + Intermediate Fine-Tuning (ours)",
+            "subject_token": "47.7",
+            "comparator_row": "BEiT (ours)",
+            "comparator_token": "45.6",
+            "numeric_relation": "gt"
+          }
+        ],
+        "limitations": [
+          "Table block_78 retains both Table 2 and Table 3 captions from the parser.",
+          "Numerical ordering is visible. Fairness and complete causal isolation require separate evidence.",
+          "The table does not spell out mIoU; the exact adjacent definition is in block_81."
+        ]
+      }
+    },
+    {
+      "id": "beit_042",
+      "paper_id": "beit",
+      "claim": {
+        "id": "claim_042",
+        "text": "In ablations, replacing visual-token prediction with masked-pixel recovery reduces BEIT performance from 82.86 to 81.04 on ImageNet and from 44.65 to 41.38 on ADE20K.",
+        "loc": {
+          "page": 8,
+          "section": "block_80: 3.2 Semantic Segmentation",
+          "char_start": null,
+          "char_end": null
+        },
+        "source_block_id": "block_84",
+        "source_quote": "Table 4: Ablation studies for BEIT pre-training on image classification and semantic segmentation.\n<table><tr><td>Models</td><td>ImageNet</td><td>ADE20K</td></tr><tr><td>BEIT (300 Epochs)</td><td>82.86</td><td>44.65</td></tr><tr><td>- Blockwise masking</td><td>82.77</td><td>42.93</td></tr><tr><td>- Visual tokens (i.e., recover masked pixels)</td><td>81.04</td><td>41.38</td></tr><tr><td>- Visual tokens - Blockwise masking</td><td>80.50</td><td>37.09</td></tr><tr><td>+ Recover 100% visual tokens</td><td>82.59</td><td>40.93</td></tr><tr><td>- Masking + Recover 100% visual tokens</td><td>81.67</td><td>36.73</td></tr><tr><td>Pretrain longer (800 epochs)</td><td>83.19</td><td>45.58</td></tr></table>",
+        "source_refs": [],
+        "conditions": [
+          {
+            "id": "c1",
+            "dataset": "ImageNet",
+            "metric": "top-1 accuracy",
+            "settings": {
+              "ablation": "- Visual tokens (i.e., recover masked pixels)",
+              "baseline": "BEIT (300 Epochs)"
+            },
+            "description": "Masked-pixel recovery: 81.04 vs baseline 82.86."
+          },
+          {
+            "id": "c2",
+            "dataset": "ADE20K",
+            "metric": "mIoU / ADE20K score",
+            "settings": {
+              "ablation": "- Visual tokens (i.e., recover masked pixels)",
+              "baseline": "BEIT (300 Epochs)"
+            },
+            "description": "Masked-pixel recovery: 41.38 vs baseline 44.65."
+          }
+        ],
+        "needs": [
+          "Experiments"
+        ],
+        "importance": "core",
+        "questions": [],
+        "evidence": [],
+        "status": "unverified",
+        "notes": []
+      },
+      "blocks": [
+        {
+          "id": "block_67",
+          "text": "Table 1 reports top-1 accuracy on image classification. We compare BEIT with vision Transformers trained by random initialization, supervised pre-training, and previous self-supervised learning methods. All the compared models are base-size, except iGPT has 1.36B parameters. Pre-training is conducted on ImageNet for the comparison purpose, except ViT-JFT300M is pretrained on Google’s in-house 300M images.",
+          "kind": "text",
+          "loc": {
+            "page": 6,
+            "section": "section_15: 3.1 Image Classification",
+            "char_start": 22095,
+            "char_end": 22503
+          },
+          "citations": []
+        },
+        {
+          "id": "block_81",
+          "text": "Semantic segmentation aims to predict a corresponding class for each pixel of the input image. We evaluate BEIT on the ADE20K benchmark $[ Z Z ^ { \\bullet + } 1 9 ]$ with 25K images and 150 semantic categories. We report the metric of mean Intersection of Union (mIoU) averaged over all semantic categories. As presented in Section 2.6, we directly follow the task layer and the most of hyperparameters described in SETR-PUP $[ Z \\mathrm { L } Z ^ { + } 2 0 ]$ . On ADE20K, we use Adam [LH19] as the optimizer. The learning rate is set to 1e-3 with layer-wise decay similar to image classification. We conduct fine-tuning for 160K steps. The batch size is 16. The detailed hyperparameters are described in Appendix I.",
+          "kind": "text",
+          "loc": {
+            "page": 7,
+            "section": "section_16: 3.2 Semantic Segmentation",
+            "char_start": 29395,
+            "char_end": 30112
+          },
+          "citations": [
+            "[ Z Z ^ { \\bullet + } 1 9 ]",
+            "[ Z \\mathrm { L } Z ^ { + } 2 0 ]",
+            "[LH19]"
+          ]
+        },
+        {
+          "id": "block_84",
+          "text": "Table 4: Ablation studies for BEIT pre-training on image classification and semantic segmentation.\n<table><tr><td>Models</td><td>ImageNet</td><td>ADE20K</td></tr><tr><td>BEIT (300 Epochs)</td><td>82.86</td><td>44.65</td></tr><tr><td>- Blockwise masking</td><td>82.77</td><td>42.93</td></tr><tr><td>- Visual tokens (i.e., recover masked pixels)</td><td>81.04</td><td>41.38</td></tr><tr><td>- Visual tokens - Blockwise masking</td><td>80.50</td><td>37.09</td></tr><tr><td>+ Recover 100% visual tokens</td><td>82.59</td><td>40.93</td></tr><tr><td>- Masking + Recover 100% visual tokens</td><td>81.67</td><td>36.73</td></tr><tr><td>Pretrain longer (800 epochs)</td><td>83.19</td><td>45.58</td></tr></table>",
+          "kind": "table",
+          "loc": {
+            "page": 8,
+            "section": "block_80: 3.2 Semantic Segmentation",
+            "char_start": null,
+            "char_end": null
+          },
+          "citations": []
+        },
+        {
+          "id": "block_87",
+          "text": "We conduct ablation studies to analyze the contributions of each component in BEIT. The models are evaluated on image classification (i.e., ImageNet) and semantic segmentation (i.e., ADE20K). We set the default pre-training steps to 300 epochs for the ablation studies, which is 37.5% of the total steps used in the previous experiments.",
+          "kind": "text",
+          "loc": {
+            "page": 8,
+            "section": "section_17: 3.3 Ablation Studies",
+            "char_start": 31370,
+            "char_end": 31707
+          },
+          "citations": []
+        },
+        {
+          "id": "block_88",
+          "text": "Table 4 reports the results of various model variants. First, we ablate blockwise masking by randomly sample masked positions. We find that blockwise masking is beneficial on both tasks, especially on semantic segmentation. Second, we ablate the usage of visual tokens by predicting the raw pixels of masked patches, i.e., the pre-training task becomes a pixel regression problem to recover masked patches. Our proposed masked image modeling task significantly outperforms naive pixel-level auto-encoding. Compared with the results in Table 1, the ablation result is worse than training vision Transformer from scratch on two tasks. The results indicate that the prediction of visual tokens is the key ingredient of BEIT. Third, we ablate the usage of visual tokens and blockwise masking together. We find that blockwise masking is even more helpful for pixel-level auto-encoding, which relieves the suffering of short-distance dependency. Forth, recovering all the visual tokens harms performance on downstream tasks. Fifth, we compare BEIT with different training steps. Pre-training the model longer can further improve performance on downstream tasks.",
+          "kind": "text",
+          "loc": {
+            "page": 8,
+            "section": "section_17: 3.3 Ablation Studies",
+            "char_start": 31709,
+            "char_end": 32864
+          },
+          "citations": []
+        }
+      ],
+      "block_roles": {
+        "block_67": "classification_top_1_metric_definition",
+        "block_81": "ADE20K_metric_definition_and_fine_tuning_protocol",
+        "block_84": "original_claim_ablation_table",
+        "block_87": "ablation_tasks_and_300_epoch_setting",
+        "block_88": "component_ablation_interpretation"
+      },
+      "provenance": {
+        "claim_path": "runs/v2_cross_domain/experiment-scope-live-5c106674/claim_042/claim.json",
+        "claim_file_sha256": "e088e47e89a9243983ab89858ff61c54fdbdbf3901b61d1f5ae62819a9960c0b",
+        "claim_canonical_json_sha256": "394fa298fa743b86aef84593332978cf7fe64a267333cc0afcba5b2b826d0790",
+        "blocks": {
+          "block_67": {
+            "text_utf8_sha256": "5889bb0ef438fe6c5504f6f1a620233d6bf01583eca0ce0efaf66d655ef260b1",
+            "block_canonical_json_sha256": "b73d49011b3d029e0dee31ad2d0b9e7db4db15a5be7303b22b1f18cb4b49e9b8"
+          },
+          "block_81": {
+            "text_utf8_sha256": "e4b067c405a7f5eef12fa6bdffa76a46f52e00f468e821b0f0cde0024e3c4533",
+            "block_canonical_json_sha256": "1e0861e7f4a881f93159ad9e395a1a3d0b67ab35552313d3641e59a8c0c153f5"
+          },
+          "block_84": {
+            "text_utf8_sha256": "2eef246543de0233c8b936de8ca5c706945702453c6c2d7a7afac2b42777f197",
+            "block_canonical_json_sha256": "2089c94e65ee95b0b843102ad413faae564f8d98b05833133548fcc453b62a89"
+          },
+          "block_87": {
+            "text_utf8_sha256": "8886848af30605634dbcdb319308e40ece67fb89b89d3bc83c303cacbac62bf6",
+            "block_canonical_json_sha256": "f95dd59a968fb731e05670b50b3cad8ca582b92b0855bc4508d4eb2be6162f6b"
+          },
+          "block_88": {
+            "text_utf8_sha256": "2ab86720f0f3b0d03378945bd54438583b13ad69439f1b916323e4e5cdd51229",
+            "block_canonical_json_sha256": "d397661dff2ae6ed4832c603af955443a5d199f88e9e25f9a3dc5968901b6d3a"
+          }
+        }
+      },
+      "expectations": {
+        "binding_targets": [
+          {
+            "condition_id": "c1",
+            "table_block_id": "block_84",
+            "dataset_label": "ImageNet",
+            "metric_context_block_ids": [
+              "block_67",
+              "block_87"
+            ],
+            "subject_row": "- Visual tokens (i.e., recover masked pixels)",
+            "subject_token": "81.04",
+            "comparator_row": "BEIT (300 Epochs)",
+            "comparator_token": "82.86",
+            "numeric_relation": "lt"
+          },
+          {
+            "condition_id": "c2",
+            "table_block_id": "block_84",
+            "dataset_label": "ADE20K",
+            "metric_context_block_ids": [
+              "block_81",
+              "block_87"
+            ],
+            "subject_row": "- Visual tokens (i.e., recover masked pixels)",
+            "subject_token": "41.38",
+            "comparator_row": "BEIT (300 Epochs)",
+            "comparator_token": "44.65",
+            "numeric_relation": "lt"
+          }
+        ],
+        "limitations": [
+          "Keep both settings in one claim.",
+          "Block_67 states top-1 explicitly for Table 1; applying the metric to Table 4 requires task/context binding through the manuscript, rather than a free global alias.",
+          "Original condition metric mIoU / ADE20K score is preserved without normalization.",
+          "Numerical ordering alone does not establish all fairness or stability requirements."
+        ]
+      }
+    },
+    {
+      "id": "bert_038",
+      "paper_id": "bert",
+      "claim": {
+        "id": "claim_038",
+        "text": "On SQuAD v1.1, the best BERT system outperforms the top leaderboard system by +1.5 F1 as an ensemble and +1.3 F1 as a single system; a single BERT model outperforms the top ensemble system in F1.",
+        "loc": {
+          "page": 6,
+          "section": "section_13: 4.2 SQuAD v1.1",
+          "char_start": 24431,
+          "char_end": 24642
+        },
+        "source_block_id": "block_78",
+        "source_quote": "Our best performing system outperforms the top leaderboard system by +1.5 F1 in ensembling and +1.3 F1 as a single system. In fact, our single BERT model outperforms the top ensemble system in terms of F1 score.",
+        "source_refs": [],
+        "conditions": [
+          {
+            "id": "c1",
+            "dataset": "SQuAD v1.1",
+            "metric": "F1",
+            "settings": {
+              "model": "best BERT ensemble",
+              "comparison": "top leaderboard system",
+              "improvement": "+1.5 F1"
+            },
+            "description": "Best BERT ensemble outperforms top leaderboard system by 1.5 F1."
+          },
+          {
+            "id": "c2",
+            "dataset": "SQuAD v1.1",
+            "metric": "F1",
+            "settings": {
+              "model": "single BERT system",
+              "comparison": "top leaderboard system",
+              "improvement": "+1.3 F1"
+            },
+            "description": "Single BERT outperforms top leaderboard system by 1.3 F1."
+          },
+          {
+            "id": "c3",
+            "dataset": "SQuAD v1.1",
+            "metric": "F1",
+            "settings": {
+              "model": "single BERT model",
+              "comparison": "top ensemble system"
+            },
+            "description": "Single BERT outperforms the top ensemble system in F1."
+          }
+        ],
+        "needs": [
+          "Literature",
+          "Experiments"
+        ],
+        "importance": "core",
+        "questions": [],
+        "evidence": [],
+        "status": "unverified",
+        "notes": []
+      },
+      "blocks": [
+        {
+          "id": "block_77",
+          "text": "Table 2 shows top leaderboard entries as well as results from top published systems (Seo et al., 2017; Clark and Gardner, 2018; Peters et al., 2018a; Hu et al., 2018). The top results from the SQuAD leaderboard do not have up-to-date public system descriptions available,<sup>11</sup> and are allowed to use any public data when training their systems. We therefore use modest data augmentation in our system by first fine-tuning on TriviaQA (Joshi et al., 2017) befor fine-tuning on SQuAD.",
+          "kind": "text",
+          "loc": {
+            "page": 6,
+            "section": "section_13: 4.2 SQuAD v1.1",
+            "char_start": 23939,
+            "char_end": 24429
+          },
+          "citations": []
+        },
+        {
+          "id": "block_78",
+          "text": "Our best performing system outperforms the top leaderboard system by +1.5 F1 in ensembling and +1.3 F1 as a single system. In fact, our single BERT model outperforms the top ensemble system in terms of F1 score. Without TriviaQA finetuning data, we only lose 0.1-0.4 F1, still outperforming all existing systems by a wide margin.<sup>12</sup>",
+          "kind": "text",
+          "loc": {
+            "page": 6,
+            "section": "section_13: 4.2 SQuAD v1.1",
+            "char_start": 24431,
+            "char_end": 24773
+          },
+          "citations": []
+        },
+        {
+          "id": "block_82",
+          "text": "<table><tr><td rowspan=\"2\">System</td><td colspan=\"2\">Dev</td><td colspan=\"2\">Test</td></tr><tr><td>EM</td><td>F1</td><td>EM</td><td>F1</td></tr><tr><td colspan=\"5\">Top Leaderboard Systems (Dec 10th, 2018)</td></tr><tr><td>Human</td><td>-</td><td>-</td><td>82.3</td><td>91.2</td></tr><tr><td>#1 Ensemble - nlnet</td><td>-</td><td>-</td><td>86.0</td><td>91.7</td></tr><tr><td>#2 Ensemble - QANet</td><td>-</td><td>-</td><td>84.5</td><td>90.5</td></tr><tr><td colspan=\"5\">Published</td></tr><tr><td>BiDAF+ELMo (Single)</td><td>-</td><td>85.6</td><td>-</td><td>85.8</td></tr><tr><td>R.M. Reader (Ensemble)</td><td>81.2</td><td>87.9</td><td>82.3</td><td>88.5</td></tr><tr><td colspan=\"5\">Ours</td></tr><tr><td>BERTBASE(Single)</td><td>80.8</td><td>88.5</td><td>-</td><td>-</td></tr><tr><td>BERTLARGE(Single)</td><td>84.1</td><td>90.9</td><td>-</td><td>-</td></tr><tr><td>BERTLARGE(Ensemble)</td><td>85.8</td><td>91.8</td><td>-</td><td>-</td></tr><tr><td>BERTLARGE(Sgl.+TriviaQA)</td><td>84.2</td><td>91.1</td><td>85.1</td><td>91.8</td></tr><tr><td>BERTLARGE(Ens.+TriviaQA)</td><td>86.2</td><td>92.2</td><td>87.4</td><td>93.2</td></tr></table>",
+          "kind": "table",
+          "loc": {
+            "page": 7,
+            "section": "section_13: 4.2 SQuAD v1.1",
+            "char_start": 24775,
+            "char_end": 25913
+          },
+          "citations": []
+        },
+        {
+          "id": "block_83",
+          "text": "Table 2: SQuAD 1.1 results. The BERT ensemble is 7x systems which use different pre-training checkpoints and fine-tuning seeds.\nTable 3: SQuAD 2.0 results. We exclude entries that use BERT as one of their components.\n<table><tr><td rowspan=\"2\">System</td><td colspan=\"2\">Dev</td><td colspan=\"2\">Test</td></tr><tr><td>EM</td><td>F1</td><td>EM</td><td>F1</td></tr><tr><td colspan=\"5\">Top Leaderboard Systems (Dec 10th, 2018)</td></tr><tr><td>Human</td><td>86.3</td><td>89.0</td><td>86.9</td><td>89.5</td></tr><tr><td>#1 Single - MIR-MRC (F-Net)</td><td>-</td><td>-</td><td>74.8</td><td>78.0</td></tr><tr><td>#2 Single - nlnet</td><td>-</td><td>-</td><td>74.2</td><td>77.1</td></tr><tr><td colspan=\"5\">Published</td></tr><tr><td>unet (Ensemble)</td><td>-</td><td>-</td><td>71.4</td><td>74.9</td></tr><tr><td>SLQA+ (Single)</td><td>-</td><td></td><td>71.4</td><td>74.4</td></tr><tr><td colspan=\"5\">Ours</td></tr><tr><td>BERTLARGE(Single)</td><td>78.7</td><td>81.9</td><td>80.0</td><td>83.1</td></tr></table>",
+          "kind": "table",
+          "loc": {
+            "page": 7,
+            "section": "block_73: 4.2 SQuAD v1.1",
+            "char_start": null,
+            "char_end": null
+          },
+          "citations": []
+        }
+      ],
+      "block_roles": {
+        "block_77": "table_2_and_TriviaQA_comparison_context",
+        "block_78": "original_claim_passage",
+        "block_82": "SQuAD_1_1_numeric_table",
+        "block_83": "distractor_SQuAD_2_0_table_with_misattached_Table_2_caption"
+      },
+      "provenance": {
+        "claim_path": "runs/v2_cross_domain/experiment-scope-live-bab84338/claim_038/claim.json",
+        "claim_file_sha256": "ef23b651e19084fcb3a7b2c4d44db0e510f3a551fdc6f10e40c4c542852c11d2",
+        "claim_canonical_json_sha256": "a9f58acbf87f8bf3200fbcf5775600c8271d5896a085083df282f53f66a794c2",
+        "blocks": {
+          "block_77": {
+            "text_utf8_sha256": "102b596fd7fab0e30e74b6d16199c747b343dc633e0b4130fbd344ab9718d8ae",
+            "block_canonical_json_sha256": "2bd22f50196ffeda7ceda76faa84189c9916062d6dd08e581961d8f1ae884619"
+          },
+          "block_78": {
+            "text_utf8_sha256": "8d2d90d546b916981f93fe89629604286b58ca0bfe261d32478099dbbe8264a0",
+            "block_canonical_json_sha256": "b0bc5f6e96219c23e2534abe44a44dce2dabd0ac349080dafc80973d789ffc88"
+          },
+          "block_82": {
+            "text_utf8_sha256": "5f4629b5edda8ad90e3a402be30d95d4e02267fdbe64de421659567f3e99fc12",
+            "block_canonical_json_sha256": "f662abeab221a2e0ee434a911efda8a9dbd267a2e689bfe4dd75bc224b0b56cd"
+          },
+          "block_83": {
+            "text_utf8_sha256": "f2a8be553b89f6d64e33f762ec709359c0800089938d22537ed2a5e42caeaa1e",
+            "block_canonical_json_sha256": "309c7a26ec6580a19c9f3b66965bf5d73cc9d7a2455603817ed4448902d161eb"
+          }
+        }
+      },
+      "expectations": {
+        "binding_targets": [
+          {
+            "condition_id": "c1",
+            "table_block_id": "block_82",
+            "dataset_label": "SQuAD v1.1",
+            "header_path": [
+              "Test",
+              "F1"
+            ],
+            "subject_row": "BERTLARGE(Ens.+TriviaQA)",
+            "subject_token": "93.2",
+            "comparator_row": "#1 Ensemble - nlnet",
+            "comparator_token": "91.7",
+            "numeric_relation": "difference_equals",
+            "difference_token": "+1.5"
+          },
+          {
+            "condition_id": "c2",
+            "table_block_id": "block_82",
+            "header_path": [
+              "Test",
+              "F1"
+            ],
+            "subject_row": "BERTLARGE(Sgl.+TriviaQA)",
+            "subject_token": "91.8",
+            "named_top_comparator_row": "#1 Ensemble - nlnet",
+            "named_top_comparator_token": "91.7",
+            "alternative_non_top_row": "#2 Ensemble - QANet",
+            "alternative_non_top_token": "90.5",
+            "numeric_relation": "ambiguous_comparator_for_claimed_plus_1_3"
+          },
+          {
+            "condition_id": "c3",
+            "table_block_id": "block_82",
+            "header_path": [
+              "Test",
+              "F1"
+            ],
+            "subject_row": "BERTLARGE(Sgl.+TriviaQA)",
+            "subject_token": "91.8",
+            "comparator_row": "#1 Ensemble - nlnet",
+            "comparator_token": "91.7",
+            "numeric_relation": "gt"
+          }
+        ],
+        "limitations": [
+          "Do not fully support c2 by selecting the QANet row solely because subtraction yields 1.3; the claim names the top system.",
+          "The block_83 SQuAD 2.0 table is a distractor. A misplaced Table 2 caption must not bind its values to SQuAD v1.1.",
+          "Keep Dev/Test and EM/F1 column identities distinct.",
+          "The 0.1 F1 ordering in c3 does not establish statistical significance."
+        ]
+      }
+    }
+  ]
+}

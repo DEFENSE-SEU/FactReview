@@ -53,6 +53,7 @@ Outputs are saved under `runs/<paper-key>_<timestamp>_<unique-id>/`:
 - `cutoff.json`: the date used for Literature, its provenance, or the reason it remains unresolved.
 - `visual_calls/`: per-image-call model/provider, image hash and dimensions, input context, response or failure, and duration. Provider credentials are removed from diagnostics.
 - `code_scopes/`: complete selected/omitted source manifests for each Code inspection, including the configured source budget.
+- `code_scope_reviews/`: independent condition-level applicability reviews of Code candidates, including source bridges, requirement facets and unresolved coverage.
 - `claim_extraction/`: original extraction responses and bounded source-repair attempts. `CLAIM_SOURCE_MAX_REPAIRS` defaults to 3 and accepts 0–3; this is separate from execution repair. Repairs preserve every candidate conclusion and condition while correcting exact source bindings.
 - `experiment_scope/`: independent applicability/support reviews for experimental evidence, including numerical comparison checks and unresolved qualifiers.
 - `screening/reference_validation.json`: original-PDF reference confirmation decisions; the original `reference_check.json` is retained separately.
@@ -84,6 +85,12 @@ Run `python scripts/check_v2_visual.py` for an opt-in live visual probe. It gene
 Literature records its search scope. An adapter that does not certify search completeness cannot support a novelty claim solely because no close work was returned. The technical query vocabulary leaves uncovered domains visibly unresolved. Theory and Code preserve questionable differences for author explanation; this implementation includes no automated theorem prover. Claim splitting semantics depend on the configured model, while source locations, exact quotations, routing and aggregation have deterministic checks.
 
 Claims can retain multiple original passages in `source_refs`, each with a location and condition scope. These locate the asserted conclusion and its qualifiers; they do not count as verification evidence. Citation support is restricted to the conditions attached to each original passage, and author-year labels such as `2018a` and `2018b` remain distinct. Experimental candidates receive a separate scope review before affecting assessment: a hardware report does not require a component ablation, and incomplete comparisons cannot establish full support. Unavailable or ambiguous reviews remain explicit limitations.
+
+Experimental table reviews select program-generated source, cell and case IDs. The verifier restores exact original values and coordinates, checks explicit table axes and claimed endpoints, and validates cited links to metric definitions or treatment settings. A treatment can apply to the subject alone. Invalid bindings remain unconfirmed for their condition; independently valid conditions survive. Nonliteral model aliases or unresolved table references can still prevent numerical support. Formal theorem proofs must match their target statement and source scope; ordinary main-text derivations retain exact-step checks and model-based semantic assessment.
+
+Code candidates with validated source lines receive one additional batch model review per claim. Complete support requires agreement with every implementation qualifier and its original claim source. A configuration line cannot establish measured performance, novelty or working public downloads. Exact source files are checked again after the review; failed or ambiguous scope decisions retain non-deciding observations. This semantic review remains model-dependent.
+
+Use `scripts/check_v2_experiments.py` to recheck selected claims from a saved run with real model calls and optional independent coverage expectations. See [the validation guide](docs/framework_validation.md) for commands and recorded service boundaries.
 
 ### Historical artifacts and RefCopilot
 

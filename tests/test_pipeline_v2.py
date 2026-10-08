@@ -229,6 +229,31 @@ class ModelBoundary:
                     }
                 ]
             }
+        if module == "verification.code.scope":
+            assert data["claim_sources"][0]["quote"] == "We use Adam."
+            assert data["source_context"]["eval.py"][0] == {"line": 1, "text": "optimizer = 'Adam'"}
+            return {
+                "conditions": [
+                    {
+                        "condition_id": "optimizer",
+                        "required_facets": ["implementation"],
+                        "claim_source_ids": ["primary"],
+                        "rationale": "The exact claim states the configured optimizer.",
+                    }
+                ],
+                "items": [
+                    {
+                        "item_index": 0,
+                        "condition_id": "optimizer",
+                        "relation": "supports_implementation",
+                        "full_condition": True,
+                        "basis": "direct_source",
+                        "bridge_quotes": [],
+                        "missing_qualifiers": [],
+                        "rationale": "The released configuration directly selects the claimed Adam optimizer.",
+                    }
+                ],
+            }
         if module == "verification.theory":
             return {
                 "items": [
@@ -359,6 +384,7 @@ def test_real_v2_stages_with_mocked_external_services_render_pdf_and_svg(tiny_in
     assert {
         "verification.theory",
         "verification.code",
+        "verification.code.scope",
         "verification.experiments",
         "verification_literature",
     }.issubset(model.calls)

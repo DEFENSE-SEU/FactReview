@@ -62,6 +62,139 @@ def _appendix(block: MaterialBlock) -> bool:
     )
 
 
+_STATEMENT = re.compile(
+    r"\b(theorem|lemma|proposition|corollary)\s+(?:[A-Za-z]\.)?\d+(?:\.\d+)*\b"
+    r"|\b(theorem|lemma|proposition|corollary)\s+[A-Za-z]\b",
+    re.I,
+)
+_PROOF_TARGET = re.compile(
+    r"\b(?:proof|derivation)\s+(?:of|for)\s+(?:the\s+)?"
+    r"((?:theorem|lemma|proposition|corollary)\s+(?:[A-Za-z]\.)?\d+(?:\.\d+)*"
+    r"|(?:theorem|lemma|proposition|corollary)\s+[A-Za-z])\b",
+    re.I,
+)
+
+
+def _statement_identity(quote: str) -> str | None:
+    # The claim's own source must identify the statement. An unrelated later
+    # sentence in the same block cannot inherit its opening theorem label.
+    start = quote.lstrip(" #*\t\r\n")
+    match = _STATEMENT.match(start)
+    if match:
+        return " ".join(match.group().casefold().split())
+    match = re.match(r"(theorem|lemma|proposition|corollary)\s*:", start, re.I)
+    if match:
+        return match.group(1).casefold()
+    return None
+
+
+def _claim_anchors(claim: Claim, materials: SharedMaterials, condition_id: str):
+    primary = (claim.source_block_id, claim.source_quote, claim.loc)
+    explicit_primary = [
+        ref for ref in claim.source_refs if (ref.source_block_id, ref.source_quote) == primary[:2]
+    ]
+    rows = [
+        (ref.source_block_id, ref.source_quote, ref.loc)
+        for ref in claim.source_refs
+        if condition_id in ref.covered
+    ]
+    if not explicit_primary or any(condition_id in ref.covered for ref in explicit_primary):
+        rows.append(primary)
+    blocks = {block.id: block for block in materials.blocks}
+    for block_id, quote, loc in rows:
+        block = blocks.get(block_id)
+        if block is None or block.loc is None or _appendix(block) or not quote or quote not in block.text:
+            continue
+        if loc.page is not None and loc.page != block.loc.page:
+            continue
+        if loc.char_start is not None and block.loc.char_start is not None:
+            start = block.loc.char_start + block.text.find(quote)
+            if (loc.char_start, loc.char_end) != (start, start + len(quote)):
+                continue
+        try:
+            _paper_pointer(materials, block.id, quote)
+        except ValueError:
+            continue
+        yield block, quote
+
+
+def _proof_binding(claim: Claim, materials: SharedMaterials, item, covered: list[str]) -> str | None:
+    blocks = {block.id: block for block in materials.blocks}
+    proof = blocks[item.block_id]
+    anchor_id = item.main_block_id or (proof.id if not _appendix(proof) else None)
+    # A proof of A can cite B without becoming a proof of B. Bind the actual
+    # quoted step to the preceding proof declaration or its section heading.
+    step_end = proof.text.find(item.quote) + item.quote.find(item.step_quote) + len(item.step_quote)
+    preceding = [
+        match
+        for match in _PROOF_TARGET.finditer(proof.text[:step_end])
+        if not proof.text[proof.text.rfind("\n", 0, match.start()) + 1 : match.start()].strip(" #*\t")
+    ]
+    target = preceding[-1].group(1) if preceding else None
+    if target is None and proof.loc and proof.loc.section:
+        match = _PROOF_TARGET.search(proof.loc.section)
+        target = match.group(1) if match else None
+    target = " ".join(target.casefold().split()) if target else None
+    anchors_by_condition = {
+        condition_id: list(_claim_anchors(claim, materials, condition_id)) for condition_id in covered
+    }
+    if not _appendix(proof):
+        if target is None and proof.id == anchor_id and re.match(r"\s*proof\b", item.quote, re.I):
+            declarations = [
+                match
+                for match in _STATEMENT.finditer(proof.text[:step_end])
+                if not proof.text[proof.text.rfind("\n", 0, match.start()) + 1 : match.start()].strip(" #*\t")
+            ]
+            target = " ".join(declarations[-1].group().casefold().split()) if declarations else None
+        if (
+            target is None
+            and _statement_identity(proof.text) is None
+            and not any(
+                _statement_identity(quote)
+                for anchors in anchors_by_condition.values()
+                for _, quote in anchors
+            )
+        ):
+            # Ordinary main-text derivations need no formal theorem numbering.
+            # Their exact step and model-declared semantic coverage still apply.
+            return None
+    for condition_id in covered:
+        anchors = [
+            (block, _statement_identity(quote))
+            for block, quote in anchors_by_condition[condition_id]
+            if block.id == anchor_id
+        ]
+        if not anchors:
+            return f"{condition_id}: no verifiable target-claim main-text anchor"
+        matched = False
+        for block, identity in anchors:
+            if identity is None:
+                continue
+            if target is not None:
+                declarations = [
+                    candidate.id
+                    for candidate in materials.blocks
+                    if not _appendix(candidate) and _statement_identity(candidate.text) == identity
+                ]
+                matched = identity == target and declarations == [block.id]
+            elif identity in {"theorem", "lemma", "proposition", "corollary"}:
+                declarations = [
+                    candidate.id
+                    for candidate in materials.blocks
+                    if not _appendix(candidate)
+                    for _ in re.finditer(rf"\b{identity}\s*(?::|\d|[A-Z]\b)", candidate.text, re.I)
+                ]
+                matched = declarations == [block.id] and bool(
+                    re.search(rf"\bthe\s+{identity}\b", item.quote, re.I)
+                    and re.match(r"\s*proof\b", proof.text, re.I)
+                )
+            if matched:
+                break
+        if not matched:
+            return f"{condition_id}: proof target does not establish the claim's theorem identity"
+    return None
+
+
 class TheoryItem(Contract):
     block_id: NonEmpty
     quote: NonEmpty = Field(
@@ -102,7 +235,11 @@ block quote and a concrete detail for each item. For support, step_quote must qu
 proof/derivation step, beyond the theorem assertion. A theorem without a proof anywhere is
 no_proof and cannot be supported. Main-text theorem statements may refer to appendix proofs:
 request only relevant appendix_block_ids from the supplied index. An appendix item must include
-main_block_id naming the main-text theorem it addresses. Return JSON matching output_schema.
+main_block_id naming the main-text theorem it addresses. This anchor must belong to the
+target claim's exact source passage or a source_ref covering the condition. Cite the proof's
+actual theorem/lemma/proposition identifier; a proof of another theorem that merely references
+the target cannot support it. If no verifiable source/proof link exists, leave full support empty.
+Return JSON matching output_schema.
 covered must be a nonempty list of distinct exact strings from allowed_condition_ids, which
 lists this claim's condition IDs. Never use claim.id, block IDs, datasets, or metric names.
 Only include conditions the item actually addresses. Omit items that cannot be tied to an
@@ -183,9 +320,16 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None) -> Bra
             ):
                 result.issues.append("No checkable derivation step found in the quoted assertion.")
                 continue
+            binding_issue = _proof_binding(claim, materials, item, covered)
+            if binding_issue:
+                full_support = False
+                result.issues.append(f"Theory proof binding unconfirmed: {binding_issue}")
         note = f"{item.kind}: {item.detail}"
         if item.direction == "support":
             note = _support_note(note, item.fully_supported_conditions)
+            note += f"; proof_main_anchor={item.main_block_id or item.block_id}"
+            if binding_issue:
+                note += f"; proof binding unconfirmed: {binding_issue}"
         if item.kind == "notation" and item.direction == "flaw":
             page = next((page for page in materials.pages if page.page == pointer.page), None)
             if page is None or not Path(page.path).is_file():
