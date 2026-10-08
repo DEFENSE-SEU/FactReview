@@ -2,14 +2,14 @@
 
 ## Task
 
-Implement `docs/method_v2_spec.md` through Phases 0–8 on `refactor/method-v2`, following the adopted prompt and maintainer decisions. Use independent automatic review at each phase and continue without phase pauses. Preserve tests and mock LLM/retrieval/Docker in unit tests. Keep RefCopilot internals, demo reference outputs and LICENSE unchanged. The documentation PR is published; refactor commits remain local. Publishing this refactor would require the separate approval specified by the adopted prompt.
+Implement `docs/method_v2_spec.md` through Phases 0–8 on `refactor/method-v2`, following the adopted prompt and maintainer decisions. Use independent automatic review at each phase and continue without phase pauses. Preserve tests and mock LLM/retrieval/Docker in unit tests. Keep RefCopilot internals, demo reference outputs and LICENSE unchanged. The maintainer rejected a separate documentation PR on 2026-10-08; PR #12 is closed and delivery focuses on the code refactor. Refactor commits remain local. Publishing this refactor would require the separate approval specified by the adopted prompt.
 
 ## Outputs
 
 Workspace: `E:\kabuda\FactReview`.
 
-- Documentation PR: https://github.com/DEFENSE-SEU/FactReview/pull/12 — requested title/body, base `main`, exactly two documentation files.
-- Docs branch: `docs/method-v2-spec`, patch `ab983b9`, continuous automatic-review amendment `281e0f5`; amendment applied locally as `84c2aeb`.
+- Documentation PR: https://github.com/DEFENSE-SEU/FactReview/pull/12 — requested title/body, base `main`, exactly two documentation files; closed on 2026-10-08 after the maintainer rejected a separate documentation PR.
+- Former docs branch: `docs/method-v2-spec`, patch `ab983b9`, continuous automatic-review amendment `281e0f5`; amendment retained locally as `84c2aeb`. Local and remote docs branches were deleted after verifying identical document contents and equivalent commits in `refactor/method-v2`.
 - Refactor branch: `refactor/method-v2`, created from docs branch. No remote branch or refactor PR has been created.
 - Authoritative specification and procedure: `docs/method_v2_spec.md`, `docs/refactor_v2_prompt.md`.
 - Final acceptance evidence: `checks.md`; durable handoff: this file.
@@ -97,4 +97,4 @@ Original Phase 0 command used the saved ignored plugin: `python -m pytest -p bas
 
 ## Next action
 
-The requested implementation and automatic reviews are complete. For additional live evidence, configure MinerU and the desired model/services locally, supply the actual venue submission deadline, and run the v2 CLI. Refactor publishing remains a separate approval boundary; all implementation commits stay local. The open documentation PR is ready for maintainer review.
+The requested implementation and automatic reviews are complete. For additional live evidence, configure MinerU and the desired model/services locally, supply the actual venue submission deadline, and run the v2 CLI. Refactor publishing remains a separate approval boundary; all implementation commits stay local. Deliver the implementation through a code refactor PR when publishing is authorized; no separate documentation PR remains open.
