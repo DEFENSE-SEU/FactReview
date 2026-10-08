@@ -219,6 +219,44 @@ class ExecutionTask(Contract):
     metric_output: str | None = None
 
 
+class PaperTargetPassage(Contract):
+    """The original reported target; no inferred or normalized source text."""
+
+    block_id: NonEmpty
+    quote: NonEmpty
+    token: NonEmpty
+    value_context: str = ""
+
+
+class PaperTargetSelector(Contract):
+    number_id: NonEmpty | None = None
+    cell_id: NonEmpty | None = None
+
+    @model_validator(mode="after")
+    def one_original_location(self) -> Self:
+        if (self.number_id is None) == (self.cell_id is None):
+            raise ValueError("A paper target selects exactly one original number or table cell")
+        return self
+
+
+class ExecutionTargetBinding(Contract):
+    """Reconstructable target proof. Consumers must revalidate it against the paper."""
+
+    version: Literal[1] = 1
+    condition_id: NonEmpty
+    reported: PaperTargetPassage
+    selector: PaperTargetSelector
+    pointer: EvidencePointer
+    block_sha256: NonEmpty
+    artifact_sha256: NonEmpty
+    claim_sha256: NonEmpty
+    condition_sha256: NonEmpty
+    value: FiniteNumber
+    quantity_kind: Literal["absolute_measurement"] = "absolute_measurement"
+    subject: str | None = None
+    unit: str | None = None
+
+
 class ExecutionPlan(Contract):
     id: NonEmpty
     claim_id: NonEmpty
@@ -228,6 +266,8 @@ class ExecutionPlan(Contract):
     run_mode: Literal["evaluation", "analysis", "training"]
     # Condition-id keys preserve two datasets reporting the same metric.
     y_paper: dict[str, FiniteNumber] = Field(min_length=1)
+    # Empty is the readable historical form; it never grants execution trust.
+    target_bindings: dict[str, ExecutionTargetBinding] = Field(default_factory=dict)
     feasibility: Literal["ready", "blocked"]
     blocker: str = ""
     priority: Literal["high", "medium", "low"]
@@ -248,6 +288,10 @@ class ExecutionPlan(Contract):
             raise ValueError("condition_ids must match target_conditions")
         if set(self.y_paper) != set(ids):
             raise ValueError("y_paper keys must match condition_ids")
+        if not set(self.target_bindings).issubset(ids) or any(
+            key != binding.condition_id for key, binding in self.target_bindings.items()
+        ):
+            raise ValueError("target bindings must identify their original plan conditions")
         if any(not condition.metric for condition in self.target_conditions):
             raise ValueError("execution target conditions require a metric")
         return self

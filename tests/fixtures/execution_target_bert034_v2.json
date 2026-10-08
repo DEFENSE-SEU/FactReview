@@ -1,0 +1,414 @@
+{
+  "external_requests": 0,
+  "source_paths": {
+    "runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\verification\\verification.json": "c2c8046489a77de7db3db4de59d7011df60f9891a164a519436698c92876c084",
+    "runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\materials\\materials.json": "2603213ce01402ff14e0b26bde6a7a598cea6f28ec67002c24c104bdddb99b71"
+  },
+  "claim": {
+    "id": "claim_034",
+    "text": "On the largest and most widely reported GLUE task, MNLI, BERT obtains a 4.6% absolute accuracy improvement.",
+    "loc": {
+      "page": 6,
+      "section": "section_12: 4.1 GLUE",
+      "char_start": 22095,
+      "char_end": 22203
+    },
+    "source_block_id": "block_71",
+    "source_quote": "For the largest and most widely reported GLUE task, MNLI, BERT obtains a 4.6% absolute accuracy improvement.",
+    "conditions": [
+      {
+        "id": "c1",
+        "dataset": "MNLI",
+        "metric": "accuracy",
+        "settings": {
+          "model": "BERT",
+          "absolute_improvement": "4.6%"
+        },
+        "description": "BERT MNLI absolute accuracy improvement."
+      }
+    ],
+    "needs": [
+      "Experiments"
+    ],
+    "importance": "core",
+    "questions": [
+      {
+        "text": "Could you clarify the fairness concern?",
+        "claim_id": "claim_034",
+        "reason": "For the MNLI improvement over OpenAI GPT, the paper acknowledges other training differences between BERT and GPT, so same data/budget/tuning is not established by the paper-internal comparison."
+      },
+      {
+        "text": "Could you clarify the fairness concern?",
+        "claim_id": "claim_034",
+        "reason": "The MNLI comparison is not controlled for pre-training data: BERT uses BooksCorpus plus Wikipedia, while GPT uses BooksCorpus only."
+      },
+      {
+        "text": "Could you clarify the fairness concern?",
+        "claim_id": "claim_034",
+        "reason": "The MNLI comparison is not controlled for pre-training batch/token budget: both are 1M steps, but BERT uses 128,000 words per batch versus GPT's 32,000."
+      },
+      {
+        "text": "Could you clarify the fairness concern?",
+        "claim_id": "claim_034",
+        "reason": "The MNLI comparison is not controlled for fine-tuning learning-rate selection: GPT uses one learning rate, while BERT selects a task-specific rate on the development set."
+      },
+      {
+        "text": "Could you clarify the stability concern?",
+        "claim_id": "claim_034",
+        "reason": "For the MNLI test result underlying the 4.6% improvement, the paper reports only a single GLUE evaluation server submission for each BERT model and does not provide variance, seeds, confidence intervals, or significance for the test comparison."
+      }
+    ],
+    "evidence": [
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\inputs\\source_pdf\\paper.pdf",
+          "quote": "Table 1: GLUE Test results, scored by the evaluation server (https://gluebenchmark.com/leaderboard). The number below each task denotes the number of training examples. The “Average” column is slightly different than the official GLUE score, since we exclude the problematic WNLI set.<sup>8</sup> BERT and OpenAI GPT are singlemodel, single task. F1 scores are reported for QQP and MRPC, Spearman correlations are reported for STS-B, and accuracy scores are reported for the other tasks. We exclude entries that use BERT as one of their components.\n<table><tr><td>System</td><td>MNLI-(m/mm)392k</td><td>QQP363k</td><td>QNLI108k</td><td>SST-267k</td><td>CoLA8.5k</td><td>STS-B5.7k</td><td>MRPC3.5k</td><td>RTE2.5k</td><td>Average-</td></tr><tr><td>Pre-OpenAI SOTA</td><td>80.6/80.1</td><td>66.1</td><td>82.3</td><td>93.2</td><td>35.0</td><td>81.0</td><td>86.0</td><td>61.7</td><td>74.0</td></tr><tr><td>BiLSTM+ELMo+Attn</td><td>76.4/76.1</td><td>64.8</td><td>79.8</td><td>90.4</td><td>36.0</td><td>73.3</td><td>84.9</td><td>56.8</td><td>71.0</td></tr><tr><td>OpenAI GPT</td><td>82.1/81.4</td><td>70.3</td><td>87.4</td><td>91.3</td><td>45.4</td><td>80.0</td><td>82.3</td><td>56.0</td><td>75.1</td></tr><tr><td>BERTBASE</td><td>84.6/83.4</td><td>71.2</td><td>90.5</td><td>93.5</td><td>52.1</td><td>85.8</td><td>88.9</td><td>66.4</td><td>79.6</td></tr><tr><td>BERTLARGE</td><td>86.7/85.9</td><td>72.1</td><td>92.7</td><td>94.9</td><td>60.5</td><td>86.5</td><td>89.3</td><td>70.1</td><td>82.1</td></tr></table>",
+          "page": 6,
+          "line": null,
+          "key": null
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "support",
+        "sufficient": false,
+        "note": "correspondence/paper_support: Table 1 reports GLUE Test MNLI-(m/mm) accuracy scores for BERTLARGE as 86.7/85.9 and the prior listed OpenAI GPT as 82.1/81.4; the matched value gives a 4.6 point improvement on MNLI-m, but this single table alone does not establish every claim qualifier, including the textual qualifier that MNLI is the largest and most widely reported GLUE task.; fully_supported_conditions=[]",
+        "concern": false,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\materials\\paper.md",
+          "quote": "For the largest and most widely reported GLUE task, MNLI, BERT obtains a 4.6% absolute accuracy improvement.",
+          "page": 6,
+          "line": null,
+          "key": "chars:22095-22203"
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "support",
+        "sufficient": false,
+        "note": "correspondence/paper_support: The text directly asserts the claimed 4.6% absolute accuracy improvement for MNLI, but the paper assertion by itself does not establish the conclusion independently; it is partial support when paired with the reported table values.; fully_supported_conditions=[]",
+        "concern": false,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\materials\\paper.md",
+          "quote": "BERT and OpenAI GPT are singlemodel, single task.",
+          "page": 6,
+          "line": null,
+          "key": "chars:20923-20972"
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "support",
+        "sufficient": false,
+        "note": "fairness/paper_support: The comparison underlying the MNLI improvement is partly fair in that Table 1 says both BERT and OpenAI GPT are singlemodel, single task, but this does not establish equal pre-training data, compute budget, or tuning.; fully_supported_conditions=[]",
+        "concern": false,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\materials\\paper.md",
+          "quote": "The core argument of this work is that the bi-directionality and the two pretraining tasks presented in Section 3.1 account for the majority of the empirical improvements, but we do note that there are several other differences between how BERT and GPT were trained:",
+          "page": 14,
+          "line": null,
+          "key": "chars:57959-58225"
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "flaw",
+        "sufficient": true,
+        "note": "fairness/missing_control: For the MNLI improvement over OpenAI GPT, the paper acknowledges other training differences between BERT and GPT, so same data/budget/tuning is not established by the paper-internal comparison.",
+        "concern": true,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\materials\\paper.md",
+          "quote": "• GPT is trained on the BooksCorpus (800M words); BERT is trained on the BooksCorpus (800M words) and Wikipedia (2,500M words).",
+          "page": 14,
+          "line": null,
+          "key": "chars:58227-58354"
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "flaw",
+        "sufficient": true,
+        "note": "fairness/missing_control: The MNLI comparison is not controlled for pre-training data: BERT uses BooksCorpus plus Wikipedia, while GPT uses BooksCorpus only.",
+        "concern": true,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\materials\\paper.md",
+          "quote": "• GPT was trained for 1M steps with a batch size of 32,000 words; BERT was trained for 1M steps with a batch size of 128,000 words.",
+          "page": 14,
+          "line": null,
+          "key": "chars:58547-58678"
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "flaw",
+        "sufficient": true,
+        "note": "fairness/missing_control: The MNLI comparison is not controlled for pre-training batch/token budget: both are 1M steps, but BERT uses 128,000 words per batch versus GPT's 32,000.",
+        "concern": true,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\materials\\paper.md",
+          "quote": "• GPT used the same learning rate of 5e-5 for all fine-tuning experiments; BERT chooses a task-specific fine-tuning learning rate which performs the best on the development set.",
+          "page": 14,
+          "line": null,
+          "key": "chars:58680-58857"
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "flaw",
+        "sufficient": true,
+        "note": "fairness/missing_control: The MNLI comparison is not controlled for fine-tuning learning-rate selection: GPT uses one learning rate, while BERT selects a task-specific rate on the development set.",
+        "concern": true,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\materials\\paper.md",
+          "quote": "We demonstrate the importance of the deep bidirectionality of BERT by evaluating two pretraining objectives using exactly the same pretraining data, fine-tuning scheme, and hyperparameters as $\\mathbf { B E R T _ { B A S E } } \\colon$",
+          "page": 8,
+          "line": null,
+          "key": "chars:31015-31249"
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "support",
+        "sufficient": false,
+        "note": "isolation/paper_support: The paper includes ablations for credited BERT pre-training components under matched data, fine-tuning scheme, and hyperparameters, but these are BERTBASE dev ablations and do not by themselves establish the BERT MNLI test 4.6% improvement condition.; fully_supported_conditions=[]",
+        "concern": false,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\inputs\\source_pdf\\paper.pdf",
+          "quote": "Table 5: Ablation over the pre-training tasks using the $\\mathbf { B E R T _ { B A S E } }$ architecture. “No NSP” is trained without the next sentence prediction task. “LTR & No NSP” is trained as a left-to-right LM without the next sentence prediction, like OpenAI GPT. “+ BiLSTM” adds a randomly initialized BiLSTM on top of the $\\mathrm { \\Sigma ^ { 6 } L T R } + \\mathrm { N o }$ NSP” model during fine-tuning.\n<table><tr><td rowspan=\"2\">Tasks</td><td colspan=\"5\">Dev Set</td></tr><tr><td>MNLI-m (Acc)</td><td>QNLI (Acc)</td><td>MRPC (Acc)</td><td>SST-2 (Acc)</td><td>SQuAD (F1)</td></tr><tr><td> $BERT_{BASE}$ </td><td>84.4</td><td>88.4</td><td>86.7</td><td>92.7</td><td>88.5</td></tr><tr><td>No NSP</td><td>83.9</td><td>84.9</td><td>86.5</td><td>92.6</td><td>87.9</td></tr><tr><td>LTR &amp; No NSP</td><td>82.1</td><td>84.3</td><td>77.5</td><td>92.1</td><td>77.8</td></tr><tr><td>+ BiLSTM</td><td>82.1</td><td>84.1</td><td>75.7</td><td>91.6</td><td>84.9</td></tr></table>",
+          "page": 8,
+          "line": null,
+          "key": null
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "support",
+        "sufficient": false,
+        "note": "isolation/paper_support: The table ablates NSP and left-to-right modeling on MNLI-m dev accuracy, reporting BERTBASE 84.4 versus LTR & No NSP 82.1, but it is not the BERTLARGE GLUE test comparison and does not cover the full 4.6% absolute MNLI accuracy improvement condition.; fully_supported_conditions=[]",
+        "concern": false,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\inputs\\source_pdf\\paper.pdf",
+          "quote": "<sup>9</sup>The GLUE data set distribution does not include the Test labels, and we only made a single GLUE evaluation server submission for each of BERT and BERT .",
+          "page": 6,
+          "line": null,
+          "key": null
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "flaw",
+        "sufficient": true,
+        "note": "stability/missing_statistic: For the MNLI test result underlying the 4.6% improvement, the paper reports only a single GLUE evaluation server submission for each BERT model and does not provide variance, seeds, confidence intervals, or significance for the test comparison.",
+        "concern": true,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\materials\\paper.md",
+          "quote": "For the largest and most widely reported GLUE task, MNLI, BERT obtains a 4.6% absolute accuracy improvement.",
+          "page": 6,
+          "line": null,
+          "key": "chars:22095-22203"
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "flaw",
+        "sufficient": false,
+        "note": "stability/large_gap_no_variance: The claimed MNLI gap is large (4.6% absolute accuracy improvement), but no variance or significance is reported for this test-set gap; this is a non-decisive stability note.",
+        "concern": false,
+        "affects_claim": false,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\materials\\paper.md",
+          "quote": "BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7% (4.6% absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).",
+          "page": 1,
+          "line": null,
+          "key": "chars:882-1297"
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "support",
+        "sufficient": false,
+        "note": "consistency/paper_support: The abstract reports MultiNLI accuracy 86.7% with 4.6% absolute improvement, consistent with the text claim and Table 1 MNLI-m value, but this item alone does not establish the full condition because the comparison baseline and full settings are not specified in the abstract quote.; fully_supported_conditions=[]",
+        "concern": false,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\materials\\paper.md",
+          "quote": "For the largest and most widely reported GLUE task, MNLI, BERT obtains a 4.6% absolute accuracy improvement.",
+          "page": 6,
+          "line": null,
+          "key": "chars:22095-22203"
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "support",
+        "sufficient": false,
+        "note": "consistency/paper_support: The main text repeats the same 4.6% absolute accuracy improvement as the abstract and is consistent with Table 1's MNLI-m difference between BERTLARGE 86.7 and OpenAI GPT 82.1.; fully_supported_conditions=[]",
+        "concern": false,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      },
+      {
+        "source": "paper_internal",
+        "pointer": {
+          "locator": "E:\\kabuda\\FactReview\\runs\\v2_cross_domain\\bert_framework_2026-10-09_014934_be4796cb\\inputs\\source_pdf\\paper.pdf",
+          "quote": "Table 1: GLUE Test results, scored by the evaluation server (https://gluebenchmark.com/leaderboard). The number below each task denotes the number of training examples. The “Average” column is slightly different than the official GLUE score, since we exclude the problematic WNLI set.<sup>8</sup> BERT and OpenAI GPT are singlemodel, single task. F1 scores are reported for QQP and MRPC, Spearman correlations are reported for STS-B, and accuracy scores are reported for the other tasks. We exclude entries that use BERT as one of their components.\n<table><tr><td>System</td><td>MNLI-(m/mm)392k</td><td>QQP363k</td><td>QNLI108k</td><td>SST-267k</td><td>CoLA8.5k</td><td>STS-B5.7k</td><td>MRPC3.5k</td><td>RTE2.5k</td><td>Average-</td></tr><tr><td>Pre-OpenAI SOTA</td><td>80.6/80.1</td><td>66.1</td><td>82.3</td><td>93.2</td><td>35.0</td><td>81.0</td><td>86.0</td><td>61.7</td><td>74.0</td></tr><tr><td>BiLSTM+ELMo+Attn</td><td>76.4/76.1</td><td>64.8</td><td>79.8</td><td>90.4</td><td>36.0</td><td>73.3</td><td>84.9</td><td>56.8</td><td>71.0</td></tr><tr><td>OpenAI GPT</td><td>82.1/81.4</td><td>70.3</td><td>87.4</td><td>91.3</td><td>45.4</td><td>80.0</td><td>82.3</td><td>56.0</td><td>75.1</td></tr><tr><td>BERTBASE</td><td>84.6/83.4</td><td>71.2</td><td>90.5</td><td>93.5</td><td>52.1</td><td>85.8</td><td>88.9</td><td>66.4</td><td>79.6</td></tr><tr><td>BERTLARGE</td><td>86.7/85.9</td><td>72.1</td><td>92.7</td><td>94.9</td><td>60.5</td><td>86.5</td><td>89.3</td><td>70.1</td><td>82.1</td></tr></table>",
+          "page": 6,
+          "line": null,
+          "key": null
+        },
+        "covered": [
+          "c1"
+        ],
+        "direction": "support",
+        "sufficient": false,
+        "note": "consistency/paper_support: Table 1 reports MNLI-(m/mm) test accuracy for BERTLARGE as 86.7/85.9 and OpenAI GPT as 82.1/81.4, so the MNLI-m table values imply 86.7 - 82.1 = 4.6 and are consistent with the abstract and text claim; no same-scale contradiction is present.; fully_supported_conditions=[]",
+        "concern": false,
+        "affects_claim": true,
+        "overturnable": true,
+        "aligned": null,
+        "provenance": null
+      }
+    ],
+    "status": "unverified",
+    "notes": [
+      "The paper-internal evidence supports the 4.6% as the MNLI-m accuracy difference between BERTLARGE 86.7 and OpenAI GPT 82.1, but MNLI-mm gives 85.9 - 81.4 = 4.5; the claim does not specify matched versus mismatched split.",
+      "No item fully supports c1 by itself: table evidence lacks the textual qualifier that MNLI is the largest and most widely reported GLUE task, while the text assertion itself does not independently establish its conclusion.",
+      "Fairness is limited: the paper acknowledges BERT and GPT differ in pre-training corpus, batch size/token budget, and fine-tuning learning-rate selection.",
+      "Stability is limited: the paper reports single GLUE evaluation submissions and no variance, seeds, confidence intervals, or significance for the MNLI test improvement.",
+      "No text_table_contradiction is identified because the abstract/text 4.6% and Table 1's MNLI-m 86.7 versus 82.1 are on the same accuracy scale and consistent; the MNLI-mm value is a different split and therefore not a contradiction under the requested rule."
+    ]
+  },
+  "plan": {
+    "id": "claim_034.plan",
+    "claim_id": "claim_034",
+    "condition_ids": [
+      "c1"
+    ],
+    "target_conditions": [
+      {
+        "id": "c1",
+        "dataset": "MNLI",
+        "metric": "accuracy",
+        "settings": {
+          "model": "BERT",
+          "absolute_improvement": "4.6%"
+        },
+        "description": "BERT MNLI absolute accuracy improvement."
+      }
+    ],
+    "task": {
+      "entry_script": null,
+      "config": null,
+      "command": [],
+      "workdir": ".",
+      "metric_output": null
+    },
+    "run_mode": "evaluation",
+    "y_paper": {
+      "c1": 4.6
+    },
+    "feasibility": "blocked",
+    "blocker": "repository_index is null, so no indexed entry script/config, data paths, or weight paths are available; the paper also reports GLUE test results from the evaluation server, whose test labels are not distributed.; Candidate released code is missing; Released data location is missing; Released weights are missing",
+    "priority": "high",
+    "estimated_cost": "unknown"
+  },
+  "primary_block": {
+    "id": "block_71",
+    "text": "Results are presented in Table 1. Both BERT and BERT outperform all systems on all tasks by a substantial margin, obtaining 4.5% and 7.0% respective average accuracy improvement over the prior state of the art. Note that $\\mathbf { B E R T _ { B A S E } }$ and OpenAI GPT are nearly identical in terms of model architecture apart from the attention masking. For the largest and most widely reported GLUE task, MNLI, BERT obtains a 4.6% absolute accuracy improvement. On the official GLUE leaderboard<sup>10</sup>, BERT obtains a score of 80.5, compared to OpenAI GPT, which obtains 72.8 as of the date of writing.",
+    "kind": "text",
+    "loc": {
+      "page": 6,
+      "section": "section_12: 4.1 GLUE",
+      "char_start": 21737,
+      "char_end": 22350
+    },
+    "citations": []
+  },
+  "verbatim_source_quote_in_block": true,
+  "observed_limit": "Original model first-pass response not present in this saved run; do not reconstruct it. Persisted plan was blocked for missing released artifacts; no actual execution from this plan is asserted."
+}

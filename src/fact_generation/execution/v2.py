@@ -58,6 +58,8 @@ class Observation(Contract):
     metric: str
     settings: dict[str, Any]
     value: FiniteNumber
+    # Optional explicit metadata from actual runtime output, never from the plan.
+    unit: str | None = None
     reported_variance: FiniteNumber | None = Field(default=None, ge=0)
     released_recomputation: ReleasedRecomputation | None = None
 
@@ -585,6 +587,48 @@ def _apply_repair(request: RunRequest, repair: Repair) -> RunRequest:
     return updated
 
 
+def _paper_variance_issue(condition):
+    variance = condition.settings.get("reported_variance")
+    if "reported_variance" in condition.settings and (
+        type(variance) not in {int, float} or not math.isfinite(variance) or variance < 0
+    ):
+        return (
+            f"{condition.id}: reported variance must be a finite nonnegative number; comparison unavailable"
+        )
+    return ""
+
+
+def _revalidate_targets(plan, claim, materials, ledger, phase):
+    """Reconstruct source bindings at each trust boundary, retaining a local audit."""
+    from verification.experiment_targets import TargetBindingError, validate_plan_targets
+
+    record = {"phase": phase, "verified": False}
+    ledger["paper_target_validation"].append(record)
+    try:
+        targets = {item.id: item for item in claim.conditions}
+        if any(targets.get(item.id) != item for item in plan.target_conditions):
+            raise TargetBindingError("plan conditions differ from its linked claim")
+        for condition in plan.target_conditions:
+            invalid = _paper_variance_issue(condition)
+            if invalid:
+                ledger["alignment"].append(
+                    {"condition_id": condition.id, "comparable": False, "reason": invalid}
+                )
+                raise TargetBindingError(invalid)
+        bindings = validate_plan_targets(plan, claim, materials)
+        record.update(
+            verified=True,
+            bindings={key: binding.model_dump(mode="json") for key, binding in bindings.items()},
+        )
+        return bindings, ""
+    except (TargetBindingError, ValueError, OSError, TypeError, KeyError, AttributeError, IndexError) as exc:
+        reason = (
+            f"Paper target binding unavailable: {exc}. Regenerate the plan from its original paper sources."
+        )
+        record["reason"] = reason
+        return {}, reason
+
+
 def execute_plans(
     plans, claims, materials, output_dir, *, config=None, runner=None, approver=None, repairer=None
 ) -> ExecutionResult:
@@ -608,9 +652,6 @@ def execute_plans(
         claim = by_id.get(plan.claim_id)
         if claim is None:
             raise ValueError(f"plan refers to unknown claim: {plan.claim_id}")
-        targets = {item.id: item for item in claim.conditions}
-        if any(targets.get(item.id) != item for item in plan.target_conditions):
-            raise ValueError("plan conditions differ from its linked claim")
         run_dir = output / f"run_{number:04d}"
         run_dir.mkdir(exist_ok=False)
         row = {
@@ -623,11 +664,16 @@ def execute_plans(
             "attempts": [],
             "repairs": [],
             "alignment": [],
+            "paper_target_validation": [],
             "tolerance_profile": "alignment",
             "config": config.model_dump(mode="json"),
         }
         result.ledger.append(row)
         reason = execution_blocker or (plan.blocker if plan.feasibility == "blocked" else "")
+        if not reason:
+            _, reason = _revalidate_targets(plan, claim, materials, row, "before_approval")
+            if reason:
+                result.issues.append(f"{plan.id}: {reason}")
         if not reason and plan.run_mode == "training":
             if plan.priority != "high":
                 reason = "training requires high priority"
@@ -642,6 +688,10 @@ def execute_plans(
                         reason = "operator declined plan"
                 except Exception as exc:
                     reason = f"operator approval unavailable: {exc}"
+                if not reason:
+                    _, reason = _revalidate_targets(plan, claim, materials, row, "after_approval")
+                    if reason:
+                        result.issues.append(f"{plan.id}: {reason}")
         if not reason:
             row["approved"] = True
             previous_evidence = len(claim.evidence)
@@ -722,6 +772,13 @@ def _execute_graph(
 
     def run(state):
         request = state["request"]
+        _, binding_issue = _revalidate_targets(request.plan, claim, materials, ledger, "before_run")
+        if binding_issue:
+            issues.append(f"{request.plan.id}: {binding_issue}")
+            state.update(
+                outcome=RunOutcome(returncode=1, issue=binding_issue), reason=binding_issue, stop=True
+            )
+            return state
         begin = time.monotonic()
         if request.plan.run_mode == "training":
             if training_budget["used"] >= request.config.training_budget:
@@ -773,24 +830,21 @@ def _execute_graph(
 
     def judge(state):
         request, outcome = state["request"], state["outcome"]
+        if state.get("stop"):
+            return state
+        from verification.experiment_targets import runtime_target_issue
+
+        bindings, binding_issue = _revalidate_targets(request.plan, claim, materials, ledger, "before_judge")
+        if binding_issue:
+            issues.append(f"{request.plan.id}: {binding_issue}")
+            state.update(reason=binding_issue, stop=True)
+            return state
         if outcome.returncode != 0:
             return state
         matched = 0
         invalid_comparisons = []
         for condition in request.plan.target_conditions:
             paper_variance = condition.settings.get("reported_variance")
-            if "reported_variance" in condition.settings and (
-                type(paper_variance) not in {int, float}
-                or not math.isfinite(paper_variance)
-                or paper_variance < 0
-            ):
-                reason = f"{condition.id}: reported variance must be a finite nonnegative number; comparison unavailable"
-                ledger["alignment"].append(
-                    {"condition_id": condition.id, "comparable": False, "reason": reason}
-                )
-                invalid_comparisons.append(reason)
-                issues.append(f"{request.plan.id}: {reason}")
-                continue
             candidates = [item for item in outcome.observations if aligned(item, condition)]
             if len(candidates) != 1:
                 ledger["alignment"].append(
@@ -802,6 +856,17 @@ def _execute_graph(
                 )
                 continue
             observation = candidates[0]
+            unit_issue = runtime_target_issue(
+                bindings[condition.id], observation.settings, observation_unit=observation.unit
+            )
+            if unit_issue:
+                reason = f"{condition.id}: {unit_issue}; comparison unavailable"
+                ledger["alignment"].append(
+                    {"condition_id": condition.id, "comparable": False, "reason": reason}
+                )
+                invalid_comparisons.append(reason)
+                issues.append(f"{request.plan.id}: {reason}")
+                continue
             matched += 1
             target = request.plan.y_paper[condition.id]
             gap = observation.value - target
@@ -857,6 +922,7 @@ def _execute_graph(
                 "consistent": consistent,
                 "repair_round": request.repair_round,
                 "variance_source": variance_audit,
+                "paper_target_binding": bindings[condition.id].model_dump(mode="json"),
             }
             ledger["alignment"].append(decision)
             provenance = {}
