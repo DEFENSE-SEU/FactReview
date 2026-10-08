@@ -187,6 +187,37 @@ class CompGCNModelFixture:
                     }
                 ]
             }
+        if name == "verification.experiments.scope":
+            return {
+                "conditions": [
+                    {
+                        "condition_id": condition["id"],
+                        "claim_quote": payload["claim"]["text"],
+                        "assertion": "descriptive",
+                        "matched_controls_required": False,
+                        "uncertainty_sensitive": False,
+                        "relation": "none",
+                        "subject": "",
+                        "comparator": "",
+                        "rationale": "The fixed claim reports two absolute MRR scores, with no superiority or causal qualifier.",
+                    }
+                    for condition in payload["claim"]["conditions"]
+                ],
+                "items": [
+                    {
+                        "item_index": index,
+                        "condition_id": condition,
+                        "applicability": "applicable",
+                        "grounds": [{"block_id": block_id(self.table), "quote": self.table}],
+                        "rationale": "The fixed Table 3 passage reports the named dataset's MRR; runtime cell targeting remains blocked separately.",
+                        "full_support": True,
+                        "qualifiers_complete": True,
+                        "comparison_objects": "not_comparative",
+                    }
+                    for index, item in enumerate(payload["candidate_items"])
+                    for condition in item["covered"]
+                ],
+            }
         if name == "verification.experiments":
             source = block_id(self.table)
             return {

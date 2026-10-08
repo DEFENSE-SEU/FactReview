@@ -100,9 +100,22 @@ def _apply_cli_env_overrides(args: argparse.Namespace) -> None:
     if llm_model:
         os.environ["AGENT_MODEL"] = llm_model
         os.environ["EXECUTION_OPENAI_MODEL"] = llm_model
-        provider = str(getattr(args, "llm_provider", "") or os.getenv("MODEL_PROVIDER") or "").strip()
+        provider = (
+            str(
+                llm_provider
+                or os.getenv("EXECUTION_MODEL_PROVIDER")
+                or os.getenv("MODEL_PROVIDER")
+                or os.getenv("AGENT_MODEL_PROVIDER")
+                or "openai-codex"
+            )
+            .strip()
+            .lower()
+            .replace("_", "-")
+        )
         if is_codex_provider(provider):
             os.environ["OPENAI_CODEX_MODEL"] = llm_model
+        elif provider in {"claude", "qwen", "deepseek"}:
+            os.environ[f"{provider.upper()}_MODEL"] = llm_model
 
     teaser_mode = str(getattr(args, "teaser_mode", "auto") or "auto").strip().lower()
     if teaser_mode == "prompt":
@@ -405,8 +418,15 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="If no explicit deadline is supplied, resolve arXiv's first-submission date and record its provenance",
     )
-    p.add_argument("--arxiv-id", default="", help="arXiv identity for a local PDF when using --derive-cutoff-from-arxiv")
-    p.add_argument("--reuse-job-id", type=str, default="", help="Legacy option; v2 reports job-snapshot reuse as unsupported")
+    p.add_argument(
+        "--arxiv-id", default="", help="arXiv identity for a local PDF when using --derive-cutoff-from-arxiv"
+    )
+    p.add_argument(
+        "--reuse-job-id",
+        type=str,
+        default="",
+        help="Legacy option; v2 reports job-snapshot reuse as unsupported",
+    )
     p.add_argument(
         "--llm-provider",
         type=str,

@@ -80,7 +80,11 @@ paper_id, purpose (citation_support / novelty / related_work / baseline), relati
 (supports / contradicts / same / partial / different / unclear), quote (a verbatim
 substring of a supplied passage), covered (claim condition ids), mechanism, setting,
 protocol, and note. All three comparison dimensions must describe the concrete
-paper-versus-source difference or match. Citation support applies only to cited ids.
+paper-versus-source difference or match. Citation support applies only to cited ids,
+and its covered IDs must be a subset of that source's citation_condition_ids.
+source_excerpts are separately located original passages with explicit condition scopes;
+they are not a single contiguous quote. Do not transfer a citation from one passage's
+conditions to another. The source_excerpt string is a legacy display summary only.
 For citation_support with relation=supports, also return fully_supported_conditions:
 the distinct subset of covered IDs for which this one retrieved passage establishes the
 ENTIRE condition, including every relevant qualifier in the claim. Default to [] for
@@ -215,8 +219,8 @@ def _in_bibliography(paper: dict[str, Any], materials: SharedMaterials) -> bool:
     )
 
 
-def _claim_source_excerpt(claim: Claim, materials: SharedMaterials) -> str:
-    """Recover the exact extraction quote, including citations omitted by paraphrase."""
+def _primary_source_excerpt(claim: Claim, materials: SharedMaterials) -> str:
+    """Recover the primary extraction quote, including citations omitted by paraphrase."""
     if claim.source_block_id is not None or claim.source_quote is not None:
         from screening.claims import _location
 
@@ -246,21 +250,123 @@ def _claim_source_excerpt(claim: Claim, materials: SharedMaterials) -> str:
     return claim.text
 
 
+def _claim_source_excerpts(claim: Claim, materials: SharedMaterials) -> list[dict[str, Any]]:
+    """Validate every separately located source before accepting any citation scope."""
+    from screening.claims import _location
+
+    primary = _primary_source_excerpt(claim, materials)
+    condition_ids = {condition.id for condition in claim.conditions}
+    refs = []
+    for ref in claim.source_refs:
+        blocks = [block for block in materials.blocks if block.id == ref.source_block_id]
+        if len(blocks) != 1 or _location(blocks[0], ref.source_quote, materials.markdown) != ref.loc:
+            raise ValueError("Claim source reference does not match a unique block and recorded location")
+        if not ref.covered or not set(ref.covered).issubset(condition_ids):
+            raise ValueError("Claim source reference has invalid condition coverage")
+        refs.append(ref.model_dump(mode="json"))
+    explicit_primary = [
+        ref
+        for ref in refs
+        if ref["source_block_id"] == claim.source_block_id and ref["source_quote"] == primary
+    ]
+    primary_scope = (
+        sorted({value for ref in explicit_primary for value in ref["covered"]})
+        if explicit_primary
+        else sorted(condition_ids)
+    )
+    excerpts = [
+        {
+            "source_block_id": claim.source_block_id,
+            "source_quote": primary,
+            "loc": claim.loc.model_dump(mode="json"),
+            "covered": primary_scope,
+        }
+    ]
+    for ref in refs:
+        existing = next(
+            (
+                item
+                for item in excerpts
+                if item["source_block_id"] == ref["source_block_id"]
+                and item["source_quote"] == ref["source_quote"]
+                and item["loc"] == ref["loc"]
+            ),
+            None,
+        )
+        if existing is None:
+            excerpts.append(ref)
+        else:
+            existing["covered"] = sorted(set(existing["covered"]) | set(ref["covered"]))
+    return excerpts
+
+
+def _excerpt_summary(excerpts: list[dict[str, Any]]) -> str:
+    return "\n\n[separate source passage]\n\n".join(item["source_quote"] for item in excerpts)
+
+
+def _claim_source_excerpt(claim: Claim, materials: SharedMaterials) -> str:
+    """Compatibility display; structured source excerpts retain distinct locations/scopes."""
+    return _excerpt_summary(_claim_source_excerpts(claim, materials))
+
+
+_CITATION_FIELDS = ("cited", "citation_condition_ids", "citation_sources")
+
+
+def _unbound_metadata(paper: dict[str, Any]) -> dict[str, Any]:
+    # Citation attachment is computed locally, never supplied by a remote service.
+    return {key: value for key, value in paper.items() if key not in _CITATION_FIELDS}
+
+
+def _merge_citation_binding(target: dict[str, Any], source: dict[str, Any]) -> None:
+    target["cited"] = bool(target.get("cited") or source.get("cited"))
+    target["citation_condition_ids"] = sorted(
+        set(target.get("citation_condition_ids", [])) | set(source.get("citation_condition_ids", []))
+    )
+    sources = list(target.get("citation_sources", []))
+    for ref in source.get("citation_sources", []):
+        if ref not in sources:
+            sources.append(ref)
+    target["citation_sources"] = sources
+
+
 def _cited_papers(
-    claim: Claim | None, materials: SharedMaterials, *, source_excerpt: str | None = None
+    claim: Claim | None,
+    materials: SharedMaterials,
+    *,
+    source_excerpt: str | None = None,
+    source_excerpts: list[dict[str, Any]] | None = None,
+    issues: list[str] | None = None,
 ) -> list[dict[str, Any]]:
     if claim is None:
         return []
-    if source_excerpt is None:
+    if source_excerpts is None:
         try:
-            source_excerpt = _claim_source_excerpt(claim, materials)
+            source_excerpts = _claim_source_excerpts(claim, materials)
         except ValueError:
             return []
-    source = source_excerpt
-    # Older offset-bearing records included citation labels in their claim text.
-    # New extraction records always use the preserved original quote exclusively.
-    if claim.source_block_id is None and claim.loc.char_start is not None and source:
-        source = claim.text + " " + source
+    # An explicitly empty legacy argument signals unavailable provenance.
+    if source_excerpt == "":
+        return []
+    works: dict[str, dict[str, Any]] = {}
+    for index, excerpt in enumerate(source_excerpts):
+        source = excerpt["source_quote"]
+        # Preserve only the old offset-bearing compatibility path, never a new paraphrase.
+        if index == 0 and claim.source_block_id is None and claim.loc.char_start is not None and source:
+            source = claim.text + " " + source
+        for paper in _match_cited_entries(source, materials, issues=issues):
+            paper["citation_condition_ids"] = list(excerpt["covered"])
+            paper["citation_sources"] = [excerpt]
+            key = _identifier(paper) or paper["bibliography_text"]
+            if key in works:
+                _merge_citation_binding(works[key], paper)
+            else:
+                works[key] = paper
+    return list(works.values())
+
+
+def _match_cited_entries(
+    source: str, materials: SharedMaterials, *, issues: list[str] | None = None
+) -> list[dict[str, Any]]:
     labels = set()
     for bracket in re.findall(r"\[([\d,\s–-]+)\]", source):
         labels.update(re.findall(r"\d+", bracket))
@@ -268,15 +374,31 @@ def _cited_papers(
             if 0 < int(end) - int(start) < 100:
                 labels.update(str(number) for number in range(int(start), int(end) + 1))
     # Local bibliography matching does not send author identity to any service.
-    author_year = re.findall(r"\b([A-Z][A-Za-z'-]+)(?:\s+et\s+al\.)?\s*[, (]+\s*((?:19|20)\d{2})", source)
+    author_year = re.findall(
+        r"\b([A-Z][A-Za-z'-]+)(?:\s+et\s+al\.)?\s*[, (]+\s*((?:19|20)\d{2}[a-z]?)\b", source
+    )
+    author_matches = set()
+    for name, year in sorted(set(author_year)):
+        matches = []
+        for index, block in enumerate(materials.bibliography):
+            entry_year = re.search(r"\b(?:19|20)\d{2}[a-z]?\b", block.text)
+            if (
+                entry_year
+                and re.search(rf"\b{re.escape(name)}\b", block.text, re.IGNORECASE)
+                and (entry_year.group() == year if len(year) > 4 else entry_year.group()[:4] == year)
+            ):
+                matches.append(index)
+        if len(matches) == 1:
+            author_matches.add(matches[0])
+        elif len(matches) > 1 and issues is not None:
+            issues.append(
+                f"Ambiguous citation {name} {year}: multiple bibliography entries match; "
+                "no author-year candidate was selected without an exact disambiguating label."
+            )
     works = []
-    for block in materials.bibliography:
+    for index, block in enumerate(materials.bibliography):
         numeric = re.match(r"\s*\[?(\d+)\]?[.\s]", block.text)
-        author_match = any(
-            re.search(rf"\b{re.escape(name)}\b", block.text, re.IGNORECASE) and year in block.text
-            for name, year in author_year
-        )
-        if not (numeric and numeric.group(1) in labels) and not author_match:
+        if not (numeric and numeric.group(1) in labels) and index not in author_matches:
             continue
         arxiv = re.search(
             r"(?:arxiv\s*:\s*|arxiv\.org/(?:abs|pdf)/)(\d{4}\.\d{4,5}(?:v\d+)?)", block.text, re.IGNORECASE
@@ -354,24 +476,36 @@ async def verify_literature(
         result.issues.append(str(exc))
         return result
     source_excerpt = ""
+    source_excerpts = []
+    source_available = True
     if claim is not None:
         try:
-            source_excerpt = _claim_source_excerpt(claim, materials)
+            source_excerpts = _claim_source_excerpts(claim, materials)
+            source_excerpt = _excerpt_summary(source_excerpts)
         except ValueError as exc:
+            source_available = False
             result.issues.append(f"Citation source unavailable: {exc}")
     queries = literature_queries(claim, materials)
     if not queries:
-        result.issues.append(
-            "Literature search scope inadequate: no recognized technical domain terms."
-        )
+        result.issues.append("Literature search scope inadequate: no recognized technical domain terms.")
     if searcher is None or reader is None:
         adapter = _default_adapter()
         searcher = searcher or adapter
         reader = reader or adapter
+    citation_issues = []
     candidates = {
         _identifier(row) or f"unresolved-cited-{idx}": row
-        for idx, row in enumerate(_cited_papers(claim, materials, source_excerpt=source_excerpt))
+        for idx, row in enumerate(
+            _cited_papers(
+                claim,
+                materials,
+                source_excerpt=source_excerpt,
+                source_excerpts=source_excerpts,
+                issues=citation_issues,
+            )
+        )
     }
+    result.issues.extend(citation_issues)
     audit: dict[str, Any] = {
         "submission_deadline": deadline.to_string(),
         "concurrent_start": concurrent_window_start(deadline).isoformat(),
@@ -381,9 +515,13 @@ async def verify_literature(
         "reads": [],
         "comparisons": [],
         "claim_source_excerpt": source_excerpt if claim is not None else None,
+        "source_excerpts": source_excerpts,
+        "source_refs": [ref.model_dump(mode="json") for ref in claim.source_refs] if claim else [],
+        "source_available": source_available,
         "query_policy": "closed_technical_vocabulary",
         "query_terms": _literature_terms(claim, materials),
         "query_intents": list(_QUERY_INTENTS) if queries else [],
+        "citation_issues": citation_issues,
     }
     self_exclusion_available = bool(
         _title_tokens(materials.title) or len(" ".join(materials.abstract.split())) >= 80
@@ -396,7 +534,7 @@ async def verify_literature(
         )
     novelty_ids = _novelty_condition_ids(claim)
     audit["novelty_condition_ids"] = sorted(novelty_ids)
-    adequate = len(queries) == 3 and self_exclusion_available
+    adequate = len(queries) == 3 and self_exclusion_available and source_available and not citation_issues
     for query in queries:
         try:
             response = await _invoke(getattr(searcher, "search", searcher), query=query, cutoff_date=deadline)
@@ -424,6 +562,7 @@ async def verify_literature(
             )
         for row in papers if isinstance(papers, list) else []:
             if isinstance(row, dict):
+                row = _unbound_metadata(row)
                 reason = (
                     "review_page"
                     if not _safe_paper(row)
@@ -445,9 +584,12 @@ async def verify_literature(
                             and len(title) >= 12
                             and title in _title_tokens(pending["bibliography_text"])
                         ):
-                            row = {**row, "cited": True, "bibliography_text": pending["bibliography_text"]}
+                            row["bibliography_text"] = pending["bibliography_text"]
+                            _merge_citation_binding(row, pending)
                             del candidates[pending_key]
-                    candidates[key] = {**row, **candidates.get(key, {})}
+                    existing = candidates.get(key, {})
+                    candidates[key] = {**row, **existing}
+                    _merge_citation_binding(candidates[key], row)
                     # Citation-only records lack title/date; retain search metadata.
                     for field, value in row.items():
                         if value and not candidates[key].get(field):
@@ -496,7 +638,7 @@ async def verify_literature(
                     else re.sub(r"v\d+$", "", returned, flags=re.I).lower() == requested.lower()
                 )
                 if response.get("success") is True and not response.get("error") and same_id:
-                    candidate = {**candidate, **metadata, "cited": True}
+                    candidate = {**candidate, **_unbound_metadata(metadata)}
                     paper_id = _identifier(candidate)
                     reason = (
                         "review_page"
@@ -539,6 +681,11 @@ async def verify_literature(
             )
             adequate = False
             continue
+        existing_read = next((row for row in read_rows if row["paper_id"] == paper_id), None)
+        if existing_read is not None:
+            _merge_citation_binding(existing_read, candidate)
+            _merge_citation_binding(existing_read["paper"], candidate)
+            continue
         try:
             response = await _invoke(
                 getattr(reader, "read_papers", reader),
@@ -572,7 +719,7 @@ async def verify_literature(
             response, item = {"success": False, "error": f"{type(exc).__name__}: {exc}"}, {}
         audit["reads"].append({"id": paper_id, "response": response})
         metadata = item.get("paper") if isinstance(item.get("paper"), dict) else {}
-        paper = {**candidate, **metadata}
+        paper = {**candidate, **_unbound_metadata(metadata)}
         if not _safe_paper(paper) or is_self_work(paper, materials):
             audit["excluded"].append({"paper": paper, "reason": "read_metadata_self_or_review"})
             continue
@@ -601,11 +748,17 @@ async def verify_literature(
                 "passages": passages,
                 "period": relation,
                 "cited": bool(candidate.get("cited")),
+                "citation_condition_ids": list(candidate.get("citation_condition_ids", [])),
+                "citation_sources": list(candidate.get("citation_sources", [])),
                 "in_bibliography": _in_bibliography(paper, materials),
                 "full_text": full_text,
             }
         )
 
+    audit["citation_bindings"] = [
+        {key: row[key] for key in ("paper_id", "cited", "citation_condition_ids", "citation_sources")}
+        for row in read_rows
+    ]
     comparisons = []
     if read_rows:
         payload = {
@@ -613,6 +766,7 @@ async def verify_literature(
             "paper_title": materials.title,
             "paper_abstract": materials.abstract,
             "source_excerpt": source_excerpt if claim else materials.abstract,
+            "source_excerpts": source_excerpts,
             "bibliography": [row.text for row in materials.bibliography],
             "sources": read_rows,
         }
@@ -729,6 +883,12 @@ async def verify_literature(
                 )
             )
         elif purpose == "citation_support" and row["cited"] and claim:
+            if not set(covered).issubset(row["citation_condition_ids"]):
+                result.issues.append(
+                    f"Rejected citation support outside the original source condition scope: {row['paper_id']}."
+                )
+                adequate = False
+                continue
             if relation not in {"supports", "contradicts", "unclear"} or period not in {
                 "prior",
                 "concurrent",

@@ -1,5 +1,6 @@
 """L1 boundary: extract once, retain findings and explicit check failures."""
 
+import os
 from pathlib import Path
 
 from pydantic import Field
@@ -22,7 +23,11 @@ class ScreeningResult(Contract):
 
 def screen_paper(materials: SharedMaterials, output_dir: Path, *, call=None, reference_checker=None):
     # Failed extraction cannot become an apparently successful review with zero claims.
-    result = ScreeningResult(claims=extract_claims(materials, call=call))
+    result = ScreeningResult(
+        claims=extract_claims(
+            materials, call=call, max_source_repairs=int(os.environ.get("CLAIM_SOURCE_MAX_REPAIRS", "3"))
+        )
+    )
     for name, check in (
         ("writing", lambda: check_writing(materials, call=call, issues=result.issues)),
         ("tables", lambda: check_tables(materials, call=call)),
@@ -36,7 +41,7 @@ def screen_paper(materials: SharedMaterials, output_dir: Path, *, call=None, ref
             "figures",
             lambda: check_figures(materials, call=call, recover_errors=True, records=result.figure_checks),
         ),
-        ("references", lambda: check_bibliography(materials, output_dir, checker=reference_checker)),
+        ("references", lambda: check_bibliography(materials, output_dir, checker=reference_checker, call=call)),
     ):
         try:
             findings, issues = check()

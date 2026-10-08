@@ -9,53 +9,9 @@ import time
 import uuid
 from contextlib import contextmanager
 from pathlib import Path
-from urllib.parse import parse_qsl, unquote, urlsplit, urlunsplit
 
 from common import run_stats
-
-
-def sanitized_endpoint(base_url: str | None) -> str:
-    endpoint = urlsplit(base_url or "")
-    return urlunsplit((endpoint.scheme, endpoint.netloc.rsplit("@", 1)[-1], endpoint.path, "", ""))
-
-
-def redact_provider_details(value, cfg):
-    """Copy diagnostic data, removing configured credentials and endpoint secrets."""
-    base_url = cfg.base_url or ""
-    endpoint = urlsplit(base_url)
-    replacements = {}
-    if base_url:
-        replacements[base_url] = sanitized_endpoint(base_url)
-    if "@" in endpoint.netloc:
-        # Include the delimiter so a common username does not alter prose.
-        userinfo = endpoint.netloc.rsplit("@", 1)[0] + "@"
-        replacements[userinfo] = ""
-        replacements[unquote(userinfo)] = ""
-    credentials = [cfg.api_key, endpoint.password]
-    credentials.extend(
-        token
-        for name, token in parse_qsl(endpoint.query)
-        if re.search(r"key|token|secret|password|signature|credential|auth", name, re.IGNORECASE)
-    )
-    for credential in credentials:
-        if credential:
-            replacements[credential] = "[redacted]"
-            replacements[unquote(credential)] = "[redacted]"
-
-    def redact(item):
-        if isinstance(item, str):
-            for original in sorted(replacements, key=len, reverse=True):
-                item = item.replace(original, replacements[original])
-            return item
-        if isinstance(item, dict):
-            return {key: redact(content) for key, content in item.items()}
-        if isinstance(item, list):
-            return [redact(content) for content in item]
-        if isinstance(item, tuple):
-            return tuple(redact(content) for content in item)
-        return item
-
-    return redact(value)
+from llm.diagnostics import redact_provider_details, sanitized_endpoint
 
 
 @contextmanager

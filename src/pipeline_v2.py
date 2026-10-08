@@ -131,6 +131,8 @@ def run_v2_pipeline(
             current_stage = name
             begin = time.perf_counter()
             stage_started = begin
+            summary["stages"][name] = "running"
+            _save(root / "full_pipeline_summary.json", summary)
             print(f"[{STAGES.index(name) + 1}/{len(STAGES)}] {name}: starting", flush=True)
             stats_module = STATS_MODULES[name]
             with run_stats.module_scope(stats_module):
@@ -215,14 +217,19 @@ def run_v2_pipeline(
                 )
                 remote_url = repository_url
                 if materials.repository is None and not remote_url:
-                    urls = set(
-                        re.findall(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", materials.markdown)
+                    urls = sorted(
+                        set(
+                            re.findall(
+                                r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", materials.markdown
+                            )
+                        )
                     )
-                    if len(urls) == 1:
-                        remote_url = next(iter(urls)).rstrip(".")
-                    elif len(urls) > 1:
+                    if urls:
+                        summary["repository_candidates"] = [url.rstrip(".") for url in urls]
                         materials.issues.append(
-                            "Multiple repository URLs; specify --repository-url for the released source."
+                            "Manuscript repository URLs have not been bound to the authors' released source; "
+                            "specify --repository-url or --repository-root. Third-party dependencies and "
+                            "baseline links cannot establish release identity."
                         )
                 if materials.repository is None and remote_url:
                     try:
@@ -350,7 +357,7 @@ def run_v2_pipeline(
             record_stage_duration(current_stage, duration)
             run_stats.record_module_status(STATS_MODULES[current_stage], "failed", warning=str(exc))
         finally:
-            for directory in ("visual_calls", "code_scopes"):
+            for directory in ("visual_calls", "code_scopes", "claim_extraction", "experiment_scope"):
                 if (root / directory).is_dir():
                     summary["outputs"][directory] = str(root / directory)
             summary["stages"] = {

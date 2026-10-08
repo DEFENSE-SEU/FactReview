@@ -124,7 +124,9 @@ class Evidence(Contract):
             )
             search_audit = pointer.locator.lower().endswith(".json") and pointer.key == "search_scope"
             if not (valid_url or valid_identifier or search_audit):
-                raise ValueError("literature evidence requires a DOI, arXiv id, URL, or saved search-scope audit")
+                raise ValueError(
+                    "literature evidence requires a DOI, arXiv id, URL, or saved search-scope audit"
+                )
             if not pointer.quote.strip():
                 raise ValueError("literature evidence requires the retrieved passage")
         elif self.source == "code" and pointer.line is None:
@@ -147,6 +149,23 @@ class AuthorQuestion(Contract):
     reason: str = ""
 
 
+class ClaimSourceRef(Contract):
+    """An original manuscript passage for specified conditions, not verification evidence."""
+
+    source_block_id: NonEmpty
+    source_quote: str = Field(min_length=1)
+    loc: ClaimLocation
+    covered: list[NonEmpty] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def check_source(self) -> Self:
+        if not self.source_quote.strip():
+            raise ValueError("source_quote must contain original manuscript text")
+        if len(self.covered) != len(set(self.covered)):
+            raise ValueError("source reference coverage ids must be unique")
+        return self
+
+
 class Claim(Contract):
     """The same record is enriched from extraction through final assessment."""
 
@@ -156,6 +175,7 @@ class Claim(Contract):
     # Optional for previously saved records; extraction retains these together.
     source_block_id: NonEmpty | None = None
     source_quote: str | None = None
+    source_refs: list[ClaimSourceRef] = Field(default_factory=list)
     conditions: list[Condition] = Field(min_length=1)
     needs: list[EvidenceNeed]
     importance: Literal["core", "secondary"] = "secondary"
@@ -175,6 +195,13 @@ class Claim(Contract):
             raise ValueError("condition ids must be unique within a claim")
         if len(self.needs) != len(set(self.needs)):
             raise ValueError("needs must not contain duplicate branches")
+        source_keys = []
+        for ref in self.source_refs:
+            if not set(ref.covered).issubset(ids):
+                raise ValueError("source reference coverage must refer to this claim's condition ids")
+            source_keys.append((ref.source_block_id, ref.source_quote, tuple(sorted(ref.covered))))
+        if len(source_keys) != len(set(source_keys)):
+            raise ValueError("source references must not be duplicated")
         for item in self.evidence:
             if not set(item.covered).issubset(ids):
                 raise ValueError("evidence coverage must refer to this claim's condition ids")

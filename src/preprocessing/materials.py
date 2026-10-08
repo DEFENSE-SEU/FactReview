@@ -155,13 +155,14 @@ def _row_text(row: dict[str, Any]) -> str:
         "image": ("image_caption", "caption"),
         "chart": ("chart_caption", "caption", "content"),
         "table": ("table_caption", "table_body", "text"),
+        "code": ("code_caption", "code_body", "text"),
         "equation": ("text", "equation"),
         "list": ("list_items", "text"),
     }.get(kind, ("text",))
     parts = []
     for key in keys:
         value = _content_text(row.get(key))
-        if value:
+        if value and (kind != "code" or value not in parts):
             parts.append(value)
     return "\n".join(parts)
 
@@ -282,6 +283,7 @@ def _blocks(markdown: str, rows: list[dict[str, Any]], issues: list[str]) -> lis
             "list",
             "table",
             "equation",
+            "code",
             "image",
             "chart",
             "ref_text",
