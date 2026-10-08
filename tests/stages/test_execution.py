@@ -3764,8 +3764,26 @@ def test_explicit_source_does_not_load_same_key_demo_fixture(tmp_path) -> None:
 
 @pytest.mark.requires_docker
 def test_docker_daemon_is_available_for_execution_stage() -> None:
-    # Smoke check that an environment claiming to be Docker-capable actually
-    # has the CLI available — protects against running the gated test on a
-    # host where the orchestrator would crash in a confusing way.
+    # This explicitly selected integration check must reach the daemon; having
+    # the CLI installed alone does not make the execution stage usable.
     if shutil.which("docker") is None:
         pytest.skip("docker CLI not available")
+    try:
+        result = subprocess.run(
+            ["docker", "version", "--format", "{{.Server.Version}}"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=30,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        pytest.fail("Docker daemon did not respond to 'docker version' within 30 seconds")
+    except OSError as exc:
+        pytest.fail(f"Could not run 'docker version': {exc}")
+    assert result.returncode == 0, (
+        f"Docker daemon is unavailable (exit {result.returncode}). "
+        f"stdout: {result.stdout.strip()} stderr: {result.stderr.strip()}"
+    )
+    assert result.stdout.strip(), "Docker daemon returned no server version"
