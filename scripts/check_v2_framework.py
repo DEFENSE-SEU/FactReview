@@ -474,6 +474,31 @@ def validate_case(name, summary, claims, parser, model):
         ledger = review.get("ledger", [])
         analysis = next((entry for entry in ledger if entry["plan"]["id"] == "claim_001.plan"), {})
         training = next((entry for entry in ledger if entry["plan"]["id"] == "claim_002.plan"), {})
+        binding = analysis.get("plan", {}).get("target_bindings", {}).get("test", {})
+        validations = analysis.get("paper_target_validation", [])
+        checks["paper_target_revalidated"] = (
+            bool(binding)
+            and {row["phase"] for row in validations} >= {"before_approval", "before_run", "before_judge"}
+            and all(
+                row.get("verified") and row.get("bindings", {}).get("test") == binding for row in validations
+            )
+        )
+        checks["original_paper_target_preserved"] = False
+        pointer = binding.get("pointer", {})
+        try:
+            source = Path(pointer["locator"])
+            start, end = map(int, pointer["key"].removeprefix("chars:").split("-"))
+            checks["original_paper_target_preserved"] = (
+                pointer["key"].startswith("chars:")
+                and source.read_text(encoding="utf-8")[start:end]
+                == pointer["quote"]
+                == "FixtureVision test accuracy is 0.75."
+                and hashlib.sha256(source.read_bytes()).hexdigest() == binding["artifact_sha256"]
+                and binding["value"] == analysis["plan"]["y_paper"]["test"] == 0.75
+                and binding["quantity_kind"] == "absolute_measurement"
+            )
+        except (KeyError, ValueError, OSError):
+            pass
         checks["training_budget_enforced"] = (
             not training.get("approved", True)
             and "training budget" in training.get("reason", "")

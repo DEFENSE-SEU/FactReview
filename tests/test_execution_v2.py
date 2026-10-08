@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 from pydantic import ValidationError
@@ -11,7 +12,15 @@ from fact_generation.execution.nodes.plan import _default_tolerance
 from fact_generation.execution.v2 import ExecutionConfig, Observation, Repair, RunOutcome, execute_plans
 from fact_generation.execution.v2_config import metric_tolerance
 from preprocessing.materials import index_repository
-from schemas.claim import Claim, ClaimLocation, Condition, ExecutionPlan, ExecutionTask
+from schemas.claim import (
+    Claim,
+    ClaimLocation,
+    ClaimSourceRef,
+    Condition,
+    ExecutionPlan,
+    ExecutionTask,
+    PaperTargetPassage,
+)
 from schemas.materials import MaterialBlock, SharedMaterials
 from util.subprocess_runner import CommandResult
 
@@ -45,12 +54,57 @@ def inputs(tmp_path):
         paper_key="paper",
         source_pdf="paper.pdf",
         markdown="Accuracy .9",
-        markdown_path="paper.md",
+        markdown_path=str(tmp_path / "paper.md"),
         content_list_path="content.json",
         provider="fixture",
         repository=index_repository(repo),
     )
-    return plan, claim, materials
+    values = plan, claim, materials
+    bind_fixture_sources(values, [("c1", "d1 test seed 1 accuracy is 0.9.", "0.9")])
+    return values
+
+
+def bind_fixture_sources(values, passages):
+    """Explicit fixture authoring; never infer paper values from the mutable plan."""
+    from verification.experiment_targets import bind_execution_target
+
+    plan, claim, materials = values
+    texts = [text for _, text, _ in passages]
+    markdown = "\n\n".join(texts)
+    Path(materials.markdown_path).write_text(markdown, encoding="utf-8")
+    materials.markdown, materials.blocks = markdown, []
+    offset = 0
+    for index, (condition_id, text, token) in enumerate(passages):
+        location = ClaimLocation(page=2, char_start=offset, char_end=offset + len(text))
+        materials.blocks.append(MaterialBlock(id=f"target-{index}", text=text, loc=location))
+        offset += len(text) + 2
+    first = materials.blocks[0]
+    claim.text, claim.loc, claim.source_block_id, claim.source_quote = (
+        markdown,
+        first.loc,
+        first.id,
+        first.text,
+    )
+    claim.source_refs = (
+        [
+            ClaimSourceRef(
+                source_block_id=block.id, source_quote=block.text, loc=block.loc, covered=[condition_id]
+            )
+            for block, (condition_id, _, _) in zip(materials.blocks, passages)
+        ]
+        if len(passages) > 1
+        else []
+    )
+    conditions = {condition.id: condition for condition in claim.conditions}
+    plan.target_bindings = {
+        condition_id: bind_execution_target(
+            claim,
+            conditions[condition_id],
+            PaperTargetPassage(block_id=block.id, quote=text, token=token, value_context=text),
+            materials,
+        )
+        for block, (condition_id, text, token) in zip(materials.blocks, passages)
+    }
 
 
 def observation(**changes):
@@ -126,6 +180,7 @@ def test_released_recomputation_requires_hash_and_real_metadata(inputs, tmp_path
     _, _, materials = inputs
     inputs[1].conditions[0].settings["aggregation"] = "mean"
     inputs[0].target_conditions[0].settings["aggregation"] = "mean"
+    bind_fixture_sources(inputs, [("c1", "d1 test seed 1 aggregation mean accuracy is 0.9.", "0.9")])
     path = Path(materials.repository.root) / "results.json"
     path.write_text(
         json.dumps(
@@ -330,10 +385,17 @@ def test_preserved_named_tolerance_profiles():
     assert metric_tolerance("mr", 100) == 30
 
 
-def test_plan_cannot_change_claim_conditions(inputs, tmp_path):
+def test_plan_cannot_change_claim_conditions(inputs, tmp_path, monkeypatch):
     inputs[0].target_conditions[0] = inputs[0].target_conditions[0].model_copy(update={"dataset": "other"})
-    with pytest.raises(ValueError, match="conditions differ"):
-        run(inputs, tmp_path, lambda _: RunOutcome(returncode=0))
+    runner, approver, refiner = Mock(), Mock(), Mock()
+    monkeypatch.setattr(v2, "_refine", refiner)
+    result = run(inputs, tmp_path, runner, approver=approver, config={"approval_mode": "interactive"})
+    runner.assert_not_called()
+    approver.assert_not_called()
+    refiner.assert_not_called()
+    assert result.ledger[0]["approved"] is False
+    assert "conditions differ" in result.ledger[0]["reason"]
+    assert not result.claims[0].evidence
 
 
 def test_subdirectory_entry_keeps_index_path_and_runtime_workdir_distinct(inputs, tmp_path):
@@ -498,6 +560,13 @@ def test_partial_matching_conditions_support_only_covered_subset(inputs, tmp_pat
     plan.target_conditions.append(second)
     plan.condition_ids.append("c2")
     plan.y_paper["c2"] = 0.8
+    bind_fixture_sources(
+        inputs,
+        [
+            ("c1", "d1 test seed 1 accuracy is 0.9.", "0.9"),
+            ("c2", "d2 test seed 1 accuracy is 0.8.", "0.8"),
+        ],
+    )
     result = run(inputs, tmp_path, lambda _: RunOutcome(returncode=0, observations=[observation()]))
     assert result.claims[0].evidence[0].covered == ["c1"]
     assert len(result.claims[0].evidence) == 1
@@ -544,6 +613,7 @@ def test_compgcn_author_json_decoded_by_default_docker_path(inputs, tmp_path, mo
     plan.target_conditions = [condition]
     claim.conditions = [condition]
     plan.y_paper = {"c1": 0.335}
+    bind_fixture_sources(inputs, [("c1", "FB15k-237 test score_func transe opn sub MRR is 0.335.", "0.335")])
     plan.task.command += ["--out", "metrics/result.json"]
     author_json = {
         "ok": True,
@@ -636,6 +706,7 @@ def test_invalid_paper_variance_never_expands_tolerance(inputs, tmp_path, varian
 def test_finite_variance_without_paper_pointer_does_not_expand_tolerance(inputs, tmp_path):
     inputs[0].target_conditions[0].settings["reported_variance"] = 1.0
     inputs[1].conditions[0].settings["reported_variance"] = 1.0
+    bind_fixture_sources(inputs, [("c1", "d1 test seed 1 accuracy is 0.9.", "0.9")])
     obs = observation(value=0.2)
     obs.settings["reported_variance"] = 1.0
     result = run(inputs, tmp_path, lambda _: RunOutcome(returncode=0, observations=[obs]))
@@ -798,6 +869,10 @@ def test_canonical_observation_conflict_with_actual_metric_is_rejected():
 @pytest.mark.parametrize("value", [True, False])
 def test_canonical_boolean_metric_cannot_support_claim(inputs, tmp_path, monkeypatch, value):
     inputs[0].y_paper = {"c1": float(value)}
+    text, token = (
+        ("d1 test seed 1 accuracy is 1.0.", "1.0") if value else ("d1 test seed 1 accuracy is 0.0.", "0.0")
+    )
+    bind_fixture_sources(inputs, [("c1", text, token)])
     monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "test-image:1"))
     monkeypatch.setattr(
         v2, "docker_run_paper_image", lambda **kwargs: ["docker", "run", "test-image:1", *kwargs["cmd"]]

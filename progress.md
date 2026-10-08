@@ -411,3 +411,56 @@ The audit additionally injects first-pass partial, scope partial and wrong repea
 ### Remaining work and next action
 
 Commit and push this verified checkpoint to the authorized `refactor/method-v2` branch. Immediately continue the execution target-binding correction, preserving the exact three-case red/control reproduction and checking absolute values versus improvement/gap quantities. Then implement separately reviewed joint-source evidence. Prepare a bounded Literature probe using original claims with honest partial/unresolved expectations; a separate explicitly synthetic citing-paper case can exercise full citation support without changing those original claims. The complete-spec audit and actual coverage limits are in `framework-gap-audit-f345/framework-gap-audit.md`.
+
+## Active execution-target provenance correction
+
+The preceding verified checkpoint was committed and pushed as `235c261e6d27fc17a6b10ad413590f9d5e632336`; local and remote matched. The goal remains active. The current implementation is under review, with no new completion claim.
+
+Decisions: persist an independently reconstructable target binding alongside `y_paper`; keep old empty-binding plans readable and block new execution until they are regenerated from the original source. Require an absolute scalar measurement with its original subject, settings and unit. Runtime units must come from actual output, with no inferred percent conversion. Validate the binding before approval, at execution boundaries and before deciding evidence. A changed source stops that plan without infrastructure repair; retain its logs and continue independent plans. The default training budget remains zero.
+
+The approved designs are `runs/v2_binding_followup/plan-target-binding-design.md` and `plan-target-execution-review.md`. Producer/schema, consumer/fixtures and the Literature probe driver have separate implementation owners. Root performs integration and independent adversarial checks. Original model responses, claims, materials, failed runs and test assertions remain intact.
+
+Root's independent preflight `runs/v2_binding_followup/target-table-preflight-62d97623ee/` preserves the initial helper snapshot and five exact inputs. Its absolute-measurement control passes, while four required rejections are falsely accepted: improvement, ratio, another method's row, and a seed borrowed from a preceding row's result. The owner is correcting table axis/quantity binding against these saved cases. No external call or Docker/training run occurs in this preflight. The new Literature script is also under review; actual requests have not yet started.
+
+Next action: finish the source and execution gates, independently rerun the unchanged red/control inputs and affected regression suite, then run the real aligned/misaligned Docker matrix. Full regression, package/protected-file verification and an authorized branch checkpoint follow accepted review. Joint-source evidence and bounded actual Literature validation remain open.
+
+## Verified execution-target and actual Literature checkpoint
+
+This section supersedes the active implementation note above. Phase 0–8 remain historical milestones; the current whole-framework goal continues into explicit joint-source support after this checkpoint. No training or new PR was requested or performed. All evidence paths below are under `runs/v2_binding_followup/`.
+
+### Decisions and resulting behavior
+
+Execution targets now persist their original number/cell selector, quote/pointer, absolute value/unit and artifact/block/claim/condition fingerprints. L2 constructs each binding; L3 reconstructs it before approval, after interactive approval, before each runner call and before judging successful or failed runs. Changed sources stop the affected plan without automatic infrastructure repair, and actual logs remain. Historical unbound plans are readable and require regeneration before a new deciding execution.
+
+The first target parser has a deliberately finite semantic contract, detailed in `plan-target-bindings-implementation.md`. Complete scalar statements and native tables with explicit dimensions are supported. Unknown metric names, derived quantities, unparsed descriptions/qualifiers, row fragments, cross-paragraph definitions and composite/list conditions remain blocked with reasons. Known absolute metric names are matched completely; changing `accuracy` to `accuracy improvement` cannot relabel a derived quantity as absolute. Explicit paper units require real runtime metadata, with no implicit percentage conversion. Existing generic alignment and tolerance tables are retained.
+
+One prior failure contract was explicitly upgraded: a plan whose conditions differ from its Claim is now locally blocked, allowing a healthy neighbor to proceed. `test_plan_cannot_change_claim_conditions` retains its original bad input and replaces the batch-level exception assertion with `approved=false`, no runner/approver/refiner calls, no evidence and the same diagnostic. A separate healthy-neighbor assertion protects failure isolation. The public fixture supplies actual paper provenance once; generic run helpers never derive new paper text from mutable `y_paper`.
+
+The new Literature probe distinguishes actual services, exact original-cache replay and injected test boundaries. Its independent review found that a second unused reader item could make the validation oracle accept an ungrounded comparison. The final driver validates only passages actually supplied to the model. Original failed requests/responses are preserved, and a failed service or malformed/rejected target comparison cannot satisfy a negative case. Synthetic citing documents are labelled separately from original claims.
+
+### Verification and review
+
+- `pytest-target-provenance-full.log`: **1710 passed, 3 original deselections**, exit 0 in 63.90 s. The single warning comes from intentionally placing a malformed raw dict into a binding field. Separate `pytest-target-provenance-legacy.log`: **2 passed**. No new skip or test weakening. Changed-file Ruff and diff checks pass.
+- `target_provenance_dist/factreview-0.1.0-py3-none-any.whl` SHA256 **22c665ad01668d728ba33f7cc583050dd4a6da80be0bed565b44619859b51de8**; `target-provenance-delivery-inspection.json` verifies all **118** packaged modules against source/Python 3.11 grammar, **27** protected demo hashes, ignored environment settings and no configured secret in tracked/nonignored files.
+- Root's exact original three-case replay `framework-gap-audit-f345/plan-target-2d0553e292/` yields **Supported / Questioned / Unverified**. The seven table cases in `target-table-preflight-c720dcf8ed/` all match their expectations. The earlier false accepts, source snapshots and inputs remain in `target-table-preflight-62d97623ee/` and `target-table-preflight-2f40f39fc3/`. The real BERT improvement fixture is copied without changing its claim/condition/plan.
+- Independent execution review: `plan-target-execution-independent-review.md`, **116** tests plus four additional boundary cases in `l3-independent-3852e2f5ad/`. A separate reviewer passes **24** target-gate tests and reviews the matrix oracle in `plan-target-l3-independent-review.md`. Tests cover exception-throwing runners that change the paper, refinement-time changes, unit failure isolation and preserved healthy execution. Owner **103** execution / **498** related tests overlap these sets and are not additive.
+- `target-docker-e502402610/` completes two actual CPU Docker cases through all seven stages. Its independent review rechecks raw `.75` output from `[1,1,0,1]`, actual selectors, original target source/hash and three validation phases: test split **Supported**, validation split **Unverified** with no deciding execution evidence. Training and repairs are **0**; PDF outputs have **16 / 15 pages**, SVGs are valid. **154** original artifacts and **120** implementation hashes stay unchanged. Parser/model/retrieval remain fixed, and this does not establish published-benchmark reproduction.
+- Literature driver independent review is in `literature-probe-independent-review/review.md`: **42** driver tests and **220** related tests pass. Exact original BEiT37 cache replay has **0 live / 10 cached** calls, preserves original responses and the exact missing-ID explanation, and retains one unrelated historical reader failure. It does not certify current reader health.
+
+### Actual citation probes
+
+The source and implementation manifests stay unchanged for all three actual cases. They use the configured `openai-codex/gpt-5.5` and actual retrieval/reading services, with original materials fixed and no Docker or training. Counts below are adapter/model boundaries, separate from underlying HTTP request counts.
+
+| Case | Result | Actual boundary calls | Measured model tokens |
+|---|---|---|---|
+| Separate synthetic GNMT reported-range positive | Supported, full c1; GNMT `1609.08144v2`, page 7 exact consumed source | 17: 3 searches, 1 metadata, 12 reads, 1 model | 18,072 = 16,075 input + 1,997 output |
+| Original BERT19 partial, all three original conditions retained | Unverified; no sufficient support for c1/c2/c3 | 7: 3 searches, 1 metadata, 2 reads, 1 model | 8,745 = 7,750 input + 995 output |
+| Separate synthetic universal-optimum overclaim | Questioned; no sufficient c1 support | 17: 3 searches, 1 metadata, 12 reads, 1 model | 18,198 = 16,008 input + 2,190 output |
+
+Outputs are `literature-live/literature-probe-26cb1a7f946c/` and `literature-live/literature-probe-530d51357e37/`. Total: **41** returned live boundary calls, **3** actual model calls, **45,015** measured tokens (**39,833 input + 5,182 output**), zero failed/estimated/missing-usage model calls. Both batches are independently confirmed in the corresponding `literature-probe-independent-review/literature-probe-*-live-review.md` reports and `three-live-cases-summary.json`. The reviewer reproduces both original partial flags and the overclaim's nondecisive, overturnable concern, checks all actual response hashes and confirms the same **119** implementation hashes across both runs. Review adds zero external requests.
+
+Search completeness remains uncertified. The positive batch rejects eight unrelated related-work comparison quotes while validating the actual target citation; this result does not establish complete novelty retrieval. Current reader APIs do not expose downloaded PDF bytes for an independent PDF hash. Page/quote/model-input identity is retained; no redundant PDF download was performed merely to manufacture a hash.
+
+### Next action
+
+Checkpoint the verified code and records on the authorized `refactor/method-v2` branch, then implement the already reviewed explicit joint-source design. Preserve original partial items and responses. A new joint candidate must name exact member spans, pass independent complete-condition scope review and expose all source pointers in FinalReview JSON/Markdown/PDF. The teaser keeps its compact summary contract. Overall work remains active.

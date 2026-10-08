@@ -31,6 +31,12 @@ python scripts/check_v2_framework.py --scenario mapped_runtime --scenario mapped
 
 This enables the production Docker builder and runner for the selected runtime scenarios. It uses a small synthetic CPU calculation, automatic approval, training budget 0, no repair attempts, a 45-second run timeout and a 180-second image-build timeout. The model/parser/retrieval fixtures remain fixed. The resulting execution ledger retains commands, output mappings, raw output, alignment decisions and evidence. Both cases continue through final assessment, PDF/JSON/Markdown report and SVG teaser. The older `validate_execution_real_repos.py` script exercises the legacy v1 execution entry and does not validate this route.
 
+The runtime matrix also checks the exact original paper target and artifact hash, plus target revalidation before approval, before launch and after the run. The same paper target must survive JSON serialization and the execution ledger. A correct output value with the wrong split still provides no deciding execution evidence.
+
+Execution plans retain `target_bindings` with original number/cell selectors, quotations, pointers and source/claim/condition hashes. L3 reconstructs them before approval and execution, and after successful or failed runs. A changed source stops that plan and retains its logs without starting infrastructure repair. Historical plans without bindings remain readable; executing them requires a new L2 plan from the original material. An invalid plan keeps its local reason while healthy plans continue.
+
+The current target binder supports a bounded set of complete scalar statements and native tables with explicit dimensions. It uses complete registered metric names for absolute measurements. Unknown metrics, derived improvements/ratios, list/composite conditions, unparsed qualifiers, incomplete table rows and cross-paragraph definitions remain blocked. Nonempty condition descriptions also need an unambiguous scalar interpretation. This limits executable coverage on real manuscripts. Explicit paper units require actual runtime unit metadata; unspecified bare values retain their original scale, and no percentage conversion is inferred. Generic condition alignment and existing tolerance profiles remain unchanged.
+
 ## Real visual route
 
 Configure the usual model or the optional `VLM_*` overrides, then run:
@@ -65,6 +71,22 @@ An optional `--expectations expected.json` supplies an independent coverage orac
 ```
 
 These IDs illustrate the format; choose expected outcomes by inspecting the actual original sources. A completed call with no support fails a required positive expectation. Without expectations, successful exit confirms that the selected verification calls and artifact checks completed; it makes no accuracy claim. Each output under `runs/v2_experiments/` records this distinction, and source or implementation changes during the probe invalidate its result. `tests/test_experiment_probe_driver.py` mocks model, network and process boundaries.
+
+## Selected Literature citations
+
+`scripts/check_v2_literature.py` runs declared citation cases with explicit service boundaries:
+
+```sh
+python scripts/check_v2_literature.py --plan path/to/probe-plan.json --case selected-case --mode live
+```
+
+A version 1 plan contains `protected_files` (input path to SHA256) and named `cases`. Each case declares its original saved run and unchanged `raw_claim`, or separately labelled synthetic claim/materials, its submission deadline, allowed modes and independent expectations. Expectations partition every original condition into supported and unsupported sets, and identify the required cited work or exact unresolved bibliography entry. Original cases require protected `materials/materials.json` and `screening/screening.json`. The driver checks the saved claim against the declared original before making requests.
+
+`live` uses the configured retrieval, reading and model services. `original-cache` requires a protected original search audit and exact request matches; it never falls back to network calls. Reconstructed cached model envelopes are labelled, and original comparison flags remain unchanged. Cache modification times do not establish original acquisition times.
+
+Positive and negative citation cases both require healthy source identity, page-located text actually supplied to the model, and a valid comparison against that passage. An unavailable service or rejected comparison cannot satisfy a negative expectation. A separately declared unresolved-cache case checks the precise missing identity and explanation; unrelated historical reader failures remain visible and do not establish reader health.
+
+Each output saves requests, responses, actual boundary counts, provider/model, recorded usage, result/assessment and input/implementation hashes. Adapter calls and HTTP requests are distinct counts. Current readers do not expose original PDF bytes for an independent PDF hash; the driver records that limitation and does not download the PDF again. These selected checks measure citation contracts and service integration; they provide no broad scientific accuracy estimate.
 
 ## Evidence report navigation
 

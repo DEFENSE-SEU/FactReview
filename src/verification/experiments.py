@@ -19,6 +19,7 @@ from schemas.claim import (
     ExecutionPlan,
     ExecutionTask,
     NonEmpty,
+    PaperTargetSelector,
 )
 from schemas.materials import SharedMaterials
 from screening.checks import ask
@@ -33,6 +34,7 @@ from verification.experiment_catalog import (
     resolve_cell,
     resolve_source,
 )
+from verification.experiment_targets import TargetBindingError, bind_execution_target
 from verification.prose_numbers import (
     bind_pair,
     direct_pair_candidates,
@@ -222,6 +224,7 @@ class PlanTarget(Contract):
         description="One exact ID from allowed_condition_ids; target IDs must be distinct within each plan."
     )
     reported: PaperNumber
+    selector: PaperTargetSelector | None = None
 
 
 class PlanCandidate(Contract):
@@ -1635,6 +1638,7 @@ def _plan(claim: Claim, materials: SharedMaterials, candidate: PlanCandidate) ->
     ids = _covered(claim, [target.condition_id for target in candidate.targets])
     values = {target.condition_id: _number(materials, target.reported) for target in candidate.targets}
     target_issues = []
+    target_bindings = {}
     for target in candidate.targets:
         condition = conditions[target.condition_id]
         # Exact quotes must identify the target metric/dataset, possibly across
@@ -1643,9 +1647,14 @@ def _plan(claim: Claim, materials: SharedMaterials, candidate: PlanCandidate) ->
             raise ValueError("Reported target quote must identify the condition's metric")
         if condition.dataset and not _has_label(condition.dataset, target.reported.quote):
             raise ValueError("Reported target quote must identify the condition's dataset")
-        ambiguity = _target_ambiguity(claim, target, values[target.condition_id])
-        if ambiguity:
-            target_issues.append(f"Unresolved paper target {target.condition_id}: {ambiguity}")
+        try:
+            target_bindings[target.condition_id] = bind_execution_target(
+                claim, condition, target.reported, materials, selector=target.selector
+            )
+        except TargetBindingError as exc:
+            ambiguity = _target_ambiguity(claim, target, values[target.condition_id])
+            detail = f"{ambiguity}; {exc}" if ambiguity else str(exc)
+            target_issues.append(f"Unresolved paper target {target.condition_id}: {detail}")
     repository = materials.repository
     files = {item.path for item in repository.files} if repository else set()
     entries = set(repository.entry_scripts) if repository else set()
@@ -1672,6 +1681,7 @@ def _plan(claim: Claim, materials: SharedMaterials, candidate: PlanCandidate) ->
         condition_ids=ids,
         target_conditions=[conditions[key] for key in ids],
         y_paper=values,
+        target_bindings=target_bindings,
         task=ExecutionTask(entry_script=candidate.entry_script, config=candidate.config),
         run_mode=candidate.run_mode,
         feasibility="blocked" if blockers else "ready",
@@ -1717,8 +1727,12 @@ def verify_experiments(
             "remain for L3. Every plan target quotes the exact paper numeric token, metric, and dataset; "
             "copy full table headers when needed. For multi-value quotes, supply an exact value_context "
             "substring identifying the target dataset/metric and its unique reported value. Ambiguous "
-            "whole-table references remain blocked until the target is resolved. Include actual indexed data/weight paths. Keep plans "
-            "with missing code, data, weights, or budget as blocked with a reason. Priority follows "
+            "whole-table references remain blocked until the target is resolved. Include actual indexed data/weight paths. "
+            "Execution targets require an absolute measurement for the original subject, dataset, metric and all settings. "
+            "A gap, improvement, percentage-point change, ratio, comparator score or one case of a composite condition "
+            "cannot replace that absolute target. Unknown target bindings remain blocked. Preserve the complete original "
+            "sentence or native table; a narrowed value_context cannot remove its governing subject or scope. "
+            "Keep plans with missing code, data, weights, or budget as blocked with a reason. Priority follows "
             "the link to the paper's core contribution. Emit no execution evidence or final verdict.",
             {
                 "claim": claim.model_dump(mode="json"),
