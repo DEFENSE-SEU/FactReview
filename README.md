@@ -51,12 +51,17 @@ The v2 teaser is rendered locally as SVG. The old Gemini teaser API, old runtime
 
 ```bash
 python -m pytest
-python scripts/check_v2_compgcn.py
 ```
 
 Unit tests mock service boundaries and block external network connections. On Windows, the suite chooses a fresh short temporary path under `runs/pytest` to keep the original execution-path assertions portable. Existing live-test markers remain opt-in.
 
-The CompGCN check is an explicitly labelled offline fixture replay using the real PDF and repository. It saves its mocked-service boundaries and a historical-label comparison. A live MinerU/LLM/Docker result requires locally configured credentials and services.
+Framework tests cover stage contracts, claim routing, source grounding, execution approval/alignment/repair and report consistency. To check a configured Docker daemon explicitly, run:
+
+```bash
+python -m pytest tests/stages/test_execution.py::test_docker_daemon_is_available_for_execution_stage -m requires_docker
+```
+
+The supplementary `python scripts/check_v2_compgcn.py` check is an explicitly labelled offline fixture replay using one real PDF and repository. It saves its mocked-service boundaries and a historical-label comparison. A live MinerU/LLM/Docker result requires locally configured credentials and services. Individual case results do not establish framework-wide review accuracy or repository compatibility.
 
 Literature records its search scope. An adapter that does not certify search completeness cannot support a novelty claim solely because no close work was returned. The technical query vocabulary leaves uncovered domains visibly unresolved. Theory and Code preserve questionable differences for author explanation; this implementation includes no automated theorem prover. Claim splitting semantics depend on the configured model, while source locations, exact quotations, routing and aggregation have deterministic checks.
 
@@ -69,7 +74,7 @@ RefCopilot remains available independently; see its [README](RefCopilot/README.m
 <details>
 <summary>Historical v1 guide and demo outputs</summary>
 
-The following guide describes the original v1 workflow and its saved demonstrations. Use the v2 instructions above for the current default entry point.
+The following guide describes the original v1 workflow and its saved demonstrations. Its commands, flags and defaults apply to the original version; this checkout's pipeline script runs v2. Use the v2 instructions above for current runs.
 
 
 <p align="center">
