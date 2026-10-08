@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import json
 import os
+import runpy
 import sys
 from pathlib import Path
+
+import pytest
 
 from fact_generation.execution.nodes.fix import (
     _add_docker_extra_index_url,
@@ -25,7 +28,27 @@ from fact_generation.execution.nodes.fix import (
     _semantic_stubs_allowed,
     fix_node,
 )
+from fact_generation.execution.tools.docker import _paper_install_deps_py_text
 from util.subprocess_runner import CommandResult
+
+
+@pytest.mark.parametrize(
+    "author_file",
+    [None, "model.py", "deployment/model.py", "author_tools/install_deps.py"],
+)
+def test_generated_installer_scans_author_code_without_scanning_itself(tmp_path, author_file) -> None:
+    installer = tmp_path / "deployment" / "install_deps.py"
+    installer.parent.mkdir()
+    installer.write_text(_paper_install_deps_py_text(), encoding="utf-8")
+    if author_file is not None:
+        source = tmp_path / author_file
+        source.parent.mkdir(parents=True, exist_ok=True)
+        source.write_text("from torch_scatter import scatter_add\n", encoding="utf-8")
+
+    # Load definitions without running package installation or external services.
+    scan = runpy.run_path(str(installer))["_repo_uses_torch_scatter"]
+
+    assert scan(tmp_path) is (author_file is not None)
 
 
 def _make_fix_state(tmp_path, *, paper_root=None):
