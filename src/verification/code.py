@@ -12,7 +12,13 @@ from schemas.claim import AuthorQuestion, Claim, Contract, Evidence, EvidencePoi
 from schemas.materials import SharedMaterials
 from screening.checks import ask
 from verification.contracts import BranchResult
-from verification.theory import _covered, _paper_pointer
+from verification.theory import (
+    FULL_SUPPORT_DESCRIPTION,
+    _covered,
+    _fully_supported,
+    _paper_pointer,
+    _support_note,
+)
 
 
 def _indexed_sources(materials: SharedMaterials) -> dict[str, str]:
@@ -39,10 +45,22 @@ def _indexed_sources(materials: SharedMaterials) -> dict[str, str]:
 class CodeItem(Contract):
     file: NonEmpty
     line: int = Field(ge=1)
-    quote: str = Field(min_length=1)
+    quote: str = Field(
+        min_length=1,
+        description="Exact contiguous full source lines starting at line; preserve indentation and whitespace.",
+    )
     paper_block_id: NonEmpty
-    paper_quote: NonEmpty
-    covered: list[NonEmpty]
+    paper_quote: NonEmpty = Field(
+        description="Verbatim contiguous substring of paper_block_id's text, preserving math and whitespace."
+    )
+    covered: list[NonEmpty] = Field(
+        min_length=1,
+        description="Distinct exact condition IDs from allowed_condition_ids for this claim. No claim IDs, block IDs, or labels.",
+        json_schema_extra={"uniqueItems": True},
+    )
+    fully_supported_conditions: list[NonEmpty] = Field(
+        default_factory=list, description=FULL_SUPPORT_DESCRIPTION, json_schema_extra={"uniqueItems": True}
+    )
     direction: Literal["support", "flaw"]
     aspect: Literal["architecture", "loss", "optimizer", "hyperparameters", "data_processing", "evaluation"]
     detail: NonEmpty
@@ -73,9 +91,25 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None) -> Branc
             "hyperparameters, data processing, and evaluation protocol. Return output_schema JSON. "
             "Each item requires a specific source/config file, its one-based first line and exact contiguous "
             "line quote, plus an exact located paper quote. Explain the agreement or mismatch in detail. "
+            "covered must be a nonempty list of distinct exact strings from allowed_condition_ids, the IDs "
+            "in claim.conditions. Never use claim.id, block IDs, datasets, or metric names. Include only "
+            "conditions the item actually addresses. Omit items that cannot be tied to an allowed condition "
+            "and explain the limitation in issues; return items=[] when none can be grounded. "
+            "For support, explicitly list fully_supported_conditions only when this one item establishes "
+            "the ENTIRE condition and every relevant qualifier of the claim. Leave the list empty for "
+            "partial agreement and describe the missing parts in detail. Source presence, loading code, "
+            "or a download hook does not prove a public URL works or that all claimed data is released. "
+            "Architecture and implementation do not establish historical novelty, reported performance, "
+            "or an extension absent from the implementation. Do not fully support such conditions using "
+            "only relevant source lines. "
+            "Copy paper_quote verbatim as one contiguous substring of the selected paper block's text. "
+            "Copy quote as complete contiguous source lines starting at line, preserving indentation. "
+            "Preserve all mathematical markup, whitespace, punctuation, and spelling; do not normalize "
+            "math, paraphrase, or join disjoint passages. "
             "Only cite supplied files. Never execute or change code. Do not invent status or sufficiency fields.",
             {
                 "claim": claim.model_dump(mode="json"),
+                "allowed_condition_ids": [condition.id for condition in claim.conditions],
                 "paper_blocks": [b.model_dump() for b in materials.blocks],
                 "files": {
                     name: [{"line": i, "text": line} for i, line in enumerate(text.splitlines(), 1)]
@@ -96,6 +130,11 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None) -> Branc
         if not item.quote.strip() or lines[item.line - 1 : item.line - 1 + len(quoted_lines)] != quoted_lines:
             raise ValueError("Code evidence quote does not match its indexed source lines")
         paper = _paper_pointer(materials, item.paper_block_id, item.paper_quote)
+        covered = _covered(claim, item.covered)
+        full_support = _fully_supported(covered, item.fully_supported_conditions)
+        note = f"{item.aspect}: {item.detail}; paper {paper.locator} [{paper.key}]: {paper.quote}"
+        if item.direction == "support":
+            note = _support_note(note, item.fully_supported_conditions)
         result.evidence.append(
             Evidence(
                 source="code",
@@ -104,10 +143,10 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None) -> Branc
                     line=item.line,
                     quote=item.quote,
                 ),
-                covered=_covered(claim, item.covered),
+                covered=covered,
                 direction=item.direction,
-                sufficient=True,
-                note=f"{item.aspect}: {item.detail}; paper {paper.locator} [{paper.key}]: {paper.quote}",
+                sufficient=item.direction == "flaw" or full_support,
+                note=note,
                 concern=item.direction == "flaw",
                 overturnable=True,
             )

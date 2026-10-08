@@ -10,6 +10,8 @@ default). The deeper RefCopilot pipeline behaviour lives in
 
 from __future__ import annotations
 
+import pytest
+
 from fact_generation.refcheck.refcheck import (
     check_references,
     format_reference_check_markdown,
@@ -94,3 +96,41 @@ def test_format_markdown_includes_warnings_for_factreview() -> None:
     assert "Fake et al. 2024" in md
     assert "Real 2017" in md
     assert "@inproceedings{real2017" in md
+
+
+@pytest.mark.parametrize("suffix", [".txt", ".tex"])
+def test_text_file_contents_reach_reference_extraction(tmp_path, monkeypatch, suffix):
+    from refcopilot.models import Reference, SourceFormat
+
+    bibliography = "A. Author. A real paper title. A Conference, 2019.\n\nB. Writer. 第二篇论文. 2020."
+    paper = tmp_path / ("bibliography" + suffix)
+    paper.write_text(bibliography, encoding="utf-8-sig")
+    captured = []
+
+    def extract(text, *, source_format):
+        captured.append((text, source_format))
+        return [Reference(title="A real paper title", raw=text, source_format=source_format)]
+
+    # Exercise the actual library input path; only external extraction and
+    # retrieval are mocked, so a path-as-text regression cannot pass unnoticed.
+    monkeypatch.setattr("refcopilot.pipeline.extract_references", extract)
+    monkeypatch.setattr("refcopilot.pipeline.RefCopilotPipeline._check_all", lambda *a, **k: [])
+    result = check_references(str(paper))
+    assert result["ok"] is True
+    assert captured == [(bibliography, SourceFormat.TEXT)]
+
+
+@pytest.mark.parametrize(
+    "explicit,expected", [(None, "test-configured-key"), ("override", "override"), ("", "")]
+)
+def test_reference_adapter_forwards_configured_scholar_key(monkeypatch, explicit, expected):
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-configured-key")
+    captured = {}
+
+    def check(paper, **kwargs):
+        captured.update(kwargs)
+        return {"ok": True}
+
+    monkeypatch.setattr("refcopilot.factreview.check_references", check)
+    check_references("A. Author. A title. 2020.", api_key=explicit)
+    assert captured["api_key"] == expected

@@ -35,6 +35,7 @@ _FIGURE_REF = re.compile(
     re.IGNORECASE,
 )
 _REFERENCE_HEADING = re.compile(r"^(?:\d+[.\s]+)?(?:references|bibliography)$", re.IGNORECASE)
+_METADATA_ROW_TYPES = {"header", "footer", "page_number", "page_num", "page_footnote", "aside_text"}
 _IGNORED_DIRS = {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache"}
 _TEXT_SUFFIXES = {
     ".py",
@@ -134,6 +135,7 @@ def _row_text(row: dict[str, Any]) -> str:
     kind = str(row.get("type") or "text")
     keys = {
         "image": ("image_caption", "caption"),
+        "chart": ("chart_caption", "caption", "content"),
         "table": ("table_caption", "table_body", "text"),
         "equation": ("text", "equation"),
         "list": ("list_items", "text"),
@@ -250,8 +252,19 @@ def _blocks(markdown: str, rows: list[dict[str, Any]], issues: list[str]) -> lis
             material_rows.append((f"block_{idx}", row))
     for block_id, row in material_rows:
         kind = str(row.get("type") or "text")
+        metadata = kind in _METADATA_ROW_TYPES
         text = _row_text(row)
-        if kind not in {"text", "list", "table", "equation", "image", "title", "heading"}:
+        if not metadata and kind not in {
+            "text",
+            "list",
+            "table",
+            "equation",
+            "image",
+            "chart",
+            "ref_text",
+            "title",
+            "heading",
+        }:
             issues.append(f"{block_id}: unsupported parser row type {kind!r}; inspect content_list.json.")
         if not text:
             content_keys = set(row) - {
@@ -272,13 +285,15 @@ def _blocks(markdown: str, rows: list[dict[str, Any]], issues: list[str]) -> lis
                     f"{block_id}: parser content could not be converted to text; inspect content_list.json."
                 )
             continue
-        span = row.get("_span") or _span(markdown, text, cursor)
+        # Headers, page numbers and marginal notes may be absent from Markdown.
+        # Their repeated text must not consume a later body passage or image hash.
+        span = None if metadata else row.get("_span") or _span(markdown, text, cursor)
         if span:
             cursor = span[1]
             text = markdown[span[0] : span[1]]
-        else:
+        elif not metadata:
             issues.append(f"{block_id}: parser text could not be aligned to markdown; char span unavailable.")
-        if row.get("text_level"):
+        if row.get("text_level") and not metadata:
             parser_section = f"{block_id}: {text.lstrip('# ').strip()}"
         section = parser_section
         for number, heading in enumerate(headings, 1):
@@ -300,7 +315,9 @@ def _blocks(markdown: str, rows: list[dict[str, Any]], issues: list[str]) -> lis
         )
         if loc is None:
             issues.append(f"{block_id}: parser supplied no verifiable location.")
-        if row.get("text_level") or any(span and h.start() <= span[0] < h.end() for h in headings):
+        if not metadata and (
+            row.get("text_level") or any(span and h.start() <= span[0] < h.end() for h in headings)
+        ):
             kind = "heading"
         blocks.append(
             MaterialBlock(
@@ -350,7 +367,7 @@ def build_materials(
     paper_pdf = paper_pdf.resolve(strict=True)
     markdown_path = output_dir / "paper.md"
     content_path = output_dir / "content_list.json"
-    markdown_path.write_text(parsed.markdown, encoding="utf-8")
+    markdown_path.write_text(parsed.markdown, encoding="utf-8", newline="")
     rows = [row for row in (parsed.content_list or []) if isinstance(row, dict)]
     content_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
     issues = [parsed.warning] if parsed.warning else []
@@ -382,10 +399,11 @@ def build_materials(
     for block in blocks:
         if block.kind == "heading":
             in_bibliography = bool(_REFERENCE_HEADING.fullmatch(block.text.lstrip("# ").strip()))
-        elif in_bibliography:
+        elif block.kind == "ref_text" or (in_bibliography and block.kind in {"text", "list"}):
             material.bibliography.append(block)
 
     assets = output_dir / "assets"
+    linked_images = []
     for name, data in (parsed.image_files or {}).items():
         destination = (assets / name.replace("\\", "/")).resolve()
         if not destination.is_relative_to(assets.resolve()):
@@ -393,10 +411,15 @@ def build_materials(
             continue
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(data)
+        # Keep the parser assets and the original Markdown image URLs. Editing
+        # Markdown here would invalidate every previously derived character span.
+        linked = (output_dir / name.replace("\\", "/")).resolve()
+        if linked.is_relative_to((output_dir / "images").resolve()):
+            linked_images.append((linked, data))
 
     images_dir = output_dir / "images"
     images_dir.mkdir(exist_ok=True)
-    image_rows = [(i, row) for i, row in enumerate(rows, 1) if row.get("type") == "image"]
+    image_rows = [(i, row) for i, row in enumerate(rows, 1) if row.get("type") in {"image", "chart"}]
     if not image_rows:
         image_rows = [
             (0, {"type": "image", "caption": match.group(1), "img_path": match.group(2)})
@@ -417,22 +440,47 @@ def build_materials(
         for idx, (row_number, row) in enumerate(image_rows, 1):
             caption = _row_text(row)
             first_reference = _FIGURE_REF.search(caption)
+            caption_anchors = set()
+            for line in caption.splitlines():
+                label = _FIGURE_REF.match(line.lstrip())
+                if label:
+                    caption_anchors.update(_anchors(label.group()))
+            if not caption_anchors and first_reference:
+                caption_anchors.add(re.match(_ANCHOR_NUMBER, first_reference.group(1)).group().lower())
+            raw_captions = row.get("chart_caption") or row.get("image_caption") or row.get("caption")
+            caption_ambiguous = len(caption_anchors) > 1 or (
+                isinstance(raw_captions, list)
+                and sum(bool(_content_text(value)) for value in raw_captions) > 1
+            )
             anchor = (
-                re.match(_ANCHOR_NUMBER, first_reference.group(1)).group().lower() if first_reference else ""
+                next(iter(caption_anchors)) if len(caption_anchors) == 1 and not caption_ambiguous else ""
             )
             block = next((b for b in blocks if b.id == f"block_{row_number}"), None)
             figure = FigureMaterial(
-                id=f"figure_{idx}", anchor=anchor, caption=caption, loc=block.loc if block else None
+                id=f"figure_{idx}",
+                anchor=anchor,
+                caption=caption,
+                caption_ambiguous=caption_ambiguous,
+                loc=block.loc if block else None,
             )
             if not caption:
                 material.issues.append(f"{figure.id}: parser supplied no caption.")
-            if not anchor:
+            if len(caption_anchors) > 1:
+                material.issues.append(
+                    f"{figure.id}: parser combined captions for figure anchors {', '.join(sorted(caption_anchors))}; "
+                    "crop-to-caption assignment is ambiguous."
+                )
+            elif caption_ambiguous:
+                material.issues.append(
+                    f"{figure.id}: parser supplied multiple captions; crop-to-caption assignment is ambiguous."
+                )
+            elif not anchor:
                 material.issues.append(f"{figure.id}: caption has no figure citation anchor.")
             for body in blocks:
                 if body.kind not in {"text", "list"} or body in material.bibliography:
                     continue
                 figure.references.extend(
-                    sentence for sentence in _sentences(body) if anchor and anchor in _anchors(sentence.text)
+                    sentence for sentence in _sentences(body) if caption_anchors & _anchors(sentence.text)
                 )
             try:
                 page_number = _page(row)
@@ -459,6 +507,14 @@ def build_materials(
             except (ValueError, TypeError, OverflowError) as exc:
                 material.issues.append(f"{figure.id}: crop/printed-size input unavailable: {exc}")
             material.figures.append(figure)
+    for linked, data in linked_images:
+        if linked.exists() and linked.read_bytes() != data:
+            material.issues.append(
+                f"Skipped parser image link colliding with a generated artifact: {linked.name}"
+            )
+            continue
+        linked.parent.mkdir(parents=True, exist_ok=True)
+        linked.write_bytes(data)
     (output_dir / "materials.json").write_text(material.model_dump_json(indent=2), encoding="utf-8")
     return material
 

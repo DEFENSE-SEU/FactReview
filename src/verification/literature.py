@@ -20,6 +20,7 @@ from util.cutoff_date import (
     publication_relation,
 )
 from verification.contracts import BranchResult
+from verification.theory import _fully_supported, _support_note
 
 # Queries consist exclusively of this domain vocabulary and fixed scope words.
 # Paper-supplied author names, search operators, and URLs cannot reach search().
@@ -79,6 +80,13 @@ paper_id, purpose (citation_support / novelty / related_work / baseline), relati
 substring of a supplied passage), covered (claim condition ids), mechanism, setting,
 protocol, and note. All three comparison dimensions must describe the concrete
 paper-versus-source difference or match. Citation support applies only to cited ids.
+For citation_support with relation=supports, also return fully_supported_conditions:
+the distinct subset of covered IDs for which this one retrieved passage establishes the
+ENTIRE condition, including every relevant qualifier in the claim. Default to [] for
+partial relevance or examples. A source describing ConvE's existence cannot establish
+another method's extensibility to ConvE. Describing an architecture cannot establish its
+historical novelty. Explain uncovered parts in note. A cited statement's existence alone
+does not prove the target claim. Never infer complete support from a shared topic.
 Same mechanism AND same target setting are required for relation=same in novelty.
 Use relation=partial for partial overlap, unclear when the passage cannot resolve it.
 For each read prior paper return a novelty comparison, even when relation=different.
@@ -308,6 +316,7 @@ async def verify_literature(
         "submission_deadline": deadline.to_string(),
         "concurrent_start": concurrent_window_start(deadline).isoformat(),
         "queries": [],
+        "metadata_lookups": [],
         "excluded": [],
         "reads": [],
         "comparisons": [],
@@ -385,6 +394,56 @@ async def verify_literature(
         if reason:
             audit["excluded"].append({"paper": candidate, "reason": reason})
             continue
+        if (
+            paper_id
+            and candidate.get("cited")
+            and not str(candidate.get("title") or "").strip()
+            and len(str(candidate.get("abstract") or "").strip()) < 80
+        ):
+            lookup = getattr(searcher, "lookup_metadata", None)
+            if callable(lookup):
+                try:
+                    response = await _invoke(lookup, identifier=paper_id)
+                except Exception as exc:
+                    response = {"success": False, "error": f"{type(exc).__name__}: {exc}"}
+                if not isinstance(response, dict):
+                    response = {"success": False, "error": "invalid metadata response"}
+                audit["metadata_lookups"].append({"id": paper_id, "response": response})
+                metadata = response.get("paper")
+                returned = _identifier(metadata) if isinstance(metadata, dict) else ""
+                requested = paper_id.removeprefix("arXiv:").removeprefix("arxiv:")
+                same_id = (
+                    returned.lower() == requested.lower()
+                    if re.search(r"v\d+$", requested, re.I)
+                    else re.sub(r"v\d+$", "", returned, flags=re.I).lower() == requested.lower()
+                )
+                if response.get("success") is True and not response.get("error") and same_id:
+                    candidate = {**candidate, **metadata, "cited": True}
+                    paper_id = _identifier(candidate)
+                    reason = (
+                        "review_page"
+                        if not _safe_paper(candidate)
+                        else "submission_version"
+                        if is_self_work(candidate, materials)
+                        else "post_cutoff"
+                        if publication_relation(candidate, deadline) == "post_cutoff"
+                        else "unknown_publication_date"
+                        if publication_relation(candidate, deadline) == "unknown"
+                        else ""
+                    )
+                    if reason:
+                        audit["excluded"].append({"paper": candidate, "reason": reason})
+                        if reason == "unknown_publication_date":
+                            adequate = False
+                            result.issues.append(
+                                f"Cannot establish publication date before reading cited work {paper_id}."
+                            )
+                        continue
+                else:
+                    adequate = False
+                    result.issues.append(
+                        f"Citation metadata lookup failed or returned a different identifier: {paper_id}."
+                    )
         if (
             not str(candidate.get("title") or "").strip()
             and len(str(candidate.get("abstract") or "").strip()) < 80
@@ -553,6 +612,12 @@ async def verify_literature(
             adequate = False
             continue
         covered = list(dict.fromkeys(covered))
+        try:
+            full_support = _fully_supported(covered, comparison.get("fully_supported_conditions", []))
+        except ValueError:
+            result.issues.append("Rejected literature comparison with invalid fully_supported_conditions.")
+            adequate = False
+            continue
         note = str(comparison.get("note") or "")
         period = row["period"]
         pointer = EvidencePointer(
@@ -596,10 +661,12 @@ async def verify_literature(
                     pointer=pointer,
                     covered=covered,
                     direction="support" if relation == "supports" else "flaw",
-                    sufficient=bool(relation == "supports" and dimensions and covered),
+                    sufficient=bool(relation == "supports" and dimensions and full_support),
                     concern=relation in {"contradicts", "unclear"},
                     overturnable=True,
-                    note=note,
+                    note=_support_note(note, comparison.get("fully_supported_conditions", []))
+                    if relation == "supports"
+                    else note,
                 )
             )
         elif (

@@ -25,6 +25,7 @@ Usage (CLI)::
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -52,9 +53,16 @@ def check_references(
     """
     from refcopilot.factreview import check_references as _check  # type: ignore
 
+    # RefCopilot's TEXT input consumes literal text. Its detector recognizes a
+    # .txt/.tex path, but the pipeline does not open that path before extraction.
+    # Keep PDF/BibTeX/URL handling in the library and resolve text files here.
+    candidate = Path(paper)
+    if candidate.suffix.lower() in {".txt", ".tex"} and candidate.is_file():
+        paper = candidate.read_text(encoding="utf-8-sig")
+
     return _check(
         paper,
-        api_key=api_key,
+        api_key=api_key if api_key is not None else os.getenv("SEMANTIC_SCHOLAR_API_KEY") or None,
         output_file=output_file,
         debug=debug,
         enable_parallel=enable_parallel,
@@ -96,8 +104,7 @@ def _cli_main() -> int:
     if result["ok"]:
         print(f"References processed: {result['total_refs']}")
         print(
-            f"Errors: {result['errors']}, Warnings: {result['warnings']}, "
-            f"Unverified: {result['unverified']}"
+            f"Errors: {result['errors']}, Warnings: {result['warnings']}, Unverified: {result['unverified']}"
         )
         return 0
     print(f"ERROR: {result['error_message']}", file=sys.stderr)

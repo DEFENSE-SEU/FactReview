@@ -11,7 +11,7 @@ import pytest
 
 from llm.client import LLMConfig
 from schemas.claim import Claim, ClaimLocation, Condition
-from schemas.materials import MaterialBlock, RepositoryFile, RepositoryIndex, SharedMaterials
+from schemas.materials import MaterialBlock, PageImage, RepositoryFile, RepositoryIndex, SharedMaterials
 from screening import checks
 from verification.code import verify_code
 from verification.experiments import verify_experiments
@@ -83,6 +83,7 @@ def theory_item(**changes) -> dict:
         "block_id": "appendix",
         "quote": "By the stated assumption, x = y; therefore convergence follows.",
         "covered": ["a"],
+        "fully_supported_conditions": ["a"],
         "kind": "derivation",
         "direction": "support",
         "detail": "The derivation uses the assumption.",
@@ -100,6 +101,7 @@ def code_item(**changes) -> dict:
         "paper_block_id": "main",
         "paper_quote": "We use Adam.",
         "covered": ["a"],
+        "fully_supported_conditions": ["a"],
         "direction": "support",
         "aspect": "optimizer",
         "detail": "The configured optimizer matches the paper.",
@@ -114,6 +116,7 @@ def experiment_item(**changes) -> dict:
         "block_id": "main",
         "quote": "A test MRR is 0.4.",
         "covered": ["a"],
+        "fully_supported_conditions": ["a"],
         "detail": "The reported experiment covers A.",
         **changes,
     }
@@ -560,3 +563,358 @@ def test_repeated_quote_uses_current_block_span_then_actual_pdf_page(materials: 
 def test_branch_llm_failure_is_visible(branch, claim: Claim, materials: SharedMaterials) -> None:
     with pytest.raises(RuntimeError, match="model request failed"):
         branch(claim, materials, call=mock_response({"status": "error", "error": "offline"}))
+
+
+@pytest.mark.parametrize(
+    ("branch", "item_schema", "response"),
+    [
+        (verify_code, "CodeItem", {"items": [], "issues": ["No condition-grounded evidence."]}),
+        (verify_theory, "TheoryItem", {"items": []}),
+        (
+            verify_experiments,
+            "ExperimentItem",
+            experiments_response(issues=["No condition-grounded evidence."]),
+        ),
+    ],
+)
+def test_branch_request_exposes_exact_condition_ids_and_quote_contract(
+    branch, item_schema, response, claim, materials
+):
+    def model(**kwargs):
+        payload = json.loads(kwargs["prompt"])
+        assert payload["allowed_condition_ids"] == [condition.id for condition in claim.conditions] == ["a"]
+        assert claim.id not in payload["allowed_condition_ids"]
+        covered = payload["output_schema"]["$defs"][item_schema]["properties"]["covered"]
+        assert covered["minItems"] == 1 and covered["uniqueItems"] is True
+        assert "allowed_condition_ids" in covered["description"]
+        assert "allowed_condition_ids" in kwargs["system"]
+        assert "verbatim" in kwargs["system"] and "whitespace" in kwargs["system"]
+        if branch is verify_theory:
+            assert "from within quote" in kwargs["system"]
+        return response
+
+    result = branch(claim, materials, call=model)
+    assert result.evidence == [] and result.plans == []
+    assert result.issues == response.get("issues", [])
+
+
+@pytest.mark.parametrize("branch", [verify_code, verify_theory, verify_experiments])
+@pytest.mark.parametrize("covered", [[], ["a", "a"], ["c1"], ["A"], ["other"]])
+def test_all_branches_reject_empty_duplicate_and_invented_condition_ids(branch, covered, claim, materials):
+    if branch is verify_code:
+        response = {"items": [code_item(covered=covered)]}
+    elif branch is verify_theory:
+        response = {
+            "items": [theory_item(block_id="main", quote="Theorem 1: the method converges.", covered=covered)]
+        }
+    else:
+        response = experiments_response(items=[experiment_item(covered=covered)])
+    with pytest.raises(ValueError) as error:
+        branch(claim, materials, call=mock_response(response))
+    if covered:
+        assert f"received={covered!r}" in str(error.value)
+        assert "allowed_condition_ids=['a']" in str(error.value)
+
+
+@pytest.mark.parametrize("changed_field", [None, "quote", "step_quote"])
+def test_theory_requires_verbatim_math_and_internal_whitespace(changed_field, claim, materials):
+    quote = r"Proof. $x = \frac{ a }{ b }$; hence convergence."
+    step = r"x = \frac{ a }{ b }"
+    materials.blocks[0].text = quote
+    materials.markdown = quote
+    Path(materials.markdown_path).write_text(quote, encoding="utf-8")
+    item = theory_item(block_id="main", quote=quote, step_quote=step, main_block_id=None)
+    if changed_field:
+        item[changed_field] = item[changed_field].replace(r"\frac{ a }{ b }", r"\frac{a}{b}")
+        with pytest.raises(ValueError):
+            verify_theory(claim, materials, call=mock_response({"items": [item]}))
+    else:
+        result = verify_theory(claim, materials, call=mock_response({"items": [item]}))
+        assert result.evidence[0].pointer.quote == quote
+
+
+@pytest.fixture
+def notation_materials(materials, tmp_path, request):
+    quote = "The direction selector is lambda(r) = dim(r)."
+    materials.blocks[0].text = materials.markdown = quote
+    Path(materials.markdown_path).write_text(quote, encoding="utf-8")
+    image_path = tmp_path / "original_page_2.png"
+    with fitz.open() as pdf:
+        pdf.new_page()
+        page = pdf.new_page()
+        selector = getattr(request, "param", "dir")
+        page.insert_text((40, 50), f"The direction selector is lambda(r) = {selector}(r).")
+        pdf.save(materials.source_pdf)
+        page.get_pixmap().save(image_path)
+        materials.pages = [
+            PageImage(
+                page=2, path=str(image_path), width_points=page.rect.width, height_points=page.rect.height
+            )
+        ]
+    return materials
+
+
+@pytest.mark.parametrize(
+    ("classification", "notation_materials"),
+    [("parser_artifact", "dir"), ("uncertain", "?"), ("manuscript_issue", "dim")],
+    indirect=["notation_materials"],
+)
+def test_notation_flaws_require_original_pdf_visual_confirmation(classification, claim, notation_materials):
+    materials = notation_materials
+    calls = []
+
+    def model(**kwargs):
+        calls.append(kwargs)
+        if len(calls) == 1:
+            return {
+                "items": [
+                    theory_item(
+                        block_id="main",
+                        quote=materials.blocks[0].text,
+                        kind="notation",
+                        direction="flaw",
+                        step_quote="",
+                        main_block_id=None,
+                        detail="The direction selector appears as dim rather than dir.",
+                    )
+                ]
+            }
+        payload = json.loads(kwargs["prompt"])
+        assert kwargs["module"] == "verification.theory.notation"
+        assert kwargs["images"] == [materials.pages[0].path]
+        assert payload["page"] == 2 and payload["parsed_quote"] == materials.blocks[0].text
+        return {"classification": classification, "explanation": "Observed the printed selector on page 2."}
+
+    result = verify_theory(claim, materials, call=model)
+    assert len(calls) == 2
+    if classification == "manuscript_issue":
+        assert len(result.evidence) == 1 and result.evidence[0].direction == "flaw"
+        assert result.evidence[0].sufficient and "original PDF page 2 confirmed" in result.evidence[0].note
+    else:
+        assert result.evidence == []
+        assert any(
+            classification in issue and "Observed the printed selector" in issue for issue in result.issues
+        )
+    assert materials.blocks[0].text == "The direction selector is lambda(r) = dim(r)."
+
+
+@pytest.mark.parametrize("missing", ["no_matching_page", "missing_file"])
+def test_notation_without_original_pdf_image_stays_explicitly_unconfirmed(missing, claim, notation_materials):
+    materials = notation_materials
+    if missing == "no_matching_page":
+        materials.pages[0].page = 1
+    else:
+        Path(materials.pages[0].path).unlink()
+    calls = []
+
+    def model(**kwargs):
+        calls.append(kwargs)
+        assert len(calls) == 1, "A missing original page must not be verified against parsed text alone"
+        return {
+            "items": [
+                theory_item(
+                    block_id="main", quote=materials.blocks[0].text, kind="notation", direction="flaw"
+                )
+            ]
+        }
+
+    result = verify_theory(claim, materials, call=model)
+    assert result.evidence == []
+    assert any("original PDF page image unavailable" in issue for issue in result.issues)
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        {"classification": "yes", "explanation": "Unvalidated verdict."},
+        {"status": "error", "error": "offline"},
+    ],
+)
+def test_notation_visual_failure_cannot_produce_deciding_flaw(response, claim, notation_materials):
+    def model(**kwargs):
+        if kwargs["module"] == "verification.theory.notation":
+            return response
+        return {
+            "items": [
+                theory_item(
+                    block_id="main",
+                    quote=notation_materials.blocks[0].text,
+                    kind="notation",
+                    direction="flaw",
+                )
+            ]
+        }
+
+    result = verify_theory(claim, notation_materials, call=model)
+    assert result.evidence == []
+    assert any("original PDF check failed" in issue for issue in result.issues)
+
+
+async def test_rejected_plan_preserves_only_validated_observations(claim, materials, tmp_path):
+    from schemas.claim import EvidenceNeed
+    from verification.contracts import RejectedPlan
+    from verification.dispatch import verify_claims
+
+    candidate = plan_candidate()
+    candidate["targets"][0]["reported"]["token"] = "0.999"
+    response = experiments_response(items=[experiment_item()], plans=[candidate])
+    with pytest.raises(RejectedPlan, match="token is absent") as caught:
+        verify_experiments(claim, materials, call=mock_response(response))
+    assert len(caught.value.observations.evidence) == 1
+    assert caught.value.observations.plans == []
+
+    claim.needs = [EvidenceNeed.EXPERIMENTS]
+    result = await verify_claims(
+        [claim],
+        materials,
+        tmp_path / "dispatch",
+        branches={
+            EvidenceNeed.EXPERIMENTS: lambda c, m: verify_experiments(c, m, call=mock_response(response))
+        },
+    )
+    assert result.plans == []
+    assert result.claims[0].evidence == caught.value.observations.evidence
+    assert any("Execution plan rejected" in issue and "token is absent" in issue for issue in result.issues)
+
+
+def support_response(branch, **changes):
+    if branch is verify_code:
+        return {"items": [code_item(**changes)]}
+    if branch is verify_theory:
+        return {
+            "items": [
+                theory_item(
+                    block_id="main",
+                    quote="A test MRR is 0.4.",
+                    step_quote="MRR is 0.4",
+                    main_block_id=None,
+                    **changes,
+                )
+            ]
+        }
+    return experiments_response(items=[experiment_item(**changes)])
+
+
+@pytest.mark.parametrize("branch", [verify_code, verify_theory, verify_experiments])
+@pytest.mark.parametrize("full", [None, [], ["a"]])
+def test_positive_evidence_requires_explicit_full_condition_support(branch, full, claim, materials):
+    from assessment.rules import assess_claim
+
+    # Include a checkable derivation marker without changing the quoted experiment number.
+    if branch is verify_theory:
+        materials.blocks[0].text = materials.markdown = "Therefore A test MRR is 0.4."
+        Path(materials.markdown_path).write_text(materials.markdown, encoding="utf-8")
+    response = support_response(branch, fully_supported_conditions=full or [])
+    if branch is verify_theory:
+        response["items"][0]["quote"] = materials.markdown
+    if full is None:
+        del response["items"][0]["fully_supported_conditions"]
+
+    def model(**kwargs):
+        assert "fully_supported_conditions" in kwargs["system"] and "ENTIRE" in kwargs["system"]
+        return response
+
+    result = branch(claim, materials, call=model)
+    assert len(result.evidence) == 1
+    evidence = result.evidence[0]
+    assert evidence.pointer.quote and evidence.direction == "support"
+    assert evidence.sufficient is bool(full)
+    assert f"fully_supported_conditions={full or []!r}" in evidence.note
+    claim.evidence = result.evidence
+    assert assess_claim(claim).status == ("supported" if full else "unverified")
+
+
+@pytest.mark.parametrize("branch", [verify_code, verify_theory, verify_experiments])
+@pytest.mark.parametrize("full", [["foreign"], ["a", "a"], "a", None])
+def test_fully_supported_conditions_must_be_a_distinct_covered_subset(branch, full, claim, materials):
+    response = support_response(branch, fully_supported_conditions=full)
+    with pytest.raises(ValueError, match="fully_supported_conditions"):
+        branch(claim, materials, call=mock_response(response))
+
+
+@pytest.mark.parametrize("branch", [verify_code, verify_theory, verify_experiments])
+def test_full_support_for_only_one_covered_condition_is_insufficient(branch, claim, materials):
+    claim.conditions.append(Condition(id="b", dataset="B", metric="MRR"))
+    response = support_response(branch, covered=["a", "b"], fully_supported_conditions=["a"])
+    if branch is verify_theory:
+        materials.blocks[0].text = materials.markdown = "Therefore A test MRR is 0.4."
+        Path(materials.markdown_path).write_text(materials.markdown, encoding="utf-8")
+        response["items"][0]["quote"] = materials.markdown
+    result = branch(claim, materials, call=mock_response(response))
+    assert result.evidence[0].covered == ["a", "b"]
+    assert not result.evidence[0].sufficient
+
+
+def test_source_presence_does_not_establish_release_url_and_all_data_availability(claim, materials):
+    from assessment.rules import assess_claim
+
+    claim.text = "The source code and all datasets are available at the stated GitHub URL."
+    claim.conditions = [
+        Condition(
+            id="a", settings={"artifact": "source code and all datasets", "url": "https://example.org/repo"}
+        )
+    ]
+    paper_quote = claim.text
+    materials.blocks[0].text = materials.markdown = paper_quote
+    Path(materials.markdown_path).write_text(paper_quote, encoding="utf-8")
+    code_quote = "load_dataset('A')"
+    source = Path(materials.repository.root) / "eval.py"
+    source.write_text(code_quote + "\n", encoding="utf-8")
+    next(f for f in materials.repository.files if f.path == "eval.py").sha256 = hashlib.sha256(
+        source.read_bytes()
+    ).hexdigest()
+    detail = (
+        "The source is present, but its presence does not verify the URL or availability of all datasets."
+    )
+    result = verify_code(
+        claim,
+        materials,
+        call=mock_response(
+            {
+                "items": [
+                    code_item(
+                        quote=code_quote,
+                        paper_quote=paper_quote,
+                        fully_supported_conditions=[],
+                        detail=detail,
+                    )
+                ]
+            }
+        ),
+    )
+    assert not result.evidence[0].sufficient and detail in result.evidence[0].note
+    claim.evidence = result.evidence
+    assert assess_claim(claim).status == "unverified"
+
+
+@pytest.mark.parametrize("branch", [verify_code, verify_theory])
+def test_architecture_evidence_does_not_establish_historical_novelty(branch, claim, materials):
+    from assessment.rules import assess_claim
+
+    claim.text = "COMPGCN is a novel framework using entity-relation composition."
+    claim.conditions = [
+        Condition(id="a", description="Historical novelty and entity-relation composition architecture.")
+    ]
+    paper_quote = "By composition, message = phi(node, relation)."
+    materials.blocks[0].text = materials.markdown = paper_quote
+    Path(materials.markdown_path).write_text(paper_quote, encoding="utf-8")
+    response = support_response(branch, fully_supported_conditions=[])
+    if branch is verify_theory:
+        response["items"][0].update(quote=paper_quote, step_quote="message = phi(node, relation)")
+    else:
+        code_quote = "message = compose(node, relation)"
+        source = Path(materials.repository.root) / "eval.py"
+        source.write_text(code_quote + "\n", encoding="utf-8")
+        next(f for f in materials.repository.files if f.path == "eval.py").sha256 = hashlib.sha256(
+            source.read_bytes()
+        ).hexdigest()
+        response["items"][0].update(quote=code_quote, paper_quote=paper_quote, aspect="architecture")
+
+    def model(**kwargs):
+        assert "historical novelty" in kwargs["system"]
+        return response
+
+    result = branch(claim, materials, call=model)
+    assert result.evidence and not result.evidence[0].sufficient
+    claim.evidence = result.evidence
+    assert assess_claim(claim).status == "unverified"

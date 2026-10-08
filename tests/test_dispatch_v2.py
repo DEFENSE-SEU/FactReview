@@ -9,6 +9,28 @@ from verification.contracts import BranchResult
 from verification.dispatch import verify_claims
 
 
+@pytest.mark.parametrize(
+    "branch,coverage", [(EvidenceNeed.CODE, "d1"), (EvidenceNeed.EXPERIMENTS, "foreign")]
+)
+async def test_rejected_plan_cannot_bypass_branch_or_coverage_checks(branch, coverage, tmp_path):
+    from verification.contracts import RejectedPlan
+
+    evidence = Evidence(
+        source="paper_internal",
+        pointer=EvidencePointer(locator="paper.pdf", page=1, quote="Claim"),
+        covered=[coverage],
+        direction="support",
+        sufficient=True,
+    )
+
+    def reject(c, m):
+        raise RejectedPlan("Invalid proposed target", BranchResult(evidence=[evidence]))
+
+    result = await verify_claims([claim([branch])], materials(tmp_path), tmp_path, branches={branch: reject})
+    assert result.plans == [] and result.claims[0].evidence == []
+    assert result.issues and result.claims[0].questions
+
+
 def claim(needs):
     return Claim(
         id="c1",
