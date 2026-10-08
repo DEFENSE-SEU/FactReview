@@ -33,6 +33,7 @@ from verification.experiment_catalog import (
     resolve_cell,
     resolve_source,
 )
+from verification.prose_numbers import bind_pair, resolve_number, transition_endpoints
 from verification.theory import (
     FULL_SUPPORT_DESCRIPTION,
     _covered,
@@ -117,25 +118,40 @@ def _target_ambiguity(claim: Claim, target: PlanTarget, value: float) -> str:
     return ""
 
 
+_UNIT_ALIASES = {
+    "percent": "%",
+    "percentage": "%",
+    "second": "s",
+    "seconds": "s",
+    "sec": "s",
+    "millisecond": "ms",
+    "milliseconds": "ms",
+    "microsecond": "us",
+    "microseconds": "us",
+    "µs": "us",
+    "μs": "us",
+    "minute": "min",
+    "minutes": "min",
+    "hour": "h",
+    "hours": "h",
+}
+
+
+def _canonical_unit(value: str) -> str | None:
+    value = value.strip().casefold()
+    return _UNIT_ALIASES.get(value, value if value in _UNIT_ALIASES.values() else None)
+
+
+def _known_unit_setting(key: str, value: str) -> bool:
+    return key in {"unit", "units"} and _canonical_unit(value) is not None
+
+
+def _metric_name_format(value: str) -> str:
+    return re.sub(r"\s*/\s*", "/", re.sub(r"\s+", " ", value.strip())).casefold()
+
+
 def _comparison_units(number: PaperNumber, metric: str) -> set[str]:
     """Retain explicit scales; do not guess a conversion for unlabelled values."""
-    aliases = {
-        "percent": "%",
-        "percentage": "%",
-        "second": "s",
-        "seconds": "s",
-        "sec": "s",
-        "millisecond": "ms",
-        "milliseconds": "ms",
-        "microsecond": "us",
-        "microseconds": "us",
-        "µs": "us",
-        "μs": "us",
-        "minute": "min",
-        "minutes": "min",
-        "hour": "h",
-        "hours": "h",
-    }
     units = ["%"] if number.token.endswith("%") else []
     # A narrowed value context may omit the table header. Keep every explicit
     # scale for this metric from the grounded full quote.
@@ -164,7 +180,7 @@ def _comparison_units(number: PaperNumber, metric: str) -> set[str]:
         "at",
     }
     units.extend(unit for unit in suffixes if unit.casefold() not in connective_words)
-    return {aliases.get(unit.casefold(), unit) for unit in units}
+    return {_canonical_unit(unit) or unit for unit in units}
 
 
 class ExperimentItem(Contract):
@@ -296,6 +312,9 @@ class ScopeComparison(Contract):
     bridges: list[SourceBridge] = Field(default_factory=list)
     left_catalog_id: str = ""
     right_catalog_id: str = ""
+    left_number_id: str = ""
+    right_number_id: str = ""
+    difference_number_id: str = ""
     expected_left: PaperNumber | None = None
     expected_right: PaperNumber | None = None
 
@@ -376,6 +395,38 @@ class CatalogScopeReview(Contract):
     items: list[CatalogItemScope]
 
 
+class CellOperand(Contract):
+    kind: Literal["cell"]
+    cell_id: NonEmpty
+    label_cell_id: NonEmpty
+
+
+class ProseOperand(Contract):
+    kind: Literal["prose"]
+    number_id: NonEmpty
+
+
+class CatalogComparisonV2(Contract):
+    case_id: NonEmpty
+    left: CellOperand | ProseOperand = Field(discriminator="kind")
+    right: CellOperand | ProseOperand = Field(discriminator="kind")
+    relation: Literal["gt", "ge", "lt", "le", "eq", "difference"]
+    bridges: list[SourceBridge] = Field(default_factory=list)
+    context_source_ids: list[NonEmpty] = Field(default_factory=list)
+    difference_number_id: str = ""
+    difference_mode: Literal["absolute", "relative_percent", "percentage_points", "unresolved"] = "unresolved"
+
+
+class CatalogItemScopeV2(CatalogItemScope):
+    comparisons: list[CatalogComparisonV2] = Field(default_factory=list)
+
+
+class CatalogScopeReviewV2(Contract):
+    schema_version: Literal["catalog-v2"]
+    conditions: list[CatalogConditionScope]
+    items: list[CatalogItemScopeV2]
+
+
 def _field(condition, path):
     if path in {"dataset", "metric"}:
         return getattr(condition, path)
@@ -439,7 +490,7 @@ def _expected_number(claim, condition_id, token, materials):
     raise ValueError("Expected endpoint is absent from this condition's original source")
 
 
-def _asserted_endpoints(claim, condition):
+def _asserted_endpoints(claim, condition, materials=None):
     """Read explicit endpoint assertions; table observations cannot supply their own targets."""
     token = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?%?"
     pair = re.compile(rf"(?<![\w.])({token})\s+vs\.?\s+(?:baseline\s+)?({token})(?![\w%]|\.\d)", re.I)
@@ -456,16 +507,41 @@ def _asserted_endpoints(claim, condition):
         raise ValueError("Claim endpoint assertion is ambiguous for this condition")
     if direct and candidates and direct[0] != candidates[0]:
         raise ValueError("Condition description and claim text assert conflicting endpoints")
-    if direct or candidates:
-        return (direct or candidates)[0]
-    return None
+    explicit = (direct or candidates or [None])[0]
+    named = transition_endpoints(claim, condition, materials) if materials is not None else None
+    if explicit and named and explicit != named:
+        raise ValueError("Claim asserts conflicting bare and named-setting endpoints")
+    return explicit or named
+
+
+def _occurrence_number(catalog, identifier, materials):
+    record = resolve_number(catalog.get("numbers", {}), identifier, materials)
+    return PaperNumber(**{key: record[key] for key in ("block_id", "quote", "token")})
+
+
+def _occurrence_units(catalog, identifier, materials):
+    record = resolve_number(catalog.get("numbers", {}), identifier, materials)
+    suffix = re.sub(r"\s+", " ", record["unit_suffix"].casefold())
+    if suffix == "percentage points":
+        suffix = "pp"
+    return {_canonical_unit(suffix) or suffix} if suffix else set()
 
 
 def _catalog_operand(item, side, scope, case, condition, materials, catalog):
-    cell_id = getattr(item, f"{side}_cell_id")
+    if isinstance(item, CatalogComparisonV2):
+        selector = getattr(item, side)
+        if isinstance(selector, ProseOperand):
+            number = _occurrence_number(catalog, selector.number_id, materials)
+            role = "subject" if side == "left" else "comparator"
+            setting = getattr(scope, f"{role}_setting")
+            label = case["settings"].get(setting, getattr(scope, role))
+            return number, label, None, ""
+        cell_id, label_id = selector.cell_id, selector.label_cell_id
+    else:
+        cell_id, label_id = getattr(item, f"{side}_cell_id"), getattr(item, f"{side}_label_cell_id")
     if cell_id:
         cell = resolve_cell(catalog, cell_id, materials)
-        label = resolve_cell(catalog, getattr(item, f"{side}_label_cell_id"), materials)
+        label = resolve_cell(catalog, label_id, materials)
         if cell["cell_type"] != "number" or label["cell_type"] != "label":
             raise ValueError("Numerical and role label cell IDs have different required types")
         if cell["table_id"] != label["table_id"] or not (
@@ -502,7 +578,7 @@ def _catalog_operand(item, side, scope, case, condition, materials, catalog):
 def _catalog_item(row, claim, materials, catalog, scope):
     condition = next(c for c in claim.conditions if c.id == row.condition_id)
     comparisons = []
-    endpoints = _asserted_endpoints(claim, condition)
+    endpoints = _asserted_endpoints(claim, condition, materials)
     for item in row.comparisons:
         case = resolve_case(catalog, condition.id, item.case_id)
         left = _catalog_operand(item, "left", scope, case, condition, materials, catalog)
@@ -517,11 +593,29 @@ def _catalog_item(row, claim, materials, catalog, scope):
                 ]
             )
         )
-        passages = [_catalog_passage(catalog, value, materials, condition.id) for value in source_ids]
+        passages = [
+            _catalog_passage(catalog, value, materials, condition.id) for value in source_ids if value
+        ]
+        for operand in (left, right):
+            if not operand[3]:
+                passages.append(ScopePassage(block_id=operand[0].block_id, quote=operand[0].quote))
         difference = None
-        if item.difference_source_id:
+        identifiers = {}
+        if isinstance(item, CatalogComparisonV2):
+            for side in ("left", "right"):
+                selector = getattr(item, side)
+                key = f"{side}_catalog_id" if isinstance(selector, CellOperand) else f"{side}_number_id"
+                identifiers[key] = (
+                    selector.cell_id if isinstance(selector, CellOperand) else selector.number_id
+                )
+            identifiers["difference_number_id"] = item.difference_number_id
+            if item.difference_number_id:
+                difference = _occurrence_number(catalog, item.difference_number_id, materials)
+        elif item.difference_source_id:
             source = _catalog_passage(catalog, item.difference_source_id, materials, condition.id)
             difference = PaperNumber(**source.model_dump(), token=item.difference_token)
+        if not isinstance(item, CatalogComparisonV2):
+            identifiers.update(left_catalog_id=item.left_cell_id, right_catalog_id=item.right_cell_id)
         comparisons.append(
             ScopeComparison(
                 case=case["id"],
@@ -538,8 +632,7 @@ def _catalog_item(row, claim, materials, catalog, scope):
                 right_cell=right[2],
                 context=passages,
                 bridges=item.bridges,
-                left_catalog_id=item.left_cell_id,
-                right_catalog_id=item.right_cell_id,
+                **identifiers,
                 expected_left=_expected_number(
                     claim,
                     condition.id,
@@ -590,8 +683,71 @@ def _own_table_reference(quote, table_name):
     return False
 
 
+def _prose_bindings(claim, condition, scope, comparison, materials, catalog):
+    if (
+        catalog is None
+        or not comparison.left_number_id
+        or not comparison.right_number_id
+        or comparison.left_cell is not None
+        or comparison.right_cell is not None
+        or comparison.left_catalog_id
+        or comparison.right_catalog_id
+        or comparison.bridges
+    ):
+        raise ValueError("Prose occurrence pairs require two original number IDs without table selectors")
+    for side in ("left", "right"):
+        identifier = getattr(comparison, f"{side}_number_id")
+        if getattr(comparison, side) != _occurrence_number(catalog, identifier, materials):
+            raise ValueError("Prose operand differs from its original numbered occurrence")
+    transition = transition_endpoints(claim, condition, materials) is not None
+    settings = {**condition.settings, **comparison.settings}
+    if any(
+        key in {"unit", "units"} and _canonical_unit(str(value)) is None for key, value in settings.items()
+    ):
+        raise ValueError("Unknown condition unit remains unresolved for prose number occurrences")
+    bind_pair(
+        materials,
+        catalog.get("numbers", {}),
+        comparison.left_number_id,
+        comparison.right_number_id,
+        dataset=condition.dataset,
+        metric=condition.metric,
+        settings=settings,
+        left_label=comparison.left_label,
+        right_label=comparison.right_label,
+        transition=transition,
+    )
+    roles = {key: "shared" for key in settings}
+    if transition:
+        if scope.subject_setting != "method" or scope.comparator_setting != "method":
+            raise ValueError("Named-setting transition must retain the same original method")
+        after, before = transition_endpoints(claim, condition, materials)
+        direction = "decrease" if float(after.rstrip("%")) < float(before.rstrip("%")) else "increase"
+        if scope.relation not in {"lt" if direction == "decrease" else "gt", "difference"}:
+            raise ValueError("Scope relation weakens or changes the original transition direction")
+        if scope.relation == "difference" and scope.difference_direction != direction:
+            raise ValueError("Scope difference direction changes the original transition assertion")
+        roles.update(from_setting="comparator", to_setting="subject")
+    else:
+        for role in ("subject", "comparator"):
+            key = getattr(scope, f"{role}_setting")
+            if key:
+                roles[key] = role
+    if any(key not in roles or roles[key] != role for key, role in scope.setting_scopes.items()):
+        raise ValueError("Prose setting scope conflicts with its directly named operand")
+    return {
+        role: {
+            **{key: str(settings[key]) for key, owner in roles.items() if owner in {role, "shared"}},
+            "role": f"settings.{getattr(scope, f'{role}_setting')}",
+        }
+        for role in ("subject", "comparator")
+    }
+
+
 def _bridge_bindings(claim, condition, scope, comparison, materials, catalog):
     """Validate exact field/source/table edges before granting contextual bindings."""
+    if comparison.left_number_id or comparison.right_number_id:
+        return _prose_bindings(claim, condition, scope, comparison, materials, catalog)
     result = {"subject": {}, "comparator": {}}
     for role in result:
         key = getattr(scope, f"{role}_setting")
@@ -671,7 +827,9 @@ def _bridge_bindings(claim, condition, scope, comparison, materials, catalog):
                     )
                 if not _has_label(bridge.paper_label, str(value)):
                     raise ValueError("Metric alias does not identify the original quantity")
-                if str(value) != bridge.paper_label and str(value) not in bridge.explanation:
+                if str(value) != bridge.paper_label and not _has_label(
+                    _metric_name_format(str(value)), _metric_name_format(bridge.explanation)
+                ):
                     raise ValueError("Composite metric needs an explicit explanation of its complete name")
                 if not any(
                     _has_label(condition.dataset, source.quote)
@@ -780,6 +938,10 @@ def _side_settings(
         if setting_scope != "shared" and setting_scope != role:
             continue
         selected = selected_settings[key] if isinstance(value, list) else str(value)
+        if _known_unit_setting(key, selected):
+            # Each operand's actual explicit scale is checked below after the
+            # exact table/prose binding, including conflicting unit fields.
+            continue
         if bridges and bridges[role].get(key) == selected:
             explicit_axes = setup_axes if setting_scope != "shared" else table_labels
             if (
@@ -806,9 +968,32 @@ def _claim_passages(claim, condition_id):
             yield ref.source_block_id, ref.source_quote
 
 
-def _numeric_scope_check(claim, condition, scope, decision, materials, *, catalog=None) -> list[str]:
+def _numeric_scope_check(
+    claim,
+    condition,
+    scope,
+    decision,
+    materials,
+    *,
+    catalog=None,
+    mode: Literal["support", "concern"] = "support",
+    require_comparison: bool = False,
+) -> list[str]:
+    """Bind every cited pair; support additionally proves all cases and the relation."""
     reasons = []
     if scope.relation == "none":
+        if _asserted_endpoints(claim, condition, materials):
+            reasons.append("An original endpoint assertion requires a grounded numerical comparison")
+        if require_comparison or (
+            mode == "concern"
+            and (
+                scope.comparator
+                or decision.comparisons
+                or decision.comparison_objects != "not_comparative"
+                or any(key in condition.settings for key in ("reference", "control"))
+            )
+        ):
+            reasons.append("This statistical concern requires an explicit numerical comparison relation")
         if scope.assertion in {"controlled_comparison", "causal_attribution"} and condition.metric:
             reasons.append("A comparative metric condition needs an explicit numerical relation")
         if decision.comparison_objects in {"unmatched", "unresolved"}:
@@ -821,8 +1006,8 @@ def _numeric_scope_check(claim, condition, scope, decision, materials, *, catalo
     if decision.comparison_objects != "matched":
         reasons.append("The claimed subject/comparator identity has not been established")
     expected_cases = set(scope.required_cases or [""])
-    # Explicit multi-setting conditions must be covered as written. A reviewer
-    # cannot silently omit a task with a tie or opposite result.
+    # Complete support covers every setting. A concern can identify one affected
+    # setting, while every selected case must still belong to this condition.
     dimensions = {
         key: [str(value) for value in values]
         for key, values in condition.settings.items()
@@ -831,8 +1016,11 @@ def _numeric_scope_check(claim, condition, scope, decision, materials, *, catalo
     expected_settings = set(product(*dimensions.values())) if dimensions else set()
     observed_settings = []
     cases = [item.case for item in decision.comparisons]
-    if len(cases) != len(set(cases)) or set(cases) != expected_cases:
-        reasons.append("Numerical checks must cover each required comparison case exactly once")
+    if mode == "support":
+        if len(cases) != len(set(cases)) or set(cases) != expected_cases:
+            reasons.append("Numerical checks must cover each required comparison case exactly once")
+    elif not cases or len(cases) != len(set(cases)) or not set(cases).issubset(expected_cases):
+        reasons.append("A statistical concern needs distinct, grounded comparison cases from this condition")
     for comparison in decision.comparisons:
         try:
             bridges = _bridge_bindings(claim, condition, scope, comparison, materials, catalog)
@@ -876,6 +1064,8 @@ def _numeric_scope_check(claim, condition, scope, decision, materials, *, catalo
                 raise ValueError("Numerical comparison changes the claimed metric")
             for key, value in condition.settings.items():
                 candidates = [settings[key]] if isinstance(value, list) else [str(value)]
+                if all(_known_unit_setting(key, candidate) for candidate in candidates):
+                    continue
                 if not all(_has_label(candidate, context) for candidate in candidates) and not any(
                     key in value for value in bridges.values()
                 ):
@@ -929,6 +1119,11 @@ def _numeric_scope_check(claim, condition, scope, decision, materials, *, catalo
                     values.append(value)
                     continue
                 local = number.value_context or number.quote
+                if comparison.left_number_id and comparison.right_number_id:
+                    # _prose_bindings already matched exact occurrence offsets to
+                    # the directly scoped subject-predicate grammar on both sides.
+                    values.append(value)
+                    continue
                 if (
                     local not in number.quote
                     or not _has_label(label, local)
@@ -947,13 +1142,24 @@ def _numeric_scope_check(claim, condition, scope, decision, materials, *, catalo
                     raise ValueError("A numerical side contains multiple unbound values")
                 values.append(value)
             units = [
-                _comparison_units(number, bridges[role].get("metric", comparison.metric_label))
-                for number, role in ((comparison.left, "subject"), (comparison.right, "comparator"))
+                _occurrence_units(catalog, identifier, materials)
+                if identifier
+                else _comparison_units(number, bridges[role].get("metric", comparison.metric_label))
+                for number, role, identifier in (
+                    (comparison.left, "subject", comparison.left_number_id),
+                    (comparison.right, "comparator", comparison.right_number_id),
+                )
             ]
             if any(len(unit) > 1 for unit in units) or units[0] != units[1]:
                 raise ValueError("Comparison units/scales do not match")
+            for key, value in condition.settings.items():
+                expected = settings[key] if isinstance(value, list) else str(value)
+                if _known_unit_setting(key, expected) and any(
+                    actual != {_canonical_unit(expected)} for actual in units
+                ):
+                    raise ValueError(f"Explicit operand units do not match condition setting {key}")
             left, right = values
-            asserted = _asserted_endpoints(claim, condition)
+            asserted = _asserted_endpoints(claim, condition, materials)
             if asserted and values != [float(token.rstrip("%")) for token in asserted]:
                 raise ValueError(
                     "Selected values do not match the current condition's asserted from/to endpoints"
@@ -988,7 +1194,14 @@ def _numeric_scope_check(claim, condition, scope, decision, materials, *, catalo
                     for block_id, quote in _claim_passages(claim, condition.id)
                 ):
                     raise ValueError("Expected difference is not grounded in this claim's own source quote")
-                difference_units = _comparison_units(comparison.difference, comparison.metric_label)
+                if comparison.difference_number_id:
+                    if comparison.difference != _occurrence_number(
+                        catalog, comparison.difference_number_id, materials
+                    ):
+                        raise ValueError("Expected difference differs from its original numbered occurrence")
+                    difference_units = _occurrence_units(catalog, comparison.difference_number_id, materials)
+                else:
+                    difference_units = _comparison_units(comparison.difference, comparison.metric_label)
                 if scope.difference_direction != "signed" and (
                     not scope.difference_direction_quote
                     or not any(
@@ -1025,20 +1238,31 @@ def _numeric_scope_check(claim, condition, scope, decision, materials, *, catalo
                     "le": left <= right,
                     "eq": left == right,
                 }[relation]
-            if not holds:
+            if mode == "support" and not holds:
                 raise ValueError(f"Numerical relation {relation} is false for {left} and {right}")
         except ValueError as exc:
             reasons.append(f"{comparison.case or condition.id}: {exc}")
-    if dimensions and (
-        len(observed_settings) != len(set(observed_settings)) or set(observed_settings) != expected_settings
-    ):
-        reasons.append("Numerical checks do not cover every joint combination of listed condition settings")
+    if dimensions:
+        observed = set(observed_settings)
+        if mode == "support" and (len(observed_settings) != len(observed) or observed != expected_settings):
+            reasons.append(
+                "Numerical checks do not cover every joint combination of listed condition settings"
+            )
+        elif mode == "concern" and (
+            len(observed_settings) != len(observed) or not observed.issubset(expected_settings)
+        ):
+            reasons.append("Statistical comparisons select duplicate or unknown joint condition settings")
     return reasons
 
 
 def _decode_scope(response, claim, materials, output, catalog):
     """One invalid condition keeps its own evidence unconfirmed; other conditions survive."""
-    catalog_mode = response.get("schema_version") == "catalog-v1"
+    version = response.get("schema_version")
+    if "schema_version" in response and (
+        not isinstance(version, str) or version not in {"catalog-v1", "catalog-v2"}
+    ):
+        raise ValueError("Unknown experiment scope schema_version")
+    catalog_mode = version in {"catalog-v1", "catalog-v2"}
     if (
         set(response) - {"schema_version", "conditions", "items"}
         or not isinstance(response.get("conditions"), list)
@@ -1068,10 +1292,21 @@ def _decode_scope(response, claim, materials, output, catalog):
                 row.required_cases = [case["id"] for case in catalog["conditions"][row.condition_id]["cases"]]
                 if not row.required_cases:
                     raise ValueError("Condition has no finite catalog cases")
+                condition = allowed[row.condition_id]
+                roles = _condition_roles(condition, row)
+                if transition_endpoints(claim, condition, materials) is not None:
+                    if (
+                        roles["comparator_setting"] not in {"", "method"}
+                        or roles["subject_setting"] != "method"
+                    ):
+                        raise ValueError(
+                            "Named-setting transition conflicts with the explicit comparison roles"
+                        )
+                    roles["comparator_setting"] = "method"
                 row = ConditionScope(
                     **row.model_dump(),
-                    **_condition_roles(allowed[row.condition_id], row),
-                    endpoint_required=bool(_asserted_endpoints(claim, allowed[row.condition_id])),
+                    **roles,
+                    endpoint_required=bool(_asserted_endpoints(claim, condition, materials)),
                 )
                 for role in ("subject", "comparator"):
                     key = getattr(row, f"{role}_setting")
@@ -1097,7 +1332,12 @@ def _decode_scope(response, claim, materials, output, catalog):
     for position, raw in enumerate(response["items"]):
         identifier = raw.get("condition_id") if isinstance(raw, dict) else None
         try:
-            row = (CatalogItemScope if catalog_mode else ItemScope).model_validate(raw)
+            item_schema = (
+                CatalogItemScopeV2
+                if version == "catalog-v2"
+                else (CatalogItemScope if catalog_mode else ItemScope)
+            )
+            row = item_schema.model_validate(raw)
             key = (row.item_index, row.condition_id)
             if key not in expected or key in decisions:
                 raise ValueError("Scope candidate/condition pair is unknown or duplicated")
@@ -1133,7 +1373,7 @@ def _scope_review(claim, materials, output, *, call, catalog):
         "paper_blocks": [block.model_dump() for block in materials.blocks],
         "candidate_items": [item.model_dump() for item in output.items],
         "catalog": catalog_prompt(catalog),
-        "output_schema": CatalogScopeReview.model_json_schema(),
+        "output_schema": CatalogScopeReviewV2.model_json_schema(),
     }
     audit = {"claim_id": claim.id, "input": payload}
     stats = run_stats.stats_path()
@@ -1143,8 +1383,8 @@ def _scope_review(claim, materials, output, *, call, catalog):
             "Independently audit experiment candidate applicability and ENTIRE condition support. "
             "Do not defer to candidate detail or fully_supported_conditions. Return output_schema JSON, "
             "one conditions entry per claim condition and exactly one items entry per candidate item_index/covered condition. "
-            "Use schema_version catalog-v1. Keep condition IDs exactly as supplied. Leave claim_quote empty: its existing identity is retained. "
-            "Sources, cells and cases are program-generated choices. Source/cell arrays follow source_fields/cell_fields in catalog; axes are shared by ID. "
+            "Use schema_version catalog-v2. Keep condition IDs exactly as supplied. Leave claim_quote empty: its existing identity is retained. "
+            "Sources, cells, numbers and cases are program-generated choices. Source/cell/number arrays follow source_fields/cell_fields/number_fields in catalog; axes and original sentences are shared by ID. Number ordinal is its one-based position among numeric occurrences in that sentence. "
             "Distinguish descriptive reports (reported scores, hardware or duration) from controlled comparisons, "
             "causal component attribution and statistical generalization. A leaderboard score/gap alone does not "
             "assert matched training data/budget/tuning or causal superiority. Missing ablations apply only to "
@@ -1155,9 +1395,9 @@ def _scope_review(claim, materials, output, *, call, catalog):
             "quantifier is established. A tie cannot establish strict improvement/degradation. A lower-ranked "
             "baseline cannot establish a comparison against the top system. Record unresolved_qualifiers explicitly. "
             "For numerical comparisons choose case_id from the current condition, one comparison per supplied case; do not invent case names or settings. "
-            "Choose left/right_cell_id for numbers and left/right_label_cell_id on their exact table axes. Do not count rows or copy tables. "
-            "For a prose numerical observation instead choose left/right_source_id, its exact token and an exact value_context substring identifying only that operand's value, role, dataset, metric and settings. "
-            "Each operand must use exactly one complete selector (cell+label cell, or prose source+token+value_context); leave the other selector empty. HTML tables require cell selectors. "
+            "Each left/right operand is either {kind:cell, cell_id, label_cell_id} on its exact table axis or {kind:prose, number_id} from the original numeric occurrence catalog. Do not copy numbers, offsets, contexts or tables. HTML tables require cell selectors. "
+            "For prose choose the directly named method's result occurrence, with a shared dataset/split prefix governing both predicates in that same sentence; ambiguous scope and contrastive role mentions remain unverified. "
+            "A named same-method transition requires original from_setting/to_setting fields and its exact from/to assertion: left selects the to-setting result, right the from-setting result. Preserve these setting scopes. "
             "left is the claim subject; right is its comparator. Structured role settings are derived from the condition by the program; do not emit subject_setting/comparator_setting. "
             "Leave subject/comparator empty when existing model/method/ablation and comparison/baseline fields identify them. Otherwise provide exact role phrases from the claim source. A training dataset or procedure is a separate setup qualifier. "
             "An extended table row name can bind to its condition field through a subject/comparator bridge with exact source IDs. "
@@ -1170,7 +1410,7 @@ def _scope_review(claim, materials, output, *, call, catalog):
             "Operand-specific setting bridges must give paper_label: the exact treatment label on that selected row/column and in its source definition. "
             "Use current-condition original sources or explicit definitions, plus the named table reference; mere unrelated co-occurrence cannot prove a bridge. "
             "For numerical from/to assertions use lt/gt as appropriate. Asserted endpoints are derived automatically from the claim and condition and checked against original sources; no expected endpoint or endpoint_required fields are accepted. "
-            "A from/to statement does not assert a separately quoted difference: never invent a delta quote. Only explicit claimed gaps use relation=difference and a grounded difference_source_id/token. "
+            "A from/to statement does not assert a separately quoted difference: never invent a delta. Only explicit claimed gaps use relation=difference and difference_number_id selected from the current condition's original source assertion. "
             "difference_mode must explicitly distinguish absolute deltas, relative_percent and percentage_points. "
             "For a stated positive increase/decrease magnitude, set condition difference_direction and copy its exact "
             "source qualifier into difference_direction_quote; decrease uses comparator minus subject, with the comparator "
@@ -1414,10 +1654,23 @@ def verify_experiments(
                         )
                     ):
                         reasons.append("Matched experimental controls are not part of this assertion")
-                    if item.kind in {"missing_statistic", "small_gap_without_statistics"} and (
-                        not scope.uncertainty_sensitive or scope.assertion == "descriptive"
-                    ):
-                        reasons.append("Unreported uncertainty does not bear on this descriptive assertion")
+                    if item.kind in {"missing_statistic", "small_gap_without_statistics"}:
+                        if not scope.uncertainty_sensitive or scope.assertion == "descriptive":
+                            reasons.append(
+                                "Unreported uncertainty does not bear on this descriptive assertion"
+                            )
+                        reasons.extend(
+                            _numeric_scope_check(
+                                claim,
+                                condition_map[condition_id],
+                                scope,
+                                decision,
+                                materials,
+                                catalog=catalog,
+                                mode="concern",
+                                require_comparison=item.kind == "small_gap_without_statistics",
+                            )
+                        )
                 else:
                     if (
                         not decision.full_support

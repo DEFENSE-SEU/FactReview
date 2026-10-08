@@ -481,3 +481,20 @@ def test_prompt_axis_sharing_has_a_measured_size_bound(paper, tmp_path):
     assert counts["cells"] == 273 and counts["shared_axes"] < 60
     assert counts["prompt_bytes"] < counts["local_bytes"] * 0.6
     assert counts["prompt_bytes"] < 50000
+
+
+def test_numeric_occurrences_share_sentence_text_without_losing_choices(paper):
+    claim, materials = paper
+    text = "On the test split of dataset D, method A has 90% accuracy and method B has 90% accuracy."
+    materials.blocks[0].text = text
+    claim.text = claim.source_quote = text
+    catalog = build_catalog(claim, materials)
+    payload = catalog_prompt(catalog)
+    assert len(payload["numbers"]) == len(catalog["numbers"]) == 2
+    assert len(payload["sentences"]) == 1
+    choices = [dict(zip(payload["number_fields"], row, strict=True)) for row in payload["numbers"].values()]
+    assert [row["ordinal"] for row in choices] == [1, 2]
+    assert all(payload["sentences"][row["sentence_id"]] == text for row in choices)
+    assert choices[0]["token"] == choices[1]["token"] == "90%"
+    assert not {"start", "end", "sentence_start", "sentence_end"} & set(payload["number_fields"])
+    assert all("start" in record and "block_sha256" in record for record in catalog["numbers"].values())
