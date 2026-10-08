@@ -86,6 +86,12 @@ def resolve_number(numbers, identifier, materials):
     return {**record, "number_id": identifier, "quote": quote}
 
 
+def sentence_id(record):
+    """Share the same original sentence identity across every model-facing index."""
+    key = (record["block_id"], record["sentence_start"], record["sentence_end"])
+    return "sentence_" + _hash(json.dumps(key))[:16]
+
+
 def _prefix(dataset, split):
     if not isinstance(dataset, str) or not dataset or not isinstance(split, str) or not split:
         raise ValueError("Prose scope requires an explicit dataset and split")
@@ -164,6 +170,56 @@ def bind_pair(
     if transition and (ordered[0] is not right or ordered[1] is not left):
         raise ValueError("Transition operands must retain subject=to and comparator=from")
     return {"left": left, "right": right, "kind": "named_transition" if transition else "explicit_pair"}
+
+
+def direct_pair_candidates(
+    materials, numbers, *, dataset, metric, settings, left_label, right_label, transition=False
+):
+    """Discover exact grammatical pairs; callers must still validate the condition and units."""
+    if (
+        not dataset
+        or not metric
+        or not left_label
+        or not right_label
+        or (left_label == right_label and not transition)
+    ):
+        return
+    sentences = {}
+    for identifier, record in numbers.items():
+        group = sentences.setdefault(sentence_id(record), {"record": record, "positions": {}})
+        group["positions"][record["start"], record["end"]] = identifier
+    orders = (
+        [(right_label, left_label, True)]
+        if transition
+        else [(left_label, right_label, False), (right_label, left_label, True)]
+    )
+    for group in sentences.values():
+        record, positions = group["record"], group["positions"]
+        for first, second, reverse in orders:
+            match = _match_pair(
+                record["sentence"], dataset, metric, settings, first, second, transition=transition
+            )
+            if match is None:
+                continue
+            identifiers = [
+                positions.get(tuple(record["sentence_start"] + offset for offset in match.span(name)))
+                for name in ("first", "second")
+            ]
+            if any(identifier is None for identifier in identifiers):
+                continue
+            left, right = reversed(identifiers) if reverse else identifiers
+            yield bind_pair(
+                materials,
+                numbers,
+                left,
+                right,
+                dataset=dataset,
+                metric=metric,
+                settings=settings,
+                left_label=left_label,
+                right_label=right_label,
+                transition=transition,
+            )
 
 
 def _transition_text(text, condition):

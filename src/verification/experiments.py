@@ -33,7 +33,13 @@ from verification.experiment_catalog import (
     resolve_cell,
     resolve_source,
 )
-from verification.prose_numbers import bind_pair, resolve_number, transition_endpoints
+from verification.prose_numbers import (
+    bind_pair,
+    direct_pair_candidates,
+    resolve_number,
+    sentence_id,
+    transition_endpoints,
+)
 from verification.theory import (
     FULL_SUPPORT_DESCRIPTION,
     _covered,
@@ -262,7 +268,10 @@ class ScopeSemantics(Contract):
     difference_direction: Literal["signed", "increase", "decrease"] = "signed"
     difference_direction_quote: str = ""
     required_cases: list[str] = Field(default_factory=list)
-    setting_scopes: dict[str, Literal["subject", "comparator", "shared"]] = Field(default_factory=dict)
+    setting_scopes: dict[str, Literal["subject", "comparator", "shared"]] = Field(
+        default_factory=dict,
+        description="Keys are the original BARE keys of condition.settings, such as split, method, from_setting or to_setting. Never put dataset, metric or settings.KEY here. For structural prose pair choices, use their canonical_setting_scopes. This differs from SourceBridge.condition_field, which uses settings.KEY.",
+    )
     rationale: NonEmpty
 
 
@@ -284,7 +293,9 @@ class TableCell(Contract):
 
 class SourceBridge(Contract):
     kind: Literal["subject", "comparator", "metric", "setting"]
-    condition_field: NonEmpty
+    condition_field: NonEmpty = Field(
+        description="The original field path: metric or settings.KEY (for example settings.procedure). This bridge path is distinct from the bare keys required in condition setting_scopes."
+    )
     applies_to: Literal["subject", "comparator", "shared"]
     table_id: NonEmpty
     source_ids: list[NonEmpty] = Field(min_length=1)
@@ -683,6 +694,17 @@ def _own_table_reference(quote, table_name):
     return False
 
 
+def _prose_setting_scopes(settings, subject_key, comparator_key, transition):
+    roles = {key: "shared" for key in settings}
+    if transition:
+        roles.update(from_setting="comparator", to_setting="subject")
+    else:
+        for role, key in (("subject", subject_key), ("comparator", comparator_key)):
+            if key:
+                roles[key] = role
+    return roles
+
+
 def _prose_bindings(claim, condition, scope, comparison, materials, catalog):
     if (
         catalog is None
@@ -717,7 +739,7 @@ def _prose_bindings(claim, condition, scope, comparison, materials, catalog):
         right_label=comparison.right_label,
         transition=transition,
     )
-    roles = {key: "shared" for key in settings}
+    roles = _prose_setting_scopes(settings, scope.subject_setting, scope.comparator_setting, transition)
     if transition:
         if scope.subject_setting != "method" or scope.comparator_setting != "method":
             raise ValueError("Named-setting transition must retain the same original method")
@@ -727,12 +749,6 @@ def _prose_bindings(claim, condition, scope, comparison, materials, catalog):
             raise ValueError("Scope relation weakens or changes the original transition direction")
         if scope.relation == "difference" and scope.difference_direction != direction:
             raise ValueError("Scope difference direction changes the original transition assertion")
-        roles.update(from_setting="comparator", to_setting="subject")
-    else:
-        for role in ("subject", "comparator"):
-            key = getattr(scope, f"{role}_setting")
-            if key:
-                roles[key] = role
     if any(key not in roles or roles[key] != role for key, role in scope.setting_scopes.items()):
         raise ValueError("Prose setting scope conflicts with its directly named operand")
     return {
@@ -1364,6 +1380,150 @@ def _decode_scope(response, claim, materials, output, catalog):
     return conditions, decisions, errors, locations
 
 
+def _bound_prose_pair_choices(claim, materials, catalog):
+    """Prepare strict structural input choices; never issue a support/applicability decision."""
+    choices = {condition.id: [] for condition in claim.conditions}
+    source_coverage = {}
+    for source in catalog["sources"].values():
+        if source["kind"] == "claim_source":
+            key = (source["block_id"], source["start"], source["end"])
+            source_coverage.setdefault(key, set()).update(source["covered"])
+    for condition in claim.conditions:
+        try:
+            scope = ConditionScope(
+                condition_id=condition.id,
+                claim_quote=claim.text,
+                assertion="unresolved",
+                matched_controls_required=False,
+                uncertainty_sensitive=False,
+                relation="eq",
+                subject="",
+                comparator="",
+                rationale="Structural selector validation only; semantic applicability is unassessed.",
+                required_cases=[case["id"] for case in catalog["conditions"][condition.id]["cases"]],
+            )
+            roles = _condition_roles(condition, scope)
+            transition = transition_endpoints(claim, condition, materials) is not None
+            if transition:
+                if roles["subject_setting"] != "method" or roles["comparator_setting"] not in {"", "method"}:
+                    continue
+                roles["comparator_setting"] = "method"
+            if not all(roles.values()):
+                continue
+            endpoints = _asserted_endpoints(claim, condition, materials)
+            for case in catalog["conditions"][condition.id]["cases"]:
+                settings = {**condition.settings, **case["settings"]}
+                subject = settings[roles["subject_setting"]]
+                comparator = settings[roles["comparator_setting"]]
+                if not isinstance(subject, str) or not isinstance(comparator, str):
+                    continue
+                canonical = _prose_setting_scopes(
+                    settings, roles["subject_setting"], roles["comparator_setting"], transition
+                )
+                for pair in direct_pair_candidates(
+                    materials,
+                    catalog["numbers"],
+                    dataset=condition.dataset,
+                    metric=condition.metric,
+                    settings=settings,
+                    left_label=subject,
+                    right_label=comparator,
+                    transition=transition,
+                ):
+                    # Identical source ranges may explicitly cover several conditions.
+                    # Distinct overlapping ranges retain their own coverage boundary.
+                    if any(
+                        condition.id not in covered
+                        and block_id == record["block_id"]
+                        and start < record["end"]
+                        and end > record["start"]
+                        for (block_id, start, end), covered in source_coverage.items()
+                        for record in (pair["left"], pair["right"])
+                    ):
+                        continue
+                    left, right = (float(pair[side]["token"].rstrip("%")) for side in ("left", "right"))
+                    relation = "lt" if left < right else ("gt" if left > right else "eq")
+                    binding_scope = scope.model_copy(
+                        update={
+                            **roles,
+                            "subject": subject,
+                            "comparator": comparator,
+                            "setting_scopes": canonical,
+                            "relation": relation,
+                            "endpoint_required": bool(endpoints),
+                        }
+                    )
+                    comparison = ScopeComparison(
+                        case=case["id"],
+                        settings=case["settings"],
+                        left=_occurrence_number(catalog, pair["left"]["number_id"], materials),
+                        right=_occurrence_number(catalog, pair["right"]["number_id"], materials),
+                        left_label=subject,
+                        right_label=comparator,
+                        metric_label=condition.metric,
+                        relation=relation,
+                        left_number_id=pair["left"]["number_id"],
+                        right_number_id=pair["right"]["number_id"],
+                        context=[
+                            ScopePassage(block_id=pair["left"]["block_id"], quote=pair["left"]["quote"])
+                        ],
+                        expected_left=_expected_number(
+                            claim, condition.id, endpoints[0] if endpoints else "", materials
+                        ),
+                        expected_right=_expected_number(
+                            claim, condition.id, endpoints[1] if endpoints else "", materials
+                        ),
+                    )
+                    decision = ItemScope(
+                        item_index=0,
+                        condition_id=condition.id,
+                        applicability="unverified",
+                        grounds=comparison.context,
+                        rationale=scope.rationale,
+                        comparison_objects="matched",
+                        comparisons=[comparison],
+                    )
+                    # The common numerical gate checks exact roles, every case
+                    # setting, units, source locations and original endpoints.
+                    # Concern mode permits one case of a multi-case condition;
+                    # neither this unresolved scope nor decision is emitted.
+                    if _numeric_scope_check(
+                        claim, condition, binding_scope, decision, materials, catalog=catalog, mode="concern"
+                    ):
+                        continue
+                    choices[condition.id].append(
+                        {
+                            "structural_only": True,
+                            "case_id": case["id"],
+                            "binding_type": pair["kind"],
+                            "left": {"kind": "prose", "number_id": pair["left"]["number_id"]},
+                            "right": {"kind": "prose", "number_id": pair["right"]["number_id"]},
+                            "subject": {
+                                "setting_key": roles["subject_setting"],
+                                "value": subject,
+                                **({"to_setting": settings["to_setting"]} if transition else {}),
+                            },
+                            "comparator": {
+                                "setting_key": roles["comparator_setting"],
+                                "value": comparator,
+                                **({"from_setting": settings["from_setting"]} if transition else {}),
+                            },
+                            "canonical_setting_scopes": canonical,
+                            "result_sentence_id": sentence_id(pair["left"]),
+                            "condition_source_ids": [
+                                key
+                                for key, source in catalog["sources"].items()
+                                if source["kind"] == "claim_source" and condition.id in source["covered"]
+                            ],
+                        }
+                    )
+        except (ValueError, TypeError, KeyError):
+            # An unavailable input hint must not alter candidate judgments or
+            # replace the original strict scope response validation.
+            choices[condition.id] = []
+    return choices
+
+
 def _scope_review(claim, materials, output, *, call, catalog):
     """Independent semantic review; its grounded structural/numeric gates fail closed."""
     from common import run_stats
@@ -1373,6 +1533,14 @@ def _scope_review(claim, materials, output, *, call, catalog):
         "paper_blocks": [block.model_dump() for block in materials.blocks],
         "candidate_items": [item.model_dump() for item in output.items],
         "catalog": catalog_prompt(catalog),
+        "bound_prose_pair_choices": _bound_prose_pair_choices(claim, materials, catalog),
+        "scope_field_contract": {
+            "setting_scopes": "Use only bare keys from this condition.settings; dataset, metric and settings.KEY are not valid keys.",
+            "allowed_setting_keys": {
+                condition.id: list(condition.settings) for condition in claim.conditions
+            },
+            "bridge_condition_field": "SourceBridge.condition_field uses metric or settings.KEY, unlike setting_scopes.",
+        },
         "output_schema": CatalogScopeReviewV2.model_json_schema(),
     }
     audit = {"claim_id": claim.id, "input": payload}
@@ -1383,6 +1551,7 @@ def _scope_review(claim, materials, output, *, call, catalog):
             "Independently audit experiment candidate applicability and ENTIRE condition support. "
             "Do not defer to candidate detail or fully_supported_conditions. Return output_schema JSON, "
             "one conditions entry per claim condition and exactly one items entry per candidate item_index/covered condition. "
+            "Review each candidate's ENTIRE item.quote; its optional comparison subquotes do not narrow that primary quote. "
             "Use schema_version catalog-v2. Keep condition IDs exactly as supplied. Leave claim_quote empty: its existing identity is retained. "
             "Sources, cells, numbers and cases are program-generated choices. Source/cell/number arrays follow source_fields/cell_fields/number_fields in catalog; axes and original sentences are shared by ID. Number ordinal is its one-based position among numeric occurrences in that sentence. "
             "Distinguish descriptive reports (reported scores, hardware or duration) from controlled comparisons, "
@@ -1397,6 +1566,8 @@ def _scope_review(claim, materials, output, *, call, catalog):
             "For numerical comparisons choose case_id from the current condition, one comparison per supplied case; do not invent case names or settings. "
             "Each left/right operand is either {kind:cell, cell_id, label_cell_id} on its exact table axis or {kind:prose, number_id} from the original numeric occurrence catalog. Do not copy numbers, offsets, contexts or tables. HTML tables require cell selectors. "
             "For prose choose the directly named method's result occurrence, with a shared dataset/split prefix governing both predicates in that same sentence; ambiguous scope and contrastive role mentions remain unverified. "
+            "Prefer bound_prose_pair_choices for the exact condition/case: copy both left/right selector objects from one row, and inspect its result_sentence_id plus condition_source_ids. Do not substitute repeated endpoint numbers from the following assertion sentence. These choices establish structural binding only; independently assess applicability and ENTIRE condition support without upgrading partial items. "
+            "setting_scopes keys are BARE condition.settings keys (split, unit, method, from_setting, to_setting), never dataset, metric or settings.KEY. A structural pair choice supplies canonical_setting_scopes; preserve its exact keys and roles. SourceBridge.condition_field separately uses metric or settings.KEY. "
             "A named same-method transition requires original from_setting/to_setting fields and its exact from/to assertion: left selects the to-setting result, right the from-setting result. Preserve these setting scopes. "
             "left is the claim subject; right is its comparator. Structured role settings are derived from the condition by the program; do not emit subject_setting/comparator_setting. "
             "Leave subject/comparator empty when existing model/method/ablation and comparison/baseline fields identify them. Otherwise provide exact role phrases from the claim source. A training dataset or procedure is a separate setup qualifier. "

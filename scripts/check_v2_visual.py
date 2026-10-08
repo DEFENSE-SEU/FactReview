@@ -48,6 +48,12 @@ FIGURE_CASES = (
         "Figure 1 shows the measurements.",
         "self_containedness",
     ),
+    (
+        "tiny_labels",
+        "Figure 1. Panel (a) shows measured processing rate over time.",
+        "Figure 1(a) shows the rate rising from 10 to 40 items per second between time 0 and 3 seconds.",
+        "legibility",
+    ),
 )
 
 
@@ -78,22 +84,26 @@ def transport_probe(directory: Path) -> dict:
 def figure_probe(directory: Path, name: str, caption: str, reference: str, expected: str | None) -> dict:
     directory.mkdir(parents=True, exist_ok=False)
     pdf = directory / "source.pdf"
+    # Keep the layout and content fixed; only the printed label size changes.
+    # At 96 dpi, 2 pt text has fewer than three vertical pixels per em.
+    label_size = 2 if name == "tiny_labels" else 11
     with pymupdf.open() as document:
         page = document.new_page(width=400, height=350)
         page.draw_line((65, 200), (345, 200), color=(0, 0, 0))
         page.draw_line((65, 200), (65, 40), color=(0, 0, 0))
         for index in range(4):
-            page.insert_text((61 + index * 90, 217), str(index), fontsize=11)
-            page.insert_text((43, 198 - index * 45), str((index + 1) * 10), fontsize=11)
+            page.insert_text((61 + index * 90, 217), str(index), fontsize=label_size)
+            page.insert_text((43, 198 - index * 45), str((index + 1) * 10), fontsize=label_size)
         page.insert_text((68, 28), "(a)", fontsize=13)
         if name != "missing_labels":
-            page.insert_text((165, 236), "Time (s)", fontsize=12)
-            page.insert_text((25, 180), "Rate (items/s)", fontsize=12, rotate=90)
+            axis_size = 2 if name == "tiny_labels" else 12
+            page.insert_text((165, 236), "Time (s)", fontsize=axis_size)
+            page.insert_text((25, 180), "Rate (items/s)", fontsize=axis_size, rotate=90)
         points = [(65, 195), (155, 150), (245, 105), (335, 60)]
         for start, end in pairwise(points):
             page.draw_line(start, end, color=(0, 0, 0.8), width=2)
         page.draw_line((85, 48), (113, 48), color=(0, 0, 0.8), width=2)
-        page.insert_text((120, 52), "Measured", fontsize=11)
+        page.insert_text((120, 52), "Measured", fontsize=label_size)
         page.insert_textbox((20, 264, 382, 304), caption, fontsize=10)
         page.insert_textbox((20, 305, 382, 345), reference, fontsize=10)
         document.save(pdf)
@@ -121,6 +131,15 @@ def figure_probe(directory: Path, name: str, caption: str, reference: str, expec
         "kind": "controlled_figure",
         "case": name,
         "expected_category": expected,
+        "inputs": [
+            {
+                "image": figure.printed_crop_path,
+                "sha256": hashlib.sha256(Path(figure.printed_crop_path).read_bytes()).hexdigest(),
+                "printed_dpi": figure.printed_dpi,
+                "bbox_points": figure.bbox_points,
+            }
+            for figure in materials.figures
+        ],
         "passed": inspected and not issues and categories == ({expected} if expected else set()),
         "findings": [item.model_dump(mode="json") for item in findings],
         "issues": issues,
@@ -131,8 +150,16 @@ def figure_probe(directory: Path, name: str, caption: str, reference: str, expec
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=("all", "transport", "figures"), default="all")
+    parser.add_argument(
+        "--figure-cases",
+        nargs="+",
+        choices=[case[0] for case in FIGURE_CASES],
+        help="Run only these figure cases; transport probes still follow --mode.",
+    )
     parser.add_argument("--run-root", type=Path, default=ROOT / "runs" / "v2_visual")
     args = parser.parse_args(argv)
+    if args.figure_cases and args.mode == "transport":
+        parser.error("--figure-cases requires --mode figures or all")
     load_env_file(ROOT / ".env")
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ") + "_" + uuid.uuid4().hex[:8]
     output = (args.run_root / stamp).resolve()
@@ -147,7 +174,11 @@ def main(argv=None) -> int:
     if args.mode in {"all", "transport"}:
         probes.extend((f"transport_{i}", lambda path: transport_probe(path)) for i in range(2))
     if args.mode in {"all", "figures"}:
-        probes.extend((case[0], lambda path, case=case: figure_probe(path, *case)) for case in FIGURE_CASES)
+        probes.extend(
+            (case[0], lambda path, case=case: figure_probe(path, *case))
+            for case in FIGURE_CASES
+            if args.figure_cases is None or case[0] in args.figure_cases
+        )
     with run_stats.run_scope(output / "run_stats.json"):
         for name, probe in probes:
             try:

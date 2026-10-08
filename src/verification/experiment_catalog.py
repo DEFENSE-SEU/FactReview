@@ -389,21 +389,22 @@ def catalog_prompt(catalog: dict) -> dict:
     original claim and paper blocks already supply the text. Hashes and full
     locations stay in the local catalog used by the resolvers and audit.
     """
+    from verification.prose_numbers import sentence_id
+
     source_fields = ["block_id", "start", "end", "kind", "covered"]
     cell_fields = ["table_id", "row", "column", "token", "cell_type", "row_axis_id", "column_axis_id"]
     number_fields = ["block_id", "token", "unit_suffix", "sentence_id", "ordinal"]
     sentences, numbers, ordinals = {}, {}, {}
     for identifier, record in catalog.get("numbers", {}).items():
-        sentence_key = (record["block_id"], record["sentence_start"], record["sentence_end"])
-        sentence_id = "sentence_" + _hash(json.dumps(sentence_key))[:16]
-        sentences[sentence_id] = record["sentence"]
-        ordinals[sentence_id] = ordinals.get(sentence_id, 0) + 1
+        sentence_key = sentence_id(record)
+        sentences[sentence_key] = record["sentence"]
+        ordinals[sentence_key] = ordinals.get(sentence_key, 0) + 1
         numbers[identifier] = [
             record["block_id"],
             record["token"],
             record["unit_suffix"],
-            sentence_id,
-            ordinals[sentence_id],
+            sentence_key,
+            ordinals[sentence_key],
         ]
     axes = {}
 

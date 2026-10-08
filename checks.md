@@ -1,5 +1,22 @@
 # FactReview v2 acceptance checks
 
+## Active follow-up findings
+
+The earlier pushed checkpoint is `f345c8b03239bad12bfc348364aebf4cfa06025c`. The input/Literature/VLM corrections below pass independent code review and **1590 tests, 3 original deselections** (`pytest-pair-literature-visual-reviewed.log`). The current wheel matches all 117 source modules and 27 protected demo hashes. Overall acceptance remains incomplete because execution targets can still bind the wrong method and joint-source evidence is pending. The historical pass table below is retained as checkpoint evidence.
+
+| requirement | verdict | evidence | correction |
+|---|---|---|---|
+| 4. Evidence source identity stays attached to the retrieved work. | pass | `literature-independent-replay-0167f36a456b/`: 176 independent tests and 13 unchanged adversarial response replays. Original failures remain in `framework-gap-audit-f345/literature-before.json` and `literature-independent-26460936/`. | Reader metadata cannot replace the retrieved identity; conflicts/unknown envelopes retain nondecisive abstract cues; malformed metadata remains local to that paper. |
+| 7. Attached bibliography citations reach Literature citation-support checking. | pass | Exact `[LH19]` / `[ZKHB21]` source replays now select their bibliography entries; scoped citations and numeric/author-year/+ and grouped-label regressions pass. | Ambiguous/unresolved labels stay visible. Local selection does not certify successful remote reading or actual citation support. |
+| 8–9. Execution compares the run against the original claim's own target value. | fail | `framework-gap-audit-f345/plan-target-70a184d7ad/summary.json`: a target taken from another method can be marked ready and yield false Supported after a matching mocked run. | Preserve both valid controls and the red end-to-end case; tighten target role/source binding next, before joint-source implementation. |
+| Real arithmetic support for the named-setting transition | pass | `selected-input-live-b5dc6eb6b905/numerical/experiment-probe-bed931b194cb/`: two real configured model calls, Supported/c1, unchanged original source and oracle. | Input-only structural pair choices guide original occurrence selection. Saved failed responses/partial flags still replay unchanged; the old failed batch is retained. |
+| Real VLM printed-size illegibility positive | pass | `selected-input-live-b5dc6eb6b905/visual/20261008T212829Z_cb7d984e/`: one real VLM call, confirmed legibility finding and verified 96 dpi crop. Ten driver tests and independent pixel/PDF/prompt review pass. | Original clear figure pixels are unchanged; the new 2 pt test discloses no expected defect in its textual prompt. Historical five-case run stays separate. |
+| Real Literature citation-support contract and unresolved citation path | unresolved | `framework-gap-audit-f345/framework-gap-audit.md`: old real runs had no cited bindings; current local selector replays recover candidates. | Add bounded actual Literature verification with original sources and explicit service/cache boundaries after target binding. |
+
+The new real batch's `independent-review.{json,md}` verifies three raw requests/responses, unchanged 117 source files plus two scripts and six original input files, exact numeric occurrence bindings and actual 473×307 printed pixels. It measures 9,958 tokens with no estimates; response-copy counterexamples remain Unverified. The execution-target P1 above remains open and takes priority over joint-source implementation. Current full-suite and package evidence: `pytest-pair-literature-visual-reviewed.log` and `pair-literature-visual-reviewed-delivery-inspection.json`. Earlier standalone legacy/Docker results remain historical evidence; this batch changes no execution runtime and makes no new Docker claim.
+
+## Previous verified engineering checkpoint
+
 Numerical-source and report-navigation checkpoint, 2026-10-09 (Asia/Shanghai). Phase 0–8 implementation and the corrections below are on `refactor/method-v2`.
 Specification: `docs/method_v2_spec.md`; procedure: `docs/refactor_v2_prompt.md`.
 The table records the current engineering checkpoint. Full regression and independent source/report reviews pass. Overall work remains active: the live same-method transition still fails its positive expectation, and real paper examples still lack complete cross-paragraph support. Passing these engineering checks does not certify semantic extraction accuracy or published-benchmark reproduction. Criterion 13 permits a reported execution blocker.
