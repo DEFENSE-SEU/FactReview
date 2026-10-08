@@ -3,11 +3,17 @@
 from __future__ import annotations
 
 import hashlib
+import json
+import os
+import re
+import uuid
+from collections import Counter
 from pathlib import Path
 from typing import Literal
 
 from pydantic import Field
 
+from common import run_stats
 from schemas.claim import AuthorQuestion, Claim, Contract, Evidence, EvidencePointer, NonEmpty
 from schemas.materials import SharedMaterials
 from screening.checks import ask
@@ -21,25 +27,75 @@ from verification.theory import (
 )
 
 
-def _indexed_sources(materials: SharedMaterials) -> dict[str, str]:
+def _indexed_sources(materials: SharedMaterials, *, claim: Claim, budget: int) -> tuple[dict[str, str], dict]:
+    """Select complete files within a serialized source budget; retain omitted scope."""
+    scope = {"budget_bytes": budget, "selected_bytes": 2, "selected_files": [], "omitted_files": []}
     if materials.repository is None:
-        return {}
+        return {}, scope
     root = Path(materials.repository.root).resolve(strict=True)
     sources = {}
-    for item in materials.repository.files:
-        if item.kind not in {"config", "source", "entry"}:
-            continue
+    terms = set(re.findall(r"[a-z][a-z0-9_]{2,}", claim.text.lower()))
+    candidates = [item for item in materials.repository.files if item.kind in {"config", "source", "entry"}]
+    # Prefer claim-named paths, then configs and entry points; tie-breaking is stable.
+    candidates.sort(
+        key=lambda item: (
+            -len(terms & set(re.findall(r"[a-z][a-z0-9_]{2,}", item.path.lower()))),
+            {"config": 0, "entry": 1, "source": 2}[item.kind],
+            item.path,
+        )
+    )
+    for item in candidates:
         path = root / item.path
         if path.is_symlink() or not path.resolve(strict=True).is_relative_to(root):
             raise ValueError(f"Indexed file escapes repository: {item.path}")
+        if path.stat().st_size > budget:
+            scope["omitted_files"].append({"path": item.path, "reason": "source_budget"})
+            continue
         content = path.read_bytes()
         if hashlib.sha256(content).hexdigest() != item.sha256:
             raise ValueError(f"Indexed repository file changed: {item.path}")
         try:
-            sources[item.path] = content.decode("utf-8")
+            text = content.decode("utf-8")
         except UnicodeDecodeError:
+            scope["omitted_files"].append({"path": item.path, "reason": "not_utf8"})
             continue
-    return sources
+        encoded = json.dumps({item.path: _numbered_lines(text)}, ensure_ascii=False).encode("utf-8")
+        # Include separators and JSON line-number overhead in the actual payload bound.
+        if scope["selected_bytes"] + len(encoded) > budget:
+            scope["omitted_files"].append({"path": item.path, "reason": "source_budget"})
+            continue
+        sources[item.path] = text
+        scope["selected_bytes"] += len(encoded)
+        scope["selected_files"].append(item.path)
+    return sources, scope
+
+
+def _numbered_lines(text: str) -> list[dict]:
+    return [{"line": i, "text": line} for i, line in enumerate(text.splitlines(), 1)]
+
+
+def _scope_summary(scope: dict, claim: Claim) -> dict:
+    """Keep prompt/report metadata bounded; full manifests remain in the run."""
+    summary = {key: scope[key] for key in ("budget_bytes", "selected_bytes")}
+    summary.update(
+        selected_count=len(scope["selected_files"]),
+        omitted_count=len(scope["omitted_files"]),
+        omission_reasons=dict(Counter(row["reason"] for row in scope["omitted_files"])),
+        selected_sample=[path[:160] for path in scope["selected_files"][:10]],
+        omitted_sample=[{**row, "path": row["path"][:160]} for row in scope["omitted_files"][:10]],
+        sample_limit=10,
+    )
+    stats = run_stats.stats_path()
+    if stats is not None:
+        directory = stats.parent / "code_scopes"
+        directory.mkdir(parents=True, exist_ok=True)
+        name = re.sub(r"[^a-zA-Z0-9_.-]", "_", claim.id)[:80]
+        path = directory / f"{name}_{uuid.uuid4().hex}.json"
+        path.write_text(
+            json.dumps({"claim_id": claim.id, **scope}, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        summary["manifest"] = str(path)
+    return summary
 
 
 class CodeItem(Contract):
@@ -72,11 +128,20 @@ class CodeOutput(Contract):
 
 
 def verify_code(claim: Claim, materials: SharedMaterials, *, call=None) -> BranchResult:
-    sources = _indexed_sources(materials)
+    budget = int(os.environ.get("CODE_SOURCE_MAX_BYTES", "200000"))
+    if budget <= 0:
+        raise ValueError("CODE_SOURCE_MAX_BYTES must be a positive integer")
+    sources, scope = _indexed_sources(materials, claim=claim, budget=budget)
+    summary = _scope_summary(scope, claim)
+    scope_issues = []
+    if scope["omitted_files"]:
+        scope_issues.append(
+            "Code verification source coverage is partial: " + json.dumps(summary, ensure_ascii=False)
+        )
     if not sources:
-        reason = "No readable released-repository index is available."
+        reason = "No readable released-repository source fits the configured inspection scope."
         return BranchResult(
-            issues=[reason],
+            issues=[reason, *scope_issues],
             questions=[
                 AuthorQuestion(
                     claim_id=claim.id,
@@ -106,22 +171,22 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None) -> Branc
             "Copy quote as complete contiguous source lines starting at line, preserving indentation. "
             "Preserve all mathematical markup, whitespace, punctuation, and spelling; do not normalize "
             "math, paraphrase, or join disjoint passages. "
+            "source_scope lists omitted files and the source budget. An omitted file has not been inspected; "
+            "do not infer missing implementations or repository-wide agreement from this selection. "
             "Only cite supplied files. Never execute or change code. Do not invent status or sufficiency fields.",
             {
                 "claim": claim.model_dump(mode="json"),
                 "allowed_condition_ids": [condition.id for condition in claim.conditions],
                 "paper_blocks": [b.model_dump() for b in materials.blocks],
-                "files": {
-                    name: [{"line": i, "text": line} for i, line in enumerate(text.splitlines(), 1)]
-                    for name, text in sources.items()
-                },
+                "files": {name: _numbered_lines(text) for name, text in sources.items()},
+                "source_scope": summary,
                 "output_schema": CodeOutput.model_json_schema(),
             },
             module="verification.code",
             call=call,
         )
     )
-    result = BranchResult(issues=output.issues)
+    result = BranchResult(issues=[*scope_issues, *output.issues])
     for item in output.items:
         if item.file not in sources:
             raise ValueError("Code evidence references a file outside the repository index")

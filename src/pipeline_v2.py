@@ -16,7 +16,7 @@ from common import run_stats
 from fact_generation.execution.v2 import execute_plans
 from fact_generation.execution.v2_config import ExecutionConfig
 from preprocessing.materials import index_repository, parse_materials
-from review.report.v2 import write_review
+from review.report.v2 import verification_limitations, write_review
 from review.teaser.v2 import write_teaser
 from schemas.review import FinalReview
 from screening.stage import screen_paper
@@ -40,6 +40,23 @@ STATS_MODULES = {
 def _save(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _model_usage(stats):
+    total = stats["total"]
+    usage = {
+        **total["token_usage"],
+        "estimated": total["estimated"],
+        **{
+            key: total[key]
+            for key in ("failed_requests", "unavailable_usage_requests", "image_count", "warnings")
+        },
+    }
+    if not usage["requests"] or (
+        usage["unavailable_usage_requests"] == usage["requests"] and not usage["estimated_requests"]
+    ):
+        usage["unavailable"] = True
+    return usage
 
 
 def _repository(url: str, destination: Path) -> Path:
@@ -229,6 +246,7 @@ def run_v2_pipeline(
                 ),
             )
             summary["issues"].extend(screening.issues)
+            summary["figure_coverage"] = screening.figure_coverage
             summary["outputs"]["screening"] = str(root / "screening" / "screening.json")
             verification = stage(
                 "verification",
@@ -297,11 +315,13 @@ def run_v2_pipeline(
                 findings=screening.findings + verification.findings,
                 ledger=ledger,
             )
-            usage = run_stats.with_totals(run_stats.read(root / "run_stats.json"))["total"]
-            token_usage = (
-                {**usage["token_usage"], "estimated": usage["estimated"]}
-                if usage["token_usage"]["requests"]
-                else None
+            summary["model_usage"] = _model_usage(
+                run_stats.with_totals(run_stats.read(root / "run_stats.json"))
+            )
+            summary["issues"] = verification_limitations(
+                issues=summary["issues"],
+                figure_coverage=summary["figure_coverage"],
+                token_usage=summary["model_usage"],
             )
             outputs = stage(
                 "report",
@@ -310,7 +330,8 @@ def run_v2_pipeline(
                     root / "review" / "report",
                     issues=summary["issues"],
                     render_pdf=render_pdf,
-                    token_usage=token_usage,
+                    token_usage=summary["model_usage"],
+                    figure_coverage=summary["figure_coverage"],
                 ),
             )
             summary["outputs"].update(
@@ -329,6 +350,9 @@ def run_v2_pipeline(
             record_stage_duration(current_stage, duration)
             run_stats.record_module_status(STATS_MODULES[current_stage], "failed", warning=str(exc))
         finally:
+            for directory in ("visual_calls", "code_scopes"):
+                if (root / directory).is_dir():
+                    summary["outputs"][directory] = str(root / directory)
             summary["stages"] = {
                 name: "skipped" if value == "pending" else value for name, value in summary["stages"].items()
             }
@@ -338,6 +362,12 @@ def run_v2_pipeline(
                     run_stats.record_module_status(module, "skipped")
             run_stats.set_pipeline_duration(summary["duration_seconds"])
             summary["run_stats"] = run_stats.with_totals(run_stats.read(root / "run_stats.json"))
+            summary["model_usage"] = _model_usage(summary["run_stats"])
+            summary["issues"] = verification_limitations(
+                issues=summary["issues"],
+                figure_coverage=summary.get("figure_coverage"),
+                token_usage=summary["model_usage"],
+            )
             _save(root / "run_stats.json", summary["run_stats"])
             summary["outputs"]["run_stats"] = str(root / "run_stats.json")
             _save(root / "full_pipeline_summary.json", summary)

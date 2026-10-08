@@ -86,7 +86,35 @@ def ordered_claims(review: FinalReview):
     )
 
 
-def render_markdown(review: FinalReview, *, issues: list[str] | None = None) -> str:
+def verification_limitations(*, issues=None, figure_coverage=None, token_usage=None) -> list[str]:
+    """Make coverage and cost uncertainty visible even when there are no findings."""
+    limitations = list(issues or [])
+    if figure_coverage is not None:
+        if not figure_coverage.get("total", 0):
+            limitations.append("No figure inputs were available for visual checks.")
+        missing = figure_coverage.get("failed", 0) + figure_coverage.get("unavailable", 0)
+        if missing:
+            limitations.append(
+                f"Figure screening is incomplete: {figure_coverage.get('failed', 0)} failed and "
+                f"{figure_coverage.get('unavailable', 0)} unavailable out of {figure_coverage.get('total', 0)} figures."
+            )
+    if token_usage:
+        failed = token_usage.get("failed_requests", 0)
+        unavailable = token_usage.get("unavailable_usage_requests", 0)
+        if failed:
+            limitations.append(f"{failed} model call attempt(s) failed; see the recorded check limitations.")
+        if unavailable:
+            limitations.append(
+                f"Provider-reported token usage is unavailable for {unavailable} call attempt(s); "
+                "recorded token totals may be incomplete or estimated."
+            )
+        limitations.extend(token_usage.get("warnings", []))
+    return list(dict.fromkeys(limitations))
+
+
+def render_markdown(
+    review: FinalReview, *, issues: list[str] | None = None, figure_coverage=None, token_usage=None
+) -> str:
     claims = ordered_claims(review)
     lines = [
         f"# FactReview — {_text(review.paper_key)}",
@@ -97,6 +125,16 @@ def render_markdown(review: FinalReview, *, issues: list[str] | None = None) -> 
         "|---|---:|",
     ]
     lines.extend(f"| {status.value} | {review.summary_counts[status]} |" for status in STATUS_ORDER)
+    if token_usage is not None:
+        lines += [
+            "",
+            "### Model call accounting",
+            "",
+            "| Call attempts | Failed attempts | Usage unavailable | Input images |",
+            "|---:|---:|---:|---:|",
+            f"| {token_usage.get('requests', 0)} | {token_usage.get('failed_requests', 0)} | "
+            f"{token_usage.get('unavailable_usage_requests', 0)} | {token_usage.get('image_count', 0)} |",
+        ]
     lines += ["", "### Items requiring attention", ""]
     concerns = [claim for claim in claims if claim.status in {ClaimStatus.FLAWED, ClaimStatus.QUESTIONED}]
     lines += [
@@ -131,6 +169,18 @@ def render_markdown(review: FinalReview, *, issues: list[str] | None = None) -> 
             lines += ["", "Notes:", "", *[f"- {_text(note)}" for note in claim.notes]]
         lines.append("")
     lines += ["## 3. Other findings", ""]
+    if figure_coverage is not None:
+        lines += [
+            "### Figure screening coverage",
+            "",
+            "| Total figures | Checked | Failed | Unavailable |",
+            "|---:|---:|---:|---:|",
+            f"| {figure_coverage.get('total', 0)} | {figure_coverage.get('checked', 0)} | "
+            f"{figure_coverage.get('failed', 0)} | {figure_coverage.get('unavailable', 0)} |",
+            "",
+            "Checked figures can still have uncertain observations; see verification limitations.",
+            "",
+        ]
     if not review.findings:
         lines.append("No additional findings recorded.")
     for finding in review.findings:
@@ -145,8 +195,11 @@ def render_markdown(review: FinalReview, *, issues: list[str] | None = None) -> 
         for item in finding.evidence:
             lines.extend(_evidence(item))
         lines.append("")
-    if issues:
-        lines += ["### Verification limitations", "", *[f"- {_text(issue)}" for issue in issues], ""]
+    limitations = verification_limitations(
+        issues=issues, figure_coverage=figure_coverage, token_usage=token_usage
+    )
+    if limitations:
+        lines += ["### Verification limitations", "", *[f"- {_text(issue)}" for issue in limitations], ""]
     lines += ["", "## 4. Execution ledger", ""]
     if not review.ledger:
         lines.append("Execution was not run; no new execution evidence was produced.")
@@ -163,13 +216,23 @@ def render_markdown(review: FinalReview, *, issues: list[str] | None = None) -> 
 
 
 def write_review(
-    review: FinalReview, output_dir: Path, *, issues=None, render_pdf=True, token_usage=None
+    review: FinalReview,
+    output_dir: Path,
+    *,
+    issues=None,
+    render_pdf=True,
+    token_usage=None,
+    figure_coverage=None,
 ) -> dict:
-    validate_publication_language([review.model_dump(), issues or []])
+    validate_publication_language(
+        [review.model_dump(), issues or [], (token_usage or {}).get("warnings", [])]
+    )
     output_dir.mkdir(parents=True, exist_ok=True)
     result = review.model_copy(deep=True)
     result.claims = ordered_claims(result)
-    result.review_markdown = render_markdown(result, issues=issues)
+    result.review_markdown = render_markdown(
+        result, issues=issues, figure_coverage=figure_coverage, token_usage=token_usage
+    )
     markdown = output_dir / "final_review.md"
     artifact = output_dir / "final_review.json"
     markdown.write_text(result.review_markdown, encoding="utf-8")

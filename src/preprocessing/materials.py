@@ -28,10 +28,12 @@ from schemas.materials import (
 
 BBoxSpace = Literal["normalized_1000", "pdf_points"]
 _HEADINGS = re.compile(r"(?m)^#{1,6}\s+(.+?)\s*#*\s*$")
-_ANCHOR_NUMBER = r"(?:[A-Za-z]\.?)?\d+(?:\.\d+)*(?![\w]|\.\d)"
+_ANCHOR_NUMBER = r"(?:[A-Za-z]\.?)?\d+(?:\.\d+)*"
+_PANEL_SUFFIX = r"(?:[a-z]|\s*\(\s*[a-z]\s*\))?"
+_FIGURE_ANCHOR = rf"{_ANCHOR_NUMBER}{_PANEL_SUFFIX}(?![\w]|\.\d)"
 _FIGURE_REF = re.compile(
-    rf"\bfig(?:ure)?s?\.?\s*({_ANCHOR_NUMBER}"
-    rf"(?:\s*(?:,\s*(?:(?:and|&)\s*)?|(?:and|&|[-–])\s*){_ANCHOR_NUMBER})*)",
+    rf"\bfig(?:ure)?s?\.?\s*({_FIGURE_ANCHOR}"
+    rf"(?:\s*(?:,\s*(?:(?:and|&)\s*)?|(?:and|&|[-–])\s*){_FIGURE_ANCHOR})*)",
     re.IGNORECASE,
 )
 _REFERENCE_HEADING = re.compile(r"^(?:\d+[.\s]+)?(?:references|bibliography)$", re.IGNORECASE)
@@ -57,6 +59,22 @@ _TEXT_SUFFIXES = {
     ".js",
     ".ts",
     ".ipynb",
+    ".r",
+    ".jl",
+    ".java",
+    ".go",
+    ".rs",
+    ".cu",
+    ".cuh",
+    ".cc",
+    ".cxx",
+    ".hpp",
+    ".m",
+    ".f",
+    ".f90",
+    ".f95",
+    ".scala",
+    ".sql",
 }
 
 
@@ -175,7 +193,12 @@ def _anchors(text: str) -> set[str]:
     anchors = set()
     for match in _FIGURE_REF.finditer(text):
         group = match.group(1)
-        anchors.update(value.lower() for value in re.findall(_ANCHOR_NUMBER, group))
+        # Panel labels identify part of the same figure and are kept in the
+        # original reference text, while linkage uses its parent figure number.
+        anchors.update(
+            value.lower()
+            for value in re.findall(rf"({_ANCHOR_NUMBER}){_PANEL_SUFFIX}(?![\w]|\.\d)", group, re.IGNORECASE)
+        )
         for start, end in re.findall(r"\b(\d+)\s*[-–]\s*(\d+)\b", group):
             if 0 < int(end) - int(start) <= 30:
                 anchors.update(str(value) for value in range(int(start), int(end) + 1))
