@@ -336,6 +336,172 @@ def test_experiments_missing_ablation_is_concrete_author_question(
     assert result.questions[0].claim_id == claim.id
 
 
+def contradiction_response(materials, left, right, left_token, right_token, *, support=False):
+    for block in materials.blocks:
+        start = materials.markdown.index(block.text)
+        block.loc.char_start = start
+        block.loc.char_end = start + len(block.text)
+    for block_id, text in (("comparison_left", left), ("comparison_right", right)):
+        start = len(materials.markdown) + 1
+        materials.blocks.append(
+            MaterialBlock(
+                id=block_id,
+                text=text,
+                loc=ClaimLocation(page=3, char_start=start, char_end=start + len(text)),
+            )
+        )
+        materials.markdown += "\n" + text
+    Path(materials.markdown_path).write_text(materials.markdown, encoding="utf-8")
+    return experiments_response(
+        items=([experiment_item()] if support else [])
+        + [
+            experiment_item(
+                aspect="consistency",
+                kind="text_table_contradiction",
+                block_id="comparison_left",
+                quote=left,
+                fully_supported_conditions=[],
+                detail="The reported values differ.",
+                comparison=[
+                    {"block_id": "comparison_left", "quote": left, "token": left_token},
+                    {"block_id": "comparison_right", "quote": right, "token": right_token},
+                ],
+            )
+        ]
+    )
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "left_token", "right_token", "metric", "settings"),
+    [
+        ("A test MRR is 0.4.", "A dev MRR is 0.5.", "0.4", "0.5", "MRR", {"split": "test"}),
+        (
+            "A test seed=1 MRR is 0.4.",
+            "A test seed=2 MRR is 0.5.",
+            "0.4",
+            "0.5",
+            "MRR",
+            {"split": "test", "seed": 1},
+        ),
+        (
+            "A test MRR is 0.4, baseline MRR is 0.5.",
+            "A test MRR is 0.5.",
+            "0.4",
+            "0.5",
+            "MRR",
+            {"split": "test"},
+        ),
+        ("A test MRR is 40%.", "A test MRR is 0.4.", "40%", "0.4", "MRR", {"split": "test"}),
+        ("A test MRR (%) is 40.", "A test MRR is 0.4.", "40", "0.4", "MRR", {"split": "test"}),
+        (
+            "A test latency is 100 ms.",
+            "A test latency is 0.1 seconds.",
+            "100",
+            "0.1",
+            "latency",
+            {"split": "test"},
+        ),
+    ],
+)
+def test_unbound_paper_comparisons_cannot_question_claim(
+    claim, materials, left, right, left_token, right_token, metric, settings
+):
+    from assessment import assess_claim
+
+    claim.conditions[0].metric = metric
+    claim.conditions[0].settings = settings
+    response = contradiction_response(materials, left, right, left_token, right_token)
+    result = verify_experiments(claim, materials, call=mock_response(response))
+    assert result.evidence == [] and result.questions == []
+    assert any("contradiction unconfirmed" in issue for issue in result.issues)
+    claim.evidence = result.evidence
+    assert assess_claim(claim).status == "unverified"
+
+
+def test_invalid_comparison_preserves_independent_paper_support(claim, materials):
+    from assessment import assess_claim
+
+    response = contradiction_response(
+        materials, "A test MRR is 0.4.", "A dev MRR is 0.5.", "0.4", "0.5", support=True
+    )
+    result = verify_experiments(claim, materials, call=mock_response(response))
+    assert len(result.evidence) == 1 and result.evidence[0].direction == "support"
+    assert result.issues and not result.questions
+    claim.evidence = result.evidence
+    assert assess_claim(claim).status == "supported"
+
+
+@pytest.mark.parametrize(
+    ("left", "right", "left_token", "right_token", "metric", "settings"),
+    [
+        ("A test MRR is 0.4.", "A test MRR is 0.5.", "0.4", "0.5", "MRR", {"split": "test"}),
+        (
+            "A test seed=1 MRR is 0.4.",
+            "A test seed=1 MRR is 0.5.",
+            "0.4",
+            "0.5",
+            "MRR",
+            {"split": "test", "seed": 1},
+        ),
+        ("A test MRR is 40%.", "A test MRR is 50%.", "40%", "50%", "MRR", {"split": "test"}),
+        (
+            "A test latency is 100 seconds.",
+            "A test latency is 200 s.",
+            "100",
+            "200",
+            "latency",
+            {"split": "test"},
+        ),
+    ],
+)
+def test_same_setting_and_scale_paper_disagreement_remains_questioned(
+    claim, materials, left, right, left_token, right_token, metric, settings
+):
+    from assessment import assess_claim
+
+    claim.conditions[0].metric = metric
+    claim.conditions[0].settings = settings
+    response = contradiction_response(materials, left, right, left_token, right_token)
+    result = verify_experiments(claim, materials, call=mock_response(response))
+    assert len(result.evidence) == 1 and not result.issues
+    evidence = result.evidence[0]
+    assert evidence.sufficient and evidence.concern and evidence.overturnable
+    assert left in evidence.note and right in evidence.note
+    assert result.questions
+    claim.evidence = result.evidence
+    assert assess_claim(claim).status == "questioned"
+
+
+@pytest.mark.parametrize(
+    ("left", "right"),
+    [
+        ("Latency (ms)\nA test latency is 100.", "Latency (s)\nA test latency is 0.1."),
+        ("A test latency is 100 ms.", "A test latency is 0.1 seconds."),
+    ],
+)
+def test_comparison_value_context_cannot_discard_units(claim, materials, left, right):
+    claim.conditions[0].metric = "latency"
+    response = contradiction_response(materials, left, right, "100", "0.1")
+    comparison = response["items"][0]["comparison"]
+    comparison[0]["value_context"] = "A test latency is 100"
+    comparison[1]["value_context"] = "A test latency is 0.1"
+    result = verify_experiments(claim, materials, call=mock_response(response))
+    assert result.evidence == [] and result.questions == []
+    assert any("units/scales" in issue for issue in result.issues)
+
+
+def test_explicit_value_context_disambiguates_real_paper_disagreement(claim, materials):
+    left = "A test MRR is 0.4. B test MRR is 0.8."
+    right = "A test MRR is 0.5. B test MRR is 0.9."
+    response = contradiction_response(materials, left, right, "0.4", "0.5")
+    comparison = response["items"][0]["comparison"]
+    comparison[0]["value_context"] = "A test MRR is 0.4."
+    comparison[1]["value_context"] = "A test MRR is 0.5."
+    result = verify_experiments(claim, materials, call=mock_response(response))
+    assert len(result.evidence) == 1 and result.evidence[0].concern
+    assert result.questions and not result.issues
+
+
 @pytest.mark.parametrize(
     "changes",
     [

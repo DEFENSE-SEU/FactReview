@@ -268,13 +268,22 @@ def _passages(item: dict[str, Any], paper: dict[str, Any]) -> list[dict[str, Any
     return passages
 
 
-def _novelty_claim(claim: Claim | None) -> bool:
-    return bool(
-        claim
-        and re.search(
-            r"\b(?:novel|new|first|introduc\w*|propos\w*|original|unprecedented)\b", claim.text, re.IGNORECASE
-        )
-    )
+def _novelty_condition_ids(claim: Claim | None) -> set[str]:
+    """Conservatively recognize explicitly described historical-novelty units.
+
+    Extraction supplies semantic descriptions; this guard cannot prove their
+    interpretation. Words such as proposed/new also occur in capability claims.
+    Numeric metrics require their own evidence and cannot be established by a
+    search that found no close prior work.
+    """
+    pattern = r"\b(?:novelty|novel|unprecedented)\b|\bfirst\s+(?:method|model|algorithm|approach|framework|technique|system|study|work|to)\b"
+    if claim is None or not re.search(pattern, claim.text, re.I):
+        return set()
+    return {
+        condition.id
+        for condition in claim.conditions
+        if condition.metric is None and re.search(pattern, condition.description, re.I)
+    }
 
 
 async def verify_literature(
@@ -321,6 +330,8 @@ async def verify_literature(
         "reads": [],
         "comparisons": [],
     }
+    novelty_ids = _novelty_condition_ids(claim)
+    audit["novelty_condition_ids"] = sorted(novelty_ids)
     adequate = len(queries) == 3
     for query in queries:
         try:
@@ -563,6 +574,7 @@ async def verify_literature(
     audit["comparisons"] = comparisons
     by_id = {row["paper_id"]: row for row in read_rows}
     compared_different = set()
+    different_coverage: dict[str, set[str]] = {}
     novelty_concern = False
     condition_ids = {condition.id for condition in claim.conditions} if claim else set()
     location = claim.loc if claim else next((block.loc for block in materials.blocks if block.loc), None)
@@ -631,7 +643,9 @@ async def verify_literature(
         if purpose == "novelty":
             if relation == "different" and dimensions and period == "prior":
                 compared_different.add(row["paper_id"])
-            if not _novelty_claim(claim) or relation not in {"same", "partial", "unclear"}:
+                different_coverage.setdefault(row["paper_id"], set()).update(set(covered) & novelty_ids)
+            covered = [condition_id for condition_id in covered if condition_id in novelty_ids]
+            if not covered or relation not in {"same", "partial", "unclear"}:
                 continue
             if period != "prior":
                 continue
@@ -698,7 +712,24 @@ async def verify_literature(
 
     prior_ids = {row["paper_id"] for row in read_rows if row["period"] == "prior"}
     adequate = adequate and prior_ids.issubset(compared_different) and not novelty_concern
-    audit["adequate_for_no_close_prior_work"] = adequate
+    supported_novelty_ids = sorted(
+        condition_id
+        for condition_id in novelty_ids
+        if adequate and all(condition_id in different_coverage.get(paper_id, set()) for paper_id in prior_ids)
+    )
+    if claim and adequate and not novelty_ids:
+        result.issues.append(
+            "No explicitly bound historical-novelty conditions; search absence cannot support this claim. "
+            "Capability and numeric-result conditions require their own evidence."
+        )
+    if adequate and novelty_ids - set(supported_novelty_ids):
+        result.issues.append(
+            "Novelty comparisons do not cover every retrieved prior work for conditions: "
+            + ", ".join(sorted(novelty_ids - set(supported_novelty_ids)))
+        )
+    audit["adequate_for_no_close_prior_work"] = adequate and (
+        claim is None or (bool(novelty_ids) and set(supported_novelty_ids) == novelty_ids)
+    )
     scope = {
         "deadline": deadline.to_string(),
         "concurrent_start": audit["concurrent_start"],
@@ -718,6 +749,7 @@ async def verify_literature(
         "prior_ids": sorted(prior_ids),
         "excluded_count": len(audit["excluded"]),
         "adequate": adequate,
+        "supported_novelty_conditions": supported_novelty_ids,
     }
     audit["search_scope"] = json.dumps(scope, ensure_ascii=False, sort_keys=True)
     directory = output_dir or Path(materials.markdown_path).parent / "verification" / "literature"
@@ -725,12 +757,12 @@ async def verify_literature(
     filename = re.sub(r"[^a-zA-Z0-9_-]", "_", claim.id if claim else "global") + "-search-audit.json"
     path = (directory / filename).resolve()
     path.write_text(json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8")
-    if adequate and _novelty_claim(claim):
+    if supported_novelty_ids:
         result.evidence.append(
             Evidence(
                 source="literature",
                 pointer=EvidencePointer(locator=str(path), key="search_scope", quote=audit["search_scope"]),
-                covered=[condition.id for condition in claim.conditions],
+                covered=supported_novelty_ids,
                 direction="support",
                 sufficient=True,
                 note="No close prior work within the recorded search scope: " + audit["search_scope"],

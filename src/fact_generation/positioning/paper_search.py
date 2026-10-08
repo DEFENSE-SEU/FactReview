@@ -1023,7 +1023,9 @@ class PaperSearchAdapter:
                 if name:
                     authors.append(name)
 
-            arxiv_id = entry_id.rsplit("/", 1)[-1] if entry_id else ""
+            # Legacy IDs include a subject archive (e.g. hep-th/9901001).
+            # Preserve it so lookup_metadata can verify the requested identity.
+            arxiv_id = entry_id.split("/abs/", 1)[-1] if "/abs/" in entry_id else ""
             abs_url = f"https://arxiv.org/abs/{arxiv_id}" if arxiv_id else ""
             pdf_url = f"https://arxiv.org/pdf/{arxiv_id}.pdf" if arxiv_id else ""
 

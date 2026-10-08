@@ -5,6 +5,7 @@ import fitz
 import pytest
 from PIL import Image
 
+from common import run_stats
 from schemas.claim import ClaimLocation
 from schemas.materials import FigureMaterial, MaterialBlock, PageImage, SharedMaterials
 from screening.figures import check_figures
@@ -515,6 +516,49 @@ def test_reference_check_reports_empty_processing_and_malformed_results(material
     findings, issues = check_bibliography(materials, tmp_path, checker=lambda **kwargs: response)
     assert not findings
     assert issues
+
+
+@pytest.mark.parametrize(
+    ("response", "status"),
+    [
+        ({"ok": True, "total_refs": 1, "issues": []}, "ok"),
+        ({"ok": False, "error_message": "fixture checker unavailable"}, "failed"),
+        ({"ok": True, "total_refs": 0, "issues": []}, "failed"),
+        ({"ok": True, "total_refs": 1}, "failed"),
+    ],
+)
+def test_reference_check_statistics_follow_actual_outcome(materials, tmp_path, response, status):
+    materials.bibliography = materials.blocks
+
+    def checker(**kwargs):
+        run_stats.record_llm_call(usage={"input_tokens": 5}, model="reference-fixture")
+        return response
+
+    with run_stats.run_scope(tmp_path / "stats.json"), run_stats.module_scope("analysis"):
+        check_bibliography(materials, tmp_path / "references", checker=checker)
+        stats = run_stats.read()
+        assert run_stats.current_module() == "analysis"
+    row = stats["modules"]["reference_check"]
+    assert row["status"] == status
+    assert row["duration_sec"] > 0
+    assert row["token_usage"]["input_tokens"] == 5
+    assert stats["modules"]["analysis"]["token_usage"]["requests"] == 0
+
+
+def test_reference_check_statistics_preserve_exception_and_skipped_states(materials, tmp_path):
+    def checker(**kwargs):
+        raise RuntimeError("fixture reference failure")
+
+    with run_stats.run_scope(tmp_path / "stats.json"):
+        check_bibliography(materials, tmp_path / "references", checker=checker)
+        assert run_stats.read()["modules"]["reference_check"]["status"] == "skipped"
+        materials.bibliography = materials.blocks
+        with pytest.raises(RuntimeError, match="fixture reference failure"):
+            check_bibliography(materials, tmp_path / "references", checker=checker)
+        row = run_stats.read()["modules"]["reference_check"]
+        assert row["status"] == "failed"
+        assert row["duration_sec"] > 0
+        assert row["warnings"] == ["fixture reference failure"]
 
 
 def test_screening_keeps_failed_checks_visible(materials, tmp_path):

@@ -221,6 +221,125 @@ async def test_no_close_prior_work_requires_saved_complete_search_scope(claim, m
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("text", "description", "metric"),
+    [
+        ("The proposed graph neural network achieves 90% accuracy on A.", "90% accuracy", "accuracy"),
+        ("The graph neural network supports a new dataset.", "Support for a new dataset", None),
+        (
+            "The graph neural network introduces support for additional relations.",
+            "Additional relation support",
+            None,
+        ),
+        (
+            "The graph neural network first evaluates test data and then validation data.",
+            "First evaluate test data",
+            None,
+        ),
+        ("The novel graph neural network achieves 90% accuracy on A.", "90% accuracy", "accuracy"),
+        ("The novel graph neural network achieves 90% accuracy on A.", "90% accuracy", None),
+    ],
+)
+async def test_complete_empty_search_cannot_establish_capability_or_performance(
+    claim, materials, text, description, metric
+):
+    from assessment import assess_claim
+
+    claim.text = text
+    claim.conditions = [Condition(id="performance", dataset="A", metric=metric, description=description)]
+    searcher, reader = boundaries([])
+    call = model()
+    result = await verify_literature(
+        claim, materials, submission_deadline="2021-01-31", searcher=searcher, reader=reader, call=call
+    )
+    call.assert_not_called()
+    assert result.evidence == []
+    assert any("search absence cannot support" in issue for issue in result.issues)
+    claim.evidence = result.evidence
+    assert assess_claim(claim).status == "unverified"
+
+
+@pytest.mark.asyncio
+async def test_explicit_novelty_condition_may_include_dataset(claim, materials):
+    from assessment import assess_claim
+
+    claim.conditions[0].dataset = "A"
+    searcher, reader = boundaries([])
+    result = await verify_literature(
+        claim, materials, submission_deadline="2021-01-31", searcher=searcher, reader=reader, call=model()
+    )
+    assert len(result.evidence) == 1 and result.evidence[0].covered == ["cond1"]
+    assert result.evidence[0].sufficient
+    claim.evidence = result.evidence
+    assert assess_claim(claim).status == "supported"
+
+
+@pytest.mark.asyncio
+async def test_novelty_absence_support_never_covers_performance_in_same_claim(claim, materials):
+    from assessment import assess_claim
+
+    claim.text += " It achieves 90% accuracy on A."
+    claim.conditions.append(
+        Condition(id="accuracy", dataset="A", metric="accuracy", description="90% accuracy")
+    )
+    searcher, reader = boundaries([])
+    result = await verify_literature(
+        claim, materials, submission_deadline="2021-01-31", searcher=searcher, reader=reader, call=model()
+    )
+    assert len(result.evidence) == 1 and result.evidence[0].covered == ["cond1"]
+    claim.evidence = result.evidence
+    assert assess_claim(claim).status == "unverified"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("relation", ["same", "partial"])
+async def test_novelty_concerns_are_bounded_to_historical_novelty_conditions(
+    claim, materials, paper, relation
+):
+    claim.text += " It achieves 90% accuracy on A."
+    claim.conditions.append(
+        Condition(id="accuracy", dataset="A", metric="accuracy", description="90% accuracy")
+    )
+    searcher, reader = boundaries([paper])
+    result = await verify_literature(
+        claim,
+        materials,
+        submission_deadline="2021-01-31",
+        searcher=searcher,
+        reader=reader,
+        call=model(comparison(paper, relation=relation, covered=["cond1", "accuracy"])),
+    )
+    assert len(result.evidence) == 1
+    assert result.evidence[0].covered == ["cond1"] and result.evidence[0].concern
+
+
+@pytest.mark.asyncio
+async def test_no_close_prior_support_requires_comparisons_for_each_novelty_condition(
+    claim, materials, paper
+):
+    from assessment import assess_claim
+
+    claim.conditions.append(
+        Condition(id="other_setting", description="Novel mechanism for node classification")
+    )
+    searcher, reader = boundaries([paper])
+    result = await verify_literature(
+        claim,
+        materials,
+        submission_deadline="2021-01-31",
+        searcher=searcher,
+        reader=reader,
+        call=model(comparison(paper, covered=["cond1"])),
+    )
+    assert len(result.evidence) == 1 and result.evidence[0].covered == ["cond1"]
+    assert any("other_setting" in issue for issue in result.issues)
+    audit = json.loads(Path(result.evidence[0].pointer.locator).read_text(encoding="utf-8"))
+    assert not audit["adequate_for_no_close_prior_work"]
+    claim.evidence = result.evidence
+    assert assess_claim(claim).status == "unverified"
+
+
+@pytest.mark.asyncio
 async def test_incomplete_retrieval_cannot_support_absence(claim, materials, paper):
     searcher, reader = boundaries([paper], complete=False)
     result = await verify_literature(

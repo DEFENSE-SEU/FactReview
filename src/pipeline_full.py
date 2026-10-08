@@ -376,12 +376,6 @@ def run_legacy_pipeline(args: argparse.Namespace) -> dict[str, Any]:
 def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     from pipeline_v2 import run_v2_pipeline
 
-    # Legacy cutoff flags are accepted only when explicitly requested. Day-level
-    # v2 retrieval still requires a concrete deadline; coarse cutoffs stay unresolved.
-    if not getattr(args, "submission_deadline", ""):
-        cutoff = _resolve_cutoff(args=args, paper_source=args.paper_pdf)
-        if cutoff and cutoff.precision == "day":
-            args.submission_deadline = cutoff.to_string()
     return run_v2_pipeline(args)
 
 
@@ -409,8 +403,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--derive-cutoff-from-arxiv",
         action="store_true",
-        help="Explicit legacy cutoff derivation; provide a day-level submission deadline for v2",
+        help="If no explicit deadline is supplied, resolve arXiv's first-submission date and record its provenance",
     )
+    p.add_argument("--arxiv-id", default="", help="arXiv identity for a local PDF when using --derive-cutoff-from-arxiv")
     p.add_argument("--reuse-job-id", type=str, default="", help="Legacy option; v2 reports job-snapshot reuse as unsupported")
     p.add_argument(
         "--llm-provider",
