@@ -7,11 +7,20 @@ from pathlib import Path
 from typing import Any
 
 from .codex_auth import CodexAuth
+from .diagnostics import redact_provider_details
 from .provider_capabilities import is_codex_provider as _is_codex_provider
 
 _DEFAULT_BASE_URL = "https://chatgpt.com/backend-api/codex"
 _DEFAULT_MODEL = "gpt-5.5"
 _DEFAULT_INSTRUCTIONS = Path(__file__).resolve().parent / "providers" / "codex_instructions.txt"
+
+
+class CodexResponseError(RuntimeError):
+    """A failed request retaining any validated usage already reported by Codex."""
+
+    def __init__(self, message: str, *, usage: dict[str, int] | None = None):
+        super().__init__(message)
+        self.usage = dict(usage or {})
 
 
 def is_codex_provider(provider: str | None) -> bool:
@@ -188,8 +197,14 @@ def invoke_codex(
         with urllib.request.urlopen(request, timeout=120) as response:
             events = _iter_sse_data(response)
     except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="ignore")[:2000]
-        raise RuntimeError(f"Codex backend HTTP {exc.code}: {detail}") from exc
+        detail = exc.read().decode("utf-8", errors="ignore")
+        detail = redact_provider_details(detail, base_url=url, secrets=(auth.access_token,))
+        raise CodexResponseError(f"Codex backend HTTP {exc.code}: {detail[:2000]}") from None
+    except Exception as exc:
+        detail = redact_provider_details(
+            f"{type(exc).__name__}: {exc}", base_url=url, secrets=(auth.access_token,)
+        )
+        raise CodexResponseError(f"Codex request failed: {detail}") from None
 
     chunks: list[str] = []
     last_payload: dict[str, Any] = {}
@@ -212,10 +227,14 @@ def invoke_codex(
         if event_type in {"error", "response.failed", "response.incomplete", "response.cancelled"} or (
             response_status in {"failed", "incomplete", "cancelled"}
         ):
-            raise RuntimeError(f"Codex backend did not complete the response: {event_type or response_status}")
+            raise CodexResponseError(
+                f"Codex backend did not complete the response: {event_type or response_status}", usage=usage
+            )
         if event_type == "response.completed":
             if response_status not in {None, "completed"}:
-                raise RuntimeError(f"Codex backend returned an invalid completion status: {response_status}")
+                raise CodexResponseError(
+                    f"Codex backend returned an invalid completion status: {response_status}", usage=usage
+                )
             completed = True
             if isinstance(response_payload, dict):
                 final_text = _extract_output_text(response_payload)
@@ -238,10 +257,12 @@ def invoke_codex(
             chunks.append(fallback_text)
 
     if not completed:
-        raise RuntimeError("Codex backend stream ended before response.completed")
+        raise CodexResponseError("Codex backend stream ended before response.completed", usage=usage)
     text = "".join(chunks).strip()
     if text:
         if return_usage:
             return text, usage
         return text
-    raise RuntimeError(f"Codex backend returned no text. Response keys: {sorted(last_payload.keys())}")
+    raise CodexResponseError(
+        f"Codex backend returned no text. Response keys: {sorted(last_payload.keys())}", usage=usage
+    )

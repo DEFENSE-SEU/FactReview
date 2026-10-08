@@ -156,6 +156,13 @@ def render_markdown(
             f"- {_text(condition.id)}: {_text(json.dumps(condition.model_dump(exclude={'id'}), ensure_ascii=False))}"
             for condition in claim.conditions
         ]
+        if claim.source_refs:
+            lines += ["", "Original manuscript sources (claim provenance):", ""]
+            lines += [
+                f"- {_text(ref.source_block_id)}; {_location(ref.loc)}; "
+                f"conditions: {_text(', '.join(ref.covered))}. Quote: {_text(ref.source_quote)}"
+                for ref in claim.source_refs
+            ]
         lines += ["", f"Evidence needs: {', '.join(claim.needs) or 'none'}.", "", "Evidence:", ""]
         if not claim.evidence:
             lines.append("No evidence is available for assessment.")

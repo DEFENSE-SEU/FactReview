@@ -184,6 +184,34 @@ class ModelBoundary:
         data = json.loads(kwargs["prompt"])
         blocks = data.get("paper_blocks", data.get("main_text", []))
         block = next(b for b in blocks if "A test MRR" in b["text"])
+        if module == "verification.experiments.scope":
+            return {
+                "conditions": [
+                    {
+                        "condition_id": "a",
+                        "claim_quote": "A test MRR is 0.4.",
+                        "assertion": "descriptive",
+                        "matched_controls_required": False,
+                        "uncertainty_sensitive": False,
+                        "relation": "none",
+                        "subject": "",
+                        "comparator": "",
+                        "rationale": "This claim reports one absolute score.",
+                    }
+                ],
+                "items": [
+                    {
+                        "item_index": 0,
+                        "condition_id": "a",
+                        "applicability": "applicable",
+                        "grounds": [{"block_id": block["id"], "quote": "A test MRR is 0.4."}],
+                        "rationale": "The exact target score and setting are reported.",
+                        "full_support": True,
+                        "qualifiers_complete": True,
+                        "comparison_objects": "not_comparative",
+                    }
+                ],
+            }
         if module == "verification.code":
             return {
                 "items": [
@@ -642,6 +670,49 @@ def test_missing_parser_failure_is_consistent_in_summary_and_stats(tiny_inputs, 
     assert summary["run_stats"]["modules"]["analysis"]["status"] == "skipped"
     assert summary["stage_durations_sec"]["materials"] > 0
     assert runner.call_count == 0
+
+
+@pytest.mark.parametrize("stage", ["materials", "screening"])
+@pytest.mark.parametrize("fail", [False, True])
+def test_running_stage_is_persisted_inside_service_boundary_and_finalized(
+    tiny_inputs, monkeypatch, stage, fail
+):
+    _args, parser = tiny_inputs
+    observed = []
+    boundary = ModelBoundary()
+    original_parse = parser.parse_pdf
+
+    def inspect_running():
+        path = run_stats.stats_path().parent / "full_pipeline_summary.json"
+        persisted = json.loads(path.read_text(encoding="utf-8"))
+        observed.append(persisted)
+        assert persisted["stages"][stage] == "running"
+        assert stage not in persisted["stage_durations_sec"]
+        if stage == "screening":
+            assert persisted["stages"]["materials"] == "ok"
+
+    async def parse(**kwargs):
+        if stage == "materials":
+            inspect_running()
+            if fail:
+                raise RuntimeError("Fixture parser failure after observing running state")
+        return await original_parse(**kwargs)
+
+    def model(**kwargs):
+        if stage == "screening" and kwargs["module"] == "screening.claims":
+            inspect_running()
+            if fail:
+                return {"status": "error", "error": "Fixture model failure after observing running state"}
+        return boundary(**kwargs)
+
+    parser.parse_pdf = parse
+    summary, _, _, _ = run_tiny(tiny_inputs, monkeypatch, call=model, render_pdf=False)
+    assert len(observed) == 1
+    assert summary["stages"][stage] == ("failed" if fail else "ok")
+    final = json.loads((Path(summary["run_dir"]) / "full_pipeline_summary.json").read_text(encoding="utf-8"))
+    assert final["stages"] == summary["stages"]
+    assert "running" not in final["stages"].values()
+    assert final["stage_durations_sec"][stage] > 0
 
 
 @pytest.mark.parametrize("first_fails", [False, True])

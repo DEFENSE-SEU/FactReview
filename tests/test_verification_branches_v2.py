@@ -30,7 +30,7 @@ def mock_config(monkeypatch: pytest.MonkeyPatch) -> None:
 def claim() -> Claim:
     return Claim(
         id="c1",
-        text="The method improves MRR on A.",
+        text="A test MRR is 0.4.",
         loc=ClaimLocation(page=2),
         conditions=[Condition(id="a", dataset="A", metric="MRR", settings={"split": "test"})],
         needs=["Theory", "Code", "Experiments"],
@@ -74,8 +74,50 @@ def materials(tmp_path: Path) -> SharedMaterials:
     return result
 
 
+def scope_response(kwargs):
+    data = json.loads(kwargs["prompt"])
+    # This shared fixture describes an absolute reported result. The dedicated
+    # isolation fixture explicitly attributes that result to a component.
+    causal = data["claim"]["text"] == "The attention component causes the improvement in A test MRR."
+    return {
+        "conditions": [
+            {
+                "condition_id": condition["id"],
+                "claim_quote": data["claim"]["text"],
+                "assertion": "causal_attribution" if causal else "descriptive",
+                "matched_controls_required": causal,
+                "credited_component": "attention component" if causal else "",
+                "uncertainty_sensitive": causal,
+                "relation": "gt" if causal else "none",
+                "subject": "",
+                "comparator": "",
+                "rationale": "The fixture states component attribution."
+                if causal
+                else "The fixture reports an absolute value.",
+            }
+            for condition in data["claim"]["conditions"]
+        ],
+        "items": [
+            {
+                "item_index": index,
+                "condition_id": condition,
+                "applicability": "applicable",
+                "grounds": [{"block_id": item["block_id"], "quote": item["quote"]}],
+                "rationale": "The exact fixture passage covers this stated condition.",
+                "full_support": True,
+                "qualifiers_complete": True,
+                "comparison_objects": "not_comparative",
+            }
+            for index, item in enumerate(data["candidate_items"])
+            for condition in item["covered"]
+        ],
+    }
+
+
 def mock_response(payload: dict):
-    return lambda **kwargs: payload
+    return lambda **kwargs: (
+        scope_response(kwargs) if kwargs["module"] == "verification.experiments.scope" else payload
+    )
 
 
 def theory_item(**changes) -> dict:
@@ -279,6 +321,8 @@ def test_code_preserves_indentation_in_exact_source_quote(claim: Claim, material
 
 def test_experiments_paper_support_and_claim_linked_plan(claim: Claim, materials: SharedMaterials) -> None:
     def model(**kwargs):
+        if kwargs["module"] == "verification.experiments.scope":
+            return scope_response(kwargs)
         assert all(aspect in kwargs["system"] for aspect in ASPECTS)
         assert "output_schema" in json.loads(kwargs["prompt"])
         return experiments_response(items=[experiment_item()], plans=[plan_candidate()])
@@ -317,6 +361,10 @@ def test_experiments_large_gap_without_variance_is_non_decisive_note(
 def test_experiments_missing_ablation_is_concrete_author_question(
     claim: Claim, materials: SharedMaterials
 ) -> None:
+    claim.text = "The attention component causes the improvement in A test MRR."
+    materials.blocks[0].text += " " + claim.text
+    materials.markdown = materials.blocks[0].text + materials.blocks[1].text
+    Path(materials.markdown_path).write_text(materials.markdown, encoding="utf-8")
     result = verify_experiments(
         claim,
         materials,
@@ -326,6 +374,7 @@ def test_experiments_missing_ablation_is_concrete_author_question(
                     experiment_item(
                         aspect="isolation",
                         kind="missing_ablation",
+                        quote=claim.text,
                         detail="No isolated component experiment is reported.",
                     )
                 ]
@@ -978,7 +1027,7 @@ def test_positive_evidence_requires_explicit_full_condition_support(branch, full
 
     def model(**kwargs):
         assert "fully_supported_conditions" in kwargs["system"] and "ENTIRE" in kwargs["system"]
-        return response
+        return scope_response(kwargs) if kwargs["module"] == "verification.experiments.scope" else response
 
     result = branch(claim, materials, call=model)
     assert len(result.evidence) == 1

@@ -311,6 +311,38 @@ class FixedModel:
                     }
                 ]
             }
+        if module == "verification.experiments.scope":
+            return {
+                "conditions": [
+                    {
+                        "condition_id": condition["id"],
+                        "claim_quote": payload["claim"]["text"],
+                        "assertion": "controlled_comparison",
+                        "matched_controls_required": True,
+                        "uncertainty_sensitive": True,
+                        "relation": "gt",
+                        "subject": "",
+                        "comparator": "",
+                        "rationale": "The fixture claims improvement on both datasets.",
+                    }
+                    for condition in payload["claim"]["conditions"]
+                ],
+                "items": [
+                    {
+                        "item_index": index,
+                        "condition_id": condition,
+                        "applicability": "applicable",
+                        "grounds": [{"block_id": item["block_id"], "quote": item["quote"]}],
+                        "rationale": "An absolute Alpha score does not establish improvement over a baseline.",
+                        "full_support": False,
+                        "qualifiers_complete": False,
+                        "comparison_objects": "unresolved",
+                        "unresolved_qualifiers": ["Baseline result absent"],
+                    }
+                    for index, item in enumerate(payload["candidate_items"])
+                    for condition in item["covered"]
+                ],
+            }
         if module == "verification.experiments":
             blocks = payload["paper_blocks"]
             claim = payload["claim"]

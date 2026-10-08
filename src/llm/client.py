@@ -14,10 +14,12 @@ from common import run_stats
 
 from .codex_auth import get_codex_auth
 from .codex_client import (
+    CodexResponseError,
     invoke_codex,
     resolve_codex_base_url,
     resolve_codex_model,
 )
+from .diagnostics import redact_provider_details
 from .provider_capabilities import is_codex_provider, normalize_provider
 
 
@@ -348,6 +350,8 @@ def llm_json(
                 else {}
             )
     except Exception as e:
+        if isinstance(e, CodexResponseError):
+            usage = e.usage
         if run_stats.stats_path() is not None:
             run_stats.record_llm_call(
                 module=module,
@@ -358,13 +362,16 @@ def llm_json(
                 failed=True,
                 image_count=len(images or []),
             )
-        return {
-            "status": "error",
-            "error": f"{type(e).__name__}: {e}",
-            "provider": cfg.provider,
-            "model": cfg.model,
-            "base_url": cfg.base_url,
-        }
+        return redact_provider_details(
+            {
+                "status": "error",
+                "error": f"{type(e).__name__}: {e}",
+                "provider": cfg.provider,
+                "model": cfg.model,
+                "base_url": cfg.base_url,
+            },
+            cfg,
+        )
 
     if run_stats.stats_path() is not None:
         run_stats.record_llm_call(
@@ -379,4 +386,4 @@ def llm_json(
             image_count=len(images or []),
         )
 
-    return _parse_json_response(text)
+    return redact_provider_details(_parse_json_response(text), cfg)
