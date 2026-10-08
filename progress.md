@@ -4,6 +4,8 @@
 
 Implement `docs/method_v2_spec.md` through Phases 0–8 on `refactor/method-v2`, following the adopted prompt and maintainer decisions. Use independent automatic review at each phase and continue without phase pauses. Preserve tests and mock LLM/retrieval/Docker in unit tests. Keep RefCopilot internals, demo reference outputs and LICENSE unchanged. The maintainer rejected a separate documentation PR on 2026-10-08; PR #12 is closed and delivery focuses on the code refactor. The maintainer explicitly requested the push on 2026-10-08. The completed phase commits are on origin/refactor/method-v2; the validated live follow-up is checkpointed for that same authorized branch. No refactor PR has been requested or opened.
 
+The maintainer reaffirmed on 2026-10-09 that the deliverable is the overall FactReview framework. Prioritize general stage contracts, verification behavior, repository integration and reporting. CompGCN is one acceptance/regression case; its missing resources remain case-level input limitations. General changes require evidence of a reusable behavior or reproducible framework defect.
+
 ## Outputs
 
 Workspace: `E:\kabuda\FactReview`.
@@ -22,7 +24,7 @@ Workspace: `E:\kabuda\FactReview`.
 - Integration fixture: `scripts/check_v2_compgcn.py`; regression tests under `tests/`, including `test_pipeline_v2.py` and `test_run_stats_v2.py`.
 - Local evidence: `runs/v2_baseline/`, `runs/v2_materials/`, `runs/v2_screening/`, `runs/v2_verification/`, `runs/v2_execution/`, `runs/v2_report/`, `runs/v2_final/`.
 - Current CompGCN fixture: `runs/v2_compgcn/compgcn_fixture_2026-10-08_050820_50ebee36/`, including `comparison.{json,md}`, `full_pipeline_summary.json`, `review/report/final_review.{json,md,pdf}`, `review/teaser/teaser.{json,svg}`.
-- Current wheel: `runs/v2_packaging_final/factreview-0.1.0-py3-none-any.whl`; final build includes the PDF literal-pointer correction.
+- Current wheel: `runs/v2_docker_recovery/dist/factreview-0.1.0-py3-none-any.whl`; includes the Docker dependency-scanner correction and is verified by `runs/v2_docker_recovery/wheel-inspection.json`.
 
 Logs and generated artifacts in `runs/` are local and ignored by Git. Saved commands and outcomes here allow another checkout to reproduce the verification.
 
@@ -73,7 +75,7 @@ Phase 8 checkpoint full default suite: **615 passed, 3 original deselections, ex
 - Reports consume deterministic assessed records. Teasers render locally to SVG; no image service. Unknown usage is marked unavailable; estimates are labelled. No claim is made about model semantic accuracy from mocked responses.
 - Independent agents inherit configured model/effort without overrides. Exact runtime identifiers were unavailable. Git commits use per-command identity `ChaoqianO <224349230+ChaoqianO@users.noreply.github.com>`, taken from the authenticated account; global Git config was unchanged. Dependencies are isolated in `.venv`.
 
-## CompGCN comparison and open issues
+## Case validation evidence and remaining limits
 
 The Phase 8 offline replay remains in `runs/v2_compgcn/compgcn_fixture_2026-10-08_050820_50ebee36/`. It has 2 supported/1 unverified versus the historical adapter's 2 supported/1 questioned. The claim sets differ, so their label counts are not an accuracy comparison. All 27 demo hashes remain unchanged; there is no Git diff to RefCopilot, demos or LICENSE.
 
@@ -120,7 +122,7 @@ Original Phase 0 command used the saved ignored plugin: `python -m pytest -p bas
 
 ## Next action
 
-Resolve the blocked CompGCN plan’s metric/settings bindings and required released artifacts before running an approved evaluation/analysis job. Docker is available and verified after a normal Desktop restart. Training remains disabled by the confirmed zero budget. The implementation and live follow-up are ready for use on the authorized remote branch; no refactor PR has been requested.
+Continue framework-wide validation of stage contracts, evidence routing, execution safeguards and reporting across paper types and repository layouts. Prioritize reproducible framework defects and usability gaps found by independent review. Cover missing repositories/artifacts, ambiguous runtime metadata, branch failures and budget handling using complementary fixtures. Keep paper-specific resource requirements in their run records. The existing `scripts/validate_execution_real_repos.py` exercises the legacy execution entry; its results alone do not verify the v2 pipeline. Docker is available and verified after a normal Desktop restart. Training remains disabled by the confirmed zero budget. No refactor PR has been requested.
 
 ## Preserved live diagnostics
 
