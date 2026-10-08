@@ -202,10 +202,79 @@ def _identifier(paper: dict[str, Any]) -> str:
     return str(paper.get("arxiv_id") or paper.get("doi") or paper.get("id") or paper.get("url") or "").strip()
 
 
+def _canonical_identity(value: str) -> tuple[str, str]:
+    """Normalize identifiers, without inferring identities from titles or authors."""
+    text = str(value or "").strip()
+    try:
+        parsed = urlsplit(text)
+    except ValueError:
+        return "invalid", text
+    host = (parsed.hostname or "").lower()
+    if host in {"arxiv.org", "www.arxiv.org", "export.arxiv.org"}:
+        text = re.sub(r"^/(?:abs|pdf)/", "", parsed.path).removesuffix(".pdf")
+    elif host in {"doi.org", "www.doi.org", "dx.doi.org"}:
+        text = unquote(parsed.path.lstrip("/"))
+    text = re.sub(r"^(?:arxiv|doi)\s*:\s*", "", text, flags=re.I)
+    if re.fullmatch(r"(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z]{2})?/\d{7})(?:v\d+)?", text, re.I):
+        return "arxiv", text.lower()
+    if re.fullmatch(r"10\.\d{4,9}/\S+", text, re.I):
+        return "doi", text.lower()
+    return "opaque", text
+
+
+def _same_identity(returned: tuple[str, str], requested: tuple[str, str]) -> bool:
+    if returned[0] != requested[0]:
+        return False
+    if requested[0] == "arxiv" and not re.search(r"v\d+$", requested[1]):
+        return re.sub(r"v\d+$", "", returned[1]) == requested[1]
+    return returned[1] == requested[1]
+
+
+def _identity_aliases(paper: dict[str, Any]) -> list[tuple[str, str]]:
+    aliases = []
+    for key in ("arxiv_id", "doi", "id", "url", "abs_url", "pdf_url"):
+        value = str(paper.get(key) or "").strip()
+        if not value:
+            continue
+        identity = _canonical_identity(value)
+        # Ordinary landing-page URLs do not establish bibliographic aliases.
+        if identity[0] != "opaque" or key == "id":
+            aliases.append(identity)
+    return aliases
+
+
+def _read_id_matches(value: str, requested: str, candidate: dict[str, Any]) -> bool:
+    returned, primary = _canonical_identity(value), _canonical_identity(requested)
+    if returned[0] == primary[0]:
+        return _same_identity(returned, primary)
+    return any(_same_identity(returned, alias) for alias in _identity_aliases(candidate))
+
+
+def _reader_identity_conflict(metadata: dict[str, Any], requested: str, candidate: dict[str, Any]) -> bool:
+    for key, namespace in (("arxiv_id", "arxiv"), ("doi", "doi")):
+        value = str(metadata.get(key) or "").strip()
+        if value and _canonical_identity(value)[0] != namespace:
+            return True
+    primary = _canonical_identity(requested)
+    expected = [primary, *_identity_aliases(candidate)]
+    for returned in _identity_aliases(metadata):
+        if returned[0] == "invalid":
+            return True
+        same_kind = [alias for alias in expected if alias[0] == returned[0]]
+        if returned[0] == primary[0]:
+            same_kind = [primary]
+        # A newly supplied cross-identifier may be a valid alias. A conflicting
+        # identifier in an already known namespace cannot rebind the passage.
+        if same_kind and not any(_same_identity(returned, alias) for alias in same_kind):
+            return True
+    return False
+
+
 def _locator(paper: dict[str, Any]) -> str:
     arxiv = str(paper.get("arxiv_id") or "").strip()
     if arxiv:
-        return f"arxiv:{arxiv.removeprefix('arXiv:').removeprefix('arxiv:')}"
+        kind, value = _canonical_identity(arxiv)
+        return f"arxiv:{value}" if kind == "arxiv" else arxiv
     return str(paper.get("doi") or paper.get("url") or paper.get("abs_url") or "")
 
 
@@ -373,6 +442,36 @@ def _match_cited_entries(
         for start, end in re.findall(r"(\d+)\s*[-–]\s*(\d+)", bracket):
             if 0 < int(end) - int(start) < 100:
                 labels.update(str(number) for number in range(int(start), int(end) + 1))
+    # Labels are source-local bibliography keys, never author search terms.
+    # Preserve exact spelling, including an explicitly supplied <sup>+</sup>.
+    labelled = {}
+    for index, block in enumerate(materials.bibliography):
+        match = re.match(r"\s*\[([^\]\n]+)\]", block.text)
+        label = match.group(1) if match else ""
+        if re.fullmatch(r"[A-Za-z][A-Za-z0-9]*(?:(?:\+|<sup>\+</sup>)[0-9]+[a-z]?)?", label) and re.search(
+            r"\d", label
+        ):
+            labelled.setdefault(label, []).append(index)
+    label_matches = set()
+    mentioned = {
+        part.strip()
+        for bracket in re.findall(r"\[([^\]\n]+)\]", source)
+        for part in re.split(r"[,;]", bracket)
+    }
+    for label in sorted(mentioned):
+        matches = labelled.get(label, [])
+        if len(matches) == 1:
+            label_matches.add(matches[0])
+        elif len(matches) > 1 and issues is not None:
+            issues.append(
+                f"Ambiguous citation label [{label}]: multiple bibliography entries match; no entry was selected."
+            )
+        elif (
+            labelled and issues is not None and re.fullmatch(r"[A-Z]{2,}(?:\+)?(?:\d{2}|\d{4})[a-z]?", label)
+        ):
+            # This is only an unresolved cue; it creates no citation candidate.
+            # Ordinary words/arrays such as [CLS], [x1, x2] remain unclassified.
+            issues.append(f"Unresolved citation label [{label}]: no exact bibliography label matches.")
     # Local bibliography matching does not send author identity to any service.
     author_year = re.findall(
         r"\b([A-Z][A-Za-z'-]+)(?:\s+et\s+al\.)?\s*[, (]+\s*((?:19|20)\d{2}[a-z]?)\b", source
@@ -398,7 +497,7 @@ def _match_cited_entries(
     works = []
     for index, block in enumerate(materials.bibliography):
         numeric = re.match(r"\s*\[?(\d+)\]?[.\s]", block.text)
-        if not (numeric and numeric.group(1) in labels) and index not in author_matches:
+        if not (numeric and numeric.group(1) in labels) and index not in author_matches | label_matches:
             continue
         arxiv = re.search(
             r"(?:arxiv\s*:\s*|arxiv\.org/(?:abs|pdf)/)(\d{4}\.\d{4,5}(?:v\d+)?)", block.text, re.IGNORECASE
@@ -671,6 +770,11 @@ async def verify_literature(
             audit["excluded"].append({"paper": candidate, "reason": "unresolved_identity_metadata"})
             result.issues.append(
                 f"Cannot exclude submission versions before reading {paper_id or 'unresolved citation'}: title/abstract metadata unavailable."
+                + (
+                    f" Bibliography entry: {candidate['bibliography_text']}"
+                    if not paper_id and candidate.get("bibliography_text")
+                    else ""
+                )
             )
             adequate = False
             continue
@@ -711,7 +815,7 @@ async def verify_literature(
                     if isinstance(row, dict)
                     and row.get("success") is True
                     and not row.get("error")
-                    and str(row.get("id") or "") == paper_id
+                    and _read_id_matches(str(row.get("id") or ""), paper_id, candidate)
                 ),
                 {},
             )
@@ -719,7 +823,36 @@ async def verify_literature(
             response, item = {"success": False, "error": f"{type(exc).__name__}: {exc}"}, {}
         audit["reads"].append({"id": paper_id, "response": response})
         metadata = item.get("paper") if isinstance(item.get("paper"), dict) else {}
-        paper = {**candidate, **_unbound_metadata(metadata)}
+        reader_identity_verified = bool(item)
+        if _reader_identity_conflict(metadata, paper_id, candidate) or not _safe_paper(metadata):
+            adequate = False
+            message = f"Reader returned conflicting paper identity or a prohibited review URL for {paper_id}; its metadata and passages were rejected."
+            result.issues.append(message)
+            audit["reads"][-1]["identity_rejected"] = True
+            # Retain only the independently retrieved original abstract fallback.
+            item, metadata = {}, {}
+            reader_identity_verified = False
+        elif not reader_identity_verified:
+            result.issues.append(
+                f"Reader response could not be bound to requested paper {paper_id}; any original abstract remains a non-deciding cue."
+            )
+        audit["reads"][-1]["identity_verified"] = reader_identity_verified
+        identity_fields = {"id", "arxiv_id", "doi", "url", "abs_url", "pdf_url"}
+        ignored = {
+            key: value
+            for key, value in metadata.items()
+            if key in identity_fields and value != candidate.get(key)
+        }
+        if ignored:
+            audit["reads"][-1]["identity_fields_not_adopted"] = ignored
+        # Content metadata cannot replace the previously resolved identity or
+        # introduce a new locator through an unverified cross-identifier alias.
+        paper = {
+            **candidate,
+            **{
+                key: value for key, value in _unbound_metadata(metadata).items() if key not in identity_fields
+            },
+        }
         if not _safe_paper(paper) or is_self_work(paper, materials):
             audit["excluded"].append({"paper": paper, "reason": "read_metadata_self_or_review"})
             continue
@@ -752,6 +885,7 @@ async def verify_literature(
                 "citation_sources": list(candidate.get("citation_sources", [])),
                 "in_bibliography": _in_bibliography(paper, materials),
                 "full_text": full_text,
+                "reader_identity_verified": reader_identity_verified,
             }
         )
 
@@ -900,7 +1034,12 @@ async def verify_literature(
                     pointer=pointer,
                     covered=covered,
                     direction="support" if relation == "supports" else "flaw",
-                    sufficient=bool(relation == "supports" and dimensions and full_support),
+                    sufficient=bool(
+                        relation == "supports"
+                        and dimensions
+                        and full_support
+                        and row["reader_identity_verified"]
+                    ),
                     concern=relation in {"contradicts", "unclear"},
                     overturnable=True,
                     note=_support_note(note, comparison.get("fully_supported_conditions", []))
