@@ -165,6 +165,7 @@ class CompGCNModelFixture:
                         "paper_block_id": block_id(self.relation),
                         "paper_quote": self.relation,
                         "covered": ["relation_update"],
+                        "fully_supported_conditions": ["relation_update"],
                         "direction": "support",
                         "aspect": "architecture",
                         "detail": "Fixture comparison: the released forward pass transforms relation embeddings with w_rel.",
@@ -178,6 +179,7 @@ class CompGCNModelFixture:
                         "block_id": block_id(self.proof),
                         "quote": self.proof,
                         "covered": ["Kipf-GCN"],
+                        "fully_supported_conditions": ["Kipf-GCN"],
                         "kind": "derivation",
                         "direction": "support",
                         "detail": "Fixture checks the explicit Kipf-GCN reduction; the other three reductions remain unassessed.",
@@ -196,6 +198,7 @@ class CompGCNModelFixture:
                         "block_id": source,
                         "quote": self.table,
                         "covered": ["FB15k-237", "WN18RR"],
+                        "fully_supported_conditions": ["FB15k-237", "WN18RR"],
                         "detail": "Fixture reads the proposed-method MRR row in Table 3; this is paper-internal support.",
                     }
                 ],

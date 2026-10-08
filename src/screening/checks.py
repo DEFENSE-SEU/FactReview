@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
+
+from pydantic import Field
 
 from llm.client import llm_json, resolve_llm_config
-from schemas.claim import Evidence, EvidencePointer, Finding
+from schemas.claim import Contract, Evidence, EvidencePointer, Finding, NonEmpty
 from schemas.materials import MaterialBlock, SharedMaterials
 
 
@@ -83,33 +85,114 @@ def paper_finding(
     )
 
 
-def check_writing(materials: SharedMaterials, *, call=None) -> list[Finding]:
+class WritingCandidate(Contract):
+    block_id: NonEmpty
+    quote: str = Field(min_length=1)
+    text: NonEmpty
+    level: Literal["definite_error", "clarity_issue"]
+
+
+class WritingDecision(Contract):
+    candidate_id: NonEmpty
+    classification: Literal["manuscript_error", "clarity_issue", "parser_artifact", "style", "uncertain"]
+    explanation: NonEmpty
+
+
+class WritingPageReview(Contract):
+    results: list[WritingDecision]
+
+
+def check_writing(materials: SharedMaterials, *, call=None, issues: list[str] | None = None) -> list[Finding]:
+    """Return PDF-confirmed findings; the stage supplies an issue sink for diagnostics."""
+    if issues is None:
+        issues = []
     result = ask(
         "Check typos, grammar, and unclear sentences. Return JSON {findings: ["
         "{block_id, quote, text, level}]}. quote must be an exact original sentence. "
         "level is definite_error (typo/grammar) or clarity_issue (reviewer judgment). "
-        "Give a concrete correction or clarification in text; exclude stylistic preferences.",
+        "Give a concrete correction or clarification in text. Exclude discretionary style: optional "
+        "hyphenation, capitalization conventions, wording preferences, concision, synonym choices, "
+        "and active/passive voice. A clarity_issue must identify a specific ambiguity that changes "
+        "the scientific meaning or prevents understanding. OCR may omit symbols, join/split words, "
+        "or alter spacing; these candidates require confirmation against the original PDF. "
+        "Copy the quote verbatim without normalizing math or whitespace. Return findings=[] when "
+        "no concrete typo, grammar error, or consequential ambiguity is identified.",
         {"blocks": [b.model_dump() for b in materials.blocks if b.kind in {"text", "list"}]},
         module="screening_writing",
         call=call,
     )
     blocks = {b.id: b for b in materials.blocks}
-    findings = []
+    candidates = []
     if not isinstance(result.get("findings"), list):
         raise ValueError("writing response must contain a findings list")
-    for row in result["findings"]:
-        if row.get("level") not in {"definite_error", "clarity_issue"}:
-            raise ValueError("writing levels are definite_error and clarity_issue")
-        findings.append(
-            paper_finding(
-                materials,
-                blocks[row["block_id"]],
-                quote=row["quote"],
-                text=row["text"],
-                kind="writing",
-                level=row["level"],
-            )
+    # Validate every candidate against the source before sending any page images.
+    for index, raw in enumerate(result["findings"], 1):
+        row = WritingCandidate.model_validate(raw)
+        finding = paper_finding(
+            materials, blocks[row.block_id], quote=row.quote, text=row.text, kind="writing", level=row.level
         )
+        candidates.append((f"writing_{index}", row, finding))
+    by_page = {}
+    for candidate in candidates:
+        by_page.setdefault(candidate[2].loc.page, []).append(candidate)
+    findings = []
+    for page_number, page_candidates in by_page.items():
+        page = next((page for page in materials.pages if page.page == page_number), None)
+        if page is None or not Path(page.path).is_file():
+            issues.append(
+                f"writing page {page_number}: original PDF page image unavailable; "
+                f"unconfirmed candidates {[candidate_id for candidate_id, _, _ in page_candidates]}"
+            )
+            continue
+        try:
+            review = WritingPageReview.model_validate(
+                ask(
+                    "Verify every supplied writing candidate against the attached original PDF page. "
+                    "Read the printed sentence, mathematical symbols, and surrounding context from the pixels. "
+                    "Return output_schema JSON with exactly one result per candidate_id and no new IDs. "
+                    "Use manuscript_error only for a visible typo or grammatical error confirmed in the original. "
+                    "Use clarity_issue only for a specific ambiguity in the printed manuscript that materially "
+                    "changes its scientific meaning or prevents understanding. Confirm the proposed issue itself. "
+                    "Use parser_artifact for OCR errors, lost arrows/symbols, or parsing-related word spacing. "
+                    "Use style for discretionary hyphenation, capitalization, rephrasing, concision, synonyms, "
+                    "or voice preferences. Use uncertain when the original page or context cannot confirm the "
+                    "specific issue. A parsed quote alone cannot confirm an error. Explain the visible evidence "
+                    "for each classification; preserve the original material.",
+                    {
+                        "page": page_number,
+                        "candidates": [
+                            {"candidate_id": candidate_id, **row.model_dump()}
+                            for candidate_id, row, _ in page_candidates
+                        ],
+                        "output_schema": WritingPageReview.model_json_schema(),
+                    },
+                    module="screening_writing.validation",
+                    call=call,
+                    images=[page.path],
+                )
+            )
+            expected = {candidate_id for candidate_id, _, _ in page_candidates}
+            received = [item.candidate_id for item in review.results]
+            if len(received) != len(set(received)) or set(received) != expected:
+                raise ValueError(
+                    f"Writing validation must cover each candidate exactly once; received={received!r}, expected={sorted(expected)!r}"
+                )
+        except Exception as exc:
+            issues.append(f"writing page {page_number}: original PDF validation failed: {exc}")
+            continue
+        decisions = {item.candidate_id: item for item in review.results}
+        for candidate_id, row, finding in page_candidates:
+            decision = decisions[candidate_id]
+            if decision.classification not in {"manuscript_error", "clarity_issue"}:
+                issues.append(
+                    f"{candidate_id} ({row.block_id}, page {page_number}): {decision.classification}; {decision.explanation}"
+                )
+                continue
+            finding.level = (
+                "definite_error" if decision.classification == "manuscript_error" else "clarity_issue"
+            )
+            finding.evidence[0].note += f"; original PDF page {page_number} confirmed: {decision.explanation}"
+            findings.append(finding)
     return findings
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -36,6 +37,43 @@ def _arxiv_detail() -> dict:
         "arxiv_id": "1911.03082",
         "pdf_url": "https://arxiv.org/pdf/1911.03082.pdf",
     }
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("requested", "returned", "success"),
+    [
+        ("1911.03082", "1911.03082v2", True),
+        ("arXiv:1911.03082", "1911.03082", True),
+        ("1911.03082v1", "1911.03082v1", True),
+        ("1911.03082v1", "1911.03082v2", False),
+        ("1911.03082", "1911.09999", False),
+    ],
+)
+async def test_metadata_lookup_checks_identifier_without_full_text(monkeypatch, requested, returned, success):
+    adapter = _adapter()
+    fetch = AsyncMock(return_value={**_arxiv_detail(), "arxiv_id": returned})
+    download = AsyncMock(side_effect=AssertionError("metadata must not download a PDF"))
+    monkeypatch.setattr(adapter, "_arxiv_fetch_single", fetch)
+    monkeypatch.setattr(adapter, "_download_pdf", download)
+    result = await adapter.lookup_metadata(identifier=requested)
+    assert result["success"] is success
+    fetch.assert_awaited_once_with(requested.removeprefix("arXiv:"))
+    download.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "identifier", ["10.1000/example", "https://openreview.net/forum?id=x", "author:Smith", ""]
+)
+async def test_metadata_lookup_rejects_unsupported_identifiers_without_network(monkeypatch, identifier):
+    adapter = _adapter()
+    fetch = AsyncMock(side_effect=AssertionError("unsupported ID must not reach network"))
+    monkeypatch.setattr(adapter, "_arxiv_fetch_single", fetch)
+    result = await adapter.lookup_metadata(identifier=identifier)
+    assert result["success"] is False
+    assert result["error"] == "unsupported_metadata_identifier"
+    fetch.assert_not_awaited()
 
 
 @pytest.mark.asyncio

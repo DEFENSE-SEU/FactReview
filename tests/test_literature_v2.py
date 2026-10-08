@@ -60,6 +60,7 @@ def paper():
 
 def boundaries(papers, *, complete=True):
     searcher = Mock()
+    searcher.lookup_metadata = None
     searcher.search = AsyncMock(
         return_value={
             "success": True,
@@ -102,6 +103,9 @@ def comparison(paper, *, relation="different", purpose="novelty", covered=None, 
         "purpose": purpose,
         "relation": relation,
         "covered": ["cond1"] if covered is None else covered,
+        "fully_supported_conditions": (["cond1"] if covered is None else covered)
+        if purpose == "citation_support" and relation == "supports"
+        else [],
         "quote": quote or "compose relation embeddings through message passing",
         "mechanism": "Compare the composition operators in the source and submission.",
         "setting": "Compare relation prediction tasks.",
@@ -565,6 +569,102 @@ async def test_unresolved_citation_identity_is_not_read_before_self_filter(claim
     assert any("Cannot exclude submission versions" in issue for issue in result.issues)
 
 
+@pytest.mark.asyncio
+async def test_cited_identifier_metadata_is_resolved_before_full_text(claim, materials, paper):
+    claim.text += " [1]"
+    materials.bibliography = [
+        MaterialBlock(id="ref", text="[1] Prior work. arXiv:2001.00001.", loc=ClaimLocation(page=5))
+    ]
+    searcher, _ = boundaries([], complete=False)
+    _, reader = boundaries([paper])
+    calls = []
+
+    async def metadata(*, identifier):
+        calls.append("metadata")
+        assert identifier == paper["id"]
+        return {"success": True, "paper": paper}
+
+    original_read = reader.read_papers.side_effect
+
+    async def read(*, items):
+        assert calls == ["metadata"]
+        calls.append("read")
+        return await original_read(items=items)
+
+    searcher.lookup_metadata = AsyncMock(side_effect=metadata)
+    reader.read_papers.side_effect = read
+    result = await verify_literature(
+        claim,
+        materials,
+        submission_deadline="2021-01-31",
+        searcher=searcher,
+        reader=reader,
+        call=model(comparison(paper, purpose="citation_support", relation="supports")),
+    )
+    assert calls == ["metadata", "read"]
+    assert any(e.direction == "support" and e.sufficient for e in result.evidence)
+    assert not any(e.pointer.key == "search_scope" for e in result.evidence)
+    audit = json.loads(next(Path(materials.markdown_path).parent.rglob("*-search-audit.json")).read_text())
+    assert audit["metadata_lookups"][0]["response"]["paper"] == paper
+
+
+@pytest.mark.parametrize(
+    "rejected", ["self", "post_cutoff", "unknown_date", "review", "different_id", "error"]
+)
+@pytest.mark.asyncio
+async def test_citation_metadata_checks_identity_and_date_before_read(claim, materials, paper, rejected):
+    claim.text += " [1]"
+    materials.bibliography = [
+        MaterialBlock(id="ref", text="[1] Prior work. arXiv:2001.00001.", loc=ClaimLocation(page=5))
+    ]
+    if rejected == "self":
+        paper["title"] = materials.title
+    elif rejected == "post_cutoff":
+        paper["published"] = "2021-02-01"
+    elif rejected == "unknown_date":
+        paper.pop("published")
+    elif rejected == "review":
+        paper["url"] = "https://openreview.net/forum?id=submission"
+    elif rejected == "different_id":
+        paper["id"] = paper["arxiv_id"] = "2002.00002"
+    searcher, reader = boundaries([], complete=False)
+    searcher.lookup_metadata = AsyncMock(return_value={"success": rejected != "error", "paper": paper})
+    result = await verify_literature(
+        claim,
+        materials,
+        submission_deadline="2021-01-31",
+        searcher=searcher,
+        reader=reader,
+        call=model(),
+    )
+    searcher.lookup_metadata.assert_awaited_once_with(identifier="2001.00001")
+    reader.read_papers.assert_not_awaited()
+    assert not result.evidence
+
+
+@pytest.mark.asyncio
+async def test_citation_metadata_transport_failure_preserves_unresolved_reason(claim, materials):
+    claim.text += " [1]"
+    materials.bibliography = [
+        MaterialBlock(id="ref", text="[1] Prior work. arXiv:2001.00001.", loc=ClaimLocation(page=5))
+    ]
+    searcher, reader = boundaries([])
+    searcher.lookup_metadata = AsyncMock(side_effect=RuntimeError("metadata unavailable"))
+    result = await verify_literature(
+        claim,
+        materials,
+        submission_deadline="2021-01-31",
+        searcher=searcher,
+        reader=reader,
+        call=model(),
+    )
+    reader.read_papers.assert_not_awaited()
+    assert not result.evidence
+    assert any("Cannot exclude submission versions" in issue for issue in result.issues)
+    audit = json.loads(next(Path(materials.markdown_path).parent.rglob("*-search-audit.json")).read_text())
+    assert "metadata unavailable" in audit["metadata_lookups"][0]["response"]["error"]
+
+
 @pytest.mark.parametrize("remaining", ["empty", "post_cutoff", "review"])
 @pytest.mark.asyncio
 async def test_empty_selected_corpus_needs_explicit_provider_completeness(claim, materials, paper, remaining):
@@ -635,3 +735,66 @@ async def test_failed_reader_container_or_item_never_supplies_decisive_evidence(
     )
     assert not any(evidence.sufficient for evidence in result.evidence)
     assert any("Full-text reading unavailable" in issue for issue in result.issues)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("missing_field", [False, True])
+async def test_citation_relevance_requires_explicit_full_support(claim, materials, paper, missing_field):
+    from assessment.rules import assess_claim
+
+    claim.text = "COMPGCN can be extended to parameterized composition operations such as ConvE. [1]"
+    claim.conditions = [
+        Condition(id="cond1", description="COMPGCN extensibility to ConvE composition operators.")
+    ]
+    materials.bibliography = [
+        MaterialBlock(id="ref", text="[1] ConvE. arXiv:2001.00001.", loc=ClaimLocation(page=5))
+    ]
+    passage = "ConvE is a convolutional model for knowledge graph embeddings."
+    row = comparison(paper, purpose="citation_support", relation="supports", quote=passage)
+    row["fully_supported_conditions"] = []
+    row["note"] = "ConvE exists, but this passage does not establish COMPGCN's extensibility to ConvE."
+    if missing_field:
+        del row["fully_supported_conditions"]
+    searcher, reader = boundaries([paper], complete=False)
+    reader.read_papers.side_effect = None
+    reader.read_papers.return_value = {
+        "success": True,
+        "items": [
+            {"id": paper["id"], "success": True, "paper": paper, "evidence": [{"text": passage, "page": 2}]}
+        ],
+    }
+    result = await verify_literature(
+        claim,
+        materials,
+        submission_deadline="2021-01-31",
+        searcher=searcher,
+        reader=reader,
+        call=model(row),
+    )
+    assert len(result.evidence) == 1
+    assert result.evidence[0].pointer.quote and not result.evidence[0].sufficient
+    assert row["note"] in result.evidence[0].note
+    claim.evidence = result.evidence
+    assert assess_claim(claim).status == "unverified"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("full", [["foreign"], ["cond1", "cond1"], "cond1", None, [True]])
+async def test_literature_full_support_rejects_invalid_coverage(claim, materials, paper, full):
+    claim.text += " [1]"
+    materials.bibliography = [
+        MaterialBlock(id="ref", text="[1] Prior work. arXiv:2001.00001.", loc=ClaimLocation(page=5))
+    ]
+    row = comparison(paper, purpose="citation_support", relation="supports")
+    row["fully_supported_conditions"] = full
+    searcher, reader = boundaries([paper])
+    result = await verify_literature(
+        claim,
+        materials,
+        submission_deadline="2021-01-31",
+        searcher=searcher,
+        reader=reader,
+        call=model(row),
+    )
+    assert not result.evidence
+    assert any("invalid fully_supported_conditions" in issue for issue in result.issues)

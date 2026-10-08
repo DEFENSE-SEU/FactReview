@@ -9,7 +9,7 @@ from pydantic import Field
 
 from schemas.claim import AuthorQuestion, Claim, Contract, EvidenceNeed, ExecutionPlan, Finding
 from schemas.materials import SharedMaterials
-from verification.contracts import BranchResult
+from verification.contracts import BranchResult, RejectedPlan
 
 
 class VerificationResult(Contract):
@@ -81,7 +81,15 @@ async def verify_claims(
     async def run(claim, name):
         try:
             branch = branches[name]
-            value = await _invoke(branch, claim.model_copy(deep=True), materials)
+            try:
+                value = await _invoke(branch, claim.model_copy(deep=True), materials)
+            except RejectedPlan as exc:
+                if name != EvidenceNeed.EXPERIMENTS or exc.observations.plans:
+                    raise ValueError(
+                        "Rejected-plan recovery requires Experiments observations without plans"
+                    ) from exc
+                value = exc.observations
+                value.issues.append(f"Execution plan rejected: {exc}")
             _validate_result(claim, name, value)
             return value
         except Exception as exc:

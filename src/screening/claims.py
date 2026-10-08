@@ -27,6 +27,11 @@ be separate claims. Example: 'best accuracy and faster inference' becomes one ac
 claim and one speed claim. One conclusion over several settings remains ONE claim
 with multiple conditions. Example: 'outperforms baselines on five datasets' is one
 claim with five dataset conditions. Preserve the original conclusion's qualifiers.
+An assertion of novelty or being first can receive a different outcome from an
+architecture, performance, or implementation assertion. Extract those independent
+conclusions separately, even when they share one source sentence. A novelty claim
+requires Literature. Do not combine novelty and architecture into one condition
+that could be marked fully supported by code describing the architecture alone.
 
 Each condition has a stable local id and describes the dataset, metric, settings, or
 non-empirical assertion it covers. Include every asserted setting. Do not invent

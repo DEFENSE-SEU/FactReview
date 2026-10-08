@@ -19,16 +19,26 @@ from schemas.claim import (
 )
 from schemas.materials import SharedMaterials
 from screening.checks import ask
-from verification.contracts import BranchResult
-from verification.theory import _covered, _paper_pointer
+from verification.contracts import BranchResult, RejectedPlan
+from verification.theory import (
+    FULL_SUPPORT_DESCRIPTION,
+    _covered,
+    _fully_supported,
+    _paper_pointer,
+    _support_note,
+)
 
 
 class PaperNumber(Contract):
     block_id: NonEmpty
-    quote: NonEmpty
+    quote: NonEmpty = Field(
+        description="Verbatim contiguous substring of the cited block's text; preserve math and whitespace."
+    )
     token: NonEmpty
     # A precise sentence/row/cell context may disambiguate a larger quoted table.
-    value_context: str = ""
+    value_context: str = Field(
+        default="", description="Exact contiguous substring of quote; preserve math and whitespace."
+    )
 
 
 def _has_label(label: str | None, quote: str) -> bool:
@@ -106,15 +116,26 @@ class ExperimentItem(Contract):
         "text_table_contradiction",
     ]
     block_id: NonEmpty
-    quote: NonEmpty
-    covered: list[NonEmpty]
+    quote: NonEmpty = Field(
+        description="Verbatim contiguous substring of the cited block's text; preserve math and whitespace."
+    )
+    covered: list[NonEmpty] = Field(
+        min_length=1,
+        description="Distinct exact condition IDs from allowed_condition_ids for this claim. No claim IDs, block IDs, or labels.",
+        json_schema_extra={"uniqueItems": True},
+    )
+    fully_supported_conditions: list[NonEmpty] = Field(
+        default_factory=list, description=FULL_SUPPORT_DESCRIPTION, json_schema_extra={"uniqueItems": True}
+    )
     detail: NonEmpty
     # Contradiction pairs must be the same metric/setting; units are explicit.
     comparison: list[PaperNumber] = Field(default_factory=list, max_length=2)
 
 
 class PlanTarget(Contract):
-    condition_id: NonEmpty
+    condition_id: NonEmpty = Field(
+        description="One exact ID from allowed_condition_ids; target IDs must be distinct within each plan."
+    )
     reported: PaperNumber
 
 
@@ -197,10 +218,26 @@ def verify_experiments(claim: Claim, materials: SharedMaterials, *, call=None) -
             "(credited components ablated), stability (variance/seeds/significance for small gaps), "
             "consistency (abstract/text/table numbers). List all five in checked_aspects. Return output_schema JSON. Every item needs "
             "an exact located paper quote and a concrete detail. paper_support stays paper-internal. "
+            "covered must be a nonempty list of distinct exact strings from allowed_condition_ids, the IDs "
+            "in claim.conditions. Every plan target condition_id must also come from that list, with no "
+            "duplicate targets. Never use claim.id, block IDs, datasets, or metric names as condition IDs. "
+            "Only include conditions the item actually addresses. Omit items/plans that cannot be tied to "
+            "allowed conditions and explain the limitation in issues; return empty items/plans when needed. "
+            "For paper_support, explicitly list fully_supported_conditions only when this one item "
+            "establishes the ENTIRE condition and every relevant claim qualifier, including its dataset, "
+            "metric, comparisons, and settings. A setup description or one component's result provides "
+            "partial support when the condition asserts more. Leave the list empty then and explain the "
+            "uncovered parts in detail. The paper's assertion by itself does not establish its conclusion. "
+            "Copy every quote verbatim as one contiguous substring of its selected paper block's text, "
+            "and copy value_context verbatim from within quote. Preserve mathematical markup, whitespace, "
+            "punctuation, and spelling exactly; do not normalize math, paraphrase, or join disjoint passages. "
             "large_gap_no_variance is a non-decisive note. text_table_contradiction requires two "
             "quoted numerical passages for the same target condition and metric, on the same scale. "
-            "For each target claim with re-obtainable reported numbers, emit one plan. Include candidate "
-            "entry script/config only from the supplied repository index; unknown commands/metric output "
+            "For each target claim with re-obtainable reported numbers, emit one plan. "
+            "A plan must use the exact metric named by its target condition. Never replace an abstract "
+            "quality or qualitative condition with a different numerical metric such as MRR. When no "
+            "reported number matches the condition's metric, omit that target/plan and explain in issues. "
+            "Include candidate entry script/config only from the supplied repository index; unknown commands/metric output "
             "remain for L3. Every plan target quotes the exact paper numeric token, metric, and dataset; "
             "copy full table headers when needed. For multi-value quotes, supply an exact value_context "
             "substring identifying the target dataset/metric and its unique reported value. Ambiguous "
@@ -209,6 +246,7 @@ def verify_experiments(claim: Claim, materials: SharedMaterials, *, call=None) -
             "the link to the paper's core contribution. Emit no execution evidence or final verdict.",
             {
                 "claim": claim.model_dump(mode="json"),
+                "allowed_condition_ids": [condition.id for condition in claim.conditions],
                 "paper_blocks": [b.model_dump() for b in materials.blocks],
                 "repository_index": materials.repository.model_dump() if materials.repository else None,
                 "output_schema": ExperimentsOutput.model_json_schema(),
@@ -232,6 +270,7 @@ def verify_experiments(claim: Claim, materials: SharedMaterials, *, call=None) -
             raise ValueError("Experimental concern is assigned to the wrong aspect")
         pointer = _paper_pointer(materials, item.block_id, item.quote)
         covered = _covered(claim, item.covered)
+        full_support = _fully_supported(covered, item.fully_supported_conditions)
         contrary = item.kind != "paper_support"
         decisive = item.kind != "large_gap_no_variance"
         overturnable = True
@@ -254,17 +293,20 @@ def verify_experiments(claim: Claim, materials: SharedMaterials, *, call=None) -
             )
         else:
             detail = item.detail
+        note = f"{item.aspect}/{item.kind}: {detail}"
+        if not contrary:
+            note = _support_note(note, item.fully_supported_conditions)
         result.evidence.append(
             Evidence(
                 source="paper_internal",
                 pointer=pointer,
                 covered=covered,
                 direction="flaw" if contrary else "support",
-                sufficient=decisive,
+                sufficient=decisive if contrary else full_support,
                 concern=contrary and decisive,
                 affects_claim=decisive,
                 overturnable=overturnable,
-                note=f"{item.aspect}/{item.kind}: {detail}",
+                note=note,
             )
         )
         if contrary and decisive:
@@ -273,5 +315,10 @@ def verify_experiments(claim: Claim, materials: SharedMaterials, *, call=None) -
                     claim_id=claim.id, text=f"Could you clarify the {item.aspect} concern?", reason=detail
                 )
             )
-    result.plans = [_plan(claim, materials, candidate) for candidate in output.plans]
+    try:
+        result.plans = [_plan(claim, materials, candidate) for candidate in output.plans]
+    except ValueError as exc:
+        # All paper observations have passed their own strict checks. Expose
+        # them to the orchestrator while rejecting the invalid plan explicitly.
+        raise RejectedPlan(str(exc), result) from exc
     return result

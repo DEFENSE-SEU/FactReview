@@ -77,6 +77,24 @@ class PaperSearchAdapter:
     def read_configured(self) -> bool:
         return bool(self.read_cfg.base_url)
 
+    async def lookup_metadata(self, *, identifier: str) -> dict:
+        """Resolve an arXiv identifier without downloading or reading its paper."""
+        requested = str(identifier or "").strip().removeprefix("arXiv:").removeprefix("arxiv:")
+        if not re.fullmatch(r"(?:\d{4}\.\d{4,5}|[a-z.-]+/\d{7})(?:v\d+)?", requested, re.I):
+            return {"success": False, "provider": "arxiv", "error": "unsupported_metadata_identifier"}
+        paper = await self._arxiv_fetch_single(requested)
+        returned = str((paper or {}).get("arxiv_id") or "").strip()
+        # An unversioned request may resolve to the latest version of that paper.
+        # An explicit version must resolve to precisely the version requested.
+        same_id = (
+            returned.lower() == requested.lower()
+            if re.search(r"v\d+$", requested, re.I)
+            else re.sub(r"v\d+$", "", returned, flags=re.I).lower() == requested.lower()
+        )
+        if not paper or not same_id:
+            return {"success": False, "provider": "arxiv", "error": "metadata_identifier_mismatch"}
+        return {"success": True, "provider": "arxiv", "requested_id": identifier, "paper": paper}
+
     async def search(
         self,
         *,

@@ -21,9 +21,12 @@ class ScreeningResult(Contract):
 def screen_paper(materials: SharedMaterials, output_dir: Path, *, call=None, reference_checker=None):
     # Failed extraction cannot become an apparently successful review with zero claims.
     result = ScreeningResult(claims=extract_claims(materials, call=call))
-    for name, check in (("writing", check_writing), ("tables", check_tables)):
+    for name, check in (
+        ("writing", lambda: check_writing(materials, call=call, issues=result.issues)),
+        ("tables", lambda: check_tables(materials, call=call)),
+    ):
         try:
-            result.findings.extend(check(materials, call=call))
+            result.findings.extend(check())
         except Exception as exc:
             result.issues.append(f"{name} check failed: {exc}")
     for name, check in (

@@ -265,3 +265,116 @@ def test_parser_assets_cannot_escape_materials_output(paper_pdf, parsed, tmp_pat
     assert not (tmp_path / "escaped.png").exists()
     assert (tmp_path / "out" / "assets" / "images" / "asset.png").read_bytes() == b"saved"
     assert any("unsafe parser image path" in issue for issue in result.issues)
+
+
+def test_mineru_charts_keep_crops_and_ambiguous_caption_assignments(paper_pdf, parsed, tmp_path):
+    captions = ["Figure 3: Basis-vector ablation.", "Figure 4: Pruned relations.", "Figure 5: Scaling."]
+    body = "Figures 3, 4, and 5 compare the model variants."
+    parsed.markdown = "\n\n".join(["# Paper", body, *captions])
+    parsed.content_list = [
+        {"type": "text", "text": "Paper", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": body, "page_idx": 0},
+        *[
+            {
+                "type": "chart",
+                "img_path": f"images/chart_{index}.jpg",
+                "content": "",
+                "chart_caption": caption,
+                "chart_footnote": [],
+                "bbox": [100, 100, 500, 500],
+                "page_idx": 0,
+            }
+            for index, caption in enumerate(([captions[0]], [], captions[1:]))
+        ],
+    ]
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert len(result.figures) == 3
+    assert [f.anchor for f in result.figures] == ["3", "", ""]
+    assert [f.caption_ambiguous for f in result.figures] == [False, False, True]
+    assert result.figures[2].caption == "\n".join(captions[1:])
+    assert result.figures[2].references[0].text == body
+    assert all(Path(f.printed_crop_path).is_file() and f.loc.page == 1 for f in result.figures)
+    assert all(f.bbox_points == (60, 80, 300, 400) for f in result.figures)
+    assert any("figure_2: parser supplied no caption" in issue for issue in result.issues)
+    assert any("figure anchors 4, 5" in issue and "ambiguous" in issue for issue in result.issues)
+    assert not any("unsupported parser row type 'chart'" in issue for issue in result.issues)
+    restored = SharedMaterials.model_validate_json(
+        (tmp_path / "out/materials.json").read_text(encoding="utf-8")
+    )
+    assert restored.figures[2].caption_ambiguous
+
+
+def test_multiple_parser_captions_remain_ambiguous_without_distinct_figure_labels(
+    paper_pdf, parsed, tmp_path
+):
+    parsed.content_list[8]["image_caption"] = ["Figure 1: First panel.", "An additional caption."]
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert result.figures[0].caption_ambiguous and result.figures[0].anchor == ""
+    assert any("multiple captions" in issue and "ambiguous" in issue for issue in result.issues)
+
+
+def test_mineru_metadata_never_consumes_body_spans_or_changes_sections(paper_pdf, parsed, tmp_path):
+    first, second = "A complete first paragraph.", "The result is 123 and includes margin notes."
+    parsed.markdown = f"# Paper\n\n{first}\n\n![](images/hash123.jpg)\n\n{second}"
+    parsed.content_list = [
+        {"type": "text", "text": "Paper", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": first, "page_idx": 0},
+        {"type": "header", "text": "Appendix", "text_level": 1, "page_idx": 0},
+        {"type": "page_number", "text": "1", "page_idx": 0},
+        {"type": "page_num", "text": "2", "page_idx": 0},
+        {"type": "aside_text", "text": "margin notes", "page_idx": 0},
+        {"type": "page_footnote", "text": "123", "page_idx": 0},
+        {"type": "text", "text": second, "page_idx": 0},
+    ]
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    for block in result.blocks[2:-1]:
+        assert block.loc.page == 1
+        assert block.loc.char_start is None and block.loc.char_end is None
+        assert "Appendix" not in block.loc.section
+    body = result.blocks[-1]
+    assert body.text == second
+    assert body.loc.char_start == parsed.markdown.index(second)
+    assert result.markdown[body.loc.char_start : body.loc.char_end] == second
+    assert not any("could not be aligned" in issue for issue in result.issues)
+
+
+def test_mineru_bibliography_excludes_page_metadata_and_ends_at_next_heading(paper_pdf, parsed, tmp_path):
+    refs = ["A. Author. First result. 2020.", "B. Author. Second result. 2021."]
+    parsed.markdown = "\n\n".join(["# References", *refs, "# Appendix", "Additional results."])
+    parsed.content_list = [
+        {"type": "text", "text": "References", "text_level": 1, "page_idx": 0},
+        {"type": "ref_text", "text": refs[0], "page_idx": 0},
+        {"type": "header", "text": "Published at a conference", "page_idx": 0},
+        {"type": "page_number", "text": "1", "page_idx": 0},
+        {"type": "aside_text", "text": "margin note", "page_idx": 0},
+        {"type": "page_footnote", "text": "footnote", "page_idx": 0},
+        {"type": "ref_text", "text": refs[1], "page_idx": 0},
+        {"type": "text", "text": "Appendix", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": "Additional results.", "page_idx": 0},
+    ]
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert [block.text for block in result.bibliography] == refs
+    assert not any("unsupported parser row type" in issue for issue in result.issues)
+    for block in result.bibliography:
+        assert result.markdown[block.loc.char_start : block.loc.char_end] == block.text
+
+
+def test_mineru_markdown_image_links_resolve_without_changing_source_bytes(paper_pdf, parsed, tmp_path):
+    parsed.markdown += "\n\n![](images/source.jpg)\n"
+    parsed.image_files = {"images/source.jpg": b"original image bytes"}
+    digest = hashlib.sha256(parsed.markdown.encode("utf-8")).hexdigest()
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert hashlib.sha256(Path(result.markdown_path).read_bytes()).hexdigest() == digest
+    assert result.markdown == parsed.markdown
+    assert (Path(result.markdown_path).parent / "images/source.jpg").read_bytes() == b"original image bytes"
+    assert (tmp_path / "out/assets/images/source.jpg").read_bytes() == b"original image bytes"
+    for block in result.blocks:
+        assert result.markdown[block.loc.char_start : block.loc.char_end] == block.text
+
+
+def test_parser_image_alias_cannot_overwrite_a_rendered_page(paper_pdf, parsed, tmp_path):
+    parsed.image_files = {"images/page_1.png": b"untrusted source asset"}
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    with Image.open(result.pages[0].path) as image:
+        assert image.width > 0
+    assert any("colliding with a generated artifact" in issue for issue in result.issues)

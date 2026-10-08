@@ -27,6 +27,11 @@ def check_bibliography(
     if not isinstance(result.get("issues"), list):
         return [], [f"Reference check returned no valid issues list; {result_path}"]
     findings, issues = [], []
+    if result["total_refs"] != len(materials.bibliography):
+        issues.append(
+            f"Reference coverage needs review: checker processed {result['total_refs']} entries "
+            f"from {len(materials.bibliography)} parser bibliography blocks; {result_path}"
+        )
     for index, row in enumerate(result.get("issues", [])):
         title = str(row.get("reference_title") or row.get("reference") or "").strip()
         matches = [b for b in materials.bibliography if title and title.casefold() in b.text.casefold()]

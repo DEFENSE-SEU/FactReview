@@ -2,7 +2,7 @@
 
 ## Task
 
-Implement `docs/method_v2_spec.md` through Phases 0–8 on `refactor/method-v2`, following the adopted prompt and maintainer decisions. Use independent automatic review at each phase and continue without phase pauses. Preserve tests and mock LLM/retrieval/Docker in unit tests. Keep RefCopilot internals, demo reference outputs and LICENSE unchanged. The maintainer rejected a separate documentation PR on 2026-10-08; PR #12 is closed and delivery focuses on the code refactor. Refactor commits remain local. Publishing this refactor would require the separate approval specified by the adopted prompt.
+Implement `docs/method_v2_spec.md` through Phases 0–8 on `refactor/method-v2`, following the adopted prompt and maintainer decisions. Use independent automatic review at each phase and continue without phase pauses. Preserve tests and mock LLM/retrieval/Docker in unit tests. Keep RefCopilot internals, demo reference outputs and LICENSE unchanged. The maintainer rejected a separate documentation PR on 2026-10-08; PR #12 is closed and delivery focuses on the code refactor. The maintainer explicitly requested the push on 2026-10-08. The completed phase commits are on origin/refactor/method-v2; the validated live follow-up is checkpointed for that same authorized branch. No refactor PR has been requested or opened.
 
 ## Outputs
 
@@ -10,7 +10,7 @@ Workspace: `E:\kabuda\FactReview`.
 
 - Documentation PR: https://github.com/DEFENSE-SEU/FactReview/pull/12 — requested title/body, base `main`, exactly two documentation files; closed on 2026-10-08 after the maintainer rejected a separate documentation PR.
 - Former docs branch: `docs/method-v2-spec`, patch `ab983b9`, continuous automatic-review amendment `281e0f5`; amendment retained locally as `84c2aeb`. Local and remote docs branches were deleted after verifying identical document contents and equivalent commits in `refactor/method-v2`.
-- Refactor branch: `refactor/method-v2`, created from docs branch. No remote branch or refactor PR has been created.
+- Refactor branch: `refactor/method-v2`, created from docs branch. Remote branch: https://github.com/DEFENSE-SEU/FactReview/tree/refactor/method-v2 . Initial push verified at `7e7630a`; no refactor PR is open.
 - Authoritative specification and procedure: `docs/method_v2_spec.md`, `docs/refactor_v2_prompt.md`.
 - Final acceptance evidence: `checks.md`; durable handoff: this file.
 - Schemas/compatibility: `src/schemas/{claim,review,materials,legacy_claim,legacy_review,v1_adapter}.py`.
@@ -42,7 +42,7 @@ Fetched and fast-forwarded main from `87dad71` to `5dc71d9`, applied the attache
 | 7 | Four-part report and all-claim four-status teaser, source/pointer preservation, recommendation guards and literal Markdown escaping. 11 cases passed at phase checkpoint. Independent `phase_reviewer`. | `32e1785` |
 | 8 | Default v2 integration, explicit deadline/config CLI, usage/error propagation, README, wheel packaging and CompGCN comparison. Final PDF pointer correction, full regression and independent artifact review passed. | Final Phase 8 checkpoint commit (`refactor(v2): phase 8 — integrate and verify the complete claim review pipeline`) |
 
-Final full default suite: **615 passed, 3 original deselections, exit 0** in `runs/v2_final/pytest-full.log`. The two deselected legacy e2e cases passed separately (`pytest-legacy-e2e.log`); the remaining live Docker case was not run. No new skips or relaxed assertions. Statistics/pipeline focus: 18 passed. Ruff passed across new implementation modules and Phase 8 files. Formatting of three new Phase 8 files retained identical ASTs. The wheel contains both pipeline entry modules and all v2 packages; 110 packaged Python modules parsed with the Python 3.11 grammar, and required packaged files matched workspace bytes (`wheel-inspection.json`).
+Phase 8 checkpoint full default suite: **615 passed, 3 original deselections, exit 0** in `runs/v2_final/pytest-full.log`. The two deselected legacy e2e cases passed separately (`pytest-legacy-e2e.log`); the remaining live Docker case was not run. No new skips or relaxed assertions. Statistics/pipeline focus: 18 passed. Ruff passed across new implementation modules and Phase 8 files. Formatting of three new Phase 8 files retained identical ASTs. The wheel contains both pipeline entry modules and all v2 packages; 110 packaged Python modules parsed with the Python 3.11 grammar, and required packaged files matched workspace bytes (`wheel-inspection.json`).
 
 ### Corrections and preserved failures
 
@@ -59,7 +59,7 @@ Final full default suite: **615 passed, 3 original deselections, exit 0** in `ru
 ## Decisions
 
 - Confirmed by the maintainer: repair default/cap **3** (initial run plus at most 3 repaired runs); default rule-based **auto** approval with optional interactive approval and the actual mode recorded; training budget **0 runs**, configurable, high-priority training only, retries counted.
-- Confirmed cutoff: explicit `--submission-deadline YYYY-MM-DD`, with **3 calendar months** before it labelled concurrent. On 2026-10-08 the maintainer authorized arXiv fallback when a venue deadline is unavailable. For the forthcoming CompGCN live run, use first submission **2019-11-08** from https://arxiv.org/abs/1911.03082 and concurrent start **2019-08-08**. Record `cutoff_source=arxiv_first_submission`; this is not asserted as a venue deadline. The earlier offline fixture remains unchanged.
+- Confirmed cutoff: explicit `--submission-deadline YYYY-MM-DD`, with **3 calendar months** before it labelled concurrent. On 2026-10-08 the maintainer authorized arXiv fallback when a venue deadline is unavailable. CompGCN live checks use first submission **2019-11-08** from https://arxiv.org/abs/1911.03082 and concurrent start **2019-08-08**. Provenance records `cutoff_source=arxiv_first_submission`; no venue deadline is asserted. The earlier offline fixture remains unchanged.
 - Confirmed tolerances: central `v2_config.TOLERANCES` preserves both existing plan and alignment profiles, including their different MRR defaults.
 - Confirmed v1 compatibility: historical `in_conflict` maps to `questioned`; original records/labels are retained. Historical display does not reassess evidence or create a v2 claim lacking required locations.
 - `--execution-config` loads a validated `ExecutionConfig`; only explicitly supplied CLI options override corresponding fields, including an explicit zero budget. Unsupported legacy options produce recorded errors. Docker is required when execution is enabled.
@@ -75,12 +75,22 @@ Final full default suite: **615 passed, 3 original deselections, exit 0** in `ru
 
 ## CompGCN comparison and open issues
 
-The latest offline replay uses the real 15-page PDF and read-only released repository, with explicitly fixed parser/model/retrieval/Docker boundaries. All seven stages completed. It yields **2 supported, 1 unverified**; the historical adapter reads **2 supported, 1 questioned**. Claim sets differ, so these counts do not establish improved accuracy. The Theory fixture covers one explicit reduction; other conditions stay unverified. The multi-value results table remains blocked for L3: **zero Docker runner calls**, no independent numerical reproduction. Paper-internal support retains its source label. All 27 demo-tree file hashes and the Phase 0 seven reference hashes match. There are no Git changes to RefCopilot, demos or LICENSE.
+The Phase 8 offline replay remains in `runs/v2_compgcn/compgcn_fixture_2026-10-08_050820_50ebee36/`. It has 2 supported/1 unverified versus the historical adapter's 2 supported/1 questioned. The claim sets differ, so their label counts are not an accuracy comparison. All 27 demo hashes remain unchanged; there is no Git diff to RefCopilot, demos or LICENSE.
 
-- **Live verification blocker (updated 2026-10-08):** the supplied configuration is saved only in Git-ignored `.env`. MinerU's authenticated read-only probe returned **HTTP 401**; the supplied JWT declares expiry **2026-07-30 20:44:50 UTC+8** (payload decoded locally; signature not independently verified). Renew the MinerU token locally before parsing. Codex `gpt-5.5` returned the expected JSON (78 input / 9 output tokens), and Semantic Scholar returned the CompGCN record (HTTP 200). The optional Sufy model-list request timed out; active routing uses local Codex OAuth. Docker daemon was not reachable. No complete live pipeline or numerical reproduction is claimed. Criterion 13 permits this reported blocker.
-- Actual historical experiment approval mode/training budget were not supplied. Confirmed defaults describe new runs only.
-- Live extraction, figure/bibliography parsing and retrieval quality require a real-service run. The deterministic tests establish contracts, routing, aggregation and saved artifacts.
-- No implementation blocker remains. All 14 acceptance criteria pass, with the live-run exception explicitly recorded for criterion 13.
+The replacement MinerU token worked: the real 15-page PDF produced 210 content-list rows. Credentials remain only in ignored `.env`; no supplied secret was found in tracked files. The active LLM route is local Codex OAuth, model `gpt-5.5`.
+
+Live observations led to these corrections:
+
+- Materials now include all 5 image/chart crops, exclude page metadata from bibliography and text cursor alignment, and preserve original Markdown bytes while restoring its image links. There are 49 bibliography blocks. Two captions were combined by MinerU; their ambiguity is explicit and cannot create caption-dependent figure flaws.
+- RefCopilot receives the actual text-file contents and the configured Semantic Scholar key. Its real run processed 48 entries from 49 parser blocks. Three findings lack unique original-text locations and remain issues. The preserved log records Semantic Scholar timeout/SSL failures and a negative-sleep error inside the protected RefCopilot library. Its internals were not changed.
+- Structured condition IDs and verbatim quotes are explicit in branch prompts. Invalid execution plans remain rejected; independently validated experiment observations survive a plan-only rejection after dispatcher revalidation.
+- Writing candidates are checked against original PDF page pixels. OCR artifacts, discretionary style and unconfirmed candidates stay in diagnostics. Theory notation flaws also require original-page confirmation. The first real audit found the printed dir(r) and mapping arrow had been corrupted in parsed text; raw parsing is preserved.
+- Positive evidence defaults to insufficient. A model must explicitly declare `fully_supported_conditions`, a distinct subset of the conditions addressed, and establish the entire covered condition including the claim's qualifiers. Contextual ConvE references cannot alone establish COMPGCN extensibility; source hooks cannot establish a public URL or all datasets. The claim prompt explicitly separates novelty from independent architecture conclusions. Semantic completeness remains a model judgment and requires audit.
+- Citation-only arXiv identifiers resolve through metadata before self/date/review-page checks and full-text reading. Search completeness is never invented; the current provider does not certify exhaustive search. Novelty support by absence remains unavailable.
+
+Full follow-up regression: **733 passed, 3 original deselections** (`runs/v2_live/pytest-semantic-final.log`, exit 0). The 2 legacy e2e cases also passed separately. Existing assertions were retained; complete-positive mocks explicitly supply the new coverage declaration. The new wheel contains 110 Python 3.11-compatible modules, with all 15 affected packaged modules matching source (`wheel-verified-inspection.json`). Independent agents cross-reviewed material, reference, visual and support-coverage changes.
+
+Remaining limits: Docker Desktop cannot initialize its local ingest socket (`sailor-ingest.sock`, Windows error 1920), so no L3 numerical reproduction is claimed; training remains 0. Literature search coverage, reference coverage and model semantic accuracy are incomplete. Model-generated statuses are system outputs, not measured accuracy or independently established ground truth.
 
 ## Reproduction commands
 
@@ -97,8 +107,22 @@ Original Phase 0 command used the saved ignored plugin: `python -m pytest -p bas
 
 ## Next action
 
-The requested implementation and automatic reviews are complete. Renew MinerU credentials locally, then resume the prepared non-execution CLI command in `runs/v2_live/resume.json` using the authorized arXiv cutoff. Sanitized service readiness and date provenance are saved in `runs/v2_live/preflight.json`. Docker must become available before enabling execution. Refactor publishing remains a separate approval boundary; all implementation commits stay local. No separate documentation PR remains open.
+Restore Docker availability and resolve the blocked plan’s metric/settings bindings and required released artifacts before running an approved evaluation/analysis job. Training remains disabled by the confirmed zero budget. The implementation and live follow-up are ready for use on the authorized remote branch; no refactor PR has been requested.
 
-## Live configuration follow-up
+## Preserved live diagnostics
 
-Configuration was saved to Git-ignored `.env`; credentials are absent from tracked files and diagnostic output. `runs/v2_live/preflight.py` performs minimal service probes and saves sanitized status. The Codex route uses the existing local OAuth login. An independent source-only review (`live_config_review`) verified provider priority and CLI environment loading without reading credentials. Full CompGCN parsing was not attempted after the MinerU authentication failure.
+- `runs/v2_live/compgcn_live_2026-10-08_213558_5e0e658d/`: first real service run, 43 claims, known parser/contract defects; diagnostic output.
+- `runs/v2_live/references_20261008_215355_a9200c8a/`: real RefCopilot response and usage; 48 processed entries. `reference-repaired-round2.log` retains service failures.
+- `runs/v2_live/probe_20261008_215439_49fdd8c8/`: real representative branch responses. Code produced 6 grounded evidence items; a qualitative experimental condition generated an invalid MRR plan, motivating explicit rejection with retained observations.
+- `runs/v2_live/compgcn_live_repaired_2026-10-08_220730_2373040b/`: 40 claims, 6 supported/30 questioned/4 unverified, no execution. Independent audit found remaining Writing/figure parser false alarms and three overbroad support cases. These counts are retained as diagnostic history.
+- `runs/v2_live/compgcn_live_repaired_2026-10-08_222956_c40e836f/`: completed corrected run (563.39 s): **54 claims, 5 supported / 0 flawed / 33 questioned / 16 unverified**. All six non-execution stages are `ok`; execution is `skipped`, approval mode `not_run`. One training plan remains blocked. It reuses actual MinerU bytes, byte-identical bibliography-check responses and exact query/deadline/id/question retrieval responses; all model judgments run again. New retrieval keys use the service. Provenance and original source runs are retained.
+- Local driver failures are preserved: the first standalone reference probe omitted the active statistics scope; one replay logger attempted to parse the extraction prompt as plain JSON. Both driver errors were corrected without changing production validation. Their logs and failed summaries remain available.
+- First branch push failed at optional LFS lock verification (EOF). Retrying with per-command `lfs.locksverify=false` succeeded; LFS uploads were not bypassed and persistent Git configuration was unchanged.
+
+## Final live audit
+
+`runs/v2_live/compgcn_live_repaired_2026-10-08_222956_c40e836f/independent-audit.json` records the distinct reviewer pass. The reviewer checked 335 local evidence pointers with no mismatches. All 29 sufficient positive evidence items explicitly declare full condition coverage; 175 contextual/partial positive items remain insufficient. The previously over-supported novelty and public-availability claims are now unverified; extensibility is questioned. The figure-caption and known Writing OCR false alarms were suppressed. These are specific observed corrections, not an accuracy estimate.
+
+The corrected report is `review/report/final_review.{json,md,pdf}` under that run; teaser is `review/teaser/teaser.svg`. The PDF has 152 pages; root-agent visual samples of the first and last pages show no clipping/overlap. Full-document visual perfection is not claimed. `run_stats.json` contains 92 model requests and labels two requests' usage as estimates; cached parsing, bibliography and retrieval provenance is explicit. All source model responses and unsuccessful prior runs remain available locally.
+
+Live follow-up checkpoint: `fix(v2): validate live evidence and original PDF findings`. The maintainer authorized pushing this work to `refactor/method-v2`; the commit contains source, regression tests and these audit records, with all runtime artifacts and credentials excluded.

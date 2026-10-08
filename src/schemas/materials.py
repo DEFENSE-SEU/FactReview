@@ -30,6 +30,7 @@ class FigureMaterial(BaseModel):
     anchor: str = ""
     loc: ClaimLocation | None = None
     caption: str = ""
+    caption_ambiguous: bool = False
     references: list[MaterialBlock] = Field(default_factory=list)
     bbox_points: tuple[float, float, float, float] | None = None
     crop_path: str = ""
