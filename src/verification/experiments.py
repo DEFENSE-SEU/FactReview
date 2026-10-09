@@ -8,7 +8,7 @@ import math
 import re
 import uuid
 from itertools import pairwise, product
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import Field, model_validator
 
@@ -21,6 +21,8 @@ from schemas.claim import (
     ExecutionTask,
     NonEmpty,
     PaperTargetSelector,
+    PredictionProjection,
+    ProjectionScopeDecision,
 )
 from schemas.materials import SharedMaterials
 from screening.checks import ask
@@ -448,6 +450,8 @@ class PlanTarget(Contract):
     )
     reported: PaperNumber
     selector: PaperTargetSelector | None = None
+    # Keep malformed new proposals plan-local; the pure binder validates them.
+    projection: PredictionProjection | Any | None = Field(default=None)
 
 
 class PlanCandidate(Contract):
@@ -688,6 +692,7 @@ class CatalogScopeReviewV2(Contract):
     schema_version: Literal["catalog-v2"]
     conditions: list[CatalogConditionScope]
     items: list[CatalogItemScopeV2]
+    plan_projection_reviews: list[ProjectionScopeDecision] = Field(default_factory=list)
 
 
 def _field(condition, path):
@@ -2007,6 +2012,7 @@ def _scope_review(
     catalog,
     joint_catalogs=None,
     binding_repair_rounds=0,
+    projection_reviews=None,
 ):
     """Independent semantic review; its grounded structural/numeric gates fail closed."""
     from common import run_stats
@@ -2016,6 +2022,7 @@ def _scope_review(
         "claim": claim.model_dump(mode="json"),
         "paper_blocks": [block.model_dump() for block in materials.blocks],
         "candidate_items": [item.model_dump() for item in output.items],
+        "candidate_plans": [plan.model_dump(mode="json") for plan in output.plans],
         "single_source_candidate_indices": [
             index for index, item in enumerate(output.items) if not item.additional_sources
         ],
@@ -2034,6 +2041,13 @@ def _scope_review(
         },
         "output_schema": CatalogScopeReviewV2.model_json_schema(),
     }
+    if any(target.projection is not None for plan in output.plans for target in plan.targets):
+        from verification.execution_projection import projection_context
+
+        try:
+            payload["execution_projection_context"] = projection_context(claim, materials)
+        except (ValueError, OSError, KeyError, TypeError) as exc:
+            payload["execution_projection_context"] = {"unavailable": str(exc)}
     audit = {"claim_id": claim.id, "input": payload}
     stats = run_stats.stats_path()
     audit_path = stats.parent / "experiment_scope" / f"{uuid.uuid4().hex}.json" if stats is not None else None
@@ -2085,7 +2099,15 @@ def _scope_review(
             "Multi-value tables without uniquely bound values remain partial. Non-numerical descriptive support "
             "does not require invented numerical comparisons. Explain applicability with exact grounds; uncertainty "
             "or missing review information must remain unverified, without creating a new flaw. Place limitations that do not block the stated result in nonblocking_notes; "
-            "unresolved_qualifiers is reserved for actual missing claim requirements. A complete condition can combine its table and connected definition/setup passages.",
+            "unresolved_qualifiers is reserved for actual missing claim requirements. A complete condition can combine its table and connected definition/setup passages. "
+            "For each non-null plan target projection independently return one plan_projection_reviews decision, even when candidate_items is empty. "
+            "Keep these decisions separate from paper support. Review the unchanged whole claim and condition, every original field path, "
+            "its selected exact paper sources and released repository definition. Confirm only an absolute fixed released-prediction "
+            "exact-match fraction whose dataset/split, model, complete sample scope and every qualifier are retained. "
+            "Inference/training provenance, comparisons, population generalizations, filtering, unknown runtime obligations or "
+            "unsupported definitions must remain unresolved. Source IDs must identify each required original passage; field path "
+            "coverage alone is insufficient. Configuration/code supplied for plans grants no additional paper-support/joint access. "
+            "Plans without a projection need no projection decision. Do not append, rewrite or merge candidates.",
             payload,
             module="verification.experiments.scope",
             call=call,
@@ -2093,9 +2115,21 @@ def _scope_review(
         audit["response"] = copy.deepcopy(response)
         pristine = copy.deepcopy(joint_catalogs) if binding_repair_rounds else {}
         diagnostics = {}
+        paper_response = {key: value for key, value in response.items() if key != "plan_projection_reviews"}
         conditions, decisions, errors, locations = _decode_scope(
-            response, claim, materials, output, catalog, joint_catalogs, diagnostics=diagnostics
+            paper_response, claim, materials, output, catalog, joint_catalogs, diagnostics=diagnostics
         )
+        if projection_reviews is not None:
+            from verification.execution_projection import decode_projection_reviews
+
+            plan_decisions, plan_errors = decode_projection_reviews(response, output.plans)
+            if response.get("schema_version") != "catalog-v2":
+                plan_decisions, plan_errors = (
+                    {},
+                    ["Execution projections require the catalog-v2 independent review"],
+                )
+            projection_reviews.update(plan_decisions)
+            audit["plan_projection_errors"] = plan_errors
         audit["validated"] = not errors
         audit["item_locations"] = locations
         audit["binding_errors"] = errors
@@ -2161,6 +2195,8 @@ def _scope_review(
         issue = prefix + "; ".join(errors) if errors else None
         return conditions, decisions, issue, audit_path
     except Exception as exc:
+        if projection_reviews is not None:
+            projection_reviews.clear()
         issue = f"Experimental scope review unconfirmed: {type(exc).__name__}: {exc}"
         audit["error"] = issue
         return {}, {}, issue, audit_path
@@ -2186,7 +2222,15 @@ def _scope_sources(decision, materials):
     return "; ".join(sources)
 
 
-def _plan(claim: Claim, materials: SharedMaterials, candidate: PlanCandidate) -> ExecutionPlan:
+def _plan(
+    claim: Claim,
+    materials: SharedMaterials,
+    candidate: PlanCandidate,
+    *,
+    projection_reviews=None,
+    scope_audit=None,
+    plan_index=0,
+) -> ExecutionPlan:
     conditions = {condition.id: condition for condition in claim.conditions}
     ids = _covered(claim, [target.condition_id for target in candidate.targets])
     values = {target.condition_id: _number(materials, target.reported) for target in candidate.targets}
@@ -2194,6 +2238,32 @@ def _plan(claim: Claim, materials: SharedMaterials, candidate: PlanCandidate) ->
     target_bindings = {}
     for target in candidate.targets:
         condition = conditions[target.condition_id]
+        if target.projection is not None:
+            from verification.execution_projection import bind_projection_target
+
+            try:
+                if len(candidate.targets) != 1:
+                    raise ValueError(
+                        "The first released-predictions recipe covers one original condition per plan"
+                    )
+                review = (projection_reviews or {}).get((plan_index, condition.id))
+                if review is None:
+                    raise ValueError("No healthy independent scope decision for this plan projection")
+                target_bindings[target.condition_id] = bind_projection_target(
+                    claim,
+                    condition,
+                    target.reported,
+                    materials,
+                    selector=target.selector,
+                    proposal=target.projection,
+                    entry_script=candidate.entry_script,
+                    config_path=candidate.config,
+                    review=review,
+                    audit_path=scope_audit,
+                )
+            except (ValueError, OSError, TypeError, KeyError, IndexError, AttributeError) as exc:
+                target_issues.append(f"Execution projection unavailable for {condition.id}: {exc}")
+            continue
         # Exact quotes must identify the target metric/dataset, possibly across
         # a full table containing the header and dataset row.
         if not _has_label(condition.metric, target.reported.quote):
@@ -2223,7 +2293,12 @@ def _plan(claim: Claim, materials: SharedMaterials, candidate: PlanCandidate) ->
         blockers.append("Candidate released code is missing")
     if not candidate.data_paths:
         blockers.append("Released data location is missing")
-    if candidate.run_mode == "evaluation" and not candidate.weight_paths:
+    released_predictions = (
+        bool(target_bindings)
+        and all(binding.version == 2 for binding in target_bindings.values())
+        and len(target_bindings) == len(candidate.targets)
+    )
+    if candidate.run_mode == "evaluation" and not candidate.weight_paths and not released_predictions:
         blockers.append("Released weights are missing")
     if candidate.feasibility == "blocked" and not blockers:
         blockers.append("Plan is blocked; runtime requirements need clarification")
@@ -2232,10 +2307,16 @@ def _plan(claim: Claim, materials: SharedMaterials, candidate: PlanCandidate) ->
         id=f"{claim.id}.plan",
         claim_id=claim.id,
         condition_ids=ids,
-        target_conditions=[conditions[key] for key in ids],
+        target_conditions=[
+            conditions[key].model_copy(deep=True) if released_predictions else conditions[key] for key in ids
+        ],
         y_paper=values,
         target_bindings=target_bindings,
-        task=ExecutionTask(entry_script=candidate.entry_script, config=candidate.config),
+        task=ExecutionTask(
+            entry_script=candidate.entry_script,
+            config=candidate.config,
+            command=["python", "-I", "-S", candidate.entry_script] if released_predictions else [],
+        ),
         run_mode=candidate.run_mode,
         feasibility="blocked" if blockers else "ready",
         blocker="; ".join(blockers),
@@ -2262,6 +2343,15 @@ def verify_experiments(
         copy.deepcopy((claim.model_dump(), materials.model_dump())) if scope_binding_repair_rounds else None
     )
     source_limit = joint_limit()
+    from verification.execution_projection import projection_context, projection_snapshot
+
+    target_catalog = build_catalog(claim, materials)
+    try:
+        projection_inputs = projection_context(claim, materials)
+        initial_projection_snapshot = projection_snapshot(claim, materials)
+    except (ValueError, OSError, TypeError, KeyError) as exc:
+        projection_inputs = {"unavailable": str(exc)}
+        initial_projection_snapshot = None
     output = ExperimentsOutput.model_validate(
         ask(
             "Check this experimental claim from the paper alone in five aspects: correspondence "
@@ -2303,13 +2393,24 @@ def verify_experiments(
             "cannot replace that absolute target. Unknown target bindings remain blocked. Preserve the complete original "
             "sentence or native table; a narrowed value_context cannot remove its governing subject or scope. "
             "Keep plans with missing code, data, weights, or budget as blocked with a reason. Priority follows "
-            "the link to the paper's core contribution. Emit no execution evidence or final verdict.",
+            "the link to the paper's core contribution. Emit no execution evidence or final verdict. "
+            "For released prediction-file evaluation you may explicitly propose released-predictions-v1 projection using "
+            "the provided original field inventory, paper source/number selectors and indexed resources. The first recipe "
+            "only computes full-list exact-match accuracy as a fraction. Classify every original semantic leaf without "
+            "editing it, choose exact source IDs for each role, and retain sample scope and conclusion boundaries. "
+            "The original reported accuracy is a target, not a runtime setting. A combined dataset/split must have an "
+            "exact identity in the released config. Unknown obligations stay unresolved. Projection requires the actual "
+            "released evaluator/data/config, a prose number_id, one original condition and evaluation mode; omit weights "
+            "only for this released-predictions resource mode. It does not prove model inference or training. "
+            "Use projection=null for ordinary model-inference/v1 targets. No support flag is granted by a proposal.",
             {
                 "claim": claim.model_dump(mode="json"),
                 "allowed_condition_ids": [condition.id for condition in claim.conditions],
                 "joint_source_limit": source_limit,
                 "paper_blocks": [b.model_dump() for b in materials.blocks],
                 "repository_index": materials.repository.model_dump() if materials.repository else None,
+                "execution_projection_context": projection_inputs,
+                "target_catalog": catalog_prompt(target_catalog),
                 "output_schema": ExperimentsOutput.model_json_schema(),
             },
             module="verification.experiments",
@@ -2324,7 +2425,8 @@ def verify_experiments(
         if not item.additional_sources:
             _paper_pointer(materials, item.block_id, item.quote)
         _fully_supported(_covered(claim, item.covered), item.fully_supported_conditions)
-    catalog = build_catalog(claim, materials) if output.items else None
+    has_projection = any(target.projection is not None for plan in output.plans for target in plan.targets)
+    catalog = target_catalog if output.items or has_projection else None
     joint_catalogs = {
         index: prepare_joint_candidate(claim, materials, catalog, item, index, max_sources=source_limit)
         for index, item in enumerate(output.items)
@@ -2340,6 +2442,7 @@ def verify_experiments(
                     "Each condition permits only one explicit joint candidate"
                 )
     frozen_output = copy.deepcopy(output.model_dump()) if scope_binding_repair_rounds else None
+    projection_reviews = {}
     scopes, decisions, scope_issue, scope_audit = (
         _scope_review(
             claim,
@@ -2349,12 +2452,23 @@ def verify_experiments(
             catalog=catalog,
             joint_catalogs=joint_catalogs,
             binding_repair_rounds=scope_binding_repair_rounds,
+            projection_reviews=projection_reviews if has_projection else None,
         )
-        if output.items
+        if output.items or has_projection
         else ({}, {}, None, None)
     )
     if scope_issue:
         result.issues.append(scope_issue)
+    if has_projection:
+        try:
+            if (
+                initial_projection_snapshot is None
+                or projection_snapshot(claim, materials) != initial_projection_snapshot
+            ):
+                raise ValueError("Original paper or released resources changed across projection review")
+        except (ValueError, OSError, TypeError, KeyError) as exc:
+            projection_reviews.clear()
+            result.issues.append(f"Execution projection unavailable: {exc}")
     if scope_binding_repair_rounds and (
         frozen_inputs != (claim.model_dump(), materials.model_dump()) or frozen_output != output.model_dump()
     ):
@@ -2560,10 +2674,37 @@ def verify_experiments(
             str(index): bounded["joint_view"] for index, bounded in joint_catalogs.items()
         }
         scope_audit.write_text(json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8")
-    try:
-        result.plans = [_plan(claim, materials, candidate) for candidate in output.plans]
-    except ValueError as exc:
-        # All paper observations have passed their own strict checks. Expose
-        # them to the orchestrator while rejecting the invalid plan explicitly.
-        raise RejectedPlan(str(exc), result) from exc
+    for plan_index, candidate in enumerate(output.plans):
+        try:
+            plan = _plan(
+                claim,
+                materials,
+                candidate,
+                projection_reviews=projection_reviews,
+                scope_audit=scope_audit,
+                plan_index=plan_index,
+            )
+            if (
+                any(target.projection is not None for target in candidate.targets)
+                and plan.feasibility == "blocked"
+            ):
+                raise ValueError(plan.blocker)
+            result.plans.append(plan)
+        except ValueError as exc:
+            if any(target.projection is not None for target in candidate.targets):
+                from schemas.limitations import VerificationLimitation
+
+                result.issues.append(f"Execution projection plan rejected: {exc}")
+                result.verification_limitations.append(
+                    VerificationLimitation(
+                        claim_id=claim.id,
+                        condition_ids=[c.id for c in claim.conditions],
+                        stage="Experiments",
+                        kind="plan_rejected",
+                        reason=f"Execution projection unavailable: {exc}",
+                    )
+                )
+            else:
+                # Preserve the original single-source plan rejection contract.
+                raise RejectedPlan(str(exc), result) from exc
     return result
