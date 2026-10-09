@@ -2,6 +2,7 @@
 
 import copy
 import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -39,6 +40,26 @@ def context(tmp_path, *, notation=True):
     if notation:
         response["items"][0].update(kind="notation", direction="flaw")
     return claim, materials, response, image, alternate
+
+
+def outside_scope(kwargs):
+    """The original valid real identity has no demonstrated notation contradiction."""
+    payload = json.loads(kwargs["prompt"])
+    return {
+        "schema_version": "theory-concern-v1",
+        "items": [
+            {
+                **pair,
+                "disposition": "outside_scope",
+                "target_sources": [{"block_id": "b1", "quote": "For real x and y"}],
+                "trace_step_ids": ["s2"],
+                "trace_gap_indices": [],
+                "scope_reason": "The source and the trace establish the same real identity; the visual label supplies no contrary mathematical step.",
+                "resolution": "The printed observation does not undermine the stated real identity.",
+            }
+            for pair in payload["allowed_pairs"]
+        ],
+    }
 
 
 @pytest.mark.parametrize("phase", ["verification.theory", "verification.theory.notation"])
@@ -90,12 +111,17 @@ def test_healthy_consumed_image_hash_is_retained_for_later_advice(tmp_path):
     expected = hashlib.sha256(image.read_bytes()).hexdigest()
 
     def model(**kw):
+        if kw["module"] == "verification.theory.concern_scope":
+            return outside_scope(kw)
         if kw["module"] == "verification.theory.notation":
             return {"classification": "manuscript_issue", "explanation": "Fixed visual confirmation."}
         return response
 
     result = verify_theory(claim, materials, call=model)
-    assert result.evidence[0].sufficient and result.evidence[0].direction == "flaw"
+    assert not result.evidence[0].sufficient and result.evidence[0].direction == "flaw"
+    assert not result.evidence[0].affects_claim
+    assert "original PDF page 1 confirmed" in result.evidence[0].note
+    assert result.theory_derivations[0].concern_reviews[0].decision.disposition == "outside_scope"
     assert result.theory_derivations[0].source_hashes[str(image)] == expected
 
 
@@ -107,13 +133,19 @@ def test_missing_unconsumed_page_has_no_effect_on_healthy_item(tmp_path, notatio
     )
 
     def model(**kw):
+        if kw["module"] == "verification.theory.concern_scope":
+            return outside_scope(kw)
         if kw["module"] == "verification.theory.notation":
             return {"classification": "manuscript_issue", "explanation": "Fixed visual confirmation."}
         # Even changes to an unused image cannot affect this item's source identity.
         materials.pages[1].path = str(tmp_path / "still-absent.png")
         return response
 
-    assert verify_theory(claim, materials, call=model).evidence[0].sufficient
+    result = verify_theory(claim, materials, call=model)
+    assert result.evidence[0].sufficient is (not notation)
+    assert result.evidence[0].affects_claim is (not notation)
+    if notation:
+        assert result.theory_derivations[0].concern_reviews[0].decision.disposition == "outside_scope"
 
 
 def test_missing_image_without_notation_does_not_block_derivation(tmp_path):
@@ -205,12 +237,17 @@ def test_two_healthy_notation_items_retain_their_actual_consumed_hashes(tmp_path
     claim, materials, response, _, _ = two_notation_items(tmp_path, different_pages=different_pages)
 
     def model(**kw):
+        if kw["module"] == "verification.theory.concern_scope":
+            return outside_scope(kw)
         if kw["module"] == "verification.theory.notation":
             return {"classification": "manuscript_issue", "explanation": "Fixed visual observation."}
         return response
 
     result = verify_theory(claim, materials, call=model)
-    assert len(result.evidence) == 2 and all(e.sufficient for e in result.evidence)
+    assert len(result.evidence) == 2 and all(
+        not e.sufficient and not e.affects_claim for e in result.evidence
+    )
     for index, record in enumerate(result.theory_derivations):
+        assert record.concern_reviews[0].decision.disposition == "outside_scope"
         page = materials.pages[index if different_pages else 0]
         assert record.source_hashes[page.path] == hashlib.sha256(Path(page.path).read_bytes()).hexdigest()

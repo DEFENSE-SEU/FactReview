@@ -23,6 +23,8 @@ from schemas.claim import (
     PaperTargetSelector,
     PredictionProjection,
     ProjectionScopeDecision,
+    SemanticPredictionProjection,
+    SemanticProjectionScopeDecision,
 )
 from schemas.materials import SharedMaterials
 from screening.checks import ask
@@ -451,7 +453,7 @@ class PlanTarget(Contract):
     reported: PaperNumber
     selector: PaperTargetSelector | None = None
     # Keep malformed new proposals plan-local; the pure binder validates them.
-    projection: PredictionProjection | Any | None = Field(default=None)
+    projection: PredictionProjection | SemanticPredictionProjection | Any | None = Field(default=None)
 
 
 class PlanCandidate(Contract):
@@ -692,7 +694,9 @@ class CatalogScopeReviewV2(Contract):
     schema_version: Literal["catalog-v2"]
     conditions: list[CatalogConditionScope]
     items: list[CatalogItemScopeV2]
-    plan_projection_reviews: list[ProjectionScopeDecision] = Field(default_factory=list)
+    plan_projection_reviews: list[ProjectionScopeDecision | SemanticProjectionScopeDecision] = Field(
+        default_factory=list
+    )
 
 
 def _field(condition, path):
@@ -2046,6 +2050,25 @@ def _scope_review(
 
         try:
             payload["execution_projection_context"] = projection_context(claim, materials)
+            from verification.execution_projection_semantics import semantic_request_context
+
+            payload["execution_projection_semantics_context"] = semantic_request_context(claim, materials)
+            from verification.execution_projection import digest
+
+            payload["execution_projection_semantics_context"]["proposals"] = [
+                {
+                    "plan_index": index,
+                    "condition_id": target.condition_id,
+                    "proposal_sha256": digest(
+                        target.projection.model_dump(mode="json")
+                        if hasattr(target.projection, "model_dump")
+                        else target.projection
+                    ),
+                }
+                for index, plan in enumerate(output.plans)
+                for target in plan.targets
+                if target.projection is not None
+            ]
         except (ValueError, OSError, KeyError, TypeError) as exc:
             payload["execution_projection_context"] = {"unavailable": str(exc)}
     audit = {"claim_id": claim.id, "input": copy.deepcopy(payload)}
@@ -2108,6 +2131,7 @@ def _scope_review(
             "Inference/training provenance, comparisons, population generalizations, filtering, unknown runtime obligations or "
             "unsupported definitions must remain unresolved. Source IDs must identify each required original passage; field path "
             "coverage alone is insufficient. Configuration/code supplied for plans grants no additional paper-support/joint access. "
+            "For released-predictions-v2, use the matching versioned plan review schema and the exact proposal_sha256 supplied in execution_projection_semantics_context.proposals. Independently review each unchanged atom, field binding and claim span; keep each atom's exact unique source ID set and every original mapping. The separate v2 context does not alter v1 decisions or grant paper/joint access. All original text must satisfy the finite recipe and retain its meaning; unknown predicates, inference, derived metrics and positive generalizations remain unresolved even if positions are covered. "
             "Plans without a projection need no projection decision. Do not append, rewrite or merge candidates.",
             payload,
             module="verification.experiments.scope",
@@ -2349,9 +2373,13 @@ def verify_experiments(
     target_catalog = build_catalog(claim, materials)
     try:
         projection_inputs = projection_context(claim, materials)
+        from verification.execution_projection_semantics import semantic_request_context
+
+        semantic_inputs = semantic_request_context(claim, materials)
         initial_projection_snapshot = projection_snapshot(claim, materials)
     except (ValueError, OSError, TypeError, KeyError) as exc:
         projection_inputs = {"unavailable": str(exc)}
+        semantic_inputs = {"unavailable": str(exc)}
         initial_projection_snapshot = None
     output = ExperimentsOutput.model_validate(
         ask(
@@ -2404,6 +2432,7 @@ def verify_experiments(
             "exact identity in the released config. Unknown obligations stay unresolved. Projection requires the actual "
             "released evaluator/data/config, a prose number_id, one original condition and evaluation mode; omit weights "
             "only for this released-predictions resource mode. It does not prove model inference or training. "
+            "The explicit released-predictions-v2 alternative can retain a qualified original metric/condition through source-grounded finite atoms. It preserves every original field and claim character span; select canonical identity/metric only from the actual config, full exact-match definition, complete fixed sample and explicit negative boundaries. Classify arbitrary field keys by their entire values; direct config keys retain runtime precedence. Use execution_projection_semantics_context as a separate version domain, without rewriting the original claim or condition. Each atom must have original condition-scoped paper source IDs; every field and claim fragment lists exactly its finite obligations. Unknown residue cannot be discharged by labeling it irrelevant. Do not convert null/old responses into a proposal or add a model stage. "
             "Use projection=null for ordinary model-inference/v1 targets. No support flag is granted by a proposal.",
             {
                 "claim": claim.model_dump(mode="json"),
@@ -2412,6 +2441,7 @@ def verify_experiments(
                 "paper_blocks": [b.model_dump() for b in materials.blocks],
                 "repository_index": materials.repository.model_dump() if materials.repository else None,
                 "execution_projection_context": projection_inputs,
+                "execution_projection_semantics_context": semantic_inputs,
                 "target_catalog": catalog_prompt(target_catalog),
                 "output_schema": ExperimentsOutput.model_json_schema(),
             },

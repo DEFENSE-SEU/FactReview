@@ -11,7 +11,13 @@ class VerificationLimitation(BaseModel):
     claim_id: StrictStr = Field(min_length=1)
     condition_ids: list[StrictStr] = Field(min_length=1)
     stage: Literal["Literature", "Theory", "Code", "Experiments", "verification", "execution"]
-    kind: Literal["branch_failed", "plan_rejected", "stage_failed", "source_context_unavailable"]
+    kind: Literal[
+        "branch_failed",
+        "plan_rejected",
+        "stage_failed",
+        "source_context_unavailable",
+        "evidence_validation_failed",
+    ]
     responsibility: Literal["system"] = "system"
     reason: StrictStr = Field(min_length=1)
     action: Literal["repair_or_retry_verification"] = "repair_or_retry_verification"

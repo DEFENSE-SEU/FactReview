@@ -291,7 +291,18 @@ def decode_projection_reviews(response, plans):
             if key in seen:
                 raise ProjectionError("Duplicate projection decision cannot restore an earlier decision")
             seen.add(key)
-            row = ProjectionScopeDecision.model_validate(raw)
+            target = next(t for t in plans[key[0]].targets if t.condition_id == key[1])
+            proposed = (
+                target.projection.model_dump()
+                if hasattr(target.projection, "model_dump")
+                else target.projection
+            )
+            if isinstance(proposed, dict) and proposed.get("version") == "released-predictions-v2":
+                from schemas.claim import SemanticProjectionScopeDecision
+
+                row = SemanticProjectionScopeDecision.model_validate(raw)
+            else:
+                row = ProjectionScopeDecision.model_validate(raw)
             accepted[key] = row
         except (ValueError, TypeError) as exc:
             if key in expected:
@@ -406,6 +417,22 @@ def bind_projection_target(
     audit_path,
 ):
     """Reconstruct source, resource, field-role and independent scope obligations."""
+    raw_proposal = proposal.model_dump() if hasattr(proposal, "model_dump") else proposal
+    if isinstance(raw_proposal, dict) and raw_proposal.get("version") == "released-predictions-v2":
+        from verification.execution_projection_semantics import bind_semantic_target
+
+        return bind_semantic_target(
+            claim,
+            condition,
+            reported,
+            materials,
+            selector=selector,
+            proposal=proposal,
+            entry_script=entry_script,
+            config_path=config_path,
+            review=review,
+            audit_path=audit_path,
+        )
     from verification.experiment_targets import _claim_fingerprint, _fingerprint, _scalar_match
 
     proposal = PredictionProjection.model_validate(

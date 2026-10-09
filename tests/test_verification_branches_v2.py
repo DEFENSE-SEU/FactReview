@@ -977,7 +977,10 @@ def test_notation_flaws_require_original_pdf_visual_confirmation(classification,
     assert len(calls) == 2
     if classification == "manuscript_issue":
         assert len(result.evidence) == 1 and result.evidence[0].direction == "flaw"
-        assert result.evidence[0].sufficient and "original PDF page 2 confirmed" in result.evidence[0].note
+        assert (
+            not result.evidence[0].sufficient and "original PDF page 2 confirmed" in result.evidence[0].note
+        )
+        assert not result.evidence[0].affects_claim and not result.evidence[0].concern
     else:
         assert result.evidence == []
         assert any(

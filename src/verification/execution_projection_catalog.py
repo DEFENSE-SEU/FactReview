@@ -203,3 +203,96 @@ def request_choices(claim, materials, *, repository_files):
                 "consumer_still_checks": "Full claim, every setting/qualifier, exact source location, selected occurrence, resource AST, all data, independent scope and immutable hashes.",
             }
     return result
+
+
+def semantic_request_choices(claim, materials, *, repository_files):
+    """A separate v2 menu; historical v1 choices remain exactly reconstructable."""
+    from verification.execution_projection_semantics import _metric, _source_authorized, pointer_tokens
+    from verification.experiment_targets import TargetBindingError, _scalar_match
+
+    previous = request_choices(claim, materials, repository_files=repository_files)
+    catalog = build_catalog(claim, materials)
+    result = {
+        key: previous[key]
+        for key in (
+            "recipe",
+            "status",
+            "resource_contract",
+            "target_contract",
+            "entries",
+            "configs",
+            "data_candidates",
+            "issues",
+        )
+    }
+    result["schema_version"] = "released-prediction-semantic-choices-v2"
+    result["conditions"] = {}
+    for condition in claim.conditions:
+        original = previous["conditions"].get(condition.id, {})
+        sources = {
+            sid: resolve_source(catalog, sid, materials)
+            for sid, row in catalog["sources"].items()
+            if row.get("block_id") and _source_authorized(catalog, row, condition.id)
+        }
+        by_config = {}
+        for path, row in original.get("by_config", {}).items():
+            cfg = row["configuration"]
+            runtime = Condition(
+                id=condition.id, dataset=cfg["dataset"], metric=cfg["metric"], settings=cfg["settings"]
+            )
+            names = [cfg["dataset"]]
+            if isinstance(cfg["settings"].get("split"), str):
+                names.append(cfg["dataset"] + " " + cfg["settings"]["split"])
+            compatible = (
+                condition.dataset in names
+                and cfg["metric"] in {"accuracy", "exact-match accuracy"}
+                and _metric(condition.metric, cfg) is not None
+            )
+            choices = []
+            if compatible:
+                for identifier, number in catalog["numbers"].items():
+                    try:
+                        scalar = _scalar_match(number["sentence"], runtime)
+                    except TargetBindingError:
+                        continue
+                    if scalar is None or scalar[2] is not None or not 0 <= scalar[1] <= 1:
+                        continue
+                    leading = len(number["sentence"]) - len(number["sentence"].lstrip())
+                    if scalar[0].span("value") != (
+                        number["start"] - number["sentence_start"] - leading,
+                        number["end"] - number["sentence_start"] - leading,
+                    ):
+                        continue
+                    authorized = [
+                        sid
+                        for sid, source in sources.items()
+                        if source["block_id"] == number["block_id"]
+                        and source["start"] <= number["sentence_start"]
+                        and number["sentence_end"] <= source["end"]
+                    ]
+                    if authorized:
+                        choices.append(
+                            {
+                                "number_id": identifier,
+                                "source_ids": authorized,
+                                "sentence": number["sentence"],
+                                "token": number["token"],
+                            }
+                        )
+            fields = []
+            for field, value in original.get("original_fields", {}).items():
+                tokens = pointer_tokens(field)
+                direct = (
+                    tokens[1]
+                    if len(tokens) == 2 and tokens[0] == "settings" and tokens[1] in cfg["settings"]
+                    else None
+                )
+                fields.append({"path": field, "original_value": value, "runtime_key_required": direct})
+            by_config[path] = {
+                "configuration": cfg,
+                "finite_metric_scope_compatible": compatible,
+                "original_fields": fields,
+                "prose_scalar_candidates": choices,
+            }
+        result["conditions"][condition.id] = {"condition_source_ids": list(sources), "by_config": by_config}
+    return result

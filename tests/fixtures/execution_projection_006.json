@@ -1,0 +1,65 @@
+{
+  "provenance": {
+    "source": "runs\\v2_method_delivery\\execution-projection-semantic-contract-design\\evidence.json",
+    "source_sha256": "70fd11a7e933b2b796359f28a2d38ad2bef68ace184d20c09a6dd36bb003995d",
+    "tier": "original saved actual claim; no re-extraction"
+  },
+  "claim": {
+    "id": "claim_006",
+    "text": "On MiniSet test, model ExactMatch has accuracy 0.75 over 4 examples, with accuracy computed as exact equality of each prediction and label.",
+    "loc": {
+      "page": 1,
+      "section": "section_5: 3. Evaluation",
+      "char_start": 1143,
+      "char_end": 1479
+    },
+    "source_block_id": "block_10",
+    "source_quote": "On MiniSet test, model ExactMatch has accuracy 0.75. Accuracy is a fraction, computed by exact equality of each prediction and label. Three of the four fixed test predictions are correct. Table 1 reports the result and Figure 1 shows the corresponding counts. No repeated-run uncertainty or population-performance conclusion is claimed.",
+    "source_refs": [
+      {
+        "source_block_id": "block_11",
+        "source_quote": "Table 1. MiniSet test result. Accuracy is a fraction; bold type identifies the measured accuracy, with no ranking against other models.\n<table><tr><td>Model</td><td>Test accuracy</td><td>Examples</td></tr><tr><td>ExactMatch</td><td>0.75</td><td>4</td></tr></table>",
+        "loc": {
+          "page": 1,
+          "section": "block_9: 3. Evaluation",
+          "char_start": null,
+          "char_end": null
+        },
+        "covered": [
+          "c1"
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "id": "c1",
+        "dataset": "MiniSet test",
+        "metric": "Test accuracy",
+        "settings": {
+          "model": "ExactMatch",
+          "accuracy": 0.75,
+          "examples": 4,
+          "accuracy_computation": "fraction computed by exact equality of each prediction and label",
+          "scope_qualifiers": [
+            "four fixed test predictions",
+            "no repeated-run uncertainty or population-performance conclusion",
+            "no ranking against other models"
+          ]
+        },
+        "description": "Measured ExactMatch accuracy on MiniSet test."
+      }
+    ],
+    "needs": [
+      "Code",
+      "Experiments"
+    ],
+    "importance": "core",
+    "questions": [],
+    "evidence": [],
+    "status": "unverified",
+    "notes": [],
+    "advice": null,
+    "theory_derivations": [],
+    "verification_limitations": []
+  }
+}
