@@ -1,5 +1,10 @@
 # FactReview v2 acceptance checks
 
+| Latest follow-up correction | Verdict | Evidence / limit |
+|---|---|---|
+| Describe existing grouped action constraints explicitly | static pass; independent review pass | Only `_FOLLOWUP_SYSTEM` changed;70 other AST nodes unchanged. Compile/Ruff/diff pass; independent report40463bf9. No additional tests or model calls. |
+| Actual extraction quality after this clarification | unverified | This does not repair historical outputs or prove recall. M2/M5 remain open. Full-native v5 is separately pinned to d2b0ff8. |
+
 Latest implementation checkpoint: `d2b0ff8764e5ba55ab6b0a09b3e1a17552638f16`, pushed and remotely verified. Current actual evidence and its limitations are recorded below. The original14-item engineering table is explicitly historical; it does not certify current whole-paper scientific accuracy.
 
 ## Current phase 4 correction: exclusive execution decision

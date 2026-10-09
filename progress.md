@@ -1,5 +1,13 @@
 # FactReview v2 progress
 
+## Phase 3 follow-up action contract clarification
+
+The actual coverage continuation rejected two `revise` actions attached to merged-conclusion observations. The follow-up prompt now states the existing group-level contract: any uncertain observation requires unresolved; any merged observation permits a source-justified split or unresolved, and a simultaneous qualifier correction cannot authorize revise. A shared conclusion may remain unchanged for independent validation to dismiss an unfounded merge observation. No validator, schema, budget or adoption behavior changed.
+
+Necessary verification: only `_FOLLOWUP_SYSTEM` differs in the AST;70 other top-level nodes are unchanged. Compilation, Ruff and scoped diff checks pass. No additional tests or actual model calls were run. Independent review passes: `coverage-action-contract-clarification/review.md` (SHA40463bf9), source82bc4cb0. This clarifies action legality and cannot establish improved recall or repair the recorded M2/M5 scope omissions. The separately prepared v5 integration remains pinned to d2b0ff8, so it will not validate this later clarification.
+
+Full-native v5 passed independent controller review (`full-native-verified-v5/independent-review.md`, SHA5d989515). After successful Docker daemon/image preflight, preparation created `prepared-517cc1f86ab2`; the complete seven-stage actual run is in progress at `actual-35ce0611055b`. It retains the original synthetic input,80-call/500k-known-token budget and all strict gates. No result is claimed while it is running.
+
 Latest implementation is pushed at `d2b0ff8764e5ba55ab6b0a09b3e1a17552638f16`, exactly matched on the remote branch. The phase4 exclusive-decision path has completed one actual Docker execution; its overall strict accounting failure is retained. The phase3 status-unit prompt clarification is independently reviewed but has no new actual semantic result.
 
 The completed coverage continuation's final independent report is `claim-coverage-continuation-probe-v1/independent-actual-5d02c58681d6/review.md` (SHA `8cc68275...`), with192 frozen source and610 protected files unchanged. M2/M5 and candidate008 atomicity remain open; no historical claims were adopted.
