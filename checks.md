@@ -1,14 +1,27 @@
 # FactReview v2 acceptance checks
 
+## Latest phase 3 correction: explicit coverage decisions
+
+Frozen coverage source `13d6dceb2bace703d5c5e5adccb6c8150a0e2b366202872643b7e9085250d51f` requests an explicit v3 review. Each claim declares its source-grounded assertion groups and qualifier/needs findings once. The exact declarations lower to the existing correction and independent-validation stages with saved mappings. Preserved qualifiers point to unchanged values in the claim's own text/conditions. Uncertainty stays nonblocking; semantic correctness is not inferred from a valid record.
+
+| requirement | verdict | evidence | correction / limit |
+|---|---|---|---|
+| Explicit groups and qualifier/needs findings reach the existing adoption path | pass | `claim-coverage-v3-implementation/report.md`, `freeze.json`; 9 necessary mocked controls, Ruff and format checks. | Original tests unchanged; no whole-suite run. Merge and uncertain reasons retain their original groups/findings. |
+| Historical source availability preserves original identity and window accounting | pass | `historical-source-feasibility.json` in the same directory: 13 exact original blocks, 6138 characters, including227 as unassigned background. | Loading creates no claim association, reviewed range, resolved observation or scientific conclusion. Character limits and unavailable sources remain explicit. |
+| Old v2 failures remain rejected | pass | New legacy-pair and public-source isolation controls; `old-contract-ast-proof.json` confirms 40 original nodes unchanged. | Old responses gain no inferred merge observation or supplemental citation permission. |
+| Frozen v3 implementation independently reviewed | pass | `claim-coverage-v3-design-independent/final-implementation-review.md`, SHA `9d39728b...`; source, test and design match the author freeze. | No blocking finding; no duplicate test run or new actual call. |
+| Real semantic extraction quality after this version | unresolved | No actual v3-wire request has yet run. Existing genuine-paper outcomes remain unchanged. | M5's lost selection restrictions,054's unnecessary hold and complete coverage remain open. |
+
 ## Latest phase 4 correction: original fixed-population claims
 
-The finite interpretation correction is reviewed and ready for checkpoint. Both candidate construction and final semantic validation require an explicit original sample-count witness for a qualitative fixed-population phrase. Dataset/metric names, runtime identities, configuration row counts and another condition cannot supply that witness. Scalar/definition/sample/boundary clauses retain complete original text, all fields, exact source binding and independent scope review.
+The finite interpretation correction is committed and pushed at `ecabcbc00644392fd7a9b2666b5b392b4700d214`, with the remote head verified exactly. Both candidate construction and final semantic validation require an explicit original sample-count witness for a qualitative fixed-population phrase. Dataset/metric names, runtime identities, configuration row counts and another condition cannot supply that witness. Scalar/definition/sample/boundary clauses retain complete original text, all fields, exact source binding and independent scope review.
 
 | requirement | verdict | evidence | correction / limit |
 |---|---|---|---|
 | Compose the original fixed-prediction claim without dropping obligations | pass | `fixed-population-composition-implementation/report.md`, `freeze.json`; semantics `3d608278...`, choices `b71daf3a...`; 78 targeted controls plus source-withdrawal and identity-role controls. | Existing tests were unchanged; no whole-suite rerun. |
 | Independent source review of builder and final consumer | pass | `fixed-population-composition-independent/review.md`; exact frozen source and changed-function review. | No blocking finding; no extra actual calls. |
 | Saved native-v4 responses produce an actual execution plan | fail | `fixed-population-composition-implementation/original-replay.json`: one structural candidate, zero plans and zero sufficient evidence; 159 original/frozen files unchanged. | Old unresolved/legacy collision and joint-source errors remain. Eligibility does not establish actual selection or Docker execution. |
+| Fresh native selection and Docker handoff on ecabcbc | fail | `claim006-native-followup-v1/actual-45160486ae7f`: two logical/physical requests, 40535 measured tokens, no missing usage; one candidate explicitly selected, but zero accepted plans/attempts. | The first response also emits a same-condition legacy plan, so the unchanged conflict gate rejects both. Joint metric-definition roles lack consumers. Partial report, source guards and usage checks pass; no execution/cleanup coverage. |
 
 Next extraction work implements an explicit versioned coverage contract with one source-grounded representation per problem. It preserves missing-needs and uncertain findings, old v2 failures, final semantic adoption, and the distinction between loaded source blocks and reviewed coverage. The independent design review is `claim-coverage-v3-design-independent/review.md`. The remaining scientific mistakes on claims030/054 are still open.
 

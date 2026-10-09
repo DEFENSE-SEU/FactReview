@@ -1,6 +1,22 @@
 # FactReview v2 progress
 
+## Latest phase 3 checkpoint: explicit coverage decisions
+
+Completed: `src/screening/claim_coverage.py` now requests an explicit v3 review, with one source-grounded declaration of each claim's independent groups and qualifier/needs findings. The exact groups and findings pass into the existing follow-up through an audited lowering step. Preserved qualifier carriers are exact values under this claim's text/conditions. Unresolved findings remain uncertain and do not create a claim block. Original raw decisions and lowering errors are retained.
+
+Verification: 9 necessary mocked controls pass in 0.46 seconds; Ruff, format and scoped diff checks pass. Forty original schema/prompt/helper nodes remain AST-identical; only the existing orchestration wiring changed. Existing tests and all actual outcomes remain untouched. Source is frozen at `13d6dceb2bace703d5c5e5adccb6c8150a0e2b366202872643b7e9085250d51f`, with evidence under `claim-coverage-v3-implementation/`. Independent source review found no blocker; its frozen report is `claim-coverage-v3-design-independent/final-implementation-review.md` (`9d39728b...`).
+
+Decisions: retain three model stages, existing budgets and old v2 rejection. Revalidate needed historical sources from the same frozen material, including null-target findings as explicitly unassigned background. Bound supplements by text characters, with no arbitrary block-count cutoff. Loaded sources do not count as reviewed or clear old pending issues. A separate offline check revalidated 13 original blocks/6138 characters, including227; it does not migrate old histories or repair050 automatically.
+
+Open issues: no actual v3-wire semantic result yet. M5's missing selection restrictions and054's false necessity remain unresolved. The fresh ecabcbc execution experiment selected the correct structural candidate but was rejected for returning both choice and legacy plan representations; no Docker attempt occurred. Do not repeat the unchanged full pipeline or reinterpret those failures as passes.
+
+Next action: complete the frozen independent source review, checkpoint/push phase 3, then use one bounded original-request check to inspect the new review contract. Continue the separate exclusive execution-decision design. Keep testing targeted and delegated. The goal remains active.
+
 ## Latest phase 4 checkpoint: fixed-population composition
+
+The phase 4 correction is committed and pushed as `ecabcbc00644392fd7a9b2666b5b392b4700d214`; the remote branch matches exactly. The next narrowly scoped actual check is being prepared from this frozen commit and the original native-v4 claim006/materials. It will exercise Experiments and qualified L3 only, without repeating extraction, MinerU, Literature or new report advice. No new actual result is claimed yet.
+
+That single-claim actual has now finished: `claim006-native-followup-v1/actual-45160486ae7f`, from `prepared-1b4c2fd908ed`. Two native logical/physical requests used 40535 measured tokens with no missing usage. The registry has one candidate and the first response explicitly selects it, but also supplies a same-condition legacy plan with null projection. The existing mutual-exclusion gate rejects both; no Docker attempt occurs. A separate joint-source item declares metric-definition roles with no numerical/bridge consumer. Its scope pair is rejected, which causes the later missing-pair diagnostic; the model did return all five pairs. The partial report and strict source/usage checks pass. The actual result remains failed, with zero execution/cleanup coverage. Original scientific fields and all declared source/controller/input guards are unchanged. Next execution work is a design for one explicit mutually exclusive decision representation, preserving strict historical rejection; no identical actual retry is planned.
 
 Completed: the original native-v4 finite-language gap is corrected in `execution_projection_semantics.py` and `execution_projection_choices.py`. Original scalar, definition, sample and negative-boundary clauses compose without dropping fields. A qualitative fixed-population phrase requires an explicit original count for the same condition in both builder and final semantic consumer. Identity-shaped strings cannot donate a count. The independent source review found no blocker on semantics `3d608278...` / choices `b71daf3a...`.
 
