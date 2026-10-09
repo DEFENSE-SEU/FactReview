@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import re
 import xml.etree.ElementTree as ET
@@ -144,9 +145,10 @@ class PaperSearchAdapter:
         return _apply_cutoff_to_search_result(result, cutoff_date)
 
     async def read_papers(self, *, items: list[dict]) -> dict:
-        if self.read_configured:
-            return await self._read_remote(items)
-        return await self._read_arxiv_fallback(items)
+        async with asyncio.timeout(max(1, int(self.read_cfg.timeout_seconds))):
+            if self.read_configured:
+                return await self._read_remote(items)
+            return await self._read_arxiv_fallback(items)
 
     async def get_search_runtime_state(
         self,
@@ -689,8 +691,8 @@ class PaperSearchAdapter:
         except Exception:
             return None
 
-        pages = [page.strip() for page in parsed.pages if str(page or "").strip()]
-        if not pages:
+        pages = [str(page or "").strip() for page in parsed.pages]
+        if not any(pages):
             return None
 
         evidence = self._select_relevant_passages(pages=pages, question=question, max_items=5)
