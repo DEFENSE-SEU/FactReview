@@ -52,19 +52,39 @@ class WritingCandidate(Contract):
 
 class WritingDecision(Contract):
     candidate_id: NonEmpty
-    classification: Literal[
-        "manuscript_error",
-        "clarity_issue",
+    decision: Literal["accept", "reject", "uncertain"]
+    confirmed_kind: Literal["grammar", "consequential_ambiguity", "cross_reference", "anonymity"] | None
+    reason: Literal[
+        "visible_defect",
         "parser_artifact",
         "style",
-        "uncertain",
-        "cross_reference_error",
-        "anonymity_violation",
+        "candidate_not_supported",
+        "not_applicable",
+        "insufficient_context",
     ]
     explanation: NonEmpty
 
+    @model_validator(mode="after")
+    def applicable_decision(self):
+        if self.decision == "accept":
+            if self.confirmed_kind is None or self.reason != "visible_defect":
+                raise ValueError("accepted writing decisions require a confirmed kind and visible_defect")
+        elif self.confirmed_kind is not None:
+            raise ValueError("rejected or uncertain writing decisions cannot confirm a kind")
+        elif self.decision == "reject" and self.reason not in {
+            "parser_artifact",
+            "style",
+            "candidate_not_supported",
+            "not_applicable",
+        }:
+            raise ValueError("rejected writing decisions require an applicable rejection reason")
+        elif self.decision == "uncertain" and self.reason != "insufficient_context":
+            raise ValueError("uncertain writing decisions require insufficient_context")
+        return self
+
 
 class WritingPageReview(Contract):
+    version: Literal["writing-decision-v1"]
     results: list[WritingDecision]
 
 
@@ -96,18 +116,25 @@ _VALIDATION_SYSTEM = (
     "Verify every supplied writing candidate against the attached original PDF page. Read the printed "
     "sentence, mathematical symbols, and surrounding context. Return output_schema JSON with exactly "
     "one result per candidate_id and no new IDs. Additional supplied pages show the original located "
-    "cross-reference targets; compare those pixels as well. Confirm the proposed defect itself. Use manuscript_error "
+    "cross-reference targets; compare those pixels as well. First decide whether the candidate's specific "
+    "allegation is confirmed: decision=accept, reject, or uncertain. Only accept may have confirmed_kind; "
+    "its reason must be visible_defect. If the original allegation is unsupported and you see a different "
+    "issue, reject this candidate; do not substitute another defect. Choose confirmed_kind=grammar "
     "only for a visible concrete typo or grammatical construction error. Explain the violated grammatical "
     "relation; conventional dataset/split names and optional articles do not alone establish an error. "
-    "Use clarity_issue only for a specific ambiguity that materially changes scientific meaning or prevents "
-    "understanding. Use parser_artifact for OCR errors or parsing-related spacing; style for discretionary "
+    "Choose consequential_ambiguity only for a specific ambiguity that materially changes scientific meaning "
+    "or prevents understanding. Reject with reason=parser_artifact for OCR errors or parsing-related spacing; "
+    "reject with reason=style for discretionary "
     "hyphenation, capitalization, rephrasing, concision, synonyms, article conventions or voice preferences. "
-    "For cross_reference candidates, use cross_reference_error only when the printed unresolved placeholder "
+    "For cross_reference candidates, accept with confirmed_kind=cross_reference only when the printed unresolved placeholder "
     "or concrete contradiction with the uniquely located supplied target is confirmed. Absence from a parser "
-    "index cannot establish absence from the manuscript. For anonymity candidates use anonymity_violation "
+    "index cannot establish absence from the manuscript. A consistent target requires rejection of the "
+    "alleged inconsistency. For anonymity candidates, accept with confirmed_kind=anonymity "
     "only under policy=required with visible explicit authorship/self-identification; cited names or "
-    "self-citations alone are insufficient. Each positive classification must match the candidate category. "
-    "Use uncertain when the page/context cannot establish the specific issue. A parsed quote alone cannot "
+    "self-citations alone are insufficient. Each confirmed_kind must match the candidate category. "
+    "Other unsupported allegations use reject/candidate_not_supported; inapplicable checks use "
+    "reject/not_applicable. Use uncertain/insufficient_context when the page/context cannot establish the "
+    "specific issue. Reject and uncertain require confirmed_kind=null. A parsed quote alone cannot "
     "confirm an error. Explain visible evidence and preserve the original material."
 )
 
@@ -315,7 +342,11 @@ def _check_section(materials, group, record, index, *, call, first_candidate):
                         "anonymity_policy": record.anonymity_policy,
                         "additional_target_pages": target_pages,
                         "candidates": [
-                            {"candidate_id": candidate_id, **row.model_dump(), "targets": targets}
+                            {
+                                "candidate_id": candidate_id,
+                                **row.model_dump(exclude={"level"}),
+                                "targets": targets,
+                            }
                             for candidate_id, row, _finding, targets in page_candidates
                         ],
                         "output_schema": WritingPageReview.model_json_schema(),
@@ -333,31 +364,30 @@ def _check_section(materials, group, record, index, *, call, first_candidate):
                 )
             decisions = {item.candidate_id: item for item in review.results}
             positive = {
-                "language": {"manuscript_error", "clarity_issue"},
-                "cross_reference": {"cross_reference_error"},
-                "anonymity": {"anonymity_violation"},
+                "language": {"grammar", "consequential_ambiguity"},
+                "cross_reference": {"cross_reference"},
+                "anonymity": {"anonymity"},
             }
-            all_positive = set().union(*positive.values())
             for candidate_id, row, _finding, _targets in page_candidates:
-                classification = decisions[candidate_id].classification
-                if classification in all_positive and classification not in positive[row.category]:
-                    raise ValueError("Writing validation classification does not match candidate category")
+                decision = decisions[candidate_id]
+                if decision.decision == "accept" and decision.confirmed_kind not in positive[row.category]:
+                    raise ValueError("Writing validation confirmed kind does not match candidate category")
         except Exception as exc:
             record.issues.append(f"writing page {page_number}: original PDF validation failed: {exc}")
             record.status = "failed"
             continue
         for candidate_id, row, finding, targets in page_candidates:
             decision = decisions[candidate_id]
-            if decision.classification not in positive[row.category]:
+            if decision.decision != "accept":
                 record.issues.append(
                     f"{candidate_id} ({row.block_id}, page {page_number}): "
-                    f"{decision.classification}; {decision.explanation}"
+                    f"{decision.decision}/{decision.reason}; {decision.explanation}"
                 )
-                if decision.classification == "uncertain" and record.status != "failed":
+                if decision.decision == "uncertain" and record.status != "failed":
                     record.status = "unavailable"
                 continue
             finding.level = (
-                "clarity_issue" if decision.classification == "clarity_issue" else "definite_error"
+                "clarity_issue" if decision.confirmed_kind == "consequential_ambiguity" else "definite_error"
             )
             finding.evidence[0].note += f"; original PDF page {page_number} confirmed: {decision.explanation}"
             if row.category != "language":

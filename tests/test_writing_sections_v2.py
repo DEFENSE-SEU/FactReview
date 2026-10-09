@@ -55,16 +55,29 @@ def candidate(block, **extra):
     }
 
 
-def confirmations(payload, classification="manuscript_error"):
+def confirmation(
+    candidate_id,
+    *,
+    decision="accept",
+    kind="grammar",
+    reason="visible_defect",
+    explanation="The original page confirms the stated, concrete issue.",
+):
     return {
+        "candidate_id": candidate_id,
+        "decision": decision,
+        "confirmed_kind": kind,
+        "reason": reason,
+        "explanation": explanation,
+    }
+
+
+def confirmations(payload, kind="grammar", **decision_fields):
+    return {
+        "version": "writing-decision-v1",
         "results": [
-            {
-                "candidate_id": row["candidate_id"],
-                "classification": classification,
-                "explanation": "The original page confirms the stated, concrete issue.",
-            }
-            for row in payload["candidates"]
-        ]
+            confirmation(row["candidate_id"], kind=kind, **decision_fields) for row in payload["candidates"]
+        ],
     }
 
 
@@ -153,7 +166,7 @@ def test_anonymity_explicit_policy_controls_same_source(tmp_path, policy):
         calls.append(kwargs["module"])
         assert payload["anonymity_policy"] == policy
         if kwargs["module"] == "screening_writing.validation":
-            return confirmations(payload, "anonymity_violation")
+            return confirmations(payload, "anonymity")
         return {
             "findings": [
                 candidate(
@@ -182,7 +195,7 @@ def test_cited_author_name_is_not_a_confirmed_anonymity_violation(tmp_path):
     def call(**kwargs):
         payload = json.loads(kwargs["prompt"])
         if kwargs["module"] == "screening_writing.validation":
-            return confirmations(payload, "uncertain")
+            return confirmations(payload, None, decision="uncertain", reason="insufficient_context")
         return {
             "findings": [
                 candidate(
@@ -241,7 +254,7 @@ def test_placeholder_can_be_confirmed_but_catalog_absence_is_not_proof(
     def call(**kwargs):
         payload = json.loads(kwargs["prompt"])
         if kwargs["module"] == "screening_writing.validation":
-            return confirmations(payload, "cross_reference_error")
+            return confirmations(payload, "cross_reference")
         return {
             "findings": [
                 candidate(
@@ -270,16 +283,19 @@ def test_dataset_phrase_style_is_excluded_while_agreement_error_survives(tmp_pat
         payload = json.loads(kwargs["prompt"])
         if kwargs["module"] == "screening_writing.validation":
             return {
+                "version": "writing-decision-v1",
                 "results": [
                     {
                         "candidate_id": c["candidate_id"],
-                        "classification": "style" if c["quote"] == quotes[0] else "manuscript_error",
+                        "decision": "reject" if c["quote"] == quotes[0] else "accept",
+                        "confirmed_kind": None if c["quote"] == quotes[0] else "grammar",
+                        "reason": "style" if c["quote"] == quotes[0] else "visible_defect",
                         "explanation": "Optional article convention."
                         if c["quote"] == quotes[0]
                         else "Plural subject conflicts with singular verb.",
                     }
                     for c in payload["candidates"]
-                ]
+                ],
             }
         return {"findings": [candidate({"id": "b1", "text": q}) for q in quotes]}
 
@@ -302,7 +318,7 @@ def test_cross_reference_conflict_uses_both_original_pages(tmp_path):
             assert kwargs["images"] == [p.path for p in materials.pages]
             assert payload["additional_target_pages"] == [2]
             assert payload["candidates"][0]["targets"][0]["quote"] == materials.blocks[1].text
-            return confirmations(payload, "cross_reference_error")
+            return confirmations(payload, "cross_reference")
         return {
             "findings": [
                 candidate(
@@ -379,7 +395,7 @@ def test_required_policy_includes_original_author_block_only_for_policy(tmp_path
     def call(**kwargs):
         payload = json.loads(kwargs["prompt"])
         if kwargs["module"] == "screening_writing.validation":
-            return confirmations(payload, "anonymity_violation")
+            return confirmations(payload, "anonymity")
         assert payload["policy_only_block_ids"] == ["b1"]
         return {
             "findings": [
@@ -438,7 +454,7 @@ def test_positive_classification_cannot_change_candidate_category(tmp_path):
     def call(**kwargs):
         payload = json.loads(kwargs["prompt"])
         if kwargs["module"] == "screening_writing.validation":
-            return confirmations(payload, "anonymity_violation")
+            return confirmations(payload, "anonymity")
         return {"findings": [candidate(payload["blocks"][0])]}
 
     records = []
@@ -492,7 +508,7 @@ def test_unexpanded_latex_reference_retains_exact_target_key(tmp_path):
     def call(**kwargs):
         payload = json.loads(kwargs["prompt"])
         if kwargs["module"] == "screening_writing.validation":
-            return confirmations(payload, "cross_reference_error")
+            return confirmations(payload, "cross_reference")
         return {
             "findings": [
                 candidate(
