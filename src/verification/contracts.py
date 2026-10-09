@@ -2,7 +2,8 @@
 
 from pydantic import Field
 
-from schemas.claim import AuthorQuestion, Contract, Evidence, ExecutionPlan, Finding
+from schemas.claim import AuthorQuestion, Contract, Evidence, ExecutionPlan, Finding, TheoryDerivationRecord
+from schemas.limitations import VerificationLimitation
 
 
 class BranchResult(Contract):
@@ -11,6 +12,8 @@ class BranchResult(Contract):
     findings: list[Finding] = Field(default_factory=list)
     questions: list[AuthorQuestion] = Field(default_factory=list)
     issues: list[str] = Field(default_factory=list)
+    theory_derivations: list[TheoryDerivationRecord] = Field(default_factory=list)
+    verification_limitations: list[VerificationLimitation] = Field(default_factory=list)
 
 
 class RejectedPlan(ValueError):

@@ -7,7 +7,8 @@ from pathlib import Path
 
 from pydantic import Field
 
-from schemas.claim import AuthorQuestion, Claim, Contract, EvidenceNeed, ExecutionPlan, Finding
+from schemas.claim import Claim, Contract, EvidenceNeed, ExecutionPlan, Finding
+from schemas.limitations import VerificationLimitation
 from schemas.materials import SharedMaterials
 from verification.contracts import BranchResult, RejectedPlan
 
@@ -33,8 +34,18 @@ async def _invoke(branch, claim, materials):
 def _validate_result(claim: Claim, name: EvidenceNeed, result: BranchResult):
     if name != EvidenceNeed.EXPERIMENTS and result.plans:
         raise ValueError("Only Experiments may emit execution plans")
+    if name != EvidenceNeed.THEORY and result.theory_derivations:
+        raise ValueError("Only Theory may emit derivation records")
     # Validate foreign coverage/questions before mutating the shared claim record.
-    Claim.model_validate({**claim.model_dump(), "evidence": result.evidence, "questions": result.questions})
+    Claim.model_validate(
+        {
+            **claim.model_dump(),
+            "evidence": result.evidence,
+            "questions": result.questions,
+            "theory_derivations": result.theory_derivations,
+            "verification_limitations": result.verification_limitations,
+        }
+    )
     conditions = {condition.id: condition for condition in claim.conditions}
     for plan in result.plans:
         if plan.claim_id != claim.id or any(conditions.get(c.id) != c for c in plan.target_conditions):
@@ -70,7 +81,9 @@ async def verify_claims(
 
         branches = {
             EvidenceNeed.LITERATURE: literature,
-            EvidenceNeed.THEORY: lambda c, m: verify_theory(c, m, call=call),
+            EvidenceNeed.THEORY: lambda c, m: verify_theory(
+                c, m, call=call, output_dir=output_dir / "theory_derivations"
+            ),
             EvidenceNeed.CODE: lambda c, m: verify_code(c, m, call=call),
             EvidenceNeed.EXPERIMENTS: lambda c, m: verify_experiments(c, m, call=call),
         }
@@ -90,16 +103,29 @@ async def verify_claims(
                     ) from exc
                 value = exc.observations
                 value.issues.append(f"Execution plan rejected: {exc}")
+                value.verification_limitations.append(
+                    VerificationLimitation(
+                        claim_id=claim.id,
+                        condition_ids=[c.id for c in claim.conditions],
+                        stage=name.value,
+                        kind="plan_rejected",
+                        reason=str(exc),
+                    )
+                )
             _validate_result(claim, name, value)
             return value
         except Exception as exc:
             message = f"{name} verification failed: {exc}"
             return BranchResult(
                 issues=[message],
-                questions=[
-                    AuthorQuestion(
-                        claim_id=claim.id, text=f"Please provide evidence for: {claim.text}", reason=message
-                    ),
+                verification_limitations=[
+                    VerificationLimitation(
+                        claim_id=claim.id,
+                        condition_ids=[c.id for c in claim.conditions],
+                        stage=name.value,
+                        kind="branch_failed",
+                        reason=message,
+                    )
                 ],
             )
 
@@ -109,13 +135,21 @@ async def verify_claims(
         claim.evidence.extend(output.evidence)
         claim.questions.extend(output.questions)
         claim.notes.extend(output.issues)
+        claim.theory_derivations.extend(output.theory_derivations)
+        claim.verification_limitations.extend(output.verification_limitations)
         result.plans.extend(output.plans)
         result.findings.extend(output.findings)
         result.issues.extend(f"{claim.id}: {issue}" for issue in output.issues)
     if global_literature is not None:
         try:
             global_result = await _invoke(global_literature, None, materials)
-            if global_result.plans or global_result.evidence or global_result.questions:
+            if (
+                global_result.plans
+                or global_result.evidence
+                or global_result.questions
+                or global_result.theory_derivations
+                or global_result.verification_limitations
+            ):
                 raise ValueError("Global literature produces findings/issues only")
             result.findings.extend(global_result.findings)
             result.issues.extend(global_result.issues)
