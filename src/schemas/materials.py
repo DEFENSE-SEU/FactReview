@@ -38,6 +38,24 @@ class FigureMaterial(BaseModel):
     printed_dpi: int = 96
 
 
+class TableMaterial(BaseModel):
+    """One parser table and its original visual context; independent of figures."""
+
+    id: str
+    block_id: str
+    anchor: str = ""
+    loc: ClaimLocation | None = None
+    caption: str = ""
+    footnotes: str = ""
+    caption_ambiguous: bool = False
+    references: list[MaterialBlock] = Field(default_factory=list)
+    bbox_points: tuple[float, float, float, float] | None = None
+    crop_path: str = ""
+    printed_crop_path: str = ""
+    printed_dpi: int = 96
+    issues: list[str] = Field(default_factory=list)
+
+
 class RepositoryFile(BaseModel):
     path: str
     kind: Literal["documentation", "config", "entry", "source", "asset"]
@@ -64,6 +82,7 @@ class SharedMaterials(BaseModel):
     blocks: list[MaterialBlock] = Field(default_factory=list)
     pages: list[PageImage] = Field(default_factory=list)
     figures: list[FigureMaterial] = Field(default_factory=list)
+    tables: list[TableMaterial] = Field(default_factory=list)
     bibliography: list[MaterialBlock] = Field(default_factory=list)
     repository: RepositoryIndex | None = None
     issues: list[str] = Field(default_factory=list)
