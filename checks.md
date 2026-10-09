@@ -1,5 +1,13 @@
 # FactReview v2 acceptance checks
 
+## Unified follow-up checkpoint (2026-10-09)
+
+Frozen `438e2e66c8be5be3907794136a2c918f129b6fb0` passes **3324 default tests** (284.48s, three original deselections, two preexisting malformed-binding warnings) and **two separate legacy tests** (3.38s). All 21 changed Python files pass Ruff check/format. The full source/test/script/vendor inventory stays unchanged through regression, packaging and installed smoke: `runs/v2_method_delivery/integration-followups/regression-final-v1/`.
+
+Wheel SHA256 `2d217803fa042bba2f293c1a3154d2ef8008235ccdb099283f9bf0ed89d8a2d7` contains 149 exact application and 41 unchanged vendor modules. All parse as Python 3.11; the smoke runtime is Python 3.12.10. Seven baseline outputs and 27 protected demonstration hashes match; configured-secret inspection reports zero tracked/wheel matches. The fresh installed application smoke passes with zero external attempts, reusing existing third-party dependencies. Build/inspection/smoke records: `package-ec72f4cfad5e/` under that regression directory.
+
+Independent native preflight confirms 191 snapshot sources, six unchanged original inputs and the unchanged strict controller/protocol. New complete actual run `full-native-verified-v2/actual-92a1606c4241` has started from `prepared-e0b91f6f0535`. Its outcome is pending. Earlier actual failures remain unchanged; this engineering checkpoint does not establish new scientific accuracy or commercial readiness.
+
 ## Reviewed Literature and multi-file Code follow-up
 
 | Follow-up | Verified result | Limit |
