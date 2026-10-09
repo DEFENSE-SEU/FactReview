@@ -1,5 +1,13 @@
 # FactReview v2 progress
 
+## Latest phase 8 checkpoint: frozen regression and new native run
+
+Implementation `438e2e66c8be5be3907794136a2c918f129b6fb0` is pushed and remotely verified. One frozen regression passes 3324 default tests and two legacy tests; all 21 changed Python files pass static checks. Full source inventory, protected original outputs and dependencies stay unchanged through offline isolated build, exact wheel inspection and a fresh installed-application smoke with zero external attempts. Wheel SHA256: `2d217803fa042bba2f293c1a3154d2ef8008235ccdb099283f9bf0ed89d8a2d7`. Certificate: `runs/v2_method_delivery/integration-followups/regression-final-v1/`.
+
+The next whole native run is now active at `runs/v2_method_delivery/full-native-verified-v2/actual-92a1606c4241`, using the independently checked `prepared-e0b91f6f0535` snapshot. Original PDF/repository, strict acceptance rules, training zero and call/token limits are unchanged. It uses actual MinerU, configured text/vision models, retrieval and qualified Docker execution. No source, claim, response or plan is injected. The two independent reviewers will check scientific/report meaning and mechanical provenance after delivery. No result is claimed while it runs.
+
+Decisions: no repeated unchanged sampling and no relaxation of scientific requirements. Preserve every earlier strict failure. The goal remains active through actual verification and any evidenced framework fixes.
+
 ## Latest phase 4 follow-up: qualified omissions and multi-file Code sources
 
 Literature now uses explicit omission qualification in its existing comparison response and binds both the actual manuscript target and retrieved scientific passage. The dispatcher supplies original extracted claim excerpts for global review. Missing or invalid qualification stays in audit, with no author-facing omission accusation. The independent reviewer reproduced four conflicts with whitespace-padded purposes; the final leaf `976d38b7623f272b8a7e37760664ae615db9b54bad7e298cdcdf9dd18b314ff2` normalizes only duplicate rejection identity. The actual acceptance path stays strict. Final independent regression: 151 passes. The authorized fixture migration preserves all 121 existing assertion ASTs and the original scientific inputs.
