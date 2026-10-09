@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 
 from schemas.limitations import VerificationLimitation
 from schemas.reference import ReferenceCorrection
+from schemas.theory_concern import TheoryConcernReview
 
 NonEmpty = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 FiniteNumber = Annotated[float, Field(allow_inf_nan=False)]
@@ -284,6 +285,7 @@ class TheoryDerivationRecord(Contract):
     provider: str = ""
     model: str = ""
     transport: Literal["live", "injected"] = "injected"
+    concern_reviews: list[TheoryConcernReview] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def trace_state(self) -> Self:
@@ -295,6 +297,13 @@ class TheoryDerivationRecord(Contract):
             raise ValueError("Validated Theory records require a versioned trace")
         if self.state == "legacy_unavailable" and (self.schema_version is not None or self.trace is not None):
             raise ValueError("Legacy Theory records must explicitly lack a versioned trace")
+        identities = [(review.item_index, review.condition_id) for review in self.concern_reviews]
+        if len(identities) != len(set(identities)) or any(
+            index != self.item_index or condition not in self.covered for index, condition in identities
+        ):
+            raise ValueError(
+                "Theory concern reviews must uniquely match this derivation and its covered conditions"
+            )
         return self
 
 
@@ -441,8 +450,128 @@ class ProjectionScopeDecision(Contract):
     rationale: NonEmpty
 
 
+class ProjectionAtom(Contract):
+    id: NonEmpty
+    source_ids: list[NonEmpty] = Field(min_length=1)
+
+
+class DatasetProjectionAtom(ProjectionAtom):
+    kind: Literal["dataset_identity"]
+    dataset: NonEmpty
+    split: str | None
+
+
+class RuntimeProjectionAtom(ProjectionAtom):
+    kind: Literal["runtime_setting"]
+    key: NonEmpty
+    value: (
+        Annotated[str, Field(strict=True)]
+        | Annotated[int, Field(strict=True)]
+        | Annotated[float, Field(strict=True, allow_inf_nan=False)]
+        | Annotated[bool, Field(strict=True)]
+        | None
+    )
+
+
+class ValueProjectionAtom(ProjectionAtom):
+    kind: Literal["reported_value"]
+    number_id: NonEmpty
+
+
+class SampleProjectionAtom(ProjectionAtom):
+    kind: Literal["sample_scope"]
+    count: int = Field(gt=0, strict=True)
+    population: Literal["fixed_released_predictions"]
+    split: str | None
+    all_records: Literal[True]
+
+    @model_validator(mode="before")
+    @classmethod
+    def strict_full_population(cls, value):
+        if isinstance(value, dict) and value.get("all_records") is not True:
+            raise ValueError("Full-population declaration must be the boolean true")
+        return value
+
+
+class DefinitionProjectionAtom(ProjectionAtom):
+    kind: Literal["measurement_definition"]
+    measure: Literal["exact_match_accuracy"]
+    predicate: Literal["prediction_equals_label"]
+    aggregation: Literal["fraction_of_all_records"]
+    unit: Literal["fraction"]
+
+
+class BoundaryProjectionAtom(ProjectionAtom):
+    kind: Literal["conclusion_boundary"]
+    excludes: list[Literal["repeated_run_uncertainty", "population_performance", "cross_model_ranking"]] = (
+        Field(min_length=1)
+    )
+
+
+class UnresolvedProjectionAtom(ProjectionAtom):
+    kind: Literal["unresolved"]
+    reason: NonEmpty
+
+
+SemanticProjectionAtom = Annotated[
+    DatasetProjectionAtom
+    | RuntimeProjectionAtom
+    | ValueProjectionAtom
+    | SampleProjectionAtom
+    | DefinitionProjectionAtom
+    | BoundaryProjectionAtom
+    | UnresolvedProjectionAtom,
+    Field(discriminator="kind"),
+]
+
+
+class ProjectionFieldBinding(Contract):
+    path: NonEmpty
+    atom_ids: list[NonEmpty] = Field(min_length=1)
+
+
+class ProjectionClaimBinding(Contract):
+    start: int = Field(ge=0, strict=True)
+    end: int = Field(gt=0, strict=True)
+    atom_ids: list[NonEmpty] = Field(min_length=1)
+
+
+class SemanticPredictionProjection(Contract):
+    version: Literal["released-predictions-v2"]
+    recipe: Literal["exact_match_accuracy"]
+    data_path: NonEmpty
+    atoms: list[SemanticProjectionAtom] = Field(min_length=1)
+    field_bindings: list[ProjectionFieldBinding] = Field(min_length=1)
+    claim_bindings: list[ProjectionClaimBinding] = Field(min_length=1)
+
+
+class ProjectionAtomReview(Contract):
+    atom_id: NonEmpty
+    decision: Literal["confirmed", "unresolved"]
+    source_ids: list[NonEmpty] = Field(min_length=1)
+    rationale: NonEmpty
+
+
+class ProjectionFieldReview(ProjectionFieldBinding):
+    decision: Literal["confirmed", "unresolved"]
+    rationale: NonEmpty
+
+
+class ProjectionClaimReview(ProjectionClaimBinding):
+    decision: Literal["confirmed", "unresolved"]
+    rationale: NonEmpty
+
+
+class SemanticProjectionScopeDecision(ProjectionScopeDecision):
+    version: Literal["released-predictions-v2"]
+    proposal_sha256: NonEmpty
+    atom_reviews: list[ProjectionAtomReview]
+    field_reviews: list[ProjectionFieldReview]
+    claim_reviews: list[ProjectionClaimReview]
+
+
 class ProjectionRecord(Contract):
-    proposal: PredictionProjection
+    proposal: PredictionProjection | SemanticPredictionProjection
     runtime_target: Condition
     sample_count: int = Field(gt=0, strict=True)
     source_pointers: dict[str, EvidencePointer]
@@ -454,15 +583,23 @@ class ProjectionRecord(Contract):
     config_path: NonEmpty
     label_key: NonEmpty
     prediction_key: NonEmpty
-    scope_review: ProjectionScopeDecision
+    scope_review: ProjectionScopeDecision | SemanticProjectionScopeDecision
     scope_audit: NonEmpty
     scope_audit_sha256: NonEmpty
     recipe_sha256: NonEmpty
 
 
+class SemanticProjectionRecord(ProjectionRecord):
+    proposal: SemanticPredictionProjection
+    scope_review: SemanticProjectionScopeDecision
+    field_consumption: dict[str, Any]
+    claim_consumption: list[dict[str, Any]]
+    semantics_sha256: NonEmpty
+
+
 class ProjectedExecutionTargetBinding(ExecutionTargetBinding):
     version: Literal[2] = 2
-    projection: ProjectionRecord
+    projection: ProjectionRecord | SemanticProjectionRecord
 
 
 class ExecutionPlan(Contract):

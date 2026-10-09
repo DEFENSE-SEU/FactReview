@@ -155,13 +155,19 @@ def test_budget_counts_line_metadata_and_cannot_ground_unseen_file(inputs, monke
         verify_code(claim, materials, call=model)
 
 
-def test_no_source_fits_returns_question_without_model_call(inputs, monkeypatch):
+def test_no_source_fits_returns_system_limitation_without_model_call(inputs, monkeypatch):
     root, materials, claim = inputs
     (root / "model.py").write_text("source" * 1000, encoding="utf-8")
     materials.repository = index_repository(root)
     monkeypatch.setenv("CODE_SOURCE_MAX_BYTES", "200")
     result = verify_code(claim, materials, call=lambda **_: pytest.fail("No inspectable input"))
-    assert result.evidence == [] and result.questions
+    assert result.evidence == [] and result.questions == []
+    assert len(result.verification_limitations) == 1
+    limitation = result.verification_limitations[0]
+    assert limitation.claim_id == claim.id
+    assert limitation.condition_ids == [condition.id for condition in claim.conditions]
+    assert limitation.stage == "Code" and limitation.kind == "source_context_unavailable"
+    assert limitation.responsibility == "system" and "source_budget" in limitation.reason
     assert any("source_budget" in issue for issue in result.issues)
 
 

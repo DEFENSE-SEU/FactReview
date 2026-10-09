@@ -14,6 +14,7 @@ from schemas.materials import SharedMaterials
 from screening.checks import ask, grounded_paper_pointer
 from verification import theory_derivations as derivations
 from verification.contracts import BranchResult
+from verification.theory_concerns import review_concerns
 from verification.theory_sections import TheorySections, partition_theory_sections
 
 
@@ -395,6 +396,26 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
         records.extend(active_records)
     result = BranchResult(theory_derivations=records, issues=list(sections.issues))
     active_cfg = second_cfg if first.appendix_block_ids else first_cfg
+    concerns = []
+    anchors = {
+        condition.id: [
+            (block.id, quote) for block, quote in _claim_anchors(claim, materials, condition.id, sections)
+        ]
+        for condition in claim.conditions
+    }
+
+    def unavailable(covered, reason):
+        result.issues.append(reason)
+        result.verification_limitations.append(
+            VerificationLimitation(
+                claim_id=claim.id,
+                condition_ids=covered,
+                stage="Theory",
+                kind="evidence_validation_failed",
+                reason=reason,
+            )
+        )
+
     for item, record in zip(items, active_records, strict=True):
         item = item.model_copy(update={"detail": derivations.safe_text(item.detail, active_cfg)})
         pointer = _paper_pointer(materials, item.block_id, item.quote)
@@ -403,6 +424,13 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
         if item.block_id in appendix and item.main_block_id not in main_ids:
             raise ValueError("An appendix proof must link to a main-text theorem")
         if item.kind == "no_proof":
+            if record.schema_version is not None and record.state != "validated":
+                unavailable(
+                    covered,
+                    "Theory no-proof observation has an invalid derivation trace: "
+                    + "; ".join(record.issues),
+                )
+                continue
             scope_issue = sections.no_proof_issue(
                 claim, covered, item.block_id, item.quote, materials, loaded_ids
             )
@@ -452,6 +480,7 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
                 note += f"; proof binding unconfirmed: {binding_issue}"
             if trace_issue:
                 note += f"; derivation record incomplete: {trace_issue}"
+        notation_confirmation = None
         if item.kind == "notation" and item.direction == "flaw":
             page = next((page for page in materials.pages if page.page == pointer.page), None)
             if page is None or not Path(page.path).is_file():
@@ -497,17 +526,97 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
                 )
                 continue
             note += f"; original PDF page {pointer.page} confirmed: {review.explanation}"
+            notation_confirmation = {
+                "page": pointer.page,
+                **review.model_dump(mode="json"),
+                "source_hashes": image_hashes,
+            }
+        if item.direction == "flaw":
+            eligible = []
+            for condition_id in covered:
+                issue = None
+                if record.state != "validated" or record.trace is None:
+                    issue = "Theory concern lacks a valid versioned derivation trace: " + "; ".join(
+                        record.issues
+                    )
+                elif not anchors[condition_id]:
+                    issue = "Theory concern lacks an exact condition-scoped target source"
+                if issue:
+                    unavailable([condition_id], issue)
+                    result.evidence.append(
+                        Evidence(
+                            source="theory",
+                            pointer=pointer,
+                            covered=[condition_id],
+                            direction="flaw",
+                            sufficient=False,
+                            note=f"{note}; {issue}",
+                            concern=False,
+                            affects_claim=False,
+                        )
+                    )
+                else:
+                    eligible.append(condition_id)
+            if eligible:
+                concerns.append(
+                    {
+                        "item": item,
+                        "record": record,
+                        "pointer": pointer,
+                        "covered": eligible,
+                        "note": note,
+                        "notation_confirmation": notation_confirmation,
+                    }
+                )
+            continue
         result.evidence.append(
             Evidence(
                 source="theory",
                 pointer=pointer,
                 covered=covered,
                 direction=item.direction,
-                sufficient=item.direction == "flaw" or full_support,
+                sufficient=full_support,
                 note=note,
-                concern=item.direction == "flaw",
+                concern=False,
                 overturnable=True,
             )
         )
+    if concerns:
+        reviews = review_concerns(
+            claim,
+            materials,
+            concerns,
+            anchors,
+            context=frozen,
+            call=call,
+            output_dir=output_dir,
+        )
+        for candidate in concerns:
+            for condition_id in candidate["covered"]:
+                review = reviews[(candidate["record"].item_index, condition_id)]
+                candidate["record"].concern_reviews.append(review)
+                decision = review.decision
+                disposition = decision.disposition if decision is not None else "unresolved"
+                active = disposition in {"answerable_concern", "closed_disproof"}
+                detail = (
+                    f"{disposition}: {decision.scope_reason}; {decision.resolution}"
+                    if decision
+                    else "; ".join(review.issues)
+                )
+                if disposition == "unresolved":
+                    unavailable([condition_id], "Theory concern applicability unconfirmed: " + detail)
+                result.evidence.append(
+                    Evidence(
+                        source="theory",
+                        pointer=candidate["pointer"],
+                        covered=[condition_id],
+                        direction="flaw",
+                        sufficient=disposition == "closed_disproof",
+                        concern=active,
+                        affects_claim=active,
+                        overturnable=disposition != "closed_disproof",
+                        note=f"{candidate['note']}; concern review {detail}; scope_audit={review.audit_pointer}",
+                    )
+                )
     frozen.check(claim, materials)
     return result

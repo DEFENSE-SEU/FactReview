@@ -260,7 +260,9 @@ def test_generated_proof_does_not_replace_missing_author_proof(tmp_path):
     claim, materials, response = paper(tmp_path)
     response["items"][0]["kind"] = "no_proof"
     result = invoke(claim, materials, response)
-    assert not result.evidence and result.questions
+    assert not result.evidence and not result.questions
+    assert result.verification_limitations[0].kind == "evidence_validation_failed"
+    assert result.verification_limitations[0].responsibility == "system"
     assert result.theory_derivations[0].state == "invalid"
     assert "no_proof" in result.theory_derivations[0].issues[0]
 

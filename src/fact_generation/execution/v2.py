@@ -867,6 +867,15 @@ def execute_plans(
     return result
 
 
+def _target_tolerance(condition, binding, config, target, gap):
+    metric = (
+        binding.projection.runtime_target.metric
+        if binding.version == 2 and binding.projection.proposal.version == "released-predictions-v2"
+        else condition.metric
+    )
+    return config.tolerance_overrides.get(condition.metric, metric_tolerance(metric, target, delta=gap))
+
+
 def _execute_graph(
     initial, claim, materials, ledger, runner, repairer, issues, manifest, training_budget
 ) -> str:
@@ -1020,9 +1029,7 @@ def _execute_graph(
             matched += 1
             target = request.plan.y_paper[condition.id]
             gap = observation.value - target
-            tolerance = request.config.tolerance_overrides.get(
-                condition.metric, metric_tolerance(condition.metric, target, delta=gap)
-            )
+            tolerance = _target_tolerance(condition, binding, request.config, target, gap)
             variance_audit = {"verified": False, "binding_mode": "none"}
             variance_ref = request.config.paper_variances.get(request.plan.id, {}).get(condition.id)
             if variance_ref is not None:
