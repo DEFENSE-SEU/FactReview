@@ -144,8 +144,25 @@ def test_visual_request_uses_real_crop_caption_all_references_and_source_pointer
     before = visual_materials.model_dump(mode="json")
 
     def call(**kwargs):
-        assert kwargs["module"] == "screening_tables.visual"
         payload = json.loads(kwargs["prompt"])
+        if kwargs["module"] == "screening_tables.context":
+            return {
+                "schema_version": "table-context-v1",
+                "context_id": payload["context_id"],
+                "table_id": payload["table_id"],
+                "target": "matched",
+                "caption_source_id": payload["caption_source"]["id"],
+                "decisions": [
+                    {
+                        "candidate_id": c["candidate_id"],
+                        "classification": "manuscript_issue",
+                        "witness_span_ids": payload["caption_source"]["page_span_ids"],
+                        "reason": "The original-page table retains the unexplained asterisk candidate.",
+                    }
+                    for c in payload["candidates"]
+                ],
+            }
+        assert kwargs["module"] == "screening_tables.visual"
         table = next(table for table in visual_materials.tables if table.id == payload["table_id"])
         assert kwargs["images"] == [table.printed_crop_path]
         with Image.open(kwargs["images"][0]) as image:
@@ -180,7 +197,10 @@ def test_visual_request_uses_real_crop_caption_all_references_and_source_pointer
     assert finding.kind == "table" and finding.level == "self_containedness"
     evidence = finding.evidence[0]
     assert evidence.source == "paper_internal" and not evidence.affects_claim
-    assert evidence.pointer.locator == visual_materials.tables[0].printed_crop_path
+    # The caption's complete PDF span starts at y=18.175, above the crop's y=20.
+    assert evidence.pointer.locator == visual_materials.source_pdf
+    with fitz.open(visual_materials.source_pdf) as pdf:
+        assert evidence.pointer.quote in pdf[0].get_text()
     assert evidence.pointer.page == 1 and evidence.pointer.key == "table_1"
     assert evidence.pointer.quote == visual_materials.tables[0].caption
     assert [row.status for row in records] == ["checked", "checked"]
@@ -277,9 +297,12 @@ def test_missing_physical_scale_never_confirms_legibility(visual_materials):
         call=lambda **_: {"findings": [issue(), issue("text_table_consistency")]},
         records=records,
     )
-    assert [f.level for f in findings] == ["text_table_consistency"]
+    assert findings == []
     assert any("printed-size legibility unavailable" in message for message in issues)
     assert records[0].printed_size_verified is False
+    assert records[0].context_status == "unavailable"
+    assert records[0].crop_response == {"findings": [issue(), issue("text_table_consistency")]}
+    assert any(issue("text_table_consistency")["text"] in message for message in issues)
 
 
 def test_missing_scale_is_visible_even_when_model_finds_no_issues(visual_materials):
@@ -300,14 +323,22 @@ def test_caption_assignment_ambiguity_downgrades_context_dependent_findings(visu
 
     visual_materials.tables = visual_materials.tables[:1]
     visual_materials.tables[0].caption_ambiguous = True
+    records = []
     findings, issues = check_visual_tables(
         visual_materials,
         call=lambda **_: {
             "findings": [issue("self_containedness"), issue("text_table_consistency"), issue()]
         },
+        records=records,
     )
     assert [f.level for f in findings] == ["legibility"]
-    assert len(issues) == 2 and all("caption assignment is ambiguous" in message for message in issues)
+    for category in ("self_containedness", "text_table_consistency"):
+        assert (
+            f"table_1: {category} unconfirmed because parser caption assignment is ambiguous: {issue(category)['text']}"
+            in issues
+        )
+    assert records[0].context_status == "failed"
+    assert any("original-page context failed" in message for message in issues)
 
 
 def test_uncertain_observation_and_missing_caption_remain_visible(visual_materials):
