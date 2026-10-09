@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import errno
 import json
+import ssl
 import urllib.error
 import urllib.request
 from collections.abc import Iterator
@@ -19,9 +21,27 @@ _DEFAULT_INSTRUCTIONS = Path(__file__).resolve().parent / "providers" / "codex_i
 class CodexResponseError(RuntimeError):
     """A failed request retaining any validated usage already reported by Codex."""
 
-    def __init__(self, message: str, *, usage: dict[str, int] | None = None):
+    def __init__(self, message: str, *, usage: dict[str, int] | None = None, pre_sse_transient: bool = False):
         super().__init__(message)
         self.usage = dict(usage or {})
+        self.pre_sse_transient = pre_sse_transient
+
+
+def _transient_connection_error(exc: Exception) -> bool:
+    """Only typed EOF/reset; certificates, timeouts and HTTP status stay terminal."""
+    if isinstance(exc, urllib.error.HTTPError):
+        return False
+    reason = exc.reason if isinstance(exc, urllib.error.URLError) else exc
+    if isinstance(reason, ssl.SSLCertVerificationError):
+        return False
+    if isinstance(reason, ssl.SSLEOFError):
+        return True
+    if isinstance(reason, ssl.SSLError):
+        return getattr(reason, "reason", None) == "UNEXPECTED_EOF_WHILE_READING"
+    return isinstance(reason, ConnectionResetError) or (
+        isinstance(reason, OSError)
+        and (reason.errno == errno.ECONNRESET or getattr(reason, "winerror", None) == 10054)
+    )
 
 
 def is_codex_provider(provider: str | None) -> bool:
@@ -221,9 +241,18 @@ def invoke_codex(
     chunks: list[str] = []
     usage: dict[str, int] = {}
     completed = False
+    response_started = False
+
+    def observed_lines(response):
+        nonlocal response_started
+        for line in response:
+            # Even a comment/malformed line closes the retry window.
+            response_started = True
+            yield line
+
     try:
         with urllib.request.urlopen(request, timeout=120) as response:
-            for event in _iter_sse_data(response):
+            for event in _iter_sse_data(observed_lines(response)):
                 try:
                     payload_item = json.loads(event)
                 except ValueError:
@@ -286,7 +315,11 @@ def invoke_codex(
         detail = redact_provider_details(
             f"{type(exc).__name__}: {exc}", base_url=url, secrets=(auth.access_token,)
         )
-        raise CodexResponseError(f"Codex request failed: {detail}", usage=usage) from None
+        raise CodexResponseError(
+            f"Codex request failed: {detail}",
+            usage=usage,
+            pre_sse_transient=not response_started and _transient_connection_error(exc),
+        ) from None
 
     if not completed:
         raise CodexResponseError("Codex backend stream ended before response.completed", usage=usage)

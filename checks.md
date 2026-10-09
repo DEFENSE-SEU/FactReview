@@ -1,5 +1,9 @@
 # FactReview v2 acceptance checks
 
+## Current targeted correction: bounded transport recovery
+
+Two actual Codex requests failed with TLS EOF before delivering a response. The shared text/vision client now permits one retry only for typed EOF/reset before any response line. Both physical attempts remain in native statistics; unknown usage remains unavailable. Certificates, authentication, timeouts, partial streams and provider failure terminals retain failure behavior. Ten necessary offline controls and six existing terminal controls pass; Ruff passes. Root reviewed the two production files. Evidence: `runs/v2_method_delivery/codex-pre-sse-retry-draft/implementation.md`. No full regression or new actual success is claimed.
+
 ## Current targeted correction: composable execution wording
 
 The unchanged `actual-70088f3cae19` accuracy claim009 exposed three equivalent-expression gaps: an omitted copula before `claimed`, dataset-first measurement descriptions, and a sample-count clause after the metric definition. The existing finite parsers now compose these clauses while requiring full consumption, exact identities and all original fields. The original saved claim/material objects produce one candidate; historical model responses and verdicts are unchanged. The existing small test file passes 54 cases, including seven necessary additions; no original assertion changed and no full regression was repeated. Root reviewed the production delta. Evidence: `runs/v2_method_delivery/execution-choice-70088-composition-bc1f3a1ef3/review.md`.
