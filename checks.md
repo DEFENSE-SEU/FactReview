@@ -1,5 +1,11 @@
 # FactReview v2 acceptance checks
 
+## Current targeted correction: composable execution wording
+
+The unchanged `actual-70088f3cae19` accuracy claim009 exposed three equivalent-expression gaps: an omitted copula before `claimed`, dataset-first measurement descriptions, and a sample-count clause after the metric definition. The existing finite parsers now compose these clauses while requiring full consumption, exact identities and all original fields. The original saved claim/material objects produce one candidate; historical model responses and verdicts are unchanged. The existing small test file passes 54 cases, including seven necessary additions; no original assertion changed and no full regression was repeated. Root reviewed the production delta. Evidence: `runs/v2_method_delivery/execution-choice-70088-composition-bc1f3a1ef3/review.md`.
+
+The complete actual run still uses its immutable `407ec8a` snapshot and is finishing Literature. Its two original TLS failures remain recorded. Candidate construction alone does not establish actual plan selection or Docker execution. The next actual validation will use the corrected source.
+
 ## Latest actual integration: execution coverage still fails
 
 `full-native-verified-v2/actual-92a1606c4241` completes all seven stages with no catastrophic failure, but emits zero plans and has zero Docker attempts. Its three failed gates are actual execution, aligned MiniSet accuracy, and execution-cleanup coverage. Empty conditional ledger checks do not establish execution. There is no observed container leak. All 36 actual model requests return with exactly one measured usage record each: 191027 input + 19979 output = 211006 tokens, five image inputs, zero missing/estimated/extra usage. All 19 retrieval boundaries return. Independent mechanical review preserves all 412 actual files, 191 snapshot sources, six original inputs and the empty ledger/report match: `runs/v2_method_delivery/full-native-mechanical-review-92a1606c4241/record.json`.
