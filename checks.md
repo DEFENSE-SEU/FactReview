@@ -1,5 +1,7 @@
 # FactReview v2 acceptance checks
 
+Latest implementation checkpoint: `d2b0ff8764e5ba55ab6b0a09b3e1a17552638f16`, pushed and remotely verified. Current actual evidence and its limitations are recorded below. The original14-item engineering table is explicitly historical; it does not certify current whole-paper scientific accuracy.
+
 ## Current phase 4 correction: exclusive execution decision
 
 Committed and pushed as `897f384a245339d4859c9fa4a20b775684757d59`, with exact remote verification.
@@ -44,6 +46,8 @@ The finite interpretation correction is committed and pushed at `ecabcbc00644392
 | Fresh native selection and Docker handoff on ecabcbc | fail | `claim006-native-followup-v1/actual-45160486ae7f`: two logical/physical requests, 40535 measured tokens, no missing usage; one candidate explicitly selected, but zero accepted plans/attempts. | The first response also emits a same-condition legacy plan, so the unchanged conflict gate rejects both. Joint metric-definition roles lack consumers. Partial report, source guards and usage checks pass; no execution/cleanup coverage. |
 
 The source review distinguishes030's accuracy profile across buckets, which may remain a multiple-setting claim under §5.1, from its independently established missing selection restrictions. It does not require one claim per number. The029 ambiguity observation remains confirmed and its correction remains unresolved. This helper probe does not perform public-orchestrator adoption or clear historical pending issues.
+
+Final independent content report: `claim-coverage-continuation-probe-v1/independent-actual-5d02c58681d6/review.md` (SHA `8cc68275...`). Its192 frozen source files and610 protected files remain unchanged. Follow-up whole-framework integration is being prepared on the latest implementation, with the existing limits and strict gates retained.
 
 A narrow prompt clarification passes independent static review: each claim has one final status, while its conditions describe the applicable settings. Merely placing independent conclusions in different conditions does not justify dismissing a merge observation. The prompts retain shared relations across settings, joint configurations and a single trajectory's endpoints, and prohibit resolving source ambiguity from presumed author intent. Only `_FOLLOWUP_SYSTEM` and `_VALIDATION_SYSTEM` changed;69 other AST nodes are identical. Compile/Ruff/format pass, with zero tests or external calls for this text-only change. Source `31860735...`; `claim-coverage-status-unit-clarification/independent-review.md`, SHA `7de60189...`. Its actual semantic effect is unverified; the completed actuals predate it.
 
