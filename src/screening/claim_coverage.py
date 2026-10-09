@@ -83,6 +83,12 @@ revise replaces one existing claim with one complete ExtractedClaim; split repla
 with two or more complete independent conclusions. Preserve every original independent assertion
 and its governing qualifiers. Keep one shared conclusion over multiple settings together. Do not
 weaken an assertion to make it easier to verify or turn each table cell into a required claim.
+Action constraints apply to the whole group of observations for one target. If any observation
+is uncertain, return unresolved with no claims. If any is merged_conclusions, revise is invalid:
+use split with at least two complete claims, or unresolved with no claims when a split is not
+source-justified. A simultaneous qualifier correction does not permit revise for that group.
+When a merge observation is unfounded because the original has one shared conclusion, retain
+unresolved and explain why; the independent validation stage decides whether to dismiss it.
 Each Claim receives one final status; its conditions do not receive separate statuses. Decide
 atomicity from the asserted scientific relation: putting distinct conclusions in separate
 conditions does not make them one conclusion. A reason for leaving a merged-conclusions observation
