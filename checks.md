@@ -2,6 +2,24 @@
 
 ## Current extraction coverage correction
 
+The second actual coverage run, `fixmatch-coverage-live-v2/actual-227e5798445d`, is complete on pushed `708efd3f01a94b572760702cb117d43d74d237f6`. All 18 logical/physical requests returned with 823752 known tokens and no unavailable usage. The final request crossed its 800000-known-token threshold, so the original mechanical result remains failed. Coverage is partial: 60 initial claims become 78 through 18 additions and six revisions, with zero splits, eight unresolved observations and blocked claims034/060. Five windows are fully reviewed and one is partial; none remains unreviewed. Counts do not establish semantic completeness.
+
+| Frozen semantic review item | Latest actual outcome |
+|---|---|
+| M1: labeled data reused without labels | repaired in claim062 with its original footnote |
+| M2: shared ablation scope governs claim037 | unresolved; the revision still omits the 250-label split and CTAugment |
+| M3: independently decidable conclusions | unresolved; no splits, and new067 also combines independent conclusions |
+| M4: original parameter-count correction | repaired as separate claim072, with original026 preserved |
+| M5: full-label selection/prototype scope | unresolved; original030 unchanged and the new observation had an invalid ellipsis quote |
+| Previous duplicate 78% conclusion | not adopted; the corresponding new observation was dismissed |
+| A1: mask/impurity definitions | unresolved; rejection preserves a real prose/formula ambiguity |
+| A2: ImageNet epoch definition | repaired in claim050 with claim-local footnote227 |
+| Previous claim048 over-blocking | not repeated; this run does not demonstrate a successful dismiss of that exact old observation |
+
+Independent main/appendix reviews are in `fixmatch-coverage-live-v2/main-semantic-review-227e5798445d/` and `appendix-final-independent-227e5798445d/`. They additionally question the necessity of blocks034/060. Four window-two source failures are confirmed non-contiguous quotations joined by literal ellipses inside the correct blocks, without evidence of a wrong block or mathematical transcription at those positions. The next narrow correction uses explicit whole-block source selection and per-claim atomicity/qualifier checks within the existing three calls. It is in progress; no new successful semantic result is claimed.
+
+That correction is now frozen at source `32fe2c89f15d5453b2f5e2c8badad18fd0aea546978bb013b08f5b1349896e49`. Thirty-eight necessary offline controls pass, including the original 29 with explicit protocol migration; all 78 preexisting assertion ASTs remain. Legacy invalid quotes still fail. All 244 original blocks pass exact whole-block binding preflight. Independent static review found no blocking defect in source restoration, closed identities, candidate-index binding, required checks or failure handling. Source/test/freeze records are in `claim-coverage-source-atomicity-implementation/`; no whole-suite rerun or real semantic improvement is claimed. Reports expose the recorded per-window and proposed-claim check counts.
+
 The genuine 21-page FixMatch extraction contains 60 claims and 119 conditions. Independent main-text and appendix review confirms omitted training-data reuse and parameter-count correction footnotes, lost ablation qualifiers, merged independent conclusions and missing metric/epoch definitions. The exact first-pass source and response are preserved. Evidence: `runs/v2_method_delivery/fixmatch-claim-coverage-review/review.md` and `audit.json`. Counts do not establish semantic recall.
 
 | requirement | verdict | evidence | correction |

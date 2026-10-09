@@ -100,15 +100,53 @@ def observation(block, kind="missing_qualifier_or_condition", target="claim_007"
     }
 
 
-def review(payload, observations):
+def claim_check(claim, observations=()):
+    conditions = [c["id"] for c in claim["conditions"]]
+    merged = any(o["kind"] == "merged_conclusions" for o in observations)
+    groups = [conditions[:1], conditions[1:] or conditions[:1]] if merged else [conditions]
     return {
-        "schema_version": "claim-coverage-v1",
+        "atomicity": "independent_conclusions"
+        if merged
+        else "shared_settings"
+        if len(conditions) > 1
+        else "single_conclusion",
+        "assertion_groups": [
+            {"proposition": "Explicit offline proposition judgment.", "condition_ids": ids} for ids in groups
+        ],
+        "governing_qualifiers": "missing"
+        if any(o["kind"] == "missing_qualifier_or_condition" for o in observations)
+        else "preserved",
+        "observation_ids": [o["id"] for o in observations],
+        "reason": "Explicit offline atomicity and qualifier judgment.",
+    }
+
+
+def review(payload, observations, *, legacy=False):
+    response = {
+        "schema_version": "claim-coverage-v1" if legacy else "claim-coverage-v2",
         "context_id": payload["context_id"],
         "window_id": payload["window_id"],
         "reviewed_block_ids": [b["id"] for b in payload["blocks"]],
-        "observations": observations,
+        "observations": copy.deepcopy(observations),
         "explanation": "Offline source-by-source judgment.",
     }
+    if not legacy:
+        for row in response["observations"]:
+            row["sources"] = [
+                {"block_id": key} for key in dict.fromkeys(s["block_id"] for s in row["sources"])
+            ]
+        registry = {r["claim_id"]: r for r in payload["current_claims"]}
+        response["claim_checks"] = [
+            {
+                "claim_id": r["claim_id"],
+                **claim_check(
+                    registry[r["claim_id"]],
+                    [o for o in observations if o["target_claim_id"] == r["claim_id"]],
+                ),
+            }
+            for r in payload["required_claim_checks"]
+        ]
+    return response
 
 
 def action(payload, obs, kind, proposals):
@@ -125,9 +163,16 @@ def action(payload, obs, kind, proposals):
     }
 
 
-def followup(payload, actions):
+def followup(payload, actions, *, legacy=False):
+    actions = copy.deepcopy(actions)
+    if not legacy:
+        for row in actions:
+            for claim in row["claims"]:
+                claim.pop("source_quote", None)
+                for ref in claim["source_refs"]:
+                    ref.pop("source_quote", None)
     return {
-        "schema_version": "claim-coverage-followup-v1",
+        "schema_version": "claim-coverage-followup-v1" if legacy else "claim-coverage-followup-v2",
         "context_id": payload["context_id"],
         "window_id": payload["window_id"],
         "actions": actions,
@@ -138,7 +183,7 @@ def validation(payload):
     """Explicit offline semantic oracle; this helper makes no model-quality claim."""
     source_ids = [b["id"] for b in payload["blocks"]]
     return {
-        "schema_version": "claim-coverage-validation-v1",
+        "schema_version": "claim-coverage-validation-v2",
         "context_id": payload["context_id"],
         "window_id": payload["window_id"],
         "change_decisions": [
@@ -147,6 +192,14 @@ def validation(payload):
                 "candidate_digest": row["candidate_digest"],
                 "verdict": "accept_change",
                 "source_block_ids": source_ids,
+                "new_claim_checks": [
+                    {
+                        "new_claim_index": i,
+                        **claim_check(c),
+                        "observation_ids": row["action"]["observation_ids"],
+                    }
+                    for i, c in enumerate(row["new_claims"], 1)
+                ],
                 "reason": "Independent mock confirms this fixed change.",
             }
             for row in payload["candidates"]
@@ -164,7 +217,7 @@ def validation(payload):
     }
 
 
-def caller(observations, kind, proposals, mutate=None):
+def caller(observations, kind, proposals, mutate=None, *, legacy_followup=False):
     calls = []
 
     def call(**kw):
@@ -174,7 +227,9 @@ def caller(observations, kind, proposals, mutate=None):
             return validation(p)
         if kw["module"] == "screening.claims.coverage":
             return review(p, copy.deepcopy(observations))
-        response = followup(p, [action(p, observations, kind, copy.deepcopy(proposals))])
+        response = followup(
+            p, [action(p, observations, kind, copy.deepcopy(proposals))], legacy=legacy_followup
+        )
         if mutate:
             mutate(response, p)
         return response
@@ -286,7 +341,13 @@ def test_confirmed_unfixed_claim_is_blocked_without_losing_originals(tmp_path, m
             raw["actions"] = []
 
     kind = "unresolved" if mode == "unresolved" else "revise"
-    call, _ = caller(obs, kind, [] if mode == "unresolved" else [fixed], mutate)
+    call, _ = caller(
+        obs,
+        kind,
+        [] if mode == "unresolved" else [fixed],
+        mutate,
+        legacy_followup=mode in {"wrong_quote", "unchanged"},
+    )
     result = m.review_claim_coverage(paper, claims, call=call, output_dir=tmp_path)
     assert result.coverage["status"] == "partial"
     assert result.blocked_claim_ids == ["claim_007"]
@@ -445,7 +506,10 @@ def test_invalid_source_action_preserves_healthy_revision_and_full_original_diff
         invalid = candidate(paper.blocks[0], "Invalid source correction.", source_quote="Absent source")
         valid = extracted(healthy.model_dump(mode="json"))
         valid["needs"] = ["Code", "Experiments"]
-        return followup(p, [action(p, [obs[0]], "revise", [invalid]), action(p, [obs[1]], "revise", [valid])])
+        # Saved quote protocol remains strict; bad text is never promoted to a selection.
+        return followup(
+            p, [action(p, [obs[0]], "revise", [invalid]), action(p, [obs[1]], "revise", [valid])], legacy=True
+        )
 
     result = m.review_claim_coverage(paper, claims, call=call, output_dir=tmp_path)
     assert result.blocked_claim_ids == ["claim_007"] and result.claims[0] == claims[0]
@@ -483,7 +547,7 @@ def test_bad_observation_isolated_with_complete_semantic_registry(tmp_path):
         if kw["module"] == "screening.claims.coverage_validation":
             return validation(p)
         if kw["module"] == "screening.claims.coverage":
-            raw = review(p, [bad, good])
+            raw = review(p, [bad, good], legacy=True)
         else:
             assert p["observations"] == [good]
             raw = followup(p, [action(p, [good], "append", [candidate(paper.blocks[1])])])
@@ -644,7 +708,16 @@ def test_actual_semantic_regressions_require_independent_bound_decisions(tmp_pat
         assert result.coverage["status"] == "complete", result.issues
         assert not result.blocked_claim_ids
         if case == "duplicate":
-            expected = next(a["claims"][0] for a in original["actions"] if a["action"] == "revise")
+            expected = copy.deepcopy(
+                next(a["claims"][0] for a in original["actions"] if a["action"] == "revise")
+            )
+            # Explicit v2 chooses complete original blocks. Semantic fields, IDs and
+            # covered relations are unchanged; the saved v1 exact subquote remains intact.
+            by_id = {b.id: b for b in paper.blocks}
+            for binding in [expected, *expected["source_refs"]]:
+                whole = by_id[binding["source_block_id"]].text
+                assert binding["source_quote"] in whole
+                binding["source_quote"] = whole
             assert extracted(result.claims[0].model_dump(mode="json")) == ExtractedClaim.model_validate(
                 expected
             ).model_dump(mode="json")
@@ -656,3 +729,119 @@ def test_actual_semantic_regressions_require_independent_bound_decisions(tmp_pat
     else:
         assert result.claims == claims and result.coverage["status"] == "partial"
         assert result.blocked_claim_ids == [claims[0].id]
+
+
+@pytest.mark.parametrize("legacy", [False, True])
+def test_explicit_whole_block_selection_preserves_math_and_legacy_bad_quote(tmp_path, legacy):
+    block = MaterialBlock(
+        id="math",
+        text="The limit is $T \\to 0 ,$ for fixed $N$.\nThe rate stays $1/N$.",
+        loc=ClaimLocation(page=1),
+    )
+    paper, claims = projection([block.model_dump(mode="json")])
+    obs = [observation(paper.blocks[0], "missing_conclusion", None)]
+    proposal = candidate(paper.blocks[0], "The stated limit is conditional on fixed N.")
+    bad = "The limit is $T \\to 0 ,$ ... The rate stays $1/N$."
+    seen = []
+
+    def call(**kw):
+        p = json.loads(kw["prompt"].split("DATA_JSON:\n", 1)[1])
+        seen.append(kw["module"])
+        if kw["module"] == "screening.claims.coverage":
+            return review(p, obs)
+        if kw["module"] == "screening.claims.coverage_followup":
+            # The bad legacy raw is retained. Only a distinct explicit v2 response
+            # selects a source; it contains no quote to silently normalize.
+            raw = copy.deepcopy(proposal)
+            raw["source_quote"] = bad
+            return followup(p, [action(p, obs, "append", [raw])], legacy=legacy)
+        assert all("claims" not in c["action"] for c in p["candidates"])
+        return validation(p)
+
+    result = m.review_claim_coverage(paper, claims, call=call, output_dir=tmp_path)
+    audit = json.loads((tmp_path / "coverage.json").read_text(encoding="utf-8"))
+    assert len(seen) == 3 and not result.blocked_claim_ids
+    if legacy:
+        assert result.claims == [] and result.coverage["status"] == "partial"
+        assert audit["attempts"][1]["response"]["actions"][0]["claims"][0]["source_quote"] == bad
+    else:
+        assert result.coverage["status"] == "complete" and len(result.claims) == 1
+        assert result.claims[0].source_quote == block.text
+        loc = result.claims[0].loc
+        assert paper.markdown[loc.char_start : loc.char_end] == block.text
+        assert "source_quote" not in audit["attempts"][1]["response"]["actions"][0]["claims"][0]
+        bound = audit["attempts"][-1]["selected_new_claim_checks"][0]
+        assert bound["new_claim_digest"] == m._digest(
+            audit["attempts"][-1]["input"]["candidates"][0]["new_claims"][0]
+        )
+
+
+@pytest.mark.parametrize(
+    "mode", ["missing", "independent_without_observation", "qualifier_without_observation"]
+)
+def test_required_current_claim_check_gap_is_partial_without_invented_block(tmp_path, mode):
+    paper, claims = small()
+
+    def call(**kw):
+        p = json.loads(kw["prompt"].split("DATA_JSON:\n", 1)[1])
+        raw = review(p, [])
+        if mode == "missing":
+            raw["claim_checks"] = []
+        elif mode == "independent_without_observation":
+            raw["claim_checks"][0]["atomicity"] = "independent_conclusions"
+            raw["claim_checks"][0]["assertion_groups"] *= 2  # Reusing c1 across groups is allowed.
+        else:
+            raw["claim_checks"][0]["governing_qualifiers"] = "missing"
+        return raw
+
+    result = m.review_claim_coverage(paper, claims, call=call, output_dir=tmp_path)
+    assert result.claims == claims and not result.blocked_claim_ids
+    assert result.coverage["status"] == "partial" and result.coverage["windows_partial"] == 1
+    assert result.coverage["claim_checks_required"] == result.coverage["claim_checks_unreviewed"] == 1
+    assert result.coverage["claim_checks_completed"] == result.coverage["unresolved_observations"] == 0
+
+
+@pytest.mark.parametrize(
+    "mode", ["joint_configuration", "legacy_missing_checks", "independent", "missing_qualifier"]
+)
+def test_candidate_atomicity_and_qualifiers_are_required_before_acceptance(tmp_path, mode):
+    paper, claims = small()
+    obs = [observation(paper.blocks[1])]
+    fixed = candidate(
+        paper.blocks[0],
+        "The joint batch-size and learning-rate configuration applies to one 250-label split.",
+        source_refs=[{"source_block_id": "b2", "source_quote": paper.blocks[1].text, "covered": ["c1"]}],
+    )
+
+    def call(**kw):
+        p = json.loads(kw["prompt"].split("DATA_JSON:\n", 1)[1])
+        if kw["module"] == "screening.claims.coverage":
+            return review(p, obs)
+        if kw["module"] == "screening.claims.coverage_followup":
+            return followup(p, [action(p, obs, "revise", [fixed])])
+        raw = validation(p)
+        row = raw["change_decisions"][0]
+        if mode == "legacy_missing_checks":
+            raw["schema_version"] = "claim-coverage-validation-v1"
+            row.pop("new_claim_checks")
+        elif mode == "joint_configuration":
+            row["new_claim_checks"][0]["atomicity"] = "shared_settings"
+        elif mode == "independent":
+            row["new_claim_checks"][0]["atomicity"] = "independent_conclusions"
+            row["new_claim_checks"][0]["assertion_groups"] *= 2
+        else:
+            row["new_claim_checks"][0]["governing_qualifiers"] = "missing"
+        return raw
+
+    result = m.review_claim_coverage(paper, claims, call=call, output_dir=tmp_path)
+    assert result.coverage["candidate_claim_checks_required"] == 1
+    assert result.coverage["budget"]["validation_calls"] == 1
+    if mode == "joint_configuration":
+        assert result.coverage["status"] == "complete" and not result.blocked_claim_ids
+        assert result.claims[0].text == fixed["text"] and len(result.claims) == 1
+        assert result.coverage["candidate_claim_checks_passed"] == 1
+    else:
+        assert result.claims == claims and result.blocked_claim_ids == ["claim_007"]
+        assert (
+            result.coverage["status"] == "partial" and result.coverage["candidate_claim_checks_passed"] == 0
+        )
