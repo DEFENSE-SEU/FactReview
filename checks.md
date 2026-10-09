@@ -2,9 +2,21 @@
 
 ## Active follow-up findings
 
-The current extraction-prompt snapshot passes **1953** default tests, two separate legacy tests and a **119**-module wheel inspection. Its fixed ten-case actual evaluation returns 24 claims through 11 model requests. Independent semantic review finds all nine required units in six synthetic controls complete; the four original regression excerpts contain 12 complete units, one qualifier-partial unit and one omitted unit. The overall semantic evaluation remains failed. Whole-framework quality work stays active.
+The current extraction-prompt snapshot passes **1953** default tests, two separate legacy tests and a **119**-module wheel inspection. Its single fixed 13-case actual batch delivers 28 claims from 11 cases; two cases fail at the provider boundary. Independent per-unit review records 24 complete units, one unit with incomplete claim-local qualifier provenance, and five unavailable units. The four original regressions now preserve all 14 required units. The complete batch remains failed; these targeted agent-labelled cases do not measure whole-paper recall. Whole-framework quality work stays active.
 
-| Current extraction semantics follow-up | Verdict | Evidence |
+| Current completeness self-check | Verdict | Evidence |
+|---|---|---|
+| Only one intended initial-prompt paragraph changed. | pass | `claim-completeness-implementation-review/review.md`: exact 498-character insertion; remaining module AST, schema, decoder and repair contracts unchanged; 87 existing related tests. |
+| Fixed input/gold isolation and visible local failures. | pass | Same independent review: 13-case fault injection retains the old N1 failure, a provider failure and 11 healthy neighbors; non-JSON gold sentinel stays outside requests; 299 protected files unchanged. |
+| Every actual case completes with usable output. | fail | `claim-completeness-evaluation-v1/live-runs/extract-219bf7d0f8f8/summary.json`: 11 returned, S3 stream interrupted and C1 HTTP 503. Fourteen actual boundaries include one N1 repair; two failed requests have no usage. Known usage is 33,358 tokens; complete batch usage is unknown. |
+| Four original regression excerpts retain frozen requirements. | pass | Independent per-unit review of the same batch: 14 units complete, including R1's restored parameter-reuse assertion and task-specific optimal values in claim text/conditions. One output per version does not establish causality or general accuracy. |
+| Six retained synthetic controls satisfy every frozen requirement. | fail | Eight required units complete; S3's required unit has no delivered output because of its service failure. The earlier successful S3 response remains historical evidence. |
+| Three new completeness controls satisfy every frozen requirement. | fail | C3's two units complete; C1's four units unavailable. C2 preserves the joint conclusion but records selection freedom in a separate claim and omits that sentence from the main claim's sources. Main-claim wording allows semantic ambiguity; this remains a qualifier-provenance limitation. |
+| Regression and packaging match the current prompt. | pass | `pytest-claim-completeness-full.log`: 1953 passed, 3 original deselections, unchanged warning; separate legacy 2 passed. `claim-completeness-delivery-inspection.json`: 119 matching modules and 27 protected hashes. |
+
+The prior ten-case evaluation remains unchanged below. Its failures are historical results of that earlier prompt, not replacements for the current fixed batch.
+
+| Preceding extraction semantics follow-up | Verdict | Evidence |
 |---|---|---|
 | Only the three intended prompt clarifications changed. | pass | `claim-semantic-prompt-independent-review/frozen-1d8887-driver-5b324f/`: 16 added system-prompt lines, remaining module AST identical; 87 existing related tests. |
 | Actual inputs, responses, sources and usage are traceable. | pass | `claim-semantic-prompt-independent-review/live-5e65383ac12e/live-review.md`: 10 initial calls plus one bounded N1 source repair, 30,082 measured tokens; 24 primary and 8 additional exact sources, 218 protected files and 72 run artifacts unchanged. |
@@ -53,8 +65,8 @@ The three-layer implementation is present. The following evaluations describe it
 |---|---|---|
 | Claim source locations remain exact. | pass | `claim-quality-current-review/audit.json` rechecks 153 historical primary locations and replays four saved excerpt responses without changing them. This establishes location integrity only. |
 | The selected new excerpts meet their predeclared reference labels. | fail | `claim-extraction-quality-set-v1/independent-semantic-review-extract-75556c6e9842/`: N1 exhausts source repair; N6 loses dataset scope/source linkage and omits Literature for ranking. N3's merged footnote/parameter value is recorded separately as input ambiguity. Source and labels were frozen before the calls. |
-| The current prompt meets the four selected original regression cases. | fail | `claim-semantic-followup-independent/evaluation-extract-5e65383ac12e/`: R1 parameter reuse is omitted and its task-specific optimum qualifier is source-only. N1 and N6's targeted issues improve; these new results do not rewrite the old failure. |
-| Targeted synthetic controls preserve grouping, scope and routing boundaries. | pass | Same fixed ten-case evaluation: six disclosed synthetic cases satisfy nine required units. There is no human expert reference or naturally sampled paper accuracy estimate. |
+| The current prompt meets the four selected original regression cases. | pass | Fixed 13-case `extract-219bf7d0f8f8`: all 14 original units complete, including R1 reuse and task-specific optima. The earlier `claim-semantic-followup-independent/evaluation-extract-5e65383ac12e/` failure remains unchanged. |
+| Every targeted synthetic control preserves grouping, scope, routing and qualifier provenance. | fail | Current fixed 13-case batch: S3 and C1 are unavailable after provider failures; C2 lacks the selection-freedom sentence in its main claim's sources. The preceding six-case tier's nine complete units remain a historical result. There is no human expert reference or naturally sampled accuracy estimate. |
 | Whole-paper recall and semantic accuracy have been measured. | unresolved | The nine-excerpt set has independent agent reference labels, not human expert annotations or a whole-paper recall denominator. Previously used BERT examples remain a separate regression tier; old full-paper outputs predate the latest prompt. |
 | The injected omissions and qualifier changes are detected. | fail | Offline injected omissions, an altered numerical qualifier and empty needs can pass the source/schema checks. These are boundary demonstrations, not newly observed live error rates. Invalid verbatim quotations remain rejected. |
 | The fairness scope reviewer distinguishes relevant and irrelevant missing controls in three fixed examples. | pass | `fairness-semantic-design/live-runs/scope-only-82b6976c0c/`: three actual scope calls return applicable / not_applicable / applicable with exact protocol grounds. First-pass candidates were frozen; whole-claim assessment was not run. |
@@ -62,7 +74,7 @@ The three-layer implementation is present. The following evaluations describe it
 | The original-paper fairness concern is scientifically justified. | unresolved | The prior 042 concern remains saved and unresolved. Three synthetic scope examples do not adjudicate it or measure general false-accusation rates. |
 | General literature, mathematical and execution reliability is established. | unresolved | Selected real source/vision/Docker integrations exist. Retrieval completeness, formal mathematical correctness, broad benchmark reproduction and reviewer benefit have no comprehensive validation. |
 
-Next: evaluate a bounded, generic completeness self-check against the retained omission and independent qualifier controls. Keep all original and new failed expectations visible; source-only text cannot substitute for an extracted independent conclusion. No causal claim about prompt changes is supported by one sample per version.
+Next: retain the completed self-check evaluation, unavailable controls and qualifier-provenance limitation, and address the original joint-evidence binding failures with a separately reviewed bounded design. Keep all original and new failed expectations visible. No causal claim about prompt changes is supported by one sample per version.
 
 ## Current 14-check framework matrix
 
@@ -70,7 +82,7 @@ Paths in this matrix use `runs/v2_binding_followup/` unless stated otherwise. Pa
 
 | requirement | verdict | evidence | correction |
 |---|---|---|---|
-| 1. Tests pass without weakening or new skips. | pass | `pytest-claim-semantic-prompt-full.log`: 1953 passed, 3 original deselections; separate legacy 2 passed. | 40 source-selection tests added at the preceding checkpoint; this prompt follow-up changes no tests. The existing malformed-binding serialization warning is unchanged. |
+| 1. Tests pass without weakening or new skips. | pass | `pytest-claim-completeness-full.log`: 1953 passed, 3 original deselections; separate legacy 2 passed. | 40 source-selection tests added at the preceding checkpoint; the two prompt follow-ups change no tests. The existing malformed-binding serialization warning is unchanged. |
 | 2. Materials → L1 → L2 → optional L3 → assessment → report → teaser. | pass | Pipeline and framework-matrix tests in the full suite; actual seven-stage `target-docker-e502402610/independent-review.md`. | Stage failure/state and concurrent statistics contracts remain covered. |
 | 3. Upfront claims and v2 splitting, without C1–C3 cap. | pass | `tests/test_claims_v2.py`, extraction boundary regressions and saved cross-domain extraction audits. | Atomicity still depends on model judgment; reports consume existing records. |
 | 4. Claims and evidence have verifiable locations and conditions. | pass | Member identity/projection independent reviews, exact range/selector tests, original source hashes and joint report pointer checks. | Every additional pointer stays attached to one declared original member; wrong scope cannot donate units or sufficient support. |
@@ -83,7 +95,7 @@ Paths in this matrix use `runs/v2_binding_followup/` unless stated otherwise. Pa
 | 11. Four statuses and safe v1 readability. | pass | Schema, adapter, assessment and report tests. | `in_conflict` maps to `questioned` for historical display without reassessment. |
 | 12. Four-part report without accept/reject recommendation. | pass | `joint-legacy-report-3819b8c4f9/independent-review.json`; `joint-live-report-delivery-48562bee28/` actual joint reports. | Original assessed fields retained; primary/additional sources have complete quotes and valid navigation. |
 | 13. Original end-to-end baseline and explicit blockers. | pass | Saved offline and actual service baseline comparisons under `runs/v2_live/`; generic real Docker integration above. | Original-paper artifact/binding limits stay reported; no benchmark reproduction or accuracy claim. |
-| 14. Progress and delivery match workspace. | pass | `progress.md`, `claim-semantic-prompt-delivery-inspection.json`, independent reviews and completed-batch manifests. | 119 packaged modules match, Python 3.11 syntax passes, 27 protected hashes unchanged; configured secrets absent from tracked/nonignored files. |
+| 14. Progress and delivery match workspace. | pass | `progress.md`, `claim-completeness-delivery-inspection.json`, independent reviews and completed-batch manifests. | 119 packaged modules match, Python 3.11 syntax passes, 27 protected hashes unchanged; configured secrets absent from tracked/nonignored files. |
 
 ## Earlier checkpoint evidence
 
