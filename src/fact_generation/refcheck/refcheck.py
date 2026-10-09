@@ -25,8 +25,12 @@ Usage (CLI)::
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
+import logging
 import os
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +39,131 @@ _REFCOPILOT_SRC = _REPO_ROOT / "RefCopilot" / "src"
 
 if _REFCOPILOT_SRC.exists() and str(_REFCOPILOT_SRC) not in sys.path:
     sys.path.insert(0, str(_REFCOPILOT_SRC))
+
+
+def record_digest(value: Any) -> str:
+    return hashlib.sha256(
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    ).hexdigest()
+
+
+@dataclass
+class ReferenceCheckBundle:
+    """The unchanged legacy export and independently saved public Report records."""
+
+    payload: dict[str, Any]
+    records: dict[str, Any] | None
+
+
+def reference_records(report, payload: dict[str, Any], input_sha256: str) -> dict[str, Any]:
+    """Bind exported issues by public object order; never join truncated titles."""
+    from refcopilot import Report, Severity, Verdict
+    from refcopilot.bibtex_suggest import suggest_bibtex
+    from refcopilot.report import to_factreview_dict
+
+    if not isinstance(report, Report):
+        raise ValueError("RefCopilot did not return a public Report")
+    report = Report.model_validate(report.model_dump(mode="json"))
+    if report.summary.total_refs != len(report.checked):
+        raise ValueError("RefCopilot Report coverage does not match its checked records")
+    bindings = []
+    for reference_index, checked in enumerate(report.checked):
+        indices = list(range(len(checked.issues)))
+        if not indices and checked.verdict == Verdict.UNVERIFIED:
+            indices = [None]
+        for issue_index in indices:
+            one = checked.model_copy(deep=True)
+            one.issues = [] if issue_index is None else [checked.issues[issue_index]]
+            rows = to_factreview_dict(Report(checked=[one]))["issues"]
+            if len(rows) != 1 or len(bindings) >= len(payload["issues"]):
+                raise ValueError("RefCopilot export cannot be bound to its original issues")
+            exported = payload["issues"][len(bindings)]
+            if rows[0] != exported:
+                raise ValueError("RefCopilot export changed while binding issue records")
+            full = ""
+            if issue_index is not None and checked.issues[issue_index].severity == Severity.WARNING:
+                full = suggest_bibtex(checked.reference, checked.merged)
+            bindings.append(
+                {
+                    "reference_index": reference_index,
+                    "issue_index": issue_index,
+                    "exported_issue": exported,
+                    "checked_sha256": record_digest(checked.model_dump(mode="json")),
+                    "corrected_bibtex": full,
+                    "bibtex_sha256": hashlib.sha256(full.encode()).hexdigest(),
+                    "export_truncated": full != exported.get("corrected_bibtex", ""),
+                }
+            )
+    if len(bindings) != len(payload["issues"]):
+        raise ValueError("RefCopilot export contains unbound issues")
+    raw_report = report.model_dump(mode="json")
+    return {
+        "version": 1,
+        "input_sha256": input_sha256,
+        "payload_sha256": record_digest(payload),
+        "report_sha256": record_digest(raw_report),
+        "report": raw_report,
+        "bindings": bindings,
+    }
+
+
+def check_references_with_records(
+    paper: str,
+    *,
+    api_key: str | None = None,
+    output_file: str | None = None,
+    debug: bool = False,
+    enable_parallel: bool = True,
+    max_workers: int = 4,
+) -> ReferenceCheckBundle:
+    """Run the public pipeline once, preserving full records outside the legacy export.
+
+    The optional v2 detail file uses the library's public Markdown serializer.
+    Legacy check_references/CLI behavior is unchanged.
+    """
+    from refcopilot import RefCopilotPipeline
+    from refcopilot.report import to_factreview_dict, to_markdown
+
+    if debug:
+        logging.basicConfig(level=logging.DEBUG)
+    try:
+        candidate = Path(paper) if len(paper) < 1024 and "\n" not in paper else None
+        source = candidate if candidate is not None and candidate.is_file() else None
+        source_hash = hashlib.sha256(source.read_bytes()).hexdigest() if source else None
+        if source and source.suffix.lower() in {".txt", ".tex"}:
+            paper = source.read_text(encoding="utf-8-sig")
+        pipeline = RefCopilotPipeline(
+            s2_api_key=api_key if api_key is not None else os.getenv("SEMANTIC_SCHOLAR_API_KEY") or None,
+            use_llm_verify=True,
+            max_workers=max_workers if enable_parallel else 1,
+        )
+        report = pipeline.run(paper)
+        if source and hashlib.sha256(source.read_bytes()).hexdigest() != source_hash:
+            raise ValueError("Reference input file changed during the check")
+        payload = to_factreview_dict(report, report_file=str(output_file or ""))
+        records = reference_records(report, payload, hashlib.sha256(paper.encode()).hexdigest())
+        if output_file:
+            destination = Path(output_file)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(to_markdown(report), encoding="utf-8")
+        return ReferenceCheckBundle(payload, records)
+    except Exception as exc:
+        return ReferenceCheckBundle(
+            {
+                "ok": False,
+                "total_refs": 0,
+                "errors": 0,
+                "warnings": 0,
+                "unverified": 0,
+                "error_message": f"{type(exc).__name__}: {exc}",
+                "issues": [],
+                "error_details": [],
+                "warning_details": [],
+                "unverified_details": [],
+                "report_file": str(output_file or ""),
+            },
+            None,
+        )
 
 
 def check_references(

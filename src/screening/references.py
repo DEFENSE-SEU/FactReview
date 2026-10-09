@@ -5,15 +5,18 @@ import re
 import unicodedata
 from pathlib import Path
 from typing import Literal
-from urllib.parse import unquote, urlsplit
 
 from pydantic import Field
 
 from common import run_stats
-from fact_generation.refcheck.refcheck import check_references
+from fact_generation.refcheck.refcheck import ReferenceCheckBundle
+from fact_generation.refcheck.refcheck import check_references_with_records as check_references
 from schemas.claim import Contract, Evidence, EvidencePointer, Finding, NonEmpty
 from schemas.materials import SharedMaterials
 from screening.checks import ask, paper_finding
+from screening.reference_corrections import bibliographic_ids as _bibliographic_ids
+from screening.reference_corrections import bound_record, build_correction, printed_publication_venue
+from screening.reference_corrections import url_identifiers as _url_identifiers
 
 
 class ReferenceDecision(Contract):
@@ -33,43 +36,6 @@ class ReferencePageReview(Contract):
 def _identity_text(value: str) -> str:
     """Formatting alone cannot establish a different author or title identity."""
     return "".join(char for char in unicodedata.normalize("NFKC", value).casefold() if char.isalnum())
-
-
-def _bibliographic_ids(text: str) -> set[str]:
-    """Read explicit identifiers, retaining arXiv versions and stripping citation punctuation."""
-    text = unquote(text)
-    identifiers = set()
-    for match in re.finditer(r"\b10\.\d{4,9}/[^\s<>\"?#]+", text, re.IGNORECASE):
-        doi = match.group().rstrip(".,;:")
-        for closing, opening in ((")", "("), ("]", "["), ("}", "{")):
-            while doi.endswith(closing) and doi.count(closing) > doi.count(opening):
-                doi = doi[:-1].rstrip(".,;:")
-        identifiers.add("doi:" + doi.casefold())
-    for match in re.finditer(
-        r"(?:arxiv\s*:\s*|\b(?:abs|pdf)/)(\d{4}\.\d{4,5}(?:v[1-9]\d*)?"
-        r"|[a-z][a-z.-]*/\d{7}(?:v[1-9]\d*)?)(?:\.pdf)?(?=$|[\s.,;:)\]}>])",
-        text,
-        re.IGNORECASE,
-    ):
-        identifiers.add("arxiv:" + match[1].casefold())
-    return identifiers
-
-
-def _url_identifiers(value):
-    try:
-        parsed = urlsplit(value)
-        if parsed.scheme not in {"http", "https"} or parsed.username or parsed.password:
-            return set()
-        path = unquote(parsed.path)
-        if parsed.hostname in {"doi.org", "dx.doi.org"} and re.match(r"^/10\.\d{4,9}/", path):
-            return {item for item in _bibliographic_ids(path) if item.startswith("doi:")}
-        if parsed.hostname in {"arxiv.org", "www.arxiv.org", "export.arxiv.org"} and path.startswith(
-            ("/abs/", "/pdf/")
-        ):
-            return {item for item in _bibliographic_ids(path) if item.startswith("arxiv:")}
-    except ValueError:
-        pass
-    return set()
 
 
 def _reference_identity(row, block):
@@ -123,7 +89,17 @@ def _check_bibliography(materials, output_dir, *, checker=None, call=None):
     output_dir.mkdir(parents=True, exist_ok=True)
     path = output_dir / "bibliography.txt"
     path.write_text("\n\n".join(b.text for b in materials.bibliography), encoding="utf-8")
-    result = (checker or check_references)(paper=str(path))
+    checked = (checker if checker is not None else check_references)(paper=str(path))
+    records_path = None
+    if isinstance(checked, ReferenceCheckBundle):
+        result = checked.payload
+        if checked.records is not None:
+            records_path = output_dir / "reference_records.json"
+            records_path.write_text(
+                json.dumps(checked.records, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+    else:
+        result = checked
     result_path = output_dir / "reference_check.json"
     result_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     if not result.get("ok"):
@@ -137,6 +113,7 @@ def _check_bibliography(materials, output_dir, *, checker=None, call=None):
     if not isinstance(result.get("issues"), list):
         return [], [f"Reference check returned no valid issues list; {result_path}"], "failed"
     findings, issues, candidates = [], [], []
+    corrections = {}
     if result["total_refs"] != len(materials.bibliography):
         issues.append(
             f"Reference coverage needs review: checker processed {result['total_refs']} entries "
@@ -144,7 +121,17 @@ def _check_bibliography(materials, output_dir, *, checker=None, call=None):
         )
     for index, row in enumerate(result.get("issues", [])):
         title = str(row.get("reference_title") or row.get("reference") or "").strip()
-        matches = [b for b in materials.bibliography if title and title.casefold() in b.text.casefold()]
+        raw_reference = str(row.get("raw_reference") or "")
+        if isinstance(checked, ReferenceCheckBundle) and checked.records is not None:
+            try:
+                reference_index = checked.records["bindings"][index]["reference_index"]
+                raw_reference = checked.records["report"]["checked"][reference_index]["reference"]["raw"]
+            except (KeyError, IndexError, TypeError):
+                pass
+        exact = [b for b in materials.bibliography if raw_reference and b.text == raw_reference]
+        matches = exact or [
+            b for b in materials.bibliography if title and title.casefold() in b.text.casefold()
+        ]
         if len(matches) != 1 or matches[0].loc is None:
             issues.append(
                 f"Reference finding lacks a unique paper location: {title}; {result_path}#issues.{index}"
@@ -152,32 +139,85 @@ def _check_bibliography(materials, output_dir, *, checker=None, call=None):
             continue
         block = matches[0]
         code = str(row.get("type") or row.get("code") or "").lower()
+        if row.get("corrected_bibtex"):
+            corrections[index] = build_correction(row, block, index, result_path, records_path)
+            if corrections[index].state == "unavailable":
+                issues.append(
+                    f"Reference correction unavailable: {corrections[index].reason}; {result_path}#issues.{index}"
+                )
+        if "arxiv_published" in code:
+            full_record = None
+            try:
+                full_record, _ = bound_record(row, block, index, result_path, records_path)
+            except (OSError, ValueError, KeyError, TypeError, IndexError, AttributeError):
+                pass
+            venue = printed_publication_venue(row, block, full_record)
+            if venue:
+                issues.append(
+                    f"Reference arxiv-only warning not confirmed: original entry already names publication venue {venue!r}; {result_path}#issues.{index}"
+                )
+                continue
+            issues.append(
+                f"Reference arxiv-only warning remains unconfirmed: retrieved publication metadata does not establish that the original citation omitted a venue; {result_path}#issues.{index}"
+            )
+            if index not in corrections or corrections[index].state != "metadata_candidate":
+                continue
         if any(kind in code for kind in ("author_mismatch", "title_mismatch")):
             candidates.append((index, row, block))
             continue
         text = str(
             row.get("details") or row.get("message") or row.get("code") or row.get("type") or "Entry check"
         )
+        if "arxiv_published" in code:
+            text = "Retrieved metadata provides a publication venue; verify whether the original preprint citation should be updated. Original manuscript omission is unconfirmed."
         text += f" [RefCopilot: {result_path}#issues.{index}]"
-        findings.append(
-            paper_finding(
-                materials,
-                block,
-                quote=block.text,
-                text=text,
-                kind="reference",
-                level=str(row.get("severity") or "unverified"),
-            )
+        finding = paper_finding(
+            materials,
+            block,
+            quote=block.text,
+            text=text,
+            kind="reference",
+            level=str(row.get("severity") or "unverified"),
         )
+        if index in corrections:
+            finding = finding.model_copy(update={"reference_correction": corrections[index]})
+        findings.append(finding)
     checked_findings, validation_issues = _confirm_reference_candidates(
-        materials, candidates, result_path, output_dir, call=call
+        materials, candidates, result_path, output_dir, call=call, corrections=corrections
     )
     findings.extend(checked_findings)
     issues.extend(validation_issues)
+    for index, _row, block in candidates:
+        correction = corrections.get(index)
+        if correction is None or correction.state != "metadata_candidate":
+            continue
+        if any(getattr(item, "reference_correction", None) == correction for item in checked_findings):
+            continue
+        finding = paper_finding(
+            materials,
+            block,
+            quote=block.text,
+            kind="reference",
+            level="metadata_candidate",
+            text="Identity-bound retrieved metadata is available as a citation candidate. "
+            "The original-PDF author/title discrepancy was not confirmed; this suggestion does not establish a manuscript error.",
+        )
+        findings.append(finding.model_copy(update={"reference_correction": correction}))
+    if corrections:
+        (output_dir / "reference_corrections.json").write_text(
+            json.dumps(
+                {str(index): value.model_dump(mode="json") for index, value in corrections.items()},
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
     return findings, issues, "ok"
 
 
-def _confirm_reference_candidates(materials, candidates, result_path, output_dir, *, call=None):
+def _confirm_reference_candidates(
+    materials, candidates, result_path, output_dir, *, call=None, corrections=None
+):
     """Keep parser-based metadata mismatches separate from PDF-confirmed defects."""
     findings, issues, audit = [], [], []
     by_page = {}
@@ -334,6 +374,8 @@ def _confirm_reference_candidates(materials, candidates, result_path, output_dir
                     note=f"Original PDF read: {decision.reason}; retrieved comparison: {comparison}",
                 )
             )
+            if corrections and _index in corrections:
+                finding = finding.model_copy(update={"reference_correction": corrections[_index]})
             findings.append(finding)
     if candidates:
         (output_dir / "reference_validation.json").write_text(
