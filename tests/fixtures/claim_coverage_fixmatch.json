@@ -1,0 +1,499 @@
+{
+  "provenance": {
+    "paper": "FixMatch",
+    "arxiv": "2001.07685",
+    "kind": "exact cached MinerU blocks and extracted claims; no new calls",
+    "materials_sha256": "61a414f5c13e77afa5fcb9a6e7ba756ac9966789e4d208000d2b6ed4eeaa181b",
+    "screening_sha256": "110205e5129098c1d8565704299ae86c2e6a200d3d87016f06bfa81f069826e8",
+    "source_audit_sha256": "23f01e6c69327f9bebf4c4b58ca9fc4b5a90a6f64729243b0692bbad0c240577",
+    "test_projection": "Tests assemble these unchanged block texts into local markdown and recalculate local offsets, retaining this original location provenance."
+  },
+  "blocks": [
+    {
+      "id": "block_34",
+      "text": "<sup>2</sup>In practice, we include all labeled data as part of unlabeled data without their labels when constructing U.",
+      "kind": "page_footnote",
+      "loc": {
+        "page": 3,
+        "section": "block_27: 2.2 Our Algorithm: FixMatch",
+        "char_start": null,
+        "char_end": null
+      },
+      "citations": []
+    },
+    {
+      "id": "block_42",
+      "text": "First, as mentioned above, we find that regularization is particularly important. In all of our models and experiments, we use simple weight decay regularization. We also found that using the Adam optimizer [22] resulted in worse performance and instead use standard SGD with momentum [50, 40, 34]. We did not find a substantial difference between standard and Nesterov momentum. For a learning rate schedule, we use a cosine learning rate decay [28] which sets the learning rate to η cos $\\left( { \\frac { 7 \\pi k } { 1 6 K } } \\right)$ where η is the initial learning rate, k is the current training step, and K is the total number of training steps. Finally, we report final performance using an exponential moving average of model parameters.",
+      "kind": "text",
+      "loc": {
+        "page": 4,
+        "section": "section_8: 2.4 Additional important factors",
+        "char_start": 14188,
+        "char_end": 14934
+      },
+      "citations": [
+        "[22]",
+        "[50, 40, 34]",
+        "[28]"
+      ]
+    },
+    {
+      "id": "block_84",
+      "text": "Since FixMatch comprises a simple combination of two existing techniques, we perform an extensive ablation study to better understand why it is able to obtain state-of-the-art results. Due to the number of experiments in our ablation study, we focus on studying with a single 250 label split from CIFAR 10 and only report results using CTAugment. Note that FixMatch with default parameters achieves 4.84% error rate on this particular split. We present complete ablation results, including optimizer (appendix B.3), learning rate decay schedule (appendix B.4), weight decay (appendix B.6), labeled to unlabeled data ratio $\\mu$ (appendix B.5), in the supplementary material.",
+      "kind": "text",
+      "loc": {
+        "page": 8,
+        "section": "section_16: 5 Ablation Study",
+        "char_start": 33163,
+        "char_end": 33837
+      },
+      "citations": []
+    },
+    {
+      "id": "block_91",
+      "text": "We also study different combinations of weak and strong augmentations for pseudo-label generation and prediction (i.e., the upper and lower paths in fig. 1). When we replaced the weak augmentation for label guessing with strong augmentation, we found that the model diverged early in training. Conversely, when replacing weak augmentation with no augmentation, the model overfits the guessed unlabeled labels. Using weak augmentation in place of strong augmentation to generate the model’s prediction for training peaked at 45% accuracy but was not stable and progressively collapsed to 12%, suggesting the importance of strong data augmentation. This observation is well-aligned with those from supervised learning [10].",
+      "kind": "text",
+      "loc": {
+        "page": 8,
+        "section": "section_18: 5.2 Augmentation Strategy",
+        "char_start": 36113,
+        "char_end": 36834
+      },
+      "citations": [
+        "[10]"
+      ]
+    },
+    {
+      "id": "block_212",
+      "text": "• Batch size. On each step our batch contains 1024 labeled examples and 5120 unlabeled examples.",
+      "kind": "text",
+      "loc": {
+        "page": 17,
+        "section": "section_34: C Implementation Details for Section 4.3",
+        "char_start": 63611,
+        "char_end": 63707
+      },
+      "citations": []
+    },
+    {
+      "id": "block_219",
+      "text": "• Training time. We train our model for 300 epochs of unlabeled examples<sup>8</sup>.",
+      "kind": "text",
+      "loc": {
+        "page": 18,
+        "section": "section_34: C Implementation Details for Section 4.3",
+        "char_start": 66391,
+        "char_end": 66476
+      },
+      "citations": []
+    },
+    {
+      "id": "block_220",
+      "text": "• Learning rate schedule. We utilize linear learning rate warmup for the first 5 epochs until it reaches an initial value of 0.4. Then we the decay learning rate at epochs 60, 120, 160, and 200 epoch by multiplying it by 0.1.",
+      "kind": "text",
+      "loc": {
+        "page": 18,
+        "section": "section_34: C Implementation Details for Section 4.3",
+        "char_start": 66478,
+        "char_end": 66703
+      },
+      "citations": []
+    },
+    {
+      "id": "block_221",
+      "text": "• Optimizer. We use Nesterov Momentum optimizer with momentum 0.9.",
+      "kind": "text",
+      "loc": {
+        "page": 18,
+        "section": "section_34: C Implementation Details for Section 4.3",
+        "char_start": 66705,
+        "char_end": 66771
+      },
+      "citations": []
+    },
+    {
+      "id": "block_222",
+      "text": "• Exponential moving average (EMA). We utilize EMA technique with decay 0.999.",
+      "kind": "text",
+      "loc": {
+        "page": 18,
+        "section": "section_34: C Implementation Details for Section 4.3",
+        "char_start": 66773,
+        "char_end": 66851
+      },
+      "citations": []
+    },
+    {
+      "id": "block_223",
+      "text": "• FixMatch loss. We use unlabeled loss weight $\\lambda _ { u } = 1 0$ and confidence threshold $\\tau = 0 . 7$ in FixMatch loss.",
+      "kind": "text",
+      "loc": {
+        "page": 18,
+        "section": "section_34: C Implementation Details for Section 4.3",
+        "char_start": 66853,
+        "char_end": 66980
+      },
+      "citations": []
+    },
+    {
+      "id": "block_224",
+      "text": "• Weight decay. Our weight decay coefficient is 0.0003. Similarly to other datasets we perform weight decay by adding L2 penalty of all weights to model loss.",
+      "kind": "text",
+      "loc": {
+        "page": 18,
+        "section": "section_34: C Implementation Details for Section 4.3",
+        "char_start": 66982,
+        "char_end": 67140
+      },
+      "citations": []
+    },
+    {
+      "id": "block_225",
+      "text": "• Augmentation of unlabeled images. For strong augmentation we use RandAugment with random magnitude [11]. For weak augmentation we use a random horizontal flip.",
+      "kind": "text",
+      "loc": {
+        "page": 18,
+        "section": "section_34: C Implementation Details for Section 4.3",
+        "char_start": 67142,
+        "char_end": 67303
+      },
+      "citations": [
+        "[11]"
+      ]
+    },
+    {
+      "id": "block_226",
+      "text": "• ImageNet preprocessing. We randomly crop and rescale to 224×224 size all labeled and unlabeled training images prior to performing augmentation. This is considered a standard ImageNet preprocessing technique.",
+      "kind": "text",
+      "loc": {
+        "page": 18,
+        "section": "section_34: C Implementation Details for Section 4.3",
+        "char_start": 67305,
+        "char_end": 67515
+      },
+      "citations": []
+    },
+    {
+      "id": "block_227",
+      "text": "<sup>8</sup>Note that one epoch of unlabelled examples contains all 1.2 million examples from Imagenet training set and it correspond to 10 passes through labelled set for 10% Imagenet task.",
+      "kind": "page_footnote",
+      "loc": {
+        "page": 18,
+        "section": "block_210: C Implementation Details for Section 4.3",
+        "char_start": null,
+        "char_end": null
+      },
+      "citations": []
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim_013",
+      "text": "Regularization is particularly important for FixMatch, all models and experiments use weight decay, Adam resulted in worse performance than SGD with momentum, standard and Nesterov momentum did not differ substantially, cosine learning-rate decay is used, and final performance is reported using an exponential moving average of model parameters.",
+      "loc": {
+        "page": 4,
+        "section": "section_8: 2.4 Additional important factors",
+        "char_start": 14188,
+        "char_end": 14934
+      },
+      "source_block_id": "block_42",
+      "source_quote": "First, as mentioned above, we find that regularization is particularly important. In all of our models and experiments, we use simple weight decay regularization. We also found that using the Adam optimizer [22] resulted in worse performance and instead use standard SGD with momentum [50, 40, 34]. We did not find a substantial difference between standard and Nesterov momentum. For a learning rate schedule, we use a cosine learning rate decay [28] which sets the learning rate to η cos $\\left( { \\frac { 7 \\pi k } { 1 6 K } } \\right)$ where η is the initial learning rate, k is the current training step, and K is the total number of training steps. Finally, we report final performance using an exponential moving average of model parameters.",
+      "source_refs": [],
+      "conditions": [
+        {
+          "id": "c1",
+          "dataset": null,
+          "metric": "performance",
+          "settings": {
+            "factor": "regularization",
+            "finding": "particularly important"
+          },
+          "description": "Importance of regularization."
+        },
+        {
+          "id": "c2",
+          "dataset": null,
+          "metric": null,
+          "settings": {
+            "implementation": "weight decay regularization",
+            "scope": "all models and experiments"
+          },
+          "description": "Use of weight decay."
+        },
+        {
+          "id": "c3",
+          "dataset": null,
+          "metric": "performance",
+          "settings": {
+            "optimizer_comparison": "Adam vs standard SGD with momentum",
+            "finding": "Adam resulted in worse performance"
+          },
+          "description": "Optimizer performance comparison."
+        },
+        {
+          "id": "c4",
+          "dataset": null,
+          "metric": "performance",
+          "settings": {
+            "comparison": "standard momentum vs Nesterov momentum",
+            "finding": "no substantial difference"
+          },
+          "description": "Momentum variant comparison."
+        },
+        {
+          "id": "c5",
+          "dataset": null,
+          "metric": null,
+          "settings": {
+            "learning_rate_schedule": "cosine learning rate decay",
+            "formula": "η cos $\\left( { \\frac { 7 \\pi k } { 1 6 K } } \\right)$"
+          },
+          "description": "Learning-rate schedule used."
+        },
+        {
+          "id": "c6",
+          "dataset": null,
+          "metric": null,
+          "settings": {
+            "reporting": "final performance using exponential moving average of model parameters"
+          },
+          "description": "EMA use for final performance."
+        }
+      ],
+      "needs": [
+        "Experiments",
+        "Code",
+        "Literature"
+      ],
+      "importance": "secondary",
+      "questions": [],
+      "evidence": [],
+      "status": "unverified",
+      "notes": [],
+      "advice": null,
+      "theory_derivations": [],
+      "verification_limitations": []
+    },
+    {
+      "id": "claim_037",
+      "text": "For pseudo-label generation and prediction augmentation, replacing weak augmentation for label guessing with strong augmentation makes the model diverge early, replacing weak augmentation with no augmentation makes the model overfit guessed unlabeled labels, and using weak rather than strong augmentation for prediction peaks at 45% accuracy but collapses to 12%.",
+      "loc": {
+        "page": 8,
+        "section": "section_18: 5.2 Augmentation Strategy",
+        "char_start": 36113,
+        "char_end": 36834
+      },
+      "source_block_id": "block_91",
+      "source_quote": "We also study different combinations of weak and strong augmentations for pseudo-label generation and prediction (i.e., the upper and lower paths in fig. 1). When we replaced the weak augmentation for label guessing with strong augmentation, we found that the model diverged early in training. Conversely, when replacing weak augmentation with no augmentation, the model overfits the guessed unlabeled labels. Using weak augmentation in place of strong augmentation to generate the model’s prediction for training peaked at 45% accuracy but was not stable and progressively collapsed to 12%, suggesting the importance of strong data augmentation. This observation is well-aligned with those from supervised learning [10].",
+      "source_refs": [],
+      "conditions": [
+        {
+          "id": "c1",
+          "dataset": "CIFAR-10",
+          "metric": "training stability",
+          "settings": {
+            "ablation": "replace weak augmentation for label guessing with strong augmentation",
+            "finding": "model diverged early in training"
+          },
+          "description": "Label guessing augmentation ablation: strong instead of weak."
+        },
+        {
+          "id": "c2",
+          "dataset": "CIFAR-10",
+          "metric": "overfitting behavior",
+          "settings": {
+            "ablation": "replace weak augmentation for label guessing with no augmentation",
+            "finding": "model overfits guessed unlabeled labels"
+          },
+          "description": "Label guessing augmentation ablation: none instead of weak."
+        },
+        {
+          "id": "c3",
+          "dataset": "CIFAR-10",
+          "metric": "accuracy",
+          "settings": {
+            "ablation": "use weak augmentation instead of strong augmentation for model prediction during training",
+            "peak_accuracy": "45%",
+            "collapsed_accuracy": "12%",
+            "finding": "not stable and progressively collapsed"
+          },
+          "description": "Prediction augmentation ablation: weak instead of strong."
+        }
+      ],
+      "needs": [
+        "Experiments",
+        "Code",
+        "Literature"
+      ],
+      "importance": "secondary",
+      "questions": [],
+      "evidence": [],
+      "status": "unverified",
+      "notes": [],
+      "advice": null,
+      "theory_derivations": [],
+      "verification_limitations": []
+    },
+    {
+      "id": "claim_050",
+      "text": "The ImageNet FixMatch implementation uses batch size 1024 labeled and 5120 unlabeled per step, trains for 300 epochs of unlabeled examples, warms the learning rate linearly for 5 epochs to 0.4 then decays at epochs 60/120/160/200 by 0.1, uses Nesterov momentum 0.9, EMA decay 0.999, λu=10, τ=0.7, weight decay 0.0003, RandAugment with random magnitude for strong augmentation, random horizontal flip for weak augmentation, and random crop/rescale to 224×224.",
+      "loc": {
+        "page": 17,
+        "section": "section_34: C Implementation Details for Section 4.3",
+        "char_start": 63611,
+        "char_end": 63707
+      },
+      "source_block_id": "block_212",
+      "source_quote": "• Batch size. On each step our batch contains 1024 labeled examples and 5120 unlabeled examples.",
+      "source_refs": [
+        {
+          "source_block_id": "block_219",
+          "source_quote": "• Training time. We train our model for 300 epochs of unlabeled examples<sup>8</sup>.",
+          "loc": {
+            "page": 18,
+            "section": "section_34: C Implementation Details for Section 4.3",
+            "char_start": 66391,
+            "char_end": 66476
+          },
+          "covered": [
+            "c1"
+          ]
+        },
+        {
+          "source_block_id": "block_220",
+          "source_quote": "• Learning rate schedule. We utilize linear learning rate warmup for the first 5 epochs until it reaches an initial value of 0.4. Then we the decay learning rate at epochs 60, 120, 160, and 200 epoch by multiplying it by 0.1.",
+          "loc": {
+            "page": 18,
+            "section": "section_34: C Implementation Details for Section 4.3",
+            "char_start": 66478,
+            "char_end": 66703
+          },
+          "covered": [
+            "c1"
+          ]
+        },
+        {
+          "source_block_id": "block_221",
+          "source_quote": "• Optimizer. We use Nesterov Momentum optimizer with momentum 0.9.",
+          "loc": {
+            "page": 18,
+            "section": "section_34: C Implementation Details for Section 4.3",
+            "char_start": 66705,
+            "char_end": 66771
+          },
+          "covered": [
+            "c1"
+          ]
+        },
+        {
+          "source_block_id": "block_222",
+          "source_quote": "• Exponential moving average (EMA). We utilize EMA technique with decay 0.999.",
+          "loc": {
+            "page": 18,
+            "section": "section_34: C Implementation Details for Section 4.3",
+            "char_start": 66773,
+            "char_end": 66851
+          },
+          "covered": [
+            "c1"
+          ]
+        },
+        {
+          "source_block_id": "block_223",
+          "source_quote": "• FixMatch loss. We use unlabeled loss weight $\\lambda _ { u } = 1 0$ and confidence threshold $\\tau = 0 . 7$ in FixMatch loss.",
+          "loc": {
+            "page": 18,
+            "section": "section_34: C Implementation Details for Section 4.3",
+            "char_start": 66853,
+            "char_end": 66980
+          },
+          "covered": [
+            "c1"
+          ]
+        },
+        {
+          "source_block_id": "block_224",
+          "source_quote": "• Weight decay. Our weight decay coefficient is 0.0003. Similarly to other datasets we perform weight decay by adding L2 penalty of all weights to model loss.",
+          "loc": {
+            "page": 18,
+            "section": "section_34: C Implementation Details for Section 4.3",
+            "char_start": 66982,
+            "char_end": 67140
+          },
+          "covered": [
+            "c1"
+          ]
+        },
+        {
+          "source_block_id": "block_225",
+          "source_quote": "• Augmentation of unlabeled images. For strong augmentation we use RandAugment with random magnitude [11]. For weak augmentation we use a random horizontal flip.",
+          "loc": {
+            "page": 18,
+            "section": "section_34: C Implementation Details for Section 4.3",
+            "char_start": 67142,
+            "char_end": 67303
+          },
+          "covered": [
+            "c1"
+          ]
+        },
+        {
+          "source_block_id": "block_226",
+          "source_quote": "• ImageNet preprocessing. We randomly crop and rescale to 224×224 size all labeled and unlabeled training images prior to performing augmentation. This is considered a standard ImageNet preprocessing technique.",
+          "loc": {
+            "page": 18,
+            "section": "section_34: C Implementation Details for Section 4.3",
+            "char_start": 67305,
+            "char_end": 67515
+          },
+          "covered": [
+            "c1"
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "id": "c1",
+          "dataset": "ImageNet",
+          "metric": null,
+          "settings": {
+            "batch_labeled": 1024,
+            "batch_unlabeled": 5120,
+            "training_time": "300 epochs of unlabeled examples",
+            "lr_warmup": "first 5 epochs to 0.4",
+            "lr_decay_epochs": [
+              60,
+              120,
+              160,
+              200
+            ],
+            "lr_decay_factor": "0.1",
+            "optimizer": "Nesterov Momentum",
+            "momentum": "0.9",
+            "EMA_decay": "0.999",
+            "$\\lambda _ { u }$": "1 0",
+            "$\\tau$": "0 . 7",
+            "weight_decay": "0.0003",
+            "weight_decay_implementation": "L2 penalty of all weights to model loss",
+            "strong_augmentation": "RandAugment with random magnitude [11]",
+            "weak_augmentation": "random horizontal flip",
+            "preprocessing": "random crop and rescale to 224×224 for all labeled and unlabeled training images"
+          },
+          "description": "ImageNet hyperparameters and preprocessing."
+        }
+      ],
+      "needs": [
+        "Code",
+        "Experiments"
+      ],
+      "importance": "secondary",
+      "questions": [],
+      "evidence": [],
+      "status": "unverified",
+      "notes": [],
+      "advice": null,
+      "theory_derivations": [],
+      "verification_limitations": []
+    }
+  ]
+}

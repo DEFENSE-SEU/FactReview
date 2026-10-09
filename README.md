@@ -6,7 +6,7 @@ The default pipeline follows the [method specification](docs/method_v2_spec.md):
 
 `materials → L1 screening → L2 typed verification → L3 execution (optional) → assessment → report → teaser`
 
-Claims are extracted once before verification. Each records its paper location, conditions and evidence needs. Literature, Theory, Code and Experiments receive only the claims routed to them. The report consumes the assessed records and preserves their evidence sources.
+Claims are extracted before verification. A separate source-window review checks for omitted claims, lost experimental qualifiers and independently checkable conclusions that were merged. Source-grounded additions, corrections and splits retain an explicit before/after audit. Each claim records its paper location, conditions and evidence needs. Literature, Theory, Code and Experiments receive only the claims routed to them. The report consumes the assessed records and preserves their evidence sources.
 
 After fixed-rule assessment, the report agent writes per-claim advice with local evidence references. Each advice call and its input snapshot are saved, and its usage is included in report accounting. Failed or stale advice is marked unavailable. Original PDF crops feed separate figure and table VLM checks; missing crops and failed checks have explicit coverage counts.
 
@@ -79,6 +79,7 @@ Outputs are saved under `runs/<paper-key>_<timestamp>_<unique-id>/`:
 - `code_scopes/`: complete selected/omitted source manifests for each Code inspection, including the configured source budget.
 - `code_scope_reviews/`: independent condition-level applicability reviews of Code candidates, including source bridges, requirement facets and unresolved coverage.
 - `claim_extraction/`: original extraction responses and bounded source-repair attempts. `CLAIM_SOURCE_MAX_REPAIRS` defaults to 3 and accepts 0–3; this is separate from execution repair. Repairs preserve every candidate conclusion and condition while correcting exact source bindings.
+- `screening/claim_coverage/coverage.json`: source windows, coverage observations, accepted changes and unresolved extraction problems. `--claim-coverage-window-chars` defaults to 24000; `--claim-coverage-review-calls` and `--claim-coverage-followup-calls` each default to 12. These bound model work without setting a claim-count target. Unreviewed windows and failed calls remain visible. Confirmed unresolved problems block the affected claims from verification while healthy claims continue. A completed model review does not prove exhaustive extraction.
 - `experiment_scope/`: independent applicability/support reviews for experimental evidence, including numerical comparison checks and unresolved qualifiers.
 - `screening/reference_validation.json`: original-PDF reference confirmation decisions; the original `reference_check.json` is retained separately.
 

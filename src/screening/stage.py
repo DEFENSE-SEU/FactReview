@@ -1,4 +1,4 @@
-"""L1 boundary: extract once, retain findings and explicit check failures."""
+"""L1: extract and review claims, retaining findings and explicit check failures."""
 
 import os
 from pathlib import Path
@@ -9,6 +9,7 @@ from pydantic import Field
 from schemas.claim import Claim, Contract, Finding
 from schemas.materials import SharedMaterials
 from screening.checks import check_tables, check_writing
+from screening.claim_coverage import coverage_summary, review_claim_coverage
 from screening.claims import ClaimExtractionError, extract_claims
 from screening.figures import FigureCheckRecord, check_figures
 from screening.references import check_bibliography
@@ -30,6 +31,8 @@ class ScreeningResult(Contract):
     writing_coverage: dict[str, int] = Field(default_factory=dict)
     anonymity_policy: Literal["unspecified", "required", "not_required"] = "unspecified"
     claim_extraction_status: Literal["ok", "failed"] = "ok"
+    claim_coverage: dict = Field(default_factory=lambda: {"status": "not_run"})
+    blocked_claim_ids: list[str] = Field(default_factory=list)
 
 
 class ScreeningFailure(ClaimExtractionError):
@@ -47,6 +50,9 @@ def screen_paper(
     call=None,
     reference_checker=None,
     anonymity_policy="unspecified",
+    claim_coverage_window_chars=24000,
+    claim_coverage_review_calls=12,
+    claim_coverage_followup_calls=12,
 ):
     # Failed extraction cannot become an apparently successful review with zero claims.
     result = ScreeningResult(claims=[], anonymity_policy=anonymity_policy)
@@ -59,6 +65,29 @@ def screen_paper(
         extraction_error = f"{type(exc).__name__}: {exc}"
         result.claim_extraction_status = "failed"
         result.issues.append(f"Claim extraction failed: {extraction_error}")
+    if extraction_error is None:
+        try:
+            coverage = review_claim_coverage(
+                materials.model_copy(deep=True),
+                [claim.model_copy(deep=True) for claim in result.claims],
+                call=call,
+                output_dir=output_dir / "claim_coverage",
+                window_chars=claim_coverage_window_chars,
+                max_review_calls=claim_coverage_review_calls,
+                max_followup_calls=claim_coverage_followup_calls,
+            )
+            result.claims = coverage.claims
+            result.claim_coverage = coverage_summary(coverage.coverage)
+            result.blocked_claim_ids = coverage.blocked_claim_ids
+            result.issues.extend(coverage.issues)
+        except Exception as exc:
+            # Independent checks and healthy first-pass claims remain usable.
+            result.claim_coverage = {
+                "status": "failed",
+                "initial_claims": len(result.claims),
+                "final_claims": len(result.claims),
+            }
+            result.issues.append(f"Claim coverage review failed: {type(exc).__name__}: {exc}")
     for name, check in (
         (
             "writing",

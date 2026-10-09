@@ -178,6 +178,7 @@ def _compact_markdown(review, nav, context):
         "|---|---:|",
     ]
     lines.extend(f"| {s.value} | {review.summary_counts[s]} |" for s in v2.STATUS_ORDER)
+    lines += v2.claim_coverage_lines(context.get("claim_coverage"))
     lines += ["", "Execution coverage: " + _json(v2.execution_summary(review)) + ".", ""]
     for key in (
         "writing_coverage",

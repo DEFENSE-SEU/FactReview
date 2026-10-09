@@ -61,9 +61,13 @@ async def verify_claims(
     branches: dict[EvidenceNeed, Callable] | None = None,
     global_literature: Callable | None = None,
     call=None,
+    blocked_claim_ids: list[str] | None = None,
 ) -> VerificationResult:
     if len({claim.id for claim in claims}) != len(claims):
         raise ValueError("Claim identifiers must be unique")
+    blocked = set(blocked_claim_ids or [])
+    if blocked - {claim.id for claim in claims}:
+        raise ValueError("Extraction blocks must refer to retained claims")
     if branches is None:
         from verification.code import verify_code
         from verification.experiments import verify_experiments
@@ -101,7 +105,27 @@ async def verify_claims(
         }
         global_literature = global_literature or literature
     result = VerificationResult(claims=[claim.model_copy(deep=True) for claim in claims])
-    jobs = [(claim, name) for claim in result.claims for name in claim.needs]
+    for claim in result.claims:
+        if claim.id not in blocked:
+            continue
+        reason = (
+            "Claim coverage review found an unresolved extraction problem. "
+            "Repair the claim's meaning, independent conclusions or original conditions "
+            "before verification; see screening/claim_coverage/coverage.json."
+        )
+        claim.verification_limitations.append(
+            VerificationLimitation(
+                claim_id=claim.id,
+                condition_ids=[condition.id for condition in claim.conditions],
+                stage="verification",
+                kind="claim_extraction_incomplete",
+                reason=reason,
+            )
+        )
+        claim.notes.append(reason)
+        result.issues.append(f"{claim.id}: {reason}")
+        result.dispatched[claim.id] = []
+    jobs = [(claim, name) for claim in result.claims if claim.id not in blocked for name in claim.needs]
 
     async def run(claim, name):
         try:
