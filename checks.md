@@ -1,6 +1,19 @@
 # FactReview v2 acceptance checks
 
+## Current phase 4 correction: exclusive execution decision
+
+The first Experiments response now requests `experiments-execution-v3`, with one explicit choice/legacy/none decision. A validated branch lowers to the existing internal representation while preserving the actual raw object. Invalid decisions cannot create a plan; independently valid paper observations survive. New choice plans revalidate the retained raw origin and adapter at the existing consumer, including L3. Legacy decisions retain their existing consumers.
+
+| requirement | verdict | evidence | correction / limit |
+|---|---|---|---|
+| One decision reaches the existing plan and L3 contracts | pass | `exclusive-execution-implementation/report.md`, `freeze.json`:21 necessary controls before the origin repair;4 affected controls after it in1.90s. Ruff/diff checks pass. | Exact raw selection, audited normalized view, privacy rejection and original legacy collision are retained. No old test changed or full suite rerun. |
+| Original failed actual remains unchanged | pass | `exclusive-execution-implementation/original-replay/summary.json`: the exact two old responses still yield0 plans and5 non-sufficient evidence items;305 protected files unchanged. | Response replay only; the newly requested schema and registry fingerprints differ from the historical request. |
+| Independent source review and origin-downgrade repair | pass | `exclusive-execution-independent/`: the unchanged original downgrade probe now rejects, as do missing record origin and combined deletion; a new old-wire plan binds its legacy origin and validates. Frozen choices `4b1220fe...`, schema `99d4ece2...`, experiments `e41325ed...`. | Four mocked calls, no external calls or repeated suite. Historical missing-origin records stay readable but need regeneration before execution. Original red and the review-harness import error remain recorded. |
+| Actual native decision and Docker execution with the new wire | unresolved | A separately versioned controller is being prepared; no actual request yet. | Existing controller/raw artifacts remain unchanged. Joint paper-source failures remain separate. |
+
 ## Latest phase 3 correction: explicit coverage decisions
+
+Committed and pushed as `343501a3f55d367f5bd1888f9ef343ac8a478fdd`; the remote branch matches exactly.
 
 Frozen coverage source `13d6dceb2bace703d5c5e5adccb6c8150a0e2b366202872643b7e9085250d51f` requests an explicit v3 review. Each claim declares its source-grounded assertion groups and qualifier/needs findings once. The exact declarations lower to the existing correction and independent-validation stages with saved mappings. Preserved qualifiers point to unchanged values in the claim's own text/conditions. Uncertainty stays nonblocking; semantic correctness is not inferred from a valid record.
 
@@ -10,7 +23,8 @@ Frozen coverage source `13d6dceb2bace703d5c5e5adccb6c8150a0e2b366202872643b7e908
 | Historical source availability preserves original identity and window accounting | pass | `historical-source-feasibility.json` in the same directory: 13 exact original blocks, 6138 characters, including227 as unassigned background. | Loading creates no claim association, reviewed range, resolved observation or scientific conclusion. Character limits and unavailable sources remain explicit. |
 | Old v2 failures remain rejected | pass | New legacy-pair and public-source isolation controls; `old-contract-ast-proof.json` confirms 40 original nodes unchanged. | Old responses gain no inferred merge observation or supplemental citation permission. |
 | Frozen v3 implementation independently reviewed | pass | `claim-coverage-v3-design-independent/final-implementation-review.md`, SHA `9d39728b...`; source, test and design match the author freeze. | No blocking finding; no duplicate test run or new actual call. |
-| Real semantic extraction quality after this version | unresolved | No actual v3-wire request has yet run. Existing genuine-paper outcomes remain unchanged. | M5's lost selection restrictions,054's unnecessary hold and complete coverage remain open. |
+| Actual v3 review contract, source identity and usage | pass | `claim-coverage-v3-contract-probe-v1/actual-5ce290b01a03`: one logical/physical request, 54760 measured tokens, zero missing usage; 80 declared blocks and all 23 required claim reviews complete. | One saved original window only, with 22 normalized observations and zero adoptions. Follow-up and validation were not run. |
+| Real semantic extraction quality after this version | fail | Independent source review in `claim-coverage-v3-contract-probe-v1/independent-actual-5ce290b01a03/`, report SHA `b38ac06e...`; 228 original files unchanged. | M2 shared ablation scope and M5 selection restrictions are still missed. Figure2 duplicates an existing conclusion;029 resolves an acknowledged ambiguity too confidently. The021 setting mismatch and parameter-count correction were valid findings. Claim054 was not exercised. |
 
 ## Latest phase 4 correction: original fixed-population claims
 
@@ -23,7 +37,7 @@ The finite interpretation correction is committed and pushed at `ecabcbc00644392
 | Saved native-v4 responses produce an actual execution plan | fail | `fixed-population-composition-implementation/original-replay.json`: one structural candidate, zero plans and zero sufficient evidence; 159 original/frozen files unchanged. | Old unresolved/legacy collision and joint-source errors remain. Eligibility does not establish actual selection or Docker execution. |
 | Fresh native selection and Docker handoff on ecabcbc | fail | `claim006-native-followup-v1/actual-45160486ae7f`: two logical/physical requests, 40535 measured tokens, no missing usage; one candidate explicitly selected, but zero accepted plans/attempts. | The first response also emits a same-condition legacy plan, so the unchanged conflict gate rejects both. Joint metric-definition roles lack consumers. Partial report, source guards and usage checks pass; no execution/cleanup coverage. |
 
-Next extraction work implements an explicit versioned coverage contract with one source-grounded representation per problem. It preserves missing-needs and uncertain findings, old v2 failures, final semantic adoption, and the distinction between loaded source blocks and reviewed coverage. The independent design review is `claim-coverage-v3-design-independent/review.md`. The remaining scientific mistakes on claims030/054 are still open.
+Next extraction work checks the existing follow-up and validation on this saved review before changing context organization. Both030 and037 already have merge observations, so their later correction remains untested. A smaller isolated continuation is being prepared without re-sampling the review or editing history. Exact source identity and valid decision records do not establish qualifier entailment. Execution work proceeds independently on one exclusive first-response decision.
 
 ## Current extraction coverage correction
 
@@ -345,9 +359,9 @@ The three-layer implementation is present. The following evaluations describe it
 
 Next: retain the completed self-check evaluation, unavailable controls and qualifier-provenance limitation, and address the original joint-evidence binding failures with a separately reviewed bounded design. Keep all original and new failed expectations visible. No causal claim about prompt changes is supported by one sample per version.
 
-## Current 14-check framework matrix
+## Historical 14-check framework matrix: visual/choice checkpoint
 
-This matrix records engineering contracts for the frozen visual/choice checkpoint. Actual scientific-quality and full-native failures remain separately visible above. New artifact paths below use `runs/v2_method_delivery/`; older named artifacts retain their original `runs/v2_binding_followup/` locations.
+This matrix records engineering contracts for the frozen visual/choice checkpoint, not the current source tree. The later complete regression at `438e2e66` passed3324 default and2 legacy tests; subsequent corrections use only the affected checks recorded above. Actual scientific-quality and full-native failures remain separately visible. New artifact paths below use `runs/v2_method_delivery/`; older named artifacts retain their original `runs/v2_binding_followup/` locations.
 
 | requirement | verdict | evidence | correction |
 |---|---|---|---|

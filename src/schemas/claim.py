@@ -729,6 +729,15 @@ class ExecutionChoiceReview(Contract):
     rationale: NonEmpty
 
 
+class ChoiceExecutionOrigin(Contract):
+    wire_version: Literal["legacy", "experiments-execution-v3"]
+    saved_response_sha256: NonEmpty
+    selected_origin_sha256: NonEmpty
+    # Original fingerprints can be unknown for historical safe copies.
+    original_response_sha256: NonEmpty | None
+    adapter_sha256: NonEmpty | None
+
+
 class ChoiceProjectionRecord(SemanticProjectionRecord):
     # REQUIRED discriminator, no default added to old records. proposal and
     # scope_review are explicitly program-normalized v2 structures; these fields
@@ -742,6 +751,9 @@ class ChoiceProjectionRecord(SemanticProjectionRecord):
     registry_sha256: NonEmpty
     registry_snapshot: dict[str, Any]
     choice_builder_sha256: NonEmpty
+    # Historical records remain readable. Execution always rebuilds a nonempty
+    # origin and compares the complete binding, so absent origins need regeneration.
+    execution_origin: ChoiceExecutionOrigin | None = None
 
 
 class ProjectedExecutionTargetBinding(ExecutionTargetBinding):

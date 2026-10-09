@@ -129,7 +129,13 @@ class ChoicePrivacy:
             }
             if phase == "selection":
                 if "first_pass_response" in result:
-                    result["first_pass_response"]["execution_choices"] = rows
+                    first = result["first_pass_response"]
+                    if "execution_wire" in result:
+                        if first.get("execution", {}).get("kind") == "choice":
+                            first["execution"]["selection"] = rows[0]
+                        result["first_pass_normalized"]["execution_choices"] = copy.deepcopy(rows)
+                    else:
+                        first["execution_choices"] = rows
                 if "execution_choices" in result.get("input", {}):
                     result["input"]["execution_choices"] = copy.deepcopy(rows)
             elif "response" in result:
@@ -148,6 +154,17 @@ class ChoicePrivacy:
                 "wire_representation": "redacted_copy",
                 "original_record_sha256": digest(audit),
             }
+        if "execution_wire" in result:
+            wire = result["execution_wire"]
+            wire["saved_response_sha256"] = digest(result["first_pass_response"])
+            wire["saved_normalized_sha256"] = digest(result["first_pass_normalized"])
+            wire["wire_representation"] = (
+                "original"
+                if wire["raw_response_sha256"] == wire["saved_response_sha256"]
+                and wire.get("normalized_response_sha256", wire["saved_normalized_sha256"])
+                == wire["saved_normalized_sha256"]
+                else "redacted_copy"
+            )
         return result
 
 
@@ -233,6 +250,7 @@ def _code_hashes():
             here / "execution_projection_catalog.py",
             here / "experiment_catalog.py",
             here / "experiment_targets.py",
+            here / "experiments.py",
             here / "prose_numbers.py",
         )
     }
@@ -684,6 +702,54 @@ def _normalized_review(candidate, actual):
     )
 
 
+def retained_choice_first_response(audit):
+    """Rebuild only the new choice wire; historical audit interpretation is unchanged."""
+    from verification.experiments import lower_execution_response
+
+    raw = audit.get("first_pass_response", {})
+    if not any(key in raw for key in ("schema_version", "execution")) and not any(
+        key in audit for key in ("execution_wire", "first_pass_normalized")
+    ):
+        return raw
+    normalized, expected = lower_execution_response(raw)
+    wire = audit.get("execution_wire")
+    if (
+        expected["kind"] != "choice"
+        or not isinstance(wire, dict)
+        or set(wire)
+        != set(expected) | {"saved_response_sha256", "saved_normalized_sha256", "wire_representation"}
+        or normalized != audit.get("first_pass_normalized")
+        or wire["saved_response_sha256"] != expected["raw_response_sha256"]
+        or wire["saved_normalized_sha256"] != expected["normalized_response_sha256"]
+        or any(
+            wire[key] != value
+            for key, value in expected.items()
+            if key not in {"raw_response_sha256", "normalized_response_sha256"}
+        )
+    ):
+        raise ProjectionError("Choice raw execution origin or audited lowering changed")
+    # Original hashes describe the pre-redaction response, never reconstructed text.
+    # The accepted origin itself remains exact; polluted origins fail the strict union.
+    if wire["wire_representation"] == "original":
+        if any(wire[key] != expected[key] for key in ("raw_response_sha256", "normalized_response_sha256")):
+            raise ProjectionError("Choice original response fingerprint changed")
+    elif wire["wire_representation"] == "redacted_copy":
+        marker = audit.get("choice_audit_representation")
+        hashes = [wire["raw_response_sha256"], wire["normalized_response_sha256"]]
+        if (
+            not isinstance(marker, dict)
+            or set(marker) != {"wire_representation", "original_record_sha256"}
+            or marker["wire_representation"] != "redacted_copy"
+        ):
+            raise ProjectionError("Choice safe-copy provenance is missing")
+        hashes.append(marker["original_record_sha256"])
+        if any(not isinstance(h, str) or len(h) != 64 or set(h) - set("0123456789abcdef") for h in hashes):
+            raise ProjectionError("Choice original safe-copy fingerprint is invalid")
+    else:
+        raise ProjectionError("Unknown choice wire representation")
+    return normalized
+
+
 def bind_choice_target(claim, materials, registry, selection, review, audit_path, *, downstream=False):
     from schemas.claim import (
         ChoiceProjectionRecord,
@@ -727,9 +793,8 @@ def bind_choice_target(claim, materials, registry, selection, review, audit_path
         b.model_dump(mode="json") for b in materials.blocks
     ]:
         raise ProjectionError("Choice audit changed original claim or paper context")
-    if audit.get("first_pass_response", {}).get("execution_choices", []) != audit["input"].get(
-        "execution_choices"
-    ):
+    retained_first = retained_choice_first_response(audit)
+    if retained_first.get("execution_choices", []) != audit["input"].get("execution_choices"):
         raise ProjectionError("Choice scope selection differs from the preserved first response")
     from verification.experiments import PlanCandidate
 
@@ -757,6 +822,19 @@ def bind_choice_target(claim, materials, registry, selection, review, audit_path
         or decisions.get(condition.id) != review
     ):
         raise ProjectionError("Choice lacks unchanged retained actual selection and independent review")
+    wire = audit.get("execution_wire")
+    saved_response_hash = digest(audit["first_pass_response"])
+    origin = {
+        "wire_version": wire["version"] if wire is not None else "legacy",
+        "saved_response_sha256": saved_response_hash,
+        "selected_origin_sha256": digest(retained_first["execution_choices"][selection["index"]]),
+        "original_response_sha256": (
+            wire["raw_response_sha256"]
+            if wire is not None
+            else (None if audit.get("choice_audit_representation") else saved_response_hash)
+        ),
+        "adapter_sha256": wire["adapter_sha256"] if wire is not None else None,
+    }
     block = next(b for b in materials.blocks if b.id == candidate["reported"]["block_id"])
     pointer = _pointer(materials, block, candidate["reported"]["quote"])
     sources = resolved["source_pointers"]
@@ -801,6 +879,7 @@ def bind_choice_target(claim, materials, registry, selection, review, audit_path
             registry_sha256=registry["registry_sha256"],
             registry_snapshot=copy.deepcopy(registry),
             choice_builder_sha256=file_hash(__file__),
+            execution_origin=origin,
         ),
     )
     revalidate_registry(registry, claim, materials, downstream=downstream)
