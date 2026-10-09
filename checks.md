@@ -2,7 +2,18 @@
 
 ## Active follow-up findings
 
-The current extraction-prompt snapshot passes **1953** default tests, two separate legacy tests and a **119**-module wheel inspection. Its single fixed 13-case actual batch delivers 28 claims from 11 cases; two cases fail at the provider boundary. Independent per-unit review records 24 complete units, one unit with incomplete claim-local qualifier provenance, and five unavailable units. The four original regressions now preserve all 14 required units. The complete batch remains failed; these targeted agent-labelled cases do not measure whole-paper recall. Whole-framework quality work stays active.
+The optional experimental scope-binding repair is implemented and independently reviewed. It defaults to 0; setting it to 1 permits one batched model request for already-complete joint candidates with two narrowly typed binding errors. Original semantic decisions, source members, conditions and numeric selectors stay frozen. All original checks run again before a patch can contribute evidence. This feature's positive checks use mocks; no actual repair request has been made.
+
+The extraction prompt is unchanged from checkpoint `0d25047`, which passed **1953** default tests, two separate legacy tests and a **119**-module wheel inspection. Its single fixed 13-case actual batch delivers 28 claims from 11 cases; two cases fail at the provider boundary. Independent per-unit review records 24 complete units, one unit with incomplete claim-local qualifier provenance, and five unavailable units. The four original regressions now preserve all 14 required units. The complete batch remains failed; these targeted agent-labelled cases do not measure whole-paper recall. Whole-framework quality work stays active.
+
+| Optional binding repair | Verdict | Evidence |
+|---|---|---|
+| Strict bounded patches and original gates. | pass | `joint-binding-repair-design/presentation-focused-final.log`: 62 new mocked cases and existing related cases, 181 passed. The earlier full related run had 61 new plus 445 existing cases. Original tests and original first/scope prompts remain unchanged. |
+| Independent adversarial review. | pass | `joint-binding-repair-independent-review/review.md`: 22 public-entry controls; `pipeline-review-final.md`: three exception-injection cases and six focused tests. Zero external calls. Permanent invalidation, input mutation, atomic audit adoption and healthy neighbors remain covered. |
+| Original positive expectations after allowed repair. | fail | `joint-binding-repair-design/fixed-mock-replay-27f176d69b/`: 039's explicit mock bridge exposes the unchanged unbound comparator; 042 has a non-repairable metric/reference error and receives no repair request. Both original whole-claim positive expectations remain false. |
+| Actual model use of the repair interface. | not evaluated | No actual repair request. Known later blockers in the retained original cases cannot be changed by this whitelist. The feature remains disabled by default; synthetic mock success establishes no scientific accuracy or real-model repair success. |
+| Original failure and audit provenance are preserved. | pass | `pipeline-review-final.md`: eight cached boundaries deep-equal to original requests/responses; audit pointers resolve; 25 protected and 17 replay files unchanged. Separate `joint-binding-repair-evaluation-v1/root-offline/repair-8eef1c574259/` retains exit 1 under the original positive expectations. |
+| Final regression and package match the reviewed source. | pass | `pytest-scope-binding-repair-final-full.log`: 2015 passed, 3 original deselections, unchanged warning; separate legacy 2 passed. `scope-binding-repair-final-delivery-inspection.json`: 120 source-matched modules and 27 protected hashes. Final presentation change preserves original diagnostics while labelling attempted repairs as history. |
 
 | Current completeness self-check | Verdict | Evidence |
 |---|---|---|
@@ -82,7 +93,7 @@ Paths in this matrix use `runs/v2_binding_followup/` unless stated otherwise. Pa
 
 | requirement | verdict | evidence | correction |
 |---|---|---|---|
-| 1. Tests pass without weakening or new skips. | pass | `pytest-claim-completeness-full.log`: 1953 passed, 3 original deselections; separate legacy 2 passed. | 40 source-selection tests added at the preceding checkpoint; the two prompt follow-ups change no tests. The existing malformed-binding serialization warning is unchanged. |
+| 1. Tests pass without weakening or new skips. | pass | `pytest-scope-binding-repair-final-full.log`: 2015 passed, 3 original deselections; separate legacy 2 passed. | 62 new mocked binding-repair cases added; existing tests are unchanged. The existing malformed-binding serialization warning is unchanged. |
 | 2. Materials → L1 → L2 → optional L3 → assessment → report → teaser. | pass | Pipeline and framework-matrix tests in the full suite; actual seven-stage `target-docker-e502402610/independent-review.md`. | Stage failure/state and concurrent statistics contracts remain covered. |
 | 3. Upfront claims and v2 splitting, without C1–C3 cap. | pass | `tests/test_claims_v2.py`, extraction boundary regressions and saved cross-domain extraction audits. | Atomicity still depends on model judgment; reports consume existing records. |
 | 4. Claims and evidence have verifiable locations and conditions. | pass | Member identity/projection independent reviews, exact range/selector tests, original source hashes and joint report pointer checks. | Every additional pointer stays attached to one declared original member; wrong scope cannot donate units or sufficient support. |
@@ -95,7 +106,7 @@ Paths in this matrix use `runs/v2_binding_followup/` unless stated otherwise. Pa
 | 11. Four statuses and safe v1 readability. | pass | Schema, adapter, assessment and report tests. | `in_conflict` maps to `questioned` for historical display without reassessment. |
 | 12. Four-part report without accept/reject recommendation. | pass | `joint-legacy-report-3819b8c4f9/independent-review.json`; `joint-live-report-delivery-48562bee28/` actual joint reports. | Original assessed fields retained; primary/additional sources have complete quotes and valid navigation. |
 | 13. Original end-to-end baseline and explicit blockers. | pass | Saved offline and actual service baseline comparisons under `runs/v2_live/`; generic real Docker integration above. | Original-paper artifact/binding limits stay reported; no benchmark reproduction or accuracy claim. |
-| 14. Progress and delivery match workspace. | pass | `progress.md`, `claim-completeness-delivery-inspection.json`, independent reviews and completed-batch manifests. | 119 packaged modules match, Python 3.11 syntax passes, 27 protected hashes unchanged; configured secrets absent from tracked/nonignored files. |
+| 14. Progress and delivery match workspace. | pass | `progress.md`, `scope-binding-repair-final-delivery-inspection.json`, independent reviews and completed-batch manifests. | 120 packaged modules match, Python 3.11 syntax passes, 27 protected hashes unchanged; configured secrets absent from tracked/nonignored files. Actual repair success remains unevaluated. |
 
 ## Earlier checkpoint evidence
 

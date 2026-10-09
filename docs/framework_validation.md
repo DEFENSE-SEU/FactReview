@@ -96,7 +96,17 @@ Table units come from the selected measurement headers, the value's own explicit
 
 Only uniquely identified new joint pairs have local source/selector failures. A duplicate or malformed pair cannot later be restored by another row. Invalid condition rows and existing single-source decoding failures retain their condition-wide behavior. A valid primary source may remain an insufficient observation when an additional member is invalid; an invalid primary cannot create an evidence pointer.
 
-An accepted source group produces one Evidence with `additional_pointers`, preserving one sufficiency decision and the original condition coverage. Old JSON remains readable with an empty default list. Complete original quotations and positions survive dispatch, assessment and FinalReview JSON/Markdown/PDF. The teaser retains its compact claim/status/source-type summary and report link. This feature uses the existing two model passes and does not start execution or training.
+An accepted source group produces one Evidence with `additional_pointers`, preserving one sufficiency decision and the original condition coverage. Old JSON remains readable with an empty default list. Complete original quotations and positions survive dispatch, assessment and FinalReview JSON/Markdown/PDF. The teaser retains its compact claim/status/source-type summary and report link. The base joint-source route uses the existing two model passes and does not start execution or training.
+
+## Optional experimental binding repair
+
+`EXPERIMENT_SCOPE_BINDING_REPAIR_ROUNDS` defaults to `0`. Setting it to `1` permits one additional model request per claim, combining eligible joint candidates into a single bounded request. The normal pipeline reads this setting through its existing configuration. It is separate from L3's execution repair budget and does not start retrieval, Docker or training.
+
+This path handles two validation errors: a missing operand-specific setting bridge, or a declared mechanical source role with no corresponding consumer. A candidate must already have complete support judgments from both original passes, valid condition identity and an intact declared source set. Partial candidates, missing joint candidates, other validation errors and permanently invalidated condition/pair identifiers remain ineligible.
+
+The model must explicitly append a bridge for the diagnosed setting or remove a diagnosed unused mechanical role. Existing source members, conditions, coverage, semantic judgments, numeric selectors, relations, existing bridges, grounds and their order stay fixed. Mixed semantic/mechanical role records retain their original rationale and are excluded from role repair. Every accepted patch passes the original source, identity, numerical, unit and setting checks again on a fresh catalog snapshot. A later failure cannot trigger a second repair. Ineffective patches and service failures remain visible; healthy original evidence survives local rejection. Input changes invalidate the repair, and adopted evidence links to the new effective response while retaining the original response and errors.
+
+The current positive repair checks use mocked synthetic candidates. Fixed original-paper replays remain unsuccessful: adding the missing setup bridge exposes an unbound comparator in one case; the other has a separate metric/reference error and receives no repair request. The original positive expectations and responses are unchanged. The option remains disabled by default, and these checks establish neither real-model repair success nor scientific accuracy.
 
 ## Selected Literature citations
 
