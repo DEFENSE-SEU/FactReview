@@ -740,7 +740,7 @@ def _render_markdown_inline_children(
         if token_type == "html_inline":
             raw_html = str(token_content or "").strip()
             anchor = re.fullmatch(
-                r'<a id="(factreview-(?:source-[a-f0-9]{64}|evidence-[0-9]{6,}(?:-source-[0-9]{2,})?))">',
+                r'<a id="(factreview-(?:(?:source|record|main)-[a-f0-9]{64}|evidence-[0-9]{6,}(?:-source-[0-9]{2,})?))">',
                 raw_html,
             )
             if anchor:
@@ -1354,7 +1354,7 @@ class _AnchoredParagraph(Paragraph):
     """
 
     _anchor = re.compile(
-        r'<a name="(factreview-(?:source-[a-f0-9]{64}|evidence-[0-9]{6,}(?:-source-[0-9]{2,})?))"/>'
+        r'<a name="(factreview-(?:(?:source|record|main)-[a-f0-9]{64}|evidence-[0-9]{6,}(?:-source-[0-9]{2,})?))"/>'
     )
 
     def __init__(self, text, *args, **kwargs):
@@ -1372,6 +1372,11 @@ class _AnchoredParagraph(Paragraph):
     def draw(self):
         for target in self._report_targets:
             self.canv.bookmarkHorizontal(target, 0, self.height)
+            pages = getattr(self.canv, "_factreview_target_pages", None)
+            if pages is not None:
+                if target in pages:
+                    raise ValueError("Duplicate generated report target")
+                pages[target] = self.canv.getPageNumber()
         super().draw()
 
 
@@ -3609,6 +3614,7 @@ def build_review_report_pdf(
     token_usage: dict[str, Any] | None = None,
     agent_model: str | None = None,
     implicit_math: bool = True,
+    navigation_targets: dict[str, int] | None = None,
 ) -> bytes:
     fonts = _resolve_report_fonts()
     logo_path: Path | None = None
@@ -3678,13 +3684,19 @@ def build_review_report_pdf(
         [
             Paragraph("<b>Token Usage</b>", styles["BodyTextEnterprise"]),
             Paragraph(
-                _escape("Unavailable" if token_payload.get("unavailable") else
-                        f"Input {token_input} | Output {token_output} | Total {token_total}"
-                        + (" (estimated)" if token_payload.get("estimated") else "")),
+                _escape(
+                    "Unavailable"
+                    if token_payload.get("unavailable")
+                    else f"Input {token_input} | Output {token_output} | Total {token_total}"
+                    + (" (estimated)" if token_payload.get("estimated") else "")
+                ),
                 styles["BodyTextEnterprise"],
             ),
             Paragraph("<b>LLM Requests</b>", styles["BodyTextEnterprise"]),
-            Paragraph(_escape("Unavailable" if token_payload.get("unavailable") else str(token_requests)), styles["BodyTextEnterprise"]),
+            Paragraph(
+                _escape("Unavailable" if token_payload.get("unavailable") else str(token_requests)),
+                styles["BodyTextEnterprise"],
+            ),
         ],
         [
             Paragraph("<b>Generated At</b>", styles["BodyTextEnterprise"]),
@@ -3767,6 +3779,8 @@ def build_review_report_pdf(
 
     def _on_page(canvas, doc):
         canvas.setProducer("FactReview")
+        if navigation_targets is not None:
+            canvas._factreview_target_pages = navigation_targets
         _draw_header_footer(
             canvas,
             doc,

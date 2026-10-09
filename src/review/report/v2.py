@@ -181,7 +181,7 @@ def execution_summary(review: FinalReview) -> dict:
     }
 
 
-def _theory_derivations(claim):
+def _theory_derivations(claim, _navigation=None):
     if not claim.theory_derivations:
         return []
     lines = [
@@ -200,7 +200,9 @@ def _theory_derivations(claim):
             "**Current Theory source integrity is unavailable.** " + _text(str(exc)),
             "Trace states below describe the retained verification. Its recorded source artifacts no longer validate.",
         ]
-    for record in claim.theory_derivations:
+    for record_index, record in enumerate(claim.theory_derivations):
+        if _navigation:
+            lines.extend(_navigation("theory_derivations", claim, record_index))
         lines += [
             "",
             f"- Phase: {_text(record.phase)}; state: {_text(record.state)}; "
@@ -365,8 +367,10 @@ def render_markdown(
     writing_coverage=None,
     anonymity_policy=None,
     token_usage=None,
+    _checked=False,
+    _navigation=None,
 ) -> str:
-    review = _checked_report(review)
+    review = review if _checked else _checked_report(review)
     claims = ordered_claims(review)
     occurrences = _source_index(claims, review.findings)
     lines = [
@@ -421,6 +425,8 @@ def render_markdown(
     lines += ["", "## 2. Claim list", ""]
     for claim in claims:
         advice_targets = {}
+        if _navigation:
+            lines.extend(_navigation("claim", claim))
         lines += [
             f"### {_text(claim.id)} — {claim.status.value}",
             "",
@@ -431,34 +437,46 @@ def render_markdown(
             "Conditions:",
             "",
         ]
-        lines += [
-            f"- {_text(condition.id)}: {_text(json.dumps(condition.model_dump(exclude={'id'}), ensure_ascii=False))}"
-            for condition in claim.conditions
-        ]
+        for index, condition in enumerate(claim.conditions):
+            if _navigation:
+                lines.extend(_navigation("conditions", claim, index))
+            lines.append(
+                f"- {_text(condition.id)}: {_text(json.dumps(condition.model_dump(exclude={'id'}), ensure_ascii=False))}"
+            )
+        if _navigation:
+            lines.extend(_navigation("primary", claim))
         if claim.source_refs:
             lines += ["", "Original manuscript sources (claim provenance):", ""]
-            lines += [
-                f"- {_text(ref.source_block_id)}; {_location(ref.loc)}; "
-                f"conditions: {_text(', '.join(ref.covered))}. Quote: {_text(ref.source_quote)}"
-                for ref in claim.source_refs
-            ]
+            for index, ref in enumerate(claim.source_refs):
+                if _navigation:
+                    lines.extend(_navigation("source_refs", claim, index))
+                lines.append(
+                    f"- {_text(ref.source_block_id)}; {_location(ref.loc)}; "
+                    f"conditions: {_text(', '.join(ref.covered))}. Quote: {_text(ref.source_quote)}"
+                )
         lines += ["", f"Evidence needs: {', '.join(claim.needs) or 'none'}.", "", "Evidence:", ""]
         if not claim.evidence:
             lines.append("No evidence is available for assessment.")
         for index, item in enumerate(claim.evidence):
+            if _navigation:
+                lines.extend(_navigation("evidence", claim, index))
             occurrence = next(occurrences)
             advice_targets[f"/evidence/{index}"] = occurrence["anchor"]
             lines.extend(_evidence(item, occurrence))
-        lines.extend(_theory_derivations(claim))
+        lines.extend(_theory_derivations(claim, _navigation))
         if claim.verification_limitations:
             lines += ["", "System verification limitations:", ""]
-            for limitation in claim.verification_limitations:
+            for index, limitation in enumerate(claim.verification_limitations):
+                if _navigation:
+                    lines.extend(_navigation("verification_limitations", claim, index))
                 lines.append(
                     f"- {_text(limitation.stage)}: {_text(limitation.reason)}. "
                     f"Conditions: {_text(', '.join(limitation.condition_ids))}. "
                     "The system operator should repair or retry this check. The failure alone does not identify missing author material."
                 )
         if claim.advice is not None:
+            if _navigation:
+                lines.extend(_navigation("advice", claim))
             lines += ["", "Reviewer advice:", ""]
             if claim.advice.state == "unavailable":
                 lines.append(f"Advice unavailable: {_text(claim.advice.failure_reason)}")
@@ -491,11 +509,18 @@ def render_markdown(
                     f"Advice audit: {_text(claim.advice.audit_pointer)}; input SHA256: {_text(claim.advice.input_sha256)}."
                 )
         lines += ["", "Questions for authors:", ""]
-        lines += [
-            f"- {_text(question.text)} Reason: {_text(question.reason)}" for question in claim.questions
-        ] or ["None recorded."]
+        if not claim.questions:
+            lines.append("None recorded.")
+        for index, question in enumerate(claim.questions):
+            if _navigation:
+                lines.extend(_navigation("questions", claim, index))
+            lines.append(f"- {_text(question.text)} Reason: {_text(question.reason)}")
         if claim.notes:
-            lines += ["", "Notes:", "", *[f"- {_text(note)}" for note in claim.notes]]
+            lines += ["", "Notes:", ""]
+            for index, note in enumerate(claim.notes):
+                if _navigation:
+                    lines.extend(_navigation("notes", claim, index))
+                lines.append(f"- {_text(note)}")
         lines.append("")
     lines += ["## 3. Other findings", ""]
     if writing_coverage is not None:
@@ -566,7 +591,9 @@ def render_markdown(
             "have no new printed-size legibility judgment; the original 96 dpi crop remains that check's input.",
             "",
         ]
-    for finding in review.findings:
+    for finding_index, finding in enumerate(review.findings):
+        if _navigation:
+            lines.extend(_navigation("finding", finding_index))
         lines += [
             f"### {finding.kind} — {_text(finding.level)}",
             "",
@@ -575,7 +602,9 @@ def render_markdown(
             _text(finding.text),
             "",
         ]
-        for item in finding.evidence:
+        for index, item in enumerate(finding.evidence):
+            if _navigation:
+                lines.extend(_navigation("finding_evidence", finding_index, index))
             lines.extend(
                 _evidence(
                     item,
@@ -602,6 +631,8 @@ def render_markdown(
         token_usage=token_usage,
     )
     if limitations:
+        if _navigation:
+            lines.extend(_navigation("issues", None))
         lines += ["### Verification limitations", "", *[f"- {_text(issue)}" for issue in limitations], ""]
     lines += ["", "## 4. Execution ledger", ""]
     if not review.ledger:
@@ -612,6 +643,8 @@ def render_markdown(
         else:
             lines.append("Execution was not run; no new execution evidence was produced.")
     for index, entry in enumerate(review.ledger, 1):
+        if _navigation:
+            lines.extend(_navigation("ledger", index - 1))
         lines += [
             f"### Run {index}",
             "",
@@ -636,7 +669,26 @@ def write_review(
     table_context_coverage=None,
     writing_coverage=None,
     anonymity_policy=None,
+    presentation="full",
 ) -> dict:
+    if presentation == "layered":
+        from review.report.compact import write_layered_review
+
+        return write_layered_review(
+            review,
+            output_dir,
+            render_pdf=render_pdf,
+            issues=issues,
+            token_usage=token_usage,
+            figure_coverage=figure_coverage,
+            figure_context_coverage=figure_context_coverage,
+            table_coverage=table_coverage,
+            table_context_coverage=table_context_coverage,
+            writing_coverage=writing_coverage,
+            anonymity_policy=anonymity_policy,
+        )
+    if presentation != "full":
+        raise ValueError("Unknown report presentation")
     result = _checked_report(review)
     validate_publication_language(
         [result.model_dump(), issues or [], (token_usage or {}).get("warnings", [])]
