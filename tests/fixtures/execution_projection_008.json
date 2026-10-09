@@ -1,0 +1,497 @@
+{
+  "provenance": {
+    "tier": "original controlled integration input; no new actual outputs",
+    "claim_source_sha256": "30265af586a55e348b5a126733cb0a0cede38ce422ba1627e59b5cee80fab5e9",
+    "materials_sha256": "d1e6d1cafb86cc840b76d0fec10a1d79f02b1c2be689a9c5fb3df73e99203d87"
+  },
+  "claims": [
+    {
+      "id": "claim_008",
+      "text": "On MiniSet test, model ExactMatch has accuracy 0.75 over four examples.",
+      "loc": {
+        "page": 1,
+        "section": "section_5: 3. Evaluation",
+        "char_start": 1143,
+        "char_end": 1479
+      },
+      "source_block_id": "block_10",
+      "source_quote": "On MiniSet test, model ExactMatch has accuracy 0.75. Accuracy is a fraction, computed by exact equality of each prediction and label. Three of the four fixed test predictions are correct. Table 1 reports the result and Figure 1 shows the corresponding counts. No repeated-run uncertainty or population-performance conclusion is claimed.",
+      "source_refs": [
+        {
+          "source_block_id": "block_11",
+          "source_quote": "Table 1. MiniSet test result. Accuracy is a fraction; bold type identifies the measured accuracy, with no ranking against other models.\n<table><tr><td>Model</td><td>Test accuracy</td><td>Examples</td></tr><tr><td>ExactMatch</td><td>0.75</td><td>4</td></tr></table>",
+          "loc": {
+            "page": 1,
+            "section": "block_9: 3. Evaluation",
+            "char_start": null,
+            "char_end": null
+          },
+          "covered": [
+            "c1"
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "id": "c1",
+          "dataset": "MiniSet test",
+          "metric": "accuracy",
+          "settings": {
+            "model": "ExactMatch",
+            "accuracy": 0.75,
+            "examples": 4,
+            "accuracy_definition": "fraction computed by exact equality of each prediction and label",
+            "qualifiers": [
+              "No repeated-run uncertainty claimed",
+              "No population-performance conclusion claimed",
+              "No ranking against other models"
+            ]
+          },
+          "description": "ExactMatch measured test accuracy on MiniSet test."
+        }
+      ],
+      "needs": [
+        "Code",
+        "Experiments"
+      ],
+      "importance": "core",
+      "questions": [],
+      "evidence": [],
+      "status": "unverified",
+      "notes": [],
+      "advice": null
+    },
+    {
+      "id": "claim_009",
+      "text": "On MiniSet test, three of the four fixed ExactMatch test predictions are correct.",
+      "loc": {
+        "page": 1,
+        "section": "section_5: 3. Evaluation",
+        "char_start": 1143,
+        "char_end": 1479
+      },
+      "source_block_id": "block_10",
+      "source_quote": "On MiniSet test, model ExactMatch has accuracy 0.75. Accuracy is a fraction, computed by exact equality of each prediction and label. Three of the four fixed test predictions are correct. Table 1 reports the result and Figure 1 shows the corresponding counts. No repeated-run uncertainty or population-performance conclusion is claimed.",
+      "source_refs": [
+        {
+          "source_block_id": "block_13",
+          "source_quote": "Number of predictions\nPrediction outcome\nFigure 1. ExactMatch prediction counts on MiniSet test: three correct and one incorrect. The vertical axis counts examples; both outcome categories are labeled.",
+          "loc": {
+            "page": 2,
+            "section": "block_12: Figure and proof",
+            "char_start": null,
+            "char_end": null
+          },
+          "covered": [
+            "c1"
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "id": "c1",
+          "dataset": "MiniSet test",
+          "metric": "prediction counts",
+          "settings": {
+            "model": "ExactMatch",
+            "correct_predictions": 3,
+            "total_predictions": 4,
+            "incorrect_predictions": 1,
+            "prediction_type": "fixed test predictions",
+            "qualifiers": [
+              "No repeated-run uncertainty claimed",
+              "No population-performance conclusion claimed"
+            ]
+          },
+          "description": "ExactMatch prediction counts on MiniSet test."
+        }
+      ],
+      "needs": [
+        "Code",
+        "Experiments"
+      ],
+      "importance": "core",
+      "questions": [],
+      "evidence": [],
+      "status": "unverified",
+      "notes": [],
+      "advice": null
+    }
+  ],
+  "materials": {
+    "paper_key": "exactmatch-integration-v1",
+    "title": "ExactMatch: a controlled integration manuscript",
+    "abstract": "This synthetic manuscript and its released code provide a small software integration example. The numerical result describes four fixed predictions and does not establish generalization performance. It contains a literature attribution, a mathematical statement, an implementation description and an evaluation result.",
+    "source_pdf": "E:\\kabuda\\FactReview\\runs\\v2_method_delivery\\actual-full-9800dedbaa\\runs\\exactmatch-integration-v1_2026-10-09_114245_3f380155\\inputs\\source_pdf\\paper.pdf",
+    "markdown": "# ExactMatch: a controlled integration manuscript\n\n## Abstract\n\nThis synthetic manuscript and its released code provide a small software integration example. The numerical result describes four fixed predictions and does not establish generalization performance. It contains a literature attribution, a mathematical statement, an implementation description and an evaluation result.\n\n## 1. Background\n\nVaswani et al. (2017) introduced the Transformer, whose architecture relies on attention and omits recurrence and convolution [1]. This is background attribution; our ExactMatch evaluator makes no architectural novelty claim.\n\n## 2. Method and implementation\n\nThe ExactMatch evaluator computes accuracy as the number of predictions equal to their labels divided by the number of examples. The public implementation is scripts/evaluate.py; its configuration and four predictions are distributed with the code. It performs evaluation without training.\n\nTheorem 1. For every real number x, the square x\\*x is nonnegative. The proof appears in Appendix A. This elementary statement is independent of the evaluation procedure.\n\n## 3. Evaluation\n\nOn MiniSet test, model ExactMatch has accuracy 0.75. Accuracy is a fraction, computed by exact equality of each prediction and label. Three of the four fixed test predictions are correct. Table 1 reports the result and Figure 1 shows the corresponding counts. No repeated-run uncertainty or population-performance conclusion is claimed.\n\n<table><tr><td>Model</td><td>Test accuracy</td><td>Examples</td></tr><tr><td>ExactMatch</td><td>0.75</td><td>4</td></tr></table>\n\nTable 1. MiniSet test result. Accuracy is a fraction; bold type identifies the measured accuracy, with no ranking against other models.\n\n## Figure and proof\n\nNumber of predictions  \n![](images/c69d336feb914cc311368c81d283c57b5ef4db26167af720962f11994ae60be8.jpg)  \nPrediction outcome  \nFigure 1. ExactMatch prediction counts on MiniSet test: three correct and one incorrect. The vertical axis counts examples; both outcome categories are labeled.\n\n## Appendix A. Proof of Theorem 1\n\nProof of Theorem 1. If x is nonnegative, multiplying x by itself gives a nonnegative product. If x is negative, write $\\mathsf { x } = - \\mathsf { y }$ for a positive real y. Then $\\mathsf { x } ^ { \\star } \\mathsf { x } = ( \\mathsf { - y } ) ^ { \\star } ( \\mathsf { - y } ) = \\mathsf { y } ^ { \\star } \\mathsf { y }$ , which is positive. These two cases cover every real x, including zero. Therefore $\\mathsf { x } ^ { \\star } \\mathsf { x }$ is nonnegative for every real x.\n\n## References\n\n[1] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. 2017. Attention Is All You Need. Advances in Neural Information Processing Systems 30. https://arxiv.org/abs/1706.03762",
+    "markdown_path": "E:\\kabuda\\FactReview\\runs\\v2_method_delivery\\actual-full-9800dedbaa\\runs\\exactmatch-integration-v1_2026-10-09_114245_3f380155\\materials\\paper.md",
+    "content_list_path": "E:\\kabuda\\FactReview\\runs\\v2_method_delivery\\actual-full-9800dedbaa\\runs\\exactmatch-integration-v1_2026-10-09_114245_3f380155\\materials\\content_list.json",
+    "provider": "mineru_v4",
+    "blocks": [
+      {
+        "id": "block_1",
+        "text": "ExactMatch: a controlled integration manuscript",
+        "kind": "heading",
+        "loc": {
+          "page": 1,
+          "section": "section_1: ExactMatch: a controlled integration manuscript",
+          "char_start": 2,
+          "char_end": 49
+        },
+        "citations": []
+      },
+      {
+        "id": "block_2",
+        "text": "Abstract",
+        "kind": "heading",
+        "loc": {
+          "page": 1,
+          "section": "section_2: Abstract",
+          "char_start": 54,
+          "char_end": 62
+        },
+        "citations": []
+      },
+      {
+        "id": "block_3",
+        "text": "This synthetic manuscript and its released code provide a small software integration example. The numerical result describes four fixed predictions and does not establish generalization performance. It contains a literature attribution, a mathematical statement, an implementation description and an evaluation result.",
+        "kind": "text",
+        "loc": {
+          "page": 1,
+          "section": "section_2: Abstract",
+          "char_start": 64,
+          "char_end": 382
+        },
+        "citations": []
+      },
+      {
+        "id": "block_4",
+        "text": "1. Background",
+        "kind": "heading",
+        "loc": {
+          "page": 1,
+          "section": "section_3: 1. Background",
+          "char_start": 387,
+          "char_end": 400
+        },
+        "citations": []
+      },
+      {
+        "id": "block_5",
+        "text": "Vaswani et al. (2017) introduced the Transformer, whose architecture relies on attention and omits recurrence and convolution [1]. This is background attribution; our ExactMatch evaluator makes no architectural novelty claim.",
+        "kind": "text",
+        "loc": {
+          "page": 1,
+          "section": "section_3: 1. Background",
+          "char_start": 402,
+          "char_end": 627
+        },
+        "citations": [
+          "[1]"
+        ]
+      },
+      {
+        "id": "block_6",
+        "text": "2. Method and implementation",
+        "kind": "heading",
+        "loc": {
+          "page": 1,
+          "section": "section_4: 2. Method and implementation",
+          "char_start": 632,
+          "char_end": 660
+        },
+        "citations": []
+      },
+      {
+        "id": "block_7",
+        "text": "The ExactMatch evaluator computes accuracy as the number of predictions equal to their labels divided by the number of examples. The public implementation is scripts/evaluate.py; its configuration and four predictions are distributed with the code. It performs evaluation without training.",
+        "kind": "text",
+        "loc": {
+          "page": 1,
+          "section": "section_4: 2. Method and implementation",
+          "char_start": 662,
+          "char_end": 951
+        },
+        "citations": []
+      },
+      {
+        "id": "block_8",
+        "text": "Theorem 1. For every real number x, the square x\\*x is nonnegative. The proof appears in Appendix A. This elementary statement is independent of the evaluation procedure.",
+        "kind": "text",
+        "loc": {
+          "page": 1,
+          "section": "section_4: 2. Method and implementation",
+          "char_start": 953,
+          "char_end": 1123
+        },
+        "citations": []
+      },
+      {
+        "id": "block_9",
+        "text": "3. Evaluation",
+        "kind": "heading",
+        "loc": {
+          "page": 1,
+          "section": "section_5: 3. Evaluation",
+          "char_start": 1128,
+          "char_end": 1141
+        },
+        "citations": []
+      },
+      {
+        "id": "block_10",
+        "text": "On MiniSet test, model ExactMatch has accuracy 0.75. Accuracy is a fraction, computed by exact equality of each prediction and label. Three of the four fixed test predictions are correct. Table 1 reports the result and Figure 1 shows the corresponding counts. No repeated-run uncertainty or population-performance conclusion is claimed.",
+        "kind": "text",
+        "loc": {
+          "page": 1,
+          "section": "section_5: 3. Evaluation",
+          "char_start": 1143,
+          "char_end": 1479
+        },
+        "citations": []
+      },
+      {
+        "id": "block_11",
+        "text": "Table 1. MiniSet test result. Accuracy is a fraction; bold type identifies the measured accuracy, with no ranking against other models.\n<table><tr><td>Model</td><td>Test accuracy</td><td>Examples</td></tr><tr><td>ExactMatch</td><td>0.75</td><td>4</td></tr></table>",
+        "kind": "table",
+        "loc": {
+          "page": 1,
+          "section": "block_9: 3. Evaluation",
+          "char_start": null,
+          "char_end": null
+        },
+        "citations": []
+      },
+      {
+        "id": "block_12",
+        "text": "Figure and proof",
+        "kind": "heading",
+        "loc": {
+          "page": 2,
+          "section": "section_6: Figure and proof",
+          "char_start": 1751,
+          "char_end": 1767
+        },
+        "citations": []
+      },
+      {
+        "id": "block_13",
+        "text": "Number of predictions\nPrediction outcome\nFigure 1. ExactMatch prediction counts on MiniSet test: three correct and one incorrect. The vertical axis counts examples; both outcome categories are labeled.",
+        "kind": "chart",
+        "loc": {
+          "page": 2,
+          "section": "block_12: Figure and proof",
+          "char_start": null,
+          "char_end": null
+        },
+        "citations": []
+      },
+      {
+        "id": "block_14",
+        "text": "Appendix A. Proof of Theorem 1",
+        "kind": "heading",
+        "loc": {
+          "page": 2,
+          "section": "section_7: Appendix A. Proof of Theorem 1",
+          "char_start": 2062,
+          "char_end": 2092
+        },
+        "citations": []
+      },
+      {
+        "id": "block_15",
+        "text": "Proof of Theorem 1. If x is nonnegative, multiplying x by itself gives a nonnegative product. If x is negative, write $\\mathsf { x } = - \\mathsf { y }$ for a positive real y. Then $\\mathsf { x } ^ { \\star } \\mathsf { x } = ( \\mathsf { - y } ) ^ { \\star } ( \\mathsf { - y } ) = \\mathsf { y } ^ { \\star } \\mathsf { y }$ , which is positive. These two cases cover every real x, including zero. Therefore $\\mathsf { x } ^ { \\star } \\mathsf { x }$ is nonnegative for every real x.",
+        "kind": "text",
+        "loc": {
+          "page": 2,
+          "section": "section_7: Appendix A. Proof of Theorem 1",
+          "char_start": 2094,
+          "char_end": 2569
+        },
+        "citations": []
+      },
+      {
+        "id": "block_16",
+        "text": "References",
+        "kind": "heading",
+        "loc": {
+          "page": 2,
+          "section": "section_8: References",
+          "char_start": 2574,
+          "char_end": 2584
+        },
+        "citations": []
+      },
+      {
+        "id": "block_17",
+        "text": "[1] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. 2017. Attention Is All You Need. Advances in Neural Information Processing Systems 30. https://arxiv.org/abs/1706.03762",
+        "kind": "ref_text",
+        "loc": {
+          "page": 2,
+          "section": "section_8: References",
+          "char_start": 2586,
+          "char_end": 2835
+        },
+        "citations": [
+          "[1]"
+        ]
+      }
+    ],
+    "pages": [
+      {
+        "page": 1,
+        "path": "E:\\kabuda\\FactReview\\runs\\v2_method_delivery\\actual-full-9800dedbaa\\runs\\exactmatch-integration-v1_2026-10-09_114245_3f380155\\materials\\images\\page_1.png",
+        "width_points": 595.0,
+        "height_points": 842.0,
+        "dpi": 200
+      },
+      {
+        "page": 2,
+        "path": "E:\\kabuda\\FactReview\\runs\\v2_method_delivery\\actual-full-9800dedbaa\\runs\\exactmatch-integration-v1_2026-10-09_114245_3f380155\\materials\\images\\page_2.png",
+        "width_points": 595.0,
+        "height_points": 842.0,
+        "dpi": 200
+      }
+    ],
+    "figures": [
+      {
+        "id": "figure_1",
+        "anchor": "",
+        "loc": {
+          "page": 2,
+          "section": "block_12: Figure and proof",
+          "char_start": null,
+          "char_end": null
+        },
+        "caption": "Number of predictions\nPrediction outcome\nFigure 1. ExactMatch prediction counts on MiniSet test: three correct and one incorrect. The vertical axis counts examples; both outcome categories are labeled.",
+        "caption_ambiguous": true,
+        "references": [
+          {
+            "id": "block_10.s4",
+            "text": "Table 1 reports the result and Figure 1 shows the corresponding counts.",
+            "kind": "text",
+            "loc": {
+              "page": 1,
+              "section": "section_5: 3. Evaluation",
+              "char_start": 1331,
+              "char_end": 1402
+            },
+            "citations": []
+          }
+        ],
+        "bbox_points": [
+          70.805,
+          99.356,
+          449.82,
+          308.172
+        ],
+        "crop_path": "E:\\kabuda\\FactReview\\runs\\v2_method_delivery\\actual-full-9800dedbaa\\runs\\exactmatch-integration-v1_2026-10-09_114245_3f380155\\materials\\images\\figure_1.png",
+        "printed_crop_path": "E:\\kabuda\\FactReview\\runs\\v2_method_delivery\\actual-full-9800dedbaa\\runs\\exactmatch-integration-v1_2026-10-09_114245_3f380155\\materials\\images\\figure_1_printed.png",
+        "printed_dpi": 96
+      }
+    ],
+    "tables": [
+      {
+        "id": "table_1",
+        "block_id": "block_11",
+        "anchor": "1",
+        "loc": {
+          "page": 1,
+          "section": "block_9: 3. Evaluation",
+          "char_start": null,
+          "char_end": null
+        },
+        "caption": "Table 1. MiniSet test result. Accuracy is a fraction; bold type identifies the measured accuracy, with no ranking against other models.",
+        "footnotes": "",
+        "caption_ambiguous": false,
+        "references": [
+          {
+            "id": "block_10.s4",
+            "text": "Table 1 reports the result and Figure 1 shows the corresponding counts.",
+            "kind": "text",
+            "loc": {
+              "page": 1,
+              "section": "section_5: 3. Evaluation",
+              "char_start": 1331,
+              "char_end": 1402
+            },
+            "citations": []
+          }
+        ],
+        "bbox_points": [
+          57.715,
+          650.866,
+          534.905,
+          710.648
+        ],
+        "crop_path": "E:\\kabuda\\FactReview\\runs\\v2_method_delivery\\actual-full-9800dedbaa\\runs\\exactmatch-integration-v1_2026-10-09_114245_3f380155\\materials\\images\\table_1.png",
+        "printed_crop_path": "E:\\kabuda\\FactReview\\runs\\v2_method_delivery\\actual-full-9800dedbaa\\runs\\exactmatch-integration-v1_2026-10-09_114245_3f380155\\materials\\images\\table_1_printed.png",
+        "printed_dpi": 96,
+        "issues": []
+      }
+    ],
+    "bibliography": [
+      {
+        "id": "block_17",
+        "text": "[1] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. 2017. Attention Is All You Need. Advances in Neural Information Processing Systems 30. https://arxiv.org/abs/1706.03762",
+        "kind": "ref_text",
+        "loc": {
+          "page": 2,
+          "section": "section_8: References",
+          "char_start": 2586,
+          "char_end": 2835
+        },
+        "citations": [
+          "[1]"
+        ]
+      }
+    ],
+    "repository": {
+      "root": "E:\\kabuda\\FactReview\\runs\\v2_method_delivery\\live-fixture-v1\\repository",
+      "files": [
+        {
+          "path": "configs/evaluation.json",
+          "kind": "config",
+          "line_count": 8,
+          "sha256": "e972f320b0fd34c04af58e0e50178ad2308b719460897b0d2d63adbb26d32763"
+        },
+        {
+          "path": "data/test_predictions.json",
+          "kind": "config",
+          "line_count": 18,
+          "sha256": "210d917445a5987180656534b67419955cbb0f027c09918368c0d8c19a271141"
+        },
+        {
+          "path": "README.md",
+          "kind": "documentation",
+          "line_count": 11,
+          "sha256": "3d3c538b96327445b2a279fc39d727c1c4098017808549212c76906f4c6dbb79"
+        },
+        {
+          "path": "scripts/evaluate.py",
+          "kind": "entry",
+          "line_count": 9,
+          "sha256": "8ee10fb7f8bdfe0e93c6455b6c926aa1709b7f280cd67a86f526fac2285e3e0c"
+        }
+      ],
+      "entry_scripts": [
+        "scripts/evaluate.py"
+      ],
+      "configs": [
+        "configs/evaluation.json",
+        "data/test_predictions.json"
+      ]
+    },
+    "issues": [
+      "block_11: parser text could not be aligned to markdown; char span unavailable.",
+      "block_13: parser text could not be aligned to markdown; char span unavailable.",
+      "figure_1: parser supplied multiple captions; crop-to-caption assignment is ambiguous."
+    ]
+  },
+  "repository_bytes": {
+    "configs/evaluation.json": "{\n  \"dataset\": \"MiniSet\",\n  \"metric\": \"accuracy\",\n  \"settings\": {\n    \"split\": \"test\",\n    \"model\": \"ExactMatch\"\n  }\n}\n",
+    "data/test_predictions.json": "[\n  {\n    \"label\": 0,\n    \"prediction\": 0\n  },\n  {\n    \"label\": 1,\n    \"prediction\": 1\n  },\n  {\n    \"label\": 0,\n    \"prediction\": 1\n  },\n  {\n    \"label\": 1,\n    \"prediction\": 1\n  }\n]\n",
+    "README.md": "# ExactMatch controlled integration artifact\n\nThis repository accompanies a synthetic software-integration manuscript. It is\nnot a benchmark of scientific performance. Python 3.11 standard library suffices.\n\nRun `python scripts/evaluate.py` from the repository root. No training, downloads,\nGPU or external dependencies are needed. Evaluation uses the four released\npredictions in data/test_predictions.json and the settings in\nconfigs/evaluation.json. Accuracy is the fraction of predictions equal to labels.\nThe stdout JSON observations contain the runtime dataset, metric, model, split\nand computed value. These are read from released inputs rather than review plans.\n",
+    "scripts/evaluate.py": "import json\nfrom pathlib import Path\n\nroot = Path(__file__).resolve().parents[1]\nconfig = json.loads((root / \"configs/evaluation.json\").read_text())\nrows = json.loads((root / \"data/test_predictions.json\").read_text())\ncorrect = sum(row[\"label\"] == row[\"prediction\"] for row in rows)\naccuracy = correct / len(rows)\nprint(json.dumps({\"observations\": [{**config, \"value\": accuracy}]}))\n"
+  }
+}
