@@ -72,6 +72,24 @@ An optional `--expectations expected.json` supplies an independent coverage orac
 
 These IDs illustrate the format; choose expected outcomes by inspecting the actual original sources. A completed call with no support fails a required positive expectation. Without expectations, successful exit confirms that the selected verification calls and artifact checks completed; it makes no accuracy claim. Each output under `runs/v2_experiments/` records this distinction, and source or implementation changes during the probe invalidate its result. `tests/test_experiment_probe_driver.py` mocks model, network and process boundaries.
 
+## Joint experimental sources
+
+An experimental candidate can declare `additional_sources` when its table, measured quantity, setup or connecting passage occupy different original locations. The first implementation permits one explicit joint `paper_support` candidate for one original condition. It retains the primary passage and every separately proposed partial observation. `EXPERIMENT_JOINT_MAX_SOURCES` defaults to six including the primary source; exceeding the configured limit leaves the candidate unconfirmed and never truncates its source list.
+
+The first pass must declare the complete joint member set. When a table depends on external metric or setup definitions, that set also needs its own exact manuscript passage connecting the numbered table. A reference emitted as a separate partial candidate grants no access to the joint. The second pass cannot add omitted members.
+
+The independent second pass selects candidate-specific catalog entries and declares `source_uses` for every joint member. Single-source candidates must return `source_uses=[]`; their indices are identified explicitly in the input. Each selected passage must fit inside one declared continuous original range. Prose operands require the complete governing sentence; table operands require the complete native table and its headers. Captions, definitions and references must also be within declared ranges. Every source retains its original block/span, parent identity, pointer and artifact fingerprint. Original Claim and SharedMaterials objects remain authoritative and unchanged.
+
+Expected endpoints and claimed differences use a separate, condition-scoped original assertion lookup. That lookup does not authorize the assertion as an observed result or as extra context for a candidate. Numerical roles, metric/setup bridges, explicit manuscript table references, units, relation, controls and required setting cases still pass their existing checks. Source count and declared roles alone cannot establish support. Mechanically checked uses and semantic-only protocol/qualifier judgments are recorded separately in the scope audit.
+
+Artifact revalidation uses each complete declared member's original pointer, location and file hash. A consumed substring remains bounded by that member even when the substring also occurs in another prepared representation, such as Markdown text within a PDF-backed member. Changes to the original member's pointer, block, range or artifact remain invalid.
+
+Table units come from the selected measurement headers, the value's own explicit suffix, or an authorized caption for that exact table. Header scope and span origins constrain inheritance in both orientations; implicit all-`td` headers use a bounded structural rule. A parent header grants access only to its next connected header level. Conflicting units, unknown unit expressions and compound operations remain unconfirmed, with no scale conversion. A caption must have a fully recognized quantity/unit declaration; any dataset and setting qualifiers must match the current operand's original condition. Unknown qualifiers, another setting, negation, disjunction and mixed quantities cannot donate units. Explicit axis/token units remain independently usable. A complete adjacent caption can be projected from one declared member while preserving existing table/cell IDs; separate fragments cannot be joined to authorize it. Unsupported layout or wording stays visible as a limitation.
+
+Only uniquely identified new joint pairs have local source/selector failures. A duplicate or malformed pair cannot later be restored by another row. Invalid condition rows and existing single-source decoding failures retain their condition-wide behavior. A valid primary source may remain an insufficient observation when an additional member is invalid; an invalid primary cannot create an evidence pointer.
+
+An accepted source group produces one Evidence with `additional_pointers`, preserving one sufficiency decision and the original condition coverage. Old JSON remains readable with an empty default list. Complete original quotations and positions survive dispatch, assessment and FinalReview JSON/Markdown/PDF. The teaser retains its compact claim/status/source-type summary and report link. This feature uses the existing two model passes and does not start execution or training.
+
 ## Selected Literature citations
 
 `scripts/check_v2_literature.py` runs declared citation cases with explicit service boundaries:
@@ -93,6 +111,8 @@ Each output saves requests, responses, actual boundary counts, provider/model, r
 The report renders supported HTML table structures as readable tables, retaining cell associations, explicit multirow headers and units on continued PDF pages. Complete row excerpts without headers use neutral column positions and identify the missing headings. Malformed or unsupported markup falls back to the escaped original passage. Original quotes and evidence judgments remain in JSON.
 
 Repeated evidence passages share a source only when `(locator, page, line, key, quote)` matches exactly. Each evidence occurrence keeps its own direction, condition coverage, sufficiency, pointer, note and execution provenance. The first occurrence displays the full source and links to every use; later occurrences link back. Markdown and PDF contain actual internal destinations, including across page and paragraph splits. Source text cannot create its own anchors or links. Report notes, questions and execution records remain complete; this presentation change does not reassess claims.
+
+Joint evidence has ordered primary and additional source usages under the same evidence judgment. Each additional location has its own destination and backlink. A source shared between an additional pointer and another evidence item's primary pointer is rendered once with links to both uses. Empty additional-pointer lists retain the existing single-source Markdown presentation; canonical JSON serialization adds the empty default field.
 
 ## Limits retained in artifacts
 

@@ -393,7 +393,15 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser("factreview_full_pipeline")
+    p = argparse.ArgumentParser(
+        "factreview_full_pipeline",
+        description="Run the default v2 review pipeline; Docker execution is opt-in.",
+        epilog=(
+            "Visual checks inherit the main model. Optional VLM_MODEL_PROVIDER, VLM_MODEL, "
+            "VLM_BASE_URL and VLM_API_KEY environment variables select an image-capable model. "
+            "The openai-codex provider uses Codex login and accepts no VLM_API_KEY."
+        ),
+    )
     p.add_argument("paper_pdf", type=str, help="Path or URL to a paper PDF")
     p.add_argument("--paper-key", type=str, default="")
     p.add_argument("--run-root", type=str, default="runs")
@@ -406,8 +414,18 @@ def parse_args() -> argparse.Namespace:
         "--repository-root", default="", help="Read-only local snapshot of the released repository"
     )
     p.add_argument("--repository-url", default="", help="HTTPS URL of the released repository")
-    p.add_argument("--approval-mode", choices=("auto", "interactive"), default="auto")
-    p.add_argument("--training-budget", type=int, default=0, help="Maximum training runs, including retries")
+    p.add_argument(
+        "--approval-mode",
+        choices=("auto", "interactive"),
+        default="auto",
+        help="Execution approval mode (default: auto)",
+    )
+    p.add_argument(
+        "--training-budget",
+        type=int,
+        default=0,
+        help="Maximum training runs, including retries (default: 0)",
+    )
     p.add_argument(
         "--execution-config",
         default="",
@@ -449,7 +467,7 @@ def parse_args() -> argparse.Namespace:
         "--gemini-api-key",
         type=str,
         default="",
-        help="Optional Gemini API key override for teaser image generation.",
+        help="Legacy v1 teaser key; v2 writes a local SVG and does not call Gemini.",
     )
     p.add_argument(
         "--teaser-mode",

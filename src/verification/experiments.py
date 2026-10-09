@@ -34,6 +34,14 @@ from verification.experiment_catalog import (
     resolve_cell,
     resolve_source,
 )
+from verification.experiment_sources import (
+    joint_limit,
+    prepare_joint_candidate,
+    record_assertion,
+    require_passage,
+    revalidate_members,
+    validate_source_uses,
+)
 from verification.experiment_targets import TargetBindingError, bind_execution_target
 from verification.prose_numbers import (
     bind_pair,
@@ -191,6 +199,199 @@ def _comparison_units(number: PaperNumber, metric: str) -> set[str]:
     return {_canonical_unit(unit) or unit for unit in units}
 
 
+def _table_header_rows(parsed, index, before_row):
+    """Keep explicit headers and a finite structurally connected all-td prefix."""
+    grid, meta, origins = parsed.tables[index], parsed.metadata[index], parsed.origins[index]
+    accepted = set()
+    numeric = re.compile(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?%?")
+    for row in range(before_row):
+        fresh = [(r, c) for r, c in grid if r == row and origins[r, c] == (r, c)]
+        if not fresh or any(numeric.fullmatch(grid[key]) for key in fresh):
+            break
+        semantic = all(
+            (meta[key]["tag"] == "th" or meta[key]["thead"]) and meta[key]["scope"] not in {"row", "rowgroup"}
+            for key in fresh
+        )
+        groups = [
+            (origin, value)
+            for origin, value in meta.items()
+            if origins[origin] == origin
+            and origin[0] in accepted
+            and value["colspan"] > 1
+            and origin[0] + value["rowspan"] == row
+        ]
+        grouped = bool(groups) and all(
+            not grid[key].strip()
+            or any(origin[1] <= key[1] < origin[1] + value["colspan"] for origin, value in groups)
+            for key in fresh
+        )
+        if row == 0 or semantic or grouped:
+            accepted.add(row)
+        else:
+            break
+    return accepted
+
+
+def _explicit_header_units(text):
+    """Consume complete unit annotations; incompatible or compound scales fail closed."""
+    annotations = list(re.finditer(r"\(([^()]*)\)", text))
+    if not annotations:
+        unit = _canonical_unit(text)
+        return {unit} if unit else set()
+    if text[annotations[-1].end() :].strip(" \t\r\n.,;:"):
+        raise ValueError(
+            "Comparison units/scales do not match: compound or trailing unit expression is unresolved"
+        )
+    if any(text[left.end() : right.start()].strip() for left, right in pairwise(annotations)):
+        raise ValueError("Comparison units/scales do not match: intervening unit expression is unresolved")
+    units = set()
+    for annotation in annotations:
+        unit = _canonical_unit(annotation.group(1))
+        if unit is None:
+            raise ValueError(
+                "Comparison units/scales do not match: selected measurement-axis unit is unknown"
+            )
+        units.add(unit)
+    return units
+
+
+def _caption_unit_scope(body, quantity, dataset, settings):
+    """Accept a finite, fully consumed unit declaration for this operand's scope."""
+    quantity_match = re.search(r"(?<!\w)" + re.escape(quantity) + r"\s*(?=\()", body, re.I)
+    if quantity_match is None:
+        return False
+    annotations = list(re.finditer(r"\([^()]*\)", body[quantity_match.end() :]))
+    if not annotations:
+        return False
+    annotation_text = body[quantity_match.end() :]
+    compound = re.compile(r"\s*(?:/|\bper\b|\*|×|÷|\^|\bdivided\b)", re.I)
+    for left, right in pairwise(annotations):
+        gap = annotation_text[left.end() : right.start()]
+        if gap.strip() and not compound.match(gap):
+            return False
+    before = body[: quantity_match.start()]
+    after = annotation_text[annotations[-1].end() :]
+    # Eligible compound expressions continue to the existing unit parser, which
+    # rejects them. A unit on an inapplicable caption never replaces axis units.
+    if compound.match(after):
+        after = ""
+    before = re.sub(
+        r"^\s*(?:results(?:\s+(?:for|of))?\s*[:.\-]?\s*)?(?:reported\s+)?", "", before, flags=re.I
+    )
+
+    def literal(value):
+        return r"\s+".join(re.escape(part) for part in str(value).split())
+
+    atoms = [literal(dataset)] if dataset else []
+    values = [str(value) for value in settings.values()]
+    for key, value in settings.items():
+        key_pattern, value_pattern = literal(key), literal(value)
+        if not key_pattern or not value_pattern:
+            continue
+        atoms.extend(
+            (key_pattern + r"(?:\s*[:=]\s*|\s+)" + value_pattern, value_pattern + r"\s+" + key_pattern)
+        )
+        if values.count(str(value)) == 1 and not re.fullmatch(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)", str(value)):
+            atoms.append(value_pattern)
+    atom = (
+        re.compile(r"(?:" + "|".join(sorted(atoms, key=len, reverse=True)) + r")(?!\w)", re.I)
+        if atoms
+        else None
+    )
+    connector = re.compile(r"(?:[\s,;:.]+|\b(?:on|for|of|with|at|using|and)\b)", re.I)
+    for residual in (before, after):
+        offset = 0
+        while offset < len(residual):
+            match = (atom.match(residual, offset) if atom else None) or connector.match(residual, offset)
+            if match is None or match.end() == offset:
+                return False
+            offset = match.end()
+    return True
+
+
+def _table_units(
+    number, cell, label, metric, dataset=None, *, metric_binding=False, caption=None, caption_settings=None
+):
+    """Read explicit units on this cell's measurement axis, retaining native scale.
+
+    Semantic th/thead headers retain their span coordinates. Native all-td tables
+    use their first header row and structurally connected span children, or the
+    identified measurement stub in a transposed row. Methods and data cells cannot
+    donate a unit, even when they contain a percentage marker.
+    """
+    parsed = _TableGrid(number.quote)
+    grid, meta = parsed.tables[cell.table], parsed.metadata[cell.table]
+    row_role = any(
+        c < cell.column and r == cell.row and _has_label(label, text) for (r, c), text in grid.items()
+    )
+    column_role = any(
+        r < cell.row and c == cell.column and _has_label(label, text) for (r, c), text in grid.items()
+    )
+    if row_role == column_role:
+        raise ValueError("Numerical unit has no unique measurement-axis orientation")
+    header_rows = _table_header_rows(parsed, cell.table, cell.row)
+    if row_role:
+        axis = [
+            text
+            for (r, c), text in grid.items()
+            if c == cell.column
+            and r < cell.row
+            and meta[r, c]["scope"] not in {"row", "rowgroup"}
+            and (r in header_rows or meta[r, c]["thead"] or meta[r, c]["scope"] in {"col", "colgroup"})
+        ]
+    else:
+        stub_fields = {"metric", "measure", "measurement", "dataset", "task"}
+        stub_columns = {
+            c for (r, c), text in grid.items() if r in header_rows and text.strip().casefold() in stub_fields
+        }
+        axis = [
+            text
+            for (r, c), text in grid.items()
+            if r == cell.row
+            and c < cell.column
+            and meta[r, c]["scope"] not in {"col", "colgroup"}
+            and (
+                parsed.origins[cell.table][r, c][1] == 0
+                or c in stub_columns
+                or meta[r, c]["scope"] in {"row", "rowgroup"}
+            )
+        ]
+    quantities = [metric, *([dataset] if metric_binding and dataset else [])]
+    units = {"%"} if number.token.endswith("%") else set()
+    axis_identified = any(_has_label(quantity, text) for quantity in quantities for text in axis)
+    if axis_identified:
+        for text in dict.fromkeys(axis):
+            units.update(_explicit_header_units(text))
+    # A located caption belongs only to the selected HTML table. Earlier table
+    # captions and unrelated prefix paragraphs cannot donate units.
+    spans = list(re.finditer(r"<table\b.*?</table>", number.quote, re.I | re.S))
+    prefix = (
+        number.quote[spans[cell.table - 1].end() if cell.table else 0 : spans[cell.table].start()]
+        if caption is None
+        else caption
+    )
+    names = list(re.finditer(r"(?:^|\n)\s*Table\s+\d+\s*[:.]", prefix, re.I))
+    if names:
+        caption = re.split(r"\n\s*\n", prefix[names[-1].start() :], maxsplit=1)[0]
+        body = re.sub(r"^\s*Table\s+\d+\s*[:.]\s*", "", caption, flags=re.I).strip()
+        for quantity in quantities:
+            if not quantity or not _caption_unit_scope(body, quantity, dataset, caption_settings or {}):
+                continue
+            pattern = r"(?<!\w)" + re.escape(quantity) + r"\s*((?:\([^()]*\)\s*)+(?:/[^\s.,;]+)?)"
+            for match in re.finditer(pattern, caption, re.I):
+                if re.match(r"\s*(?:/|\bper\b|\*|×|÷|\^|\bdivided\b)", caption[match.end() :], re.I):
+                    raise ValueError(
+                        "Comparison units/scales do not match: compound caption unit is unresolved"
+                    )
+                units.update(_explicit_header_units(match.group(1)))
+    return units
+
+
+class ScopePassage(Contract):
+    block_id: NonEmpty
+    quote: NonEmpty
+
+
 class ExperimentItem(Contract):
     aspect: Literal["correspondence", "fairness", "isolation", "stability", "consistency"]
     kind: Literal[
@@ -217,6 +418,23 @@ class ExperimentItem(Contract):
     detail: NonEmpty
     # Contradiction pairs must be the same metric/setting; units are explicit.
     comparison: list[PaperNumber] = Field(default_factory=list, max_length=2)
+    additional_sources: list[ScopePassage] = Field(
+        default_factory=list,
+        description=(
+            "Exact additional members of ONE joint paper_support candidate for ONE condition; "
+            "[] means single-source. Together with block_id/quote, declare the complete supporting set: "
+            "results, required definitions/setup, and the manuscript's exact numbered-table-reference "
+            "passage linking any external metric/setup definition to the selected table. "
+            "One exact member may serve multiple roles; do not duplicate it. "
+            "A source in another partial item grants this candidate no access. Do not merge partial flags."
+        ),
+    )
+
+    @model_validator(mode="after")
+    def joint_contract(self):
+        if self.additional_sources and (self.kind != "paper_support" or len(self.covered) != 1):
+            raise ValueError("Joint additional_sources require paper_support for exactly one condition")
+        return self
 
 
 class PlanTarget(Contract):
@@ -245,11 +463,6 @@ class ExperimentsOutput(Contract):
     items: list[ExperimentItem]
     plans: list[PlanCandidate] = Field(default_factory=list, max_length=1)
     issues: list[str] = Field(default_factory=list)
-
-
-class ScopePassage(Contract):
-    block_id: NonEmpty
-    quote: NonEmpty
 
 
 class ScopeSemantics(Contract):
@@ -301,7 +514,14 @@ class SourceBridge(Contract):
     )
     applies_to: Literal["subject", "comparator", "shared"]
     table_id: NonEmpty
-    source_ids: list[NonEmpty] = Field(min_length=1)
+    source_ids: list[NonEmpty] = Field(
+        min_length=1,
+        description=(
+            "Verify each ID's resolved quote against this bridge. Include all required definition "
+            "and manuscript table-reference passages; they may use different IDs. "
+            "A passage mentioned only in explanation does not supply a missing source ID."
+        ),
+    )
     paper_label: str = Field(
         default="",
         description="For metric bridges: the exact original metric quantity (e.g. mIoU), never a dataset column label. For setup bridges: an exact treatment phrase shared by the selected axis and its definition, not necessarily the entire row label.",
@@ -431,8 +651,32 @@ class CatalogComparisonV2(Contract):
     difference_mode: Literal["absolute", "relative_percent", "percentage_points", "unresolved"] = "unresolved"
 
 
+class CandidateSourceUse(Contract):
+    source_id: NonEmpty
+    roles: list[
+        Literal[
+            "result",
+            "metric_definition",
+            "setup_definition",
+            "table_reference",
+            "protocol",
+            "other_qualifier",
+        ]
+    ] = Field(min_length=1)
+    rationale: NonEmpty
+
+
 class CatalogItemScopeV2(CatalogItemScope):
     comparisons: list[CatalogComparisonV2] = Field(default_factory=list)
+    source_uses: list[CandidateSourceUse] = Field(
+        default_factory=list,
+        description=(
+            "Only for joint candidates whose first-pass additional_sources is nonempty: exactly one "
+            "entry per declared member_source_id, including the primary. For every index in "
+            "single_source_candidate_indices (additional_sources=[]), this field MUST be []. "
+            "Grounds or bridges on a single-source candidate do not permit nonempty source_uses."
+        ),
+    )
 
 
 class CatalogScopeReviewV2(Contract):
@@ -489,7 +733,7 @@ def _catalog_passage(catalog, source_id, materials, condition_id):
     return ScopePassage(block_id=source["block_id"], quote=source["quote"])
 
 
-def _expected_number(claim, condition_id, token, materials):
+def _expected_number(claim, condition_id, token, materials, catalog=None):
     if not token:
         return None
     for block_id, quote in _claim_passages(claim, condition_id):
@@ -498,6 +742,7 @@ def _expected_number(claim, condition_id, token, materials):
         candidate = PaperNumber(block_id=block_id, quote=quote, token=token)
         try:
             _number(materials, candidate)
+            record_assertion(catalog, materials, candidate, purpose="asserted_endpoint")
             return candidate
         except ValueError:
             continue
@@ -530,11 +775,45 @@ def _asserted_endpoints(claim, condition, materials=None):
 
 def _occurrence_number(catalog, identifier, materials):
     record = resolve_number(catalog.get("numbers", {}), identifier, materials)
+    require_passage(catalog, materials, record["block_id"], record["quote"], purpose="number_occurrence")
+    if "joint_view" in catalog:
+        trace = catalog["joint_view"].setdefault("selector_consumption", [])
+        selected = {
+            "kind": "number",
+            "selected_id": identifier,
+            "parent_number_id": identifier,
+            **{
+                key: record[key]
+                for key in (
+                    "block_id",
+                    "start",
+                    "end",
+                    "sentence_start",
+                    "sentence_end",
+                    "token",
+                    "unit_suffix",
+                )
+            },
+        }
+        if selected not in trace:
+            trace.append(selected)
     return PaperNumber(**{key: record[key] for key in ("block_id", "quote", "token")})
 
 
-def _occurrence_units(catalog, identifier, materials):
-    record = resolve_number(catalog.get("numbers", {}), identifier, materials)
+def _assertion_number(catalog, identifier, materials):
+    record = resolve_number(
+        catalog.get("assertion_numbers", catalog.get("numbers", {})), identifier, materials
+    )
+    return PaperNumber(**{key: record[key] for key in ("block_id", "quote", "token")})
+
+
+def _occurrence_units(catalog, identifier, materials, *, assertion=False):
+    numbers = (
+        catalog.get("assertion_numbers", catalog.get("numbers", {}))
+        if assertion
+        else catalog.get("numbers", {})
+    )
+    record = resolve_number(numbers, identifier, materials)
     suffix = re.sub(r"\s+", " ", record["unit_suffix"].casefold())
     if suffix == "percentage points":
         suffix = "pp"
@@ -624,7 +903,7 @@ def _catalog_item(row, claim, materials, catalog, scope):
                 )
             identifiers["difference_number_id"] = item.difference_number_id
             if item.difference_number_id:
-                difference = _occurrence_number(catalog, item.difference_number_id, materials)
+                difference = _assertion_number(catalog, item.difference_number_id, materials)
         elif item.difference_source_id:
             source = _catalog_passage(catalog, item.difference_source_id, materials, condition.id)
             difference = PaperNumber(**source.model_dump(), token=item.difference_token)
@@ -652,16 +931,20 @@ def _catalog_item(row, claim, materials, catalog, scope):
                     condition.id,
                     endpoints[0] if endpoints else "",
                     materials,
+                    catalog,
                 ),
                 expected_right=_expected_number(
                     claim,
                     condition.id,
                     endpoints[1] if endpoints else "",
                     materials,
+                    catalog,
                 ),
             )
         )
-    payload = row.model_dump(exclude={"grounds_source_ids", "comparisons", "nonblocking_notes"})
+    payload = row.model_dump(
+        exclude={"grounds_source_ids", "comparisons", "nonblocking_notes", "source_uses"}
+    )
     if row.nonblocking_notes:
         payload["rationale"] += "; nonblocking notes: " + "; ".join(row.nonblocking_notes)
     return ItemScope(
@@ -682,7 +965,7 @@ def _own_table_reference(quote, table_name):
     boundaries.append(len(quote))
     target = re.escape(table_name) + r"(?![\w.]|\.\d)"
     self_reference = re.compile(
-        rf"^\s*(?:{target}\s+(?:reports?|shows?|presents?|compares?|summarizes?|lists?|contains?|provides?)\b"
+        rf"^\s*(?:(?:Our\s+)?{target}\s+(?:reports?|shows?|presents?|compares?|summarizes?|lists?|contains?|provides?)\b"
         rf"|As\s+(?:shown|reported|presented|summarized|listed|detailed)\s+in\s+{target})",
         re.I,
     )
@@ -883,7 +1166,7 @@ def _bridge_bindings(claim, condition, scope, comparison, materials, catalog):
     return result
 
 
-def _table_value(number, cell, label, metric, settings, *, metric_binding=False, dataset=None):
+def _table_value(number, cell, label, metric, settings, *, metric_binding=False, dataset=None, caption=None):
     tables = _TableGrid(number.quote).tables
     if cell.table >= len(tables):
         raise ValueError("Selected numerical table does not exist in the exact quote")
@@ -903,7 +1186,8 @@ def _table_value(number, cell, label, metric, settings, *, metric_binding=False,
     if cell.table >= len(spans):
         raise ValueError("Table caption boundaries are unresolved")
     prior_end = spans[cell.table - 1].end() if cell.table else 0
-    caption = number.quote[prior_end : spans[cell.table].start()]
+    if caption is None:
+        caption = number.quote[prior_end : spans[cell.table].start()]
     captions = list(re.finditer(r"(?:^|\n)\s*Table\s+\d+\s*[:.]", caption, re.I))
     if len(captions) > 1:
         caption = caption[captions[-1].start() :]
@@ -1069,7 +1353,30 @@ def _numeric_scope_check(
                             raise ValueError(f"Numerical operand changes condition {role} setting {key}")
             if comparison.relation != scope.relation:
                 raise ValueError("Numerical comparison weakens or changes the claim's relation")
-            context = "\n".join(p.quote for p in comparison.context)
+            captions = {"subject": None, "comparator": None}
+            if catalog is not None and "joint_view" in catalog:
+                for role, number, cell, identifier in (
+                    ("subject", comparison.left, comparison.left_cell, comparison.left_catalog_id),
+                    ("comparator", comparison.right, comparison.right_cell, comparison.right_catalog_id),
+                ):
+                    if identifier and cell is not None:
+                        selected = resolve_cell(catalog, identifier, materials)
+                        if (number.block_id, number.quote, number.token) != (
+                            selected["block_id"],
+                            selected["quote"],
+                            selected["token"],
+                        ) or (cell.table, cell.row, cell.column) != (
+                            selected["table"],
+                            selected["row"],
+                            selected["column"],
+                        ):
+                            raise ValueError("Caption association differs from the selected numerical cell")
+                        # resolve_cell revalidates this table's complete authorized
+                        # caption and member artifact; keep the body quote intact.
+                        captions[role] = selected["caption"]
+            context = "\n".join(
+                [*(p.quote for p in comparison.context), *(value for value in captions.values() if value)]
+            )
             for passage in comparison.context:
                 _paper_pointer(materials, passage.block_id, passage.quote)
             if condition.dataset and not _has_label(condition.dataset, context):
@@ -1104,6 +1411,7 @@ def _numeric_scope_check(
                         settings,
                         metric_binding="metric" in bridges[role],
                         dataset=condition.dataset,
+                        caption=captions[role],
                     )
                     # A named variant's setup may be defined separately. Other
                     # model-row names are not alternative setting headers.
@@ -1163,10 +1471,52 @@ def _numeric_scope_check(
             units = [
                 _occurrence_units(catalog, identifier, materials)
                 if identifier
-                else _comparison_units(number, bridges[role].get("metric", comparison.metric_label))
-                for number, role, identifier in (
-                    (comparison.left, "subject", comparison.left_number_id),
-                    (comparison.right, "comparator", comparison.right_number_id),
+                else (
+                    _table_units(
+                        number,
+                        cell,
+                        label,
+                        bridges[role].get("metric", comparison.metric_label),
+                        condition.dataset,
+                        metric_binding="metric" in bridges[role],
+                        caption=captions[role],
+                        caption_settings={
+                            key: settings[key] if isinstance(value, list) else str(value)
+                            for key, value in condition.settings.items()
+                            if key
+                            not in {
+                                "unit",
+                                "units",
+                                "model",
+                                "method",
+                                "subject",
+                                "comparison",
+                                "comparator",
+                                "baseline",
+                                scope.subject_setting,
+                                scope.comparator_setting,
+                            }
+                            and scope.setting_scopes.get(key, "shared") in {role, "shared"}
+                        },
+                    )
+                    if cell is not None
+                    else _comparison_units(number, comparison.metric_label)
+                )
+                for number, role, identifier, cell, label in (
+                    (
+                        comparison.left,
+                        "subject",
+                        comparison.left_number_id,
+                        comparison.left_cell,
+                        comparison.left_label,
+                    ),
+                    (
+                        comparison.right,
+                        "comparator",
+                        comparison.right_number_id,
+                        comparison.right_cell,
+                        comparison.right_label,
+                    ),
                 )
             ]
             if any(len(unit) > 1 for unit in units) or units[0] != units[1]:
@@ -1214,13 +1564,16 @@ def _numeric_scope_check(
                 ):
                     raise ValueError("Expected difference is not grounded in this claim's own source quote")
                 if comparison.difference_number_id:
-                    if comparison.difference != _occurrence_number(
+                    if comparison.difference != _assertion_number(
                         catalog, comparison.difference_number_id, materials
                     ):
                         raise ValueError("Expected difference differs from its original numbered occurrence")
-                    difference_units = _occurrence_units(catalog, comparison.difference_number_id, materials)
+                    difference_units = _occurrence_units(
+                        catalog, comparison.difference_number_id, materials, assertion=True
+                    )
                 else:
                     difference_units = _comparison_units(comparison.difference, comparison.metric_label)
+                record_assertion(catalog, materials, comparison.difference, purpose="asserted_difference")
                 if scope.difference_direction != "signed" and (
                     not scope.difference_direction_quote
                     or not any(
@@ -1274,7 +1627,7 @@ def _numeric_scope_check(
     return reasons
 
 
-def _decode_scope(response, claim, materials, output, catalog):
+def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=None):
     """One invalid condition keeps its own evidence unconfirmed; other conditions survive."""
     version = response.get("schema_version")
     if "schema_version" in response and (
@@ -1348,22 +1701,63 @@ def _decode_scope(response, claim, materials, output, catalog):
     for identifier in allowed.keys() - conditions.keys():
         reject(identifier, "Scope review must cover each claim condition exactly once")
     expected = {(index, condition) for index, item in enumerate(output.items) for condition in item.covered}
+    joint_catalogs = joint_catalogs or {}
+    seen_pairs, invalid_pairs = set(), set()
+
+    def reject_item(key, identifier, message):
+        if key in expected and key[0] in joint_catalogs:
+            invalid_pairs.add(key)
+            errors.append(f"joint {key}: {message}")
+            joint_catalogs[key[0]]["joint_view"]["errors"].append(message)
+        else:
+            reject(identifier, message)
+
     for position, raw in enumerate(response["items"]):
         identifier = raw.get("condition_id") if isinstance(raw, dict) else None
+        index = raw.get("item_index") if isinstance(raw, dict) else None
+        key = (index, identifier.strip()) if type(index) is int and isinstance(identifier, str) else None
+        duplicate = key in seen_pairs
+        if key in expected:
+            seen_pairs.add(key)
         try:
+            if duplicate:
+                raise ValueError("Scope candidate/condition pair is duplicated and cannot be restored")
             item_schema = (
                 CatalogItemScopeV2
                 if version == "catalog-v2"
                 else (CatalogItemScope if catalog_mode else ItemScope)
             )
             row = item_schema.model_validate(raw)
-            key = (row.item_index, row.condition_id)
-            if key not in expected or key in decisions:
+            parsed_key = (row.item_index, row.condition_id)
+            if row.item_index in joint_catalogs and key != parsed_key:
+                raise ValueError(
+                    "Joint item_index must be an original non-boolean integer with a canonical covered condition"
+                )
+            key = parsed_key
+            if key not in expected or key in decisions or key in invalid_pairs:
                 raise ValueError("Scope candidate/condition pair is unknown or duplicated")
+            item_catalog = joint_catalogs.get(row.item_index, catalog)
+            if row.item_index in joint_catalogs:
+                if version != "catalog-v2":
+                    raise ValueError("Joint candidates require the catalog-v2 source_uses contract")
+                if item_catalog["joint_view"]["errors"]:
+                    raise ValueError(
+                        "Joint source manifest is invalid: " + "; ".join(item_catalog["joint_view"]["errors"])
+                    )
+                validate_source_uses(
+                    item_catalog,
+                    row,
+                    materials,
+                    own_table_reference=_own_table_reference,
+                    has_label=_has_label,
+                    condition=allowed[row.condition_id],
+                )
+            elif isinstance(row, CatalogItemScopeV2) and row.source_uses:
+                raise ValueError("Single-source candidates cannot claim joint source_uses")
             if catalog_mode:
                 if row.condition_id not in conditions:
                     raise ValueError("Catalog operand has no validated condition scope")
-                row = _catalog_item(row, claim, materials, catalog, conditions[row.condition_id])
+                row = _catalog_item(row, claim, materials, item_catalog, conditions[row.condition_id])
             for passage in row.grounds:
                 _paper_pointer(materials, passage.block_id, passage.quote)
             decisions[key] = row
@@ -1374,12 +1768,14 @@ def _decode_scope(response, claim, materials, output, catalog):
                     "response_pointer": f"/response/items/{position}",
                 }
             )
-        except (ValueError, TypeError) as exc:
-            reject(identifier, str(exc))
-    for _, identifier in expected - decisions.keys():
-        reject(identifier, "Scope review must cover every candidate/condition pair exactly once")
+        except (ValueError, TypeError, KeyError) as exc:
+            reject_item(key, identifier, str(exc))
+    for key in expected - decisions.keys():
+        reject_item(key, key[1], "Scope review must cover every candidate/condition pair exactly once")
     conditions = {key: row for key, row in conditions.items() if key not in invalid}
-    decisions = {key: row for key, row in decisions.items() if key[1] not in invalid}
+    decisions = {
+        key: row for key, row in decisions.items() if key[1] not in invalid and key not in invalid_pairs
+    }
     return conditions, decisions, errors, locations
 
 
@@ -1527,15 +1923,23 @@ def _bound_prose_pair_choices(claim, materials, catalog):
     return choices
 
 
-def _scope_review(claim, materials, output, *, call, catalog):
+def _scope_review(claim, materials, output, *, call, catalog, joint_catalogs=None):
     """Independent semantic review; its grounded structural/numeric gates fail closed."""
     from common import run_stats
 
+    joint_catalogs = joint_catalogs or {}
     payload = {
         "claim": claim.model_dump(mode="json"),
         "paper_blocks": [block.model_dump() for block in materials.blocks],
         "candidate_items": [item.model_dump() for item in output.items],
+        "single_source_candidate_indices": [
+            index for index, item in enumerate(output.items) if not item.additional_sources
+        ],
         "catalog": catalog_prompt(catalog),
+        "joint_candidates": {
+            str(index): {"manifest": bounded["joint_view"], "catalog": catalog_prompt(bounded)}
+            for index, bounded in joint_catalogs.items()
+        },
         "bound_prose_pair_choices": _bound_prose_pair_choices(claim, materials, catalog),
         "scope_field_contract": {
             "setting_scopes": "Use only bare keys from this condition.settings; dataset, metric and settings.KEY are not valid keys.",
@@ -1555,6 +1959,9 @@ def _scope_review(claim, materials, output, *, call, catalog):
             "Do not defer to candidate detail or fully_supported_conditions. Return output_schema JSON, "
             "one conditions entry per claim condition and exactly one items entry per candidate item_index/covered condition. "
             "Review each candidate's ENTIRE item.quote; its optional comparison subquotes do not narrow that primary quote. "
+            "For an explicit additional_sources candidate, independently review the joint set of primary and additional exact sources for its ONE condition. Use only its joint_candidates[item_index].catalog IDs for grounds, cells, numbers, contexts and bridges. Global or another candidate's IDs are invalid. "
+            "For joint difference_number_id use only that candidate's assertion_numbers, which are the current condition's original assertion occurrences. These assertion selectors do not authorize observations, context, bridges or source_uses. Expected endpoints remain program-derived from original condition-scoped assertions and need not be declared supporting members. "
+            "Only for those joint candidates, return source_uses exactly once for each member_source_id, including the primary, with its roles and rationale. For every single_source_candidate_indices entry, additional_sources is empty and source_uses MUST be []; this also applies when that single-source review uses grounds or bridges. Use the global catalog for its normal grounds/comparisons; do not put its primary source in source_uses. result/metric_definition/setup_definition/table_reference roles must actually feed the corresponding number/cell/bridge; protocol and other_qualifier uses require grounded semantic review and do not prove numerical bindings. Do not combine or upgrade other partial candidates. Invalid manifests remain unverified. "
             "Use schema_version catalog-v2. Keep condition IDs exactly as supplied. Leave claim_quote empty: its existing identity is retained. "
             "Sources, cells, numbers and cases are program-generated choices. Source/cell/number arrays follow source_fields/cell_fields/number_fields in catalog; axes and original sentences are shared by ID. Number ordinal is its one-based position among numeric occurrences in that sentence. "
             "Distinguish descriptive reports (reported scores, hardware or duration) from controlled comparisons, "
@@ -1600,7 +2007,9 @@ def _scope_review(claim, materials, output, *, call, catalog):
             call=call,
         )
         audit["response"] = response
-        conditions, decisions, errors, locations = _decode_scope(response, claim, materials, output, catalog)
+        conditions, decisions, errors, locations = _decode_scope(
+            response, claim, materials, output, catalog, joint_catalogs
+        )
         audit["validated"] = not errors
         audit["item_locations"] = locations
         audit["binding_errors"] = errors
@@ -1694,6 +2103,7 @@ def _plan(claim: Claim, materials: SharedMaterials, candidate: PlanCandidate) ->
 def verify_experiments(
     claim: Claim, materials: SharedMaterials, *, call=None, scope_call=None
 ) -> BranchResult:
+    source_limit = joint_limit()
     output = ExperimentsOutput.model_validate(
         ask(
             "Check this experimental claim from the paper alone in five aspects: correspondence "
@@ -1711,6 +2121,8 @@ def verify_experiments(
             "metric, comparisons, and settings. A setup description or one component's result provides "
             "partial support when the condition asserts more. Leave the list empty then and explain the "
             "uncovered parts in detail. The paper's assertion by itself does not establish its conclusion. "
+            "When one located passage needs connected definitions/setup/results, you may propose ONE NEW paper_support item per condition with additional_sources (exact block_id/quote pairs). Such a joint candidate covers exactly one condition; its primary plus additional passages must together establish every qualifier before fully_supported_conditions can include it. Keep separate partial observations unchanged. Do not join disjoint passages into any quote or automatically merge partial flags. The configured joint_source_limit includes the primary source; do not exceed it. "
+            "Declare the COMPLETE member set in that candidate now. When a selected table relies on metric/setup definitions outside the table, include both those definitions and the exact manuscript passage explicitly referencing that numbered table to connect them. Definitions and the exact manuscript table reference may be different members; a definition need not repeat the table number. The cited passages must connect the same task, dataset and applicable settings; topic overlap alone is insufficient. One exact member may serve multiple roles; do not duplicate it. A table-reference passage emitted only as another partial item grants this joint candidate no access; the independent scope review cannot append it. Preserve missing-reference or unresolved-qualifier limitations and leave fully_supported_conditions empty when the complete condition is not established. "
             "Copy every quote verbatim as one contiguous substring of its selected paper block's text, "
             "and copy value_context verbatim from within quote. Preserve mathematical markup, whitespace, "
             "punctuation, and spelling exactly; do not normalize math, paraphrase, or join disjoint passages. "
@@ -1737,6 +2149,7 @@ def verify_experiments(
             {
                 "claim": claim.model_dump(mode="json"),
                 "allowed_condition_ids": [condition.id for condition in claim.conditions],
+                "joint_source_limit": source_limit,
                 "paper_blocks": [b.model_dump() for b in materials.blocks],
                 "repository_index": materials.repository.model_dump() if materials.repository else None,
                 "output_schema": ExperimentsOutput.model_json_schema(),
@@ -1750,11 +2163,28 @@ def verify_experiments(
     result = BranchResult(issues=output.issues)
     # Invalid first-pass source/coverage contracts still raise before an audit.
     for item in output.items:
-        _paper_pointer(materials, item.block_id, item.quote)
+        if not item.additional_sources:
+            _paper_pointer(materials, item.block_id, item.quote)
         _fully_supported(_covered(claim, item.covered), item.fully_supported_conditions)
     catalog = build_catalog(claim, materials) if output.items else None
+    joint_catalogs = {
+        index: prepare_joint_candidate(claim, materials, catalog, item, index, max_sources=source_limit)
+        for index, item in enumerate(output.items)
+        if item.additional_sources
+    }
+    by_condition = {}
+    for index, bounded in joint_catalogs.items():
+        by_condition.setdefault(bounded["joint_view"]["condition_id"], []).append(index)
+    for indices in by_condition.values():
+        if len(indices) > 1:
+            for index in indices:
+                joint_catalogs[index]["joint_view"]["errors"].append(
+                    "Each condition permits only one explicit joint candidate"
+                )
     scopes, decisions, scope_issue, scope_audit = (
-        _scope_review(claim, materials, output, call=scope_call or call, catalog=catalog)
+        _scope_review(
+            claim, materials, output, call=scope_call or call, catalog=catalog, joint_catalogs=joint_catalogs
+        )
         if output.items
         else ({}, {}, None, None)
     )
@@ -1762,6 +2192,14 @@ def verify_experiments(
         result.issues.append(scope_issue)
     condition_map = {condition.id: condition for condition in claim.conditions}
     for index, item in enumerate(output.items):
+        item_catalog = joint_catalogs.get(index, catalog)
+        view = item_catalog.get("joint_view") if item_catalog else None
+        additional_pointers = []
+        if view is not None:
+            result.issues.extend(f"Joint candidate {index}: {error}" for error in view["errors"])
+            if view["primary_source_id"] is None:
+                continue
+            additional_pointers = [m["pointer"] for m in view["members"] if m["ordinal"] > 0]
         required_aspect = {
             "missing_ablation": "isolation",
             "missing_statistic": "stability",
@@ -1771,7 +2209,14 @@ def verify_experiments(
         }.get(item.kind)
         if required_aspect and item.aspect != required_aspect:
             raise ValueError("Experimental concern is assigned to the wrong aspect")
-        pointer = _paper_pointer(materials, item.block_id, item.quote)
+        try:
+            pointer = _paper_pointer(materials, item.block_id, item.quote)
+        except ValueError as exc:
+            if view is None:
+                raise
+            view["errors"].append(f"Primary source became unavailable: {exc}")
+            result.issues.append(f"Joint candidate {index}: {view['errors'][-1]}")
+            continue
         covered = _covered(claim, item.covered)
         full_support = _fully_supported(covered, item.fully_supported_conditions)
         contrary = item.kind != "paper_support"
@@ -1851,7 +2296,7 @@ def verify_experiments(
                                 scope,
                                 decision,
                                 materials,
-                                catalog=catalog,
+                                catalog=item_catalog,
                                 mode="concern",
                                 require_comparison=item.kind == "small_gap_without_statistics",
                             )
@@ -1868,12 +2313,31 @@ def verify_experiments(
                         )
                     reasons.extend(
                         _numeric_scope_check(
-                            claim, condition_map[condition_id], scope, decision, materials, catalog=catalog
+                            claim,
+                            condition_map[condition_id],
+                            scope,
+                            decision,
+                            materials,
+                            catalog=item_catalog,
                         )
                     )
                 scope_notes.append(f"{condition_id}: {scope.assertion}; {decision.rationale}")
                 scope_notes.append(
                     f"{condition_id} scope_source_refs=[{_scope_sources(decision, materials)}]"
+                )
+            if view is not None:
+                try:
+                    revalidate_members(item_catalog, materials)
+                except (ValueError, OSError) as exc:
+                    reasons.append(str(exc))
+                if view["errors"]:
+                    reasons.extend(view["errors"])
+                view.setdefault("final_checks", []).append(
+                    {
+                        "condition_id": condition_id,
+                        "errors": list(reasons),
+                        "first_pass_full": condition_id in item.fully_supported_conditions,
+                    }
                 )
             if reasons:
                 message = f"Experimental {item.kind} scope unconfirmed for {condition_id}: " + "; ".join(
@@ -1902,6 +2366,7 @@ def verify_experiments(
                 Evidence(
                     source="paper_internal",
                     pointer=pointer,
+                    additional_pointers=additional_pointers,
                     covered=group,
                     direction="flaw" if contrary else "support",
                     sufficient=sufficient,
@@ -1917,6 +2382,12 @@ def verify_experiments(
                     claim_id=claim.id, text=f"Could you clarify the {item.aspect} concern?", reason=detail
                 )
             )
+    if scope_audit is not None and joint_catalogs:
+        audit = json.loads(scope_audit.read_text(encoding="utf-8"))
+        audit["joint_sources"] = {
+            str(index): bounded["joint_view"] for index, bounded in joint_catalogs.items()
+        }
+        scope_audit.write_text(json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8")
     try:
         result.plans = [_plan(claim, materials, candidate) for candidate in output.plans]
     except ValueError as exc:

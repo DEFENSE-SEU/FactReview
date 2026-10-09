@@ -29,6 +29,7 @@ class TableGrid(HTMLParser):
     def __init__(self, text):
         super().__init__(convert_charrefs=True)
         self.tables, self.rows, self.row, self.cell = [], None, None, None
+        self.headers, self.origins, self.metadata, self.in_thead = [], [], [], False
         self.feed(text)
         self.close()
         if self.rows is not None or self.row is not None or self.cell is not None:
@@ -39,6 +40,9 @@ class TableGrid(HTMLParser):
             if self.rows is not None:
                 raise ValueError("Nested tables have ambiguous numerical coordinates")
             self.rows = []
+            self.in_thead = False
+        elif tag == "thead" and self.rows is not None:
+            self.in_thead = True
         elif tag == "tr" and self.rows is not None:
             if self.row is not None:
                 raise ValueError("Unclosed table row")
@@ -53,7 +57,17 @@ class TableGrid(HTMLParser):
                 raise ValueError("Unsupported table span") from None
             if any(value < 1 or value > 100 for value in spans):
                 raise ValueError("Unsupported table span")
-            self.cell = [[], *spans]
+            self.cell = [
+                [],
+                *spans,
+                {
+                    "tag": tag,
+                    "thead": self.in_thead,
+                    "scope": (attrs.get("scope") or "").lower(),
+                    "rowspan": spans[0],
+                    "colspan": spans[1],
+                },
+            ]
 
     def handle_data(self, data):
         if self.cell is not None:
@@ -68,13 +82,15 @@ class TableGrid(HTMLParser):
                 raise ValueError("Unclosed table cell")
             self.rows.append(self.row)
             self.row = None
+        elif tag == "thead":
+            self.in_thead = False
         elif tag == "table" and self.rows is not None:
             if self.row is not None:
                 raise ValueError("Unclosed table row")
-            grid = {}
+            grid, headers, origins, metadata = {}, {}, {}, {}
             for row_index, row in enumerate(self.rows):
                 column = 0
-                for text, rowspan, colspan in row:
+                for text, rowspan, colspan, meta in row:
                     while (row_index, column) in grid:
                         column += 1
                     for y in range(row_index, row_index + rowspan):
@@ -82,8 +98,14 @@ class TableGrid(HTMLParser):
                             if (y, x) in grid:
                                 raise ValueError("Overlapping table spans")
                             grid[y, x] = text
+                            headers[y, x] = meta["tag"] == "th" or meta["thead"]
+                            origins[y, x] = (row_index, column)
+                            metadata[y, x] = meta.copy()
                     column += colspan
             self.tables.append(grid)
+            self.headers.append(headers)
+            self.origins.append(origins)
+            self.metadata.append(metadata)
             self.rows = None
 
 
@@ -337,7 +359,12 @@ def resolve_source(catalog: dict, source_id: str, materials: SharedMaterials) ->
     start, end = source["start"], source["end"]
     if not 0 <= start < end <= len(block.text):
         raise ValueError("Invalid catalog source span")
-    return {**copy.deepcopy(source), "quote": block.text[start:end]}
+    result = {**copy.deepcopy(source), "quote": block.text[start:end]}
+    if catalog.get("joint_view") is not None:
+        from verification.experiment_sources import require_passage
+
+        require_passage(catalog, materials, result["block_id"], result["quote"], purpose="catalog_source")
+    return result
 
 
 def resolve_cell(catalog: dict, cell_id: str, materials: SharedMaterials) -> dict:
@@ -363,6 +390,23 @@ def resolve_cell(catalog: dict, cell_id: str, materials: SharedMaterials) -> dic
         if table["caption_source_id"]
         else ""
     )
+    if "joint_view" in catalog:
+        record = {
+            "kind": "cell",
+            "selected_id": cell_id,
+            "parent_cell_id": cell["parent_cell_id"],
+            "origin_table_id": cell["origin_table_id"],
+            "origin_table_index": cell["origin_table_index"],
+            "quote_table_index": cell["table"],
+            "row": cell["row"],
+            "column": cell["column"],
+            "token": cell["token"],
+            "source_id": cell["source_id"],
+            "caption_source_id": table["caption_source_id"],
+        }
+        trace = catalog["joint_view"].setdefault("selector_consumption", [])
+        if record not in trace:
+            trace.append(record)
     return {
         **copy.deepcopy(cell),
         "block_id": source["block_id"],
@@ -406,6 +450,18 @@ def catalog_prompt(catalog: dict) -> dict:
             sentence_key,
             ordinals[sentence_key],
         ]
+    assertion_numbers = {}
+    for identifier, record in catalog.get("assertion_numbers", {}).items():
+        sentence_key = sentence_id(record)
+        sentences[sentence_key] = record["sentence"]
+        assertion_numbers[identifier] = [
+            record["block_id"],
+            record["token"],
+            record["unit_suffix"],
+            sentence_key,
+            record["start"],
+            record["end"],
+        ]
     axes = {}
 
     def axis_id(text):
@@ -438,9 +494,32 @@ def catalog_prompt(catalog: dict) -> dict:
         "cells": cells,
         "number_fields": number_fields,
         "numbers": numbers,
+        **(
+            {
+                "assertion_number_fields": [
+                    "block_id",
+                    "token",
+                    "unit_suffix",
+                    "sentence_id",
+                    "original_start",
+                    "original_end",
+                ],
+                "assertion_numbers": assertion_numbers,
+            }
+            if "joint_view" in catalog
+            else {}
+        ),
         "sentences": sentences,
         "axes": axes,
         "tables": copy.deepcopy(catalog["tables"]),
         "conditions": copy.deepcopy(catalog["conditions"]),
         "issues": list(catalog["issues"]),
+        **(
+            {
+                "candidate_id": catalog["joint_view"]["candidate_id"],
+                "member_source_ids": catalog["joint_view"]["member_source_ids"],
+            }
+            if "joint_view" in catalog
+            else {}
+        ),
     }
