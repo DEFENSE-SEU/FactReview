@@ -209,7 +209,14 @@ class TheoryItem(Contract):
         json_schema_extra={"uniqueItems": True},
     )
     fully_supported_conditions: list[NonEmpty] = Field(
-        default_factory=list, description=FULL_SUPPORT_DESCRIPTION, json_schema_extra={"uniqueItems": True}
+        default_factory=list,
+        description=(
+            FULL_SUPPORT_DESCRIPTION
+            + " For Theory, the evidence item includes its complete attached trace, whose exact sources "
+            "may span multiple blocks already supplied in this pass. The primary quote/step locates "
+            "one concrete step; the complete trace must establish the entire condition."
+        ),
+        json_schema_extra={"uniqueItems": True},
     )
     kind: Literal["derivation", "missing_assumption", "edge_case", "notation", "no_proof"]
     direction: Literal["support", "flaw"]
@@ -266,7 +273,12 @@ lists this claim's condition IDs. Never use claim.id, block IDs, datasets, or me
 Only include conditions the item actually addresses. Omit items that cannot be tied to an
 allowed condition; return items=[] when none can be grounded.
 For support, explicitly list fully_supported_conditions only when this item establishes the
-ENTIRE condition, including every relevant qualifier of the claim. Relatedness, a component
+ENTIRE condition through its complete attached trace, including every relevant qualifier of
+the claim. A single trace may combine definitions and steps from multiple already supplied
+blocks, with each assumption/step separately source-bound. Its primary quote and step_quote
+still locate one exact contiguous original step; that primary passage need not contain all
+premises of the complete trace. Do not automatically combine separate partial items or
+upgrade their flags. Relatedness, a component
 equation, and partial agreement alone leave that list empty. Explain any uncovered parts in
 detail. A design equation or implementation cannot establish historical novelty, superiority,
 artifact availability, or an unanalyzed extension. Do not fully support those conditions from
@@ -397,6 +409,7 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
     result = BranchResult(theory_derivations=records, issues=list(sections.issues))
     active_cfg = second_cfg if first.appendix_block_ids else first_cfg
     concerns = []
+    parser_artifacts: dict[str, list[str]] = {}
     anchors = {
         condition.id: [
             (block.id, quote) for block, quote in _claim_anchors(claim, materials, condition.id, sections)
@@ -524,6 +537,11 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
                 result.issues.append(
                     f"Notation flaw suppressed for block {item.block_id}: {review.classification}; {review.explanation}"
                 )
+                if review.classification == "parser_artifact":
+                    for condition_id in covered:
+                        blocks = parser_artifacts.setdefault(condition_id, [])
+                        if item.block_id not in blocks:
+                            blocks.append(item.block_id)
                 continue
             note += f"; original PDF page {pointer.page} confirmed: {review.explanation}"
             notation_confirmation = {
@@ -618,5 +636,27 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
                         note=f"{candidate['note']}; concern review {detail}; scope_audit={review.audit_pointer}",
                     )
                 )
+    supported = {
+        condition_id
+        for evidence in result.evidence
+        if evidence.source == "theory" and evidence.direction == "support" and evidence.sufficient
+        for condition_id in evidence.covered
+    }
+    for condition_id, blocks in parser_artifacts.items():
+        if condition_id not in supported:
+            result.verification_limitations.append(
+                VerificationLimitation(
+                    claim_id=claim.id,
+                    condition_ids=[condition_id],
+                    stage="Theory",
+                    kind="source_context_unavailable",
+                    reason=(
+                        f"Original PDF confirmation identified parser_artifact in {', '.join(blocks)}; "
+                        "after suppressing that observation, this condition still lacks sufficient "
+                        "Theory proof verification. The parsing discrepancy does not establish an "
+                        "author defect or a completed proof."
+                    ),
+                )
+            )
     frozen.check(claim, materials)
     return result
