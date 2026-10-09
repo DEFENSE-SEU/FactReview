@@ -712,8 +712,27 @@ def verify_theory(
         from verification.theory_visual import recheck
 
         frozen.check(claim, materials)
+        visual_ids = set(loaded_ids)
+        proof_ids = {target["item"].block_id for target in visual_targets}
+        preceding = None
+        for block in frozen.blocks.values():
+            if block["id"] in proof_ids and preceding is not None:
+                page = (block.get("loc") or {}).get("page")
+                if page is not None and (preceding.get("loc") or {}).get("page") == page:
+                    # Only supply the frozen region title. Its existing consumer
+                    # still checks exact span, identity, position and uniqueness.
+                    # Retain same-page duplicates so ambiguity cannot disappear.
+                    visual_ids.update(
+                        candidate["id"]
+                        for candidate in frozen.blocks.values()
+                        if candidate.get("kind") == "heading"
+                        and candidate["text"] == preceding["text"]
+                        and (candidate.get("loc") or {}).get("page") == page
+                    )
+            if block.get("kind") == "heading":
+                preceding = block
         visual_context = derivations.SourceContext.capture(
-            claim, materials, [block for block in materials.blocks if block.id in loaded_ids]
+            claim, materials, [block for block in materials.blocks if block.id in visual_ids]
         )
         # Reuse the baseline captured before any model callback, including page pixels.
         visual_context.paths = frozen.paths

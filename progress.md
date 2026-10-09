@@ -1,8 +1,14 @@
 # FactReview v2 progress
 
+## Current phase 4: frozen proof heading and genuine-paper coverage
+
+The visual Theory input now carries the same-page region heading for its selected proof, using the complete original `SourceContext` frozen before any model callback. The existing heading consumer still decides identity, position and uniqueness, including duplicate candidates. The 20-line addition changes no scientific sufficiency rule. Three necessary mocked controls pass. A fixed replay of the four original 70088 responses adds only block14 to the supplied allowed blocks and validates the original complete visual derivation; the original actual remains Unverified and all 423 artifacts are unchanged. Evidence: `runs/v2_method_delivery/theory-heading-context-70088/`. Root reviewed the delta without repeating tests.
+
+The maintainer's extraction-coverage concern is an active priority. The ten-claim result was from a two-page, roughly 365-word synthetic integration input; subsequent reports must state that scope explicitly. The genuine FixMatch input is 21 pages, with 244 material blocks and 60 extracted claims. An independent source-based coverage review is checking the actual paper and a separate architecture review is identifying the smallest auditable coverage improvement. No fixed count target or speculative claim inflation is permitted. The original full-text extraction has no count cap; its exact-source checks do not prove semantic coverage.
+
 ## Latest actual outcome and delivery: 70088
 
-The complete `full-native-verified-v2/actual-70088f3cae19` run finished on immutable `407ec8a`: seven completed stages, ten claims (five Supported/five Unverified), zero plans/Docker attempts, 44 logical model calls and 249436 known tokens. Three pre-response TLS EOF failures retain unknown usage. Its eight failed gates include the table VLM/retrieval service failures, execution/alignment/cleanup coverage and complete model/usage accounting. The original inputs, responses and verdicts are retained. Independent final reviews are underway.
+The complete `full-native-verified-v2/actual-70088f3cae19` run used the two-page synthetic integration input and finished on immutable `407ec8a`: seven completed stages, ten claims (five Supported/five Unverified), zero plans/Docker attempts, 44 logical model calls and 249436 known tokens. Three pre-response TLS EOF failures retain unknown usage. Its eight failed gates include the table VLM/retrieval service failures, execution/alignment/cleanup coverage and complete model/usage accounting. The original inputs, responses and verdicts are retained. Independent final reviews are complete.
 
 The finite-language correction is committed as `77b8cd6`; the bounded pre-stream retry is `98814bc4cb3b04aa7fdbcb8d2286c8b02976d66a`. Both are pushed on `refactor/method-v2`, with the exact remote HEAD verified. No new PR was opened. Necessary targeted checks were delegated; no repeated whole-suite run occurred.
 
