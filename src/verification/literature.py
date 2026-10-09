@@ -11,9 +11,11 @@ from typing import Any
 from urllib.parse import unquote, urlsplit
 
 from fact_generation.positioning.paper_search import PaperReadConfig, PaperSearchAdapter, PaperSearchConfig
-from llm.client import llm_json, resolve_llm_config
+from llm.client import LLMConfig, llm_json, resolve_llm_config
 from schemas.claim import AuthorQuestion, Claim, Evidence, EvidencePointer, Finding
+from schemas.limitations import VerificationLimitation
 from schemas.materials import SharedMaterials
+from screening.visual_audit import redacted_record, redaction_scope
 from util.cutoff_date import (
     concurrent_window_start,
     parse_submission_deadline,
@@ -573,6 +575,10 @@ async def verify_literature(
     support. The caller can inject all remote boundaries in unit tests.
     """
     result = BranchResult()
+    directory = output_dir or Path(materials.markdown_path).parent / "verification" / "literature"
+    filename = re.sub(r"[^a-zA-Z0-9_-]", "_", claim.id if claim else "global") + "-search-audit.json"
+    path = (directory / filename).resolve()
+    condition_ids = {condition.id for condition in claim.conditions} if claim else set()
     try:
         deadline = parse_submission_deadline(submission_deadline)
     except ValueError as exc:
@@ -595,6 +601,29 @@ async def verify_literature(
         adapter = _default_adapter()
         searcher = searcher or adapter
         reader = reader or adapter
+    diagnostic_configs = []
+    for boundary in (searcher, reader):
+        for name in ("search_cfg", "read_cfg"):
+            config = getattr(boundary, name, None)
+            for prefix in ("", "semantic_scholar_", "openalex_"):
+                base_url = getattr(config, prefix + "base_url", None)
+                api_key = getattr(config, prefix + "api_key", None)
+                if isinstance(base_url, str) or isinstance(api_key, str):
+                    diagnostic_configs.append(
+                        LLMConfig(
+                            "diagnostic",
+                            "diagnostic",
+                            base_url if isinstance(base_url, str) else None,
+                            api_key if isinstance(api_key, str) else None,
+                        )
+                    )
+
+    def diagnostic_copy(value):
+        # Raw metadata, passages and model output have already been validated;
+        # only copied audit records and explanatory diagnostics are redacted.
+        with redaction_scope(diagnostic_configs):
+            return redacted_record(value, None)
+
     citation_issues = []
     candidates = {
         _identifier(row) or f"unresolved-cited-{idx}": row
@@ -625,7 +654,57 @@ async def verify_literature(
         "query_terms": _literature_terms(claim, materials),
         "query_intents": list(_QUERY_INTENTS) if queries else [],
         "citation_issues": citation_issues,
+        "context_events": [],
     }
+
+    def context_event(
+        operation,
+        identifier,
+        category,
+        covered,
+        error,
+        pointer,
+        *,
+        response=None,
+        boundary=None,
+        limited=False,
+        limitation_kind="source_context_unavailable",
+    ):
+        """Keep operation failures separate from bibliographic/content conclusions."""
+        ids = sorted(set(covered) & condition_ids)
+        provider = response.get("provider") if isinstance(response, dict) else None
+        if not isinstance(provider, str) or not provider:
+            config = getattr(boundary, "read_cfg" if operation == "read_papers" else "search_cfg", None)
+            provider = getattr(config, "provider", None)
+        if isinstance(boundary, PaperSearchAdapter):
+            if operation == "lookup_metadata" or (
+                operation == "read_papers" and not boundary.read_cfg.base_url
+            ):
+                provider = "arxiv"
+        provider = provider if isinstance(provider, str) and provider else "unknown"
+        event = {
+            "operation": operation,
+            "identifier": identifier,
+            "provider": provider,
+            "category": category,
+            "condition_ids": ids,
+            "error": str(error),
+            "pointer": f"{path}#/{pointer}",
+            "system_limited": bool(limited and ids),
+        }
+        audit["context_events"].append(event)
+        if claim and limited and ids:
+            result.verification_limitations.append(
+                VerificationLimitation(
+                    claim_id=claim.id,
+                    condition_ids=ids,
+                    stage="Literature",
+                    kind=limitation_kind,
+                    reason=f"{operation} ({category}) for {identifier or 'submitted comparison'}, provider={provider}: {error}. Audit: {event['pointer']}",
+                )
+            )
+
+    unresolved_citation_ids = set()
     self_exclusion_available = bool(
         _title_tokens(materials.title) or len(" ".join(materials.abstract.split())) >= 80
     )
@@ -639,16 +718,64 @@ async def verify_literature(
     audit["novelty_condition_ids"] = sorted(novelty_ids)
     adequate = len(queries) == 3 and self_exclusion_available and source_available and not citation_issues
     for query in queries:
+        failure_category = None
         try:
             response = await _invoke(getattr(searcher, "search", searcher), query=query, cutoff_date=deadline)
         except Exception as exc:
             response = {"success": False, "error": f"{type(exc).__name__}: {exc}", "papers": []}
+            failure_category = "service_failure"
         if not isinstance(response, dict):
+            raw_response = response
             response = {"success": False, "error": "invalid search response", "papers": []}
+            failure_category = "search_protocol_failure"
+        else:
+            raw_response = response
         audit["queries"].append({"query": query, "response": response})
+        if raw_response is not response:
+            audit["queries"][-1]["raw_response"] = raw_response
+        if not failure_category and (response.get("success") is False or response.get("error")):
+            failure_category = "service_failure"
+        if failure_category:
+            context_event(
+                "search",
+                query,
+                failure_category,
+                novelty_ids,
+                response.get("error") or "Search was unsuccessful",
+                f"queries/{len(audit['queries']) - 1}",
+                response=response,
+                boundary=searcher,
+                limited=True,
+            )
         papers = response.get("papers")
         question_results = response.get("question_results", [])
         valid_rows = isinstance(papers, list) and all(isinstance(row, dict) for row in papers)
+        if not failure_category:
+            malformed = (
+                response.get("success") is not True
+                or not valid_rows
+                or not isinstance(question_results, list)
+                or not all(isinstance(row, dict) for row in question_results)
+            )
+            failed_queries = (
+                [row for row in question_results if row.get("success") is False or row.get("error")]
+                if not malformed
+                else []
+            )
+            if malformed or failed_queries:
+                context_event(
+                    "search",
+                    query,
+                    "search_protocol_failure" if malformed else "service_failure",
+                    novelty_ids,
+                    "Malformed search result"
+                    if malformed
+                    else json.dumps(failed_queries, ensure_ascii=False),
+                    f"queries/{len(audit['queries']) - 1}",
+                    response=response,
+                    boundary=searcher,
+                    limited=True,
+                )
         complete = (
             valid_rows
             and isinstance(question_results, list)
@@ -700,10 +827,21 @@ async def verify_literature(
     read_rows = []
     seen = set()
     for candidate in candidates.values():
+        citation_ids = candidate.get("citation_condition_ids", [])
         if not self_exclusion_available:
             audit["excluded"].append({"paper": candidate, "reason": "self_exclusion_unavailable"})
             continue
         paper_id = _identifier(candidate)
+        if candidate.get("cited") and not paper_id:
+            unresolved_citation_ids.update(citation_ids)
+            context_event(
+                "citation_binding",
+                "",
+                "unresolved_identifier",
+                citation_ids,
+                "The original citation has no resolvable identifier",
+                "citation_issues",
+            )
         if paper_id and paper_id in seen:
             continue
         seen.add(paper_id)
@@ -725,13 +863,36 @@ async def verify_literature(
         ):
             lookup = getattr(searcher, "lookup_metadata", None)
             if callable(lookup):
+                failure_category = None
                 try:
                     response = await _invoke(lookup, identifier=paper_id)
                 except Exception as exc:
                     response = {"success": False, "error": f"{type(exc).__name__}: {exc}"}
+                    failure_category = "service_failure"
                 if not isinstance(response, dict):
+                    raw_response = response
                     response = {"success": False, "error": "invalid metadata response"}
+                    failure_category = "metadata_protocol_failure"
+                else:
+                    raw_response = response
                 audit["metadata_lookups"].append({"id": paper_id, "response": response})
+                metadata_pointer = f"metadata_lookups/{len(audit['metadata_lookups']) - 1}"
+                if raw_response is not response:
+                    audit["metadata_lookups"][-1]["raw_response"] = raw_response
+                if not failure_category and (response.get("success") is False or response.get("error")):
+                    failure_category = "service_failure"
+                if failure_category:
+                    context_event(
+                        "lookup_metadata",
+                        paper_id,
+                        failure_category,
+                        citation_ids,
+                        response.get("error") or "Metadata lookup was unsuccessful",
+                        metadata_pointer,
+                        response=response,
+                        boundary=searcher,
+                        limited=True,
+                    )
                 metadata = response.get("paper")
                 returned = _identifier(metadata) if isinstance(metadata, dict) else ""
                 requested = paper_id.removeprefix("arXiv:").removeprefix("arxiv:")
@@ -764,6 +925,18 @@ async def verify_literature(
                         continue
                 else:
                     adequate = False
+                    if not failure_category:
+                        context_event(
+                            "lookup_metadata",
+                            paper_id,
+                            "identity_conflict" if returned and not same_id else "metadata_protocol_failure",
+                            citation_ids,
+                            "Metadata response did not establish the requested identity",
+                            metadata_pointer,
+                            response=response,
+                            boundary=searcher,
+                            limited=True,
+                        )
                     result.issues.append(
                         f"Citation metadata lookup failed or returned a different identifier: {paper_id}."
                     )
@@ -794,6 +967,9 @@ async def verify_literature(
             _merge_citation_binding(existing_read, candidate)
             _merge_citation_binding(existing_read["paper"], candidate)
             continue
+        failure_category = None
+        failure_error = ""
+        item = {}
         try:
             response = await _invoke(
                 getattr(reader, "read_papers", reader),
@@ -804,28 +980,71 @@ async def verify_literature(
                     }
                 ],
             )
-            items = response.get("items") if isinstance(response, dict) else None
+        except Exception as exc:
+            response = {"success": False, "error": f"{type(exc).__name__}: {exc}"}
+            failure_category = "service_failure"
+        items = response.get("items") if isinstance(response, dict) else None
+        if failure_category or (
+            isinstance(response, dict) and (response.get("success") is False or response.get("error"))
+        ):
+            failure_category = "service_failure"
+            failure_error = response.get("error") or "Reader was unsuccessful"
+        else:
             if (
                 not isinstance(response, dict)
                 or response.get("success") is not True
                 or response.get("error")
                 or not isinstance(items, list)
             ):
-                raise ValueError("Reader returned an unsuccessful or malformed response")
-            item = next(
-                (
-                    row
-                    for row in items
-                    if isinstance(row, dict)
-                    and row.get("success") is True
-                    and not row.get("error")
-                    and _read_id_matches(str(row.get("id") or ""), paper_id, candidate)
-                ),
-                {},
-            )
-        except Exception as exc:
-            response, item = {"success": False, "error": f"{type(exc).__name__}: {exc}"}, {}
+                failure_category, failure_error = (
+                    "reader_protocol_failure",
+                    "Reader returned an unsuccessful or malformed response",
+                )
+            else:
+                item = next(
+                    (
+                        row
+                        for row in items
+                        if isinstance(row, dict)
+                        and row.get("success") is True
+                        and not row.get("error")
+                        and _read_id_matches(str(row.get("id") or ""), paper_id, candidate)
+                    ),
+                    {},
+                )
+                if not item:
+                    failed = next(
+                        (
+                            row
+                            for row in items
+                            if isinstance(row, dict)
+                            and _read_id_matches(str(row.get("id") or ""), paper_id, candidate)
+                            and (row.get("success") is False or row.get("error"))
+                        ),
+                        None,
+                    )
+                    failure_category = "service_failure" if failed else "reader_protocol_failure"
+                    failure_error = (
+                        (failed.get("error") or "Requested reader item was unsuccessful")
+                        if failed
+                        else "Reader returned no successful item bound to the requested identifier"
+                    )
         audit["reads"].append({"id": paper_id, "response": response})
+        read_pointer = f"reads/{len(audit['reads']) - 1}"
+        if failure_category:
+            context_event(
+                "read_papers",
+                paper_id,
+                failure_category,
+                citation_ids,
+                failure_error,
+                read_pointer,
+                response=response,
+                boundary=reader,
+                limited=True,
+            )
+            adequate = False
+            result.issues.append(f"Literature read failed for {paper_id}: {failure_error}")
         metadata = item.get("paper") if isinstance(item.get("paper"), dict) else {}
         reader_identity_verified = bool(item)
         if _reader_identity_conflict(metadata, paper_id, candidate) or not _safe_paper(metadata):
@@ -833,6 +1052,17 @@ async def verify_literature(
             message = f"Reader returned conflicting paper identity or a prohibited review URL for {paper_id}; its metadata and passages were rejected."
             result.issues.append(message)
             audit["reads"][-1]["identity_rejected"] = True
+            context_event(
+                "read_papers",
+                paper_id,
+                "identity_conflict",
+                citation_ids,
+                message,
+                read_pointer,
+                response=response,
+                boundary=reader,
+                limited=True,
+            )
             # Retain only the independently retrieved original abstract fallback.
             item, metadata = {}, {}
             reader_identity_verified = False
@@ -871,6 +1101,16 @@ async def verify_literature(
             result.issues.append(
                 f"Full-text reading unavailable for {paper_id}; only a retrieved abstract may be used."
             )
+            context_event(
+                "read_papers",
+                paper_id,
+                "abstract_only" if passages else "no_passage",
+                citation_ids,
+                "No full-text passage was available",
+                read_pointer,
+                response=response,
+                boundary=reader,
+            )
         if not passages or not _locator(paper):
             adequate = False
             result.issues.append(f"No verifiable literature passage could be read for {paper_id}.")
@@ -898,6 +1138,7 @@ async def verify_literature(
         for row in read_rows
     ]
     comparisons = []
+    comparison_response_valid = False
     if read_rows:
         payload = {
             "claim": claim.model_dump(mode="json") if claim else None,
@@ -912,14 +1153,21 @@ async def verify_literature(
             ],
         }
         prompt = _SYSTEM + "\nDATA_JSON:\n" + json.dumps(payload, ensure_ascii=False)
+        comparison_exception = False
+        cfg = None
         try:
+            cfg = resolve_llm_config()
+            if cfg is not None:
+                diagnostic_configs.append(cfg)
             response = (call or llm_json)(
-                prompt=prompt, system=_SYSTEM, cfg=resolve_llm_config(), module="verification_literature"
+                prompt=prompt, system=_SYSTEM, cfg=cfg, module="verification_literature"
             )
             if inspect.isawaitable(response):
                 response = await response
         except Exception as exc:
             response = {"status": "error", "error": str(exc)}
+            comparison_exception = True
+        audit["comparison_response"] = response
         if (
             isinstance(response, dict)
             and response.get("status") == "ok"
@@ -928,15 +1176,33 @@ async def verify_literature(
             and all(isinstance(row, dict) for row in response["comparisons"])
         ):
             comparisons = response["comparisons"]
+            comparison_response_valid = True
         else:
             adequate = False
             result.issues.append("Literature comparison model returned no valid comparison result.")
+            sent_ids = novelty_ids | {cid for row in read_rows for cid in row["citation_condition_ids"]}
+            service_failure = comparison_exception or (
+                isinstance(response, dict) and (response.get("status") == "error" or response.get("error"))
+            )
+            context_event(
+                "comparison",
+                "",
+                "service_failure" if service_failure else "comparison_protocol_failure",
+                sent_ids,
+                response.get("error")
+                if isinstance(response, dict) and response.get("error")
+                else "No valid comparison response",
+                "comparison_response",
+                response={"provider": getattr(cfg, "provider", None)},
+                limited=True,
+            )
     audit["comparisons"] = comparisons
     by_id = {row["paper_id"]: row for row in read_rows}
     compared_different = set()
     different_coverage: dict[str, set[str]] = {}
     novelty_concern = False
-    condition_ids = {condition.id for condition in claim.conditions} if claim else set()
+    compared_citation_ids = set()
+    content_question_sources: dict[str, set[str]] = {}
     location = claim.loc if claim else next((block.loc for block in materials.blocks if block.loc), None)
     for row in read_rows:
         if row["period"] == "concurrent" and location:
@@ -1035,6 +1301,11 @@ async def verify_literature(
                 "concurrent",
             }:
                 continue
+            if row["reader_identity_verified"]:
+                compared_citation_ids.update(covered)
+                if relation in {"contradicts", "unclear"}:
+                    for condition_id in covered:
+                        content_question_sources.setdefault(condition_id, set()).add(row["paper_id"])
             result.evidence.append(
                 Evidence(
                     source="literature",
@@ -1125,11 +1396,34 @@ async def verify_literature(
         "supported_novelty_conditions": supported_novelty_ids,
     }
     audit["search_scope"] = json.dumps(scope, ensure_ascii=False, sort_keys=True)
-    directory = output_dir or Path(materials.markdown_path).parent / "verification" / "literature"
+    unresolved_comparisons = (
+        {
+            cid
+            for row in read_rows
+            if row["cited"] and row["reader_identity_verified"]
+            for cid in row["citation_condition_ids"]
+        }
+        - compared_citation_ids
+        if comparison_response_valid
+        else set()
+    )
+    if unresolved_comparisons:
+        message = "No accepted citation comparison resolved conditions " + ", ".join(
+            sorted(unresolved_comparisons)
+        )
+        result.issues.append(message + "; the comparison remains a verification limitation.")
+        context_event(
+            "comparison",
+            "",
+            "comparison_unresolved",
+            unresolved_comparisons,
+            message,
+            "comparisons",
+            limited=True,
+            limitation_kind="evidence_validation_failed",
+        )
     directory.mkdir(parents=True, exist_ok=True)
-    filename = re.sub(r"[^a-zA-Z0-9_-]", "_", claim.id if claim else "global") + "-search-audit.json"
-    path = (directory / filename).resolve()
-    path.write_text(json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8")
+    path.write_text(json.dumps(diagnostic_copy(audit), ensure_ascii=False, indent=2), encoding="utf-8")
     if supported_novelty_ids:
         result.evidence.append(
             Evidence(
@@ -1145,16 +1439,42 @@ async def verify_literature(
         result.issues.append(
             "Novelty search is insufficient for support-by-absence; search scope: " + str(path)
         )
-    if (
-        claim
-        and any(row.get("cited") for row in candidates.values())
-        and not any(item.direction == "support" for item in result.evidence)
-    ):
+    limited_ids = {cid for limitation in result.verification_limitations for cid in limitation.condition_ids}
+    supported_ids = {cid for item in result.evidence if item.direction == "support" for cid in item.covered}
+    for condition_id, paper_ids in sorted(content_question_sources.items()):
+        if claim and condition_id not in supported_ids:
+            result.questions.append(
+                AuthorQuestion(
+                    claim_id=claim.id,
+                    text=f"How do the passages read from {', '.join(sorted(paper_ids))} support condition {condition_id} under its stated assumptions?",
+                    reason=f"An accepted comparison of these read passages did not establish citation support for condition {condition_id}.",
+                )
+            )
+    question_ids = sorted(
+        unresolved_citation_ids - limited_ids - supported_ids - set(content_question_sources)
+    )
+    if claim and question_ids:
         result.questions.append(
             AuthorQuestion(
                 claim_id=claim.id,
-                text="Which passages in the cited works support this claim under its stated conditions?",
-                reason="Citation support could not be established from the available retrieved passages.",
+                text="Which passages in the cited works support this claim under conditions "
+                + ", ".join(question_ids)
+                + "?",
+                reason="Citation support remains unresolved for conditions "
+                + ", ".join(question_ids)
+                + "; see the accepted content comparisons or unresolved original citation identifiers.",
             )
         )
+    result.issues = diagnostic_copy(result.issues)
+    for evidence in result.evidence:
+        evidence.note = diagnostic_copy(evidence.note)
+    for finding in result.findings:
+        finding.text = diagnostic_copy(finding.text)
+        for evidence in finding.evidence:
+            evidence.note = diagnostic_copy(evidence.note)
+    for question in result.questions:
+        question.text = diagnostic_copy(question.text)
+        question.reason = diagnostic_copy(question.reason)
+    for limitation in result.verification_limitations:
+        limitation.reason = diagnostic_copy(limitation.reason)
     return result
