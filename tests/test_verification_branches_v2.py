@@ -295,7 +295,11 @@ def test_theory_missing_proof_yields_question_without_support(
             }
         ),
     )
-    assert result.evidence == [] and result.questions and result.issues
+    assert result.evidence == [] and not result.questions and result.issues
+    assert len(result.verification_limitations) == 1
+    assert result.verification_limitations[0].kind == "source_context_unavailable"
+    assert result.verification_limitations[0].condition_ids == ["a"]
+    assert result.verification_limitations[0].responsibility == "system"
 
 
 @pytest.mark.parametrize(
