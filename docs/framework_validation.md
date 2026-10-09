@@ -2,6 +2,12 @@
 
 The acceptance gate remains the 14 requirements in `checks.md`. The commands below add complementary integration coverage through the current v2 pipeline and save explicit service boundaries. They use synthetic inputs and do not estimate review accuracy, false accusations, false support, or performance on published benchmarks.
 
+## Current method delivery checks
+
+`tests/test_pipeline_partial_delivery_v2.py` injects extraction, verification and execution failures through the public pipeline. It checks retained independent findings, immutable claim snapshots, explicit partial JSON/Markdown/SVG, failure statistics, saved execution ledgers and absent execution evidence after failed adoption. Historical materials without table crops show unavailable coverage. All service boundaries are mocked.
+
+`tests/test_table_vision_v2.py` covers table crops, printed dimensions, captions/notes/body references and per-table failure isolation. `tests/test_report_advice_v2.py` checks status-conditioned advice, local references, unchanged assessments, stale-source rejection, unavailable audit storage and usage. `tests/test_codex_stream_lifecycle.py` and `tests/test_execution_audit_isolation_v2.py` check terminal stream outcomes and container separation from host audit records. These are interface/failure controls; real model decisions require separate saved evaluations.
+
 ## Offline integration matrix
 
 Install the development/runtime dependencies described in the README, then run:

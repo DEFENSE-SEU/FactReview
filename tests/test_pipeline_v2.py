@@ -43,6 +43,7 @@ def offline_boundaries(monkeypatch):
 
     monkeypatch.setattr("screening.claims.resolve_llm_config", cfg)
     monkeypatch.setattr("screening.checks.resolve_llm_config", cfg)
+    monkeypatch.setattr("review.report.advice.resolve_llm_config", cfg)
     monkeypatch.setattr(literature, "resolve_llm_config", cfg)
     monkeypatch.setattr("screening.claims.llm_json", forbidden)
     monkeypatch.setattr("screening.checks.llm_json", forbidden)
@@ -122,6 +123,27 @@ class ModelBoundary:
     def __call__(self, **kwargs):
         module = kwargs["module"]
         self.calls.append(module)
+        if module == "report_generation":
+            data = json.loads(kwargs["prompt"].split("\nADVICE_DATA_JSON:\n", 1)[1])
+            claim = data["claim"]
+            assert claim["status"] == "supported"
+            run_stats.record_llm_call(
+                module=module,
+                provider="mock",
+                model="fixture",
+                usage={"input_tokens": 7, "output_tokens": 3, "total_tokens": 10},
+            )
+            return {
+                "status": "ok",
+                "claim_id": claim["id"],
+                "items": [
+                    {
+                        "text": "Use the recorded support under the stated conditions.",
+                        "condition_ids": [c["id"] for c in claim["conditions"]],
+                        "basis_refs": [key for key in data["basis"] if key.startswith("/evidence/")],
+                    }
+                ],
+            }
         if module == "screening.claims":
             payload = json.loads(kwargs["prompt"].split("\nPAPER_DATA_JSON:\n", 1)[1])
             block = next(b for b in payload["blocks"] if "A test MRR" in b["text"])
@@ -390,8 +412,21 @@ def test_real_v2_stages_with_mocked_external_services_render_pdf_and_svg(tiny_in
     }.issubset(model.calls)
     assert all(deadline == "2021-01-31" for _, deadline in retrieval.queries)
     assert model.calls.count("screening.claims") == 1
-    assert not any("report" in name for name in model.calls)
+    assert model.calls.count("report_generation") == 4
+    assert summary["advice"] == {"generated": 4, "unavailable": 0}
+    assert summary["table_coverage"] == {"total": 1, "checked": 0, "failed": 0, "unavailable": 1}
+    assert stats["report_generation"]["token_usage"]["requests"] == 4
+    assert stats["report_generation"]["token_usage"]["total_tokens"] == 40
+    assert summary["model_usage"]["total_tokens"] >= 40
     review = json.loads(Path(summary["outputs"]["report_json"]).read_text(encoding="utf-8"))
+    for claim in review["claims"]:
+        assert claim["advice"]["state"] == "generated"
+        audit = json.loads(Path(claim["advice"]["audit_pointer"]).read_text(encoding="utf-8"))
+        assert audit["input"]["claim"] == {key: value for key, value in claim.items() if key != "advice"}
+        assert audit["response"]["claim_id"] == claim["id"]
+        assert all(
+            ref in audit["input"]["basis"] for item in claim["advice"]["items"] for ref in item["basis_refs"]
+        )
     execution_claim = next(c for c in review["claims"] if c["id"] == "claim_001")
     assert {e["source"] for e in execution_claim["evidence"]} == {"paper_internal", "execution"}
     assert next(e for e in execution_claim["evidence"] if e["source"] == "execution")["aligned"] is True
@@ -425,7 +460,7 @@ def test_wrong_runtime_metadata_never_becomes_execution_support(tiny_inputs, mon
     assert claim["questions"] and review["ledger"][0]["alignment"]
 
 
-def test_extraction_failure_stops_before_verification_and_report(tiny_inputs, monkeypatch):
+def test_extraction_failure_stops_verification_but_delivers_explicit_partial_report(tiny_inputs, monkeypatch):
     summary, _, retrieval, runner = run_tiny(
         tiny_inputs,
         monkeypatch,
@@ -433,10 +468,14 @@ def test_extraction_failure_stops_before_verification_and_report(tiny_inputs, mo
         render_pdf=False,
     )
     assert summary["stages"]["screening"] == "failed"
-    assert summary["stages"]["verification"] == summary["stages"]["report"] == "skipped"
+    assert summary["stages"]["verification"] == summary["stages"]["execution"] == "skipped"
+    assert summary["stages"]["report"] == "ok"
     assert "fixture provider offline" in summary["stage_errors"]["screening"]
     assert retrieval.queries == [] and runner.call_count == 0
-    assert "report_json" not in summary["outputs"]
+    review = json.loads(Path(summary["outputs"]["report_json"]).read_text(encoding="utf-8"))
+    assert review["run_status"] == "partial" and review["incomplete_stages"] == ["screening"]
+    assert not review["claims"]
+    assert Path(summary["outputs"]["screening"]).is_file()
 
 
 def test_same_second_runs_have_distinct_directories_and_do_not_overwrite(tiny_inputs, monkeypatch):
@@ -635,7 +674,10 @@ def test_invalid_execution_config_is_recorded_as_execution_failure(tiny_inputs, 
     summary, _, _, runner = run_tiny(tiny_inputs, monkeypatch, render_pdf=False)
     assert summary["stages"]["execution"] == "failed"
     assert "max_attempts" in summary["stage_errors"]["execution"]
-    assert runner.call_count == 0 and summary["stages"]["report"] == "skipped"
+    assert runner.call_count == 0 and summary["stages"]["report"] == "ok"
+    review = json.loads(Path(summary["outputs"]["report_json"]).read_text(encoding="utf-8"))
+    assert review["run_status"] == "partial" and review["incomplete_stages"] == ["execution"]
+    assert len(review["claims"]) == 4
 
 
 @pytest.mark.parametrize(
@@ -679,7 +721,9 @@ def test_run_statistics_environment_is_restored_after_success_and_failure(tiny_i
     assert summary["stages"]["screening"] == "failed"
     assert "FACTREVIEW_RUN_STATS_PATH" not in os.environ
     assert summary["run_stats"]["modules"]["analysis"]["status"] == "failed"
-    assert summary["run_stats"]["modules"]["report_generation"]["status"] == "skipped"
+    assert summary["run_stats"]["modules"]["report_generation"]["status"] == "ok"
+    review = json.loads(Path(summary["outputs"]["report_json"]).read_text(encoding="utf-8"))
+    assert review["run_status"] == "partial" and review["incomplete_stages"] == ["screening"]
 
 
 def test_missing_parser_failure_is_consistent_in_summary_and_stats(tiny_inputs, monkeypatch):
@@ -799,9 +843,10 @@ def test_concurrent_pipelines_keep_usage_and_parent_context_isolated(
         assert summary["run_stats"]["modules"]["analysis"]["models"] == {f"run-{index}": 1}
         failed = first_fails and index == 11
         assert summary["stages"]["screening"] == ("failed" if failed else "ok")
-        assert summary["stages"]["report"] == ("skipped" if failed else "ok")
-        if not failed:
-            assert Path(summary["outputs"]["report_json"]).is_file()
+        assert summary["stages"]["report"] == "ok"
+        review = json.loads(Path(summary["outputs"]["report_json"]).read_text(encoding="utf-8"))
+        assert review["run_status"] == ("partial" if failed else "completed")
+        assert review["incomplete_stages"] == (["screening"] if failed else [])
     assert parent.read_text(encoding="utf-8") == '{"parent":true}'
     assert os.environ["FACTREVIEW_RUN_STATS_PATH"] == str(parent)
     assert os.environ["FACTREVIEW_ACTIVE_STATS_MODULE"] == "parse"

@@ -38,6 +38,7 @@ def validate_publication_language(value) -> None:
         r"\b(?:recommend(?:ation|ed)?\s*:?\s*(?:to\s+)?(?:accept(?:ance|ing)?|reject(?:ion|ing)?)|accept(?:ance)?\s+recommendation|reject(?:ion)?\s+recommendation)\b",
         r"\bdecision\s*:\s*(?:(?:weak|strong)\s+)?(?:accept(?:ed)?|reject(?:ed)?)\b",
         r"\b(?:paper|submission|manuscript|work)\s+(?:(?:should|must)\s+be|is)\s+(?:accept|reject)ed\b",
+        r"\b(?:vote(?:d|s)?|voting)(?:\s+is)?\s+(?:to\s+(?:accept|reject)|for\s+(?:the\s+)?(?:acceptance|rejection)\s+of)\s+(?:(?:this|the|that|a)\s+)?(?:paper|submission|manuscript|work)\b",
         r"(?:建议|推荐|决定)\s*(?:录用|接收|拒稿)(?:该|这篇)?(?:论文|稿件)?",
     )
     if any(re.search(pattern, text, re.IGNORECASE) for pattern in patterns):
@@ -164,7 +165,9 @@ def ordered_claims(review: FinalReview):
     )
 
 
-def verification_limitations(*, issues=None, figure_coverage=None, token_usage=None) -> list[str]:
+def verification_limitations(
+    *, issues=None, figure_coverage=None, table_coverage=None, token_usage=None
+) -> list[str]:
     """Make coverage and cost uncertainty visible even when there are no findings."""
     limitations = list(issues or [])
     if figure_coverage is not None:
@@ -187,17 +190,40 @@ def verification_limitations(*, issues=None, figure_coverage=None, token_usage=N
                 "recorded token totals may be incomplete or estimated."
             )
         limitations.extend(token_usage.get("warnings", []))
+    if table_coverage is not None:
+        missing = table_coverage.get("failed", 0) + table_coverage.get("unavailable", 0)
+        if missing:
+            limitations.append(
+                f"Table visual screening is incomplete: {table_coverage.get('failed', 0)} failed and "
+                f"{table_coverage.get('unavailable', 0)} unavailable out of {table_coverage.get('total', 0)} tables."
+            )
     return list(dict.fromkeys(limitations))
 
 
 def render_markdown(
-    review: FinalReview, *, issues: list[str] | None = None, figure_coverage=None, token_usage=None
+    review: FinalReview,
+    *,
+    issues: list[str] | None = None,
+    figure_coverage=None,
+    table_coverage=None,
+    token_usage=None,
 ) -> str:
+    from review.report.advice import checked_review
+
+    review = checked_review(review)
     claims = ordered_claims(review)
     occurrences = _source_index(claims, review.findings)
     lines = [
         f"# FactReview — {_text(review.paper_key)}",
         "",
+    ]
+    if review.run_status == "partial":
+        lines += [
+            f"**Partial review — incomplete stages: {_text(', '.join(review.incomplete_stages))}.**",
+            "Counts cover retained claims only. Missing claims or evidence cannot establish an absence of paper problems.",
+            "",
+        ]
+    lines += [
         "## 1. Overview",
         "",
         "| Status | Count |",
@@ -221,6 +247,7 @@ def render_markdown(
     ] or ["No claim is assessed as flawed or questioned."]
     lines += ["", "## 2. Claim list", ""]
     for claim in claims:
+        advice_targets = {}
         lines += [
             f"### {_text(claim.id)} — {claim.status.value}",
             "",
@@ -245,8 +272,38 @@ def render_markdown(
         lines += ["", f"Evidence needs: {', '.join(claim.needs) or 'none'}.", "", "Evidence:", ""]
         if not claim.evidence:
             lines.append("No evidence is available for assessment.")
-        for item in claim.evidence:
-            lines.extend(_evidence(item, next(occurrences)))
+        for index, item in enumerate(claim.evidence):
+            occurrence = next(occurrences)
+            advice_targets[f"/evidence/{index}"] = occurrence["anchor"]
+            lines.extend(_evidence(item, occurrence))
+        if claim.advice is not None:
+            lines += ["", "Reviewer advice:", ""]
+            if claim.advice.state == "unavailable":
+                lines.append(f"Advice unavailable: {_text(claim.advice.failure_reason)}")
+            else:
+                from review.report.advice import advice_input
+
+                data = advice_input(claim, review.ledger)
+                for item in claim.advice.items:
+                    lines.append(f"- {_text(item.text)} Conditions: {_text(', '.join(item.condition_ids))}.")
+                    for ref in item.basis_refs:
+                        if ref in advice_targets:
+                            lines.append(
+                                f"  - Basis: [evidence {_text(ref.rsplit('/', 1)[1])}](#{advice_targets[ref]})."
+                            )
+                        else:
+                            # Context and missing coverage remain visible beside
+                            # the advice; they do not become verification evidence.
+                            lines.append(
+                                f"  - Basis {_text(ref)}: {_text(json.dumps(data['basis'][ref]['content'], ensure_ascii=False))}"
+                            )
+                lines.append(
+                    "Advice wording is a model interpretation; references and input consistency were checked."
+                )
+            if claim.advice.audit_pointer:
+                lines.append(
+                    f"Advice audit: {_text(claim.advice.audit_pointer)}; input SHA256: {_text(claim.advice.input_sha256)}."
+                )
         lines += ["", "Questions for authors:", ""]
         lines += [
             f"- {_text(question.text)} Reason: {_text(question.reason)}" for question in claim.questions
@@ -269,6 +326,18 @@ def render_markdown(
         ]
     if not review.findings:
         lines.append("No additional findings recorded.")
+    if table_coverage is not None:
+        lines += [
+            "### Table visual screening coverage",
+            "",
+            "| Total tables | Checked | Failed | Unavailable |",
+            "|---:|---:|---:|---:|",
+            f"| {table_coverage.get('total', 0)} | {table_coverage.get('checked', 0)} | "
+            f"{table_coverage.get('failed', 0)} | {table_coverage.get('unavailable', 0)} |",
+            "",
+            "Parsed-text table checks are recorded separately. Checked visuals can still contain uncertain observations.",
+            "",
+        ]
     for finding in review.findings:
         lines += [
             f"### {finding.kind} — {_text(finding.level)}",
@@ -282,13 +351,18 @@ def render_markdown(
             lines.extend(_evidence(item, next(occurrences)))
         lines.append("")
     limitations = verification_limitations(
-        issues=issues, figure_coverage=figure_coverage, token_usage=token_usage
+        issues=issues, figure_coverage=figure_coverage, table_coverage=table_coverage, token_usage=token_usage
     )
     if limitations:
         lines += ["### Verification limitations", "", *[f"- {_text(issue)}" for issue in limitations], ""]
     lines += ["", "## 4. Execution ledger", ""]
     if not review.ledger:
-        lines.append("Execution was not run; no new execution evidence was produced.")
+        if "execution" in review.incomplete_stages:
+            lines.append(
+                "Execution failed and no complete execution record was recovered. Runs may have started; their outcomes and cleanup state are unknown. No new execution evidence was adopted."
+            )
+        else:
+            lines.append("Execution was not run; no new execution evidence was produced.")
     for index, entry in enumerate(review.ledger, 1):
         lines += [
             f"### Run {index}",
@@ -309,15 +383,22 @@ def write_review(
     render_pdf=True,
     token_usage=None,
     figure_coverage=None,
+    table_coverage=None,
 ) -> dict:
+    from review.report.advice import checked_review
+
+    result = checked_review(review)
     validate_publication_language(
-        [review.model_dump(), issues or [], (token_usage or {}).get("warnings", [])]
+        [result.model_dump(), issues or [], (token_usage or {}).get("warnings", [])]
     )
     output_dir.mkdir(parents=True, exist_ok=True)
-    result = review.model_copy(deep=True)
     result.claims = ordered_claims(result)
     result.review_markdown = render_markdown(
-        result, issues=issues, figure_coverage=figure_coverage, token_usage=token_usage
+        result,
+        issues=issues,
+        figure_coverage=figure_coverage,
+        table_coverage=table_coverage,
+        token_usage=token_usage,
     )
     markdown = output_dir / "final_review.md"
     artifact = output_dir / "final_review.json"
@@ -327,12 +408,19 @@ def write_review(
     if render_pdf:
         from review.report.pdf_renderer import build_review_report_pdf
 
+        advice_models = sorted(
+            {
+                f"{claim.advice.provider}/{claim.advice.model}"
+                for claim in result.claims
+                if claim.advice is not None and claim.advice.state == "generated"
+            }
+        )
         try:
             content = build_review_report_pdf(
                 workspace_title=f"FactReview {review.paper_key}",
                 source_pdf_name=review.paper_key,
                 run_id=review.run_id,
-                status="completed",
+                status=result.run_status,
                 decision=None,
                 estimated_cost=0,
                 actual_cost=None,
@@ -341,7 +429,9 @@ def write_review(
                 reviewers=[],
                 raw_output=None,
                 final_report_markdown=result.review_markdown,
-                agent_model="deterministic v2 report",
+                agent_model=("v2 renderer; claim advice: " + ", ".join(advice_models))
+                if advice_models
+                else "deterministic v2 report",
                 # Evidence paths and identifiers must survive PDF rendering literally.
                 implicit_math=False,
                 token_usage=token_usage if token_usage is not None else {"unavailable": True},

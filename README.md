@@ -8,6 +8,10 @@ The default pipeline follows the [method specification](docs/method_v2_spec.md):
 
 Claims are extracted once before verification. Each records its paper location, conditions and evidence needs. Literature, Theory, Code and Experiments receive only the claims routed to them. The report consumes the assessed records and preserves their evidence sources.
 
+After fixed-rule assessment, the report agent writes per-claim advice with local evidence references. Each advice call and its input snapshot are saved, and its usage is included in report accounting. Failed or stale advice is marked unavailable. Original PDF crops feed separate figure and table VLM checks; missing crops and failed checks have explicit coverage counts.
+
+When extraction fails, independent writing, visual and reference checks can still produce an explicitly partial report. A later verification or execution failure retains the last complete claim snapshot and any recoverable execution audit records. The failed stage remains visible in the summary and CLI result; counts describe retained claims only.
+
 | Status | Evidence rule |
 |---|---|
 | `supported` | Sufficient support covers every condition, with no concern affecting the claim. |

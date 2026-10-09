@@ -263,7 +263,10 @@ def test_real_beit_table_four_indexes_original_external_reference_block_88():
         source["block_id"] == "block_88" and source["quote"] == block_88["text"] for source in resolved
     )
     assert all(source["block_id"] != "block_84" for source in resolved)
-    assert claim.model_dump(mode="json") == case["claim"]
+    # Frozen v1-of-this-fixture predates optional report-stage advice. Its
+    # original fields remain byte-for-value identical after catalog building.
+    assert "advice" not in case["claim"]
+    assert claim.model_dump(mode="json") == {**case["claim"], "advice": None}
 
 
 @pytest.mark.parametrize("change", ["text", "page", "block_id", "paper_key", "source_pdf"])
