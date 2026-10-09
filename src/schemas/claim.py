@@ -167,6 +167,41 @@ class AuthorQuestion(Contract):
     reason: str = ""
 
 
+class AdviceItem(Contract):
+    """Reviewer-facing wording bound to this claim's frozen report inputs."""
+
+    text: NonEmpty
+    condition_ids: list[str] = Field(min_length=1)
+    basis_refs: list[str] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def exact_references(self) -> Self:
+        for values in (self.condition_ids, self.basis_refs):
+            if len(values) != len(set(values)) or any(not v or v != v.strip() for v in values):
+                raise ValueError("advice references must be distinct exact identifiers")
+        return self
+
+
+class ClaimAdvice(Contract):
+    """An optional report-stage result; absent in historical and upstream records."""
+
+    state: Literal["generated", "unavailable"]
+    items: list[AdviceItem] = Field(default_factory=list)
+    input_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    audit_pointer: str | None = None
+    failure_reason: str = ""
+    provider: str = ""
+    model: str = ""
+
+    @model_validator(mode="after")
+    def generation_result(self) -> Self:
+        if self.state == "generated" and (not self.items or self.failure_reason):
+            raise ValueError("generated advice requires items and no failure reason")
+        if self.state == "unavailable" and (self.items or not self.failure_reason.strip()):
+            raise ValueError("unavailable advice requires a reason and no generated items")
+        return self
+
+
 class ClaimSourceRef(Contract):
     """An original manuscript passage for specified conditions, not verification evidence."""
 
@@ -201,6 +236,7 @@ class Claim(Contract):
     evidence: list[Evidence] = Field(default_factory=list)
     status: ClaimStatus = ClaimStatus.UNVERIFIED
     notes: list[str] = Field(default_factory=list)
+    advice: ClaimAdvice | None = None
 
     @model_validator(mode="after")
     def check_references(self) -> Self:
@@ -226,6 +262,10 @@ class Claim(Contract):
         for question in self.questions:
             if question.claim_id is not None and question.claim_id != self.id:
                 raise ValueError("an author question must refer to its enclosing claim")
+        if self.advice:
+            for item in self.advice.items:
+                if not set(item.condition_ids).issubset(ids):
+                    raise ValueError("advice must refer to its enclosing claim's condition ids")
         return self
 
 

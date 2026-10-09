@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import Field
 
@@ -16,6 +16,8 @@ class FinalReview(Contract):
     findings: list[Finding] = Field(default_factory=list)
     ledger: list[dict[str, Any]] = Field(default_factory=list)
     review_markdown: str = ""
+    run_status: Literal["completed", "partial"] = "completed"
+    incomplete_stages: list[str] = Field(default_factory=list)
 
     @property
     def summary_counts(self) -> dict[ClaimStatus, int]:

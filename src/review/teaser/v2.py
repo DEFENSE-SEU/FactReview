@@ -17,6 +17,8 @@ def write_teaser(review: FinalReview, output_dir: Path) -> dict[str, str]:
     claims = ordered_claims(review)
     payload = {
         "paper_key": review.paper_key,
+        "run_status": review.run_status,
+        "incomplete_stages": review.incomplete_stages,
         "counts": {status.value: review.summary_counts[status] for status in STATUS_ORDER},
         "claims": [
             {
@@ -46,6 +48,11 @@ def write_teaser(review: FinalReview, output_dir: Path) -> dict[str, str]:
         elements.append(f'<text x="32" y="{y}" font-size="17">{escape(line)}</text>')
         y += 22
     y += 26
+    if review.run_status == "partial":
+        elements.append(
+            f'<text x="32" y="{y}" font-size="16" fill="#b42318">Partial review: {escape(", ".join(review.incomplete_stages))}. Counts cover retained claims only.</text>'
+        )
+        y += 30
     for index, status in enumerate(STATUS_ORDER):
         x = 32 + index * 218
         elements += [

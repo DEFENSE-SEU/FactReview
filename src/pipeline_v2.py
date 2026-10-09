@@ -13,17 +13,19 @@ from urllib.parse import urlsplit
 
 from assessment import assess_claims
 from common import run_stats
-from fact_generation.execution.v2 import execute_plans
+from fact_generation.execution.recovery import recover_execution_records
+from fact_generation.execution.v2 import ExecutionResult, execute_plans
 from fact_generation.execution.v2_config import ExecutionConfig
 from preprocessing.materials import index_repository, parse_materials
+from review.report.advice import generate_advice
 from review.report.v2 import verification_limitations, write_review
 from review.teaser.v2 import write_teaser
 from schemas.review import FinalReview
-from screening.stage import screen_paper
+from screening.stage import ScreeningFailure, screen_paper
 from util.paper_input import infer_paper_key, materialize_paper_pdf
 from util.run_layout import build_run_dir, make_run_id
 from util.submission_cutoff import resolve_arxiv_first_submission
-from verification.dispatch import verify_claims
+from verification.dispatch import VerificationResult, verify_claims
 
 STAGES = ("materials", "screening", "verification", "execution", "assessment", "report", "teaser")
 STATS_MODULES = {
@@ -126,7 +128,7 @@ def run_v2_pipeline(
             )
             run_stats.record_duration(STATS_MODULES[name], max(0, duration - nested))
 
-        def stage(name, function):
+        def stage(name, function, *, recover=None):
             nonlocal current_stage, stage_started
             current_stage = name
             begin = time.perf_counter()
@@ -135,15 +137,40 @@ def run_v2_pipeline(
             _save(root / "full_pipeline_summary.json", summary)
             print(f"[{STAGES.index(name) + 1}/{len(STAGES)}] {name}: starting", flush=True)
             stats_module = STATS_MODULES[name]
-            with run_stats.module_scope(stats_module):
-                value = function()
+            failure = None
+            try:
+                with run_stats.module_scope(stats_module):
+                    value = function()
+            except Exception as exc:
+                if recover is None:
+                    raise
+                value = recover(exc)
+                failure = f"{type(exc).__name__}: {exc}"
+                summary["stage_errors"][name] = failure
+                summary["issues"].append(f"{name} stage failed: {failure}")
             duration = time.perf_counter() - begin
             summary["stage_durations_sec"][name] = duration
-            summary["stages"][name] = "ok"
+            summary["stages"][name] = "failed" if failure else "ok"
             record_stage_duration(name, duration)
-            run_stats.record_module_status(stats_module, "ok")
+            failed = any(summary["stages"][s] == "failed" for s in STAGES if STATS_MODULES[s] == stats_module)
+            run_stats.record_module_status(stats_module, "failed" if failed else "ok", warning=failure)
             _save(root / "full_pipeline_summary.json", summary)
             return value
+
+        def recover_screening(exc):
+            if not isinstance(exc, ScreeningFailure):
+                raise exc
+            return exc.result
+
+        def skip_stage(name, reason):
+            summary["stages"][name] = "skipped"
+            summary["issues"].append(reason)
+            if not any(
+                summary["stages"][s] in {"ok", "failed"}
+                for s in STAGES
+                if STATS_MODULES[s] == STATS_MODULES[name]
+            ):
+                run_stats.record_module_status(STATS_MODULES[name], "skipped")
 
         try:
             unsupported = [
@@ -251,30 +278,57 @@ def run_v2_pipeline(
                 lambda: screen_paper(
                     materials, root / "screening", call=call, reference_checker=reference_checker
                 ),
+                recover=recover_screening,
             )
             summary["issues"].extend(screening.issues)
             summary["figure_coverage"] = screening.figure_coverage
+            summary["table_coverage"] = screening.table_coverage
             summary["outputs"]["screening"] = str(root / "screening" / "screening.json")
-            verification = stage(
-                "verification",
-                lambda: asyncio.run(
-                    verify_claims(
-                        screening.claims,
-                        materials,
-                        root / "verification",
-                        submission_deadline=deadline,
-                        branches=branches,
-                        global_literature=global_literature,
-                        call=call,
+            extracted = [c.model_copy(deep=True) for c in screening.claims]
+
+            def recover_verification(exc):
+                retained = [c.model_copy(deep=True) for c in extracted]
+                for claim in retained:
+                    claim.notes.append(
+                        f"Verification stage failed; no result was adopted: {type(exc).__name__}: {exc}"
                     )
-                ),
-            )
+                return VerificationResult(claims=retained)
+
+            if screening.claim_extraction_status == "failed":
+                skip_stage("verification", "Verification skipped because claim extraction failed.")
+                verification = VerificationResult(claims=[])
+            else:
+                verification = stage(
+                    "verification",
+                    lambda: asyncio.run(
+                        verify_claims(
+                            [c.model_copy(deep=True) for c in extracted],
+                            materials,
+                            root / "verification",
+                            submission_deadline=deadline,
+                            branches=branches,
+                            global_literature=global_literature,
+                            call=call,
+                        )
+                    ),
+                    recover=recover_verification,
+                )
             summary["issues"].extend(verification.issues)
-            summary["outputs"]["verification"] = str(root / "verification" / "verification.json")
+            if summary["stages"]["verification"] == "ok":
+                summary["outputs"]["verification"] = str(root / "verification" / "verification.json")
             claims, ledger = verification.claims, []
-            if getattr(args, "run_execution", False):
-                current_stage = "execution"
-                stage_started = time.perf_counter()
+            verified = [c.model_copy(deep=True) for c in claims]
+
+            def recover_execution(exc):
+                retained = [c.model_copy(deep=True) for c in verified]
+                for claim in retained:
+                    claim.notes.append(
+                        f"Execution stage failed; no new execution result was adopted: {type(exc).__name__}: {exc}"
+                    )
+                records, issues = recover_execution_records(root / "execution", verification.plans)
+                return ExecutionResult(claims=retained, ledger=records, issues=issues)
+
+            def execution_stage():
                 if getattr(args, "execution_no_docker", False):
                     raise ValueError("V2 execution requires Docker")
                 config_path = str(getattr(args, "execution_config", "") or "")
@@ -294,53 +348,83 @@ def run_v2_pipeline(
                 if not config_path or "execution_no_llm" in overrides:
                     config_data["refine_with_llm"] = not getattr(args, "execution_no_llm", False)
                 config = ExecutionConfig.model_validate(config_data)
+                return execute_plans(
+                    [plan.model_copy(deep=True) for plan in verification.plans],
+                    [c.model_copy(deep=True) for c in verified],
+                    materials,
+                    root / "execution",
+                    config=config,
+                    runner=runner,
+                    repairer=repairer,
+                    approver=approver
+                    or (_interactive_approval if config.approval_mode == "interactive" else None),
+                )
+
+            if summary["stages"]["verification"] != "ok":
+                skip_stage("execution", "Execution skipped because verification did not complete.")
+            elif getattr(args, "run_execution", False):
                 execution = stage(
                     "execution",
-                    lambda: execute_plans(
-                        verification.plans,
-                        claims,
-                        materials,
-                        root / "execution",
-                        config=config,
-                        runner=runner,
-                        repairer=repairer,
-                        approver=approver
-                        or (_interactive_approval if config.approval_mode == "interactive" else None),
-                    ),
+                    execution_stage,
+                    recover=recover_execution,
                 )
                 claims, ledger = execution.claims, execution.ledger
                 summary["issues"].extend(execution.issues)
             else:
-                summary["stages"]["execution"] = "skipped"
-                run_stats.record_module_status("execution", "skipped")
-                summary["issues"].append("Execution disabled; released artifacts were not run.")
-            claims = stage("assessment", lambda: assess_claims(claims))
+                skip_stage("execution", "Execution disabled; released artifacts were not run.")
+            if screening.claim_extraction_status == "failed":
+                skip_stage("assessment", "Assessment skipped because claim extraction failed.")
+            else:
+                claims = stage("assessment", lambda: assess_claims(claims))
+            incomplete = [name for name in STAGES if summary["stages"][name] == "failed"]
             review = FinalReview(
                 paper_key=key,
                 run_id=run_id,
                 claims=claims,
                 findings=screening.findings + verification.findings,
                 ledger=ledger,
+                run_status="partial" if incomplete else "completed",
+                incomplete_stages=incomplete,
             )
-            summary["model_usage"] = _model_usage(
-                run_stats.with_totals(run_stats.read(root / "run_stats.json"))
-            )
-            summary["issues"] = verification_limitations(
-                issues=summary["issues"],
-                figure_coverage=summary["figure_coverage"],
-                token_usage=summary["model_usage"],
-            )
-            outputs = stage(
-                "report",
-                lambda: write_review(
+            _save(root / "assessment" / "assessed_review.json", review.model_dump(mode="json"))
+            summary["outputs"]["assessment_snapshot"] = str(root / "assessment" / "assessed_review.json")
+
+            def report_stage():
+                nonlocal review
+                advice = generate_advice(review, root / "review" / "advice", call=call)
+                review = advice.review
+                summary["issues"].extend(advice.issues)
+                summary["advice"] = advice.counts
+                if (root / "review" / "advice").is_dir():
+                    summary["outputs"]["advice"] = str(root / "review" / "advice")
+                summary["model_usage"] = _model_usage(
+                    run_stats.with_totals(run_stats.read(root / "run_stats.json"))
+                )
+                summary["issues"] = verification_limitations(
+                    issues=summary["issues"],
+                    figure_coverage=summary["figure_coverage"],
+                    table_coverage=summary["table_coverage"],
+                    token_usage=summary["model_usage"],
+                )
+                rendered = write_review(
                     review,
                     root / "review" / "report",
                     issues=summary["issues"],
                     render_pdf=render_pdf,
                     token_usage=summary["model_usage"],
                     figure_coverage=summary["figure_coverage"],
-                ),
-            )
+                    table_coverage=summary["table_coverage"],
+                )
+                # Static rendering revalidates advice against the saved sources.
+                # Use that persisted result for counts and downstream delivery.
+                review = FinalReview.model_validate_json(Path(rendered["json"]).read_text(encoding="utf-8"))
+                summary["advice"] = {
+                    state: sum(c.advice is not None and c.advice.state == state for c in review.claims)
+                    for state in ("generated", "unavailable")
+                }
+                return rendered
+
+            outputs = stage("report", report_stage)
             summary["outputs"].update(
                 {f"report_{name}": path for name, path in outputs.items() if name != "pdf_error"}
             )
@@ -373,6 +457,7 @@ def run_v2_pipeline(
             summary["issues"] = verification_limitations(
                 issues=summary["issues"],
                 figure_coverage=summary.get("figure_coverage"),
+                table_coverage=summary.get("table_coverage"),
                 token_usage=summary["model_usage"],
             )
             _save(root / "run_stats.json", summary["run_stats"])

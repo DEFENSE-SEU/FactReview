@@ -4,6 +4,14 @@ Status: agreed design for the ARR resubmission. This document is the single sour
 the v2 refactor and for the Method section of the paper. Anything not covered here is out of scope
 until it is added here first.
 
+Maintainer update (2026-10-09): the supplied Method §§4.1–4.3 extends this design with
+table VLM checks, chapter-level writing/cross-reference/submission-policy checks,
+explicit theory derivation records and status-conditioned reviewer advice. The
+implementation/validation state of each addition is tracked in `checks.md`; this
+amendment does not certify that every addition is already complete. Existing
+confirmed auto approval, optional interactive approval, training budget 0 and
+explicitly requested arXiv fallback remain in force.
+
 ## 0. Goal and principles
 
 **Goal.** Make LLM-assisted peer review trustworthy by working at the level of individual claims:
@@ -21,7 +29,7 @@ check. FactReview assists human reviewers; it never issues an accept/reject reco
 ## 1. Deliverables (what the system returns)
 
 1. **Claim records** — one per extracted claim: text, location, conditions, evidence needs,
-   evidence items (with source type and pointer), status, and questions for the authors.
+   evidence items (with source type and pointer), status, reviewer advice, and questions for the authors.
 2. **Findings** — issues not tied to a single claim: writing, figures, references, missing related
    work or baselines. Each has a location and evidence.
 3. **Questions for authors** — reviewer-facing items: what needs clarification, what could not be
@@ -92,7 +100,12 @@ Checks three things only:
 - *Text–figure consistency*: caption and body references match what the figure shows (e.g. body
   cites panel (c) that does not exist; caption mentions a dashed line that is absent).
 
-Excluded: colour, style, aesthetics. Tables are checked from parsed text (headers, units), not by VLM.
+Excluded: colour, style, aesthetics. Tables retain parsed-text checks for headers and
+units and also receive VLM checks from original PDF crops, captions, table notes and
+body references. Table visuals use the same three categories, with text–table
+consistency as the third. Bold and symbolic marks must have an explained meaning;
+stylistic preferences are excluded. Missing crops or physical-size metadata remain
+explicit limitations. Figure and table coverage are counted separately.
 
 **Reference check.** Entry-level only: does the reference exist; are authors, year, venue correct;
 is it retracted/withdrawn. (Existing RefCopilot.) Whether a cited work supports the citing sentence
@@ -219,11 +232,26 @@ notes and do not change the status.
 
 1. Overview — counts per status; the most important Flawed/Questioned items.
 2. Claim list — ordered Flawed, Questioned, Unverified, Supported. Each: location, status, evidence
-   with source type (paper-internal / literature / theory / code / execution), questions for authors.
+   with source type (paper-internal / literature / theory / code / execution), reviewer advice and questions for authors.
 3. Other findings — writing, figures, references, missing related work/baselines.
 4. Execution ledger — per-run details for reviewers who want them.
 
 No accept/reject recommendation anywhere (report, teaser).
+
+After deterministic assessment, the report agent writes advice for each claim from
+its frozen status, evidence and recorded limitations. Flawed advice states the
+supported problem; Questioned advice asks answerable questions; Unverified advice
+identifies missing support; Supported advice states how the support can be used.
+Each advice item cites local condition IDs and evidence/context references. The
+report agent cannot change the claim or status. Unavailable or stale advice is
+reported explicitly, with its audit retained.
+
+An extraction failure still permits independent surface checks and a partial
+report; dependent verification and execution remain skipped. A later stage failure
+preserves the last complete claim snapshot. Recovered execution ledgers are audit
+records and do not recreate claim evidence. JSON, Markdown/PDF and teaser must mark
+partial delivery and incomplete stages; successful rendering cannot clear a failed
+stage or turn absent results into a finding that the paper has no problems.
 
 ## 8. Open items (must be confirmed against implementation/experiments)
 

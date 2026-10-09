@@ -2,6 +2,21 @@
 
 ## Active follow-up findings
 
+**Active method-manuscript work (2026-10-09):** table VLM, per-claim advice and partial delivery are implemented in the current frozen source. Its final regression has **2151 passed**, three original deselections and the unchanged malformed-binding warning (`runs/v2_method_delivery/pytest-method-delivery-final-v2.log`); the separate legacy route has two passes. The wheel contains all **123** source modules with exact bytes and Python 3.11 syntax; 27 protected artifacts match and configured secrets are absent from tracked content (`delivery-inspection.json`). The older follow-up tables below retain their own historical checkpoint counts.
+
+| Current method extension | Engineering evidence | Remaining validation |
+|---|---|---|
+| Table VLM with crop/caption/notes/body references and separate coverage | 27 new leaf controls plus integrated coverage; actual controlled run has one checked table and one checked figure | Independent review of the actual visual decisions; broader table quality |
+| Per-claim advice after fixed assessment | 30 advice controls, immutable claim/evidence checks, local basis references, audit failure and late source-change rejection; accounting follows persisted output | Actual advice generation in the ongoing full flow; semantic usefulness |
+| Partial delivery after failed extraction, verification or execution | Public pipeline failure injection; independent L1 findings and frozen claim snapshots retained; report/teaser explicit partial; failed statistics retained | Actual full-flow limitations and final artifact inspection |
+| Host execution audit isolation and recovery | Scratch-only container bind, immutable host records; strict recovery of completed plan-bound ledgers without restoring evidence | Fresh real Docker controls under current source |
+| Provider stream terminal correctness | Independent original refusal/incomplete-message repros now fail correctly; valid completion keeps usage and stops reading | Actual full flow uses the fixed configured provider |
+| Chapter-level writing, explicit theory derivations, sourced corrected references | Independent gap audit and concrete designs saved under `runs/v2_method_delivery/` | **Open: implementation and validation** |
+
+The actual run `actual-full-9800dedbaa` finished all seven orchestration stages with source hashes unchanged: 36 real model calls, 181877 provider-reported tokens, four image-bearing calls, nine generated advice records, two Supported and seven Unverified claims. MinerU, model and retrieval boundaries were live. **The predeclared full execution gate failed:** no valid plan reached Docker and the ledger is empty. Independent L1 review reproduces unsupported composite conditions/target syntax, a reference warning contradicted by the original cited venue, and figure crops missing original axis titles. All original inputs and responses remain fixed. See `driver-result.json` and `independent-l1-review/review.md` in that run.
+
+Separate fresh real Docker controls under `docker-scratch-recheck-9db0cb89a0dc/` pass aligned test / misaligned validation cases, preserve host manifests and clean up both containers. Their parser/model/retrieval boundaries are fixtures; their four advice records are unavailable because the old fixed model lacks the new advice contract. Those Docker controls cannot establish that the native all-live run executed successfully. No commercial readiness is claimed.
+
 The bounded non-transition prose grammar extension is implemented and independently reviewed. It adds complete ordinary comparison forms with explicit dataset/split prefixes and metric-before-`is` predicates, retaining original source offsets and every evidence gate. Final regression passes **2031** default tests and **2** separate legacy tests; the **120**-module wheel matches source. This deterministic correction introduces no model stage or claim reassessment.
 
 | Current ordinary prose-pair follow-up | Verdict | Evidence |
