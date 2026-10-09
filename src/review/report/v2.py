@@ -290,6 +290,7 @@ def verification_limitations(
     figure_coverage=None,
     figure_context_coverage=None,
     table_coverage=None,
+    table_context_coverage=None,
     writing_coverage=None,
     anonymity_policy=None,
     token_usage=None,
@@ -342,6 +343,14 @@ def verification_limitations(
                 f"Table visual screening is incomplete: {table_coverage.get('failed', 0)} failed and "
                 f"{table_coverage.get('unavailable', 0)} unavailable out of {table_coverage.get('total', 0)} tables."
             )
+    if table_context_coverage is not None:
+        missing = sum(table_context_coverage.get(key, 0) for key in ("failed", "unavailable", "unrecorded"))
+        if missing:
+            limitations.append(
+                f"Table page-context confirmation is incomplete: {table_context_coverage.get('failed', 0)} failed, "
+                f"{table_context_coverage.get('unavailable', 0)} unavailable and "
+                f"{table_context_coverage.get('unrecorded', 0)} unrecorded. Crop checks have separate coverage."
+            )
     return list(dict.fromkeys(limitations))
 
 
@@ -352,6 +361,7 @@ def render_markdown(
     figure_coverage=None,
     figure_context_coverage=None,
     table_coverage=None,
+    table_context_coverage=None,
     writing_coverage=None,
     anonymity_policy=None,
     token_usage=None,
@@ -541,6 +551,21 @@ def render_markdown(
             "Parsed-text table checks are recorded separately. Checked visuals can still contain uncertain observations.",
             "",
         ]
+    if table_context_coverage is not None:
+        lines += [
+            "### Table page-context coverage",
+            "",
+            "| Total tables | Checked | Failed | Unavailable | Not requested | Unrecorded |",
+            "|---:|---:|---:|---:|---:|---:|",
+            f"| {table_context_coverage.get('total', 0)} | {table_context_coverage.get('checked', 0)} | "
+            f"{table_context_coverage.get('failed', 0)} | {table_context_coverage.get('unavailable', 0)} | "
+            f"{table_context_coverage.get('not_requested', 0)} | {table_context_coverage.get('unrecorded', 0)} |",
+            "",
+            "Page-context confirmation checks selected table observations and caption associations. "
+            "Checked confirmations can remain uncertain. Captions recovered outside the original crop "
+            "have no new printed-size legibility judgment; the original 96 dpi crop remains that check's input.",
+            "",
+        ]
     for finding in review.findings:
         lines += [
             f"### {finding.kind} — {_text(finding.level)}",
@@ -571,6 +596,7 @@ def render_markdown(
         figure_coverage=figure_coverage,
         figure_context_coverage=figure_context_coverage,
         table_coverage=table_coverage,
+        table_context_coverage=table_context_coverage,
         writing_coverage=writing_coverage,
         anonymity_policy=anonymity_policy,
         token_usage=token_usage,
@@ -607,6 +633,7 @@ def write_review(
     figure_coverage=None,
     figure_context_coverage=None,
     table_coverage=None,
+    table_context_coverage=None,
     writing_coverage=None,
     anonymity_policy=None,
 ) -> dict:
@@ -622,6 +649,7 @@ def write_review(
         figure_coverage=figure_coverage,
         figure_context_coverage=figure_context_coverage,
         table_coverage=table_coverage,
+        table_context_coverage=table_context_coverage,
         writing_coverage=writing_coverage,
         anonymity_policy=anonymity_policy,
         token_usage=token_usage,
