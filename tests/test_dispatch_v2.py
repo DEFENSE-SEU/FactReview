@@ -28,7 +28,10 @@ async def test_rejected_plan_cannot_bypass_branch_or_coverage_checks(branch, cov
 
     result = await verify_claims([claim([branch])], materials(tmp_path), tmp_path, branches={branch: reject})
     assert result.plans == [] and result.claims[0].evidence == []
-    assert result.issues and result.claims[0].questions
+    assert result.issues and not result.claims[0].questions
+    limitation = result.claims[0].verification_limitations[0]
+    assert limitation.kind == "branch_failed" and limitation.responsibility == "system"
+    assert limitation.claim_id == "c1" and limitation.condition_ids == ["d1"]
 
 
 def claim(needs):
@@ -108,7 +111,11 @@ async def test_branch_failure_records_reason_without_fabricated_evidence(tmp_pat
         branches={EvidenceNeed.LITERATURE: branch},
     )
     assert not result.claims[0].evidence
-    assert result.claims[0].questions[0].claim_id == "c1"
+    assert result.claims[0].questions == []
+    limitation = result.claims[0].verification_limitations[0]
+    assert limitation.claim_id == "c1" and limitation.condition_ids == ["d1"]
+    assert limitation.stage == "Literature" and limitation.kind == "branch_failed"
+    assert limitation.responsibility == "system" and limitation.action == "repair_or_retry_verification"
     assert "mock retrieval unavailable" in result.issues[0]
 
 
