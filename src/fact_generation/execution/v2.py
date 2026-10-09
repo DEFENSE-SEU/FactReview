@@ -11,6 +11,7 @@ import difflib
 import hashlib
 import json
 import math
+import os
 import re
 import shutil
 import statistics
@@ -163,13 +164,19 @@ def _snapshot(materials: SharedMaterials, workspace: Path) -> dict[str, str]:
     return manifest
 
 
-def _validate_command(command: list[str], workspace: Path, entry: str | None, workdir: str = ".") -> None:
+def _validate_command(
+    command: list[str], workspace: Path, entry: str | None, workdir: str = ".", *, isolated_recipe=False
+) -> None:
     if not command or any(not token or "\x00" in token for token in command):
         raise ValueError("empty or invalid launch command")
     # A direct interpreter/script entry makes the repair boundary checkable.
     # Shell strings, inline Python, and alternate executables require a new plan.
     exe = command[0]
-    if exe in {"python", "python3"}:
+    if isolated_recipe:
+        if command != ["python", "-I", "-S", entry] or workdir != ".":
+            raise ValueError("Released-predictions recipe requires its isolated standard-library interpreter")
+        script = entry
+    elif exe in {"python", "python3"}:
         if len(command) < 2 or command[1].startswith("-"):
             raise ValueError("Python execution requires a released script")
         script = command[1]
@@ -198,6 +205,9 @@ def _refine(
     }
     command = list(plan.task.command)
     metric_output = plan.task.metric_output
+    if any(binding.version == 2 for binding in plan.target_bindings.values()):
+        if configured_mapping is not None:
+            raise ValueError("Released-predictions recipe requires unchanged canonical author output")
     if not command and not config.refine_with_llm and plan.task.entry_script and not plan.task.config:
         suffix = Path(plan.task.entry_script).suffix.lower()
         relative = (
@@ -261,7 +271,13 @@ def _refine(
         if not isinstance(command, list) or not all(isinstance(token, str) for token in command):
             raise ValueError("refined command must be an argv list")
     _inside(workspace, plan.task.workdir)
-    _validate_command(command, workspace, plan.task.entry_script, plan.task.workdir)
+    _validate_command(
+        command,
+        workspace,
+        plan.task.entry_script,
+        plan.task.workdir,
+        isolated_recipe=any(binding.version == 2 for binding in plan.target_bindings.values()),
+    )
     if metric_output is None:
         for flag in ("--out", "--output", "--metrics-output"):
             if flag in command and command.index(flag) + 1 < len(command):
@@ -304,6 +320,53 @@ def _cleanup_container(name: str, run_dir: str, logs: Path) -> dict:
     return audit
 
 
+def _prediction_image(request, logs, *, frozen_id=None):
+    """Inspect an existing operator-trusted CPython image; never install paper deps."""
+    version = request.config.python_version
+    if not re.fullmatch(r"3\.(?:[8-9]|1[0-4])(?:\.[0-9]+)?", version):
+        raise ValueError("Released-predictions recipe requires a supported explicit CPython 3.8-3.14 image")
+    reference = "python:" + version
+    options = request.config.docker_options
+    custom = options.get("docker_paper_python_image") or os.environ.get("EXECUTION_DOCKER_PAPER_PYTHON_IMAGE")
+    extra = options.get("docker_extra_pip_packages") or os.environ.get("EXECUTION_DOCKER_EXTRA_PIP_PACKAGES")
+    if (custom and custom not in {reference, reference + "-slim"}) or extra or request.dependencies:
+        raise ValueError("Released-predictions recipe cannot use custom images or install extra dependencies")
+    reference = custom or reference
+    command = docker_cmd(["image", "inspect", frozen_id or reference])
+    result = run_command(command, cwd=request.run_dir, timeout_sec=30)
+    phase = "after" if frozen_id else "before"
+    persist_command_result(result, logs, prefix=f"image_{phase}")
+    if result.returncode != 0:
+        raise ValueError("Required existing CPython image is unavailable; no image was pulled or built")
+    rows = json.loads(result.stdout)
+    if not isinstance(rows, list) or len(rows) != 1 or not isinstance(rows[0], dict):
+        raise ValueError("CPython image inspection did not identify one image")
+    row = rows[0]
+    if not isinstance(row.get("Config"), dict) or not isinstance(row.get("RepoTags"), list):
+        raise ValueError("CPython image configuration is unavailable")
+    image_id = row.get("Id")
+    if (
+        not isinstance(image_id, str)
+        or not re.fullmatch(r"sha256:[0-9a-f]{64}", image_id)
+        or (frozen_id and image_id != frozen_id)
+        or (not frozen_id and reference not in row.get("RepoTags", []))
+        or row.get("Config", {}).get("Entrypoint") not in (None, [])
+    ):
+        raise ValueError(
+            "Inspected CPython image identity or entrypoint violates the isolated recipe contract"
+        )
+    audit = {
+        "reference": reference,
+        "image_id": image_id,
+        "entrypoint": None,
+        "interpreter_flags": ["-I", "-S"],
+        "author_dependencies_installed": False,
+        "trust_boundary": "Operator-trusted standard CPython image and Docker engine; image compromise is outside this proof.",
+    }
+    _json(logs / f"image_{phase}.json", audit)
+    return image_id, command, audit
+
+
 def docker_runner(request: RunRequest) -> RunOutcome:
     """Real Docker transport. A JSON output or stdout marker supplies observations.
 
@@ -326,21 +389,37 @@ def docker_runner(request: RunRequest) -> RunOutcome:
     start = time.monotonic()
     # Docker's existing builder writes deployment files. Isolate these generated
     # files from the runtime snapshot, including repositories with their own deployment/.
-    build_context = logs / "build_context"
-    shutil.copytree(request.workspace, build_context)
-    ok, image = docker_ensure_paper_image(
-        options,
-        paper_key=request.plan.id,
-        paper_root_host=str(build_context),
-        python_spec=request.config.python_version,
-        timeout_sec=request.config.docker_build_timeout_seconds,
-    )
-    build_log = logs / "build" / "commands.jsonl"
-    build_commands = (
-        [json.loads(line)["command"] for line in build_log.read_text(encoding="utf-8").splitlines()]
-        if build_log.exists()
-        else []
-    )
+    projected = any(binding.version == 2 for binding in request.plan.target_bindings.values())
+    recipe_environment = None
+    if projected:
+        try:
+            from .prediction_measurement import check_request
+
+            check_request(request, next(iter(request.plan.target_bindings.values())))
+            image, inspect_command, recipe_environment = _prediction_image(request, logs)
+            build_commands, ok = [inspect_command], True
+        except (ValueError, OSError, TypeError, KeyError) as exc:
+            return RunOutcome(
+                returncode=1,
+                issue=f"Isolated prediction environment unavailable: {exc}",
+                environment={"transport": "docker", "python": request.config.python_version},
+            )
+    else:
+        build_context = logs / "build_context"
+        shutil.copytree(request.workspace, build_context)
+        ok, image = docker_ensure_paper_image(
+            options,
+            paper_key=request.plan.id,
+            paper_root_host=str(build_context),
+            python_spec=request.config.python_version,
+            timeout_sec=request.config.docker_build_timeout_seconds,
+        )
+        build_log = logs / "build" / "commands.jsonl"
+        build_commands = (
+            [json.loads(line)["command"] for line in build_log.read_text(encoding="utf-8").splitlines()]
+            if build_log.exists()
+            else []
+        )
     if not ok:
         return RunOutcome(
             returncode=1,
@@ -360,7 +439,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
         cmd=request.command,
         env={"FACTREVIEW_REPAIR_ROUND": str(request.repair_round)},
         env_passthrough=[],
-        gpus=options.get("docker_gpus"),
+        gpus=None if projected else options.get("docker_gpus"),
         container_name=container_name,
     )
     # Force the fresh workspace mount regardless of legacy environment options.
@@ -423,12 +502,24 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             f"Docker container cleanup failed for {container_name}; the container may still be running: "
             f"{cleanup['stderr']}" + (f"; {issue}" if issue else "")
         )
+    after_commands = []
+    execution_returncode = result.returncode
+    if projected:
+        try:
+            _, inspect_command, confirmed = _prediction_image(request, logs, frozen_id=image)
+            after_commands.append(inspect_command)
+            if confirmed != recipe_environment:
+                raise ValueError("Isolated interpreter image metadata changed during execution")
+        except (ValueError, OSError, TypeError, KeyError) as exc:
+            observations = []
+            execution_returncode = 1
+            issue = f"Isolated prediction environment revalidation failed: {exc}"
     return RunOutcome(
-        returncode=result.returncode,
+        returncode=execution_returncode,
         stdout=result.stdout,
         stderr=result.stderr,
         observations=observations,
-        commands=[*build_commands, command, *([cleanup["command"]] if cleanup else [])],
+        commands=[*build_commands, command, *after_commands, *([cleanup["command"]] if cleanup else [])],
         logs={
             "stdout": str(logs / "run_stdout.log"),
             "stderr": str(logs / "run_stderr.log"),
@@ -444,6 +535,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             "container_name": container_name,
             "writable_runtime_directory": str(runtime_dir),
             **({"container_cleanup": cleanup} if cleanup else {}),
+            **({"prediction_recipe_environment": recipe_environment} if recipe_environment else {}),
         },
         runtime_seconds=time.monotonic() - start,
         issue=issue,
@@ -735,7 +827,20 @@ def execute_plans(
         ):
             execution_blocker = f"execution stopped after {plan.id}: Docker container cleanup failed; remaining plans were not run"
         row["reason"] = reason
-        if reason:
+        projected = any(getattr(binding, "version", None) == 2 for binding in plan.target_bindings.values())
+        if reason and projected:
+            from schemas.limitations import VerificationLimitation
+
+            claim.verification_limitations.append(
+                VerificationLimitation(
+                    claim_id=claim.id,
+                    condition_ids=plan.condition_ids,
+                    stage="execution",
+                    kind="plan_rejected",
+                    reason=reason,
+                )
+            )
+        elif reason:
             claim.questions.append(
                 AuthorQuestion(
                     claim_id=claim.id,
@@ -783,6 +888,20 @@ def _execute_graph(
             state.update(
                 outcome=RunOutcome(returncode=1, issue=binding_issue), reason=binding_issue, stop=True
             )
+            return state
+        try:
+            from .prediction_measurement import check_request
+
+            for binding in request.plan.target_bindings.values():
+                if binding.version == 2:
+                    check_request(request, binding)
+            if any(binding.version == 2 for binding in request.plan.target_bindings.values()):
+                changed_before = protected_changes(request.workspace)
+                if changed_before:
+                    raise ValueError("execution workspace changed before run: " + ", ".join(changed_before))
+        except ValueError as exc:
+            state.update(outcome=RunOutcome(returncode=1, issue=str(exc)), reason=str(exc), stop=True)
+            issues.append(f"{request.plan.id}: {exc}")
             return state
         begin = time.monotonic()
         if request.plan.run_mode == "training":
@@ -849,8 +968,10 @@ def _execute_graph(
         matched = 0
         invalid_comparisons = []
         for condition in request.plan.target_conditions:
+            binding = bindings[condition.id]
+            runtime_target = binding.projection.runtime_target if binding.version == 2 else condition
             paper_variance = condition.settings.get("reported_variance")
-            candidates = [item for item in outcome.observations if aligned(item, condition)]
+            candidates = [item for item in outcome.observations if aligned(item, runtime_target)]
             if len(candidates) != 1:
                 ledger["alignment"].append(
                     {
@@ -861,6 +982,30 @@ def _execute_graph(
                 )
                 continue
             observation = candidates[0]
+            raw_observation = observation
+            measurement_path, measurement_provenance = None, {}
+            if binding.version == 2:
+                from .prediction_measurement import measure_predictions
+
+                measurement_path = Path(request.run_dir) / f"host_measurement_{len(ledger['alignment'])}.json"
+                try:
+                    measured, measurement_provenance = measure_predictions(
+                        request,
+                        binding,
+                        materials,
+                        observation,
+                        measurement_path,
+                        runtime_environment=outcome.environment,
+                    )
+                    observation = Observation.model_validate(measured)
+                except (ValueError, OSError, TypeError, KeyError, IndexError) as exc:
+                    reason = f"{condition.id}: trusted released-predictions measurement unavailable: {exc}"
+                    ledger["alignment"].append(
+                        {"condition_id": condition.id, "comparable": False, "reason": reason}
+                    )
+                    invalid_comparisons.append(reason)
+                    issues.append(f"{request.plan.id}: {reason}")
+                    continue
             unit_issue = runtime_target_issue(
                 bindings[condition.id], observation.settings, observation_unit=observation.unit
             )
@@ -928,9 +1073,18 @@ def _execute_graph(
                 "repair_round": request.repair_round,
                 "variance_source": variance_audit,
                 "paper_target_binding": bindings[condition.id].model_dump(mode="json"),
+                **(
+                    {
+                        "measurement": str(measurement_path),
+                        "resource_mode": "released_predictions",
+                        "model_inference_performed": False,
+                    }
+                    if measurement_path
+                    else {}
+                ),
             }
             ledger["alignment"].append(decision)
-            provenance = {}
+            provenance = measurement_provenance
             if not consistent and observation.released_recomputation:
                 try:
                     provenance = _released_provenance(
@@ -952,8 +1106,10 @@ def _execute_graph(
                 Evidence(
                     source="execution",
                     pointer=EvidencePointer(
-                        locator=outcome.logs["observations"],
-                        key=f"{outcome.observations.index(observation)}.value",
+                        locator=str(measurement_path) if measurement_path else outcome.logs["observations"],
+                        key="measurement.value"
+                        if measurement_path
+                        else f"{outcome.observations.index(raw_observation)}.value",
                     ),
                     covered=[condition.id],
                     direction="support" if consistent else "flaw",
@@ -962,7 +1118,13 @@ def _execute_graph(
                     concern=not consistent,
                     overturnable=not decisive,
                     note=f"Paper={target}; observed={observation.value}; gap={gap}; tolerance={tolerance}; "
-                    f"approval={request.config.approval_mode}; conditions={actual.model_dump(mode='json')}",
+                    f"approval={request.config.approval_mode}; conditions={actual.model_dump(mode='json')}"
+                    + (
+                        f"; released_predictions exact-match evaluation; host independently recomputed the complete frozen data; "
+                        f"no model inference or training performed; raw author output={outcome.logs['observations']}"
+                        if measurement_path
+                        else ""
+                    ),
                     provenance=ExecutionProvenance(
                         run_id=request.plan.id,
                         command=request.command,
