@@ -252,6 +252,106 @@ class CoverageReviewV2(CoverageReview):
     claim_checks: list[CurrentClaimCheck]
 
 
+class SourcedAssertionGroup(AssertionGroup):
+    source_block_ids: list[StrictStr] = Field(min_length=1)
+
+
+class QualifierFinding(Contract):
+    kind: Literal["missing_qualifier_or_condition"]
+    condition_ids: list[StrictStr] = Field(min_length=1)
+    source_block_ids: list[StrictStr] = Field(min_length=1)
+    restriction: StrictStr = Field(min_length=1)
+    material_effect: StrictStr = Field(
+        min_length=1,
+        description="The materially different interpretation or verification setting permitted by this missing restriction; check whether existing claim semantics already exclude it.",
+    )
+    reason: StrictStr = Field(min_length=1)
+
+
+class NeedsFinding(Contract):
+    kind: Literal["missing_needs"]
+    condition_ids: list[StrictStr] = Field(min_length=1)
+    source_block_ids: list[StrictStr] = Field(min_length=1)
+    needs: list[EvidenceNeed] = Field(min_length=1)
+    reason: StrictStr = Field(min_length=1)
+
+
+class UncertainFinding(Contract):
+    kind: Literal["uncertain"]
+    condition_ids: list[StrictStr] = Field(min_length=1)
+    source_block_ids: list[StrictStr] = Field(min_length=1)
+    reason: StrictStr = Field(min_length=1)
+
+
+class PreservedQualifier(Contract):
+    source_block_ids: list[StrictStr] = Field(min_length=1)
+    restriction: StrictStr = Field(min_length=1)
+    claim_path: StrictStr = Field(
+        description="Exact JSON pointer to /text or a value under /conditions in this current claim. A source quote or another claim is not a carrier."
+    )
+    claim_value: Any = Field(description="Unchanged value at claim_path, including its JSON type.")
+
+
+class CurrentClaimReviewV3(Contract):
+    claim_id: StrictStr
+    claim_digest: StrictStr
+    state: Literal["resolved", "unresolved"]
+    assertion_groups: list[SourcedAssertionGroup] = Field(
+        description="One group declares one conclusion across settings or an explicitly joint configuration; multiple groups explicitly declare independently judgeable conclusions. Account for every original condition."
+    )
+    findings: list[QualifierFinding | NeedsFinding | UncertainFinding]
+    preserved_qualifiers: list[PreservedQualifier] = Field(
+        description="For each governing restriction judged preserved, identify its source and its actual carrier in this claim text/conditions. Empty only when no governing restriction is judged preserved; source presence alone is insufficient."
+    )
+    source_block_ids: list[StrictStr] = Field(min_length=1)
+    reason: StrictStr = Field(min_length=1)
+
+
+class NewFindingV3(Contract):
+    kind: Literal["missing_conclusion", "uncertain"]
+    source_block_ids: list[StrictStr] = Field(min_length=1)
+    reason: StrictStr = Field(min_length=1)
+
+
+class CoverageReviewV3(Contract):
+    schema_version: Literal["claim-coverage-v3"]
+    context_id: StrictStr
+    window_id: StrictStr
+    reviewed_block_ids: list[StrictStr]
+    claim_reviews: list[CurrentClaimReviewV3]
+    new_findings: list[NewFindingV3]
+    explanation: StrictStr = Field(min_length=1)
+
+
+_REVIEW_SYSTEM_V3 = (
+    _REVIEW_SYSTEM.split("Select original whole-block IDs as sources;", 1)[0]
+    + """
+Return the explicit claim-coverage-v3 contract. Select unchanged whole-block IDs as sources;
+do not write quotes or locations. For each REQUIRED_CLAIM_CHECKS entry, return exactly one
+claim_review with its exact claim_id and digest. In a resolved review, assertion_groups declare
+all independently judgeable conclusions: exactly one group for a single conclusion across
+settings or an explicitly joint configuration, multiple groups for independent conclusions.
+Each group names its source blocks and closed original condition IDs. Groups may share a
+condition when it contains separate assertions. Do not separately repeat a merged-conclusions
+observation: the program lowers this explicit declaration once for follow-up.
+Use findings for missing_qualifier_or_condition and missing_needs; identify their source blocks
+and affected conditions. A missing qualifier names the original restriction and the materially
+different verification interpretation its absence allows. For each preserved governing qualifier,
+give its source restriction and the actual unchanged value and JSON pointer in THIS claim's
+text/conditions. Check dataset, split, label budget and selection scope where they actually govern
+the claim. A source quote, another claim or a section transition does not establish preservation
+or a necessary missing qualifier. These judgments still require scientific interpretation.
+Use state unresolved and uncertain findings when the relationship is unclear; do not simultaneously
+assert a definite problem. New independent omissions or untargeted uncertainty go in new_findings.
+supplemental_sources are revalidated earlier pending sources, separate from this window's blocks.
+unassigned_background has no claim association. Loading permits explicit citation but does not
+assign a target, resolve a historical observation, or count any current block as reviewed.
+reviewed_block_ids contains only the original window blocks actually reviewed, in supplied order.
+Historical IDs are not current findings. Retain the supplied three-stage workflow and JSON schema.
+"""
+)
+
+
 class SelectedSourceRef(Contract):
     source_block_id: StrictStr = Field(min_length=1)
     covered: list[StrictStr] = Field(min_length=1)
@@ -339,6 +439,283 @@ def _whole_block(identifier, blocks, allowed, markdown):
         raise ValueError("Selected whole block is not losslessly representable")
     _location(block, block.text, markdown)
     return block.text
+
+
+def _observation_bindings(observation, blocks, markdown, materials_digest, source_hashes):
+    """Capture only after an observation has passed exact source validation."""
+    return [
+        {
+            "block_id": source.block_id,
+            "quote": source.quote,
+            "loc": _location(blocks[source.block_id], source.quote, markdown).model_dump(mode="json"),
+            "block_digest": _digest(blocks[source.block_id].model_dump(mode="json")),
+            "materials_digest": materials_digest,
+            "source_hashes": copy.deepcopy(source_hashes),
+        }
+        for source in observation.sources
+    ]
+
+
+def _supplemental_sources(
+    history,
+    target_ids,
+    window_ids,
+    blocks,
+    frozen_original,
+    markdown,
+    materials_digest,
+    source_hashes,
+    char_limit,
+):
+    """Rebind pending sources without assigning claims or changing reviewed coverage."""
+    loaded, unavailable, by_id, size = [], [], {}, 0
+    ordered = sorted(history, key=lambda row: row.get("target_claim_id") not in target_ids)
+    for row in ordered:
+        identity = {"history_window_id": row.get("window_id"), "observation_id": row.get("id")}
+        try:
+            target = row.get("target_claim_id")
+            if row.get("state") != "unresolved" or (target is not None and target not in target_ids):
+                raise ValueError(
+                    "Historical observation is invalid or outside current target/background scope"
+                )
+            observation = CoverageObservation.model_validate(
+                {key: row[key] for key in CoverageObservation.model_fields}
+            )
+            bindings = _observation_bindings(observation, blocks, markdown, materials_digest, source_hashes)
+            if not bindings or _digest(bindings) != _digest(row.get("source_bindings")):
+                raise ValueError("Historical source has no matching previously validated binding")
+            if len({b["block_id"] for b in bindings}) != len(bindings):
+                raise ValueError("Historical source bindings repeat a block")
+            for binding in bindings:
+                key = binding["block_id"]
+                if key not in frozen_original or _digest(blocks[key].model_dump(mode="json")) != _digest(
+                    frozen_original[key]
+                ):
+                    raise ValueError("Historical source is not the unchanged original parsed block")
+            for binding in bindings:
+                key = binding["block_id"]
+                if key in window_ids:
+                    continue  # This block retains the current window's review obligation.
+                text = _whole_block(key, blocks, set(frozen_original), markdown)
+                provenance = {
+                    **identity,
+                    "target_claim_id": target,
+                    "association": "current_target" if target is not None else "unassigned_background",
+                    "source_binding": copy.deepcopy(binding),
+                }
+                if key in by_id:
+                    by_id[key]["bindings"].append(provenance)
+                elif size + len(text) > min(char_limit, 24_000):
+                    unavailable.append(
+                        {**identity, "block_id": key, "reason": "Supplemental character budget exceeded"}
+                    )
+                else:
+                    item = {"block": copy.deepcopy(frozen_original[key]), "bindings": [provenance]}
+                    loaded.append(item)
+                    by_id[key] = item
+                    size += len(text)
+        except (ValueError, KeyError, TypeError) as exc:
+            unavailable.append({**identity, "reason": str(exc)})
+    return loaded, unavailable
+
+
+def _claim_carrier(claim, path):
+    if path != "/text" and not path.startswith("/conditions/"):
+        raise ValueError("Preserved qualifier must locate this claim's text or conditions")
+    value = claim
+    for token in path[1:].split("/"):
+        if re.search(r"~(?![01])", token):
+            raise ValueError("Invalid qualifier JSON pointer escape")
+        token = token.replace("~1", "/").replace("~0", "~")
+        if isinstance(value, list):
+            if not re.fullmatch(r"0|[1-9][0-9]*", token):
+                raise ValueError("Invalid qualifier array index")
+            value = value[int(token)]
+        else:
+            value = value[token]
+    return value
+
+
+def _lower_v3(review, required, registry, blocks, markdown, supplemental_ids):
+    """Normalize explicit v3 declarations once; old v2 outputs never enter here."""
+    allowed = set(review.reviewed_block_ids) | set(supplemental_ids)
+    by_id = {row["claim_id"]: row for row in registry}
+    required_ids = {row["claim_id"]: row for row in required}
+    counts = Counter(row.claim_id.strip() for row in review.claim_reviews)
+    observations, checks = [], []
+    audit = {"version": "claim-coverage-v3-lowering-v1", "mappings": [], "errors": []}
+
+    def source_ids(ids):
+        if not ids or len(set(ids)) != len(ids):
+            raise ValueError("V3 source IDs must be nonempty and unique")
+        for key in ids:
+            _whole_block(key, blocks, allowed, markdown)
+        return ids
+
+    def conditions(ids, available):
+        if len(set(ids)) != len(ids) or not set(ids) <= available:
+            raise ValueError("V3 finding/group contains repeated or foreign conditions")
+
+    def observation(kind, target, ids, reason, path, raw):
+        identifier = "v3_" + _digest([review.context_id, path, raw, kind])[:24]
+        return SelectedObservation(
+            id=identifier,
+            kind=kind,
+            target_claim_id=target,
+            sources=[CoverageSourceSelection(block_id=key) for key in source_ids(ids)],
+            reason=reason,
+        )
+
+    for index, row in enumerate(review.claim_reviews):
+        path = f"/claim_reviews/{index}"
+        raw = row.model_dump(mode="json")
+        try:
+            key = row.claim_id
+            if key not in required_ids or counts[key] != 1:
+                raise ValueError("V3 claim identity is foreign, padded or duplicated")
+            claim = by_id[key]
+            if row.claim_digest != claim["digest"] or row.claim_digest != required_ids[key]["digest"]:
+                raise ValueError("V3 claim digest differs from the current required claim")
+            ids = {c["id"] for c in claim["conditions"]}
+            used = list(source_ids(row.source_block_ids))
+            covered = set()
+            for group in row.assertion_groups:
+                conditions(group.condition_ids, ids)
+                covered.update(group.condition_ids)
+                used.extend(source_ids(group.source_block_ids))
+            if row.state == "resolved" and (not row.assertion_groups or covered != ids):
+                raise ValueError("Resolved V3 groups must account for every original condition")
+            for preserved in row.preserved_qualifiers:
+                used.extend(source_ids(preserved.source_block_ids))
+                if _digest(_claim_carrier(claim, preserved.claim_path)) != _digest(preserved.claim_value):
+                    raise ValueError("Preserved qualifier carrier differs from the original claim value/type")
+            for finding in row.findings:
+                conditions(finding.condition_ids, ids)
+                used.extend(source_ids(finding.source_block_ids))
+                if isinstance(finding, NeedsFinding) and (
+                    len(set(finding.needs)) != len(finding.needs) or set(finding.needs) & set(claim["needs"])
+                ):
+                    raise ValueError("Missing needs must name distinct branches absent from this claim")
+            uncertain = any(f.kind == "uncertain" for f in row.findings)
+            if (row.state == "resolved" and uncertain) or (
+                row.state == "unresolved" and any(f.kind != "uncertain" for f in row.findings)
+            ):
+                raise ValueError("V3 resolved/unresolved state conflicts with its findings")
+            emitted = []
+            if row.state == "unresolved":
+                emitted.append(
+                    observation(
+                        "uncertain",
+                        key,
+                        list(dict.fromkeys(used)),
+                        json.dumps(
+                            {
+                                name: raw[name]
+                                for name in (
+                                    "reason",
+                                    "assertion_groups",
+                                    "findings",
+                                    "preserved_qualifiers",
+                                )
+                            },
+                            ensure_ascii=False,
+                        ),
+                        path,
+                        raw,
+                    )
+                )
+            else:
+                if len(row.assertion_groups) > 1:
+                    emitted.append(
+                        observation(
+                            "merged_conclusions",
+                            key,
+                            list(dict.fromkeys(used)),
+                            json.dumps(
+                                {"reason": row.reason, "assertion_groups": raw["assertion_groups"]},
+                                ensure_ascii=False,
+                            ),
+                            path,
+                            raw,
+                        )
+                    )
+                for j, finding in enumerate(row.findings):
+                    detail = finding.model_dump(mode="json")
+                    emitted.append(
+                        observation(
+                            finding.kind,
+                            key,
+                            finding.source_block_ids,
+                            json.dumps(detail, ensure_ascii=False),
+                            f"{path}/findings/{j}",
+                            detail,
+                        )
+                    )
+            check = CurrentClaimCheck(
+                claim_id=key,
+                atomicity="unresolved"
+                if row.state == "unresolved"
+                else ("independent_conclusions" if len(row.assertion_groups) > 1 else "single_conclusion"),
+                assertion_groups=[
+                    AssertionGroup(proposition=g.proposition, condition_ids=g.condition_ids)
+                    for g in row.assertion_groups
+                ],
+                governing_qualifiers="unresolved"
+                if row.state == "unresolved"
+                else (
+                    "missing"
+                    if any(f.kind == "missing_qualifier_or_condition" for f in row.findings)
+                    else "preserved"
+                ),
+                observation_ids=[o.id for o in emitted],
+                reason=row.reason,
+            )
+            _check_assertions(check, claim["conditions"], set(check.observation_ids))
+            checks.append(check)
+            observations.extend(emitted)
+            audit["mappings"].append(
+                {
+                    "raw_path": path,
+                    "raw_digest": _digest(raw),
+                    "claim_id": key,
+                    "observation_ids": check.observation_ids,
+                    "source_block_ids": list(dict.fromkeys(used)),
+                }
+            )
+        except (ValueError, KeyError, TypeError, IndexError) as exc:
+            audit["errors"].append({"raw_path": path, "error": str(exc)})
+    new_counts = Counter(_digest(row.model_dump(mode="json")) for row in review.new_findings)
+    for index, row in enumerate(review.new_findings):
+        path, raw = f"/new_findings/{index}", row.model_dump(mode="json")
+        try:
+            if new_counts[_digest(raw)] != 1:
+                raise ValueError("Duplicate V3 new findings are rejected")
+            emitted = observation(row.kind, None, row.source_block_ids, row.reason, path, raw)
+            observations.append(emitted)
+            audit["mappings"].append(
+                {
+                    "raw_path": path,
+                    "raw_digest": _digest(raw),
+                    "observation_ids": [emitted.id],
+                    "source_block_ids": list(row.source_block_ids),
+                }
+            )
+        except (ValueError, KeyError, TypeError) as exc:
+            audit["errors"].append({"raw_path": path, "error": str(exc)})
+    audit["consumed_supplemental_ids"] = [
+        key
+        for key in blocks
+        if key in supplemental_ids and any(key in m["source_block_ids"] for m in audit["mappings"])
+    ]
+    return CoverageReviewV2(
+        schema_version="claim-coverage-v2",
+        context_id=review.context_id,
+        window_id=review.window_id,
+        reviewed_block_ids=review.reviewed_block_ids,
+        observations=observations,
+        claim_checks=checks,
+        explanation=review.explanation,
+    ), audit
 
 
 def _restore_claim(candidate, blocks, allowed, markdown):
@@ -697,6 +1074,7 @@ def review_claim_coverage(
     review_blocks = _review_blocks(materials)
     blocks = {b.id: b for b in review_blocks}
     original_block_ids = {b.id for b in materials.blocks}
+    frozen_blocks = {b.id: copy.deepcopy(b.model_dump(mode="json")) for b in materials.blocks}
     issues, pending, confirmed_targets = [], {}, set()
     cfg = None
     files = {p: _file_hash(p) for p in {materials.source_pdf, materials.markdown_path} if p}
@@ -784,6 +1162,7 @@ def review_claim_coverage(
             # implicit source choices or affirmative claim checks.
             legacy = {
                 "claim-coverage-v1": CoverageReview,
+                "claim-coverage-v2": CoverageReviewV2,
                 "claim-coverage-followup-v1": CoverageFollowup,
                 "claim-coverage-validation-v1": CoverageValidation,
             }
@@ -834,6 +1213,25 @@ def review_claim_coverage(
                 for observation in old["observations"]
                 if observation["state"] in {"unresolved", "invalid"}
             ]
+            check()
+            supplements, unavailable = _supplemental_sources(
+                unresolved,
+                {row["claim_id"] for row in required},
+                ids,
+                blocks,
+                frozen_blocks,
+                materials.markdown,
+                coverage["materials_digest"],
+                files,
+                window_chars,
+            )
+            window["supplemental_sources"] = {
+                "loaded_block_ids": [row["block"]["id"] for row in supplements],
+                "characters": sum(len(row["block"]["text"]) for row in supplements),
+                "character_limit": min(window_chars, 24_000),
+                "unavailable": unavailable,
+                "meaning": "Loaded citation context only; original window review obligations remain unchanged.",
+            }
             payload = {
                 "window_id": window["id"],
                 "paper_title": materials.title,
@@ -842,10 +1240,11 @@ def review_claim_coverage(
                 "required_claim_checks": required,
                 "previous_unresolved_observations": unresolved,
                 "review_only_block_ids": [key for key in ids if key not in original_block_ids],
+                "supplemental_sources": supplements,
             }
             coverage["budget"]["review_calls"] += 1
             try:
-                review = request(_REVIEW_SYSTEM, payload, CoverageReviewV2, "screening.claims.coverage")
+                review = request(_REVIEW_SYSTEM_V3, payload, CoverageReviewV3, "screening.claims.coverage")
                 selected = set(review.reviewed_block_ids)
                 if (
                     not selected
@@ -855,6 +1254,24 @@ def review_claim_coverage(
                     raise ValueError(
                         "Reviewed block IDs must be a nonempty unique ordered subset of this window"
                     )
+                supplemental_ids = set()
+                lowering_errors = []
+                if isinstance(review, CoverageReviewV3):
+                    supplemental_ids = {row["block"]["id"] for row in supplements}
+                    review, lowering = _lower_v3(
+                        review,
+                        required,
+                        registry,
+                        blocks,
+                        materials.markdown,
+                        supplemental_ids,
+                    )
+                    audit["attempts"][-1]["v3_lowering"] = lowering
+                    audit["attempts"][-1]["normalized_response"] = review.model_dump(mode="json")
+                    lowering_errors = [f"{row['raw_path']}: {row['error']}" for row in lowering["errors"]]
+                    window["v3_lowering_errors"] = lowering_errors
+                    save()
+                evidence_allowed = selected | supplemental_ids
                 if len({o.id for o in review.observations}) != len(review.observations):
                     raise ValueError("Coverage observation IDs must be unique")
             except Exception as exc:
@@ -873,12 +1290,12 @@ def review_claim_coverage(
                     ):
                         raise ValueError("Coverage observation has an invalid original claim target")
                     for source in observation.sources:
-                        if source.block_id not in selected:
+                        if source.block_id not in evidence_allowed:
                             raise ValueError(
                                 "Coverage observation borrows a source outside the declared reviewed range"
                             )
                         if isinstance(observation, SelectedObservation):
-                            _whole_block(source.block_id, blocks, selected, materials.markdown)
+                            _whole_block(source.block_id, blocks, evidence_allowed, materials.markdown)
                         else:
                             _location(blocks[source.block_id], source.quote, materials.markdown)
                     if isinstance(observation, SelectedObservation):
@@ -917,6 +1334,7 @@ def review_claim_coverage(
                 valid_observations,
                 selected,
             )
+            window["claim_check_errors"].extend(lowering_errors)
             if window["claim_check_errors"] or any(r["state"] != "checked" for r in window["claim_checks"]):
                 window["status"] = "partially_reviewed"
             review = review.model_copy(update={"observations": valid_observations})
@@ -929,10 +1347,22 @@ def review_claim_coverage(
                 )
                 if observation.target_claim_id is not None and observation.kind != "uncertain":
                     confirmed_targets.add(observation.target_claim_id)
-                window["observations"].append({**observation.model_dump(mode="json"), "state": "unresolved"})
+                window["observations"].append(
+                    {
+                        **observation.model_dump(mode="json"),
+                        "state": "unresolved",
+                        "source_bindings": _observation_bindings(
+                            observation,
+                            blocks,
+                            materials.markdown,
+                            coverage["materials_digest"],
+                            files,
+                        ),
+                    }
+                )
             if not review.observations:
                 continue
-            source_ids = set(ids)
+            source_ids = set(ids) | supplemental_ids
             for c in current:
                 if c.id in {o.target_claim_id for o in review.observations}:
                     source_ids.update(_source_ids(c))
