@@ -24,6 +24,7 @@ from schemas.materials import (
     RepositoryFile,
     RepositoryIndex,
     SharedMaterials,
+    TableMaterial,
 )
 
 BBoxSpace = Literal["normalized_1000", "pdf_points"]
@@ -33,6 +34,11 @@ _PANEL_SUFFIX = r"(?:[a-z]|\s*\(\s*[a-z]\s*\))?"
 _FIGURE_ANCHOR = rf"{_ANCHOR_NUMBER}{_PANEL_SUFFIX}(?![\w]|\.\d)"
 _FIGURE_REF = re.compile(
     rf"\bfig(?:ure)?s?\.?\s*({_FIGURE_ANCHOR}"
+    rf"(?:\s*(?:,\s*(?:(?:and|&)\s*)?|(?:and|&|[-–])\s*){_FIGURE_ANCHOR})*)",
+    re.IGNORECASE,
+)
+_TABLE_REF = re.compile(
+    rf"\btab(?:le)?s?\.?\s*({_FIGURE_ANCHOR}"
     rf"(?:\s*(?:,\s*(?:(?:and|&)\s*)?|(?:and|&|[-–])\s*){_FIGURE_ANCHOR})*)",
     re.IGNORECASE,
 )
@@ -190,9 +196,9 @@ def _span(markdown: str, text: str, cursor: int) -> tuple[int, int] | None:
     return None
 
 
-def _anchors(text: str) -> set[str]:
+def _anchors(text: str, *, pattern: re.Pattern = _FIGURE_REF) -> set[str]:
     anchors = set()
-    for match in _FIGURE_REF.finditer(text):
+    for match in pattern.finditer(text):
         group = match.group(1)
         # Panel labels identify part of the same figure and are kept in the
         # original reference text, while linkage uses its parent figure number.
@@ -212,7 +218,11 @@ def _sentences(block: MaterialBlock) -> list[MaterialBlock]:
     spans = []
     for boundary in re.finditer(r"(?<=[.!?])\s+(?=[A-Z])", block.text):
         prefix = block.text[: boundary.start()]
-        if re.search(r"\b(?:figs?|figures?|eqs?|secs?|e\.g|i\.e|et al)\.$|\b[A-Z]\.$", prefix, re.IGNORECASE):
+        if re.search(
+            r"\b(?:figs?|figures?|tabs?|tables?|eqs?|secs?|e\.g|i\.e|et al)\.$|\b[A-Z]\.$",
+            prefix,
+            re.IGNORECASE,
+        ):
             continue
         spans.append((start, boundary.start()))
         start = boundary.end()
@@ -370,6 +380,73 @@ def _bbox(row: dict[str, Any], width: float, height: float, default: BBoxSpace) 
     if not (0 <= x1 < x2 <= width and 0 <= y1 < y2 <= height):
         raise ValueError("bbox is outside the page or has non-positive area")
     return coords
+
+
+def _table_materials(material: SharedMaterials, rows, pdf, images_dir: Path, bbox_space: BBoxSpace):
+    """Keep table pixels and coverage separate from the historical figure contract."""
+    import fitz
+    from PIL import Image
+
+    blocks = {block.id: block for block in material.blocks}
+    for row_number, row in enumerate(rows, 1):
+        if row.get("type") != "table":
+            continue
+        raw_captions = row.get("table_caption")
+        caption = _content_text(raw_captions)
+        caption_anchors = set()
+        for line in caption.splitlines():
+            label = _TABLE_REF.match(line.lstrip())
+            if label:
+                caption_anchors.update(_anchors(label.group(), pattern=_TABLE_REF))
+        ambiguous = len(caption_anchors) > 1 or (
+            isinstance(raw_captions, list) and sum(bool(_content_text(value)) for value in raw_captions) > 1
+        )
+        block_id = f"block_{row_number}"
+        block = blocks.get(block_id)
+        table = TableMaterial(
+            id=f"table_{len(material.tables) + 1}",
+            block_id=block_id,
+            anchor=next(iter(caption_anchors)) if len(caption_anchors) == 1 and not ambiguous else "",
+            loc=block.loc if block else None,
+            caption=caption,
+            footnotes=_content_text(row.get("table_footnote")),
+            caption_ambiguous=ambiguous,
+        )
+        if not caption:
+            table.issues.append(f"{table.id}: parser supplied no table caption.")
+        elif ambiguous:
+            table.issues.append(
+                f"{table.id}: crop-to-caption assignment is ambiguous; parser supplied multiple table captions."
+            )
+        elif not table.anchor:
+            table.issues.append(f"{table.id}: caption has no table citation anchor.")
+        for body in material.blocks:
+            if body.kind not in {"text", "list"} or body in material.bibliography:
+                continue
+            table.references.extend(
+                sentence
+                for sentence in _sentences(body)
+                if caption_anchors & _anchors(sentence.text, pattern=_TABLE_REF)
+            )
+        try:
+            page_number = _page(row)
+            if page_number is None or page_number > len(pdf):
+                raise ValueError("missing or out-of-range parser page")
+            page = pdf[page_number - 1]
+            box = _bbox(row, page.rect.width, page.rect.height, bbox_space)
+            table.bbox_points = box
+            crop = images_dir / f"{table.id}.png"
+            printed = images_dir / f"{table.id}_printed.png"
+            page.get_pixmap(dpi=200, clip=fitz.Rect(box)).save(crop)
+            size = (max(1, round((box[2] - box[0]) * 96 / 72)), max(1, round((box[3] - box[1]) * 96 / 72)))
+            with Image.open(crop) as image:
+                image.resize(size, Image.Resampling.LANCZOS).save(printed, dpi=(96, 96))
+            table.crop_path, table.printed_crop_path = str(crop), str(printed)
+            if table.loc is None:
+                table.loc = ClaimLocation(page=page_number)
+        except (ValueError, TypeError, OverflowError) as exc:
+            table.issues.append(f"{table.id}: crop/printed-size input unavailable: {exc}")
+        material.tables.append(table)
 
 
 def build_materials(
@@ -532,6 +609,7 @@ def build_materials(
             except (ValueError, TypeError, OverflowError) as exc:
                 material.issues.append(f"{figure.id}: crop/printed-size input unavailable: {exc}")
             material.figures.append(figure)
+        _table_materials(material, rows, pdf, images_dir, bbox_space)
     for linked, data in linked_images:
         if linked.exists() and linked.read_bytes() != data:
             material.issues.append(
