@@ -207,6 +207,79 @@ def test_computed_as_preserves_non_equivalent_or_unknown_tail_rejection(tail):
     )
 
 
+def test_actual009_composed_definition_sample_and_negative_qualifiers(tmp_path):
+    claim, materials = actual006(tmp_path)
+    claim.text = (
+        "On MiniSet test, model ExactMatch has accuracy 0.75, computed as a fraction "
+        "by exact equality of each prediction and label over four examples."
+    )
+    claim.conditions[0].settings = {
+        "model": "ExactMatch",
+        "accuracy": 0.75,
+        "examples": 4,
+        "computation": "fraction computed by exact equality of each prediction and label",
+        "qualifiers": [
+            "four fixed test predictions",
+            "no repeated-run uncertainty claimed",
+            "no population-performance conclusion claimed",
+            "no ranking against other models",
+        ],
+    }
+    claim.conditions[0].description = "Measured MiniSet test accuracy for ExactMatch."
+    before = copy.deepcopy((claim.model_dump(), materials.model_dump()))
+    registry = build_choice_registry(claim, materials)
+    assert len(registry["candidates"]) == 1, registry["unavailable"]
+    candidate = next(iter(registry["candidates"].values()))
+    assert candidate["condition"] == claim.conditions[0].model_dump(mode="json")
+    assert {b["path"] for b in candidate["proposal"]["field_bindings"]} == set(
+        field_inventory(claim.conditions[0])
+    )
+    assert candidate["proposal"]["claim_bindings"][0]["end"] == len(claim.text)
+    assert before == (claim.model_dump(), materials.model_dump())
+
+
+def test_finite_composition_reuses_dynamic_identity_and_sample_slots():
+    cfg = {
+        "dataset": "D[2].+",
+        "metric": "accuracy",
+        "settings": {"split": "held-out", "model": "R+G(v2)"},
+    }
+    runtime = Condition(id="c1", **cfg)
+    head = "On D[2].+ held-out, model R+G(v2) has accuracy 0.75"
+    definition = "a fraction by exact equality of each prediction and label"
+    expected = {"dataset", "definition", "runtime:model", "sample", "value"}
+    for text in (
+        head + ", computed as " + definition + " over seven examples.",
+        head + " over seven examples, computed as " + definition + ".",
+    ):
+        assert _interpret_text(text, cfg, runtime, 0.75, 7) == expected
+    for text in (
+        "Measured D[2].+ held-out accuracy for R+G(v2) on seven fixed examples.",
+        "Reported R+G(v2) accuracy on D[2].+ held-out over seven fixed examples.",
+    ):
+        assert _interpret_text(text, cfg, runtime, 0.75, 7) == expected - {"value"}
+    assert _interpret_text("no population-performance conclusion claimed", cfg, runtime, 0.75, 7) == {
+        "boundary:population_performance"
+    }
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "On MiniSet test, model ExactMatch has accuracy 0.75, computed as a fraction "
+        "by weighted exact equality of each prediction and label over four examples.",
+        "On MiniSet test, model ExactMatch has accuracy 0.75, computed as a fraction "
+        "by exact equality of each prediction and label over four examples except errors.",
+        "On MiniSet test, model ExactMatch has accuracy 0.75 over four examples, "
+        "computed as exact equality of each prediction and label over four examples.",
+        "no population-performance conclusion claimed except for unseen populations",
+        "population-performance conclusion claimed",
+    ],
+)
+def test_finite_composition_keeps_unknown_or_conflicting_meaning_unavailable(text):
+    assert _interpret_text(text, CFG, RUNTIME, 0.75, 4) is None
+
+
 @pytest.mark.parametrize(
     "phrase",
     [

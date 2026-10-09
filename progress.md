@@ -1,5 +1,11 @@
 # FactReview v2 progress
 
+## Current phase 4: composable execution wording
+
+The current actual run `full-native-verified-v2/actual-70088f3cae19` uses its independent `407ec8a` snapshot. Its accuracy claim009 retains eleven condition fields and the complete original statement, but equivalent wording prevented execution candidate construction. The finite parser now composes the existing definition, sample, negative-boundary and description clauses. The unchanged original claim/materials produce one candidate; metric changes, unknown residue and repeated sample clauses remain rejected. This scope covers exact-match accuracy only.
+
+The delegated small-file check passes 54 cases, including seven necessary controls; existing assertions remain intact. Root reviewed the implementation without repeating tests. Saved run inputs, responses, snapshots and controllers remain unchanged. Evidence: `execution-choice-70088-composition-bc1f3a1ef3/` under `runs/v2_method_delivery/`. Actual execution remains to be demonstrated after this correction. The ongoing old-snapshot run continues independently.
+
 ## Current actual outcome and necessary corrections
 
 The complete `actual-92a1606c4241` run has finished. Seven stages complete; zero plans and zero Docker attempts leave actual execution, aligned accuracy and cleanup-coverage gates failed. The independent mechanical review confirms 36 successful actual requests, 211006 measured tokens, five image inputs, unchanged 191 source/6 original input snapshots, and all 412 original artifacts retained. Conditional empty-ledger checks are not execution coverage. The new L1 review validates exact quotes/page locations and records a changed theorem condition: its independence qualifier is retained in the source quote rather than explicit settings, so it cannot close the old identical-condition proof case.

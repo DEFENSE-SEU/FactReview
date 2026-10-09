@@ -52,8 +52,8 @@ def _normal(text):
 
 def _definition(text, *, require_fraction=False):
     text = _normal(text)
-    prefix = r"(?:accuracy (?:is |computed (?:as |by ))?(?:a )?)?"
-    fraction = r"fraction,? (?:computed (?:by|as) )?"
+    prefix = r"(?:accuracy (?:is |computed (?:as |by ))?)?"
+    fraction = r"(?:a )?fraction,? (?:(?:computed )?(?:by|as) )?"
     equality = r"(?:the )?exact equality of (?:each |every )?prediction and (?:its )?label"
     if re.fullmatch(prefix + fraction + equality, text):
         return True
@@ -62,7 +62,7 @@ def _definition(text, *, require_fraction=False):
 
 def _negative(text):
     text = _normal(text).replace("-", " ")
-    text = re.sub(r" (?:is|are) claimed$", "", text)
+    text = re.sub(r" (?:(?:is|are) )?claimed$", "", text)
     if not text.startswith("no "):
         return None
     parts = re.split(r"\s+(?:or|and)\s+", text[3:])
@@ -107,22 +107,27 @@ def _statement(text, runtime, value, count):
     from verification.experiment_targets import _scalar_match
 
     normalized = text.strip().rstrip(".! ")
-    pieces = re.split(r",\s*(?:with|computed\s+as)\s+", normalized, flags=re.I)
+    pieces = re.split(r",\s*(?:with|computed\s+(?:as|by))\s+", normalized, flags=re.I)
     if len(pieces) > 2:
         return None
     keys = set()
+    for index, piece in enumerate(pieces):
+        samples = []
+        for over in re.finditer(r"\s+over\s+", piece, re.I):
+            sample = _sample(piece[over.end() :], count, runtime.settings.get("split"))
+            if sample is not None:
+                samples.append((over.start(), sample))
+        if len(samples) > 1 or (samples and "sample" in keys):
+            return None
+        if samples:
+            start, sample = samples[0]
+            keys.update(sample)
+            pieces[index] = piece[:start]
     if len(pieces) == 2:
         if not _definition(pieces[1]):
             return None
         keys.add("definition")
     head = pieces[0]
-    over = re.search(r"\s+over\s+(.+)$", head, re.I)
-    if over:
-        sample = _sample(over.group(1), count, runtime.settings.get("split"))
-        if sample is None:
-            return None
-        keys.update(sample)
-        head = head[: over.start()]
     scalar = _scalar_match(head, runtime)
     if scalar is None or scalar[1] != value or scalar[2] is not None:
         return None
@@ -138,30 +143,30 @@ def _description(text, cfg, count=None):
     scope = re.escape(cfg["dataset"])
     if cfg["settings"].get("split"):
         scope += " " + re.escape(str(cfg["settings"]["split"]))
-    if re.fullmatch(
-        r"Measured " + re.escape(roles[0]) + r" (?:exact[- ]match )?accuracy on " + scope + r"[.]?",
-        text,
-        re.I,
-    ):
-        return {"dataset", "definition"} | {
-            "runtime:" + k for k in ("model", "method") if k in cfg["settings"]
-        }
-    if (
-        type(count) is int
-        and count > 0
-        and re.fullmatch(
-            r"Reported "
-            + scope
-            + r" (?:exact[- ]match )?accuracy for "
-            + re.escape(roles[0])
-            + rf" on (?:{count}|{re.escape(_words_count(count))}) (?:fixed )?examples[.]?",
-            text,
+    metric = r"(?:exact[- ]match )?accuracy"
+    layouts = (
+        re.escape(roles[0]) + " " + metric + " on " + scope,
+        scope + " " + metric + " for " + re.escape(roles[0]),
+    )
+    for layout in layouts:
+        match = re.fullmatch(
+            r"(?:Measured|Reported) " + layout + r"(?: (?:on|over) (?P<sample>.+))?",
+            text.strip().rstrip(".! "),
             re.I,
         )
-    ):
-        return {"dataset", "definition", "sample"} | {
+        if match is None:
+            continue
+        keys = {"dataset", "definition"} | {
             "runtime:" + k for k in ("model", "method") if k in cfg["settings"]
         }
+        if match.group("sample") is not None:
+            if type(count) is not int or count <= 0:
+                return None
+            sample = _sample(match.group("sample"), count, cfg["settings"].get("split"))
+            if sample is None:
+                return None
+            keys.update(sample)
+        return keys
     return None
 
 
