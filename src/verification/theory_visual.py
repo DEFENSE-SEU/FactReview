@@ -61,14 +61,82 @@ def _key(row):
     return value if isinstance(value, str) and value == value.strip() else None
 
 
+def _layout(materials):
+    return [
+        {"id": block.id, "kind": block.kind, "loc": block.loc.model_dump(mode="json") if block.loc else None}
+        for block in materials.blocks
+    ]
+
+
+def _check_layout(original, materials):
+    if _layout(materials) != original:
+        raise ValueError("Theory visual source layout changed during verification")
+
+
 class VisualContext:
-    def __init__(self, base, target, readings, catalog, audit_path, cfg):
+    def __init__(self, base, target, readings, catalog, audit_path, cfg, layout):
         self.base, self.target, self.readings = base, target, readings
         self.catalog, self.audit_path, self.cfg = catalog, audit_path, cfg
         self.consumed = set()
+        self.heading_bindings = {}
+        self.layout = layout
 
     def check(self, claim, materials):
         self.base.check(claim, materials)
+        _check_layout(self.layout, materials)
+
+    def heading_source(self, reading, raw, claim, materials):
+        """Bind one loaded, exact appendix heading to its following proof region."""
+        title = reading.printed_anchor
+        if raw.get("printed_anchor") != title:
+            raise ValueError("Visual heading must retain its exact original text")
+        remainder = re.sub(r"^Appendix (?:[A-Z]|[0-9]+)(?:\.[0-9]+)*[.:]?\s+", "", title, count=1, flags=re.I)
+        if remainder == title or not _printed_identity_matches(remainder, self.target["printed_identity"]):
+            raise ValueError("Visual source printed theorem identity does not match its original anchor")
+        headings = [b for b in self.base.blocks.values() if b.get("kind") == "heading" and b["text"] == title]
+        if len(headings) != 1:
+            raise ValueError("Visual appendix heading is not one unique loaded original heading")
+        heading = headings[0]
+        anchor = self.base.blocks[reading.anchor_block_id]
+
+        def span(block):
+            loc = block.get("loc") or {}
+            start, end = loc.get("char_start"), loc.get("char_end")
+            if (
+                type(start) is not int
+                or type(end) is not int
+                or not 0 <= start < end <= len(self.base.markdown)
+                or self.base.markdown[start:end] != block["text"]
+            ):
+                raise ValueError("Visual heading/proof requires its exact original character span")
+            return start, end
+
+        start, end = span(heading)
+        proof_start, _ = span(anchor)
+        page = self.catalog[reading.page_id]["page"]
+        if (
+            (heading.get("loc") or {}).get("page") != page
+            or (anchor.get("loc") or {}).get("page") != page
+            or end > proof_start
+        ):
+            raise ValueError("Visual appendix heading must precede its proof on the same original page")
+        ids = [block["id"] for block in self.layout]
+        first, last = ids.index(heading["id"]), ids.index(anchor["id"])
+        if first >= last or any(block["kind"] == "heading" for block in self.layout[first + 1 : last]):
+            raise ValueError("Visual proof belongs to another heading region")
+        # A misordered block list cannot hide a different positioned heading.
+        if any(
+            block["kind"] == "heading"
+            and block["id"] != heading["id"]
+            and block["loc"] is not None
+            and type(block["loc"]["char_start"]) is int
+            and start < block["loc"]["char_start"] < proof_start
+            for block in self.layout
+        ):
+            raise ValueError("Visual proof is separated from its heading by another original heading")
+        return self.base.source(
+            derivations.SourceQuote(block_id=heading["id"], quote=title), claim, materials
+        )
 
     def source(self, source, claim, materials):
         self.check(claim, materials)
@@ -89,7 +157,13 @@ class VisualContext:
             raise ValueError("Visual source page/anchor is outside the declared target")
         identity = target["printed_identity"]
         if identity and not _printed_identity_matches(reading.printed_anchor, identity):
-            raise ValueError("Visual source printed theorem identity does not match its original anchor")
+            heading = self.heading_source(reading, raw, claim, materials)
+            self.heading_bindings[index] = {
+                "target_id": target["target_id"],
+                "visual_source_index": index,
+                "anchor_block_id": reading.anchor_block_id,
+                "source": heading.model_dump(mode="json"),
+            }
         if redacted_record(reading.model_dump(), self.cfg) != reading.model_dump():
             raise ValueError("Visual reading contains provider credentials")
         self.base.check_page(page["page"], materials, consume=True)
@@ -132,6 +206,7 @@ def recheck(claim, materials, targets, *, context, call=None, output_dir=None, s
 
 
 def _recheck(claim, materials, targets, *, context, call=None, output_dir=None, start_index=0):
+    layout = _layout(materials)
     cfg = checks.resolve_vlm_config()
     stats = run_stats.stats_path()
     directory = (
@@ -199,6 +274,7 @@ def _recheck(claim, materials, targets, *, context, call=None, output_dir=None, 
         "request": snapshot,
         "request_sha256": derivations._digest(snapshot),
         "source_hashes": source_hashes,
+        "source_layout": copy.deepcopy(layout),
         "provider": cfg.provider,
         "model": cfg.model,
         "endpoint": sanitized_endpoint(cfg.base_url),
@@ -214,6 +290,7 @@ def _recheck(claim, materials, targets, *, context, call=None, output_dir=None, 
 
     raw, failure = None, None
     context.check(claim, materials)
+    _check_layout(layout, materials)
     try:
         save()
         raw = checks.ask(
@@ -228,6 +305,7 @@ def _recheck(claim, materials, targets, *, context, call=None, output_dir=None, 
     except OSError as exc:
         failure = f"Visual Theory audit unavailable: {type(exc).__name__}"
     context.check(claim, materials)
+    _check_layout(layout, materials)
     if snapshot != payload:
         raise ValueError("Visual Theory request changed during verification")
     expected = {target["target_id"]: target for target in targets}
@@ -273,7 +351,7 @@ def _recheck(claim, materials, targets, *, context, call=None, output_dir=None, 
             target_id=identifier,
             original_record_index=target["original_record_index"],
         )
-        item = None
+        item, resolver = None, None
         try:
             if failure or identifier in invalid or identifier not in rows:
                 raise ValueError(failure or invalid.get(identifier, "Missing visual Theory target"))
@@ -283,7 +361,7 @@ def _recheck(claim, materials, targets, *, context, call=None, output_dir=None, 
             trace_input = item.trace.model_dump(mode="json")
             if redacted_record(trace_input, cfg) != trace_input:
                 raise ValueError("Visual Theory trace contains provider credentials")
-            resolver = VisualContext(context, target, raw["visual_sources"], catalog, str(path), cfg)
+            resolver = VisualContext(context, target, raw["visual_sources"], catalog, str(path), cfg, layout)
             trace = derivations.validate_trace_structure(
                 item.trace, resolver, claim, materials, cfg, output_model=TheoryVisualTrace
             )
@@ -296,6 +374,8 @@ def _recheck(claim, materials, targets, *, context, call=None, output_dir=None, 
         except (ValueError, TypeError, OSError) as exc:
             record.issues.append(redacted_record(str(exc), cfg))
             item = None
+        if resolver is not None and resolver.heading_bindings:
+            audit.setdefault("heading_bindings", []).extend(resolver.heading_bindings.values())
         results.append((target, item, record))
     audit["validation"] = [
         {"target_id": r.target_id, "state": r.state, "issues": r.issues} for _, _, r in results
@@ -314,4 +394,5 @@ def _recheck(claim, materials, targets, *, context, call=None, output_dir=None, 
             record.issues.append("Visual Theory audit unavailable after validation")
         results = [(target, None, record) for target, _, record in results]
     context.check(claim, materials)
+    _check_layout(layout, materials)
     return results
