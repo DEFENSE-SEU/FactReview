@@ -1,0 +1,540 @@
+{
+  "provenance": {
+    "audit_path": "runs/v2_method_delivery/fixmatch-coverage-live-v1/actual-fb6411b410e6/claim_coverage/coverage.json",
+    "audit_sha256": "106624b612a33d7f5e3b7d7c232196f87dc241c835c0e8a27b19cae39642be17",
+    "selection": "Exact original observations/actions/claims/blocks. Tests project unchanged text into local offsets and explicitly rebind local target index/digest; validation is injected mock, no inference on model quality."
+  },
+  "duplicate": {
+    "claims": [
+      {
+        "id": "claim_030",
+        "text": "For CIFAR-10 one-label-per-class experiments using prototypicality buckets, training only on most prototypical examples reaches median 78% accuracy with maximum 84%, training on the middle reaches 65%, and training only on outliers fails to converge with 10% accuracy.",
+        "loc": {
+          "page": 7,
+          "section": "section_15: 4.4 Barely Supervised Learning",
+          "char_start": 31876,
+          "char_end": 32339
+        },
+        "source_block_id": "block_76",
+        "source_quote": "Using the same hyperparameters, the model trained only on the most prototypical examples reaches a median of 78% accuracy (with a maximum of 84% accuracy); training on the middle of the distribution reaches 65% accuracy; and training on only the outliers fails to converge completely, with 10% accuracy. Figure 2 shows the full labeled training dataset for the split where FixMatch achieved a median accuracy of 78%. Further analysis is presented in Appendix B.7.",
+        "source_refs": [
+          {
+            "source_block_id": "block_75",
+            "source_quote": "Specifically, we take the ordering of the CIFAR-10 training set from [5] that sorts examples from those that are most representative to those that are least. This example ordering was determined after training many CIFAR-10 models with all labeled data. We thus do not envision this as a practical method for choosing examples for use in SSL, but rather to experimentally verify that examples that are more representative are better suited for low-label training. We divide this ordering evenly into eight buckets (so all of the most representative examples are in the first bucket, and all of the outliers in the last). We then create eight labeled training sets by randomly selecting one labeled example of each class from the same bucket.",
+            "loc": {
+              "page": 7,
+              "section": "section_15: 4.4 Barely Supervised Learning",
+              "char_start": 31133,
+              "char_end": 31874
+            },
+            "covered": [
+              "c1",
+              "c2",
+              "c3"
+            ]
+          }
+        ],
+        "conditions": [
+          {
+            "id": "c1",
+            "dataset": "CIFAR-10",
+            "metric": "accuracy",
+            "settings": {
+              "method": "FixMatch",
+              "labels": "one example per class",
+              "selection": "most prototypical examples using ordering from [5]",
+              "hyperparameters": "same hyperparameters",
+              "median": "78%",
+              "maximum": "84%"
+            },
+            "description": "Most prototypical one-label-per-class performance."
+          },
+          {
+            "id": "c2",
+            "dataset": "CIFAR-10",
+            "metric": "accuracy",
+            "settings": {
+              "method": "FixMatch",
+              "labels": "one example per class",
+              "selection": "middle of the prototypicality distribution",
+              "hyperparameters": "same hyperparameters",
+              "reported_value": "65%"
+            },
+            "description": "Middle prototypicality performance."
+          },
+          {
+            "id": "c3",
+            "dataset": "CIFAR-10",
+            "metric": "accuracy",
+            "settings": {
+              "method": "FixMatch",
+              "labels": "one example per class",
+              "selection": "outliers / least prototypical examples",
+              "hyperparameters": "same hyperparameters",
+              "reported_value": "10%",
+              "finding": "fails to converge completely"
+            },
+            "description": "Outlier one-label-per-class performance."
+          }
+        ],
+        "needs": [
+          "Literature",
+          "Experiments",
+          "Code"
+        ],
+        "importance": "core",
+        "questions": [],
+        "evidence": [],
+        "status": "unverified",
+        "notes": [],
+        "advice": null,
+        "theory_derivations": [],
+        "verification_limitations": []
+      }
+    ],
+    "observations": [
+      {
+        "id": "obs_003",
+        "kind": "missing_conclusion",
+        "target_claim_id": null,
+        "sources": [
+          {
+            "block_id": "block_67",
+            "quote": "Figure 2: FixMatch reaches 78% CIFAR-10 accuracy using only above 10 labeled images."
+          }
+        ],
+        "reason": "The figure caption states an independent headline conclusion about reaching 78% CIFAR-10 accuracy with only 10 labeled images; related one-label-per-class claims cover prototypicality-bucket details, but this caption-level conclusion is not separately captured."
+      },
+      {
+        "id": "obs_006",
+        "kind": "missing_qualifier_or_condition",
+        "target_claim_id": "claim_030",
+        "sources": [
+          {
+            "block_id": "block_75",
+            "quote": "This example ordering was determined after training many CIFAR-10 models with all labeled data. We thus do not envision this as a practical method for choosing examples for use in SSL, but rather to experimentally verify that examples that are more representative are better suited for low-label training."
+          }
+        ],
+        "reason": "Claim_030 captures the prototypicality-bucket results and notes the ordering source, but omits the governing qualifier that the ordering was derived using many fully labeled CIFAR-10 models and is not envisioned as a practical SSL example-selection method."
+      }
+    ],
+    "actions": [
+      {
+        "observation_ids": [
+          "obs_003"
+        ],
+        "action": "append",
+        "original_claim_id": null,
+        "original_index": null,
+        "original_digest": null,
+        "claims": [
+          {
+            "text": "Figure 2 states that FixMatch reaches 78% CIFAR-10 accuracy using only above 10 labeled images.",
+            "source_block_id": "block_67",
+            "source_quote": "Figure 2: FixMatch reaches 78% CIFAR-10 accuracy using only above 10 labeled images.",
+            "source_refs": [],
+            "conditions": [
+              {
+                "id": "c1",
+                "dataset": "CIFAR-10",
+                "metric": "accuracy",
+                "settings": {
+                  "method": "FixMatch",
+                  "labels": "only above 10 labeled images",
+                  "reported_value": "78%",
+                  "source": "Figure 2 caption"
+                },
+                "description": "Caption-level headline result for CIFAR-10 with 10 labeled images."
+              }
+            ],
+            "needs": [
+              "Experiments",
+              "Code"
+            ],
+            "importance": "secondary"
+          }
+        ],
+        "reason": "The figure caption is a supplied block and independently states the headline result."
+      },
+      {
+        "observation_ids": [
+          "obs_006"
+        ],
+        "action": "revise",
+        "original_claim_id": "claim_030",
+        "original_index": 30,
+        "original_digest": "16d256b13041265e942025a36d1fe28f674ea0afc27302f41f65011e42a61c69",
+        "claims": [
+          {
+            "text": "For CIFAR-10 one-label-per-class experiments using prototypicality buckets, the authors use an ordering from [5] determined after training many CIFAR-10 models with all labeled data, which they do not envision as a practical SSL example-selection method but use to test whether more representative examples are better suited for low-label training; using the same hyperparameters, training only on most prototypical examples reaches median 78% accuracy with maximum 84%, training on the middle reaches 65%, and training only on outliers fails to converge with 10% accuracy.",
+            "source_block_id": "block_76",
+            "source_quote": "Using the same hyperparameters, the model trained only on the most prototypical examples reaches a median of 78% accuracy (with a maximum of 84% accuracy); training on the middle of the distribution reaches 65% accuracy; and training on only the outliers fails to converge completely, with 10% accuracy. Figure 2 shows the full labeled training dataset for the split where FixMatch achieved a median accuracy of 78%. Further analysis is presented in Appendix B.7.",
+            "source_refs": [
+              {
+                "source_block_id": "block_75",
+                "source_quote": "Specifically, we take the ordering of the CIFAR-10 training set from [5] that sorts examples from those that are most representative to those that are least. This example ordering was determined after training many CIFAR-10 models with all labeled data. We thus do not envision this as a practical method for choosing examples for use in SSL, but rather to experimentally verify that examples that are more representative are better suited for low-label training. We divide this ordering evenly into eight buckets (so all of the most representative examples are in the first bucket, and all of the outliers in the last). We then create eight labeled training sets by randomly selecting one labeled example of each class from the same bucket.",
+                "covered": [
+                  "c1",
+                  "c2",
+                  "c3"
+                ]
+              }
+            ],
+            "conditions": [
+              {
+                "id": "c1",
+                "dataset": "CIFAR-10",
+                "metric": "accuracy",
+                "settings": {
+                  "method": "FixMatch",
+                  "labels": "one example per class",
+                  "selection": "most prototypical examples using ordering from [5]",
+                  "ordering_derivation": "determined after training many CIFAR-10 models with all labeled data",
+                  "practicality_qualifier": "not envisioned as a practical method for choosing examples for use in SSL",
+                  "experimental_purpose": "experimentally verify that more representative examples are better suited for low-label training",
+                  "hyperparameters": "same hyperparameters",
+                  "median": "78%",
+                  "maximum": "84%"
+                },
+                "description": "Most prototypical one-label-per-class performance with ordering qualifier."
+              },
+              {
+                "id": "c2",
+                "dataset": "CIFAR-10",
+                "metric": "accuracy",
+                "settings": {
+                  "method": "FixMatch",
+                  "labels": "one example per class",
+                  "selection": "middle of the prototypicality distribution",
+                  "ordering_derivation": "determined after training many CIFAR-10 models with all labeled data",
+                  "practicality_qualifier": "not envisioned as a practical method for choosing examples for use in SSL",
+                  "hyperparameters": "same hyperparameters",
+                  "reported_value": "65%"
+                },
+                "description": "Middle prototypicality performance with ordering qualifier."
+              },
+              {
+                "id": "c3",
+                "dataset": "CIFAR-10",
+                "metric": "accuracy",
+                "settings": {
+                  "method": "FixMatch",
+                  "labels": "one example per class",
+                  "selection": "outliers / least prototypical examples",
+                  "ordering_derivation": "determined after training many CIFAR-10 models with all labeled data",
+                  "practicality_qualifier": "not envisioned as a practical method for choosing examples for use in SSL",
+                  "hyperparameters": "same hyperparameters",
+                  "reported_value": "10%",
+                  "finding": "fails to converge completely"
+                },
+                "description": "Outlier one-label-per-class performance with ordering qualifier."
+              }
+            ],
+            "needs": [
+              "Literature",
+              "Experiments",
+              "Code"
+            ],
+            "importance": "core"
+          }
+        ],
+        "reason": "The revision preserves the original prototypicality results and adds the governing qualifier from the supplied source."
+      }
+    ],
+    "blocks": [
+      {
+        "id": "block_67",
+        "text": "Figure 2: FixMatch reaches 78% CIFAR-10 accuracy using only above 10 labeled images.",
+        "kind": "image",
+        "loc": {
+          "page": 7,
+          "section": "section_12: 4.1 CIFAR-10, CIFAR-100, and SVHN",
+          "char_start": 28570,
+          "char_end": 28654
+        },
+        "citations": []
+      },
+      {
+        "id": "block_75",
+        "text": "We hypothesize that this variability is caused by the quality of the 10 labeled examples comprising each dataset and that sampling low-quality examples might make it more difficult for the model to learn some particular class effectively. To test this, we construct eight new training datasets with examples ranging in “prototypicality” (i.e., representative of the underlying class). Specifically, we take the ordering of the CIFAR-10 training set from [5] that sorts examples from those that are most representative to those that are least. This example ordering was determined after training many CIFAR-10 models with all labeled data. We thus do not envision this as a practical method for choosing examples for use in SSL, but rather to experimentally verify that examples that are more representative are better suited for low-label training. We divide this ordering evenly into eight buckets (so all of the most representative examples are in the first bucket, and all of the outliers in the last). We then create eight labeled training sets by randomly selecting one labeled example of each class from the same bucket.",
+        "kind": "text",
+        "loc": {
+          "page": 7,
+          "section": "section_15: 4.4 Barely Supervised Learning",
+          "char_start": 30748,
+          "char_end": 31874
+        },
+        "citations": [
+          "[5]"
+        ]
+      },
+      {
+        "id": "block_76",
+        "text": "Using the same hyperparameters, the model trained only on the most prototypical examples reaches a median of 78% accuracy (with a maximum of 84% accuracy); training on the middle of the distribution reaches 65% accuracy; and training on only the outliers fails to converge completely, with 10% accuracy. Figure 2 shows the full labeled training dataset for the split where FixMatch achieved a median accuracy of 78%. Further analysis is presented in Appendix B.7.",
+        "kind": "text",
+        "loc": {
+          "page": 7,
+          "section": "section_15: 4.4 Barely Supervised Learning",
+          "char_start": 31876,
+          "char_end": 32339
+        },
+        "citations": []
+      }
+    ]
+  },
+  "dismiss": {
+    "claims": [
+      {
+        "id": "claim_048",
+        "text": "Tables 9 and 10 show that FixMatch using unlabeled data has substantially lower error rates than supervised models trained only with labeled data under the same strong augmentation settings.",
+        "loc": {
+          "page": 17,
+          "section": "section_33: B.8 Comparison to Supervised Baselines",
+          "char_start": 63094,
+          "char_end": 63290
+        },
+        "source_block_id": "block_209",
+        "source_quote": "In table 9 and table 10, we present the performance of models trained only with the labeled data using strong data augmentations to highlight the effectiveness of using unlabeled data in FixMatch.",
+        "source_refs": [
+          {
+            "source_block_id": "block_216",
+            "source_quote": "Table 9: Error rates for CIFAR-10, CIFAR-100 and SVHN on 5 different folds. Models with (RA) uses RandAugment [11] and the ones with (CTA) uses CTAugment [3] for strong-augmentation. All models are tested using the same codebase.\n<table><tr><td></td><td colspan=\"3\">CIFAR-10</td><td colspan=\"3\">CIFAR-100</td><td colspan=\"3\">SVHN</td></tr><tr><td>Method</td><td>40 labels</td><td>250 labels</td><td>4000 labels</td><td>400 labels</td><td>2500 labels</td><td>10000 labels</td><td>40 labels</td><td>250 labels</td><td>1000 labels</td></tr><tr><td>Supervised (RA)</td><td> $64.01 \\pm 0.76$ </td><td> $39.12 \\pm 0.77$ </td><td> $12.74 \\pm 0.29$ </td><td> $79.47 \\pm 0.18$ </td><td> $52.88 \\pm 0.51$ </td><td> $32.55 \\pm 0.21$ </td><td> $52.68 \\pm 2.29$ </td><td> $22.48 \\pm 0.55$ </td><td> $10.89 \\pm 0.12$ </td></tr><tr><td>Supervised (CTA)</td><td> $64.53 \\pm 0.83$ </td><td> $41.92 \\pm 1.17$ </td><td> $13.64 \\pm 0.12$ </td><td> $79.79 \\pm 0.59$ </td><td> $54.23 \\pm 0.48$ </td><td> $35.30 \\pm 0.19$ </td><td> $43.05 \\pm 2.34$ </td><td> $15.06 \\pm 1.02$ </td><td> $7.69 \\pm 0.27$ </td></tr><tr><td>FixMatch (RA)</td><td> $13.81 \\pm 3.37$ </td><td> $5.07 \\pm 0.65$ </td><td> $4.26 \\pm 0.05$ </td><td> $48.85 \\pm 1.75$ </td><td> $28.29 \\pm 0.11$ </td><td> $22.60 \\pm 0.12$ </td><td> $3.96 \\pm 2.17$ </td><td> $2.48 \\pm 0.38$ </td><td> $2.28 \\pm 0.11$ </td></tr><tr><td>FixMatch (CTA)</td><td> $11.39 \\pm 3.35$ </td><td> $5.07 \\pm 0.33$ </td><td> $4.31 \\pm 0.15$ </td><td> $49.95 \\pm 3.01$ </td><td> $28.64 \\pm 0.24$ </td><td> $23.18 \\pm 0.11$ </td><td> $7.65 \\pm 7.65$ </td><td> $2.64 \\pm 0.64$ </td><td> $2.36 \\pm 0.19$ </td></tr></table>",
+            "loc": {
+              "page": 18,
+              "section": "block_210: C Implementation Details for Section 4.3",
+              "char_start": null,
+              "char_end": null
+            },
+            "covered": [
+              "c1"
+            ]
+          },
+          {
+            "source_block_id": "block_218",
+            "source_quote": "Table 10: Error rates for STL-10 on 1000-label splits. All models are tested using the same codebase.\n<table><tr><td>Method</td><td>Error rate</td><td>Method</td><td>Error rate</td></tr><tr><td>Supervised (RA)</td><td>20.66±0.83</td><td>FixMatch (RA)</td><td>7.98±1.50</td></tr><tr><td>Supervised (CTA)</td><td>19.86±0.66</td><td>FixMatch (CTA)</td><td>5.17±0.63</td></tr></table>",
+            "loc": {
+              "page": 18,
+              "section": "block_210: C Implementation Details for Section 4.3",
+              "char_start": null,
+              "char_end": null
+            },
+            "covered": [
+              "c1"
+            ]
+          }
+        ],
+        "conditions": [
+          {
+            "id": "c1",
+            "dataset": "CIFAR-10, CIFAR-100, SVHN, STL-10",
+            "metric": "error rate",
+            "settings": {
+              "comparison": "supervised trained only with labeled data vs FixMatch using unlabeled data",
+              "augmentations": [
+                "RandAugment",
+                "CTAugment"
+              ],
+              "folds": "5 different folds for CIFAR-10/CIFAR-100/SVHN; STL-10 1000-label splits",
+              "same_codebase": true
+            },
+            "description": "Supervised baseline comparison showing effectiveness of unlabeled data."
+          }
+        ],
+        "needs": [
+          "Experiments",
+          "Code"
+        ],
+        "importance": "core",
+        "questions": [],
+        "evidence": [],
+        "status": "unverified",
+        "notes": [],
+        "advice": null,
+        "theory_derivations": [],
+        "verification_limitations": []
+      }
+    ],
+    "observations": [
+      {
+        "id": "obs_007",
+        "kind": "missing_qualifier_or_condition",
+        "target_claim_id": "claim_048",
+        "sources": [
+          {
+            "block_id": "block_216",
+            "quote": "Table 9: Error rates for CIFAR-10, CIFAR-100 and SVHN on 5 different folds. Models with (RA) uses RandAugment [11] and the ones with (CTA) uses CTAugment [3] for strong-augmentation. All models are tested using the same codebase."
+          },
+          {
+            "block_id": "block_216",
+            "quote": "Supervised (RA)</td><td> $64.01 \\pm 0.76$ </td><td> $39.12 \\pm 0.77$ </td><td> $12.74 \\pm 0.29$ </td><td> $79.47 \\pm 0.18$ </td><td> $52.88 \\pm 0.51$ </td><td> $32.55 \\pm 0.21$ </td><td> $52.68 \\pm 2.29$ </td><td> $22.48 \\pm 0.55$ </td><td> $10.89 \\pm 0.12$ </td>"
+          },
+          {
+            "block_id": "block_216",
+            "quote": "Supervised (CTA)</td><td> $64.53 \\pm 0.83$ </td><td> $41.92 \\pm 1.17$ </td><td> $13.64 \\pm 0.12$ </td><td> $79.79 \\pm 0.59$ </td><td> $54.23 \\pm 0.48$ </td><td> $35.30 \\pm 0.19$ </td><td> $43.05 \\pm 2.34$ </td><td> $15.06 \\pm 1.02$ </td><td> $7.69 \\pm 0.27$ </td>"
+          }
+        ],
+        "reason": "Claim_048 captures the conclusion that FixMatch improves over supervised baselines, but omits the listed supervised baseline error rates for CIFAR-10, CIFAR-100, and SVHN in Table 9, which are part of the table’s extractable results and conditions for the comparison."
+      }
+    ],
+    "actions": [
+      {
+        "observation_ids": [
+          "obs_007"
+        ],
+        "action": "revise",
+        "original_claim_id": "claim_048",
+        "original_index": 48,
+        "original_digest": "4517449f3bb187c3d788fcde5a43d8f9f8e9f39f00236a983d8b7f210acb4434",
+        "claims": [
+          {
+            "text": "Tables 9 and 10 compare supervised models trained only with labeled data using strong augmentations against FixMatch using unlabeled data under the same codebase, showing substantially lower FixMatch error rates; Table 9 lists supervised baseline error rates for CIFAR-10/CIFAR-100/SVHN over 5 folds as Supervised (RA): $64.01 \\pm 0.76$, $39.12 \\pm 0.77$, $12.74 \\pm 0.29$, $79.47 \\pm 0.18$, $52.88 \\pm 0.51$, $32.55 \\pm 0.21$, $52.68 \\pm 2.29$, $22.48 \\pm 0.55$, $10.89 \\pm 0.12$ and Supervised (CTA): $64.53 \\pm 0.83$, $41.92 \\pm 1.17$, $13.64 \\pm 0.12$, $79.79 \\pm 0.59$, $54.23 \\pm 0.48$, $35.30 \\pm 0.19$, $43.05 \\pm 2.34$, $15.06 \\pm 1.02$, $7.69 \\pm 0.27$ for CIFAR-10 40/250/4000 labels, CIFAR-100 400/2500/10000 labels, and SVHN 40/250/1000 labels respectively; Table 10 lists STL-10 supervised baseline error rates of 20.66±0.83 for Supervised (RA) and 19.86±0.66 for Supervised (CTA), compared with FixMatch (RA) 7.98±1.50 and FixMatch (CTA) 5.17±0.63.",
+            "source_block_id": "block_209",
+            "source_quote": "In table 9 and table 10, we present the performance of models trained only with the labeled data using strong data augmentations to highlight the effectiveness of using unlabeled data in FixMatch.",
+            "source_refs": [
+              {
+                "source_block_id": "block_216",
+                "source_quote": "Table 9: Error rates for CIFAR-10, CIFAR-100 and SVHN on 5 different folds. Models with (RA) uses RandAugment [11] and the ones with (CTA) uses CTAugment [3] for strong-augmentation. All models are tested using the same codebase.\n<table><tr><td></td><td colspan=\"3\">CIFAR-10</td><td colspan=\"3\">CIFAR-100</td><td colspan=\"3\">SVHN</td></tr><tr><td>Method</td><td>40 labels</td><td>250 labels</td><td>4000 labels</td><td>400 labels</td><td>2500 labels</td><td>10000 labels</td><td>40 labels</td><td>250 labels</td><td>1000 labels</td></tr><tr><td>Supervised (RA)</td><td> $64.01 \\pm 0.76$ </td><td> $39.12 \\pm 0.77$ </td><td> $12.74 \\pm 0.29$ </td><td> $79.47 \\pm 0.18$ </td><td> $52.88 \\pm 0.51$ </td><td> $32.55 \\pm 0.21$ </td><td> $52.68 \\pm 2.29$ </td><td> $22.48 \\pm 0.55$ </td><td> $10.89 \\pm 0.12$ </td></tr><tr><td>Supervised (CTA)</td><td> $64.53 \\pm 0.83$ </td><td> $41.92 \\pm 1.17$ </td><td> $13.64 \\pm 0.12$ </td><td> $79.79 \\pm 0.59$ </td><td> $54.23 \\pm 0.48$ </td><td> $35.30 \\pm 0.19$ </td><td> $43.05 \\pm 2.34$ </td><td> $15.06 \\pm 1.02$ </td><td> $7.69 \\pm 0.27$ </td></tr><tr><td>FixMatch (RA)</td><td> $13.81 \\pm 3.37$ </td><td> $5.07 \\pm 0.65$ </td><td> $4.26 \\pm 0.05$ </td><td> $48.85 \\pm 1.75$ </td><td> $28.29 \\pm 0.11$ </td><td> $22.60 \\pm 0.12$ </td><td> $3.96 \\pm 2.17$ </td><td> $2.48 \\pm 0.38$ </td><td> $2.28 \\pm 0.11$ </td></tr><tr><td>FixMatch (CTA)</td><td> $11.39 \\pm 3.35$ </td><td> $5.07 \\pm 0.33$ </td><td> $4.31 \\pm 0.15$ </td><td> $49.95 \\pm 3.01$ </td><td> $28.64 \\pm 0.24$ </td><td> $23.18 \\pm 0.11$ </td><td> $7.65 \\pm 7.65$ </td><td> $2.64 \\pm 0.64$ </td><td> $2.36 \\pm 0.19$ </td></tr></table>",
+                "covered": [
+                  "c1",
+                  "c2",
+                  "c3",
+                  "c4"
+                ]
+              },
+              {
+                "source_block_id": "block_218",
+                "source_quote": "Table 10: Error rates for STL-10 on 1000-label splits. All models are tested using the same codebase.\n<table><tr><td>Method</td><td>Error rate</td><td>Method</td><td>Error rate</td></tr><tr><td>Supervised (RA)</td><td>20.66±0.83</td><td>FixMatch (RA)</td><td>7.98±1.50</td></tr><tr><td>Supervised (CTA)</td><td>19.86±0.66</td><td>FixMatch (CTA)</td><td>5.17±0.63</td></tr></table>",
+                "covered": [
+                  "c1",
+                  "c4"
+                ]
+              }
+            ],
+            "conditions": [
+              {
+                "id": "c1",
+                "dataset": "CIFAR-10, CIFAR-100, SVHN, STL-10",
+                "metric": "error rate",
+                "settings": {
+                  "comparison": "supervised trained only with labeled data vs FixMatch using unlabeled data",
+                  "augmentations": [
+                    "RandAugment",
+                    "CTAugment"
+                  ],
+                  "same_codebase": true,
+                  "purpose": "highlight the effectiveness of using unlabeled data in FixMatch"
+                },
+                "description": "Supervised baseline comparison showing effectiveness of unlabeled data."
+              },
+              {
+                "id": "c2",
+                "dataset": "CIFAR-10, CIFAR-100, SVHN",
+                "metric": "error rate",
+                "settings": {
+                  "folds": 5,
+                  "method": "Supervised (RA)",
+                  "strong_augmentation": "RandAugment [11]",
+                  "values_by_column": {
+                    "CIFAR-10 40 labels": "$64.01 \\pm 0.76$",
+                    "CIFAR-10 250 labels": "$39.12 \\pm 0.77$",
+                    "CIFAR-10 4000 labels": "$12.74 \\pm 0.29$",
+                    "CIFAR-100 400 labels": "$79.47 \\pm 0.18$",
+                    "CIFAR-100 2500 labels": "$52.88 \\pm 0.51$",
+                    "CIFAR-100 10000 labels": "$32.55 \\pm 0.21$",
+                    "SVHN 40 labels": "$52.68 \\pm 2.29$",
+                    "SVHN 250 labels": "$22.48 \\pm 0.55$",
+                    "SVHN 1000 labels": "$10.89 \\pm 0.12$"
+                  }
+                },
+                "description": "Table 9 supervised RandAugment baseline error rates."
+              },
+              {
+                "id": "c3",
+                "dataset": "CIFAR-10, CIFAR-100, SVHN",
+                "metric": "error rate",
+                "settings": {
+                  "folds": 5,
+                  "method": "Supervised (CTA)",
+                  "strong_augmentation": "CTAugment [3]",
+                  "values_by_column": {
+                    "CIFAR-10 40 labels": "$64.53 \\pm 0.83$",
+                    "CIFAR-10 250 labels": "$41.92 \\pm 1.17$",
+                    "CIFAR-10 4000 labels": "$13.64 \\pm 0.12$",
+                    "CIFAR-100 400 labels": "$79.79 \\pm 0.59$",
+                    "CIFAR-100 2500 labels": "$54.23 \\pm 0.48$",
+                    "CIFAR-100 10000 labels": "$35.30 \\pm 0.19$",
+                    "SVHN 40 labels": "$43.05 \\pm 2.34$",
+                    "SVHN 250 labels": "$15.06 \\pm 1.02$",
+                    "SVHN 1000 labels": "$7.69 \\pm 0.27$"
+                  }
+                },
+                "description": "Table 9 supervised CTAugment baseline error rates."
+              },
+              {
+                "id": "c4",
+                "dataset": "STL-10",
+                "metric": "error rate",
+                "settings": {
+                  "labels": 1000,
+                  "same_codebase": true,
+                  "supervised_RA": "20.66±0.83",
+                  "supervised_CTA": "19.86±0.66",
+                  "FixMatch_RA": "7.98±1.50",
+                  "FixMatch_CTA": "5.17±0.63"
+                },
+                "description": "Table 10 STL-10 supervised baseline and FixMatch comparison."
+              }
+            ],
+            "needs": [
+              "Experiments",
+              "Code"
+            ],
+            "importance": "core"
+          }
+        ],
+        "reason": "The revision preserves the original supervised-versus-FixMatch conclusion and adds the omitted supervised baseline error rates and STL-10 comparison values from Tables 9 and 10 without splitting the table into individual cell claims."
+      }
+    ],
+    "blocks": [
+      {
+        "id": "block_209",
+        "text": "In table 9 and table 10, we present the performance of models trained only with the labeled data using strong data augmentations to highlight the effectiveness of using unlabeled data in FixMatch.",
+        "kind": "text",
+        "loc": {
+          "page": 17,
+          "section": "section_33: B.8 Comparison to Supervised Baselines",
+          "char_start": 63094,
+          "char_end": 63290
+        },
+        "citations": []
+      },
+      {
+        "id": "block_216",
+        "text": "Table 9: Error rates for CIFAR-10, CIFAR-100 and SVHN on 5 different folds. Models with (RA) uses RandAugment [11] and the ones with (CTA) uses CTAugment [3] for strong-augmentation. All models are tested using the same codebase.\n<table><tr><td></td><td colspan=\"3\">CIFAR-10</td><td colspan=\"3\">CIFAR-100</td><td colspan=\"3\">SVHN</td></tr><tr><td>Method</td><td>40 labels</td><td>250 labels</td><td>4000 labels</td><td>400 labels</td><td>2500 labels</td><td>10000 labels</td><td>40 labels</td><td>250 labels</td><td>1000 labels</td></tr><tr><td>Supervised (RA)</td><td> $64.01 \\pm 0.76$ </td><td> $39.12 \\pm 0.77$ </td><td> $12.74 \\pm 0.29$ </td><td> $79.47 \\pm 0.18$ </td><td> $52.88 \\pm 0.51$ </td><td> $32.55 \\pm 0.21$ </td><td> $52.68 \\pm 2.29$ </td><td> $22.48 \\pm 0.55$ </td><td> $10.89 \\pm 0.12$ </td></tr><tr><td>Supervised (CTA)</td><td> $64.53 \\pm 0.83$ </td><td> $41.92 \\pm 1.17$ </td><td> $13.64 \\pm 0.12$ </td><td> $79.79 \\pm 0.59$ </td><td> $54.23 \\pm 0.48$ </td><td> $35.30 \\pm 0.19$ </td><td> $43.05 \\pm 2.34$ </td><td> $15.06 \\pm 1.02$ </td><td> $7.69 \\pm 0.27$ </td></tr><tr><td>FixMatch (RA)</td><td> $13.81 \\pm 3.37$ </td><td> $5.07 \\pm 0.65$ </td><td> $4.26 \\pm 0.05$ </td><td> $48.85 \\pm 1.75$ </td><td> $28.29 \\pm 0.11$ </td><td> $22.60 \\pm 0.12$ </td><td> $3.96 \\pm 2.17$ </td><td> $2.48 \\pm 0.38$ </td><td> $2.28 \\pm 0.11$ </td></tr><tr><td>FixMatch (CTA)</td><td> $11.39 \\pm 3.35$ </td><td> $5.07 \\pm 0.33$ </td><td> $4.31 \\pm 0.15$ </td><td> $49.95 \\pm 3.01$ </td><td> $28.64 \\pm 0.24$ </td><td> $23.18 \\pm 0.11$ </td><td> $7.65 \\pm 7.65$ </td><td> $2.64 \\pm 0.64$ </td><td> $2.36 \\pm 0.19$ </td></tr></table>",
+        "kind": "table",
+        "loc": {
+          "page": 18,
+          "section": "block_210: C Implementation Details for Section 4.3",
+          "char_start": null,
+          "char_end": null
+        },
+        "citations": [
+          "[11]",
+          "[3]"
+        ]
+      },
+      {
+        "id": "block_218",
+        "text": "Figure 7: Accuracy of the model when trained on the 1-label-per-class datasets from Figure 6, ordered from most prototypical (top row) to least (bottom row).\nTable 10: Error rates for STL-10 on 1000-label splits. All models are tested using the same codebase.\n<table><tr><td>Method</td><td>Error rate</td><td>Method</td><td>Error rate</td></tr><tr><td>Supervised (RA)</td><td>20.66±0.83</td><td>FixMatch (RA)</td><td>7.98±1.50</td></tr><tr><td>Supervised (CTA)</td><td>19.86±0.66</td><td>FixMatch (CTA)</td><td>5.17±0.63</td></tr></table>",
+        "kind": "table",
+        "loc": {
+          "page": 18,
+          "section": "block_210: C Implementation Details for Section 4.3",
+          "char_start": null,
+          "char_end": null
+        },
+        "citations": []
+      }
+    ]
+  }
+}

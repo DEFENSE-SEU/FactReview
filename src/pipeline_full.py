@@ -451,6 +451,12 @@ def parse_args() -> argparse.Namespace:
         help="Maximum claim correction calls after coverage review (default: 12)",
     )
     p.add_argument(
+        "--claim-coverage-validation-calls",
+        type=int,
+        default=12,
+        help="Maximum independent reviews before adopting claim corrections (default: 12)",
+    )
+    p.add_argument(
         "--training-budget",
         type=int,
         default=0,

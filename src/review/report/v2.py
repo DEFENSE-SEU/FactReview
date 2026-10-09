@@ -359,6 +359,7 @@ def claim_coverage_lines(claim_coverage: dict | None) -> list[str]:
         f"Coverage check status: **{value('status')}**.",
         f"Initial claims: {value('initial_claims')}; final claims: {value('final_claims')}.",
         f"Source windows reviewed: {value('windows_reviewed')} / {value('windows_total')}; "
+        f"partially reviewed: {value('windows_partial')}; "
         f"unreviewed: {value('windows_unreviewed')}.",
         f"Unresolved observations: {value('unresolved_observations')}; "
         f"blocked claim IDs: {_text(blocked_text)}.",
