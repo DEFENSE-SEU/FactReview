@@ -740,7 +740,8 @@ def _render_markdown_inline_children(
         if token_type == "html_inline":
             raw_html = str(token_content or "").strip()
             anchor = re.fullmatch(
-                r'<a id="(factreview-(?:source-[a-f0-9]{64}|evidence-[0-9]{6,}))">', raw_html
+                r'<a id="(factreview-(?:source-[a-f0-9]{64}|evidence-[0-9]{6,}(?:-source-[0-9]{2,})?))">',
+                raw_html,
             )
             if anchor:
                 parts.append(f'<a name="{anchor.group(1)}"/>')
@@ -1352,7 +1353,9 @@ class _AnchoredParagraph(Paragraph):
     its actual page when the layout moves or splits that paragraph.
     """
 
-    _anchor = re.compile(r'<a name="(factreview-(?:source-[a-f0-9]{64}|evidence-[0-9]{6,}))"/>')
+    _anchor = re.compile(
+        r'<a name="(factreview-(?:source-[a-f0-9]{64}|evidence-[0-9]{6,}(?:-source-[0-9]{2,})?))"/>'
+    )
 
     def __init__(self, text, *args, **kwargs):
         self._report_targets = self._anchor.findall(text) if isinstance(text, str) else []

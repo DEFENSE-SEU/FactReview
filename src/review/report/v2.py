@@ -61,49 +61,53 @@ def _source_index(claims, findings):
     groups += [(f"finding {index}", finding.evidence) for index, finding in enumerate(findings, 1)]
     for owner, evidence in groups:
         for ordinal, item in enumerate(evidence, 1):
-            pointer = item.pointer
-            key = (pointer.locator, pointer.page, pointer.line, pointer.key, pointer.quote)
             occurrence = {
                 "anchor": f"factreview-evidence-{len(occurrences) + 1:06d}",
                 "label": f"E{len(occurrences) + 1:04d}",
                 "owner": f"{owner}, evidence {ordinal}",
-                "source": None,
+                "usages": [],
             }
-            if pointer.quote:
-                if key not in sources:
-                    digest = hashlib.sha256(
-                        json.dumps(key, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-                    ).hexdigest()
-                    sources[key] = {
-                        "anchor": f"factreview-source-{digest}",
-                        "label": f"S{len(sources) + 1:04d}",
-                        "occurrences": [],
-                    }
-                source = sources[key]
-                occurrence["source"] = source
-                source["occurrences"].append(occurrence)
+            for index, pointer in enumerate([item.pointer, *item.additional_pointers]):
+                role = f"additional {index}" if index else "primary"
+                usage = {
+                    "anchor": occurrence["anchor"] + (f"-source-{index + 1:02d}" if index else ""),
+                    "label": occurrence["label"] + (f" / {role}" if item.additional_pointers else ""),
+                    "owner": occurrence["owner"],
+                    "source": None,
+                }
+                key = (pointer.locator, pointer.page, pointer.line, pointer.key, pointer.quote)
+                if pointer.quote:
+                    if key not in sources:
+                        digest = hashlib.sha256(
+                            json.dumps(key, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                        ).hexdigest()
+                        sources[key] = {
+                            "anchor": f"factreview-source-{digest}",
+                            "label": f"S{len(sources) + 1:04d}",
+                            "occurrences": [],
+                        }
+                    source = sources[key]
+                    usage["source"] = source
+                    source["occurrences"].append(usage)
+                occurrence["usages"].append(usage)
             occurrences.append(occurrence)
     return iter(occurrences)
 
 
-def _evidence(item: Evidence, occurrence=None) -> list[str]:
-    pointer = item.pointer
-    source = "paper-internal" if item.source == "paper_internal" else item.source
+def _pointer_location(pointer):
     location = [pointer.locator]
     location.extend(
         f"{name} {value}"
         for name, value in (("page", pointer.page), ("line", pointer.line), ("key", pointer.key))
         if value is not None
     )
-    lines = [
-        f"- **{source} / {item.direction}**; sufficient: {str(item.sufficient).lower()}; "
-        f"covers: {_text(', '.join(item.covered) or 'no claim conditions')}. "
-        f"Pointer: {_text('; '.join(location))}."
-    ]
-    source = occurrence["source"] if occurrence else None
-    if occurrence:
-        lines[0] += f' <a id="{occurrence["anchor"]}"></a>Evidence {occurrence["label"]}.'
-    repeated = source is not None and source["occurrences"][0] is not occurrence
+    return _text("; ".join(location))
+
+
+def _passage(pointer, usage=None):
+    lines = []
+    source = usage["source"] if usage else None
+    repeated = source is not None and source["occurrences"][0] is not usage
     if repeated:
         lines.append(f"  - Passage: [Source {source['label']}](#{source['anchor']}) (same exact source).")
     elif pointer.quote:
@@ -123,6 +127,26 @@ def _evidence(item: Evidence, occurrence=None) -> list[str]:
                 lines.extend(table_lines)
         else:
             lines.append(f"  - Passage: {_text(pointer.quote)}")
+    return lines
+
+
+def _evidence(item: Evidence, occurrence=None) -> list[str]:
+    source = "paper-internal" if item.source == "paper_internal" else item.source
+    lines = [
+        f"- **{source} / {item.direction}**; sufficient: {str(item.sufficient).lower()}; "
+        f"covers: {_text(', '.join(item.covered) or 'no claim conditions')}. "
+        f"Pointer: {_pointer_location(item.pointer)}."
+    ]
+    if occurrence:
+        lines[0] += f' <a id="{occurrence["anchor"]}"></a>Evidence {occurrence["label"]}.'
+    lines.extend(_passage(item.pointer, occurrence["usages"][0] if occurrence else None))
+    for index, pointer in enumerate(item.additional_pointers, 1):
+        usage = occurrence["usages"][index] if occurrence else None
+        line = f"  - Additional pointer {index}: {_pointer_location(pointer)}."
+        if usage:
+            line += f' <a id="{usage["anchor"]}"></a>Source usage {usage["label"]}.'
+        lines.append(line)
+        lines.extend(_passage(pointer, usage))
     if item.note:
         lines.append(f"  - Detail: {_text(item.note)}")
     if item.source == "execution":

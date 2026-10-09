@@ -99,6 +99,7 @@ class ExecutionProvenance(Contract):
 class Evidence(Contract):
     source: Literal["paper_internal", "literature", "theory", "code", "execution"]
     pointer: EvidencePointer
+    additional_pointers: list[EvidencePointer] = Field(default_factory=list)
     covered: list[NonEmpty] = Field(default_factory=list)
     direction: Literal["support", "flaw"]
     sufficient: bool = False
@@ -112,6 +113,23 @@ class Evidence(Contract):
     @model_validator(mode="after")
     def check_pointer_and_alignment(self) -> Self:
         pointer = self.pointer
+        if self.additional_pointers:
+            if self.source != "paper_internal" or self.direction != "support":
+                raise ValueError("additional pointers require paper_internal support evidence")
+            seen = {(pointer.locator, pointer.page, pointer.line, pointer.key, pointer.quote)}
+            for additional in self.additional_pointers:
+                if not additional.quote.strip() or not (additional.page or (additional.key or "").strip()):
+                    raise ValueError("additional paper pointers require an exact quote and page or key")
+                identity = (
+                    additional.locator,
+                    additional.page,
+                    additional.line,
+                    additional.key,
+                    additional.quote,
+                )
+                if identity in seen:
+                    raise ValueError("evidence pointers must identify distinct exact sources")
+                seen.add(identity)
         if self.source in {"paper_internal", "theory"}:
             if not pointer.quote.strip() or not (pointer.page or (pointer.key or "").strip()):
                 raise ValueError("paper/theory evidence requires a quote and page or section key")
