@@ -104,6 +104,8 @@ A version 1 plan contains `protected_files` (input path to SHA256) and named `ca
 
 Positive and negative citation cases both require healthy source identity, page-located text actually supplied to the model, and a valid comparison against that passage. An unavailable service or rejected comparison cannot satisfy a negative expectation. A separately declared unresolved-cache case checks the precise missing identity and explanation; unrelated historical reader failures remain visible and do not establish reader health.
 
+Literature quotations must be exact substrings of the matching source's `passages[].text`, preserving original characters, hyphenation and whitespace. The model-visible `paper` metadata omits `abstract`; original metadata remains available to identity, self-exclusion and audit processing. Abstract text remains eligible when explicitly included in the source's passages by the existing fallback, with its existing sufficiency restrictions. Text normalization or another reader item cannot silently grant a quotation evidence status.
+
 Each output saves requests, responses, actual boundary counts, provider/model, recorded usage, result/assessment and input/implementation hashes. Adapter calls and HTTP requests are distinct counts. Current readers do not expose original PDF bytes for an independent PDF hash; the driver records that limitation and does not download the PDF again. These selected checks measure citation contracts and service integration; they provide no broad scientific accuracy estimate.
 
 ## Evidence report navigation
