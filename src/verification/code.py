@@ -16,6 +16,7 @@ from pydantic import Field
 from common import run_stats
 from llm.diagnostics import redact_provider_details
 from schemas.claim import AuthorQuestion, Claim, Contract, Evidence, EvidencePointer, NonEmpty
+from schemas.limitations import VerificationLimitation
 from schemas.materials import SharedMaterials
 from screening import checks
 from screening.checks import ask
@@ -144,6 +145,19 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
         )
     if not sources:
         reason = "No readable released-repository source fits the configured inspection scope."
+        if scope["omitted_files"]:
+            return BranchResult(
+                issues=[reason, *scope_issues],
+                verification_limitations=[
+                    VerificationLimitation(
+                        claim_id=claim.id,
+                        condition_ids=[condition.id for condition in claim.conditions],
+                        stage="Code",
+                        kind="source_context_unavailable",
+                        reason=" ".join([reason, *scope_issues]),
+                    )
+                ],
+            )
         return BranchResult(
             issues=[reason, *scope_issues],
             questions=[
