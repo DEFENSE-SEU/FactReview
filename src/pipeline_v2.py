@@ -289,6 +289,7 @@ def run_v2_pipeline(
             summary["figure_coverage"] = screening.figure_coverage
             summary["figure_context_coverage"] = screening.figure_context_coverage
             summary["table_coverage"] = screening.table_coverage
+            summary["table_context_coverage"] = screening.table_context_coverage
             summary["writing_coverage"] = screening.writing_coverage
             summary["anonymity_policy"] = screening.anonymity_policy
             summary["outputs"]["screening"] = str(root / "screening" / "screening.json")
@@ -432,6 +433,7 @@ def run_v2_pipeline(
                     figure_coverage=summary["figure_coverage"],
                     figure_context_coverage=summary["figure_context_coverage"],
                     table_coverage=summary["table_coverage"],
+                    table_context_coverage=summary["table_context_coverage"],
                     writing_coverage=summary["writing_coverage"],
                     anonymity_policy=summary["anonymity_policy"],
                     token_usage=summary["model_usage"],
@@ -445,6 +447,7 @@ def run_v2_pipeline(
                     figure_coverage=summary["figure_coverage"],
                     figure_context_coverage=summary["figure_context_coverage"],
                     table_coverage=summary["table_coverage"],
+                    table_context_coverage=summary["table_context_coverage"],
                     writing_coverage=summary["writing_coverage"],
                     anonymity_policy=summary["anonymity_policy"],
                 )
@@ -499,6 +502,7 @@ def run_v2_pipeline(
                 figure_coverage=summary.get("figure_coverage"),
                 figure_context_coverage=summary.get("figure_context_coverage"),
                 table_coverage=summary.get("table_coverage"),
+                table_context_coverage=summary.get("table_context_coverage"),
                 writing_coverage=summary.get("writing_coverage"),
                 anonymity_policy=summary.get("anonymity_policy"),
                 token_usage=summary["model_usage"],

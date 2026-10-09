@@ -25,6 +25,7 @@ class ScreeningResult(Contract):
     figure_context_coverage: dict[str, int] = Field(default_factory=dict)
     table_checks: list[TableCheckRecord] = Field(default_factory=list)
     table_coverage: dict[str, int] = Field(default_factory=dict)
+    table_context_coverage: dict[str, int] = Field(default_factory=dict)
     writing_checks: list[WritingSectionRecord] = Field(default_factory=list)
     writing_coverage: dict[str, int] = Field(default_factory=dict)
     anonymity_policy: Literal["unspecified", "required", "not_required"] = "unspecified"
@@ -84,7 +85,11 @@ def screen_paper(
         issue = (
             f"{block.id}: table visual material unavailable; rebuild shared materials from the original PDF."
         )
-        result.table_checks.append(TableCheckRecord(table_id=block.id, status="unavailable", issues=[issue]))
+        result.table_checks.append(
+            TableCheckRecord(
+                table_id=block.id, status="unavailable", context_status="unavailable", issues=[issue]
+            )
+        )
         result.issues.append(issue)
     for name, check in (
         (
@@ -136,6 +141,14 @@ def screen_paper(
             status: sum(record.status == status for record in result.table_checks)
             for status in ("checked", "failed", "unavailable")
         },
+    }
+    result.table_context_coverage = {
+        "total": len(materials.tables) + len(missing_tables),
+        **{
+            status: sum(record.context_status == status for record in result.table_checks)
+            for status in ("not_requested", "checked", "failed", "unavailable")
+        },
+        "unrecorded": max(0, len(materials.tables) + len(missing_tables) - len(result.table_checks)),
     }
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "screening.json").write_text(result.model_dump_json(indent=2), encoding="utf-8")
