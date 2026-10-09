@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import AliasChoices, Field
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -53,6 +53,14 @@ class Settings(BaseSettings):
     agent_max_tokens: int = 4096
     agent_max_turns: int = 1000
     agent_resume_attempts: int = 2
+    experiment_scope_binding_repair_rounds: int = Field(default=0, ge=0, le=1)
+
+    @field_validator("experiment_scope_binding_repair_rounds", mode="before")
+    @classmethod
+    def bounded_binding_repair_rounds(cls, value):
+        if (type(value) is int and value in (0, 1)) or (type(value) is str and value in {"0", "1"}):
+            return int(value)
+        raise ValueError("experiment_scope_binding_repair_rounds must be 0 or 1")
 
     max_pdf_bytes: int = 50 * 1024 * 1024
 

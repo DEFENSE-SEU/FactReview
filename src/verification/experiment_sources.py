@@ -13,6 +13,7 @@ import os
 import re
 from pathlib import Path
 
+from verification.experiment_binding_repair import BindingContractError
 from verification.experiment_catalog import _CAPTION, _stable_id, resolve_source
 from verification.theory import _paper_pointer
 
@@ -340,7 +341,18 @@ def validate_source_uses(catalog, row, materials, *, own_table_reference, has_la
                     {"source_id": source_id, "role": role, "rationale": use.rationale}
                 )
             elif role not in consumed[source_id]:
-                raise ValueError(f"Joint source role {role} has no corresponding numerical/bridge consumer")
+                raise BindingContractError(
+                    f"Joint source role {role} has no corresponding numerical/bridge consumer",
+                    code="unused_mechanical_source_role",
+                    unused=[
+                        {"source_id": identifier, "role": candidate}
+                        for identifier, declared in uses.items()
+                        for candidate in declared.roles
+                        if candidate not in {"protocol", "other_qualifier"}
+                        and candidate not in consumed[identifier]
+                        and not (candidate == "result" and not row.comparisons)
+                    ],
+                )
     view["source_uses"] = [use.model_dump() for use in row.source_uses]
     view["role_consumption"] = {key: sorted(value) for key, value in consumed.items()}
 

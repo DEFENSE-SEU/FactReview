@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import math
 import re
@@ -24,6 +25,10 @@ from schemas.claim import (
 from schemas.materials import SharedMaterials
 from screening.checks import ask
 from verification.contracts import BranchResult, RejectedPlan
+from verification.experiment_binding_repair import (
+    BindingContractError,
+    repair_bindings,
+)
 from verification.experiment_catalog import (
     TableGrid as _TableGrid,
 )
@@ -1065,8 +1070,17 @@ def _bridge_bindings(claim, condition, scope, comparison, materials, catalog):
             # its operand-specific scope without an external setup definition.
             result[role][key] = label
     if not comparison.bridges:
-        if any(value != "shared" and key not in result[value] for key, value in scope.setting_scopes.items()):
-            raise ValueError("Operand-specific settings require explicit source bindings")
+        missing = [
+            {"field": f"settings.{key}", "role": role}
+            for key, role in scope.setting_scopes.items()
+            if role != "shared" and key not in result[role]
+        ]
+        if missing:
+            raise BindingContractError(
+                "Operand-specific settings require explicit source bindings",
+                code="missing_operand_setting_bridge",
+                fields=missing,
+            )
         return result
     if catalog is None or not comparison.left_catalog_id or not comparison.right_catalog_id:
         raise ValueError("Source bridges require verified catalog cell IDs")
@@ -1162,7 +1176,15 @@ def _bridge_bindings(claim, condition, scope, comparison, materials, catalog):
         if key not in condition.settings:
             raise ValueError("Setting scope refers to an unknown condition field")
         if role != "shared" and key not in result[role]:
-            raise ValueError("Operand-specific setting is missing its source binding")
+            raise BindingContractError(
+                "Operand-specific setting is missing its source binding",
+                code="missing_operand_setting_bridge",
+                fields=[
+                    {"field": f"settings.{name}", "role": owner}
+                    for name, owner in scope.setting_scopes.items()
+                    if owner != "shared" and name not in result[owner]
+                ],
+            )
     return result
 
 
@@ -1281,6 +1303,7 @@ def _numeric_scope_check(
     catalog=None,
     mode: Literal["support", "concern"] = "support",
     require_comparison: bool = False,
+    binding_issues: list | None = None,
 ) -> list[str]:
     """Bind every cited pair; support additionally proves all cases and the relation."""
     reasons = []
@@ -1324,7 +1347,7 @@ def _numeric_scope_check(
             reasons.append("Numerical checks must cover each required comparison case exactly once")
     elif not cases or len(cases) != len(set(cases)) or not set(cases).issubset(expected_cases):
         reasons.append("A statistical concern needs distinct, grounded comparison cases from this condition")
-    for comparison in decision.comparisons:
+    for comparison_index, comparison in enumerate(decision.comparisons):
         try:
             bridges = _bridge_bindings(claim, condition, scope, comparison, materials, catalog)
             settings = dict(comparison.settings)
@@ -1613,6 +1636,8 @@ def _numeric_scope_check(
             if mode == "support" and not holds:
                 raise ValueError(f"Numerical relation {relation} is false for {left} and {right}")
         except ValueError as exc:
+            if binding_issues is not None and isinstance(exc, BindingContractError):
+                binding_issues.append({**exc.record(), "comparison_index": comparison_index})
             reasons.append(f"{comparison.case or condition.id}: {exc}")
     if dimensions:
         observed = set(observed_settings)
@@ -1627,7 +1652,7 @@ def _numeric_scope_check(
     return reasons
 
 
-def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=None):
+def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=None, *, diagnostics=None):
     """One invalid condition keeps its own evidence unconfirmed; other conditions survive."""
     version = response.get("schema_version")
     if "schema_version" in response and (
@@ -1643,6 +1668,7 @@ def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=No
         raise ValueError("Scope review must return conditions/items lists and the declared schema")
     allowed = {condition.id: condition for condition in claim.conditions}
     errors, invalid, conditions, decisions, locations = [], set(), {}, {}, []
+    hard_pairs, typed_pairs = set(), set()
 
     def reject(identifier, message):
         errors.append(f"{identifier}: {message}")
@@ -1704,8 +1730,12 @@ def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=No
     joint_catalogs = joint_catalogs or {}
     seen_pairs, invalid_pairs = set(), set()
 
-    def reject_item(key, identifier, message):
+    def reject_item(key, identifier, message, *, error=None, missing=False):
         if key in expected and key[0] in joint_catalogs:
+            if isinstance(error, BindingContractError):
+                typed_pairs.add(key)
+            elif not (missing and key in typed_pairs):
+                hard_pairs.add(key)
             invalid_pairs.add(key)
             errors.append(f"joint {key}: {message}")
             joint_catalogs[key[0]]["joint_view"]["errors"].append(message)
@@ -1769,13 +1799,17 @@ def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=No
                 }
             )
         except (ValueError, TypeError, KeyError) as exc:
-            reject_item(key, identifier, str(exc))
+            reject_item(key, identifier, str(exc), error=exc)
     for key in expected - decisions.keys():
-        reject_item(key, key[1], "Scope review must cover every candidate/condition pair exactly once")
+        reject_item(
+            key, key[1], "Scope review must cover every candidate/condition pair exactly once", missing=True
+        )
     conditions = {key: row for key, row in conditions.items() if key not in invalid}
     decisions = {
         key: row for key, row in decisions.items() if key[1] not in invalid and key not in invalid_pairs
     }
+    if diagnostics is not None:
+        diagnostics.update(hard_condition_ids=set(invalid), hard_pairs=hard_pairs, typed_pairs=typed_pairs)
     return conditions, decisions, errors, locations
 
 
@@ -1923,7 +1957,57 @@ def _bound_prose_pair_choices(claim, materials, catalog):
     return choices
 
 
-def _scope_review(claim, materials, output, *, call, catalog, joint_catalogs=None):
+def _probe_joint_binding(claim, materials, raw, scope, bounded):
+    """Revalidate one pristine pair without discarding any non-binding failure."""
+    typed, blockers, decision = [], [], None
+    try:
+        row = CatalogItemScopeV2.model_validate(raw)
+        condition = next(c for c in claim.conditions if c.id == row.condition_id)
+        try:
+            validate_source_uses(
+                bounded,
+                row,
+                materials,
+                own_table_reference=_own_table_reference,
+                has_label=_has_label,
+                condition=condition,
+            )
+        except BindingContractError as exc:
+            typed.append(exc.record())
+        decision = _catalog_item(row, claim, materials, bounded, scope)
+        for passage in decision.grounds:
+            _paper_pointer(materials, passage.block_id, passage.quote)
+        numerical = []
+        reasons = _numeric_scope_check(
+            claim,
+            condition,
+            scope,
+            decision,
+            materials,
+            catalog=bounded,
+            binding_issues=numerical,
+        )
+        typed.extend(numerical)
+        # Each typed numerical exception contributes exactly one reason. Any
+        # additional reason remains a blocker, without classifying its text.
+        if len(reasons) != len(numerical):
+            blockers.extend(reasons)
+        revalidate_members(bounded, materials)
+    except (ValueError, TypeError, KeyError, IndexError, OSError) as exc:
+        blockers.append(str(exc))
+    return {"binding_issues": typed, "blocking_errors": blockers, "decision": decision}
+
+
+def _scope_review(
+    claim,
+    materials,
+    output,
+    *,
+    call,
+    catalog,
+    joint_catalogs=None,
+    binding_repair_rounds=0,
+):
     """Independent semantic review; its grounded structural/numeric gates fail closed."""
     from common import run_stats
 
@@ -2006,15 +2090,75 @@ def _scope_review(claim, materials, output, *, call, catalog, joint_catalogs=Non
             module="verification.experiments.scope",
             call=call,
         )
-        audit["response"] = response
+        audit["response"] = copy.deepcopy(response)
+        pristine = copy.deepcopy(joint_catalogs) if binding_repair_rounds else {}
+        diagnostics = {}
         conditions, decisions, errors, locations = _decode_scope(
-            response, claim, materials, output, catalog, joint_catalogs
+            response, claim, materials, output, catalog, joint_catalogs, diagnostics=diagnostics
         )
         audit["validated"] = not errors
         audit["item_locations"] = locations
         audit["binding_errors"] = errors
         audit["resolved_items"] = [row.model_dump(mode="json") for row in decisions.values()]
-        issue = "Experimental scope review unconfirmed: " + "; ".join(errors) if errors else None
+        if binding_repair_rounds:
+            try:
+                accepted, repair_audit = repair_bindings(
+                    claim=claim,
+                    output=output,
+                    response=response,
+                    scopes=conditions,
+                    pristine=pristine,
+                    diagnostics=diagnostics,
+                    call=call,
+                    probe=lambda raw, scope, bounded: _probe_joint_binding(
+                        claim, materials, raw, scope, bounded
+                    ),
+                )
+            except Exception as exc:
+                from llm.diagnostics import redact_provider_details
+
+                accepted = {}
+                repair_audit = {
+                    "status": "failed",
+                    "outcomes": [],
+                    "error": redact_provider_details(f"{type(exc).__name__}: {exc}"),
+                }
+            audit["binding_repair"] = repair_audit
+            for key, (decision, bounded, position) in accepted.items():
+                decisions[key] = decision
+                joint_catalogs[key[0]] = bounded
+                locations[:] = [
+                    row for row in locations if (row["candidate_index"], row["condition_id"]) != key
+                ]
+                locations.append(
+                    {
+                        "candidate_index": key[0],
+                        "condition_id": key[1],
+                        "response_pointer": f"/binding_repair/effective_response/items/{position}",
+                    }
+                )
+            if repair_audit["status"] != "not_needed":
+                audit["binding_repair"]["resolved_items"] = [
+                    row.model_dump(mode="json") for row in decisions.values()
+                ]
+                # Preserve the original errors even when a new explicit patch
+                # passes. They remain independently inspectable in the audit.
+                repair_errors = [
+                    message
+                    for outcome in repair_audit["outcomes"]
+                    for message in outcome.get("validation_errors", [])
+                ]
+                errors = [
+                    *errors,
+                    f"Binding repair {repair_audit['status']}: {len(accepted)} pair(s) accepted",
+                    *repair_errors,
+                ]
+        prefix = (
+            "Original scope diagnostics and binding repair history: "
+            if binding_repair_rounds and audit["binding_repair"]["status"] != "not_needed"
+            else "Experimental scope review unconfirmed: "
+        )
+        issue = prefix + "; ".join(errors) if errors else None
         return conditions, decisions, issue, audit_path
     except Exception as exc:
         issue = f"Experimental scope review unconfirmed: {type(exc).__name__}: {exc}"
@@ -2101,8 +2245,22 @@ def _plan(claim: Claim, materials: SharedMaterials, candidate: PlanCandidate) ->
 
 
 def verify_experiments(
-    claim: Claim, materials: SharedMaterials, *, call=None, scope_call=None
+    claim: Claim,
+    materials: SharedMaterials,
+    *,
+    call=None,
+    scope_call=None,
+    scope_binding_repair_rounds=None,
 ) -> BranchResult:
+    if scope_binding_repair_rounds is None:
+        from common.config import get_settings
+
+        scope_binding_repair_rounds = get_settings().experiment_scope_binding_repair_rounds
+    if type(scope_binding_repair_rounds) is not int or scope_binding_repair_rounds not in (0, 1):
+        raise ValueError("scope_binding_repair_rounds must be 0 or 1")
+    frozen_inputs = (
+        copy.deepcopy((claim.model_dump(), materials.model_dump())) if scope_binding_repair_rounds else None
+    )
     source_limit = joint_limit()
     output = ExperimentsOutput.model_validate(
         ask(
@@ -2181,15 +2339,27 @@ def verify_experiments(
                 joint_catalogs[index]["joint_view"]["errors"].append(
                     "Each condition permits only one explicit joint candidate"
                 )
+    frozen_output = copy.deepcopy(output.model_dump()) if scope_binding_repair_rounds else None
     scopes, decisions, scope_issue, scope_audit = (
         _scope_review(
-            claim, materials, output, call=scope_call or call, catalog=catalog, joint_catalogs=joint_catalogs
+            claim,
+            materials,
+            output,
+            call=scope_call or call,
+            catalog=catalog,
+            joint_catalogs=joint_catalogs,
+            binding_repair_rounds=scope_binding_repair_rounds,
         )
         if output.items
         else ({}, {}, None, None)
     )
     if scope_issue:
         result.issues.append(scope_issue)
+    if scope_binding_repair_rounds and (
+        frozen_inputs != (claim.model_dump(), materials.model_dump()) or frozen_output != output.model_dump()
+    ):
+        result.issues.append("Binding repair input snapshot changed; no evidence or plans accepted")
+        return result
     condition_map = {condition.id: condition for condition in claim.conditions}
     for index, item in enumerate(output.items):
         item_catalog = joint_catalogs.get(index, catalog)
@@ -2350,6 +2520,8 @@ def verify_experiments(
         note += "; independent_scope_review=" + " | ".join(scope_notes)
         if scope_audit is not None:
             note += f"; scope_audit={scope_audit}; candidate_index={index}; condition_ids={covered!r} (see audit item_locations)"
+        if view is not None and view.get("binding_repair"):
+            note += "; binding_repair=accepted (original rejection retained in scope audit)"
         rejected = [condition_id for condition_id in covered if condition_id not in accepted]
         if contrary:
             groups = [(accepted, decisive), (rejected, False)]
