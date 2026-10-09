@@ -1,5 +1,11 @@
 # FactReview v2 progress
 
+Latest implementation is pushed at `d2b0ff8764e5ba55ab6b0a09b3e1a17552638f16`, exactly matched on the remote branch. The phase4 exclusive-decision path has completed one actual Docker execution; its overall strict accounting failure is retained. The phase3 status-unit prompt clarification is independently reviewed but has no new actual semantic result.
+
+The completed coverage continuation's final independent report is `claim-coverage-continuation-probe-v1/independent-actual-5d02c58681d6/review.md` (SHA `8cc68275...`), with192 frozen source and610 protected files unchanged. M2/M5 and candidate008 atomicity remain open; no historical claims were adopted.
+
+Current independent work: prepare a v5 complete seven-stage integration controller on this implementation, carrying the reviewed nested-wire/origin inspector into the full pipeline. Reuse the original bounded v4 input/budget and preserve its strict gates; no new external run is authorized by the preparation itself. This exercises framework integration on the synthetic input and cannot certify full-paper recall. Do not repeat the unchanged coverage review or the completed single-claim run to seek a passing sample. The goal remains active.
+
 ## Current phase 4: exclusive execution decision
 
 Committed and pushed as `897f384a245339d4859c9fa4a20b775684757d59`; remote head verified exactly. Independent final source review is `exclusive-execution-independent/review-final.md` (SHA `de083ccc...`).
@@ -14,7 +20,7 @@ The native v2 check has now completed on897f384: `claim006-native-followup-v2/ac
 
 Its overall strict result remains failed:2 logical/3 physical calls,47706 known tokens,1 missing usage. The initial TLS EOF before streaming triggered the existing bounded retry; the unmeasured attempt remains visible and causes both strict usage checks to fail. Known sums and all3 physical records agree; the stricter check requires every attempt's usage to be available. No identical actual retry is planned. Final read-only mechanical review is `claim006-native-followup-v2/review-e8b15072cf52/review.md` (SHA `865a9fef...`), with333 actual files unchanged and all5 paper observations still non-sufficient.
 
-Next action: finish independent content review of the completed coverage continuation, record which changes are justified and resolve the remaining semantic failure through a bounded general design. The execution correction is delivered; complete genuine-paper coverage remains open. The goal remains active.
+Next action: integrate the reviewed execution-decision inspection into the complete native controller while retaining the separately documented extraction defects. The execution correction is delivered; complete genuine-paper coverage remains open. The goal remains active.
 
 ## Latest phase 3 checkpoint: explicit coverage decisions
 
