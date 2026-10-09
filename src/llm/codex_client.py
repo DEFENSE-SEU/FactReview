@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import urllib.error
 import urllib.request
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
@@ -92,8 +93,33 @@ def _extract_output_text(payload: dict[str, Any]) -> str:
     return "\n".join(chunk for chunk in chunks if chunk).strip()
 
 
-def _iter_sse_data(response) -> list[str]:
-    events: list[str] = []
+def _completed_output_text(response: dict[str, Any]) -> str:
+    """Reject malformed terminal content before considering earlier deltas."""
+    if response.get("error") is not None:
+        raise ValueError("Codex completed response contains an error")
+    if "output_text" in response and not isinstance(response["output_text"], str):
+        raise ValueError("Codex completed output_text is not text")
+    output = response.get("output", [])
+    if not isinstance(output, list):
+        raise ValueError("Codex completed output is not a list")
+    for item in output:
+        if not isinstance(item, dict) or not isinstance(item.get("content", []), list):
+            raise ValueError("Codex completed output item is malformed")
+        if (item.get("type") == "message" or "content" in item) and (
+            "status" in item and item["status"] != "completed"
+        ):
+            raise ValueError("Codex completed response contains an unfinished message")
+        for content in item.get("content", []):
+            if not isinstance(content, dict) or (
+                content.get("type") in {"output_text", "text"} and not isinstance(content.get("text"), str)
+            ):
+                raise ValueError("Codex completed text content is malformed")
+            if content.get("type") == "refusal":
+                raise ValueError("Codex completed response contains a refusal")
+    return _extract_output_text(response)
+
+
+def _iter_sse_data(response) -> Iterator[str]:
     for raw_line in response:
         if isinstance(raw_line, bytes):
             line = raw_line.decode("utf-8", errors="ignore").strip()
@@ -105,8 +131,7 @@ def _iter_sse_data(response) -> list[str]:
         if data == "[DONE]":
             break
         if data:
-            events.append(data)
-    return events
+            yield data
 
 
 def _coerce_usage(value: Any) -> dict[str, int]:
@@ -193,68 +218,75 @@ def invoke_codex(
     request.add_header("Accept", "text/event-stream")
     request.add_header("User-Agent", "factreview/execution")
 
+    chunks: list[str] = []
+    usage: dict[str, int] = {}
+    completed = False
     try:
         with urllib.request.urlopen(request, timeout=120) as response:
-            events = _iter_sse_data(response)
+            for event in _iter_sse_data(response):
+                try:
+                    payload_item = json.loads(event)
+                except ValueError:
+                    continue
+                if not isinstance(payload_item, dict):
+                    continue
+                event_usage = _extract_usage(payload_item)
+                if event_usage:
+                    usage = event_usage
+                event_type = payload_item.get("type")
+                response_payload = payload_item.get("response")
+                response_status = (
+                    response_payload.get("status") if isinstance(response_payload, dict) else None
+                )
+                if event_type in {
+                    "error",
+                    "response.failed",
+                    "response.incomplete",
+                    "response.cancelled",
+                } or (response_status in {"failed", "incomplete", "cancelled"}):
+                    raise CodexResponseError(
+                        f"Codex backend did not complete the response: {event_type or response_status}",
+                        usage=usage,
+                    )
+                if event_type == "response.completed":
+                    if not isinstance(response_payload, dict) or response_status != "completed":
+                        raise CodexResponseError(
+                            f"Codex backend returned an invalid completion status: {response_status}",
+                            usage=usage,
+                        )
+                    final_text = _completed_output_text(response_payload)
+                    if final_text:
+                        chunks = [final_text]
+                    completed = True
+                    # This is the terminal provider event; do not wait for a
+                    # trailing [DONE], EOF, or keep-alive socket timeout.
+                    break
+                if event_type == "response.output_text.delta" and isinstance(payload_item.get("delta"), str):
+                    chunks.append(payload_item["delta"])
+                    continue
+                if (
+                    event_type == "response.output_text.done"
+                    and isinstance(payload_item.get("text"), str)
+                    and not chunks
+                ):
+                    chunks.append(payload_item["text"])
+                    continue
+
+                fallback_text = _extract_output_text(payload_item)
+                if fallback_text and not chunks:
+                    chunks.append(fallback_text)
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="ignore")
         detail = redact_provider_details(detail, base_url=url, secrets=(auth.access_token,))
-        raise CodexResponseError(f"Codex backend HTTP {exc.code}: {detail[:2000]}") from None
+        raise CodexResponseError(f"Codex backend HTTP {exc.code}: {detail[:2000]}", usage=usage) from None
+    except CodexResponseError as exc:
+        detail = redact_provider_details(str(exc), base_url=url, secrets=(auth.access_token,))
+        raise CodexResponseError(detail, usage=exc.usage) from None
     except Exception as exc:
         detail = redact_provider_details(
             f"{type(exc).__name__}: {exc}", base_url=url, secrets=(auth.access_token,)
         )
-        raise CodexResponseError(f"Codex request failed: {detail}") from None
-
-    chunks: list[str] = []
-    last_payload: dict[str, Any] = {}
-    usage: dict[str, int] = {}
-    completed = False
-    for event in events:
-        try:
-            payload_item = json.loads(event)
-        except Exception:
-            continue
-        if not isinstance(payload_item, dict):
-            continue
-        last_payload = payload_item
-        event_usage = _extract_usage(payload_item)
-        if event_usage:
-            usage = event_usage
-        event_type = payload_item.get("type")
-        response_payload = payload_item.get("response")
-        response_status = response_payload.get("status") if isinstance(response_payload, dict) else None
-        if event_type in {"error", "response.failed", "response.incomplete", "response.cancelled"} or (
-            response_status in {"failed", "incomplete", "cancelled"}
-        ):
-            raise CodexResponseError(
-                f"Codex backend did not complete the response: {event_type or response_status}", usage=usage
-            )
-        if event_type == "response.completed":
-            if response_status not in {None, "completed"}:
-                raise CodexResponseError(
-                    f"Codex backend returned an invalid completion status: {response_status}", usage=usage
-                )
-            completed = True
-            if isinstance(response_payload, dict):
-                final_text = _extract_output_text(response_payload)
-                if final_text:
-                    chunks = [final_text]
-            continue
-        if event_type == "response.output_text.delta" and isinstance(payload_item.get("delta"), str):
-            chunks.append(payload_item["delta"])
-            continue
-        if (
-            event_type == "response.output_text.done"
-            and isinstance(payload_item.get("text"), str)
-            and not chunks
-        ):
-            chunks.append(payload_item["text"])
-            continue
-
-        fallback_text = _extract_output_text(payload_item)
-        if fallback_text and not chunks:
-            chunks.append(fallback_text)
+        raise CodexResponseError(f"Codex request failed: {detail}", usage=usage) from None
 
     if not completed:
         raise CodexResponseError("Codex backend stream ended before response.completed", usage=usage)
@@ -263,6 +295,4 @@ def invoke_codex(
         if return_usage:
             return text, usage
         return text
-    raise CodexResponseError(
-        f"Codex backend returned no text. Response keys: {sorted(last_payload.keys())}", usage=usage
-    )
+    raise CodexResponseError("Codex backend returned no text", usage=usage)

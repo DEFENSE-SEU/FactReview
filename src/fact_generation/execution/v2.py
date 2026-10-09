@@ -313,6 +313,10 @@ def docker_runner(request: RunRequest) -> RunOutcome:
     come from the executed configuration/logs, never from the supplied plan.
     """
     run_dir = Path(request.run_dir)
+    # Only scratch is container-writable. Host audit files (including manifests,
+    # prior attempts and build logs) stay outside every runtime bind mount.
+    runtime_dir = _inside(run_dir, "runtime_scratch")
+    runtime_dir.mkdir(exist_ok=True)
     logs = run_dir / f"attempt_{request.repair_round}"
     logs.mkdir(parents=True, exist_ok=True)
     options = dict(request.config.docker_options)
@@ -351,7 +355,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
     command = docker_run_paper_image(
         image=image,
         paper_root_host=request.workspace,
-        run_dir_host=request.run_dir,
+        run_dir_host=str(runtime_dir),
         cwd_container="/app/" + Path(request.workdir).as_posix().removeprefix("./"),
         cmd=request.command,
         env={"FACTREVIEW_REPAIR_ROUND": str(request.repair_round)},
@@ -438,6 +442,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             "image": image,
             "python": request.config.python_version,
             "container_name": container_name,
+            "writable_runtime_directory": str(runtime_dir),
             **({"container_cleanup": cleanup} if cleanup else {}),
         },
         runtime_seconds=time.monotonic() - start,
