@@ -244,7 +244,7 @@ def entry_recipe(materials, entry, config, data):
     }
 
 
-def projection_context(claim, materials):
+def repository_context_files(materials):
     files = []
     if materials.repository:
         for row in materials.repository.files:
@@ -252,10 +252,19 @@ def projection_context(claim, materials):
                 path = indexed_file(materials, row.path)
                 if path.stat().st_size <= 100_000:
                     files.append({"path": row.path, "sha256": row.sha256, "text": path.read_text("utf-8")})
+    return files
+
+
+def projection_context(claim, materials):
+    from verification.execution_projection_catalog import request_choices
+
+    files = repository_context_files(materials)
+
     return {
         "field_inventory": {c.id: field_inventory(c) for c in claim.conditions},
         "repository_files": files,
         "limit": "Only finite full-list JSON exact-match released-predictions evaluation. No model inference or training proof.",
+        "request_choices": request_choices(claim, materials, repository_files=files),
     }
 
 
@@ -318,6 +327,69 @@ def _words_count(value):
         "twenty",
     ]
     return names[value] if 0 <= value < len(names) else str(value)
+
+
+def expected_field_role(field, actual, configuration):
+    """Preserve the binder's finite precedence; a role alone grants no acceptance."""
+    key = field.removeprefix("/settings/")
+    if field == "/dataset":
+        return "dataset_identity"
+    if field == "/metric":
+        return "metric"
+    if field == "/description":
+        return "conclusion_boundary"
+    if key in configuration["settings"] and not isinstance(actual, (dict, list)):
+        return "runtime_setting"
+    if key in {"accuracy", "reported_value"}:
+        return "reported_value"
+    if key in {"examples", "sample_count"}:
+        return "sample_scope"
+    if key in {"accuracy_definition", "measurement_definition"}:
+        return "measurement_definition"
+    if re.fullmatch(r"qualifiers/[0-9]+", key):
+        return "conclusion_boundary"
+    return None
+
+
+def qualifier_category(actual):
+    families = (
+        r"no repeated.run uncertainty(?: claimed)?",
+        r"no population.performance conclusion(?: claimed)?",
+        r"no ranking against other models",
+    )
+    if not isinstance(actual, str) or not any(re.fullmatch(p, actual, re.I) for p in families):
+        return None
+    return (
+        "ranking"
+        if "ranking" in actual.lower()
+        else ("population" if "population" in actual.lower() else "repeated")
+    )
+
+
+def source_requirements(field, actual, role):
+    """Exact existing lexical predicates, shared by request hints and final checks."""
+    if role == "sample_scope":
+        if type(actual) is not int or actual <= 0:
+            return {"explicit_sample_phrase": r"(?!)"}
+        words = rf"(?:{actual}|{_words_count(actual)})"
+        return {
+            "explicit_sample_phrase": rf"\b{words}\s+(?:(?:fixed|test|validation|training)\s+)*(?:examples|predictions)\b"
+        }
+    if role == "measurement_definition":
+        return {
+            "fraction": r"\bfraction\b",
+            "prediction": r"\bpredictions?\b",
+            "label": r"\blabels?\b",
+            "equality": r"\bequal(?:ity)?\b",
+        }
+    if role == "conclusion_boundary" and re.fullmatch(r"/settings/qualifiers/[0-9]+", field):
+        category = qualifier_category(actual)
+        return {"explicit_negative_qualifier": rf"\bno\b[^.]*\b{category}" if category else r"(?!)"}
+    return {}
+
+
+def source_hits(requirements, text):
+    return {name: bool(re.search(pattern, text, re.I)) for name, pattern in requirements.items()}
 
 
 def bind_projection_target(
@@ -468,57 +540,30 @@ def bind_projection_target(
         field, actual = row.path, inventory[row.path]
         text = "\n".join(sources[sid].quote for sid in row.source_ids)
         key = field.removeprefix("/settings/")
-        if field == "/dataset":
-            expected_role = "dataset_identity"
-        elif field == "/metric":
-            expected_role = "metric"
-        elif field == "/description":
-            expected_role = "conclusion_boundary"
+        expected_role = expected_field_role(field, actual, cfg)
+        requirements = source_requirements(field, actual, expected_role)
+        if field in {"/dataset", "/metric", "/description"}:
+            pass
         elif key in cfg["settings"] and not isinstance(actual, (dict, list)):
-            expected_role = "runtime_setting"
             if json.dumps(actual) != json.dumps(cfg["settings"][key]):
                 raise ProjectionError("Original runtime setting differs from the actual config")
             known_runtime.add(key)
         elif key in {"accuracy", "reported_value"}:
-            expected_role = "reported_value"
             if type(actual) not in {int, float} or actual != value:
                 raise ProjectionError("Original reported-value field differs from its scalar selector")
         elif key in {"examples", "sample_count"}:
-            expected_role = "sample_scope"
             if type(actual) is not int or actual <= 0:
                 raise ProjectionError("Original sample count must be one positive integer")
-            words = rf"(?:{actual}|{_words_count(actual)})"
-            if not re.search(
-                rf"\b{words}\s+(?:(?:fixed|test|validation|training)\s+)*(?:examples|predictions)\b",
-                text,
-                re.I,
-            ):
+            if not all(source_hits(requirements, text).values()):
                 raise ProjectionError("Sample count lacks an explicit scoped paper passage")
             sample_values.append(actual)
         elif key in {"accuracy_definition", "measurement_definition"}:
-            expected_role = "measurement_definition"
-            if not isinstance(actual, str) or not all(
-                re.search(term, text, re.I)
-                for term in (r"\bfraction\b", r"\bpredictions?\b", r"\blabels?\b", r"\bequal(?:ity)?\b")
-            ):
+            if not isinstance(actual, str) or not all(source_hits(requirements, text).values()):
                 raise ProjectionError("Exact-match fraction definition lacks original source grounding")
         elif re.fullmatch(r"qualifiers/[0-9]+", key):
-            expected_role = "conclusion_boundary"
-            families = (
-                r"no repeated.run uncertainty(?: claimed)?",
-                r"no population.performance conclusion(?: claimed)?",
-                r"no ranking against other models",
-            )
-            if not isinstance(actual, str) or not any(
-                re.fullmatch(pattern, actual, re.I) for pattern in families
-            ):
+            if qualifier_category(actual) is None:
                 raise ProjectionError("Unknown qualifier cannot be discharged as a conclusion boundary")
-            category = (
-                "ranking"
-                if "ranking" in actual.lower()
-                else ("population" if "population" in actual.lower() else "repeated")
-            )
-            if not re.search(rf"\bno\b[^.]*\b{category}", text, re.I):
+            if not all(source_hits(requirements, text).values()):
                 raise ProjectionError("Conclusion boundary lacks its original negative qualifier")
         else:
             raise ProjectionError("Unclassified original runtime or semantic obligation")
