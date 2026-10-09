@@ -8,10 +8,50 @@ import re
 import time
 import uuid
 from contextlib import contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 
 from common import run_stats
 from llm.diagnostics import redact_provider_details, sanitized_endpoint
+
+_REDACTION_CONFIGS = ContextVar("screening_audit_redaction_configs", default=())
+
+
+@contextmanager
+def redaction_scope(configs):
+    """Keep both writing providers' credentials out of copied audit records."""
+    token = _REDACTION_CONFIGS.set(tuple(configs))
+    try:
+        yield
+    finally:
+        _REDACTION_CONFIGS.reset(token)
+
+
+def redacted_record(value, cfg):
+    configs = (cfg, *_REDACTION_CONFIGS.get())
+
+    def copy_safe(item):
+        if isinstance(item, str):
+            for config in configs:
+                item = redact_provider_details(item, config)
+            return item
+        if isinstance(item, dict):
+            entries = [{"key": copy_safe(key), "value": copy_safe(content)} for key, content in item.items()]
+            if len({row["key"] for row in entries}) != len(entries):
+                # Audit-only representation retains every value when credentials
+                # collapse distinct keys. It never becomes model/source input.
+                return {
+                    "_audit_redaction": "dictionary keys collided after credential redaction",
+                    "entries": entries,
+                }
+            return {row["key"]: row["value"] for row in entries}
+        if isinstance(item, list):
+            return [copy_safe(content) for content in item]
+        if isinstance(item, tuple):
+            return tuple(copy_safe(content) for content in item)
+        return item
+
+    return copy_safe(value)
 
 
 @contextmanager
@@ -40,9 +80,12 @@ def visual_call_audit(*, module, cfg, system, payload, images, injected=False):
 
     def save():
         safe_record = dict(record)
-        for key in ("response", "error"):
-            if key in safe_record:
-                safe_record[key] = redact_provider_details(safe_record[key], cfg)
+        if _REDACTION_CONFIGS.get():
+            safe_record = redacted_record(safe_record, cfg)
+        else:
+            for key in ("response", "error"):
+                if key in safe_record:
+                    safe_record[key] = redact_provider_details(safe_record[key], cfg)
         path.write_text(json.dumps(safe_record, ensure_ascii=False, indent=2), encoding="utf-8")
 
     save()
