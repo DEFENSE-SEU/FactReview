@@ -22,6 +22,7 @@ class ScreeningResult(Contract):
     issues: list[str] = Field(default_factory=list)
     figure_checks: list[FigureCheckRecord] = Field(default_factory=list)
     figure_coverage: dict[str, int] = Field(default_factory=dict)
+    figure_context_coverage: dict[str, int] = Field(default_factory=dict)
     table_checks: list[TableCheckRecord] = Field(default_factory=list)
     table_coverage: dict[str, int] = Field(default_factory=dict)
     writing_checks: list[WritingSectionRecord] = Field(default_factory=list)
@@ -120,6 +121,14 @@ def screen_paper(
             status: sum(record.status == status for record in result.figure_checks)
             for status in ("checked", "failed", "unavailable")
         },
+    }
+    result.figure_context_coverage = {
+        "total": len(materials.figures),
+        **{
+            status: sum(record.context_status == status for record in result.figure_checks)
+            for status in ("not_requested", "checked", "failed", "unavailable")
+        },
+        "unrecorded": max(0, len(materials.figures) - len(result.figure_checks)),
     }
     result.table_coverage = {
         "total": len(materials.tables) + len(missing_tables),

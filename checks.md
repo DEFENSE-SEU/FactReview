@@ -149,7 +149,7 @@ Paths in this matrix use `runs/v2_binding_followup/` unless stated otherwise. Pa
 | 11. Four statuses and safe v1 readability. | pass | Schema, adapter, assessment and report tests. | `in_conflict` maps to `questioned` for historical display without reassessment. |
 | 12. Four-part report without accept/reject recommendation. | pass | `joint-legacy-report-3819b8c4f9/independent-review.json`; `joint-live-report-delivery-48562bee28/` actual joint reports. | Original assessed fields retained; primary/additional sources have complete quotes and valid navigation. |
 | 13. Original end-to-end baseline and explicit blockers. | pass | Saved offline and actual service baseline comparisons under `runs/v2_live/`; generic real Docker integration above. | Original-paper artifact/binding limits stay reported; no benchmark reproduction or accuracy claim. |
-| 14. Progress and delivery match workspace. | pass | `progress.md`, `prose-nominal-pair-delivery-inspection.json`, independent reviews and completed-batch manifests. | 120 packaged modules match, Python 3.11 syntax passes, 27 protected hashes unchanged; configured secrets absent from tracked/nonignored files. Actual repair success remains unevaluated. |
+| 14. Progress and delivery match workspace. | pass | `progress.md`, `runs/v2_method_delivery/context-projection-delivery-inspection.json`, independent Figure/projection reviews and installed smoke. | 2458 default plus 2 legacy tests; 130 application and 41 vendor modules match, Python 3.11 passes, 27 protected hashes unchanged; no configured secrets in tracked/unignored files. Actual full-flow and semantic limitations remain open above. |
 
 ## Earlier checkpoint evidence
 

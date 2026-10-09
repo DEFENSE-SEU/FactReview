@@ -288,6 +288,7 @@ def verification_limitations(
     *,
     issues=None,
     figure_coverage=None,
+    figure_context_coverage=None,
     table_coverage=None,
     writing_coverage=None,
     anonymity_policy=None,
@@ -315,6 +316,14 @@ def verification_limitations(
                 f"Figure screening is incomplete: {figure_coverage.get('failed', 0)} failed and "
                 f"{figure_coverage.get('unavailable', 0)} unavailable out of {figure_coverage.get('total', 0)} figures."
             )
+    if figure_context_coverage is not None:
+        missing = sum(figure_context_coverage.get(key, 0) for key in ("failed", "unavailable", "unrecorded"))
+        if missing:
+            limitations.append(
+                f"Figure page-context confirmation is incomplete: {figure_context_coverage.get('failed', 0)} failed, "
+                f"{figure_context_coverage.get('unavailable', 0)} unavailable and "
+                f"{figure_context_coverage.get('unrecorded', 0)} unrecorded. Crop checks have separate coverage."
+            )
     if token_usage:
         failed = token_usage.get("failed_requests", 0)
         unavailable = token_usage.get("unavailable_usage_requests", 0)
@@ -341,6 +350,7 @@ def render_markdown(
     *,
     issues: list[str] | None = None,
     figure_coverage=None,
+    figure_context_coverage=None,
     table_coverage=None,
     writing_coverage=None,
     anonymity_policy=None,
@@ -499,7 +509,22 @@ def render_markdown(
             f"| {figure_coverage.get('total', 0)} | {figure_coverage.get('checked', 0)} | "
             f"{figure_coverage.get('failed', 0)} | {figure_coverage.get('unavailable', 0)} |",
             "",
+            "Counts refer to parsed figure crops; panels may be separate inputs. "
             "Checked figures can still have uncertain observations; see verification limitations.",
+            "",
+        ]
+    if figure_context_coverage is not None:
+        lines += [
+            "### Figure page-context coverage",
+            "",
+            "| Total figures | Checked | Failed | Unavailable | Not requested | Unrecorded |",
+            "|---:|---:|---:|---:|---:|---:|",
+            f"| {figure_context_coverage.get('total', 0)} | {figure_context_coverage.get('checked', 0)} | "
+            f"{figure_context_coverage.get('failed', 0)} | {figure_context_coverage.get('unavailable', 0)} | "
+            f"{figure_context_coverage.get('not_requested', 0)} | {figure_context_coverage.get('unrecorded', 0)} |",
+            "",
+            "Page-context confirmation checks selected crop observations. Checked confirmations can remain uncertain. "
+            "Printed-size legibility uses the original 96 dpi crop; labels outside that crop have no legibility result.",
             "",
         ]
     if not review.findings:
@@ -544,6 +569,7 @@ def render_markdown(
     limitations = verification_limitations(
         issues=issues,
         figure_coverage=figure_coverage,
+        figure_context_coverage=figure_context_coverage,
         table_coverage=table_coverage,
         writing_coverage=writing_coverage,
         anonymity_policy=anonymity_policy,
@@ -579,6 +605,7 @@ def write_review(
     render_pdf=True,
     token_usage=None,
     figure_coverage=None,
+    figure_context_coverage=None,
     table_coverage=None,
     writing_coverage=None,
     anonymity_policy=None,
@@ -593,6 +620,7 @@ def write_review(
         result,
         issues=issues,
         figure_coverage=figure_coverage,
+        figure_context_coverage=figure_context_coverage,
         table_coverage=table_coverage,
         writing_coverage=writing_coverage,
         anonymity_policy=anonymity_policy,

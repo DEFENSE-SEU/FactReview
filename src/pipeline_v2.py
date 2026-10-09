@@ -287,6 +287,7 @@ def run_v2_pipeline(
             )
             summary["issues"].extend(screening.issues)
             summary["figure_coverage"] = screening.figure_coverage
+            summary["figure_context_coverage"] = screening.figure_context_coverage
             summary["table_coverage"] = screening.table_coverage
             summary["writing_coverage"] = screening.writing_coverage
             summary["anonymity_policy"] = screening.anonymity_policy
@@ -429,6 +430,7 @@ def run_v2_pipeline(
                 summary["issues"] = verification_limitations(
                     issues=summary["issues"],
                     figure_coverage=summary["figure_coverage"],
+                    figure_context_coverage=summary["figure_context_coverage"],
                     table_coverage=summary["table_coverage"],
                     writing_coverage=summary["writing_coverage"],
                     anonymity_policy=summary["anonymity_policy"],
@@ -441,6 +443,7 @@ def run_v2_pipeline(
                     render_pdf=render_pdf,
                     token_usage=summary["model_usage"],
                     figure_coverage=summary["figure_coverage"],
+                    figure_context_coverage=summary["figure_context_coverage"],
                     table_coverage=summary["table_coverage"],
                     writing_coverage=summary["writing_coverage"],
                     anonymity_policy=summary["anonymity_policy"],
@@ -494,6 +497,7 @@ def run_v2_pipeline(
             summary["issues"] = verification_limitations(
                 issues=summary["issues"],
                 figure_coverage=summary.get("figure_coverage"),
+                figure_context_coverage=summary.get("figure_context_coverage"),
                 table_coverage=summary.get("table_coverage"),
                 writing_coverage=summary.get("writing_coverage"),
                 anonymity_policy=summary.get("anonymity_policy"),
