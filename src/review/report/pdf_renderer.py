@@ -3,7 +3,9 @@ from __future__ import annotations
 import html
 import io
 import logging
+import os
 import re
+import sys
 import textwrap
 from collections import defaultdict
 from collections.abc import Iterable
@@ -935,12 +937,25 @@ def _safe_file(path: Path | None) -> Path | None:
     return None
 
 
-def _register_ttf_font(font_name: str, font_path: Path, *, quiet: bool = False) -> bool:
-    if font_name in pdfmetrics.getRegisteredFontNames():
+def _register_ttf_font(
+    font_name: str, font_path: Path, *, quiet: bool = False, required_chars: Iterable[str] = ()
+) -> bool:
+    registered = font_name in pdfmetrics.getRegisteredFontNames()
+    if registered and not required_chars:
         return True
 
     try:
-        pdfmetrics.registerFont(TTFont(font_name, str(font_path)))
+        font = pdfmetrics.getFont(font_name) if registered else TTFont(font_name, str(font_path))
+        missing = sorted({char for char in required_chars if not font.face.charToGlyph.get(ord(char))})
+        if missing:
+            logger.info(
+                "Skipped PDF math font %s: missing glyphs %s",
+                font_path,
+                ", ".join(f"U+{ord(char):04X}" for char in missing),
+            )
+            return False
+        if not registered:
+            pdfmetrics.registerFont(font)
         return True
     except Exception as exc:
         if quiet:
@@ -955,8 +970,9 @@ def _resolve_report_fonts() -> ReportFonts:
 
     Body and heading fall through to ReportLab's built-in CJK CID font
     (``STSong-Light``) so Chinese characters render even without any
-    repo-local font assets. Mono prefers a system DejaVu font for full
-    Unicode coverage and falls back to the built-in Courier.
+    repo-local font assets. Mono/formulas prefer the existing system DejaVu
+    candidates. Windows can use an installed font covering the renderer's
+    mapped math symbols; unavailable fonts retain the limited Courier fallback.
     """
     global _FONTS_CACHE
     if _FONTS_CACHE is not None:
@@ -988,6 +1004,19 @@ def _resolve_report_fonts() -> ReportFonts:
         if _register_ttf_font(FONT_MONO_UNICODE_NAME, mono_path, quiet=True):
             mono_font = FONT_MONO_UNICODE_NAME
             break
+
+    if mono_font == FONT_MONO_NAME and sys.platform == "win32":
+        directory = Path(os.environ.get("WINDIR") or "C:/Windows") / "Fonts"
+        required_chars = "".join(_LATEX_COMMAND_REPLACEMENTS.values()) + "".join(_LATEX_MATHBB_MAP.values())
+        for name, filename in (("Cambria", "cambria.ttc"), ("SegoeUISymbol", "seguisym.ttf")):
+            path = _safe_file(directory / filename)
+            if path and _register_ttf_font(
+                f"DS-WindowsMath-{name}", path, quiet=True, required_chars=required_chars
+            ):
+                mono_font = f"DS-WindowsMath-{name}"
+                break
+    if mono_font == FONT_MONO_NAME:
+        logger.warning("PDF formula font falls back to Courier; mathematical glyphs may be unavailable")
 
     _FONTS_CACHE = ReportFonts(body=body_font, heading=heading_font, mono=mono_font)
     return _FONTS_CACHE
