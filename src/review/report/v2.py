@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from review.report.evidence_tables import table_passage_lines
-from schemas.claim import ClaimLocation, ClaimStatus, Evidence
+from schemas.claim import ClaimLocation, ClaimStatus, Evidence, EvidencePointer
 from schemas.review import FinalReview
 
 STATUS_ORDER = [ClaimStatus.FLAWED, ClaimStatus.QUESTIONED, ClaimStatus.UNVERIFIED, ClaimStatus.SUPPORTED]
@@ -237,6 +237,27 @@ def _theory_derivations(claim, _navigation=None):
                     for source in entry.sources:
                         lines.append(f"  - Source: {_pointer_location(source.pointer)}.")
                         lines.extend(_passage(source.pointer))
+        for review in record.concern_reviews:
+            lines += [
+                f"  - Concern review for {_text(review.condition_id)}: {_text(review.state)}.",
+            ]
+            if review.decision:
+                decision = review.decision
+                lines += [
+                    f"    - Applicability: {_text(decision.disposition)}. {_text(decision.scope_reason)}",
+                    f"    - Resolution: {_text(decision.resolution)}",
+                    f"    - Trace steps: {_text(', '.join(decision.trace_step_ids) or 'none')}; "
+                    f"gap indices (zero-based): {_text(', '.join(map(str, decision.trace_gap_indices)) or 'none')}.",
+                ]
+            for source in review.target_sources:
+                pointer = EvidencePointer(
+                    locator=source.locator, page=source.page, key=source.key, quote=source.quote
+                )
+                lines.append(f"    - Target source: {_pointer_location(pointer)}.")
+                lines.extend(_passage(pointer))
+            lines.extend(f"    - Limitation: {_text(issue)}" for issue in review.issues)
+            if review.audit_pointer:
+                lines.append(f"    - Concern audit: {_text(review.audit_pointer)}.")
         lines.extend(f"  - Limitation: {_text(issue)}" for issue in record.issues)
         if record.audit_pointer:
             lines.append(f"  - Trace audit: {_text(record.audit_pointer)}.")
