@@ -317,7 +317,18 @@ under the same original exact-step and full-condition contracts.
 """
 
 
-def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output_dir=None) -> BranchResult:
+def verify_theory(
+    claim: Claim, materials: SharedMaterials, *, call=None, output_dir=None, visual_recheck_rounds=None
+) -> BranchResult:
+    from common.config import get_settings
+
+    rounds = (
+        get_settings().theory_visual_recheck_rounds
+        if visual_recheck_rounds is None
+        else visual_recheck_rounds
+    )
+    if type(rounds) is not int or rounds not in (0, 1):
+        raise ValueError("theory_visual_recheck_rounds must be 0 or 1")
     sections = partition_theory_sections(materials)
     main = [block for block in materials.blocks if sections.is_main(block.id)]
     appendix = {block.id: block for block in materials.blocks if sections.is_appendix(block.id)}
@@ -410,6 +421,7 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
     active_cfg = second_cfg if first.appendix_block_ids else first_cfg
     concerns = []
     parser_artifacts: dict[str, list[str]] = {}
+    visual_targets = []
     anchors = {
         condition.id: [
             (block.id, quote) for block, quote in _claim_anchors(claim, materials, condition.id, sections)
@@ -427,6 +439,46 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
                 kind="evidence_validation_failed",
                 reason=reason,
             )
+        )
+
+    def visual_target(item, record, condition_id, trigger, notation=None):
+        if not anchors[condition_id] or _proof_binding(claim, materials, item, [condition_id], sections):
+            return
+        identities = {
+            identity
+            for _, quote in anchors[condition_id]
+            if (identity := _statement_identity(quote)) is not None
+        }
+        if len(identities) > 1:
+            return
+        original_index = next(i for i, entry in enumerate(records) if entry is record)
+        if any(
+            target["condition_id"] == condition_id and target["original_record_index"] == original_index
+            for target in visual_targets
+        ):
+            return
+        visual_targets.append(
+            {
+                "target_id": "target:"
+                + derivations._digest(
+                    {
+                        "claim": claim.model_dump(mode="json"),
+                        "condition": condition_id,
+                        "record": original_index,
+                        "source_hashes": frozen.hashes,
+                        "trigger": trigger,
+                    }
+                ),
+                "trigger": trigger,
+                "condition_id": condition_id,
+                "original_record_index": original_index,
+                "item": item,
+                "record": record,
+                "pointer": _paper_pointer(materials, item.block_id, item.quote),
+                "anchors": anchors[condition_id],
+                "printed_identity": next(iter(identities), ""),
+                "notation": notation,
+            }
         )
 
     for item, record in zip(items, active_records, strict=True):
@@ -485,6 +537,16 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
             if trace_issue:
                 full_support = False
                 result.issues.append(f"Theory derivation incomplete: {trace_issue}")
+            if (
+                record.adopted
+                and record.schema_version == "theory-derivation-v1"
+                and record.state == "validated"
+                and record.trace is not None
+                and record.trace.outcome == "partial"
+                and item.block_id in loaded_ids
+            ):
+                for condition_id in covered:
+                    visual_target(item, record, condition_id, "partial_proof")
         note = f"{item.kind}: {item.detail}"
         if item.direction == "support":
             note = _support_note(note, item.fully_supported_conditions)
@@ -542,6 +604,17 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
                         blocks = parser_artifacts.setdefault(condition_id, [])
                         if item.block_id not in blocks:
                             blocks.append(item.block_id)
+                        visual_target(
+                            item,
+                            record,
+                            condition_id,
+                            "parser_confirmed",
+                            {
+                                "page": pointer.page,
+                                **review.model_dump(mode="json"),
+                                "source_hashes": image_hashes,
+                            },
+                        )
                 continue
             note += f"; original PDF page {pointer.page} confirmed: {review.explanation}"
             notation_confirmation = {
@@ -599,6 +672,114 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
                 overturnable=True,
             )
         )
+    already_supported = {
+        condition
+        for evidence in result.evidence
+        if evidence.direction == "support" and evidence.sufficient
+        for condition in evidence.covered
+    }
+    visual_targets = [target for target in visual_targets if target["condition_id"] not in already_supported]
+    if rounds and visual_targets:
+        frozen.check(claim, materials)
+        available = []
+        for target in visual_targets:
+            number = target["pointer"].page
+            original = [page for page in frozen.pages if page["page"] == number]
+            current = [page.model_dump(mode="json") for page in materials.pages if page.page == number]
+            # Initial absence is local. Changed previously captured page identity
+            # or pixels keeps the original source-rejection contract.
+            if current != original:
+                raise ValueError("Theory visual recovery page identity changed during verification")
+            if len(original) != 1 or frozen.image_hashes.get(original[0]["path"]) is None:
+                result.verification_limitations.append(
+                    VerificationLimitation(
+                        claim_id=claim.id,
+                        condition_ids=[target["condition_id"]],
+                        stage="Theory",
+                        kind="source_context_unavailable",
+                        reason=(
+                            f"Visual Theory {target['trigger']} recovery unavailable: original proof "
+                            f"page {number} had no unique available image at the initial source snapshot; "
+                            f"target_id={target['target_id']}; original_record_index={target['original_record_index']}"
+                        ),
+                    )
+                )
+                continue
+            frozen.check_page(number, materials, consume=True)
+            available.append(target)
+        visual_targets = available
+    if rounds and visual_targets:
+        from verification.theory_visual import recheck
+
+        frozen.check(claim, materials)
+        visual_context = derivations.SourceContext.capture(
+            claim, materials, [block for block in materials.blocks if block.id in loaded_ids]
+        )
+        # Reuse the baseline captured before any model callback, including page pixels.
+        visual_context.paths = frozen.paths
+        visual_context.pages = frozen.pages
+        visual_context.image_hashes = frozen.image_hashes
+        try:
+            recovered = recheck(
+                claim,
+                materials,
+                visual_targets,
+                context=visual_context,
+                call=call,
+                output_dir=output_dir,
+                start_index=1 + max((record.item_index or 0 for record in active_records), default=-1),
+                text_cfg=active_cfg,
+            )
+        except (ValueError, OSError, RuntimeError) as exc:
+            result.issues.append(
+                "Visual Theory recheck unavailable: " + derivations.safe_text(str(exc), active_cfg)
+            )
+            recovered = []
+        for target, reviewed, record in recovered:
+            result.theory_derivations.append(record)
+            if reviewed is None:
+                unavailable(record.covered, "Visual Theory recheck invalid: " + "; ".join(record.issues))
+                continue
+            item = target["item"].model_copy(
+                update={
+                    "kind": "derivation",
+                    "direction": reviewed.direction,
+                    "detail": derivations.safe_text(reviewed.detail, active_cfg),
+                    "covered": record.covered,
+                    "fully_supported_conditions": record.covered if reviewed.fully_supported else [],
+                }
+            )
+            note = (
+                "Visual Theory recheck: "
+                + item.detail
+                + "; sources include model-transcribed original pixels, without formal-proof certification"
+                + f"; trace_audit={record.audit_pointer}; target_id={record.target_id}"
+            )
+            if item.direction == "flaw":
+                concerns.append(
+                    {
+                        "item": item,
+                        "record": record,
+                        "pointer": target["pointer"],
+                        "covered": record.covered,
+                        "note": note,
+                        "notation_confirmation": target["notation"],
+                    }
+                )
+            else:
+                trace_issue = derivations.positive_trace_issue(record)
+                result.evidence.append(
+                    Evidence(
+                        source="theory",
+                        pointer=target["pointer"],
+                        covered=record.covered,
+                        direction="support",
+                        sufficient=reviewed.fully_supported and not trace_issue,
+                        note=note + ("; " + trace_issue if trace_issue else ""),
+                    )
+                )
+        visual_context.check(claim, materials)
+        frozen.consumed_pages.update(visual_context.consumed_pages)
     if concerns:
         reviews = review_concerns(
             claim,
@@ -659,4 +840,10 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
                 )
             )
     frozen.check(claim, materials)
+    for record in result.theory_derivations:
+        if record.schema_version == "theory-visual-derivation-v1":
+            if record.state == "validated" and (not record.audit_pointer or not record.audit_sha256):
+                raise ValueError("Validated visual Theory record has no audit path/hash")
+            if record.audit_sha256 and derivations._file_hash(record.audit_pointer) != record.audit_sha256:
+                raise ValueError("Visual Theory audit changed after its recorded verification")
     return result
