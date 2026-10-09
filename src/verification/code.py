@@ -20,6 +20,7 @@ from schemas.materials import SharedMaterials
 from screening import checks
 from screening.checks import ask
 from verification.code_scope import review_code_scope
+from verification.code_sources import CodeSourceContext
 from verification.contracts import BranchResult
 from verification.theory import (
     FULL_SUPPORT_DESCRIPTION,
@@ -154,6 +155,7 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
             ],
         )
     cfg = checks.resolve_llm_config()
+    frozen = CodeSourceContext.capture(claim, materials, sources)
     response = ask(
         "Compare paper descriptions to indexed configs and source: architecture, loss, optimizer, "
         "hyperparameters, data processing, and evaluation protocol. Return output_schema JSON. "
@@ -188,6 +190,7 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
         module="verification.code",
         call=call,
     )
+    frozen.check(claim, materials)
     try:
         output = CodeOutput.model_validate(response)
     except ValueError as exc:
@@ -206,10 +209,12 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
         _fully_supported(covered, item.fully_supported_conditions)
         validated.append((item, paper, covered))
     if not validated:
+        frozen.check(claim, materials)
         return result
     scopes, decisions, issues, audit = review_code_scope(
         claim, materials, output.items, sources, summary, call=scope_call or call
     )
+    frozen.check(claim, materials)
     result.issues.extend(issues)
     root = Path(materials.repository.root).resolve(strict=True)
     hashes = {entry.path: entry.sha256 for entry in materials.repository.files}
@@ -290,4 +295,5 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
                     }
                 )
             )
+    frozen.check(claim, materials)
     return result

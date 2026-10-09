@@ -9,10 +9,12 @@ from typing import Literal
 from pydantic import Field
 
 from schemas.claim import AuthorQuestion, Claim, Contract, Evidence, EvidencePointer, NonEmpty
-from schemas.materials import MaterialBlock, SharedMaterials
+from schemas.limitations import VerificationLimitation
+from schemas.materials import SharedMaterials
 from screening.checks import ask, grounded_paper_pointer
 from verification import theory_derivations as derivations
 from verification.contracts import BranchResult
+from verification.theory_sections import TheorySections, partition_theory_sections
 
 
 def _paper_pointer(materials: SharedMaterials, block_id: str, quote: str) -> EvidencePointer:
@@ -53,16 +55,6 @@ def _support_note(detail: str, ids: list[str]) -> str:
     return detail + f"; fully_supported_conditions={ids!r}"
 
 
-def _appendix(block: MaterialBlock) -> bool:
-    return bool(
-        re.search(
-            r"\b(?:appendix|appendices|supplement(?:ary)?)\b",
-            block.loc.section if block.loc and block.loc.section else "",
-            re.I,
-        )
-    )
-
-
 _STATEMENT = re.compile(
     r"\b(theorem|lemma|proposition|corollary)\s+(?:[A-Za-z]\.)?\d+(?:\.\d+)*\b"
     r"|\b(theorem|lemma|proposition|corollary)\s+[A-Za-z]\b",
@@ -89,7 +81,7 @@ def _statement_identity(quote: str) -> str | None:
     return None
 
 
-def _claim_anchors(claim: Claim, materials: SharedMaterials, condition_id: str):
+def _claim_anchors(claim: Claim, materials: SharedMaterials, condition_id: str, sections: TheorySections):
     primary = (claim.source_block_id, claim.source_quote, claim.loc)
     explicit_primary = [
         ref for ref in claim.source_refs if (ref.source_block_id, ref.source_quote) == primary[:2]
@@ -104,7 +96,13 @@ def _claim_anchors(claim: Claim, materials: SharedMaterials, condition_id: str):
     blocks = {block.id: block for block in materials.blocks}
     for block_id, quote, loc in rows:
         block = blocks.get(block_id)
-        if block is None or block.loc is None or _appendix(block) or not quote or quote not in block.text:
+        if (
+            block is None
+            or block.loc is None
+            or not sections.is_main(block.id)
+            or not quote
+            or quote not in block.text
+        ):
             continue
         if loc.page is not None and loc.page != block.loc.page:
             continue
@@ -119,10 +117,12 @@ def _claim_anchors(claim: Claim, materials: SharedMaterials, condition_id: str):
         yield block, quote
 
 
-def _proof_binding(claim: Claim, materials: SharedMaterials, item, covered: list[str]) -> str | None:
+def _proof_binding(
+    claim: Claim, materials: SharedMaterials, item, covered: list[str], sections: TheorySections
+) -> str | None:
     blocks = {block.id: block for block in materials.blocks}
     proof = blocks[item.block_id]
-    anchor_id = item.main_block_id or (proof.id if not _appendix(proof) else None)
+    anchor_id = item.main_block_id or (proof.id if sections.is_main(proof.id) else None)
     # A proof of A can cite B without becoming a proof of B. Bind the actual
     # quoted step to the preceding proof declaration or its section heading.
     step_end = proof.text.find(item.quote) + item.quote.find(item.step_quote) + len(item.step_quote)
@@ -137,9 +137,10 @@ def _proof_binding(claim: Claim, materials: SharedMaterials, item, covered: list
         target = match.group(1) if match else None
     target = " ".join(target.casefold().split()) if target else None
     anchors_by_condition = {
-        condition_id: list(_claim_anchors(claim, materials, condition_id)) for condition_id in covered
+        condition_id: list(_claim_anchors(claim, materials, condition_id, sections))
+        for condition_id in covered
     }
-    if not _appendix(proof):
+    if sections.is_main(proof.id):
         if target is None and proof.id == anchor_id and re.match(r"\s*proof\b", item.quote, re.I):
             declarations = [
                 match
@@ -175,14 +176,14 @@ def _proof_binding(claim: Claim, materials: SharedMaterials, item, covered: list
                 declarations = [
                     candidate.id
                     for candidate in materials.blocks
-                    if not _appendix(candidate) and _statement_identity(candidate.text) == identity
+                    if sections.is_main(candidate.id) and _statement_identity(candidate.text) == identity
                 ]
                 matched = identity == target and declarations == [block.id]
             elif identity in {"theorem", "lemma", "proposition", "corollary"}:
                 declarations = [
                     candidate.id
                     for candidate in materials.blocks
-                    if not _appendix(candidate)
+                    if sections.is_main(candidate.id)
                     for _ in re.finditer(rf"\b{identity}\s*(?::|\d|[A-Z]\b)", candidate.text, re.I)
                 ]
                 matched = declarations == [block.id] and bool(
@@ -292,6 +293,11 @@ Trace sources may only cite allowed_theory_source_block_ids for this pass. The c
 source_refs describe extraction provenance and can mention an appendix not yet supplied
 as proof context; request its appendix_block_ids before citing it in items or trace sources.
 This trace cannot establish author proof existence or enlarge covered/full-support flags.
+source_partition records author-grounded section roles. References and unknown regions are
+not eligible proof sources. Appendix passages in claim source_refs remain provenance/context
+only until their block IDs are explicitly requested and supplied in the second phase.
+Do not infer that the author omitted a proof merely because a relevant appendix is unread or
+its section role is unresolved. Report the scope limitation rather than inventing a main-text anchor.
 For no_proof, preserve an unable trace explaining the missing author proof; do not replace
 it with a proof invented by you. Keep ordinary unnumbered main-text derivations eligible
 under the same original exact-step and full-condition contracts.
@@ -299,8 +305,9 @@ under the same original exact-step and full-condition contracts.
 
 
 def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output_dir=None) -> BranchResult:
-    main = [block for block in materials.blocks if not _appendix(block)]
-    appendix = {block.id: block for block in materials.blocks if _appendix(block)}
+    sections = partition_theory_sections(materials)
+    main = [block for block in materials.blocks if sections.is_main(block.id)]
+    appendix = {block.id: block for block in materials.blocks if sections.is_appendix(block.id)}
     frozen = derivations.SourceContext.capture(claim, materials, materials.blocks)
     first_context = derivations.SourceContext.capture(claim, materials, main)
     payload = {
@@ -311,6 +318,7 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
             {"id": b.id, "section": b.loc.section if b.loc else ""} for b in appendix.values()
         ],
         "allowed_theory_source_block_ids": [block.id for block in main],
+        "source_partition": sections.audit(),
         "output_schema": TheoryDerivationOutput.model_json_schema(),
     }
     system = _SYSTEM + _DERIVATION_SYSTEM
@@ -343,10 +351,12 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
         injected=call is not None,
     )
     active_records = records
+    loaded_ids = set(main_ids)
     if first.appendix_block_ids:
         if not set(first.appendix_block_ids).issubset(appendix):
             raise ValueError("Theory requested an unknown appendix block")
         selected = [appendix[key] for key in dict.fromkeys(first.appendix_block_ids)]
+        loaded_ids.update(block.id for block in selected)
         second_context = derivations.SourceContext.capture(claim, materials, [*main, *selected])
         second_raw, second_audit, second_cfg = derivations.request(
             system + " Relevant appendix proofs are now supplied; finish the check.",
@@ -383,7 +393,7 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
             injected=call is not None,
         )
         records.extend(active_records)
-    result = BranchResult(theory_derivations=records)
+    result = BranchResult(theory_derivations=records, issues=list(sections.issues))
     active_cfg = second_cfg if first.appendix_block_ids else first_cfg
     for item, record in zip(items, active_records, strict=True):
         item = item.model_copy(update={"detail": derivations.safe_text(item.detail, active_cfg)})
@@ -393,6 +403,22 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
         if item.block_id in appendix and item.main_block_id not in main_ids:
             raise ValueError("An appendix proof must link to a main-text theorem")
         if item.kind == "no_proof":
+            scope_issue = sections.no_proof_issue(
+                claim, covered, item.block_id, item.quote, materials, loaded_ids
+            )
+            if scope_issue:
+                reason = f"Author-proof absence is unconfirmed: {scope_issue}"
+                result.issues.append(reason)
+                result.verification_limitations.append(
+                    VerificationLimitation(
+                        claim_id=claim.id,
+                        condition_ids=covered,
+                        stage="Theory",
+                        kind="source_context_unavailable",
+                        reason=reason,
+                    )
+                )
+                continue
             result.issues.append(f"No proof located: {item.detail}")
             result.questions.append(
                 AuthorQuestion(
@@ -410,7 +436,7 @@ def verify_theory(claim: Claim, materials: SharedMaterials, *, call=None, output
             ):
                 result.issues.append("No checkable derivation step found in the quoted assertion.")
                 continue
-            binding_issue = _proof_binding(claim, materials, item, covered)
+            binding_issue = _proof_binding(claim, materials, item, covered, sections)
             if binding_issue:
                 full_support = False
                 result.issues.append(f"Theory proof binding unconfirmed: {binding_issue}")
