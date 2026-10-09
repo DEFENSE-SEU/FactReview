@@ -48,6 +48,19 @@ Paper-internal support never establishes independent reproduction by execution.
 Preserve all stated limits. Do not give publication acceptance/rejection advice.
 Cover all uncovered conditions for unverified and all supported conditions for
 supported. Existing author questions are inputs, not evidence of a final verdict.
+
+The request stores each scientific record once in basis. catalog_arrays lists
+the exact basis references for the claim's evidence, notes, questions, derivations
+and operational limitations; ledger rows likewise reference basis where possible.
+These are complete original records, with no summarization. Read their contents.
+Local source-file integrity hashes are retained separately in the immutable audit.
+item_requirements enumerates the validator's per-condition requirements. EVERY
+item must include all required_basis_refs and at least one reference from EACH
+one_or_more_from_each_group, for EACH condition it names. Obey required_action
+when supplied. Write one consolidated item per eligible condition, combining its
+context and limitations. Extra explanatory items need the same complete bases;
+do not append unsupported context-only or operational-only items. Use only the
+listed eligible conditions and cover every required_condition_id.
 """
 
 
@@ -324,17 +337,22 @@ def generate_advice(review: FinalReview, output_dir: Path, *, call=None) -> Advi
             if _digest(advice_input(review.claims[index], review.ledger)) != digest:
                 raise ValueError("Advice input or local source artifact changed before generation")
             cfg = resolve_llm_config()
+            from review.report.advice_request import build_request
+
+            request = build_request(claim, data)
             prompt = (
                 "Return JSON matching this schema:\n"
                 + json.dumps(AdviceOutput.model_json_schema(), ensure_ascii=False)
                 + "\nADVICE_DATA_JSON:\n"
-                + json.dumps(data, ensure_ascii=False)
+                + json.dumps(request, ensure_ascii=False)
             )
             audit.update(
                 system=_SYSTEM,
                 prompt=prompt,
                 input=data,
                 input_sha256=digest,
+                request=request,
+                request_sha256=_digest(request),
                 provider=cfg.provider,
                 model=cfg.model,
                 attempted=True,
@@ -348,6 +366,15 @@ def generate_advice(review: FinalReview, output_dir: Path, *, call=None) -> Advi
             current = advice_input(review.claims[index], review.ledger)
             if _digest(current) != digest or _digest(advice_input(claim, frozen.ledger)) != digest:
                 raise ValueError("Advice input or local source artifact changed during generation")
+            response = audit["response"]
+            if (
+                isinstance(response, dict)
+                and response.get("status") == "error"
+                and isinstance(response.get("error"), str)
+                and response["error"].strip()
+            ):
+                audit["failure_kind"] = "provider_error"
+                raise RuntimeError("Advice provider request failed: " + response["error"])
             output = AdviceOutput.model_validate(audit["response"])
             if output.claim_id != claim.id:
                 raise ValueError("Advice response belongs to another claim")
