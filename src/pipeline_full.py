@@ -415,6 +415,12 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument("--repository-url", default="", help="HTTPS URL of the released repository")
     p.add_argument(
+        "--anonymity-policy",
+        choices=("unspecified", "required", "not_required"),
+        default="unspecified",
+        help="Submission anonymity requirement; unspecified cannot establish an anonymity violation",
+    )
+    p.add_argument(
         "--approval-mode",
         choices=("auto", "interactive"),
         default="auto",
