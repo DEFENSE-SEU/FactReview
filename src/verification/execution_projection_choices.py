@@ -34,6 +34,7 @@ from verification.execution_projection import (
 from verification.execution_projection_semantics import (
     _interpret_text,
     _metric,
+    _require_fixed_sample_count,
     _same,
     _source_authorized,
     _source_supports,
@@ -343,6 +344,7 @@ def _candidate(claim, condition, materials, catalog, sources, recipe, entry, con
     whole = _interpret_text(claim.text, cfg, runtime, value, count)
     if not whole:
         raise ProjectionError("Whole claim is outside the finite choice grammar")
+    _require_fixed_sample_count(claim, condition, cfg, runtime, value, count, claim_texts=[claim.text])
     keys = set().union(whole, *fields.values())
     if not {"dataset", "value", "sample", "definition"}.issubset(keys):
         raise ProjectionError("Choice lacks a complete fixed exact-match measurement")
