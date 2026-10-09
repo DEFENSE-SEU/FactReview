@@ -9,6 +9,9 @@ from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
+from schemas.limitations import VerificationLimitation
+from schemas.reference import ReferenceCorrection
+
 NonEmpty = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 FiniteNumber = Annotated[float, Field(allow_inf_nan=False)]
 
@@ -171,6 +174,7 @@ class AdviceItem(Contract):
     """Reviewer-facing wording bound to this claim's frozen report inputs."""
 
     text: NonEmpty
+    action: Literal["reviewer_guidance", "author_question", "verification_followup"] = "reviewer_guidance"
     condition_ids: list[str] = Field(min_length=1)
     basis_refs: list[str] = Field(min_length=1)
 
@@ -186,6 +190,7 @@ class ClaimAdvice(Contract):
     """An optional report-stage result; absent in historical and upstream records."""
 
     state: Literal["generated", "unavailable"]
+    input_version: Literal["advice-v1", "advice-v2"] = "advice-v1"
     items: list[AdviceItem] = Field(default_factory=list)
     input_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     audit_pointer: str | None = None
@@ -219,6 +224,80 @@ class ClaimSourceRef(Contract):
         return self
 
 
+class TheorySource(Contract):
+    """A program-grounded manuscript source for a generated derivation record."""
+
+    block_id: NonEmpty
+    pointer: EvidencePointer
+    block_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+class TheoryAssumption(Contract):
+    id: NonEmpty
+    text: NonEmpty
+    status: Literal["paper_explicit", "required_unstated"]
+    sources: list[TheorySource] = Field(default_factory=list)
+
+
+class TheoryStep(Contract):
+    id: NonEmpty
+    statement: NonEmpty
+    reason: NonEmpty
+    assumption_ids: list[str] = Field(default_factory=list)
+    previous_step_ids: list[str] = Field(default_factory=list)
+    sources: list[TheorySource] = Field(default_factory=list)
+
+
+class TheoryGap(Contract):
+    at: NonEmpty
+    reason: NonEmpty
+    needed: NonEmpty
+    sources: list[TheorySource] = Field(default_factory=list)
+
+
+class TheoryTrace(Contract):
+    """Model-authored mathematical reasoning, without formal-proof guarantees."""
+
+    goal: NonEmpty
+    assumptions: list[TheoryAssumption]
+    steps: list[TheoryStep]
+    gaps: list[TheoryGap]
+    outcome: Literal["completed", "partial", "unable"]
+    completion_reason: NonEmpty
+
+
+class TheoryDerivationRecord(Contract):
+    schema_version: Literal["theory-derivation-v1"] | None = None
+    claim_id: NonEmpty
+    item_index: int | None = Field(default=None, ge=0, strict=True)
+    phase: Literal["main", "appendix"]
+    adopted: bool
+    covered: list[str] = Field(default_factory=list)
+    source_pointer: EvidencePointer | None = None
+    state: Literal["validated", "invalid", "legacy_unavailable"]
+    validation_scope: Literal["structure_and_source_only"] = "structure_and_source_only"
+    trace: TheoryTrace | None = None
+    issues: list[str] = Field(default_factory=list)
+    audit_pointer: str | None = None
+    source_hashes: dict[str, str] = Field(default_factory=dict)
+    provider: str = ""
+    model: str = ""
+    transport: Literal["live", "injected"] = "injected"
+
+    @model_validator(mode="after")
+    def trace_state(self) -> Self:
+        if any(not identifier or identifier != identifier.strip() for identifier in self.covered):
+            raise ValueError("Theory record condition IDs must be exact")
+        if len(self.covered) != len(set(self.covered)):
+            raise ValueError("Theory record condition IDs must be unique")
+        if self.state == "validated" and (self.schema_version is None or self.trace is None):
+            raise ValueError("Validated Theory records require a versioned trace")
+        if self.state == "legacy_unavailable" and (self.schema_version is not None or self.trace is not None):
+            raise ValueError("Legacy Theory records must explicitly lack a versioned trace")
+        return self
+
+
 class Claim(Contract):
     """The same record is enriched from extraction through final assessment."""
 
@@ -237,6 +316,8 @@ class Claim(Contract):
     status: ClaimStatus = ClaimStatus.UNVERIFIED
     notes: list[str] = Field(default_factory=list)
     advice: ClaimAdvice | None = None
+    theory_derivations: list[TheoryDerivationRecord] = Field(default_factory=list)
+    verification_limitations: list[VerificationLimitation] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def check_references(self) -> Self:
@@ -266,6 +347,14 @@ class Claim(Contract):
             for item in self.advice.items:
                 if not set(item.condition_ids).issubset(ids):
                     raise ValueError("advice must refer to its enclosing claim's condition ids")
+        for record in self.theory_derivations:
+            if record.claim_id != self.id or not set(record.covered).issubset(ids):
+                raise ValueError("Theory derivations must refer to the enclosing claim and its condition ids")
+        for limitation in self.verification_limitations:
+            if limitation.claim_id != self.id or not set(limitation.condition_ids).issubset(ids):
+                raise ValueError(
+                    "Verification limitations must refer to the enclosing claim and its condition ids"
+                )
         return self
 
 
@@ -361,3 +450,10 @@ class Finding(Contract):
     evidence: list[Evidence] = Field(min_length=1)
     level: NonEmpty
     text: NonEmpty
+    reference_correction: ReferenceCorrection | None = None
+
+    @model_validator(mode="after")
+    def correction_kind(self) -> Self:
+        if self.reference_correction is not None and self.kind != "reference":
+            raise ValueError("Reference corrections may only be attached to reference findings")
+        return self
