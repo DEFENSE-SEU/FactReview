@@ -37,6 +37,11 @@ SCENARIOS = (
 )
 ASPECTS = ["correspondence", "fairness", "isolation", "stability", "consistency"]
 LIMIT = "Synthetic contract fixtures; no model accuracy or independent scientific reproduction is measured."
+FIGURE_FIXTURE_VERSION = "printed-caption-v2"
+FIGURE_FIXTURE_CHANGE = (
+    "Original parser/Markdown captions are now printed beside the same synthetic PDF panels. "
+    "Earlier generated PDFs omitted those captions; their original artifacts remain unchanged."
+)
 RUNTIME_SCRIPT = """import json
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]
@@ -174,6 +179,14 @@ def make_inputs(name: str, directory: Path):
                 page.draw_rect(box)
                 page.draw_line((box.x0, box.y1), (box.x1, box.y0))
                 page.insert_text((box.x0 + 4, box.y0 + 14), "synthetic panel", fontsize=8)
+                captions = row["image_caption"]
+                captions = captions if isinstance(captions, list) else [captions]
+                for offset, caption in enumerate(captions):
+                    caption_box = pymupdf.Rect(
+                        box.x0, box.y1 + 8 + offset * 30, box.x1, box.y1 + 36 + offset * 30
+                    )
+                    if page.insert_textbox(caption_box, caption, fontsize=7) < 0:
+                        raise AssertionError("Synthetic caption does not fit beside its original panel")
         pdf.save(pdf_path)
     save(directory / "parser_fixture.json", {"markdown": markdown, "content_list": rows, "boundary": LIMIT})
     parsed = MineruParseResult(
@@ -275,6 +288,40 @@ class FixedModel:
                         "text": "Fixture plotted axis has no unit label.",
                     }
                 ]
+            }
+        if module == "screening_figures.context":
+            # Fixed visual judgment for the same original positive candidate.
+            # IDs and exact page spans must come from the production-bound context.
+            if payload["figure_id"] != "figure_3" or payload["caption_ambiguous"]:
+                raise AssertionError("Only the uniquely captioned later panel has a context fixture")
+            parts = payload["caption_parts"]
+            if len(parts) != 1 or not parts[0]["caption_label"] or not parts[0]["matching_span_ids"]:
+                raise AssertionError("Context fixture requires its actual unique PDF caption")
+            witnesses = parts[0]["matching_span_ids"]
+            if not set(witnesses).issubset(payload["allowed_witness_span_ids"]):
+                raise AssertionError("Context fixture cannot borrow a neighboring panel caption")
+            return {
+                "schema_version": "figure-context-v1",
+                "context_id": payload["context_id"],
+                "figure_id": payload["figure_id"],
+                "target": "matched",
+                "part_roles": [
+                    {
+                        "part_id": parts[0]["id"],
+                        "role": "caption",
+                        "page_span_ids": witnesses,
+                        "reason": "The original caption is printed beside the selected synthetic panel.",
+                    }
+                ],
+                "decisions": [
+                    {
+                        "candidate_id": row["candidate_id"],
+                        "classification": "manuscript_issue",
+                        "witness_span_ids": witnesses,
+                        "reason": "Fixed visual judgment: the bound plotted panel and its original caption leave the axis unit unspecified.",
+                    }
+                    for row in payload["candidates"]
+                ],
             }
         if module.startswith("verification.theory"):
             blocks = payload["main_text"]
@@ -618,6 +665,14 @@ def run_case(name: str, root: Path, *, real_docker=False):
         {
             "scenario": name,
             "boundary_note": LIMIT,
+            **(
+                {
+                    "fixture_version": FIGURE_FIXTURE_VERSION,
+                    "fixture_source_correction": FIGURE_FIXTURE_CHANGE,
+                }
+                if name == "figures_partial"
+                else {}
+            ),
             "boundaries": {
                 "MinerU": "fixed parser",
                 "LLM_VLM": "fixed responses",

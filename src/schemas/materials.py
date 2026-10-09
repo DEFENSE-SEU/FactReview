@@ -25,8 +25,21 @@ class PageImage(BaseModel):
     dpi: int = 200
 
 
+class FigureCaptionPart(BaseModel):
+    """An unchanged parser element; visual role is deliberately not inferred here."""
+
+    id: str
+    field: str
+    index: int
+    text: str
+
+
 class FigureMaterial(BaseModel):
     id: str
+    block_id: str = ""
+    parser_row_index: int | None = None
+    parser_bbox_space: Literal["normalized_1000", "pdf_points"] | None = None
+    caption_parts: list[FigureCaptionPart] = Field(default_factory=list)
     anchor: str = ""
     loc: ClaimLocation | None = None
     caption: str = ""

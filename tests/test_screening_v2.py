@@ -303,10 +303,21 @@ def test_figures_send_printed_pixels_caption_all_references(figure_materials):
             ]
         }
 
-    result, issues = check_figures(materials, call=call)
-    assert not issues
-    assert result[0].level == "text_figure_consistency"
-    assert result[0].evidence[0].direction == "flaw"
+    records = []
+    result, issues = check_figures(materials, call=call, records=records)
+    assert result == []
+    assert records[0].context_status == "unavailable"
+    assert records[0].crop_response == {
+        "findings": [
+            {
+                "category": "text_figure_consistency",
+                "disposition": "issue",
+                "text": "The caption refers to absent panel (c).",
+            }
+        ]
+    }
+    assert any("original-page context unavailable" in issue for issue in issues)
+    assert any("The caption refers to absent panel (c)." in issue for issue in issues)
     assert calls[0]["images"] == [str(path)]
     assert "Figure 1: Model." in calls[0]["prompt"]
     assert "Our methods is fast." in calls[0]["prompt"]
@@ -361,7 +372,11 @@ def test_ambiguous_parser_captions_block_contextual_flaws_and_preserve_legibilit
 
     findings, issues = check_figures(figure_materials, call=call)
     assert [finding.level for finding in findings] == ["legibility"]
-    assert len(issues) == 2 and all("parser caption assignment is ambiguous" in issue for issue in issues)
+    assert [issue for issue in issues if "parser caption assignment is ambiguous" in issue] == [
+        f"figure_1: {category} unconfirmed because parser caption assignment is ambiguous: A candidate defect."
+        for category in ("self_containedness", "text_figure_consistency")
+    ]
+    assert any("original-page context unavailable" in issue for issue in issues)
 
 
 def test_uncertain_figure_observation_remains_an_explicit_issue(figure_materials):
@@ -378,10 +393,11 @@ def test_uncertain_figure_observation_remains_an_explicit_issue(figure_materials
         },
     )
     assert findings == []
-    assert issues == [
+    assert (
         "figure_1: text_figure_consistency check uncertain: "
         "The crop cuts off panel (c), so its presence cannot be assessed."
-    ]
+    ) in issues
+    assert any("original-page context unavailable" in issue for issue in issues)
 
 
 @pytest.mark.parametrize("disposition", [None, "unknown", True, 1, {}])

@@ -18,6 +18,7 @@ from typing import Any, Literal
 from preprocessing.parse.mineru_adapter import MineruAdapter, MineruConfig, MineruParseResult
 from schemas.claim import ClaimLocation
 from schemas.materials import (
+    FigureCaptionPart,
     FigureMaterial,
     MaterialBlock,
     PageImage,
@@ -171,6 +172,24 @@ def _row_text(row: dict[str, Any]) -> str:
         if value and (kind != "code" or value not in parts):
             parts.append(value)
     return "\n".join(parts)
+
+
+def figure_caption_parts(row: dict[str, Any]) -> list[FigureCaptionPart]:
+    """Preserve scalar caption elements without assigning caption/axis roles."""
+    keys = (
+        ("chart_caption", "caption", "content")
+        if row.get("type") == "chart"
+        else ("image_caption", "caption")
+    )
+    parts = []
+    for key in keys:
+        values = row.get(key)
+        for index, value in enumerate(values if isinstance(values, list) else [values]):
+            if isinstance(value, dict):
+                value = value.get("text") or value.get("content")
+            if isinstance(value, str) and value.strip():
+                parts.append(FigureCaptionPart(id=f"{key}:{index}", field=key, index=index, text=value))
+    return parts
 
 
 def _page(row: dict[str, Any]) -> int | None:
@@ -560,6 +579,10 @@ def build_materials(
             block = next((b for b in blocks if b.id == f"block_{row_number}"), None)
             figure = FigureMaterial(
                 id=f"figure_{idx}",
+                block_id=block.id if block else "",
+                parser_row_index=row_number if row_number else None,
+                parser_bbox_space=bbox_space,
+                caption_parts=figure_caption_parts(row),
                 anchor=anchor,
                 caption=caption,
                 caption_ambiguous=caption_ambiguous,
