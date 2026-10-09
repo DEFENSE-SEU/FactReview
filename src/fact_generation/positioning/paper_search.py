@@ -2,15 +2,14 @@ from __future__ import annotations
 
 import json
 import re
-import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from urllib.parse import quote_plus
 
-import anyio
 import httpx
 
 from preprocessing.parse.markdown_parser import parse_pdf_locally
+from util.arxiv_requests import ARXIV_REQUESTS
 from util.cutoff_date import CutoffDate, filter_papers
 
 
@@ -65,7 +64,6 @@ class PaperSearchAdapter:
         self.search_cfg = search_cfg
         self.read_cfg = read_cfg
         self._search_state_cache: PaperSearchRuntimeState | None = None
-        self._last_arxiv_request_at = 0.0
 
     @property
     def search_configured(self) -> bool:
@@ -502,9 +500,7 @@ class PaperSearchAdapter:
                 payload = response.json()
                 rows = payload.get("results") if isinstance(payload, dict) else []
                 papers = [
-                    self._normalize_openalex_item(item)
-                    for item in (rows or [])
-                    if isinstance(item, dict)
+                    self._normalize_openalex_item(item) for item in (rows or []) if isinstance(item, dict)
                 ]
                 papers = [paper for paper in papers if paper.get("title")]
                 question_results.append(
@@ -717,9 +713,9 @@ class PaperSearchAdapter:
         }
 
     async def _download_pdf(self, url: str) -> bytes:
-        await self._throttle_arxiv_request()
-        async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
+        async with ARXIV_REQUESTS.slot(), httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
             response = await client.get(url, headers=self._arxiv_headers())
+            ARXIV_REQUESTS.observe_retry_after(response.status_code, response.headers.get("Retry-After"))
         response.raise_for_status()
         content = response.content
         if not content.startswith(b"%PDF"):
@@ -818,9 +814,9 @@ class PaperSearchAdapter:
             f"search_query=all:{query}&start=0&max_results={max(1, min(16, max_results))}"
         )
 
-        await self._throttle_arxiv_request()
-        async with httpx.AsyncClient(timeout=45) as client:
+        async with ARXIV_REQUESTS.slot(), httpx.AsyncClient(timeout=45) as client:
             response = await client.get(url, headers=self._arxiv_headers())
+            ARXIV_REQUESTS.observe_retry_after(response.status_code, response.headers.get("Retry-After"))
         response.raise_for_status()
 
         return self._parse_arxiv_feed(response.text)
@@ -833,20 +829,13 @@ class PaperSearchAdapter:
         query = quote_plus(f"id:{clean}")
         url = f"https://export.arxiv.org/api/query?search_query={query}&start=0&max_results=1"
 
-        await self._throttle_arxiv_request()
-        async with httpx.AsyncClient(timeout=45) as client:
+        async with ARXIV_REQUESTS.slot(), httpx.AsyncClient(timeout=45) as client:
             response = await client.get(url, headers=self._arxiv_headers())
+            ARXIV_REQUESTS.observe_retry_after(response.status_code, response.headers.get("Retry-After"))
         response.raise_for_status()
 
         papers = self._parse_arxiv_feed(response.text)
         return papers[0] if papers else None
-
-    async def _throttle_arxiv_request(self) -> None:
-        now = time.monotonic()
-        wait_seconds = 3.2 - (now - self._last_arxiv_request_at)
-        if wait_seconds > 0:
-            await anyio.sleep(wait_seconds)
-        self._last_arxiv_request_at = time.monotonic()
 
     def _arxiv_headers(self) -> dict[str, str]:
         return {
@@ -963,15 +952,9 @@ class PaperSearchAdapter:
         openalex_id = str(item.get("id") or ids.get("openalex") or "").strip()
         doi = str(item.get("doi") or ids.get("doi") or "").strip()
         url = str(ids.get("openalex") or openalex_id or doi or "").strip()
-        pdf_url = str(
-            best_oa_location.get("pdf_url")
-            or primary_location.get("pdf_url")
-            or ""
-        ).strip()
+        pdf_url = str(best_oa_location.get("pdf_url") or primary_location.get("pdf_url") or "").strip()
         landing_url = str(
-            best_oa_location.get("landing_page_url")
-            or primary_location.get("landing_page_url")
-            or ""
+            best_oa_location.get("landing_page_url") or primary_location.get("landing_page_url") or ""
         ).strip()
         arxiv_id = _extract_arxiv_id_from_text(" ".join([url, doi, pdf_url, landing_url]))
         if arxiv_id and not pdf_url:
