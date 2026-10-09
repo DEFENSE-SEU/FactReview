@@ -106,6 +106,97 @@ def test_visual_failure_and_ambiguous_caption_reach_report_without_losing_later_
     assert review["claims"][0]["evidence"][0]["covered"] == ["alpha"]
 
 
+def test_figure_fixture_prints_the_original_caption_and_uses_one_bound_context(matrix):
+    case = next(row for row in matrix["cases"] if row["scenario"] == "figures_partial")
+    assert case["fixture_version"] == "printed-caption-v2"
+    assert "omitted" in case["fixture_source_correction"]
+    fixture = json.loads(Path(case["paths"]["parser_fixture"]).read_text(encoding="utf-8"))
+    figure_rows = [row for row in fixture["content_list"] if row["type"] == "image"]
+    assert figure_rows[-1]["bbox"] == [680, 450, 880, 650]
+    with pymupdf.open(case["paths"]["input_pdf"]) as pdf:
+        blocks = pdf[0].get_text("blocks")
+        caption = figure_rows[-1]["image_caption"]
+        matches = [block for block in blocks if block[4].split() == caption.split()]
+        assert len(matches) == 1
+        assert matches[0][0] >= 408 and matches[0][2] <= 528 and matches[0][1] > 520
+        page_tokens = " ".join(pdf[0].get_text().split())
+        assert all(
+            text in page_tokens
+            for row in figure_rows
+            for text in (
+                row["image_caption"] if isinstance(row["image_caption"], list) else [row["image_caption"]]
+            )
+        )
+    calls = json.loads(Path(case["paths"]["model_calls"]).read_text(encoding="utf-8"))
+    context = [call for call in calls if call["module"] == "screening_figures.context"]
+    assert len(context) == 1 and len(context[0]["images"]) == 2
+    assert context[0]["input"]["figure_id"] == "figure_3"
+    assert context[0]["response"]["decisions"][0]["classification"] == "manuscript_issue"
+
+
+def _figure_materials_with_sources(script, tmp_path, *, omit_pdf_captions=False):
+    from preprocessing.materials import build_materials
+
+    pdf_path, parsed, claims, _ = script.make_inputs("figures_partial", tmp_path)
+    if omit_pdf_captions:
+        # Recreate the earlier source inconsistency locally; generated historical
+        # PDFs are never edited. Crop panels and parser/Markdown stay unchanged.
+        with pymupdf.open(pdf_path) as pdf:
+            page = pdf[0]
+            page.add_redact_annot((0, 525, 600, 600))
+            page.apply_redactions()
+            old = tmp_path / "legacy_without_printed_captions.pdf"
+            pdf.save(old)
+        pdf_path = old
+    return build_materials(
+        parsed, paper_pdf=pdf_path, output_dir=tmp_path / "materials", paper_key="figures_partial"
+    ), claims
+
+
+def test_old_missing_pdf_caption_cannot_be_rescued_by_new_context_mock(script, tmp_path, monkeypatch):
+    from llm.client import LLMConfig
+    from screening.figures import check_figures
+
+    monkeypatch.setattr(
+        "screening.checks.resolve_llm_config", lambda: LLMConfig("mock", "fixture", None, None)
+    )
+    materials, claims = _figure_materials_with_sources(script, tmp_path, omit_pdf_captions=True)
+    model = script.FixedModel("figures_partial", claims)
+    records = []
+    findings, _ = check_figures(materials, call=model, records=records, recover_errors=True)
+    assert {finding.level for finding in findings} == {"legibility"}
+    assert records[-1].context_status == "unavailable"
+    assert "absent" in " ".join(records[-1].issues)
+    assert all(call["module"] != "screening_figures.context" for call in model.calls)
+
+
+def test_context_fixture_cannot_borrow_the_neighbor_panel_caption(script, tmp_path, monkeypatch):
+    from llm.client import LLMConfig
+    from screening.figures import check_figures
+
+    monkeypatch.setattr(
+        "screening.checks.resolve_llm_config", lambda: LLMConfig("mock", "fixture", None, None)
+    )
+    materials, claims = _figure_materials_with_sources(script, tmp_path)
+    model = script.FixedModel("figures_partial", claims)
+
+    def call(**kwargs):
+        response = model(**kwargs)
+        if kwargs["module"] == "screening_figures.context":
+            payload = json.loads(kwargs["prompt"])
+            foreign = next(
+                span["id"] for span in payload["page_spans"] if span["text"].startswith("Figure 1:")
+            )
+            response["decisions"][0]["witness_span_ids"] = [foreign]
+        return response
+
+    records = []
+    findings, _ = check_figures(materials, call=call, records=records, recover_errors=True)
+    assert {finding.level for finding in findings} == {"legibility"}
+    assert records[-1].context_status == "failed"
+    assert "another figure" in " ".join(records[-1].issues)
+
+
 def test_missing_repository_retains_blocked_plan_and_nondeciding_reason(matrix):
     case = next(row for row in matrix["cases"] if row["scenario"] == "missing_repository")
     review = json.loads(Path(case["paths"]["report_json"]).read_text(encoding="utf-8"))

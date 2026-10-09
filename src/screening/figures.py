@@ -1,5 +1,6 @@
 """Inspect each figure at its physical printed dimensions using actual image pixels."""
 
+import copy
 import math
 from pathlib import Path
 from typing import Literal
@@ -9,6 +10,7 @@ from pydantic import Field
 from schemas.claim import Contract, Evidence, EvidencePointer, Finding
 from schemas.materials import FigureMaterial, SharedMaterials
 from screening.checks import ask
+from screening.figure_context import FigureSources, confirm, safe_response
 
 CATEGORIES = {"self_containedness", "legibility", "text_figure_consistency"}
 
@@ -19,6 +21,9 @@ class FigureCheckRecord(Contract):
     finding_count: int = Field(default=0, ge=0)
     printed_size_verified: bool = False
     issues: list[str] = Field(default_factory=list)
+    crop_response: dict = Field(default_factory=dict)
+    context_status: Literal["not_requested", "checked", "failed", "unavailable"] = "not_requested"
+    context_record: dict = Field(default_factory=dict)
 
 
 def _printed_size_verified(figure: FigureMaterial) -> bool:
@@ -58,7 +63,23 @@ def check_figures(
     findings, issues = [], []
     if records is None:
         records = []
-    for figure in materials.figures:
+    # Freeze all figures before any callback can change a later figure's baseline.
+    hash_cache, pending = {}, []
+    frozen = [
+        (figure.model_copy(deep=True), FigureSources.capture(materials, figure, hash_cache))
+        for figure in materials.figures
+    ]
+    for figure, guard in frozen:
+        if guard.hashes.get(figure.printed_crop_path):
+            try:
+                guard.check(materials)
+            except Exception as exc:
+                if not recover_errors:
+                    raise
+                issue = f"figures check failed for {figure.id}: {exc}"
+                issues.append(issue)
+                records.append(FigureCheckRecord(figure_id=figure.id, status="failed", issues=[issue]))
+                continue
         if not figure.printed_crop_path or not Path(figure.printed_crop_path).is_file() or figure.loc is None:
             issue = f"{figure.id}: figure check unavailable; crop or location missing"
             issues.append(issue)
@@ -71,18 +92,114 @@ def check_figures(
             issues.append(issue)
             records.append(FigureCheckRecord(figure_id=figure.id, status="unavailable", issues=[issue]))
             continue
+        record = FigureCheckRecord(figure_id=figure.id, status="checked", printed_size_verified=verified)
         try:
-            figure_findings, figure_issues = _check_figure(figure, call=call, printed_size_verified=verified)
+            guard.check(materials)
+            # Verify available PDF/crop identity before even the crop-only call.
+            # Caption/legacy-context gaps stay observable without inventing a source.
+            context = guard.prepare(materials)
+            raw = _crop_response(figure, call=call, printed_size_verified=verified)
+            record.crop_response = copy.deepcopy(raw)
+            guard.check(materials)
+            # Only original crop pixels can establish a printed-size concern.
+            figure_findings, figure_issues = _crop_findings(
+                figure, {"findings": [r for r in raw["findings"] if r["category"] == "legibility"]}
+            )
+            candidates = [
+                {**row, "candidate_id": f"candidate_{index}"}
+                for index, row in enumerate(raw["findings"])
+                if row["category"] != "legibility" and row["disposition"] != "clear"
+            ]
+            if candidates or figure.caption_ambiguous:
+                guard.check(materials, context=context is not None)
+                if context is None:
+                    record.context_status = "unavailable"
+                    figure_issues.append(
+                        f"{figure.id}: original-page context unavailable: {guard.context_error}"
+                    )
+                else:
+                    try:
+                        response, context_record = confirm(context, candidates, call=call)
+                        guard.check(materials, context=True)
+                        guard.context_consumed = True
+                        record.context_record = context_record
+                        record.context_status = "checked"
+                        context_findings, context_issues = [], []
+                        if context_record["caption_assignment"] != "confirmed":
+                            context_issues.append(
+                                f"{figure.id}: original-page target/caption assignment remains uncertain."
+                            )
+                        by_id = {c["candidate_id"]: c for c in candidates}
+                        spans = {s["id"]: s for s in context["page_spans"]}
+                        for decision in response.decisions:
+                            candidate = by_id[decision.candidate_id]
+                            if decision.classification != "manuscript_issue":
+                                context_issues.append(
+                                    f"{figure.id}: {candidate['category']} {decision.classification}: "
+                                    f"{decision.reason}; original crop observation: {candidate['text']}"
+                                )
+                                if decision.classification == "crop_artifact":
+                                    context_issues.append(
+                                        f"{figure.id}: crop boundary coverage is incomplete; "
+                                        "original-page context does not establish omitted labels' printed-size legibility."
+                                    )
+                                continue
+                            # The raw ambiguous parser assignment is never rewritten.
+                            observed = {
+                                "category": candidate["category"],
+                                "disposition": "issue",
+                                "text": f"{candidate['text']} Original-page confirmation: {decision.reason}",
+                            }
+                            finding = _figure_finding(figure, observed)
+                            for span_id in decision.witness_span_ids:
+                                finding.evidence.append(
+                                    Evidence(
+                                        source="paper_internal",
+                                        direction="flaw",
+                                        sufficient=False,
+                                        affects_claim=False,
+                                        pointer=EvidencePointer(
+                                            locator=materials.source_pdf,
+                                            page=figure.loc.page,
+                                            key=f"{figure.id}:bbox={figure.bbox_points}:{span_id}",
+                                            quote=spans[span_id]["text"],
+                                        ),
+                                        note=f"Original-page visual confirmation; context_id={context['context_id']}; "
+                                        "caption assignment independently checked; model visual interpretation.",
+                                    )
+                                )
+                            context_findings.append(finding)
+                        figure_findings.extend(context_findings)
+                        figure_issues.extend(context_issues)
+                    except Exception as exc:
+                        record.context_status = "failed"
+                        figure_issues.append(f"{figure.id}: original-page context failed: {exc}")
+                    # Includes provider failures: mutated source cannot retain crop findings.
+                    guard.check(materials, context=True)
+                if record.context_status != "checked":
+                    for c in candidates:
+                        if c["disposition"] == "uncertain":
+                            figure_issues.append(f"{figure.id}: {c['category']} check uncertain: {c['text']}")
+                        elif figure.caption_ambiguous:
+                            figure_issues.append(
+                                f"{figure.id}: {c['category']} unconfirmed because parser "
+                                f"caption assignment is ambiguous: {c['text']}"
+                            )
+                        else:
+                            figure_issues.append(
+                                f"{figure.id}: {c['category']} unconfirmed original crop observation: {c['text']}"
+                            )
+            guard.check(materials)
         except Exception as exc:
             if not recover_errors:
                 raise
             issue = f"figures check failed for {figure.id}: {exc}"
             issues.append(issue)
-            records.append(
-                FigureCheckRecord(
-                    figure_id=figure.id, status="failed", printed_size_verified=verified, issues=[issue]
-                )
-            )
+            record.status, record.issues = "failed", [issue]
+            if record.context_status == "checked":
+                record.context_status = "failed"
+                record.context_record["source_integrity"] = "failed"
+            records.append(record)
             continue
         if recover_errors and not verified:
             figure_issues.append(
@@ -96,24 +213,36 @@ def check_figures(
                         f"be verified: {finding.text}"
                     )
             figure_findings = [finding for finding in figure_findings if finding.level != "legibility"]
-        findings.extend(figure_findings)
-        issues.extend(figure_issues)
-        records.append(
-            FigureCheckRecord(
-                figure_id=figure.id,
-                status="checked",
-                finding_count=len(figure_findings),
-                printed_size_verified=verified,
-                issues=figure_issues,
-            )
-        )
+        record.finding_count, record.issues = len(figure_findings), figure_issues
+        records.append(record)
+        pending.append((guard, record, figure_findings))
+    # A later figure callback may have changed an already-used crop/page.
+    for guard, record, figure_findings in pending:
+        try:
+            guard.check(materials)
+        except Exception as exc:
+            if not recover_errors:
+                raise
+            record.status, record.finding_count = "failed", 0
+            if record.context_status == "checked":
+                record.context_status = "failed"
+                record.context_record["source_integrity"] = "failed"
+            record.issues.append(f"{record.figure_id}: final source integrity check failed: {exc}")
+        else:
+            findings.extend(figure_findings)
+        issues.extend(record.issues)
     return findings, issues
 
 
 def _check_figure(
     figure: FigureMaterial, *, call=None, printed_size_verified: bool = False
 ) -> tuple[list[Finding], list[str]]:
-    findings, issues = [], []
+    return _crop_findings(
+        figure, _crop_response(figure, call=call, printed_size_verified=printed_size_verified)
+    )
+
+
+def _crop_response(figure, *, call=None, printed_size_verified=False):
     result = ask(
         "Inspect the attached cropped image, its caption, and EVERY supplied body reference. "
         "When printed_size_verified is true, the image is downscaled to its printed size at 96 dpi: "
@@ -156,6 +285,12 @@ def _check_figure(
             raise ValueError("figure finding disposition must be issue, clear, or uncertain")
         if not isinstance(row.get("text"), str) or not row["text"].strip():
             raise ValueError("figure finding text must be a nonempty explanation")
+    return safe_response(result)
+
+
+def _crop_findings(figure, result):
+    findings, issues = [], []
+    for row in result["findings"]:
         if row["disposition"] == "clear":
             continue
         if row["disposition"] == "uncertain":
@@ -175,27 +310,30 @@ def _check_figure(
         if not quote:
             issues.append(f"{figure.id}: {row['text']} (caption/body reference unavailable)")
             continue
-        findings.append(
-            Finding(
-                kind="figure",
-                loc=figure.loc,
-                level=row["category"],
-                text=row["text"],
-                evidence=[
-                    Evidence(
-                        source="paper_internal",
-                        pointer=EvidencePointer(
-                            locator=figure.printed_crop_path,
-                            quote=quote,
-                            page=figure.loc.page,
-                            key=figure.id,
-                        ),
-                        direction="flaw",
-                        sufficient=False,
-                        note=row["text"],
-                        affects_claim=False,
-                    )
-                ],
-            )
-        )
+        findings.append(_figure_finding(figure, row))
     return findings, issues
+
+
+def _figure_finding(figure, row):
+    quote = figure.caption or next((b.text for b in figure.references), "")
+    return Finding(
+        kind="figure",
+        loc=figure.loc,
+        level=row["category"],
+        text=row["text"],
+        evidence=[
+            Evidence(
+                source="paper_internal",
+                pointer=EvidencePointer(
+                    locator=figure.printed_crop_path,
+                    quote=quote,
+                    page=figure.loc.page,
+                    key=figure.id,
+                ),
+                direction="flaw",
+                sufficient=False,
+                note=row["text"],
+                affects_claim=False,
+            )
+        ],
+    )

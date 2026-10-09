@@ -178,5 +178,17 @@ def test_production_cannot_confirm_printed_legibility_without_physical_box(visua
         ),
     )
     second = [finding for finding in result.findings if finding.evidence[0].pointer.key == "figure_2"]
-    assert [finding.level for finding in second] == ["self_containedness"]
+    assert second == []
+    record = result.figure_checks[1]
+    assert record.context_status == "unavailable"
+    assert record.crop_response["findings"][1] == {
+        "category": "self_containedness",
+        "disposition": "issue",
+        "text": "Axis has no units.",
+    }
+    assert any("original-page context unavailable" in issue for issue in record.issues)
+    assert any(
+        "self_containedness unconfirmed original crop observation: Axis has no units." in issue
+        for issue in record.issues
+    )
     assert any("figure_2: legibility check uncertain" in issue for issue in result.issues)
