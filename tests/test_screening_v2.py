@@ -11,6 +11,7 @@ from schemas.materials import FigureMaterial, MaterialBlock, PageImage, SharedMa
 from screening.figures import check_figures
 from screening.references import check_bibliography
 from screening.writing import check_tables, check_writing
+from tests.test_writing_sections_v2 import confirmation
 
 
 @pytest.fixture
@@ -51,13 +52,12 @@ def test_writing_preserves_original_sentence_and_levels(writing_materials):
         if kwargs["module"] == "screening_writing.validation":
             assert kwargs["images"] == [materials.pages[0].path]
             return {
+                "version": "writing-decision-v1",
                 "results": [
-                    {
-                        "candidate_id": "writing_1",
-                        "classification": "manuscript_error",
-                        "explanation": "The original sentence has incorrect plural agreement.",
-                    }
-                ]
+                    confirmation(
+                        "writing_1", explanation="The original sentence has incorrect plural agreement."
+                    )
+                ],
             }
         return {
             "findings": [
@@ -109,7 +109,13 @@ def test_writing_batches_original_pdf_review_and_excludes_ocr_style_uncertainty(
                 )
             )
         pdf.save(materials.source_pdf)
-    classifications = ["manuscript_error", "style", "parser_artifact", "clarity_issue", "uncertain"]
+    decisions = [
+        {"decision": "accept", "kind": "grammar", "reason": "visible_defect"},
+        {"decision": "reject", "kind": None, "reason": "style"},
+        {"decision": "reject", "kind": None, "reason": "parser_artifact"},
+        {"decision": "accept", "kind": "consequential_ambiguity", "reason": "visible_defect"},
+        {"decision": "uncertain", "kind": None, "reason": "insufficient_context"},
+    ]
     calls = []
 
     def call(**kwargs):
@@ -131,14 +137,15 @@ def test_writing_batches_original_pdf_review_and_excludes_ocr_style_uncertainty(
         assert kwargs["images"] == [materials.pages[payload["page"] - 1].path]
         assert len(payload["candidates"]) == (3 if payload["page"] == 1 else 2)
         return {
+            "version": "writing-decision-v1",
             "results": [
-                {
-                    "candidate_id": row["candidate_id"],
-                    "classification": classifications[int(row["candidate_id"].split("_")[1]) - 1],
-                    "explanation": "Compared with the printed sentence and context.",
-                }
+                confirmation(
+                    row["candidate_id"],
+                    **decisions[int(row["candidate_id"].split("_")[1]) - 1],
+                    explanation="Compared with the printed sentence and context.",
+                )
                 for row in payload["candidates"]
-            ]
+            ],
         }
 
     issues = []
@@ -200,23 +207,16 @@ def test_writing_checks_every_quote_before_any_visual_validation(writing_materia
 @pytest.mark.parametrize(
     "response",
     [
-        {"results": []},
+        {"version": "writing-decision-v1", "results": []},
+        {"version": "writing-decision-v1", "results": [confirmation("other", explanation="Confirmed")]},
         {
-            "results": [
-                {"candidate_id": "other", "classification": "manuscript_error", "explanation": "Confirmed"}
-            ]
+            "version": "writing-decision-v1",
+            "results": [confirmation("writing_1", explanation="Confirmed")] * 2,
         },
         {
-            "results": [
-                {
-                    "candidate_id": "writing_1",
-                    "classification": "manuscript_error",
-                    "explanation": "Confirmed",
-                }
-            ]
-            * 2
+            "version": "writing-decision-v1",
+            "results": [confirmation("writing_1", kind="unknown", explanation="Confirmed")],
         },
-        {"results": [{"candidate_id": "writing_1", "classification": "unknown", "explanation": "Confirmed"}]},
         {"status": "error", "error": "offline"},
     ],
 )

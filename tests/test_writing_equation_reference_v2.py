@@ -40,7 +40,7 @@ def test_equation_labels_reach_original_page_confirmation_only_when_bound(tmp_pa
             validations.append(payload)
             assert kwargs["images"] == [page.path for page in materials.pages]
             assert payload["additional_target_pages"] == [2]
-            return confirmations(payload, "cross_reference_error")
+            return confirmations(payload, "cross_reference")
         return {
             "findings": [
                 candidate(

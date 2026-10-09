@@ -17,6 +17,7 @@ from screening.checks import ask, paper_finding
 from screening.reference_corrections import bibliographic_ids as _bibliographic_ids
 from screening.reference_corrections import bound_record, build_correction, printed_publication_venue
 from screening.reference_corrections import url_identifiers as _url_identifiers
+from screening.reference_warnings import workshop_publication_metadata
 
 
 class ReferenceDecision(Contract):
@@ -165,9 +166,21 @@ def _check_bibliography(materials, output_dir, *, checker=None, call=None):
         if any(kind in code for kind in ("author_mismatch", "title_mismatch")):
             candidates.append((index, row, block))
             continue
+        publication_text = None
+        if "workshop_promoted" in code:
+            publication_text, unavailable = workshop_publication_metadata(
+                row, block, index, result_path, records_path, corrections.get(index)
+            )
+            if unavailable:
+                issues.append(
+                    f"Reference workshop publication warning unconfirmed: {unavailable}; {result_path}#issues.{index}"
+                )
+                continue
         text = str(
             row.get("details") or row.get("message") or row.get("code") or row.get("type") or "Entry check"
         )
+        if publication_text:
+            text = publication_text
         if "arxiv_published" in code:
             text = "Retrieved metadata provides a publication venue; verify whether the original preprint citation should be updated. Original manuscript omission is unconfirmed."
         text += f" [RefCopilot: {result_path}#issues.{index}]"
@@ -177,7 +190,7 @@ def _check_bibliography(materials, output_dir, *, checker=None, call=None):
             quote=block.text,
             text=text,
             kind="reference",
-            level=str(row.get("severity") or "unverified"),
+            level="metadata_candidate" if publication_text else str(row.get("severity") or "unverified"),
         )
         if index in corrections:
             finding = finding.model_copy(update={"reference_correction": corrections[index]})
