@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import inspect
 import json
 import re
@@ -1186,9 +1187,17 @@ async def verify_literature(
             cfg = resolve_llm_config()
             if cfg is not None:
                 diagnostic_configs.append(cfg)
-            response = (call or llm_json)(
-                prompt=prompt, system=_SYSTEM, cfg=cfg, module="verification_literature"
-            )
+            comparison_call = call or llm_json
+            comparison_kwargs = {
+                "prompt": prompt,
+                "system": _SYSTEM,
+                "cfg": cfg,
+                "module": "verification_literature",
+            }
+            if inspect.iscoroutinefunction(comparison_call):
+                response = comparison_call(**comparison_kwargs)
+            else:
+                response = await asyncio.to_thread(comparison_call, **comparison_kwargs)
             if inspect.isawaitable(response):
                 response = await response
         except Exception as exc:

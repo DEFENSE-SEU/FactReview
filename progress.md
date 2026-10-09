@@ -1,5 +1,15 @@
 # FactReview v2 progress
 
+## Latest actual outcome and delivery: 70088
+
+The complete `full-native-verified-v2/actual-70088f3cae19` run finished on immutable `407ec8a`: seven completed stages, ten claims (five Supported/five Unverified), zero plans/Docker attempts, 44 logical model calls and 249436 known tokens. Three pre-response TLS EOF failures retain unknown usage. Its eight failed gates include the table VLM/retrieval service failures, execution/alignment/cleanup coverage and complete model/usage accounting. The original inputs, responses and verdicts are retained. Independent final reviews are underway.
+
+The finite-language correction is committed as `77b8cd6`; the bounded pre-stream retry is `98814bc4cb3b04aa7fdbcb8d2286c8b02976d66a`. Both are pushed on `refactor/method-v2`, with the exact remote HEAD verified. No new PR was opened. Necessary targeted checks were delegated; no repeated whole-suite run occurred.
+
+The versioned v3 actual controller passes four necessary independent controls and retains the original final validator byte-for-byte. Each physical Codex attempt is now gated before transport and separately recorded. Its prepared `fb2993c12343` source snapshot has not run. The confirmed synchronous Literature comparison is now offloaded with `asyncio.to_thread`, preserving async callbacks, returned awaitables and statistics context. Two necessary controls and three existing controls pass; root reviewed the 15-line production change. Evidence: `literature-comparison-async/`. This change permits unrelated event-loop timers to progress; synchronous PDF parsing remains outside a hard CPU deadline. The exact cause of an individual old delay is unproven.
+
+Independent mechanical review is complete at `actual-70088-mechanical-review/`: all eight failure gates agree with recomputation, 423 original artifacts and the prepared/execution/input/controller hashes are unchanged. There were 46 retrieval boundaries, including nine failures. Scientific review found that the selected appendix proof body omitted its same-page heading from the visual model's allowed blocks; the original correctly rejected visual record and Unverified status remain. The next narrow correction supplies that frozen heading context. Then prepare a fresh source snapshot and continue actual validation.
+
 ## Current phase 8: bounded transport recovery
 
 The shared Codex client now retries a typed connection EOF/reset once, only before receiving any response line. The first failed physical request is recorded before the retry, including unavailable usage; the final attempt retains the existing accounting path. Authentication, certificate, timeout, partial-stream and provider-terminal errors do not trigger retries. Ten necessary mocked controls and six selected existing controls pass, with static checks. Root reviewed the change; the whole suite was not repeated.
