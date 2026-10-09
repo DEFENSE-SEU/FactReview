@@ -266,6 +266,7 @@ def _compact_markdown(review, nav, context):
                 f"- Original source {v2._text(source.source_block_id)}; {v2._location(source.loc)}; "
                 f"covers {v2._text(', '.join(source.covered))}. {nav.link(path + f'/source_refs/{i}')} ."
             )
+        lines.extend(v2._code_joint_integrity(claim))
         reasons, groups = _selection(claim.evidence)
         selections[path] = {"groups": groups, "selected": {str(i): why for i, why in reasons.items()}}
         lines += [

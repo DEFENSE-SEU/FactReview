@@ -22,6 +22,7 @@ from util.cutoff_date import (
     publication_relation,
 )
 from verification.contracts import BranchResult
+from verification.literature_omissions import OmissionContext
 from verification.theory import _fully_supported, _support_note
 
 # Queries consist exclusively of this domain vocabulary and fixed scope words.
@@ -101,8 +102,24 @@ does not prove the target claim. Never infer complete support from a shared topi
 Same mechanism AND same target setting are required for relation=same in novelty.
 Use relation=partial for partial overlap, unclear when the passage cannot resolve it.
 For each read prior paper return a novelty comparison, even when relation=different.
-For uncited relevant papers propose related_work/baseline findings even if no explicit
-novelty claim exists. Never infer sufficiency from a shared topic. Never invent quotes,
+For uncited relevant papers assess related_work/baseline qualification even if no explicit
+novelty claim exists. Relation and condition coverage do not establish an important omission.
+For these two purposes include omission_assessment with version="omission-v1",
+decision (important_missing / candidate_only / not_applicable / unresolved),
+basis (method_positioning / same_problem_alternative / evaluation_baseline / none),
+target_source_id from manuscript_targets, target_quote (an exact contiguous substring of
+that target's source_quote), external_role (scientific_contribution / evaluation_result /
+background_or_bibliography / unresolved), and reason. Use empty target fields if no
+target resolves and decision=unresolved. The existing comparison quote is the external
+source anchor. Explain how omitting this work materially impairs understanding, positioning,
+or evaluation of the actual manuscript target, using mechanism, setting, and protocol.
+A later application, broad topic, or bibliography overlap alone warrants candidate_only.
+An important related-work omission requires method_positioning or same_problem_alternative;
+an important baseline omission requires evaluation_baseline and a genuinely usable comparison
+under the target task/protocol. Different protocols can still warrant related-work discussion.
+Global review may use covered=[] with an exact manuscript target; do not fabricate conditions.
+Candidate-only and unresolved reasons are audit diagnostics, not requests to the authors.
+Never infer sufficiency from a shared topic. Never invent quotes,
 paper ids, search completeness, or publication dates. Do not issue recommendations.
 """
 
@@ -567,6 +584,7 @@ async def verify_literature(
     reader=None,
     call=None,
     output_dir: Path | None = None,
+    manuscript_targets: list[dict[str, Any]] | None = None,
 ) -> BranchResult:
     """Check one claim, or collect global uncited-neighbor findings with claim=None.
 
@@ -594,6 +612,11 @@ async def verify_literature(
         except ValueError as exc:
             source_available = False
             result.issues.append(f"Citation source unavailable: {exc}")
+    omission_context = OmissionContext(
+        materials,
+        source_excerpts if claim is not None else (manuscript_targets or []),
+        global_review=claim is None,
+    )
     queries = literature_queries(claim, materials)
     if not queries:
         result.issues.append("Literature search scope inadequate: no recognized technical domain terms.")
@@ -655,6 +678,9 @@ async def verify_literature(
         "query_intents": list(_QUERY_INTENTS) if queries else [],
         "citation_issues": citation_issues,
         "context_events": [],
+        "manuscript_targets": omission_context.payload(),
+        "omission_target_unavailable": omission_context.unavailable,
+        "omission_decisions": omission_context.decisions,
     }
 
     def context_event(
@@ -1146,6 +1172,7 @@ async def verify_literature(
             "paper_abstract": materials.abstract,
             "source_excerpt": source_excerpt if claim else materials.abstract,
             "source_excerpts": source_excerpts,
+            "manuscript_targets": omission_context.payload(),
             "bibliography": [row.text for row in materials.bibliography],
             "sources": [
                 {**row, "paper": {key: value for key, value in row["paper"].items() if key != "abstract"}}
@@ -1204,6 +1231,7 @@ async def verify_literature(
     compared_citation_ids = set()
     content_question_sources: dict[str, set[str]] = {}
     location = claim.loc if claim else next((block.loc for block in materials.blocks if block.loc), None)
+    duplicate_omissions = omission_context.duplicate_indices(comparisons)
     for row in read_rows:
         if row["period"] == "concurrent" and location:
             passage = row["passages"][0]
@@ -1225,7 +1253,7 @@ async def verify_literature(
                     text="Concurrent work: " + str(row["paper"].get("title") or row["paper_id"]),
                 )
             )
-    for comparison in comparisons:
+    for comparison_index, comparison in enumerate(comparisons):
         if not isinstance(comparison, dict):
             adequate = False
             continue
@@ -1325,32 +1353,20 @@ async def verify_literature(
                     else note,
                 )
             )
-        elif (
-            purpose in {"related_work", "baseline"}
-            and not row["in_bibliography"]
-            and relevant
-            and location
-            and period == "prior"
-        ):
-            evidence = Evidence(
-                source="literature",
+        elif purpose in {"related_work", "baseline"}:
+            finding = omission_context.finding(
+                comparison,
+                comparison_index,
+                eligible=not row["in_bibliography"]
+                and relevant
+                and period == "prior"
+                and row["reader_identity_verified"],
                 pointer=pointer,
                 covered=covered,
-                direction="support",
-                sufficient=False,
-                concern=False,
-                affects_claim=False,
-                note=note,
+                duplicate=comparison_index in duplicate_omissions,
             )
-            result.findings.append(
-                Finding(
-                    kind=purpose,
-                    loc=location,
-                    evidence=[evidence],
-                    level="missing",
-                    text=note or f"Consider discussing {row['paper'].get('title') or row['paper_id']}",
-                )
-            )
+            if finding is not None:
+                result.findings.append(finding)
 
     prior_ids = {row["paper_id"] for row in read_rows if row["period"] == "prior"}
     adequate = adequate and prior_ids.issubset(compared_different) and not novelty_concern

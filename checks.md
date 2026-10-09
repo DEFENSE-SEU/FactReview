@@ -1,5 +1,14 @@
 # FactReview v2 acceptance checks
 
+## Reviewed Literature and multi-file Code follow-up
+
+| Follow-up | Verified result | Limit |
+|---|---|---|
+| Literature omission qualification | Explicit manuscript/external sources, purpose-compatible importance assessment and prior-work guards are required. Independent review repaired four purpose-whitespace duplicate failures; 12 independent controls, 36 new controls and 103 old tests pass together (151). All 121 old assertion ASTs remain. | Importance and baseline comparability still depend on model judgment. Original three unqualified missing findings disappear only in a fixed-response replay; healthy citation/concurrent results remain exact. |
+| Multi-file Code evidence | One explicitly proposed condition can bind several exact code ranges through the existing two model calls. Fifty new tests and 301 related tests pass; eight root controls and the 50 new tests pass together (58). Canonical pointers, audit identity and current source integrity reach JSON, advice, full/layered Markdown and PDF. | No automatic union of partial evidence. Public availability and empirical outcomes retain their separate requirements. Original claim003 still has three partial observations and is Unverified. |
+
+Independent reports: `runs/v2_method_delivery/literature-omission-independent/review.md` (SHA256 `37bb36b45313e9d9f9ccd0f2448be754e5695e79461ceb862fca6cb3a530b2bd`) and `code-joint-independent/review.md`. Original actual responses, reports and scientific inputs remain unchanged. Unified frozen regression, package verification and the next complete native run are pending; earlier package certificates do not cover this follow-up.
+
 ## Reviewed Theory heading and Experiments responsibility follow-up
 
 Theory visual recovery now binds an exact, unique, same-page Appendix heading to its proof and freezes the complete source layout across model callbacks. Independent review reproduced and retained an initial sibling-heading mutation failure; the final implementation rejects that source change. Thirty new controls and 143 existing related tests pass; four independent controls plus the new tests pass (34 total). Review: `runs/v2_method_delivery/theory-heading-independent/review-final.md`, SHA256 `778411a0f0738443e261ddef6435a83e66129a9eab796fd6458afa4736ee77da`. The original three-response visual replay validates the heading, preserves the partial proof and all 49 protected artifacts, and remains Unverified with zero sufficient evidence. No new actual visual success is claimed.
