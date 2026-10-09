@@ -288,6 +288,7 @@ def run_v2_pipeline(
                     claim_coverage_window_chars=getattr(args, "claim_coverage_window_chars", 24000),
                     claim_coverage_review_calls=getattr(args, "claim_coverage_review_calls", 12),
                     claim_coverage_followup_calls=getattr(args, "claim_coverage_followup_calls", 12),
+                    claim_coverage_validation_calls=getattr(args, "claim_coverage_validation_calls", 12),
                 ),
                 recover=recover_screening,
             )

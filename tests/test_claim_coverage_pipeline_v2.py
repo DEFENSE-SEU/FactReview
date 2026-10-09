@@ -237,6 +237,8 @@ def test_cli_budgets_reach_stage_and_blocked_claim_survives_final_report(
             "2",
             "--claim-coverage-followup-calls",
             "1",
+            "--claim-coverage-validation-calls",
+            "3",
         ],
     )
     parsed = pipeline_full.parse_args()
@@ -244,6 +246,7 @@ def test_cli_budgets_reach_stage_and_blocked_claim_survives_final_report(
         "claim_coverage_window_chars",
         "claim_coverage_review_calls",
         "claim_coverage_followup_calls",
+        "claim_coverage_validation_calls",
     ):
         setattr(args, key, getattr(parsed, key))
     args.report_presentation = "full"
@@ -254,6 +257,7 @@ def test_cli_budgets_reach_stage_and_blocked_claim_survives_final_report(
             2,
             1,
         )
+        assert kwargs["max_validation_calls"] == 3
         return coverage_result(claims, kwargs["output_dir"], blocked=["claim_001"])
 
     summary, review, called = run_coverage_pipeline(tiny_inputs, isolated_stage, monkeypatch, followup)
