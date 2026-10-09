@@ -361,6 +361,11 @@ def claim_coverage_lines(claim_coverage: dict | None) -> list[str]:
         f"Source windows reviewed: {value('windows_reviewed')} / {value('windows_total')}; "
         f"partially reviewed: {value('windows_partial')}; "
         f"unreviewed: {value('windows_unreviewed')}.",
+        f"Claim checks across source windows: {value('claim_checks_completed')} / "
+        f"{value('claim_checks_required')}; unreviewed: {value('claim_checks_unreviewed')}. "
+        "A claim may be checked in more than one window.",
+        f"Proposed-claim checks passed: {value('candidate_claim_checks_passed')} / "
+        f"{value('candidate_claim_checks_required')}.",
         f"Unresolved observations: {value('unresolved_observations')}; "
         f"blocked claim IDs: {_text(blocked_text)}.",
         f"Coverage audit: {value('audit_path')}.",
