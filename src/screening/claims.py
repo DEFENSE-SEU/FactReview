@@ -31,6 +31,11 @@ be separate claims. Example: 'best accuracy and faster inference' becomes one ac
 claim and one speed claim. One conclusion over several settings remains ONE claim
 with multiple conditions. Example: 'outperforms baselines on five datasets' is one
 claim with five dataset conditions. Preserve the original conclusion's qualifiers.
+A shared conclusion over multiple tasks or input types remains one claim with
+separate conditions, including a single predicate applied to both tasks. A change
+of task or input type alone does not establish an independent conclusion. Distinct
+outcomes, directions or separately asserted factual properties may require
+separate claims.
 An assertion of novelty or being first can receive a different outcome from an
 architecture, performance, or implementation assertion. Extract those independent
 conclusions separately, even when they share one source sentence. A novelty claim
@@ -52,6 +57,11 @@ unstated datasets, metrics, numbers, or experimental details.
 needs is a multi-label subset of Literature, Theory, Code, Experiments. Select every
 branch needed to verify this claim; the later dispatcher will call exactly these
 branches. importance is core for a central contribution, otherwise secondary.
+Include Literature when a claim depends on an external cited result or an external
+record of prior-best status or competition/leaderboard standing. Include Experiments
+as well when paper-internal measurements or comparisons need checking. Preserve the
+external record's task, track and stated scope; do not turn a paper's local table
+comparison into a global ranking assertion.
 
 For each claim, choose a source_block_id from the supplied blocks and copy a unique
 verbatim source_quote from that block. The quote must support the extracted claim
@@ -68,6 +78,12 @@ the primary passage too if its scope is narrower than the whole claim. Each cond
 asserted settings and numbers must be traceable to these passages. Never infer concrete
 numbers from an introductory sentence when the numbers only appear in later bullets.
 These references record what is asserted, and do not establish that it is correct.
+Resolve each claim's local scope from the supplied text, table and caption before
+finalizing it. When these passages unambiguously govern a reported comparison or
+positioning statement, retain its dataset, metric, split, comparator and applicable
+qualifiers, and include their exact source_refs on that claim. Another extracted
+claim does not supply this claim's conditions or sources. Preserve uncertainty
+when the connection is ambiguous; do not infer a connection from adjacency alone.
 Return status='ok' and claims=[] only when the paper contains no eligible claims.
 """
 
