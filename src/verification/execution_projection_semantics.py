@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from dataclasses import dataclass
 from pathlib import Path
 
 from schemas.claim import Condition, SemanticPredictionProjection, SemanticProjectionScopeDecision
@@ -87,6 +88,23 @@ def _sample(text, count, split):
     return keys
 
 
+def _fixed_sample(text, split):
+    scoped = rf"(?:{re.escape(split.casefold())} )?" if isinstance(split, str) and split else ""
+    if not re.fullmatch(rf"fixed {scoped}(?:examples|predictions)", _normal(text)):
+        return None
+    keys = {"sample"}
+    if split and re.search(r"\b" + re.escape(split.casefold()) + r"\b", _normal(text)):
+        keys.add("dataset")
+    return keys
+
+
+@dataclass(frozen=True)
+class _Meaning:
+    keys: set[str]
+    counted: bool = False
+    qualitative: bool = False
+
+
 def _metric(text, cfg):
     bare = r"(?:exact[- ]match )?accuracy"
     if re.fullmatch(bare, _normal(text)):
@@ -103,37 +121,69 @@ def _fragments(text):
     return [s.strip() for s in re.split(r"(?<=[.!?])\s+(?=[A-Z])|\n|;\s*", text) if s.strip()]
 
 
-def _statement(text, runtime, value, count):
+def _statement_meaning(text, runtime, value, count):
     from verification.experiment_targets import _scalar_match
 
     normalized = text.strip().rstrip(".! ")
-    pieces = re.split(r",\s*(?:with|computed\s+(?:as|by))\s+", normalized, flags=re.I)
-    if len(pieces) > 2:
-        return None
-    keys = set()
-    for index, piece in enumerate(pieces):
+    separators = list(re.finditer(r",\s*(computed\s+(?:as|by)|with|over)\s+", normalized, re.I))
+    pieces = [("scalar", normalized[: separators[0].start()] if separators else normalized)]
+    pieces.extend(
+        (
+            match.group(1).casefold(),
+            normalized[match.end() : separators[i + 1].start() if i + 1 < len(separators) else None],
+        )
+        for i, match in enumerate(separators)
+    )
+    keys, seen = set(), set()
+    split = runtime.settings.get("split")
+    for connector, piece in pieces:
+        # Preserve the existing unpunctuated "... over N examples" form.
         samples = []
-        for over in re.finditer(r"\s+over\s+", piece, re.I):
-            sample = _sample(piece[over.end() :], count, runtime.settings.get("split"))
-            if sample is not None:
-                samples.append((over.start(), sample))
-        if len(samples) > 1 or (samples and "sample" in keys):
+        if connector != "over":
+            for over in re.finditer(r"\s+over\s+", piece, re.I):
+                sample = _sample(piece[over.end() :], count, split)
+                if sample is not None:
+                    samples.append((over.start(), sample))
+        if len(samples) > 1 or (samples and "counted" in seen):
             return None
         if samples:
             start, sample = samples[0]
             keys.update(sample)
-            pieces[index] = piece[:start]
-    if len(pieces) == 2:
-        if not _definition(pieces[1]):
+            seen.add("counted")
+            piece = piece[:start]
+        if connector == "scalar":
+            scalar = _scalar_match(piece, runtime)
+            if scalar is None or scalar[1] != value or scalar[2] is not None:
+                return None
+            keys.update({"dataset", "value"})
+            keys.update("runtime:" + key for key in runtime.settings if key != "split")
+            continue
+        category, meaning = None, None
+        if connector == "over":
+            category, meaning = "counted", _sample(piece, count, split)
+        elif _definition(piece):
+            category, meaning = "definition", {"definition"}
+        elif connector == "with":
+            negative = _negative(piece)
+            if negative is not None:
+                if keys & negative:
+                    return None
+                keys.update(negative)
+                continue
+            meaning = _sample(piece, count, split)
+            category = "counted"
+            if meaning is None:
+                category, meaning = "qualitative", _fixed_sample(piece, split)
+        if meaning is None or category in seen:
             return None
-        keys.add("definition")
-    head = pieces[0]
-    scalar = _scalar_match(head, runtime)
-    if scalar is None or scalar[1] != value or scalar[2] is not None:
-        return None
-    keys.update({"dataset", "value"})
-    keys.update("runtime:" + key for key in runtime.settings if key != "split")
-    return keys
+        seen.add(category)
+        keys.update(meaning)
+    return _Meaning(keys, counted="counted" in seen, qualitative="qualitative" in seen)
+
+
+def _statement(text, runtime, value, count):
+    meaning = _statement_meaning(text, runtime, value, count)
+    return meaning.keys if meaning is not None else None
 
 
 def _description(text, cfg, count=None):
@@ -170,21 +220,57 @@ def _description(text, cfg, count=None):
     return None
 
 
-def _interpret_text(text, cfg, runtime, value, count):
+def _interpretation(text, cfg, runtime, value, count):
     if not isinstance(text, str) or not text.strip():
         return None
     if _definition(text):
-        return {"definition"}
+        return _Meaning({"definition"})
     negative = _negative(text)
     if negative is not None:
-        return negative
+        return _Meaning(negative)
     sample = _sample(text, count, cfg["settings"].get("split"))
     if sample is not None:
-        return sample
+        return _Meaning(sample, counted=True)
+    fixed = _fixed_sample(text, cfg["settings"].get("split"))
+    if fixed is not None:
+        return _Meaning(fixed, qualitative=True)
     description = _description(text, cfg, count)
     if description is not None:
-        return description
-    return _statement(text, runtime, value, count)
+        return _Meaning(description, counted="sample" in description)
+    return _statement_meaning(text, runtime, value, count)
+
+
+def _interpret_text(text, cfg, runtime, value, count):
+    meaning = _interpretation(text, cfg, runtime, value, count)
+    return meaning.keys if meaning is not None else None
+
+
+def _require_fixed_sample_count(claim, condition, cfg, runtime, value, count, *, claim_texts):
+    """A fixed-population property cannot invent an original cardinality assertion."""
+    qualitative, counted = False, False
+    for path, actual in field_inventory(condition).items():
+        tokens = pointer_tokens(path)
+        if path in {"/dataset", "/metric"}:
+            continue  # Identity fields retain their actual role, even if their names resemble a count.
+        if len(tokens) == 2 and tokens[0] == "settings" and tokens[1] in cfg["settings"]:
+            continue  # Runtime settings cannot double as sample-count assertions.
+        if path in {"/settings/examples", "/settings/sample_count"}:
+            counted |= type(actual) is int and actual == count
+        if isinstance(actual, str):
+            meaning = _interpretation(actual, cfg, runtime, value, count)
+            if meaning is not None:
+                qualitative |= meaning.qualitative
+                counted |= meaning.counted
+    for text in claim_texts:
+        meaning = _interpretation(text, cfg, runtime, value, count)
+        qualitative |= meaning is not None and meaning.qualitative
+    # Only the full original statement bound to this dataset/model/split can
+    # contribute a claim-level count. Another claim fragment or condition cannot.
+    whole = _interpretation(claim.text, cfg, runtime, value, count)
+    if whole is not None and {"dataset", "value"}.issubset(whole.keys):
+        counted |= whole.counted
+    if qualitative and not counted:
+        raise ProjectionError("Fixed-population qualifier lacks an explicit original sample count")
 
 
 def _source_authorized(catalog, source, condition_id):
@@ -437,6 +523,15 @@ def validate_semantic_obligations(
         cursor = row.end
     if claim.text[cursor:].strip(" \t\r\n,;.!?"):
         raise ProjectionError("Original claim suffix was omitted")
+    _require_fixed_sample_count(
+        claim,
+        condition,
+        cfg,
+        runtime,
+        value,
+        count,
+        claim_texts=[r["text"] for r in claim_consumed],
+    )
     used = {i for r in [*proposal.field_bindings, *proposal.claim_bindings] for i in r.atom_ids}
     if used != set(atom_keys) or not {"dataset", "value", "sample", "definition"}.issubset(seen_keys):
         raise ProjectionError("Projection contains unused atoms or lacks a full measurement obligation")

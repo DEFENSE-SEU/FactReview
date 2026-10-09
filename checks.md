@@ -1,16 +1,29 @@
 # FactReview v2 acceptance checks
 
+## Latest phase 4 correction: original fixed-population claims
+
+The finite interpretation correction is reviewed and ready for checkpoint. Both candidate construction and final semantic validation require an explicit original sample-count witness for a qualitative fixed-population phrase. Dataset/metric names, runtime identities, configuration row counts and another condition cannot supply that witness. Scalar/definition/sample/boundary clauses retain complete original text, all fields, exact source binding and independent scope review.
+
+| requirement | verdict | evidence | correction / limit |
+|---|---|---|---|
+| Compose the original fixed-prediction claim without dropping obligations | pass | `fixed-population-composition-implementation/report.md`, `freeze.json`; semantics `3d608278...`, choices `b71daf3a...`; 78 targeted controls plus source-withdrawal and identity-role controls. | Existing tests were unchanged; no whole-suite rerun. |
+| Independent source review of builder and final consumer | pass | `fixed-population-composition-independent/review.md`; exact frozen source and changed-function review. | No blocking finding; no extra actual calls. |
+| Saved native-v4 responses produce an actual execution plan | fail | `fixed-population-composition-implementation/original-replay.json`: one structural candidate, zero plans and zero sufficient evidence; 159 original/frozen files unchanged. | Old unresolved/legacy collision and joint-source errors remain. Eligibility does not establish actual selection or Docker execution. |
+
+Next extraction work implements an explicit versioned coverage contract with one source-grounded representation per problem. It preserves missing-needs and uncertain findings, old v2 failures, final semantic adoption, and the distinction between loaded source blocks and reviewed coverage. The independent design review is `claim-coverage-v3-design-independent/review.md`. The remaining scientific mistakes on claims030/054 are still open.
+
 ## Current extraction coverage correction
 
-Current pushed source is `e6401b5aebd48da344987fe855a22515f33d51b1`. Genuine coverage v3 (`fixmatch-coverage-live-v3/actual-de8e5667121f`) has finished with partial coverage and strict failure: 16 requests, 755401 known tokens, one failed request with unavailable usage. Thirteen adopted changes reconstruct 80 claims from the original60; independent source/accounting checks pass. The two-page whole native v4 (`full-native-verified-v4/actual-13f2c04b8c9a`) continues on its immutable e640 snapshot. No complete scientific or integration pass is claimed.
+Current pushed source is `8ce4116d24506aaff35e88926ae5a1525dcb5a2c`, remotely verified exactly. Genuine coverage v3 (`fixmatch-coverage-live-v3/actual-de8e5667121f`) has finished on e640 with partial coverage and strict failure: 16 requests, 755401 known tokens, one failed request with unavailable usage. Thirteen adopted changes reconstruct 80 claims from the original60; independent source/accounting checks pass. Two-page whole native v4 (`full-native-verified-v4/actual-13f2c04b8c9a`) also finished on immutable e640 with its strict failures retained. No complete scientific or integration pass is claimed.
 
 | Current checkpoint | verdict | evidence | correction / limit |
 |---|---|---|---|
 | Versioned whole-block selection and explicit per-claim checks | pass | Frozen source `32fe2c89...`; 38 necessary mocked controls and independent source review below. | Mechanical checks cannot certify model judgment or whole-paper coverage. |
 | Current wheel contains the new module and CLI controls | pass | `coverage-wheel-smoke-e640/review.md`, `final-result.json`; wheel `2608cae2...`; 191 exact source modules, isolated imports and four flags. | One build/install, no full regression; runtime 3.12.10, syntax-only 3.11 check. Initial smoke-harness error preserved. |
 | Genuine-paper semantic correction after e640 | fail | `fixmatch-coverage-v3-mechanical-independent/` confirms immutable sources/reconstruction; final main/appendix reviews under `fixmatch-coverage-live-v3/` confirm013/043 splits and the retained ablation/selection-scope omissions. | 38/62 required checks completed; 24 unreviewed. New054 hold lacks necessity,065 still merges assertions,079 repeats existing measurements. |
-| Existing assertion-group, qualifier and source-ID contracts are stated to the model | pass | Prompt-only leaf `afff40dd...`, `claim-coverage-check-prompt-clarification/`; unchanged38 controls pass. Independent AST/schema review: `claim-coverage-check-prompt-independent/`. | Actual effect awaits at most two focused decision probes. No automatic regrouping, relaxed gate or new model round. |
-| Complete native integration after e640 | unresolved | Fresh run `full-native-verified-v4/actual-13f2c04b8c9a`. | Synthetic integration scope; all original service/accounting/semantic failures remain visible. |
+| Existing assertion-group, qualifier and source-ID contracts are stated to the model | pass | Prompt-only leaf `afff40dd...`, `claim-coverage-check-prompt-clarification/`; unchanged38 controls pass. Independent AST/schema review: `claim-coverage-check-prompt-independent/`. | Actual results are recorded in the next row. No automatic regrouping, relaxed gate or new model round. |
+| Focused genuine coverage decisions after prompt clarification | fail | `claim-coverage-contract-probe-v1/actual-7e30710229d8` and its `independent-actual-7e30710229d8/` review: two returned requests, 99886 measured tokens, complete usage,791 unchanged files; full80-block declaration and037's missing scope identified. | Six of23 checks lack corresponding merged observations;030 scope and054 false-hold expectations still fail. No historical claim was changed. No repeat request planned in this batch. |
+| Complete native integration after e640 | fail | `full-native-v4-mechanical-independent/`: seven stages completed, seven claims (5 Supported/2 Unverified), actual figure/table VLM, complete advice states; 36 logical/38 physical calls, 211910 known tokens. | Zero plans/Docker; alignment/cleanup coverage absent. One retrieval timeout, two unknown-usage failed physical requests, partial L1 coverage. Synthetic integration scope only. |
 
 ### Previous genuine run and implementation record
 
