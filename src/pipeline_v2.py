@@ -111,6 +111,7 @@ def run_v2_pipeline(
             "run_id": run_id,
             "run_dir": str(root),
             "paper_source": source,
+            "report_presentation": getattr(args, "report_presentation", "full"),
             "stages": dict.fromkeys(STAGES, "pending"),
             "stage_durations_sec": {},
             "stage_errors": {},
@@ -174,6 +175,8 @@ def run_v2_pipeline(
                 run_stats.record_module_status(STATS_MODULES[name], "skipped")
 
         try:
+            if summary["report_presentation"] not in ("full", "layered"):
+                raise ValueError("Unknown report presentation; choose full or layered")
             unsupported = [
                 name
                 for name in (
@@ -450,6 +453,7 @@ def run_v2_pipeline(
                     table_context_coverage=summary["table_context_coverage"],
                     writing_coverage=summary["writing_coverage"],
                     anonymity_policy=summary["anonymity_policy"],
+                    presentation=summary["report_presentation"],
                 )
                 # Static rendering revalidates advice against the saved sources.
                 # Use that persisted result for counts and downstream delivery.
@@ -462,10 +466,11 @@ def run_v2_pipeline(
 
             outputs = stage("report", report_stage)
             summary["outputs"].update(
-                {f"report_{name}": path for name, path in outputs.items() if name != "pdf_error"}
+                {f"report_{name}": path for name, path in outputs.items() if not name.endswith("_error")}
             )
-            if outputs.get("pdf_error"):
-                summary["stage_errors"]["report_pdf"] = outputs["pdf_error"]
+            for name, detail in outputs.items():
+                if name.endswith("_error") and detail:
+                    summary["stage_errors"][f"report_{name.removesuffix('_error')}"] = detail
             outputs = stage("teaser", lambda: write_teaser(review, root / "review" / "teaser"))
             summary["outputs"].update({f"teaser_{name}": path for name, path in outputs.items()})
             summary["counts"] = {status.value: count for status, count in review.summary_counts.items()}

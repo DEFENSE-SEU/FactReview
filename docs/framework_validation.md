@@ -10,6 +10,14 @@ The acceptance gate remains the 14 requirements in `checks.md`. The commands bel
 
 ## Offline integration matrix
 
+The report controls in `tests/test_report_layered_v2.py` and `tests/test_report_layered_context_v2.py` verify canonical-record preservation, complete source reuse and navigation, lossless diagnostic display, stale-output rejection and individual PDF failures. `tests/test_pipeline_report_presentation_v2.py` passes the selected layout through the public pipeline and checks the actual renderer and teaser against the same assessed claims, with LLM, retrieval, parsing and Docker boundaries mocked. Run these controls with:
+
+```sh
+python -m pytest tests/test_report_layered_v2.py tests/test_report_layered_context_v2.py tests/test_pipeline_report_presentation_v2.py
+```
+
+For a saved review, `review.report.v2.write_review(..., presentation="layered")` writes the reading report, full technical appendix, combined PDF and field-location manifest to a fresh output directory. This is presentation-only processing; unchanged saved records retain their original model decisions and limitations. A successful render does not revalidate scientific judgments or turn unavailable advice into generated advice. Keep the original report and compare all canonical JSON fields except the rendered `review_markdown` string when evaluating a new layout.
+
 Install the development/runtime dependencies described in the README, then run:
 
 ```sh
