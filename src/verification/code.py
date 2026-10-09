@@ -377,6 +377,22 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
         confirmed = []
         for cid in covered:
             scope, decision = scopes.get(cid), decisions.get((index, cid))
+            if scope is None or decision is None:
+                result.verification_limitations.append(
+                    VerificationLimitation(
+                        claim_id=claim.id,
+                        condition_ids=[cid],
+                        stage="Code",
+                        kind="evidence_validation_failed",
+                        reason=(
+                            f"Code scope validation unavailable for candidate {index}, condition {cid}; "
+                            f"condition_scope_accepted={scope is not None}; "
+                            f"pair_decision_accepted={decision is not None}; "
+                            f"scope_audit={audit or 'unavailable'}. "
+                            f"Scope review diagnostics: {'; '.join(issues) or 'No accepted scope record.'}"
+                        ),
+                    )
+                )
             valid = bool(
                 scope
                 and decision
