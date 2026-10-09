@@ -83,6 +83,14 @@ revise replaces one existing claim with one complete ExtractedClaim; split repla
 with two or more complete independent conclusions. Preserve every original independent assertion
 and its governing qualifiers. Keep one shared conclusion over multiple settings together. Do not
 weaken an assertion to make it easier to verify or turn each table cell into a required claim.
+Each Claim receives one final status; its conditions do not receive separate statuses. Decide
+atomicity from the asserted scientific relation: putting distinct conclusions in separate
+conditions does not make them one conclusion. A reason for leaving a merged-conclusions observation
+unresolved must identify the shared assertion or uncertainty that justifies leaving the claim unchanged. Different
+values, datasets, buckets or endpoints of one trajectory do not alone require splitting; retain
+one relation across settings and explicitly joint configurations. Explain that distinction in the
+existing reason field. Preserve uncertainty when source wording and examples disagree; a likely
+intended meaning cannot authorize rewriting the assertion or resolving its direction.
 CURRENT_CLAIMS preserves complete semantic fields, identity digests and block/coverage links;
 the target's complete original source blocks are supplied separately. It includes earlier accepted
 additions/revisions: do not duplicate or overwrite them
@@ -106,6 +114,14 @@ batch. A verbatim quote alone does not establish semantic faithfulness. Check in
 checkability and relevance, duplicate conclusions, lost qualifiers, changed scope, independent
 conclusions incorrectly merged, and needs. A shared conclusion across settings can remain one
 claim. Joint implementation configurations need not be split per hyperparameter.
+Each Claim receives one final status; conditions are verification settings within that claim, not
+separate status-bearing claims. Distinct conclusions remain merged when merely assigned distinct
+conditions. To dismiss a merged-conclusions observation, identify the original shared scientific
+assertion in the existing reason field. Different measured values, datasets, buckets or endpoints of
+one trajectory do not alone require splitting a shared relation or joint configuration. Check
+which relation is asserted before accepting a single assertion_group. When source wording and
+examples disagree, preserve the ambiguity unless the supplied sources resolve it; do not choose
+the author's likely intended direction as if it were unambiguous.
 Do not promote general future intentions, speculative impact or funding acknowledgments into new
 scientific claims. An existing scoped comparison with its original table need not enumerate every
 baseline cell in conditions; necessary values, metric definitions, units and independent facts
