@@ -404,6 +404,67 @@ class ExecutionTargetBinding(Contract):
     unit: str | None = None
 
 
+class ProjectionFieldRole(Contract):
+    path: NonEmpty
+    role: Literal[
+        "dataset_identity",
+        "metric",
+        "runtime_setting",
+        "reported_value",
+        "sample_scope",
+        "measurement_definition",
+        "conclusion_boundary",
+        "unresolved",
+    ]
+    source_ids: list[NonEmpty] = Field(min_length=1)
+
+
+class PredictionProjection(Contract):
+    """A proposed interpretation of an unchanged original execution condition."""
+
+    version: Literal["released-predictions-v1"]
+    recipe: Literal["exact_match_accuracy"]
+    data_path: NonEmpty
+    field_roles: list[ProjectionFieldRole] = Field(min_length=1)
+
+
+class ProjectionScopeDecision(Contract):
+    plan_index: int = Field(ge=0, strict=True)
+    condition_id: NonEmpty
+    classification: Literal["absolute_fixed_predictions", "comparative", "unresolved"]
+    dataset_identity_confirmed: bool = Field(strict=True)
+    measurement_definition_confirmed: bool = Field(strict=True)
+    all_original_qualifiers_preserved: bool = Field(strict=True)
+    confirmed_field_paths: list[NonEmpty]
+    source_ids: list[NonEmpty] = Field(min_length=1)
+    unresolved: list[str]
+    rationale: NonEmpty
+
+
+class ProjectionRecord(Contract):
+    proposal: PredictionProjection
+    runtime_target: Condition
+    sample_count: int = Field(gt=0, strict=True)
+    source_pointers: dict[str, EvidencePointer]
+    source_hashes: dict[str, NonEmpty]
+    paper_hashes: dict[str, NonEmpty]
+    repository_hashes: dict[str, NonEmpty]
+    repository_root: NonEmpty
+    entry_script: NonEmpty
+    config_path: NonEmpty
+    label_key: NonEmpty
+    prediction_key: NonEmpty
+    scope_review: ProjectionScopeDecision
+    scope_audit: NonEmpty
+    scope_audit_sha256: NonEmpty
+    recipe_sha256: NonEmpty
+
+
+class ProjectedExecutionTargetBinding(ExecutionTargetBinding):
+    version: Literal[2] = 2
+    projection: ProjectionRecord
+
+
 class ExecutionPlan(Contract):
     id: NonEmpty
     claim_id: NonEmpty
@@ -414,7 +475,9 @@ class ExecutionPlan(Contract):
     # Condition-id keys preserve two datasets reporting the same metric.
     y_paper: dict[str, FiniteNumber] = Field(min_length=1)
     # Empty is the readable historical form; it never grants execution trust.
-    target_bindings: dict[str, ExecutionTargetBinding] = Field(default_factory=dict)
+    target_bindings: dict[str, ExecutionTargetBinding | ProjectedExecutionTargetBinding] = Field(
+        default_factory=dict
+    )
     feasibility: Literal["ready", "blocked"]
     blocker: str = ""
     priority: Literal["high", "medium", "low"]

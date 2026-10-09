@@ -521,9 +521,47 @@ def validate_plan_targets(plan, claim, materials):
     result = {}
     for condition in plan.target_conditions:
         binding = plan.target_bindings[condition.id]
-        rebuilt = bind_execution_target(
-            claim, condition, binding.reported, materials, selector=binding.selector
-        )
+        if binding.version == 2:
+            from verification.execution_projection import bind_projection_target
+
+            projection = binding.projection
+            expected_paths = {str(materials.source_pdf), str(materials.markdown_path)}
+            if set(projection.paper_hashes) != expected_paths or any(
+                hashlib.sha256(Path(path).read_bytes()).hexdigest() != sha
+                for path, sha in projection.paper_hashes.items()
+            ):
+                raise TargetBindingError("Projected paper artifacts changed after independent review")
+            if (
+                len(plan.condition_ids) != 1
+                or plan.run_mode != "evaluation"
+                or plan.task.entry_script != projection.entry_script
+                or plan.task.config != projection.config_path
+                or plan.task.command != ["python", "-I", "-S", projection.entry_script]
+                or plan.task.workdir != "."
+                or plan.task.metric_output is not None
+            ):
+                raise TargetBindingError(
+                    "Released-predictions plan differs from its bound single evaluation task"
+                )
+            try:
+                rebuilt = bind_projection_target(
+                    claim,
+                    condition,
+                    binding.reported,
+                    materials,
+                    selector=binding.selector,
+                    proposal=projection.proposal,
+                    entry_script=projection.entry_script,
+                    config_path=projection.config_path,
+                    review=projection.scope_review,
+                    audit_path=projection.scope_audit,
+                )
+            except (ValueError, OSError, TypeError, KeyError, IndexError) as exc:
+                raise TargetBindingError(f"Execution projection unavailable: {exc}") from exc
+        else:
+            rebuilt = bind_execution_target(
+                claim, condition, binding.reported, materials, selector=binding.selector
+            )
         if rebuilt != binding or plan.y_paper.get(condition.id) != rebuilt.value:
             raise TargetBindingError(
                 f"Paper target binding changed or conflicts with y_paper: {condition.id}"
@@ -534,6 +572,11 @@ def validate_plan_targets(plan, claim, materials):
 
 def runtime_target_issue(binding, observation_settings, *, observation_unit=None):
     """Check observed units without copying a paper unit or converting the value."""
+    if binding.version == 2:
+        units = [observation_settings[k] for k in ("unit", "units") if k in observation_settings]
+        if observation_unit != "fraction" or any(unit != "fraction" for unit in units):
+            return "Released-predictions measurement requires its independently computed fraction scale"
+        return ""
     try:
         actual = {_unit(observation_settings[k]) for k in ("unit", "units") if k in observation_settings}
         if observation_unit is not None:
