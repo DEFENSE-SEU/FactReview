@@ -211,6 +211,12 @@ def _theory_derivations(claim, _navigation=None):
         if record.source_pointer:
             lines += [f"  - Original proof location: {_pointer_location(record.source_pointer)}."]
             lines.extend(_passage(record.source_pointer))
+        if record.schema_version == "theory-visual-derivation-v1":
+            lines.append(
+                "  - Visual recovery: model-transcribed original pixels; program checks page/source identity "
+                "and trace structure. Transcription and mathematics remain model judgments. "
+                f"Original record index: {record.original_record_index}; target: {_text(record.target_id)}."
+            )
         trace = record.trace
         if trace:
             lines += [
@@ -235,8 +241,17 @@ def _theory_derivations(claim, _navigation=None):
                         detail = f"{entry.at}: {entry.reason}. Needed: {entry.needed}"
                     lines.append(f"  - {kind}: {_text(detail)}.")
                     for source in entry.sources:
-                        lines.append(f"  - Source: {_pointer_location(source.pointer)}.")
+                        label = (
+                            "Model-transcribed original-page source"
+                            if getattr(source, "source_kind", None) == "visual"
+                            else "Source"
+                        )
+                        lines.append(f"  - {label}: {_pointer_location(source.pointer)}.")
                         lines.extend(_passage(source.pointer))
+                        if getattr(source, "source_kind", None) == "visual":
+                            lines.append(
+                                f"    - Visual reading audit: {_text(source.audit_pointer)}; image: {_text(source.image_path)}."
+                            )
         for review in record.concern_reviews:
             lines += [
                 f"  - Concern review for {_text(review.condition_id)}: {_text(review.state)}.",

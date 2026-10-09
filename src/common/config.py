@@ -54,6 +54,14 @@ class Settings(BaseSettings):
     agent_max_turns: int = 1000
     agent_resume_attempts: int = 2
     experiment_scope_binding_repair_rounds: int = Field(default=0, ge=0, le=1)
+    theory_visual_recheck_rounds: int = Field(default=1, ge=0, le=1)
+
+    @field_validator("theory_visual_recheck_rounds", mode="before")
+    @classmethod
+    def bounded_theory_visual_rounds(cls, value):
+        if (type(value) is int and value in (0, 1)) or (type(value) is str and value in {"0", "1"}):
+            return int(value)
+        raise ValueError("theory_visual_recheck_rounds must be 0 or 1")
 
     @field_validator("experiment_scope_binding_repair_rounds", mode="before")
     @classmethod

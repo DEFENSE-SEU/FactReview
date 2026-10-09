@@ -544,18 +544,39 @@ def validate_plan_targets(plan, claim, materials):
                     "Released-predictions plan differs from its bound single evaluation task"
                 )
             try:
-                rebuilt = bind_projection_target(
-                    claim,
-                    condition,
-                    binding.reported,
-                    materials,
-                    selector=binding.selector,
-                    proposal=projection.proposal,
-                    entry_script=projection.entry_script,
-                    config_path=projection.config_path,
-                    review=projection.scope_review,
-                    audit_path=projection.scope_audit,
-                )
+                if getattr(projection, "record_version", None) == "released-predictions-choice-v1":
+                    from verification.execution_projection_choices import bind_choice_target
+
+                    if next((c for c in claim.conditions if c.id == condition.id), None) != condition:
+                        raise TargetBindingError("Choice plan target differs from the original condition")
+                    rebuilt = bind_choice_target(
+                        claim,
+                        materials,
+                        projection.registry_snapshot,
+                        {
+                            "index": projection.selection_index,
+                            "selection": projection.selection.model_dump(mode="json"),
+                        },
+                        {
+                            "index": projection.review_index,
+                            "review": projection.choice_review.model_dump(mode="json"),
+                        },
+                        projection.scope_audit,
+                        downstream=True,
+                    )
+                else:
+                    rebuilt = bind_projection_target(
+                        claim,
+                        condition,
+                        binding.reported,
+                        materials,
+                        selector=binding.selector,
+                        proposal=projection.proposal,
+                        entry_script=projection.entry_script,
+                        config_path=projection.config_path,
+                        review=projection.scope_review,
+                        audit_path=projection.scope_audit,
+                    )
             except (ValueError, OSError, TypeError, KeyError, IndexError) as exc:
                 raise TargetBindingError(f"Execution projection unavailable: {exc}") from exc
         else:

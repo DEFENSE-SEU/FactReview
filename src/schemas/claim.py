@@ -307,6 +307,63 @@ class TheoryDerivationRecord(Contract):
         return self
 
 
+class TheoryVisualSource(Contract):
+    source_kind: Literal["visual"] = "visual"
+    origin: Literal["model_transcribed_from_original_pixels"] = "model_transcribed_from_original_pixels"
+    visual_source_id: NonEmpty
+    target_id: NonEmpty
+    page_id: NonEmpty
+    anchor_block_id: NonEmpty
+    printed_anchor: str
+    pointer: EvidencePointer
+    artifact_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    image_path: NonEmpty
+    image_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    anchor_block_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    audit_pointer: NonEmpty
+
+
+class TheoryVisualAssumption(TheoryAssumption):
+    sources: list[TheorySource | TheoryVisualSource] = Field(default_factory=list)
+
+
+class TheoryVisualStep(TheoryStep):
+    sources: list[TheorySource | TheoryVisualSource] = Field(default_factory=list)
+
+
+class TheoryVisualGap(TheoryGap):
+    sources: list[TheorySource | TheoryVisualSource] = Field(default_factory=list)
+
+
+class TheoryVisualTrace(TheoryTrace):
+    assumptions: list[TheoryVisualAssumption]
+    steps: list[TheoryVisualStep]
+    gaps: list[TheoryVisualGap]
+
+
+class TheoryVisualRecord(TheoryDerivationRecord):
+    schema_version: Literal["theory-visual-derivation-v1"]
+    phase: Literal["visual_recheck"]
+    state: Literal["validated", "invalid"]
+    validation_scope: Literal["structure_source_identity_and_model_visual_reading"] = (
+        "structure_source_identity_and_model_visual_reading"
+    )
+    trace: TheoryVisualTrace | None = None
+    target_id: NonEmpty
+    original_record_index: int = Field(ge=0, strict=True)
+    response_item_index: int | None = Field(default=None, ge=0, strict=True)
+    audit_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+
+    @model_validator(mode="after")
+    def visual_audit_required(self) -> Self:
+        if self.state == "validated" and (not self.audit_pointer or not self.audit_sha256):
+            raise ValueError("Validated visual Theory records require their audit path and hash")
+        return self
+
+
+TheoryRecord = TheoryDerivationRecord | TheoryVisualRecord
+
+
 class Claim(Contract):
     """The same record is enriched from extraction through final assessment."""
 
@@ -325,7 +382,7 @@ class Claim(Contract):
     status: ClaimStatus = ClaimStatus.UNVERIFIED
     notes: list[str] = Field(default_factory=list)
     advice: ClaimAdvice | None = None
-    theory_derivations: list[TheoryDerivationRecord] = Field(default_factory=list)
+    theory_derivations: list[TheoryRecord] = Field(default_factory=list)
     verification_limitations: list[VerificationLimitation] = Field(default_factory=list)
 
     @model_validator(mode="after")
@@ -597,9 +654,63 @@ class SemanticProjectionRecord(ProjectionRecord):
     semantics_sha256: NonEmpty
 
 
+ChoiceIdentity = Annotated[str, Field(strict=True, min_length=1, pattern=r"^\S(?:[\s\S]*\S)?$")]
+
+
+class ExecutionChoiceSelection(Contract):
+    version: Literal["released-predictions-choice-v1"]
+    condition_id: ChoiceIdentity
+    decision: Literal["select"]
+    candidate_id: ChoiceIdentity
+    rationale: NonEmpty
+
+
+class ExecutionChoiceUnresolved(Contract):
+    version: Literal["released-predictions-choice-v1"]
+    condition_id: ChoiceIdentity
+    decision: Literal["unresolved"]
+    rationale: NonEmpty
+
+
+ExecutionChoice = Annotated[
+    ExecutionChoiceSelection | ExecutionChoiceUnresolved, Field(discriminator="decision")
+]
+
+
+class ExecutionChoiceObligationReview(Contract):
+    obligation_id: ChoiceIdentity
+    decision: Literal["confirmed", "unresolved"]
+    rationale: NonEmpty
+
+
+class ExecutionChoiceReview(Contract):
+    version: Literal["released-predictions-choice-v1"]
+    condition_id: ChoiceIdentity
+    candidate_id: ChoiceIdentity
+    classification: Literal["absolute_fixed_predictions", "unresolved"]
+    decision: Literal["confirmed", "unresolved"]
+    reviews: list[ExecutionChoiceObligationReview]
+    rationale: NonEmpty
+
+
+class ChoiceProjectionRecord(SemanticProjectionRecord):
+    # REQUIRED discriminator, no default added to old records. proposal and
+    # scope_review are explicitly program-normalized v2 structures; these fields
+    # retain the actual new wire decision and its audit list positions.
+    record_version: Literal["released-predictions-choice-v1"]
+    selection: ExecutionChoiceSelection
+    choice_review: ExecutionChoiceReview
+    selection_index: int = Field(ge=0, strict=True)
+    review_index: int = Field(ge=0, strict=True)
+    candidate_id: ChoiceIdentity
+    registry_sha256: NonEmpty
+    registry_snapshot: dict[str, Any]
+    choice_builder_sha256: NonEmpty
+
+
 class ProjectedExecutionTargetBinding(ExecutionTargetBinding):
     version: Literal[2] = 2
-    projection: ProjectionRecord | SemanticProjectionRecord
+    projection: ChoiceProjectionRecord | ProjectionRecord | SemanticProjectionRecord
 
 
 class ExecutionPlan(Contract):

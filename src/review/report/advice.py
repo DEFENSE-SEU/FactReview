@@ -92,12 +92,22 @@ def theory_source_integrity(claim: Claim) -> dict[str, str]:
     files = {}
     for record in claim.theory_derivations:
         expected = list(record.source_hashes.items())
+        if record.schema_version == "theory-visual-derivation-v1":
+            if record.state == "validated" and (not record.audit_pointer or not record.audit_sha256):
+                raise ValueError("Validated visual Theory record has no audit path/hash")
+            if record.audit_sha256:
+                expected.append((record.audit_pointer, record.audit_sha256))
         for review in record.concern_reviews:
             expected.extend(review.source_hashes.items())
             expected.extend((source.locator, source.artifact_sha256) for source in review.target_sources)
         if record.trace:
             for entry in [*record.trace.assumptions, *record.trace.steps, *record.trace.gaps]:
                 expected.extend((source.pointer.locator, source.artifact_sha256) for source in entry.sources)
+                expected.extend(
+                    (source.image_path, source.image_sha256)
+                    for source in entry.sources
+                    if getattr(source, "source_kind", None) == "visual"
+                )
         for locator, digest in expected:
             path = Path(locator)
             if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest:

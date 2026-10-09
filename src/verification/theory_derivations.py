@@ -218,6 +218,11 @@ def safe_text(value, cfg):
 
 def _trace(raw, context, claim, materials, cfg):
     trace = Derivation.model_validate(raw)
+    return validate_trace_structure(trace, context, claim, materials, cfg)
+
+
+def validate_trace_structure(trace, context, claim, materials, cfg, *, output_model=TheoryTrace):
+    """Shared dependency/completeness checks; each version retains its own source resolver."""
     assumption_ids = _ids([a.id for a in trace.assumptions], label="assumptions")
     step_ids = _ids([step.id for step in trace.steps], label="steps")
     if assumption_ids & step_ids:
@@ -273,7 +278,7 @@ def _trace(raw, context, claim, materials, cfg):
     if trace.outcome != "completed" and not gaps:
         raise ValueError("Incomplete Theory traces require explicit gaps")
     context.check(claim, materials)
-    return TheoryTrace(
+    return output_model(
         **{
             **trace.model_dump(),
             "goal": safe_text(trace.goal, cfg),
