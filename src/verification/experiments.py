@@ -2048,7 +2048,7 @@ def _scope_review(
             payload["execution_projection_context"] = projection_context(claim, materials)
         except (ValueError, OSError, KeyError, TypeError) as exc:
             payload["execution_projection_context"] = {"unavailable": str(exc)}
-    audit = {"claim_id": claim.id, "input": payload}
+    audit = {"claim_id": claim.id, "input": copy.deepcopy(payload)}
     stats = run_stats.stats_path()
     audit_path = stats.parent / "experiment_scope" / f"{uuid.uuid4().hex}.json" if stats is not None else None
     try:
@@ -2101,6 +2101,7 @@ def _scope_review(
             "or missing review information must remain unverified, without creating a new flaw. Place limitations that do not block the stated result in nonblocking_notes; "
             "unresolved_qualifiers is reserved for actual missing claim requirements. A complete condition can combine its table and connected definition/setup passages. "
             "For each non-null plan target projection independently return one plan_projection_reviews decision, even when candidate_items is empty. "
+            "execution_projection_context.request_choices is a versioned structural menu under each config. Its roles, source lexical hits and prose candidates do not establish applicability or full support. Review the entire original claim and all original fields; do not inherit a decision from a catalog hint. "
             "Keep these decisions separate from paper support. Review the unchanged whole claim and condition, every original field path, "
             "its selected exact paper sources and released repository definition. Confirm only an absolute fixed released-prediction "
             "exact-match fraction whose dataset/split, model, complete sample scope and every qualifier are retained. "
@@ -2398,6 +2399,7 @@ def verify_experiments(
             "the provided original field inventory, paper source/number selectors and indexed resources. The first recipe "
             "only computes full-list exact-match accuracy as a fraction. Classify every original semantic leaf without "
             "editing it, choose exact source IDs for each role, and retain sample scope and conclusion boundaries. "
+            "Use execution_projection_context.request_choices for exact repository-relative entry/config/data identifiers, number_id-only prose choices and per-config field roles. Set data_paths to exactly [projection.data_path], keeping config and entry in their separate fields. A field with no supported role remains unresolved. Explicitly select source_ids, using complete_source_ids or combined lexical hits only as syntax hints; never add omitted sources automatically. Every choice still requires independent semantic review and final binding. "
             "The original reported accuracy is a target, not a runtime setting. A combined dataset/split must have an "
             "exact identity in the released config. Unknown obligations stay unresolved. Projection requires the actual "
             "released evaluator/data/config, a prose number_id, one original condition and evaluation mode; omit weights "
