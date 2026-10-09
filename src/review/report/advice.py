@@ -92,6 +92,9 @@ def theory_source_integrity(claim: Claim) -> dict[str, str]:
     files = {}
     for record in claim.theory_derivations:
         expected = list(record.source_hashes.items())
+        for review in record.concern_reviews:
+            expected.extend(review.source_hashes.items())
+            expected.extend((source.locator, source.artifact_sha256) for source in review.target_sources)
         if record.trace:
             for entry in [*record.trace.assumptions, *record.trace.steps, *record.trace.gaps]:
                 expected.extend((source.pointer.locator, source.artifact_sha256) for source in entry.sources)
@@ -110,6 +113,9 @@ def _local_files(claim, ledger):
     for record in claim.theory_derivations:
         if record.audit_pointer:
             locators.append(record.audit_pointer)
+        for review in record.concern_reviews:
+            if review.audit_pointer:
+                locators.append(review.audit_pointer.split("#", 1)[0])
         if record.source_pointer:
             locators.append(record.source_pointer.locator)
         if record.trace:
