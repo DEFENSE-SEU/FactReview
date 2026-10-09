@@ -9,7 +9,7 @@
 | Explicit writing accept/reject/uncertain and first-pass audit | pass | 35 new controls, 126 independent related tests, ten independent boundary probes; all old assertion ASTs and actual inputs remain unchanged. |
 | Writing original-page actual decisions | strict gate fail; three target decisions correct | `writing-decision-actual-695101778490`: 3 actual requests, 12317 tokens, 3 images. Original writing_8 rejected with candidate_not_supported instead of the predeclared parser_artifact; writing_20 rejected and writing_36 grammar accepted. Exact reason failure retained. |
 | Unsupported workshop promotion warning | pass | Independent original-result replay removes only the source-contradicted issue22; other 19 findings and all 31 unavailable corrections unchanged. No actual new retrieval or model call. |
-| Table original-page context and coverage | review pending | 182 affected controls; closed candidates, unique same-page caption source and source guards. Original Table13 first request/response and seven files unchanged; context replay uses an explicit mock. |
+| Table original-page context and coverage | pass | 182 initial affected controls, 12 independent public controls and four independent caption-pointer controls. Final 96 targeted tests pass after fixing a crop-external caption pointer to the original PDF. Original Table13 first request/response and seven files unchanged; context replay uses an explicit mock. |
 | Inherited writing source/secret boundaries | unresolved | Independent synthetic probes reproduce post-callback changed page acceptance and successful model secret reflection in existing delivery/visual payload. New first-pass audit is redacted; broader writing boundaries need a separate fix. |
 
 
