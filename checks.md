@@ -2,7 +2,17 @@
 
 ## Active follow-up findings
 
-The current Literature delivery builds on pushed joint-source checkpoint `c6c880feeb93323c6a815c9c72ad676f338c5e2c`. The final snapshot passes **1913** default tests, two separate legacy tests and a **119**-module wheel inspection. Literature now separates model-visible identity metadata from eligible quote passages; its independently audited actual comparison grounds all **8** previously problematic targets. The member-identity, caption-projection and caption-unit defects remain fixed. Both old-response replay and the fresh original numerical pair retain failed positive expectations through model-selected bindings/roles. The saved fairness concern's scientific applicability remains unresolved. The framework follow-up stays active for those quality limits.
+The current claim-source repair snapshot passes **1953** default tests, two separate legacy tests and a **119**-module wheel inspection. The new repair-only `source-block-v1` contract restores complete original blocks after explicit model selection; it preserves the initial extraction contract and every claim's semantic fields. The original nine-excerpt failure remains recorded, including the unresolved scope, splitting and needs problems below. Whole-framework quality work stays active.
+
+| Current claim-source repair | Verdict | Evidence |
+|---|---|---|
+| Explicit source selection preserves strict grounding and claim content. | pass | `claim-source-selection-implementation/report.md`: 40 new tests and 47 existing related tests; initial prompt/schema and original grounding AST unchanged. |
+| Original failure remains reproducible. | pass | `claim-source-selection-implementation/replay-summary.json`: the four unchanged original N1 responses still fail; separate explicit-ID mock changes only primary sources 2/3, with all six original semantic records retained. |
+| Independent source-selector and probe review. | pass | `claim-source-selection-independent-review/frozen-c1d7352/review.md`: 32 public-entry controls plus 6 probe controls; 8 original AST nodes and 187 protected files unchanged, zero external calls. |
+| Regression and packaging. | pass | `pytest-source-selection-full.log`: 1953 passed, 3 original deselections, unchanged warning; separate legacy 2 passed. `source-selection-delivery-inspection.json`: 119 matching modules, 27 protected hashes unchanged. |
+| Actual model use of the new repair interface. | pass | `claim-source-selection-independent-review/live-a6db883218fe/live-review.md`: cached original initial response plus one real repair request, 1,390 measured tokens; only sources 2/3 change to the exact original whole block. All six semantic records stay Unverified without evidence; the original task-splitting issue remains. |
+
+The preceding Literature delivery separates model-visible identity metadata from eligible quote passages; its independently audited actual comparison grounds all **8** previously problematic targets. The member-identity, caption-projection and caption-unit defects remain fixed. Both old-response replay and the fresh original numerical pair retain failed positive expectations through model-selected bindings/roles. The saved fairness concern's scientific applicability remains unresolved.
 
 | Current Literature follow-up | Verdict | Evidence |
 |---|---|---|
@@ -32,14 +42,15 @@ The three-layer implementation is present. The following evaluations describe it
 | Quality question | Verdict | Observed evidence and remaining work |
 |---|---|---|
 | Claim source locations remain exact. | pass | `claim-quality-current-review/audit.json` rechecks 153 historical primary locations and replays four saved excerpt responses without changing them. This establishes location integrity only. |
-| Claim recall, qualifiers and needs are reliable on unseen material. | unresolved | `claim-quality-current-review/review.md`: no independently labelled coverage denominator exists. Existing splitting/dispatch unit tests inject model answers. A historical joint-tuning split failure remains accepted by the structural decoder and preserved in its original run. |
+| The selected new excerpts meet their predeclared reference labels. | fail | `claim-extraction-quality-set-v1/independent-semantic-review-extract-75556c6e9842/`: N1 exhausts source repair; N6 loses dataset scope/source linkage and omits Literature for ranking. N3's merged footnote/parameter value is recorded separately as input ambiguity. Source and labels were frozen before the calls. |
+| Whole-paper recall and semantic accuracy have been measured. | unresolved | The nine-excerpt set has independent agent reference labels, not human expert annotations or a whole-paper recall denominator. Previously used BERT examples remain a separate regression tier; old full-paper outputs predate the latest prompt. |
 | The injected omissions and qualifier changes are detected. | fail | Offline injected omissions, an altered numerical qualifier and empty needs can pass the source/schema checks. These are boundary demonstrations, not newly observed live error rates. Invalid verbatim quotations remain rejected. |
 | The fairness scope reviewer distinguishes relevant and irrelevant missing controls in three fixed examples. | pass | `fairness-semantic-design/live-runs/scope-only-82b6976c0c/`: three actual scope calls return applicable / not_applicable / applicable with exact protocol grounds. First-pass candidates were frozen; whole-claim assessment was not run. |
 | Those three examples also pass the full numerical verifier. | fail | `fairness-semantic-design/prepared-2260c2111e/manifest.json`: original numerical prose is outside the current finite grammar. Its full-verifier preflight remains blocked, independently of the scope-only result. |
 | The original-paper fairness concern is scientifically justified. | unresolved | The prior 042 concern remains saved and unresolved. Three synthetic scope examples do not adjudicate it or measure general false-accusation rates. |
 | General literature, mathematical and execution reliability is established. | unresolved | Selected real source/vision/Docker integrations exist. Retrieval completeness, formal mathematical correctness, broad benchmark reproduction and reviewer benefit have no comprehensive validation. |
 
-Next: freeze and independently review a small labelled extraction set before any new model responses are inspected; retain existing prompt-development examples as regressions and report new inputs separately.
+Next: address the observed splitting, per-claim scope and external-record routing omissions with independently labelled paired controls. Keep the original nine-excerpt failure and reference labels visible; the successful new source repair does not change its semantic score.
 
 ## Current 14-check framework matrix
 
@@ -47,7 +58,7 @@ Paths in this matrix use `runs/v2_binding_followup/` unless stated otherwise. Pa
 
 | requirement | verdict | evidence | correction |
 |---|---|---|---|
-| 1. Tests pass without weakening or new skips. | pass | `pytest-literature-projection-full.log`: 1913 passed, 3 original deselections; separate legacy 2 passed. | Original grounding/support assertions remain; the model-input metadata assertion now checks field removal plus unchanged backend data. The existing malformed-binding serialization warning is unchanged. |
+| 1. Tests pass without weakening or new skips. | pass | `pytest-source-selection-full.log`: 1953 passed, 3 original deselections; separate legacy 2 passed. | 40 source-selection tests added; existing test files unchanged. The existing malformed-binding serialization warning is unchanged. |
 | 2. Materials → L1 → L2 → optional L3 → assessment → report → teaser. | pass | Pipeline and framework-matrix tests in the full suite; actual seven-stage `target-docker-e502402610/independent-review.md`. | Stage failure/state and concurrent statistics contracts remain covered. |
 | 3. Upfront claims and v2 splitting, without C1–C3 cap. | pass | `tests/test_claims_v2.py`, extraction boundary regressions and saved cross-domain extraction audits. | Atomicity still depends on model judgment; reports consume existing records. |
 | 4. Claims and evidence have verifiable locations and conditions. | pass | Member identity/projection independent reviews, exact range/selector tests, original source hashes and joint report pointer checks. | Every additional pointer stays attached to one declared original member; wrong scope cannot donate units or sufficient support. |
@@ -60,7 +71,7 @@ Paths in this matrix use `runs/v2_binding_followup/` unless stated otherwise. Pa
 | 11. Four statuses and safe v1 readability. | pass | Schema, adapter, assessment and report tests. | `in_conflict` maps to `questioned` for historical display without reassessment. |
 | 12. Four-part report without accept/reject recommendation. | pass | `joint-legacy-report-3819b8c4f9/independent-review.json`; `joint-live-report-delivery-48562bee28/` actual joint reports. | Original assessed fields retained; primary/additional sources have complete quotes and valid navigation. |
 | 13. Original end-to-end baseline and explicit blockers. | pass | Saved offline and actual service baseline comparisons under `runs/v2_live/`; generic real Docker integration above. | Original-paper artifact/binding limits stay reported; no benchmark reproduction or accuracy claim. |
-| 14. Progress and delivery match workspace. | pass | `progress.md`, `literature-projection-delivery-inspection.json`, independent reviews and completed-batch manifests. | 119 packaged modules match, Python 3.11 syntax passes, 27 protected hashes unchanged; configured secrets absent from tracked/nonignored files. |
+| 14. Progress and delivery match workspace. | pass | `progress.md`, `source-selection-delivery-inspection.json`, independent reviews and completed-batch manifests. | 119 packaged modules match, Python 3.11 syntax passes, 27 protected hashes unchanged; configured secrets absent from tracked/nonignored files. |
 
 ## Earlier checkpoint evidence
 
