@@ -126,7 +126,29 @@ def _match_pair(text, dataset, metric, settings, first_label, second_label, *, t
             + _actor(second_label)
             + _quantity("second", metric)
         )
-    return re.fullmatch(prefix + body + r"\s*[.!]?", text, re.I)
+    match = re.fullmatch(prefix + body + r"\s*[.!]?", text, re.I)
+    if match is not None or transition:
+        return match
+
+    def nominal(label, name):
+        return (
+            rf"(?:(?:method|model)\s+)?{re.escape(label)}\s+{re.escape(metric)}\s+is\s+"
+            rf"(?P<{name}>{TOKEN})(?:\s+(?P<{name}_unit>{_SUFFIX}))?"
+        )
+
+    set_prefix = rf"(?:On|For)\s+the\s+{re.escape(dataset)}\s+{re.escape(settings['split'])}\s+set,\s*"
+    nominal_body = nominal(first_label, "first") + r"\s*,?\s+and\s+" + nominal(second_label, "second")
+    # Each complete template has its own named groups. Transitions returned
+    # above retain the original grammar; neither side mixes predicate forms.
+    for pair_prefix, pair_body in (
+        (prefix, nominal_body),
+        (set_prefix, body),
+        (set_prefix, nominal_body),
+    ):
+        match = re.fullmatch(pair_prefix + pair_body + r"\s*[.!]?", text, re.I)
+        if match is not None:
+            return match
+    return None
 
 
 def bind_pair(
