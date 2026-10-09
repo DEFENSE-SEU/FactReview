@@ -8,7 +8,7 @@ import math
 import re
 import uuid
 from itertools import pairwise, product
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import Field, model_validator
 
@@ -19,6 +19,7 @@ from schemas.claim import (
     Evidence,
     ExecutionChoice,
     ExecutionChoiceReview,
+    ExecutionChoiceSelection,
     ExecutionPlan,
     ExecutionTask,
     NonEmpty,
@@ -477,6 +478,63 @@ class ExperimentsOutput(Contract):
     plans: list[PlanCandidate] = Field(default_factory=list, max_length=1)
     execution_choices: list[ExecutionChoice] = Field(default_factory=list)
     issues: list[str] = Field(default_factory=list)
+
+
+EXECUTION_WIRE_VERSION = "experiments-execution-v3"
+
+
+class ChoiceExecutionDecision(Contract):
+    kind: Literal["choice"]
+    selection: ExecutionChoiceSelection
+
+
+class LegacyExecutionDecision(Contract):
+    kind: Literal["legacy"]
+    plan: PlanCandidate
+
+
+class NoExecutionDecision(Contract):
+    kind: Literal["none"]
+    rationale: NonEmpty
+
+
+class ExperimentsOutputV3(Contract):
+    schema_version: Literal["experiments-execution-v3"]
+    checked_aspects: list[Literal["correspondence", "fairness", "isolation", "stability", "consistency"]]
+    items: list[ExperimentItem]
+    execution: Annotated[
+        ChoiceExecutionDecision | LegacyExecutionDecision | NoExecutionDecision, Field(discriminator="kind")
+    ]
+    issues: list[str] = Field(default_factory=list)
+
+
+def lower_execution_response(raw):
+    """Validate explicit new wire; preserve raw objects when producing the internal view."""
+    from pathlib import Path
+
+    from verification.execution_projection import digest, file_hash
+
+    parsed = ExperimentsOutputV3.model_validate(raw)
+    normalized = copy.deepcopy({k: raw[k] for k in ("checked_aspects", "items", "issues") if k in raw})
+    normalized.update(plans=[], execution_choices=[])
+    origin, target = None, None
+    if parsed.execution.kind == "choice":
+        normalized["execution_choices"] = [copy.deepcopy(raw["execution"]["selection"])]
+        origin, target = "/execution/selection", "/execution_choices/0"
+    elif parsed.execution.kind == "legacy":
+        normalized["plans"] = [copy.deepcopy(raw["execution"]["plan"])]
+        origin, target = "/execution/plan", "/plans/0"
+    return normalized, {
+        "version": EXECUTION_WIRE_VERSION,
+        "status": "normalized",
+        "kind": parsed.execution.kind,
+        "adapter_sha256": file_hash(Path(__file__)),
+        "raw_response_sha256": digest(raw),
+        "normalized_response_sha256": digest(normalized),
+        "raw_origin_pointer": origin,
+        "normalized_target_pointer": target,
+        "raw_origin_sha256": digest(raw["execution"][origin.rsplit("/", 1)[1]]) if origin else None,
+    }
 
 
 class ScopeSemantics(Contract):
@@ -2027,6 +2085,7 @@ def _scope_review(
     choice_reviews=None,
     first_choice_response=None,
     choice_privacy=None,
+    first_execution_audit=None,
 ):
     """Independent semantic review; its grounded structural/numeric gates fail closed."""
     from common import run_stats
@@ -2091,6 +2150,8 @@ def _scope_review(
     if choice_selections:
         audit["choice_registry"] = copy.deepcopy(choice_registry)
         audit["first_pass_response"] = copy.deepcopy(first_choice_response)
+    if first_execution_audit is not None:
+        audit.update(copy.deepcopy(first_execution_audit))
     stats = run_stats.stats_path()
     audit_path = stats.parent / "experiment_scope" / f"{uuid.uuid4().hex}.json" if stats is not None else None
     try:
@@ -2454,8 +2515,8 @@ def verify_experiments(
         "covered must be a nonempty list of distinct exact strings from allowed_condition_ids, the IDs "
         "in claim.conditions. Every plan target condition_id must also come from that list, with no "
         "duplicate targets. Never use claim.id, block IDs, datasets, or metric names as condition IDs. "
-        "Only include conditions the item actually addresses. Omit items/plans that cannot be tied to "
-        "allowed conditions and explain the limitation in issues; return empty items/plans when needed. "
+        "Only include conditions the item actually addresses. Omit items or execution targets that cannot be tied to "
+        "allowed conditions and explain the limitation in issues; return empty items and execution kind=none when needed. "
         "For paper_support, explicitly list fully_supported_conditions only when this one item "
         "establishes the ENTIRE condition and every relevant claim qualifier, including its dataset, "
         "metric, comparisons, and settings. A setup description or one component's result provides "
@@ -2471,7 +2532,7 @@ def verify_experiments(
         "on the same scale. Each value_context must identify those labels and one unique numeric value; "
         "preserve explicit units and percentage markers. Different splits/seeds/models, ambiguous "
         "multi-value tables, or unresolved unit conversions do not establish a contradiction. "
-        "For each target claim with re-obtainable reported numbers, emit one plan. "
+        "For a target claim with re-obtainable reported numbers, emit one explicit execution decision. "
         "A plan must use the exact metric named by its target condition. Never replace an abstract "
         "quality or qualitative condition with a different numerical metric such as MRR. When no "
         "reported number matches the condition's metric, omit that target/plan and explain in issues. "
@@ -2496,7 +2557,14 @@ def verify_experiments(
         "released evaluator/data/config, a prose number_id, one original condition and evaluation mode; omit weights "
         "only for this released-predictions resource mode. It does not prove model inference or training. "
         "The explicit released-predictions-v2 alternative can retain a qualified original metric/condition through source-grounded finite atoms. It preserves every original field and claim character span; select canonical identity/metric only from the actual config, full exact-match definition, complete fixed sample and explicit negative boundaries. Classify arbitrary field keys by their entire values; direct config keys retain runtime precedence. Use execution_projection_semantics_context as a separate version domain, without rewriting the original claim or condition. Each atom must have original condition-scoped paper source IDs; every field and claim fragment lists exactly its finite obligations. Unknown residue cannot be discharged by labeling it irrelevant. Do not convert null/old responses into a proposal or add a model stage. "
-        "Prefer execution_choice_context for released-predictions-choice-v1 when a complete structural candidate exists: explicitly select its exact condition_id and candidate_id via execution_choices, or return decision=unresolved with a reason. Inspect the full original field/claim obligations and sources before selecting. This finite menu does not grant semantic support. Do not retype its resource paths, values, source sets, offsets or atom mappings. Emit at most one execution target for this claim; do not emit a legacy plan alongside a choice. Absent/empty/unresolved choices and existing null projections are never automatically upgraded. "
+        "Return schema_version=experiments-execution-v3 and exactly one required execution object: "
+        "{kind:choice, selection:<explicit released-predictions-choice-v1 select>} or "
+        "{kind:legacy, plan:<one plan>} or {kind:none, rationale:<reason execution is unresolved or not requested>}. "
+        "These branches are mutually exclusive. Do not output top-level plans or execution_choices, or put a legacy plan beside a choice. "
+        "Prefer execution_choice_context when a complete structural candidate exists: explicitly select its exact condition_id and candidate_id in execution.selection. "
+        "Inspect the full original field/claim obligations and sources before selecting. This finite menu does not grant semantic support. "
+        "Do not retype its resource paths, values, source sets, offsets or atom mappings. If no candidate can be selected and no valid legacy target is proposed, use kind=none. "
+        "A choice already specifies the single target; do not repeat it as a legacy plan. None and existing null projections are never automatically upgraded. "
         "Use projection=null for ordinary model-inference/v1 targets. No support flag is granted by a proposal.",
         {
             "claim": claim.model_dump(mode="json"),
@@ -2508,20 +2576,46 @@ def verify_experiments(
             "execution_projection_semantics_context": semantic_inputs,
             "execution_choice_context": choice_inputs,
             "target_catalog": catalog_prompt(target_catalog),
-            "output_schema": ExperimentsOutput.model_json_schema(),
+            "output_schema": ExperimentsOutputV3.model_json_schema(),
         },
         module="verification.experiments",
         call=choice_privacy.capture(call),
     )
     # Keep the strict model-facing choice schema while rejecting malformed new
     # rows locally, without discarding valid paper observations or legacy data.
-    raw_choices = copy.deepcopy(first_response.get("execution_choices", []))
+    response_view = first_response
+    first_execution_audit, execution_errors = None, []
+    if "schema_version" in first_response or "execution" in first_response:
+        try:
+            response_view, wire = lower_execution_response(first_response)
+        except (ValueError, TypeError, KeyError) as exc:
+            from verification.execution_projection import digest
+
+            # A bad execution union cannot remove independently valid paper observations.
+            response_view = {
+                k: copy.deepcopy(first_response[k])
+                for k in ("checked_aspects", "items", "issues")
+                if k in first_response
+            }
+            response_view.update(plans=[], execution_choices=[])
+            wire = {
+                "version": EXECUTION_WIRE_VERSION,
+                "status": "rejected",
+                "raw_response_sha256": digest(first_response),
+            }
+            execution_errors.append(f"Invalid execution decision: {exc}")
+        first_execution_audit = {
+            "first_pass_response": copy.deepcopy(first_response),
+            "first_pass_normalized": copy.deepcopy(response_view),
+            "execution_wire": wire,
+        }
+    raw_choices = copy.deepcopy(response_view.get("execution_choices", []))
     safe_choices, privacy_rejected = choice_privacy.rows(raw_choices, "selection")
-    output = ExperimentsOutput.model_validate({**first_response, "execution_choices": []})
+    output = ExperimentsOutput.model_validate({**response_view, "execution_choices": []})
     if set(output.checked_aspects) != {"correspondence", "fairness", "isolation", "stability", "consistency"}:
         raise ValueError("Experiments must inspect all five required aspects")
     result = BranchResult(issues=choice_privacy.safe(output.issues))
-    choice_selections, choice_errors = {}, []
+    choice_selections, choice_errors = {}, execution_errors
     choice_conflicts = set()
     if raw_choices != []:
         if choice_registry is None:
@@ -2543,22 +2637,24 @@ def verify_experiments(
     result.issues.extend(
         "Execution choice unavailable: " + error for error in choice_privacy.safe(choice_errors)
     )
-    if raw_choices != [] and not choice_selections:
+    if (raw_choices != [] and not choice_selections) or first_execution_audit is not None:
         from common import run_stats
 
         stats = run_stats.stats_path()
         if stats is not None:
-            rejected_path = stats.parent / "execution_choices" / f"{uuid.uuid4().hex}.json"
+            directory = "execution_decisions" if first_execution_audit is not None else "execution_choices"
+            rejected_path = stats.parent / directory / f"{uuid.uuid4().hex}.json"
             rejected_path.parent.mkdir(parents=True, exist_ok=True)
             rejected_path.write_text(
                 json.dumps(
                     choice_privacy.audit(
                         {
-                            "status": "unresolved",
+                            "status": "unresolved" if choice_errors else "normalized",
                             "first_pass_response": copy.deepcopy(first_response),
                             "choice_registry": copy.deepcopy(choice_registry),
                             "errors": choice_errors,
                             "additional_model_calls": 0,
+                            **(first_execution_audit or {}),
                         }
                     ),
                     ensure_ascii=False,
@@ -2607,6 +2703,7 @@ def verify_experiments(
             choice_reviews=choice_reviews,
             first_choice_response=first_response,
             choice_privacy=choice_privacy,
+            first_execution_audit=first_execution_audit,
         )
         if output.items or has_projection or choice_selections
         else ({}, {}, None, None)
