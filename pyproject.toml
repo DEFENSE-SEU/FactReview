@@ -64,13 +64,14 @@ positioning = [
 ]
 
 # ── fact_generation/refcheck (reference-accuracy validation) ─────────────────
-# Runtime dependencies of RefCopilot (RefCopilot/), which the refcheck stage
-# imports via sys.path injection from src/fact_generation/refcheck/refcheck.py.
+# Runtime dependencies of the unchanged RefCopilot library, bundled from
+# RefCopilot/src in distributions and imported directly in installed wheels.
 refcheck = [
   "httpx>=0.27.0",
   "rapidfuzz>=3.5.0",
   "pdfplumber>=0.10.0",
   "pybtex>=0.25.1",
+  "python-dotenv>=1.0",
 ]
 
 # ── fact_generation/execution (§3.3 code execution / verification) ───────────
@@ -129,10 +130,11 @@ packages = [
   "src/screening",
   "src/verification",
   "src/util",
+  "RefCopilot/src/refcopilot",
 ]
 
 [tool.hatch.build.targets.sdist]
-include = ["src", "demos", "README.md", "LICENSE"]
+include = ["src", "RefCopilot/src", "RefCopilot/README.md", "scripts", "demos", "README.md", "LICENSE", "pyproject.toml"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "src/pipeline_full.py" = "pipeline_full.py"

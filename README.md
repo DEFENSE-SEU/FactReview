@@ -32,6 +32,15 @@ python scripts/execute_review_pipeline.py path/to/paper.pdf \
   --repository-root path/to/released/repository
 ```
 
+Built wheels include the unchanged RefCopilot library. With a wheel installed using its
+`runtime,refcheck,positioning` extras, run the same options through `python -m pipeline_full`.
+The source distribution also includes the library needed to rebuild the wheel.
+From a checkout, `python scripts/check_v2_distribution.py path/to/factreview.whl` installs
+that wheel into a fresh local directory and checks application imports, the reference
+adapter, CLI options and PDF output with external calls blocked. This check reuses the
+current environment's third-party dependencies; dependency resolution and live services
+require separate validation.
+
 Replace `YYYY-MM-DD` with the target venue's actual submission deadline. Literature treats the preceding three calendar months as concurrent work. A missing deadline leaves Literature verification unresolved. The default never derives a date from the paper's arXiv ID. `--repository-url https://github.com/owner/repo` or `--repository-root` explicitly binds the authors' released source. Repository links found in a manuscript are recorded as candidates; even a unique link may identify a third-party dependency or baseline, so it is not automatically used as the submitted implementation.
 
 When the venue deadline is unavailable, explicitly enable `--derive-cutoff-from-arxiv`. For a local PDF, also supply `--arxiv-id ID`. This resolves the first submission's exact `published` date through arXiv metadata and records the fallback in `cutoff.json`, the run summary and report limitations. An explicit deadline takes precedence. Unavailable or mismatched metadata leaves Literature unresolved; revision dates and the identifier's month never become a guessed day-level cutoff.
