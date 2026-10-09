@@ -18,6 +18,8 @@ class FinalReview(Contract):
     review_markdown: str = ""
     run_status: Literal["completed", "partial"] = "completed"
     incomplete_stages: list[str] = Field(default_factory=list)
+    # None preserves the unspecified context of historical artifacts.
+    execution_requested: bool | None = None
 
     @property
     def summary_counts(self) -> dict[ClaimStatus, int]:

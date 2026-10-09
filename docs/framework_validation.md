@@ -159,3 +159,15 @@ Joint evidence has ordered primary and additional source usages under the same e
 - VLM failures do not stop other figures. Coverage distinguishes checked, failed and unavailable input; checked figures may retain uncertain observations. Missing physical dimensions prevent a confirmed printed-size legibility finding.
 - Failed calls and unknown usage are counted. Text-only estimates cannot establish image token cost.
 - Independent semantic accuracy, comprehensive benchmark reproduction and human-review benefits remain separate research evaluations. The matrix establishes the listed engineering contracts only.
+
+## Current method delivery contracts
+
+Writing checks use section-scoped requests and retain per-section checked/failed/unavailable records. `--anonymity-policy` defaults to `unspecified`; only `required` enables an anonymity violation finding. Cross-reference namespaces stay distinct, and missing parser entries cannot establish missing printed objects. Confirmed writing findings still require original PDF evidence and semantic model review.
+
+Theory emits a versioned derivation trace containing assumptions, steps, dependencies, gaps and source pointers. Both main-text and requested appendix requests are retained, including failed responses. New incomplete traces cannot grant full positive support. Historical responses remain readable with `legacy_unavailable` traces. Source/structure validation does not prove mathematical correctness.
+
+System branch failures and rejected generated plans are recorded separately from author-material findings. Advice for affected uncovered conditions requires operator follow-up and references to these limitations. Advice input versions preserve exact historical hashes when new fields remain empty; additional observations or changed local sources invalidate saved wording.
+
+New pipeline reports include execution coverage on the overview and actual recorded attempt counts on the PDF cover and teaser. The completion status describes pipeline delivery. Plan records, attempts and claims with aligned execution evidence are reported separately, with explicit uncertainty after a failed execution stage.
+
+Reference corrections use a single public RefCopilot run, preserving its original export and complete Report sidecar. Candidate BibTeX requires original work/version identity and field-level provenance. A candidate does not establish a manuscript error. RefCopilot internals remain unchanged, and unavailable metadata or source revalidation failures remain visible.

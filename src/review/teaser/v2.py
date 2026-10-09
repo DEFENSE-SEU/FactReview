@@ -5,7 +5,7 @@ import textwrap
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-from review.report.v2 import STATUS_ORDER, ordered_claims, validate_publication_language
+from review.report.v2 import STATUS_ORDER, execution_summary, ordered_claims, validate_publication_language
 from schemas.review import FinalReview
 
 COLORS = {"flawed": "#b42318", "questioned": "#b54708", "unverified": "#475467", "supported": "#067647"}
@@ -19,6 +19,7 @@ def write_teaser(review: FinalReview, output_dir: Path) -> dict[str, str]:
         "paper_key": review.paper_key,
         "run_status": review.run_status,
         "incomplete_stages": review.incomplete_stages,
+        "execution": execution_summary(review),
         "counts": {status.value: review.summary_counts[status] for status in STATUS_ORDER},
         "claims": [
             {
@@ -48,6 +49,11 @@ def write_teaser(review: FinalReview, output_dir: Path) -> dict[str, str]:
         elements.append(f'<text x="32" y="{y}" font-size="17">{escape(line)}</text>')
         y += 22
     y += 26
+    execution = payload["execution"]
+    elements.append(
+        f'<text x="32" y="{y}" font-size="14">Recorded execution attempts: {execution["recorded_attempts"]}; claims with aligned execution evidence: {execution["claims_with_aligned_execution_evidence"]}.</text>'
+    )
+    y += 28
     if review.run_status == "partial":
         elements.append(
             f'<text x="32" y="{y}" font-size="16" fill="#b42318">Partial review: {escape(", ".join(review.incomplete_stages))}. Counts cover retained claims only.</text>'

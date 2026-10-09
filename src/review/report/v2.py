@@ -131,10 +131,11 @@ def _passage(pointer, usage=None):
     return lines
 
 
-def _evidence(item: Evidence, occurrence=None) -> list[str]:
+def _evidence(item: Evidence, occurrence=None, *, reference_context=False) -> list[str]:
     source = "paper-internal" if item.source == "paper_internal" else item.source
+    label = "reference source; discrepancy unconfirmed" if reference_context else item.direction
     lines = [
-        f"- **{source} / {item.direction}**; sufficient: {str(item.sufficient).lower()}; "
+        f"- **{source} / {label}**; sufficient: {str(item.sufficient).lower()}; "
         f"covers: {_text(', '.join(item.covered) or 'no claim conditions')}. "
         f"Pointer: {_pointer_location(item.pointer)}."
     ]
@@ -165,11 +166,146 @@ def ordered_claims(review: FinalReview):
     )
 
 
+def execution_summary(review: FinalReview) -> dict:
+    """Count retained records; an attempt is not a successful reproduction."""
+    return {
+        "plan_records": len(review.ledger),
+        "recorded_attempts": sum(
+            len(row["attempts"]) for row in review.ledger if isinstance(row.get("attempts"), list)
+        ),
+        "claims_with_aligned_execution_evidence": sum(
+            any(e.source == "execution" and e.aligned is True and e.affects_claim for e in claim.evidence)
+            for claim in review.claims
+        ),
+        "outcomes_incomplete": "execution" in review.incomplete_stages,
+    }
+
+
+def _theory_derivations(claim):
+    if not claim.theory_derivations:
+        return []
+    lines = [
+        "",
+        "Theory derivation traces:",
+        "",
+        "Model reasoning is recorded below. Program validation checks structure and source correspondence; mathematical correctness requires review.",
+    ]
+    from review.report.advice import theory_source_integrity
+
+    try:
+        theory_source_integrity(claim)
+    except (OSError, ValueError) as exc:
+        lines += [
+            "",
+            "**Current Theory source integrity is unavailable.** " + _text(str(exc)),
+            "Trace states below describe the retained verification. Its recorded source artifacts no longer validate.",
+        ]
+    for record in claim.theory_derivations:
+        lines += [
+            "",
+            f"- Phase: {_text(record.phase)}; state: {_text(record.state)}; "
+            f"adopted: {str(record.adopted).lower()}; conditions: {_text(', '.join(record.covered))}.",
+        ]
+        if record.source_pointer:
+            lines += [f"  - Original proof location: {_pointer_location(record.source_pointer)}."]
+            lines.extend(_passage(record.source_pointer))
+        trace = record.trace
+        if trace:
+            lines += [
+                f"  - Goal: {_text(trace.goal)}.",
+                f"  - Outcome: {_text(trace.outcome)}. {_text(trace.completion_reason)}",
+            ]
+            for kind, entries in (
+                ("Assumption", trace.assumptions),
+                ("Step", trace.steps),
+                ("Gap", trace.gaps),
+            ):
+                for entry in entries:
+                    if kind == "Assumption":
+                        detail = f"{entry.id} ({entry.status}): {entry.text}"
+                    elif kind == "Step":
+                        detail = (
+                            f"{entry.id}: {entry.statement}. Reason: {entry.reason}. "
+                            f"Assumptions: {', '.join(entry.assumption_ids) or 'none'}. "
+                            f"Previous steps: {', '.join(entry.previous_step_ids) or 'none'}"
+                        )
+                    else:
+                        detail = f"{entry.at}: {entry.reason}. Needed: {entry.needed}"
+                    lines.append(f"  - {kind}: {_text(detail)}.")
+                    for source in entry.sources:
+                        lines.append(f"  - Source: {_pointer_location(source.pointer)}.")
+                        lines.extend(_passage(source.pointer))
+        lines.extend(f"  - Limitation: {_text(issue)}" for issue in record.issues)
+        if record.audit_pointer:
+            lines.append(f"  - Trace audit: {_text(record.audit_pointer)}.")
+    return lines
+
+
+def _checked_report(review):
+    from review.report.advice import checked_review
+    from screening.reference_corrections import checked_correction
+
+    result = checked_review(review)
+    for finding in result.findings:
+        if finding.reference_correction:
+            finding.reference_correction = checked_correction(finding.reference_correction)
+    return result
+
+
+def _reference_correction(correction):
+    if correction is None:
+        return []
+    lines = ["", f"Reference metadata suggestion: {_text(correction.state)}.", _text(correction.reason), ""]
+    if correction.state == "metadata_candidate":
+        # A metadata title may contain Markdown fences; preserve the exact BibTeX
+        # inside a longer fence so it remains literal source content.
+        runs = re.findall(r"`+", correction.corrected_bibtex)
+        fence = "`" * max(3, max((len(value) + 1 for value in runs), default=0))
+        lines += [
+            fence + "bibtex",
+            correction.corrected_bibtex,
+            fence,
+            "",
+            "| Field | Retrieved value | Source record |",
+            "|---|---|---|",
+        ]
+        for field in correction.fields:
+            lines.append(
+                f"| {_text(field.field)} | {_text(field.value)} | "
+                f"{_text(field.backend)} / {_text(field.record_id)}: {_text(field.url)} |"
+            )
+        lines += ["", f"Identity: {_text(correction.identity_identifier)}."]
+    lines.append(f"Original reference check: {_text(correction.raw_result_pointer)}.")
+    if correction.records_pointer:
+        lines.append(
+            f"Metadata provenance: {_text(correction.records_pointer)}; "
+            f"SHA256: {_text(correction.records_sha256)}."
+        )
+    return lines
+
+
 def verification_limitations(
-    *, issues=None, figure_coverage=None, table_coverage=None, token_usage=None
+    *,
+    issues=None,
+    figure_coverage=None,
+    table_coverage=None,
+    writing_coverage=None,
+    anonymity_policy=None,
+    token_usage=None,
 ) -> list[str]:
     """Make coverage and cost uncertainty visible even when there are no findings."""
     limitations = list(issues or [])
+    if writing_coverage is not None:
+        missing = writing_coverage.get("failed", 0) + writing_coverage.get("unavailable", 0)
+        if missing:
+            limitations.append(
+                f"Writing screening is incomplete: {writing_coverage.get('failed', 0)} failed and "
+                f"{writing_coverage.get('unavailable', 0)} unavailable out of {writing_coverage.get('total', 0)} sections."
+            )
+    if anonymity_policy == "unspecified":
+        limitations.append(
+            "Submission anonymity policy was unspecified; anonymity violations were not assessed."
+        )
     if figure_coverage is not None:
         if not figure_coverage.get("total", 0):
             limitations.append("No figure inputs were available for visual checks.")
@@ -206,11 +342,11 @@ def render_markdown(
     issues: list[str] | None = None,
     figure_coverage=None,
     table_coverage=None,
+    writing_coverage=None,
+    anonymity_policy=None,
     token_usage=None,
 ) -> str:
-    from review.report.advice import checked_review
-
-    review = checked_review(review)
+    review = _checked_report(review)
     claims = ordered_claims(review)
     occurrences = _source_index(claims, review.findings)
     lines = [
@@ -230,6 +366,23 @@ def render_markdown(
         "|---|---:|",
     ]
     lines.extend(f"| {status.value} | {review.summary_counts[status]} |" for status in STATUS_ORDER)
+    execution = execution_summary(review)
+    execution_lines = [
+        "",
+        "### Execution coverage",
+        "",
+        "| Plan records | Recorded attempts | Claims with aligned execution evidence |",
+        "|---:|---:|---:|",
+        f"| {execution['plan_records']} | {execution['recorded_attempts']} | "
+        f"{execution['claims_with_aligned_execution_evidence']} |",
+        "",
+        "Pipeline completion describes delivery of the available checks. Recorded attempts can fail or remain unaligned.",
+    ]
+    if review.execution_requested is not None:
+        lines += execution_lines
+        lines += [f"Execution requested: {str(review.execution_requested).lower()}.", ""]
+        if execution["outcomes_incomplete"]:
+            lines += ["Execution records are incomplete; additional attempts or outcomes may be unknown.", ""]
     if token_usage is not None:
         lines += [
             "",
@@ -276,6 +429,15 @@ def render_markdown(
             occurrence = next(occurrences)
             advice_targets[f"/evidence/{index}"] = occurrence["anchor"]
             lines.extend(_evidence(item, occurrence))
+        lines.extend(_theory_derivations(claim))
+        if claim.verification_limitations:
+            lines += ["", "System verification limitations:", ""]
+            for limitation in claim.verification_limitations:
+                lines.append(
+                    f"- {_text(limitation.stage)}: {_text(limitation.reason)}. "
+                    f"Conditions: {_text(', '.join(limitation.condition_ids))}. "
+                    "The system operator should repair or retry this check. The failure alone does not identify missing author material."
+                )
         if claim.advice is not None:
             lines += ["", "Reviewer advice:", ""]
             if claim.advice.state == "unavailable":
@@ -283,9 +445,13 @@ def render_markdown(
             else:
                 from review.report.advice import advice_input
 
-                data = advice_input(claim, review.ledger)
+                data = advice_input(claim, review.ledger, version=claim.advice.input_version)
                 for item in claim.advice.items:
                     lines.append(f"- {_text(item.text)} Conditions: {_text(', '.join(item.condition_ids))}.")
+                    if item.action == "verification_followup":
+                        lines.append(
+                            "  - Action for the system operator: repair or retry the recorded verification."
+                        )
                     for ref in item.basis_refs:
                         if ref in advice_targets:
                             lines.append(
@@ -312,6 +478,18 @@ def render_markdown(
             lines += ["", "Notes:", "", *[f"- {_text(note)}" for note in claim.notes]]
         lines.append("")
     lines += ["## 3. Other findings", ""]
+    if writing_coverage is not None:
+        lines += [
+            "### Writing screening coverage",
+            "",
+            "| Total sections | Checked | Failed | Unavailable |",
+            "|---:|---:|---:|---:|",
+            f"| {writing_coverage.get('total', 0)} | {writing_coverage.get('checked', 0)} | "
+            f"{writing_coverage.get('failed', 0)} | {writing_coverage.get('unavailable', 0)} |",
+            "",
+            f"Submission anonymity policy: {_text(anonymity_policy or 'unspecified')}.",
+            "",
+        ]
     if figure_coverage is not None:
         lines += [
             "### Figure screening coverage",
@@ -348,10 +526,28 @@ def render_markdown(
             "",
         ]
         for item in finding.evidence:
-            lines.extend(_evidence(item, next(occurrences)))
+            lines.extend(
+                _evidence(
+                    item,
+                    next(occurrences),
+                    reference_context=(
+                        finding.kind == "reference"
+                        and finding.level == "metadata_candidate"
+                        and not item.affects_claim
+                        and not item.sufficient
+                        and not item.covered
+                    ),
+                )
+            )
+        lines.extend(_reference_correction(finding.reference_correction))
         lines.append("")
     limitations = verification_limitations(
-        issues=issues, figure_coverage=figure_coverage, table_coverage=table_coverage, token_usage=token_usage
+        issues=issues,
+        figure_coverage=figure_coverage,
+        table_coverage=table_coverage,
+        writing_coverage=writing_coverage,
+        anonymity_policy=anonymity_policy,
+        token_usage=token_usage,
     )
     if limitations:
         lines += ["### Verification limitations", "", *[f"- {_text(issue)}" for issue in limitations], ""]
@@ -384,10 +580,10 @@ def write_review(
     token_usage=None,
     figure_coverage=None,
     table_coverage=None,
+    writing_coverage=None,
+    anonymity_policy=None,
 ) -> dict:
-    from review.report.advice import checked_review
-
-    result = checked_review(review)
+    result = _checked_report(review)
     validate_publication_language(
         [result.model_dump(), issues or [], (token_usage or {}).get("warnings", [])]
     )
@@ -398,6 +594,8 @@ def write_review(
         issues=issues,
         figure_coverage=figure_coverage,
         table_coverage=table_coverage,
+        writing_coverage=writing_coverage,
+        anonymity_policy=anonymity_policy,
         token_usage=token_usage,
     )
     markdown = output_dir / "final_review.md"
@@ -420,7 +618,12 @@ def write_review(
                 workspace_title=f"FactReview {review.paper_key}",
                 source_pdf_name=review.paper_key,
                 run_id=review.run_id,
-                status=result.run_status,
+                status=(
+                    f"{result.run_status}; {execution_summary(result)['recorded_attempts']} recorded execution attempts"
+                    + ("; execution records incomplete" if "execution" in result.incomplete_stages else "")
+                )
+                if result.execution_requested is not None
+                else result.run_status,
                 decision=None,
                 estimated_cost=0,
                 actual_cost=None,

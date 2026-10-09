@@ -20,6 +20,7 @@ from preprocessing.materials import index_repository, parse_materials
 from review.report.advice import generate_advice
 from review.report.v2 import verification_limitations, write_review
 from review.teaser.v2 import write_teaser
+from schemas.limitations import VerificationLimitation
 from schemas.review import FinalReview
 from screening.stage import ScreeningFailure, screen_paper
 from util.paper_input import infer_paper_key, materialize_paper_pdf
@@ -276,13 +277,19 @@ def run_v2_pipeline(
             screening = stage(
                 "screening",
                 lambda: screen_paper(
-                    materials, root / "screening", call=call, reference_checker=reference_checker
+                    materials,
+                    root / "screening",
+                    call=call,
+                    reference_checker=reference_checker,
+                    anonymity_policy=getattr(args, "anonymity_policy", "unspecified"),
                 ),
                 recover=recover_screening,
             )
             summary["issues"].extend(screening.issues)
             summary["figure_coverage"] = screening.figure_coverage
             summary["table_coverage"] = screening.table_coverage
+            summary["writing_coverage"] = screening.writing_coverage
+            summary["anonymity_policy"] = screening.anonymity_policy
             summary["outputs"]["screening"] = str(root / "screening" / "screening.json")
             extracted = [c.model_copy(deep=True) for c in screening.claims]
 
@@ -291,6 +298,15 @@ def run_v2_pipeline(
                 for claim in retained:
                     claim.notes.append(
                         f"Verification stage failed; no result was adopted: {type(exc).__name__}: {exc}"
+                    )
+                    claim.verification_limitations.append(
+                        VerificationLimitation(
+                            claim_id=claim.id,
+                            condition_ids=[c.id for c in claim.conditions],
+                            stage="verification",
+                            kind="stage_failed",
+                            reason=f"{type(exc).__name__}: {exc}",
+                        )
                     )
                 return VerificationResult(claims=retained)
 
@@ -324,6 +340,15 @@ def run_v2_pipeline(
                 for claim in retained:
                     claim.notes.append(
                         f"Execution stage failed; no new execution result was adopted: {type(exc).__name__}: {exc}"
+                    )
+                    claim.verification_limitations.append(
+                        VerificationLimitation(
+                            claim_id=claim.id,
+                            condition_ids=[c.id for c in claim.conditions],
+                            stage="execution",
+                            kind="stage_failed",
+                            reason=f"{type(exc).__name__}: {exc}",
+                        )
                     )
                 records, issues = recover_execution_records(root / "execution", verification.plans)
                 return ExecutionResult(claims=retained, ledger=records, issues=issues)
@@ -385,6 +410,7 @@ def run_v2_pipeline(
                 ledger=ledger,
                 run_status="partial" if incomplete else "completed",
                 incomplete_stages=incomplete,
+                execution_requested=bool(getattr(args, "run_execution", False)),
             )
             _save(root / "assessment" / "assessed_review.json", review.model_dump(mode="json"))
             summary["outputs"]["assessment_snapshot"] = str(root / "assessment" / "assessed_review.json")
@@ -404,6 +430,8 @@ def run_v2_pipeline(
                     issues=summary["issues"],
                     figure_coverage=summary["figure_coverage"],
                     table_coverage=summary["table_coverage"],
+                    writing_coverage=summary["writing_coverage"],
+                    anonymity_policy=summary["anonymity_policy"],
                     token_usage=summary["model_usage"],
                 )
                 rendered = write_review(
@@ -414,6 +442,8 @@ def run_v2_pipeline(
                     token_usage=summary["model_usage"],
                     figure_coverage=summary["figure_coverage"],
                     table_coverage=summary["table_coverage"],
+                    writing_coverage=summary["writing_coverage"],
+                    anonymity_policy=summary["anonymity_policy"],
                 )
                 # Static rendering revalidates advice against the saved sources.
                 # Use that persisted result for counts and downstream delivery.
@@ -441,9 +471,16 @@ def run_v2_pipeline(
             record_stage_duration(current_stage, duration)
             run_stats.record_module_status(STATS_MODULES[current_stage], "failed", warning=str(exc))
         finally:
-            for directory in ("visual_calls", "code_scopes", "claim_extraction", "experiment_scope"):
+            for directory in (
+                "visual_calls",
+                "code_scopes",
+                "claim_extraction",
+                "experiment_scope",
+            ):
                 if (root / directory).is_dir():
                     summary["outputs"][directory] = str(root / directory)
+            if (root / "verification" / "theory_derivations").is_dir():
+                summary["outputs"]["theory_derivations"] = str(root / "verification" / "theory_derivations")
             summary["stages"] = {
                 name: "skipped" if value == "pending" else value for name, value in summary["stages"].items()
             }
@@ -458,6 +495,8 @@ def run_v2_pipeline(
                 issues=summary["issues"],
                 figure_coverage=summary.get("figure_coverage"),
                 table_coverage=summary.get("table_coverage"),
+                writing_coverage=summary.get("writing_coverage"),
+                anonymity_policy=summary.get("anonymity_policy"),
                 token_usage=summary["model_usage"],
             )
             _save(root / "run_stats.json", summary["run_stats"])
