@@ -1,5 +1,11 @@
 # FactReview v2 progress
 
+## Current phase 8: bounded transport recovery
+
+The shared Codex client now retries a typed connection EOF/reset once, only before receiving any response line. The first failed physical request is recorded before the retry, including unavailable usage; the final attempt retains the existing accounting path. Authentication, certificate, timeout, partial-stream and provider-terminal errors do not trigger retries. Ten necessary mocked controls and six selected existing controls pass, with static checks. Root reviewed the change; the whole suite was not repeated.
+
+Evidence is in `runs/v2_method_delivery/codex-pre-sse-retry-draft/`. The active actual run uses its original independent source snapshot and retains its two failures. The next versioned native controller additionally bounds each physical Codex attempt under the existing request/token limits, while keeping all old strict acceptance checks. A recovered request with unknown first-attempt usage still fails the strict complete-accounting criterion. No original run or test expectation is reclassified.
+
 ## Current phase 4: composable execution wording
 
 The current actual run `full-native-verified-v2/actual-70088f3cae19` uses its independent `407ec8a` snapshot. Its accuracy claim009 retains eleven condition fields and the complete original statement, but equivalent wording prevented execution candidate construction. The finite parser now composes the existing definition, sample, negative-boundary and description clauses. The unchanged original claim/materials produce one candidate; metric changes, unknown residue and repeated sample clauses remain rejected. This scope covers exact-match accuracy only.

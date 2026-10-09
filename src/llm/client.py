@@ -239,6 +239,7 @@ def llm_json(
     t0 = time.monotonic()
     usage: dict[str, Any] = {}
     text = ""
+    retry_failure_recorded = False
     try:
         encoded_images = []
         for image_path in images or []:
@@ -292,19 +293,45 @@ def llm_json(
                 usage["total_tokens"] = int(usage["input_tokens"]) + int(usage["output_tokens"])
         elif cfg.provider == "openai-codex":
             auth = get_codex_auth(allow_browser_login=True)
-            codex_result = invoke_codex(
-                prompt=prompt,
-                system=system,
-                auth=auth,
-                model=cfg.model,
-                base_url=cfg.base_url or "https://chatgpt.com/backend-api/codex",
-                return_usage=True,
-                **(
-                    {"image_data": [f"data:{mime};base64,{data}" for mime, data in encoded_images]}
-                    if encoded_images
-                    else {}
-                ),
-            )
+            for attempt in range(2):
+                try:
+                    codex_result = invoke_codex(
+                        prompt=prompt,
+                        system=system,
+                        auth=auth,
+                        model=cfg.model,
+                        base_url=cfg.base_url or "https://chatgpt.com/backend-api/codex",
+                        return_usage=True,
+                        **(
+                            {"image_data": [f"data:{mime};base64,{data}" for mime, data in encoded_images]}
+                            if encoded_images
+                            else {}
+                        ),
+                    )
+                    break
+                except CodexResponseError as exc:
+                    if attempt != 0 or not exc.pre_sse_transient:
+                        raise
+                    # Persist the failed physical request before another POST.
+                    # If recording/backoff fails, no new request has begun.
+                    retry_failure_recorded = True
+                    if run_stats.stats_path() is not None:
+                        run_stats.record_llm_call(
+                            module=module,
+                            provider=cfg.provider,
+                            model=cfg.model,
+                            usage=exc.usage,
+                            duration_sec=time.monotonic() - t0,
+                            failed=True,
+                            image_count=len(images or []),
+                            warning="Codex transport attempt 1 failed before SSE with EOF/reset; "
+                            f"{redact_provider_details(str(exc), cfg)}. "
+                            "One retry follows; missing usage remains unavailable.",
+                        )
+                    time.sleep(1.0)
+                    t0 = time.monotonic()
+                    usage = {}
+                    retry_failure_recorded = False
             if isinstance(codex_result, tuple):
                 text, usage = codex_result
             else:
@@ -352,7 +379,7 @@ def llm_json(
     except Exception as e:
         if isinstance(e, CodexResponseError):
             usage = e.usage
-        if run_stats.stats_path() is not None:
+        if not retry_failure_recorded and run_stats.stats_path() is not None:
             run_stats.record_llm_call(
                 module=module,
                 provider=cfg.provider,
