@@ -57,7 +57,7 @@ def _definition(text, *, require_fraction=False):
     equality = r"(?:the )?exact equality of (?:each |every )?prediction and (?:its )?label"
     if re.fullmatch(prefix + fraction + equality, text):
         return True
-    return not require_fraction and bool(re.fullmatch(r"accuracy computed (?:as|by) " + equality, text))
+    return not require_fraction and bool(re.fullmatch(r"(?:accuracy computed (?:as|by) )?" + equality, text))
 
 
 def _negative(text):
@@ -131,7 +131,7 @@ def _statement(text, runtime, value, count):
     return keys
 
 
-def _description(text, cfg):
+def _description(text, cfg, count=None):
     roles = [str(cfg["settings"][k]) for k in ("model", "method") if k in cfg["settings"]]
     if len(roles) != 1:
         return None
@@ -144,6 +144,22 @@ def _description(text, cfg):
         re.I,
     ):
         return {"dataset", "definition"} | {
+            "runtime:" + k for k in ("model", "method") if k in cfg["settings"]
+        }
+    if (
+        type(count) is int
+        and count > 0
+        and re.fullmatch(
+            r"Reported "
+            + scope
+            + r" (?:exact[- ]match )?accuracy for "
+            + re.escape(roles[0])
+            + rf" on (?:{count}|{re.escape(_words_count(count))}) examples[.]?",
+            text,
+            re.I,
+        )
+    ):
+        return {"dataset", "definition", "sample"} | {
             "runtime:" + k for k in ("model", "method") if k in cfg["settings"]
         }
     return None
@@ -160,7 +176,7 @@ def _interpret_text(text, cfg, runtime, value, count):
     sample = _sample(text, count, cfg["settings"].get("split"))
     if sample is not None:
         return sample
-    description = _description(text, cfg)
+    description = _description(text, cfg, count)
     if description is not None:
         return description
     return _statement(text, runtime, value, count)

@@ -1,5 +1,19 @@
 # FactReview v2 progress
 
+## Latest phase 4 follow-up: finite execution language
+
+Reader checkpoint `cad84623a9b1f083f93cb314b5f37952fa14d9c5` is pushed and verified on `origin/refactor/method-v2`. This next change adds two parameterized exact-match grammar forms; all original condition fields and the whole claim must still bind. The original source must explicitly establish fraction and equality. Actual config identity, complete data count, unknown residual clauses and independent model scope confirmation remain required. Only three functions in `execution_projection_semantics.py` change; existing tests remain unchanged.
+
+Validation: initial39 controls retain nine red results before repair; final43 new controls plus old related modules give **308 passed / 46.36s**. Independent AST/source inspection and15 additional controls give **58 combined passed / 1.86s**. Review SHA256 `47506c008f3efda3eaf160d90f2c232b8f88987357287384631ffe2d848dc136`, under `runs/v2_method_delivery/choice-finite-language-independent/`. The independent first run expected None for competing actors, while the existing binder raises a specific rejection; that local test expectation was corrected, with the original log retained. Production and old tests did not change during independent verification.
+
+Original `bef2` model responses replay unchanged against the new one-candidate menu and still yield zero plans/zero sufficient evidence. All409 original files and all scientific fields remain unchanged. The prior3159-test wheel predates this follow-up; a unified certificate will follow the next reviewed fixes.
+
+### Actual visual recovery and next actions
+
+The independently approved D0B869 driver ran once with prepared manifest `41556e613a3b` and saved `actual-474363787afb`. One new actual VLM call used12517 input+1770 output=14287 measured tokens and one original-page image. Two historical cached calls/13149 tokens are disclosed separately. The result remains **strict FAIL/Unverified**;188 snapshot sources and all declared originals are unchanged. The report preserves mixed provenance and both derivation records. Independent review checks238 unique files and confirms the printed proof transcription (`theory-cached-partial-visual-independent/actual-474-review/review.md`).
+
+The visual matcher currently rejects the exact supplied same-page heading `Appendix A. Proof of Theorem 1`. A narrow original-heading binding correction is in progress. The same actual response independently retains `fully_supported=false` and a partial independence qualifier; fixing heading recognition must preserve those flags and Unverified. Continue that correction, the explicit Literature omission-qualification design and the Code multi-file evidence design. No repeated unchanged native sampling, paper-condition edits or overall completion claim.
+
 ## Latest phase 4 checkpoint: reader bounds and complete-run findings
 
 The preceding delivered implementation is `6fdd8f44a2eba4048a16f29f5f1a4be9d44f010a`, verified on the authorized remote branch. This checkpoint fixes physical PDF page preservation and places the existing reader operations under one asynchronous deadline. Existing service-failure responsibility, response content and healthy neighboring evidence stay intact. Ten new mocked controls, independent fixed-input reviews and 73 related tests pass. Full frozen regression has **3159 passed**, three original deselections and two preexisting warnings (254.63s); separate legacy tests have **2 passed** (2.00s). No existing tests were edited. Evidence: `runs/v2_method_delivery/reader-bounds-regression-88169e34e90f/`, `arxiv-physical-page-independent/review-fixed.md`, `reader-deadline-final-independent/review.md`.
