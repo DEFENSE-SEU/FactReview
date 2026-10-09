@@ -57,7 +57,10 @@ class CodeScopeDecision(Contract):
     bridge_quotes: list[BridgeQuote]
     missing_qualifiers: list[NonEmpty]
     rationale: NonEmpty
-    source_uses: list[CodeSourceUse] = Field(default_factory=list)
+    source_uses: list[CodeSourceUse] = Field(
+        default_factory=list,
+        description="Use only for explicit joint candidates with additional_sources; single-source candidates require an empty list.",
+    )
 
 
 class CodeScopeOutput(Contract):
@@ -178,7 +181,9 @@ def review_code_scope(
         "Code context contains selected snippets; omitted files or unseen code cannot establish "
         "implementation absence. Mark absence-based proposals with basis=absence and unresolved "
         "context with uncertain. Do not invent execution evidence or claim statuses. "
-        "Copy bridge quotes verbatim, preserving whitespace and mathematical markup."
+        "Copy bridge quotes verbatim, preserving whitespace and mathematical markup. "
+        "For every single-source candidate, return source_uses=[]. This field is reserved for "
+        "explicit joint candidates with additional_sources."
     )
     if members:
         system += (
@@ -191,7 +196,7 @@ def review_code_scope(
             "do not substitute unused/dead/optional paths. repository_contents means only the supplied "
             "frozen repository's local artifact contents. availability still includes public URL access "
             "or external release completeness and cannot be established by local files. Keep empirical "
-            "outcomes and novelty separate. Single-source items must leave source_uses empty."
+            "outcomes and novelty separate."
         )
     stats = run_stats.stats_path()
     audit_path = stats.parent / "code_scope_reviews" / f"{uuid.uuid4().hex}.json" if stats else None

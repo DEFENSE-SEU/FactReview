@@ -107,7 +107,7 @@ def _statement(text, runtime, value, count):
     from verification.experiment_targets import _scalar_match
 
     normalized = text.strip().rstrip(".! ")
-    pieces = re.split(r",\s*with\s+", normalized, flags=re.I)
+    pieces = re.split(r",\s*(?:with|computed\s+as)\s+", normalized, flags=re.I)
     if len(pieces) > 2:
         return None
     keys = set()
@@ -154,7 +154,7 @@ def _description(text, cfg, count=None):
             + scope
             + r" (?:exact[- ]match )?accuracy for "
             + re.escape(roles[0])
-            + rf" on (?:{count}|{re.escape(_words_count(count))}) examples[.]?",
+            + rf" on (?:{count}|{re.escape(_words_count(count))}) (?:fixed )?examples[.]?",
             text,
             re.I,
         )

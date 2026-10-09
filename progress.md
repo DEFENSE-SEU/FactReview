@@ -1,5 +1,15 @@
 # FactReview v2 progress
 
+## Current actual outcome and necessary corrections
+
+The complete `actual-92a1606c4241` run has finished. Seven stages complete; zero plans and zero Docker attempts leave actual execution, aligned accuracy and cleanup-coverage gates failed. The independent mechanical review confirms 36 successful actual requests, 211006 measured tokens, five image inputs, unchanged 191 source/6 original input snapshots, and all 412 original artifacts retained. Conditional empty-ledger checks are not execution coverage. The new L1 review validates exact quotes/page locations and records a changed theorem condition: its independence qualifier is retained in the source quote rather than explicit settings, so it cannot close the old identical-condition proof case.
+
+The next narrow corrections address actual failures: support the already-bound fixed-example description and computed-as definition connector; clarify the joint-only source_uses field for single-source Code candidates; record missing Code scope decisions as system limitations instead of requesting existing materials from the author. The original claim006 can now construct one structural choice without changing its eleven fields or complete text. Its old unresolved/legacy collision and invalid joint-source consumption remain failed historical responses. Claim007's compound prediction-count metric stays outside the current accuracy recipe; no metric substitution is allowed.
+
+Follow the maintainer's reduced-testing direction: subagents perform only necessary targeted checks, and the main task continues toward actual execution. Do not rerun the full test suite or modify prior failures to claim completion.
+
+The three corrections are frozen and reviewed. Grammar source `5298a3a3` recognizes both bounded forms while retaining exact identities, all eleven fields, the whole claim and unknown-tail rejection. Code scope source `8f4e69c3` changes only the field description and instructions. Code source `89cbbef7` adds condition-scoped system limitations for missing validated scope decisions, preserving all scientific predicates and healthy neighbors. Delegated targeted checks pass; root reviewed these deltas without repeating full regression. Next: commit the corrections and run the unchanged complete native protocol on the new frozen source.
+
 ## Latest phase 8 checkpoint: frozen regression and new native run
 
 Implementation `438e2e66c8be5be3907794136a2c918f129b6fb0` is pushed and remotely verified. One frozen regression passes 3324 default tests and two legacy tests; all 21 changed Python files pass static checks. Full source inventory, protected original outputs and dependencies stay unchanged through offline isolated build, exact wheel inspection and a fresh installed-application smoke with zero external attempts. Wheel SHA256: `2d217803fa042bba2f293c1a3154d2ef8008235ccdb099283f9bf0ed89d8a2d7`. Certificate: `runs/v2_method_delivery/integration-followups/regression-final-v1/`.
@@ -7,6 +17,8 @@ Implementation `438e2e66c8be5be3907794136a2c918f129b6fb0` is pushed and remotely
 The next whole native run is now active at `runs/v2_method_delivery/full-native-verified-v2/actual-92a1606c4241`, using the independently checked `prepared-e0b91f6f0535` snapshot. Original PDF/repository, strict acceptance rules, training zero and call/token limits are unchanged. It uses actual MinerU, configured text/vision models, retrieval and qualified Docker execution. No source, claim, response or plan is injected. The two independent reviewers will check scientific/report meaning and mechanical provenance after delivery. No result is claimed while it runs.
 
 Decisions: no repeated unchanged sampling and no relaxation of scientific requirements. Preserve every earlier strict failure. The goal remains active through actual verification and any evidenced framework fixes.
+
+The maintainer subsequently requested fewer tests and delegated testing. Keep existing tests intact; use subagents for only the targeted checks needed by a demonstrated change or actual failure. Do not repeat full regression or add broad new suites without a concrete need. Prioritize completing and inspecting the actual three-layer pipeline.
 
 ## Latest phase 4 follow-up: qualified omissions and multi-file Code sources
 

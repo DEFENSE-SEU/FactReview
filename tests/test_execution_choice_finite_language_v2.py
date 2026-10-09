@@ -132,6 +132,81 @@ def test_actual006_registry_preserves_all_original_fields(tmp_path):
     assert before == (claim.model_dump(), materials.model_dump())
 
 
+def test_current_actual006_fixed_sample_and_computed_as_registry(tmp_path):
+    claim, materials = actual006(tmp_path)
+    claim.text = (
+        "On MiniSet test, model ExactMatch has accuracy 0.75 over four examples, "
+        "computed as exact equality of each prediction and label."
+    )
+    claim.conditions[0].settings = {
+        "model": "ExactMatch",
+        "accuracy": 0.75,
+        "examples": 4,
+        "computation": "fraction computed by exact equality of each prediction and label",
+        "qualifiers": [
+            "four fixed test predictions",
+            "no repeated-run uncertainty",
+            "no population-performance conclusion",
+            "no ranking against other models",
+        ],
+    }
+    claim.conditions[0].description = "Reported MiniSet test accuracy for ExactMatch on four fixed examples."
+    before = copy.deepcopy((claim.model_dump(), materials.model_dump()))
+    registry = build_choice_registry(claim, materials)
+    assert len(registry["candidates"]) == 1, registry["unavailable"]
+    candidate = next(iter(registry["candidates"].values()))
+    assert candidate["condition"] == claim.conditions[0].model_dump(mode="json")
+    assert {b["path"] for b in candidate["proposal"]["field_bindings"]} == set(
+        field_inventory(claim.conditions[0])
+    )
+    assert candidate["proposal"]["claim_bindings"][0]["end"] == len(claim.text)
+    assert before == (claim.model_dump(), materials.model_dump())
+
+
+def test_fixed_sample_and_computed_as_use_dynamic_bound_identity():
+    cfg = {
+        "dataset": "D[2].+",
+        "metric": "accuracy",
+        "settings": {"split": "held-out", "model": "R+G(v2)"},
+    }
+    runtime = Condition(id="c1", **cfg)
+    assert _interpret_text(
+        "Reported D[2].+ held-out accuracy for R+G(v2) on seven fixed examples.",
+        cfg,
+        runtime,
+        0.75,
+        7,
+    ) == {"dataset", "definition", "runtime:model", "sample"}
+    assert _interpret_text(
+        "On D[2].+ held-out, model R+G(v2) has accuracy 0.75 over seven examples, "
+        "computed as exact equality of each prediction and label.",
+        cfg,
+        runtime,
+        0.75,
+        7,
+    ) == {"dataset", "definition", "runtime:model", "sample", "value"}
+
+
+@pytest.mark.parametrize(
+    "tail",
+    [
+        "computed as weighted exact equality of each prediction and label.",
+        "computed as exact equality of each prediction and label except hard examples.",
+    ],
+)
+def test_computed_as_preserves_non_equivalent_or_unknown_tail_rejection(tail):
+    assert (
+        _interpret_text(
+            "On MiniSet test, model ExactMatch has accuracy 0.75 over four examples, " + tail,
+            CFG,
+            RUNTIME,
+            0.75,
+            4,
+        )
+        is None
+    )
+
+
 @pytest.mark.parametrize(
     "phrase",
     [

@@ -1,5 +1,13 @@
 # FactReview v2 acceptance checks
 
+## Latest actual integration: execution coverage still fails
+
+`full-native-verified-v2/actual-92a1606c4241` completes all seven stages with no catastrophic failure, but emits zero plans and has zero Docker attempts. Its three failed gates are actual execution, aligned MiniSet accuracy, and execution-cleanup coverage. Empty conditional ledger checks do not establish execution. There is no observed container leak. All 36 actual model requests return with exactly one measured usage record each: 191027 input + 19979 output = 211006 tokens, five image inputs, zero missing/estimated/extra usage. All 19 retrieval boundaries return. Independent mechanical review preserves all 412 actual files, 191 snapshot sources, six original inputs and the empty ledger/report match: `runs/v2_method_delivery/full-native-mechanical-review-92a1606c4241/record.json`.
+
+Necessary follow-up: two normal phrases in claim006 prevent finite candidate construction; their narrow fix produces one candidate from the unchanged original claim/materials. A single-source Code response uses a joint-only field whose empty-list requirement was missing from its prompt; that prompt is clarified. Its failed validation also needs system-responsibility reporting. Targeted checks are delegated, with no repeated whole-suite run. Original failed responses and reports remain unchanged; corrected actual behavior is not yet established.
+
+These corrections are now reviewed: the two grammar changes pass the existing small file plus four new controls (47 total); the Code prompt passes four selected existing controls with all validation logic unchanged; the 16-line Code responsibility addition passes five targeted controls. Original claim002 response replay stays Unverified and adds only a condition-scoped system limitation, with all 412 original files retained. Reviews: `execution-choice-92a-finite-b1f38045eb/`, `code-single-source-prompt-independent/`, and `code-scope-responsibility-92/` under `runs/v2_method_delivery/`. Root reviewed the narrow production deltas; no full regression was repeated.
+
 ## Unified follow-up checkpoint (2026-10-09)
 
 Frozen `438e2e66c8be5be3907794136a2c918f129b6fb0` passes **3324 default tests** (284.48s, three original deselections, two preexisting malformed-binding warnings) and **two separate legacy tests** (3.38s). All 21 changed Python files pass Ruff check/format. The full source/test/script/vendor inventory stays unchanged through regression, packaging and installed smoke: `runs/v2_method_delivery/integration-followups/regression-final-v1/`.
