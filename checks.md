@@ -25,6 +25,22 @@ The current Literature delivery builds on pushed joint-source checkpoint `c6c880
 
 The first failed actual synthetic batch records **33,229** measured tokens; the successful second pair records **32,708**; the original-paper pair records **318,742**. Each has four successful actual model calls, and all saved responses and original expectations remain unchanged. Source corrections were evaluated against all four original raw responses before the new `joint-source-live-aa1b0f0fcd/` batch. That batch completed four healthy calls using **336,944 measured tokens** and exited 1 because both required positive expectations failed; source and implementation hashes remained unchanged. No further numerical model retry is planned in this bounded batch.
 
+## Scientific-quality coverage beyond the engineering matrix
+
+The three-layer implementation is present. The following evaluations describe its current semantic limits separately from the 14 engineering contracts. Small selected examples and exact source locations do not estimate claim recall, false support or false accusation rates.
+
+| Quality question | Verdict | Observed evidence and remaining work |
+|---|---|---|
+| Claim source locations remain exact. | pass | `claim-quality-current-review/audit.json` rechecks 153 historical primary locations and replays four saved excerpt responses without changing them. This establishes location integrity only. |
+| Claim recall, qualifiers and needs are reliable on unseen material. | unresolved | `claim-quality-current-review/review.md`: no independently labelled coverage denominator exists. Existing splitting/dispatch unit tests inject model answers. A historical joint-tuning split failure remains accepted by the structural decoder and preserved in its original run. |
+| The injected omissions and qualifier changes are detected. | fail | Offline injected omissions, an altered numerical qualifier and empty needs can pass the source/schema checks. These are boundary demonstrations, not newly observed live error rates. Invalid verbatim quotations remain rejected. |
+| The fairness scope reviewer distinguishes relevant and irrelevant missing controls in three fixed examples. | pass | `fairness-semantic-design/live-runs/scope-only-82b6976c0c/`: three actual scope calls return applicable / not_applicable / applicable with exact protocol grounds. First-pass candidates were frozen; whole-claim assessment was not run. |
+| Those three examples also pass the full numerical verifier. | fail | `fairness-semantic-design/prepared-2260c2111e/manifest.json`: original numerical prose is outside the current finite grammar. Its full-verifier preflight remains blocked, independently of the scope-only result. |
+| The original-paper fairness concern is scientifically justified. | unresolved | The prior 042 concern remains saved and unresolved. Three synthetic scope examples do not adjudicate it or measure general false-accusation rates. |
+| General literature, mathematical and execution reliability is established. | unresolved | Selected real source/vision/Docker integrations exist. Retrieval completeness, formal mathematical correctness, broad benchmark reproduction and reviewer benefit have no comprehensive validation. |
+
+Next: freeze and independently review a small labelled extraction set before any new model responses are inspected; retain existing prompt-development examples as regressions and report new inputs separately.
+
 ## Current 14-check framework matrix
 
 Paths in this matrix use `runs/v2_binding_followup/` unless stated otherwise. Passing engineering contracts do not establish broad scientific accuracy; the explicit failed original expectations above remain visible.
