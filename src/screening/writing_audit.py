@@ -8,7 +8,8 @@ import uuid
 from contextlib import contextmanager
 
 from common import run_stats
-from llm.diagnostics import redact_provider_details, sanitized_endpoint
+from llm.diagnostics import sanitized_endpoint
+from screening.visual_audit import redacted_record
 
 
 @contextmanager
@@ -35,7 +36,7 @@ def writing_call_audit(*, module, cfg, system, payload, injected=False):
 
     def save():
         path.write_text(
-            json.dumps(redact_provider_details(record, cfg), ensure_ascii=False, indent=2),
+            json.dumps(redacted_record(record, cfg), ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
 

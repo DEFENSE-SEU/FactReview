@@ -11,7 +11,10 @@ from pydantic import Field, model_validator
 
 from schemas.claim import Contract, Finding, NonEmpty
 from schemas.materials import SharedMaterials
+from screening import checks
 from screening.checks import ask, check_tables, paper_finding
+from screening.visual_audit import redaction_scope
+from screening.writing_sources import WritingSourceError, WritingSources
 
 AnonymityPolicy = Literal["unspecified", "required", "not_required"]
 
@@ -247,7 +250,13 @@ def _reference_context(row, index):
     return matches, None
 
 
-def _check_section(materials, group, record, index, *, call, first_candidate):
+def _safe(value, configs):
+    for cfg in configs:
+        value = checks.redact_provider_details(value, cfg)
+    return value
+
+
+def _check_section(materials, group, record, index, *, call, first_candidate, sources, configs):
     blocks = {block.id: block for block in group["blocks"]}
     if len(blocks) != len(group["blocks"]):
         raise ValueError("writing section has duplicate block identities")
@@ -256,7 +265,15 @@ def _check_section(materials, group, record, index, *, call, first_candidate):
         record.issues.append(
             "Section includes unlocated text; original-source confirmation is unavailable for those blocks."
         )
-    result = ask(
+
+    def original_request(*args, **kwargs):
+        sources.check_section(materials, record.section, _reference_index(materials))
+        try:
+            return ask(*args, **kwargs)
+        finally:
+            sources.check_section(materials, record.section, _reference_index(materials))
+
+    result = original_request(
         _SYSTEM,
         {
             "section_id": record.section_id,
@@ -285,6 +302,12 @@ def _check_section(materials, group, record, index, *, call, first_candidate):
         finding = paper_finding(
             materials, blocks[row.block_id], quote=row.quote, text=row.text, kind="writing", level=row.level
         )
+        if _safe(finding.evidence[0].pointer.model_dump(mode="json"), configs) != finding.evidence[
+            0
+        ].pointer.model_dump(mode="json"):
+            raise ValueError(
+                "Writing original-source provenance contains configured credentials and cannot be published"
+            )
         candidate_id = f"writing_{first_candidate + offset}"
         targets = []
         if row.category == "anonymity" and record.anonymity_policy != "required":
@@ -298,6 +321,15 @@ def _check_section(materials, group, record, index, *, call, first_candidate):
                 record.issues.append(f"{candidate_id}: unconfirmed; {limitation}")
                 record.status = "unavailable"
                 continue
+        protected = {
+            "candidate_id": candidate_id,
+            **row.model_dump(exclude={"level", "text"}),
+            "targets": targets,
+        }
+        if _safe(protected, configs) != protected:
+            raise ValueError(
+                "Writing original-source fields contain configured credentials and cannot be forwarded"
+            )
         candidates.append((candidate_id, row, finding, targets))
     # No image request occurs until every candidate in this section has validated.
     by_page = {}
@@ -328,14 +360,16 @@ def _check_section(materials, group, record, index, *, call, first_candidate):
                     continue
                 if target_page.path not in image_paths:
                     image_paths.append(target_page.path)
+                if target_page_number != page_number and target_page_number not in target_pages:
                     target_pages.append(target_page_number)
         if missing_target_page:
             if record.status != "failed":
                 record.status = "unavailable"
             continue
         try:
+            sources.check_pages(materials, [page_number, *target_pages], section=record.section, consume=True)
             review = WritingPageReview.model_validate(
-                ask(
+                original_request(
                     _VALIDATION_SYSTEM,
                     {
                         "page": page_number,
@@ -345,6 +379,7 @@ def _check_section(materials, group, record, index, *, call, first_candidate):
                             {
                                 "candidate_id": candidate_id,
                                 **row.model_dump(exclude={"level"}),
+                                "text": _safe(row.text, configs),
                                 "targets": targets,
                             }
                             for candidate_id, row, _finding, targets in page_candidates
@@ -373,7 +408,9 @@ def _check_section(materials, group, record, index, *, call, first_candidate):
                 if decision.decision == "accept" and decision.confirmed_kind not in positive[row.category]:
                     raise ValueError("Writing validation confirmed kind does not match candidate category")
         except Exception as exc:
-            record.issues.append(f"writing page {page_number}: original PDF validation failed: {exc}")
+            record.issues.append(
+                _safe(f"writing page {page_number}: original PDF validation failed: {exc}", configs)
+            )
             record.status = "failed"
             continue
         for candidate_id, row, finding, targets in page_candidates:
@@ -403,6 +440,11 @@ def _check_section(materials, group, record, index, *, call, first_candidate):
     if record.status == "failed":
         return []
     record.confirmed_count = len(findings)
+    for finding in findings:
+        finding.text = _safe(finding.text, configs)
+        for evidence in finding.evidence:
+            evidence.note = _safe(evidence.note, configs)
+    record.issues = _safe(record.issues, configs)
     return findings
 
 
@@ -434,7 +476,10 @@ def check_writing(
         )
         return []
     index = _reference_index(materials)
+    sources = WritingSources.capture(materials, groups, index)
+    configs = ()
     findings, first_candidate = [], 1
+    section_results = []
     for section, group in groups.items():
         identity = "unsectioned" if section is None else "section:" + section
         record = WritingSectionRecord(
@@ -445,18 +490,50 @@ def check_writing(
             anonymity_policy=anonymity_policy,
         )
         try:
-            findings.extend(
-                _check_section(materials, group, record, index, call=call, first_candidate=first_candidate)
-            )
+            if not configs:
+                text_cfg = checks.resolve_llm_config()
+                configs = (text_cfg,)
+                try:
+                    configs += (checks.resolve_vlm_config(fallback=text_cfg),)
+                except ValueError:
+                    # A text-only section need not have a usable visual provider.
+                    # The original ask path still rejects that configuration if used.
+                    pass
+            with redaction_scope(configs):
+                section_findings = _check_section(
+                    materials,
+                    group,
+                    record,
+                    index,
+                    call=call,
+                    first_candidate=first_candidate,
+                    sources=sources,
+                    configs=configs,
+                )
+            section_results.append((record, section_findings))
         except Exception as exc:
             record.status = "failed"
-            record.issues.append(f"writing check failed for section {section!r}: {exc}")
+            record.issues.append(_safe(f"writing check failed for section {section!r}: {exc}", configs))
             if not recover_errors:
                 raise
         finally:
             first_candidate += record.candidate_count
+            record.issues = _safe(record.issues, configs)
             records.append(record)
             issues.extend(record.issues)
+    for record, section_findings in section_results:
+        try:
+            sources.check_section(materials, record.section, _reference_index(materials))
+        except WritingSourceError as exc:
+            record.status = "failed"
+            record.confirmed_count = 0
+            detail = _safe(str(exc), configs)
+            record.issues.append(detail)
+            issues.append(detail)
+            if not recover_errors:
+                raise
+        else:
+            findings.extend(section_findings)
     return findings
 
 
