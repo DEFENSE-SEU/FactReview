@@ -13,6 +13,7 @@ from screening.claims import ClaimExtractionError, extract_claims
 from screening.figures import FigureCheckRecord, check_figures
 from screening.references import check_bibliography
 from screening.tables import TableCheckRecord, check_visual_tables
+from screening.writing import WritingSectionRecord
 
 
 class ScreeningResult(Contract):
@@ -23,6 +24,9 @@ class ScreeningResult(Contract):
     figure_coverage: dict[str, int] = Field(default_factory=dict)
     table_checks: list[TableCheckRecord] = Field(default_factory=list)
     table_coverage: dict[str, int] = Field(default_factory=dict)
+    writing_checks: list[WritingSectionRecord] = Field(default_factory=list)
+    writing_coverage: dict[str, int] = Field(default_factory=dict)
+    anonymity_policy: Literal["unspecified", "required", "not_required"] = "unspecified"
     claim_extraction_status: Literal["ok", "failed"] = "ok"
 
 
@@ -34,9 +38,16 @@ class ScreeningFailure(ClaimExtractionError):
         self.result = result
 
 
-def screen_paper(materials: SharedMaterials, output_dir: Path, *, call=None, reference_checker=None):
+def screen_paper(
+    materials: SharedMaterials,
+    output_dir: Path,
+    *,
+    call=None,
+    reference_checker=None,
+    anonymity_policy="unspecified",
+):
     # Failed extraction cannot become an apparently successful review with zero claims.
-    result = ScreeningResult(claims=[])
+    result = ScreeningResult(claims=[], anonymity_policy=anonymity_policy)
     extraction_error = None
     try:
         result.claims = extract_claims(
@@ -47,7 +58,17 @@ def screen_paper(materials: SharedMaterials, output_dir: Path, *, call=None, ref
         result.claim_extraction_status = "failed"
         result.issues.append(f"Claim extraction failed: {extraction_error}")
     for name, check in (
-        ("writing", lambda: check_writing(materials, call=call, issues=result.issues)),
+        (
+            "writing",
+            lambda: check_writing(
+                materials,
+                call=call,
+                issues=result.issues,
+                records=result.writing_checks,
+                anonymity_policy=result.anonymity_policy,
+                recover_errors=True,
+            ),
+        ),
         ("tables", lambda: check_tables(materials, call=call)),
     ):
         try:
@@ -86,6 +107,13 @@ def screen_paper(materials: SharedMaterials, output_dir: Path, *, call=None, ref
             result.issues.extend(issues)
         except Exception as exc:
             result.issues.append(f"{name} check failed: {exc}")
+    result.writing_coverage = {
+        "total": len(result.writing_checks),
+        **{
+            status: sum(record.status == status for record in result.writing_checks)
+            for status in ("checked", "failed", "unavailable")
+        },
+    }
     result.figure_coverage = {
         "total": len(materials.figures),
         **{
