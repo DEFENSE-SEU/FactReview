@@ -415,6 +415,12 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument("--repository-url", default="", help="HTTPS URL of the released repository")
     p.add_argument(
+        "--report-presentation",
+        choices=("full", "layered"),
+        default="full",
+        help="Report layout: full detail, or primary report with complete technical appendix and linked PDF bundle",
+    )
+    p.add_argument(
         "--anonymity-policy",
         choices=("unspecified", "required", "not_required"),
         default="unspecified",

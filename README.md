@@ -21,6 +21,8 @@ When extraction fails, independent writing, visual and reference checks can stil
 
 Paper-internal support stays explicitly labelled. The report has four parts: Overview, Claim list, Other findings, Execution ledger. Claim order is flawed, questioned, unverified, supported. FactReview assists reviewers and provides no publication decision.
 
+Use `--report-presentation layered` for a reading report, a complete technical appendix and a combined PDF with internal navigation. The reading report keeps every claim and condition, valid advice, author questions and recorded sufficient evidence; it also shows a representative from each remaining evidence group. All evidence, diagnostic text and source passages remain in the appendix and canonical JSON. The renderer makes no model calls or new judgments. `--report-presentation full` retains the original detailed layout.
+
 ### Run v2
 
 Use Python 3.11+ and the existing LLM and MinerU configuration. Install the runtime and reference-check dependencies:
@@ -61,6 +63,7 @@ Outputs are saved under `runs/<paper-key>_<timestamp>_<unique-id>/`:
 - `screening/screening.json`, `verification/verification.json`: claims, findings, evidence, plans and unresolved issues.
 - `execution/`: per-run commands, output, approval, alignment and repair records when enabled.
 - `review/report/final_review.{json,md,pdf}`: canonical records and the rendered review.
+- With `--report-presentation layered`, `technical_appendix.{md,pdf}` retains complete records and `review_bundle.{md,pdf}` combines the reading report and appendix. The bundle provides internal source and return links; the standalone reading PDF gives appendix page references. `report_manifest.json` records artifact hashes, display choices and locations for every canonical JSON field. Individual PDF export failures are retained in the summary while available JSON and Markdown outputs remain usable.
 - `review/teaser/teaser.{json,svg}` and `teaser_prompt.md`: deterministic four-status summary and optional image-authoring prompt.
 - `full_pipeline_summary.json`, `run_stats.json`: stage results, errors and measured or explicitly estimated usage.
 - `cutoff.json`: the date used for Literature, its provenance, or the reason it remains unresolved.
