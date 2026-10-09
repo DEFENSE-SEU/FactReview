@@ -1,5 +1,15 @@
 # FactReview v2 progress
 
+## Latest phase 4 follow-up: Theory heading and execution evidence responsibility
+
+The reviewed Theory visual source is `836a80d3a23cda286225b4e64f2a67ae1cb70f77fade1f2c0d49ab59dc014e2f`. It accepts a finite Appendix-prefix heading only with exact, unique, loaded, same-page source binding and a frozen complete block layout. The original direct matcher is unchanged. Independent review found and retained the initial unselected-heading mutation failure; the final lifecycle rejects it explicitly. Author regression: 173 passes. Independent regression: 34 passes. The original 474 visual replay retains its three responses, 49 protected files, partial derivation and Unverified outcome.
+
+The reviewed Experiments source is `07259edbb0b30dff82beb89b1d5f19a9e8dc26392ab44918a246443dc55c927e`. A narrow post-validation addition attributes joint-source protocol failures to the system using the original item's covered conditions. Valid repairs do not retain stale limitations, and ordinary partial scientific evidence receives no protocol-failure label. Author regression: 208 passes. Independent regression: 78 passes, including ten new public-entry controls. Exact original claim006/007 responses and all 409 actual artifacts remain; neither replay gains a plan or sufficient evidence.
+
+Decisions: preserve historical scientific results and raw failures. Use system follow-up for failures in organizing already available evidence; retain author questions for genuine scientific concerns. Keep current source-integrity diagnostics visible without rewriting historical statuses. Reviews: `runs/v2_method_delivery/theory-heading-independent/review-final.md` and `experiment-joint-responsibility-independent/review.md` (both under the same delivery directory).
+
+Next: finish independent Literature and Code review, freeze all resulting sources for unified regression/package verification, then run the complete native integration with unchanged strict execution requirements. The overall goal remains active.
+
 ## Latest phase 4 follow-up: finite execution language
 
 Reader checkpoint `cad84623a9b1f083f93cb314b5f37952fa14d9c5` is pushed and verified on `origin/refactor/method-v2`. This next change adds two parameterized exact-match grammar forms; all original condition fields and the whole claim must still bind. The original source must explicitly establish fraction and equality. Actual config identity, complete data count, unknown residual clauses and independent model scope confirmation remain required. Only three functions in `execution_projection_semantics.py` change; existing tests remain unchanged.

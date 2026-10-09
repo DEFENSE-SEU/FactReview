@@ -2834,6 +2834,24 @@ def verify_experiments(
                     claim_id=claim.id, text=f"Could you clarify the {item.aspect} concern?", reason=detail
                 )
             )
+    for index, bounded in joint_catalogs.items():
+        errors = bounded["joint_view"]["errors"]
+        if errors:
+            from schemas.limitations import VerificationLimitation
+
+            result.verification_limitations.append(
+                VerificationLimitation(
+                    claim_id=claim.id,
+                    condition_ids=list(output.items[index].covered),
+                    stage="Experiments",
+                    kind="evidence_validation_failed",
+                    reason=choice_privacy.safe(
+                        f"Joint candidate {index} source/coverage validation failed: "
+                        + "; ".join(errors)
+                        + (f"; scope_audit={scope_audit}" if scope_audit is not None else "")
+                    ),
+                )
+            )
     if scope_audit is not None and joint_catalogs:
         audit = json.loads(scope_audit.read_text(encoding="utf-8"))
         audit["joint_sources"] = {
