@@ -37,6 +37,11 @@ For unverified: explain the uncovered conditions and what checkable materials ar
 still needed. Concrete missing code, data, weights or statistics require an explicit
 recorded basis. Without such a record, request supporting evidence for the condition.
 An unavailable service is a verification limitation, never proof of a paper defect.
+Operational limitations identify failed system checks. For each uncovered condition
+with such a limitation, use action=verification_followup, cite the corresponding
+/verification_limitations entry, and explain how the operator can repair or retry
+that check. Do not attribute these failures to absent author materials. Preserve any
+separate substantiated concern, with its own evidence and conditions.
 For supported: summarize how the reviewer can use the support within its conditions.
 Paper-internal support never establishes independent reproduction by execution.
 
@@ -69,15 +74,39 @@ def _usable(item) -> bool:
     return item.affects_claim and (item.source != "execution" or item.aligned is True)
 
 
+def theory_source_integrity(claim: Claim) -> dict[str, str]:
+    """Compare current bytes with the hashes captured during Theory verification."""
+    files = {}
+    for record in claim.theory_derivations:
+        expected = list(record.source_hashes.items())
+        if record.trace:
+            for entry in [*record.trace.assumptions, *record.trace.steps, *record.trace.gaps]:
+                expected.extend((source.pointer.locator, source.artifact_sha256) for source in entry.sources)
+        for locator, digest in expected:
+            path = Path(locator)
+            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+                raise ValueError("Theory source artifact changed after its recorded verification: " + locator)
+            files[str(path.resolve())] = digest
+    return files
+
+
 def _local_files(claim, ledger):
     """Hash available local evidence artifacts without fetching remote locators."""
+    files = theory_source_integrity(claim)
     locators = [p.locator for e in claim.evidence for p in [e.pointer, *e.additional_pointers]]
+    for record in claim.theory_derivations:
+        if record.audit_pointer:
+            locators.append(record.audit_pointer)
+        if record.source_pointer:
+            locators.append(record.source_pointer.locator)
+        if record.trace:
+            for entry in [*record.trace.assumptions, *record.trace.steps, *record.trace.gaps]:
+                locators.extend(source.pointer.locator for source in entry.sources)
     for row in ledger:
         # The authoritative execution evidence pointer normally already covers
         # its log. Preserve source hashes for explicit released artifacts too.
         if isinstance(row.get("artifact_path"), str):
             locators.append(row["artifact_path"])
-    files = {}
     for locator in locators:
         if locator.lower().startswith(("http:", "https:", "doi:", "arxiv:")):
             continue
@@ -87,9 +116,18 @@ def _local_files(claim, ledger):
     return files
 
 
-def advice_input(claim: Claim, ledger: list[dict]) -> dict:
+def advice_input(claim: Claim, ledger: list[dict], *, version="advice-v2") -> dict:
     """A local basis catalog plus its exact immutable assessment snapshot."""
     record = claim.model_dump(mode="json", exclude={"advice"})
+    if version == "advice-v1":
+        # Reproduce the exact historical hash only while every added input is empty.
+        # New observations must invalidate stale wording instead of being hidden.
+        for name in ("theory_derivations", "verification_limitations"):
+            if record.get(name):
+                raise ValueError("New verification records were added after legacy advice generation")
+            record.pop(name, None)
+    elif version != "advice-v2":
+        raise ValueError("Unknown advice input version")
     ids = [c.id for c in claim.conditions]
     linked = [
         row for row in ledger if isinstance(row.get("plan"), dict) and row["plan"].get("claim_id") == claim.id
@@ -106,6 +144,16 @@ def advice_input(claim: Claim, ledger: list[dict]) -> dict:
                 "condition_ids": ids,
                 "content": item.model_dump(mode="json") if hasattr(item, "model_dump") else item,
             }
+    if version == "advice-v2":
+        for kind, rows in (
+            ("theory_derivations", claim.theory_derivations),
+            ("verification_limitations", claim.verification_limitations),
+        ):
+            for index, item in enumerate(rows):
+                basis[f"/{kind}/{index}"] = {
+                    "condition_ids": item.covered if kind == "theory_derivations" else item.condition_ids,
+                    "content": item.model_dump(mode="json"),
+                }
     for index, item in enumerate(linked):
         covered = [cid for cid in item["plan"].get("condition_ids", []) if cid in ids]
         if covered:
@@ -116,7 +164,10 @@ def advice_input(claim: Claim, ledger: list[dict]) -> dict:
                 "condition_ids": [cid],
                 "content": "The available usable sufficient support does not cover this condition. This alone does not identify a missing artifact or a paper defect.",
             }
-    return {"claim": record, "ledger": linked, "basis": basis, "source_files": _local_files(claim, linked)}
+    result = {"claim": record, "ledger": linked, "basis": basis, "source_files": _local_files(claim, linked)}
+    if version == "advice-v2":
+        result["input_version"] = version
+    return result
 
 
 def validate_items(claim: Claim, data: dict, items: list[AdviceItem]) -> None:
@@ -163,6 +214,18 @@ def validate_items(claim: Claim, data: dict, items: list[AdviceItem]) -> None:
                     raise ValueError("Questioned advice requires the recorded concern")
             elif f"/coverage_gaps/{cid}" not in item.basis_refs:
                 raise ValueError("Unverified advice must identify its uncovered conditions")
+            if claim.status == ClaimStatus.UNVERIFIED and f"/coverage_gaps/{cid}" in data["basis"]:
+                limitations = {
+                    ref
+                    for ref, value in data["basis"].items()
+                    if ref.startswith("/verification_limitations/") and cid in value["condition_ids"]
+                }
+                if limitations and (
+                    item.action != "verification_followup" or not limitations.issubset(item.basis_refs)
+                ):
+                    raise ValueError(
+                        "System-limited advice requires operational follow-up and all recorded failure bases"
+                    )
         all_covered.update(item.condition_ids)
     required = (
         ids
@@ -207,7 +270,7 @@ def checked_review(review: FinalReview) -> FinalReview:
             continue
         try:
             checked = ClaimAdvice.model_validate(claim.advice.model_dump())
-            data = advice_input(claim, result.ledger)
+            data = advice_input(claim, result.ledger, version=checked.input_version)
             if _digest(data) != checked.input_sha256:
                 raise ValueError("Advice input or local source artifact changed after generation")
             validate_items(claim, data, checked.items)
@@ -312,6 +375,7 @@ def generate_advice(review: FinalReview, output_dir: Path, *, call=None) -> Advi
             state="unavailable" if reason else "generated",
             items=[] if reason else items,
             input_sha256=digest,
+            input_version="advice-v2",
             audit_pointer=audit_pointer,
             failure_reason=reason,
             provider=cfg.provider if cfg else "",
