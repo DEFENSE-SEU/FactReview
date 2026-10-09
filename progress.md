@@ -1,5 +1,28 @@
 # FactReview v2 progress
 
+## Active phase 3: genuine claim coverage correction
+
+Independent review of the original FixMatch paper found real omissions, missing governing qualifiers and merged independent conclusions. The original extraction is 60 claims/119 conditions over 21 pages/244 blocks; its source is byte-identical to the current first-pass extractor. The source audit at `runs/v2_method_delivery/fixmatch-claim-coverage-review/` preserves the original files and maps concrete findings to manuscript blocks and claims.
+
+The implementation now adds a separate bounded source-window review before L2, followed by explicit source-grounded append/revise/split actions. Every revision retains the original and replacement records. Confirmed unresolved extraction problems hold their affected claims for repair, with system responsibility, while healthy claims continue. The original extraction audit remains unchanged. The leaf passes 21 necessary mocked controls; five new integration controls and one unchanged existing pipeline case pass. Six narrow report checks pass, including both layouts and PDF inputs without changing scientific records. Initial failures in the new test fixtures (invalid code pointer and escaped Markdown ID) remain recorded; production and existing assertions were not changed to accommodate them. No whole-suite rerun occurred.
+
+Independent review found that matching all occurrences of short labels fragmented markdown; the final leaf uses validated spans/unique substantial block matches and restores complete paragraphs. Final source SHA `603f304991c9963e906d1cb842126dc270b29c73bf3368259273ca3cc77f4f6b` retains all 244 original blocks and adds 40 exact paragraph spans in six windows. Independent final source/extent inspection passes. Unmatched markdown remains review-only until a claim can bind to an existing original parsed block.
+
+### Decisions
+
+- Use 24000-character consecutive source windows and configurable budgets of 12 coverage-review calls and 12 follow-up calls. These limit work, never the number of claims. Unreviewed ranges remain explicit.
+- Include original blocks that are absent from markdown, including footnotes. Markdown-only spans can reveal missing material; a final claim still needs an existing original block accepted by downstream source validation.
+- Keep a joint experimental configuration together when it represents one assertion; split independently decidable conclusions. Do not split every hyperparameter or table cell to inflate counts.
+- Preserve ambiguous observations without treating them as confirmed extraction failures. Propagate unresolved confirmed problems through later splits so new child IDs cannot evade the hold.
+- Validate the new coverage pass against the historical genuine-paper materials and first-pass claims, using new native calls and a frozen implementation. This mixed-origin follow-up will not be reported as a new whole-pipeline run. Original audit findings are not supplied to its model.
+
+The parallel original v3 native integration has finished on immutable `18b4f03`: seven stages, eight extracted claims (five Supported/three Unverified), one actual Docker evaluation with aligned accuracy 0.75, zero training/repairs. It has 36 logical calls, 38 physical attempts and 337260 known tokens; four usage records are unavailable. Overall strict acceptance still fails. Independent inspection traced the cleanup and host-measurement gates to the test controller rejecting Docker's exact `[]` stdout with container-specific absence stderr. The original controller/artifacts/verdict remain unchanged; all other service and accounting failures remain open. Evidence: `coverage-driver-and-af3c-independent-review/`.
+
+The genuine-paper actual follow-up is running at `runs/v2_method_delivery/fixmatch-coverage-live-v1/actual-fb6411b410e6`, using `prepared-5e270abd6e90` and the independently reviewed native boundary driver. Twelve review/twelve follow-up calls, at most 48 physical attempts and 500000 known tokens are allowed; failed/unknown usage is retained. This is a new coverage pass over saved original materials and claims. Separate agents will review main-text and appendix corrections against the original evidence. No outcome is claimed while running.
+
+Next: commit/push the reviewed L1 change, inspect the real coverage corrections and resolve demonstrated residual failures. The goal remains active.
+
+
 ## Current phase 4: frozen proof heading and genuine-paper coverage
 
 The visual Theory input now carries the same-page region heading for its selected proof, using the complete original `SourceContext` frozen before any model callback. The existing heading consumer still decides identity, position and uniqueness, including duplicate candidates. The 20-line addition changes no scientific sufficiency rule. Three necessary mocked controls pass. A fixed replay of the four original 70088 responses adds only block14 to the supplied allowed blocks and validates the original complete visual derivation; the original actual remains Unverified and all 423 artifacts are unchanged. Evidence: `runs/v2_method_delivery/theory-heading-context-70088/`. Root reviewed the delta without repeating tests.

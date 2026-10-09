@@ -433,6 +433,24 @@ def parse_args() -> argparse.Namespace:
         help="Execution approval mode (default: auto)",
     )
     p.add_argument(
+        "--claim-coverage-window-chars",
+        type=int,
+        default=24000,
+        help="Source characters per claim coverage review window (default: 24000)",
+    )
+    p.add_argument(
+        "--claim-coverage-review-calls",
+        type=int,
+        default=12,
+        help="Maximum claim coverage review calls; unreached windows remain visible (default: 12)",
+    )
+    p.add_argument(
+        "--claim-coverage-followup-calls",
+        type=int,
+        default=12,
+        help="Maximum claim correction calls after coverage review (default: 12)",
+    )
+    p.add_argument(
         "--training-budget",
         type=int,
         default=0,

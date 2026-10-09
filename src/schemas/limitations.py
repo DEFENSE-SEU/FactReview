@@ -16,6 +16,7 @@ class VerificationLimitation(BaseModel):
         "plan_rejected",
         "stage_failed",
         "source_context_unavailable",
+        "claim_extraction_incomplete",
         "evidence_validation_failed",
     ]
     responsibility: Literal["system"] = "system"

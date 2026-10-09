@@ -285,6 +285,9 @@ def run_v2_pipeline(
                     call=call,
                     reference_checker=reference_checker,
                     anonymity_policy=getattr(args, "anonymity_policy", "unspecified"),
+                    claim_coverage_window_chars=getattr(args, "claim_coverage_window_chars", 24000),
+                    claim_coverage_review_calls=getattr(args, "claim_coverage_review_calls", 12),
+                    claim_coverage_followup_calls=getattr(args, "claim_coverage_followup_calls", 12),
                 ),
                 recover=recover_screening,
             )
@@ -294,8 +297,11 @@ def run_v2_pipeline(
             summary["table_coverage"] = screening.table_coverage
             summary["table_context_coverage"] = screening.table_context_coverage
             summary["writing_coverage"] = screening.writing_coverage
+            summary["claim_coverage"] = screening.claim_coverage
             summary["anonymity_policy"] = screening.anonymity_policy
             summary["outputs"]["screening"] = str(root / "screening" / "screening.json")
+            if screening.claim_coverage.get("audit_path"):
+                summary["outputs"]["claim_coverage"] = screening.claim_coverage["audit_path"]
             extracted = [c.model_copy(deep=True) for c in screening.claims]
 
             def recover_verification(exc):
@@ -330,6 +336,7 @@ def run_v2_pipeline(
                             branches=branches,
                             global_literature=global_literature,
                             call=call,
+                            blocked_claim_ids=screening.blocked_claim_ids,
                         )
                     ),
                     recover=recover_verification,
@@ -438,6 +445,7 @@ def run_v2_pipeline(
                     table_coverage=summary["table_coverage"],
                     table_context_coverage=summary["table_context_coverage"],
                     writing_coverage=summary["writing_coverage"],
+                    claim_coverage=summary["claim_coverage"],
                     anonymity_policy=summary["anonymity_policy"],
                     token_usage=summary["model_usage"],
                 )
@@ -452,6 +460,7 @@ def run_v2_pipeline(
                     table_coverage=summary["table_coverage"],
                     table_context_coverage=summary["table_context_coverage"],
                     writing_coverage=summary["writing_coverage"],
+                    claim_coverage=summary["claim_coverage"],
                     anonymity_policy=summary["anonymity_policy"],
                     presentation=summary["report_presentation"],
                 )
@@ -509,6 +518,7 @@ def run_v2_pipeline(
                 table_coverage=summary.get("table_coverage"),
                 table_context_coverage=summary.get("table_context_coverage"),
                 writing_coverage=summary.get("writing_coverage"),
+                claim_coverage=summary.get("claim_coverage"),
                 anonymity_policy=summary.get("anonymity_policy"),
                 token_usage=summary["model_usage"],
             )

@@ -1,5 +1,20 @@
 # FactReview v2 acceptance checks
 
+## Current extraction coverage correction
+
+The genuine 21-page FixMatch extraction contains 60 claims and 119 conditions. Independent main-text and appendix review confirms omitted training-data reuse and parameter-count correction footnotes, lost ablation qualifiers, merged independent conclusions and missing metric/epoch definitions. The exact first-pass source and response are preserved. Evidence: `runs/v2_method_delivery/fixmatch-claim-coverage-review/review.md` and `audit.json`. Counts do not establish semantic recall.
+
+| requirement | verdict | evidence | correction |
+|---|---|---|---|
+| Genuine-paper claim completeness, qualifiers and atomicity | fail | Original FixMatch items 013/030/037/043/045 and footnotes at pages 3, 7 and 18; independent source review above. | A bounded separate L1 coverage pass is being integrated; actual correction quality remains unverified. |
+| Coverage corrections are auditable and do not silently replace the first pass | pass | 21 leaf controls, five integration controls and one unchanged existing pipeline case; all external boundaries mocked. `claim-coverage-implementation/` and `claim-coverage-integration-review/`. | Source-window review, additions/revisions/splits, immutable before/after records and explicit unresolved claims. Original failing mock-fixture attempts remain; production and old tests were not relaxed. Actual semantic quality remains separate. |
+| Coverage is visible in both report layouts without changing scientific records | pass | Six necessary mocked checks in `tests/test_report_claim_coverage_v2.py`; static checks; root inspected the delta. | Shows reviewed/unreviewed scope, unresolved observations and blocked IDs; no exhaustive-recall claim. |
+| Current whole native integration reaches actual aligned Docker evaluation | pass | `full-native-verified-v3/actual-af3c25bee896`: one actual attempt, fixed released predictions 3/4 = 0.75; source-bound selection and alignment. | Two-page synthetic integration scope only; original overall strict failure remains. |
+| Current native service and complete usage acceptance | fail | Same run: 36 logical requests, 38 physical attempts, 337260 known tokens, four unavailable-usage records; retrieval and branch failures retained. | Continue independent framework work. Two additional cleanup/measurement failures were traced to the validator rejecting Docker's exact empty-array stdout; independent interpretation is separate from the unchanged original verdict. |
+
+The independent window review found and corrected short-label matches that fragmented original markdown. Frozen leaf `603f304991c9963e906d1cb842126dc270b29c73bf3368259273ca3cc77f4f6b` retains all 244 original blocks and adds 40 exact full-paragraph review-only spans in six bounded windows. Its new actual coverage follow-up is running at `fixmatch-coverage-live-v1/actual-fb6411b410e6`; it starts from historical materials/claims and supplies no audit findings to the model. No semantic result is claimed yet. The whole test suite and installed-wheel certificate below predate this change and were not repeated.
+
+
 ## Claim coverage scope and current Theory correction
 
 The ten claims below belong to a two-page, approximately 365-word synthetic integration input. They do not measure extraction completeness on a genuine full paper. The saved genuine FixMatch run has 21 PDF pages, 244 material blocks and 60 extracted claims. A source-based chapter coverage review is now checking omissions, incorrect merging and missing conditions; no minimum claim count is used. The current extractor sends the full materials without a claim cap, but schema/source validation alone does not establish semantic recall.

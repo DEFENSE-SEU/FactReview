@@ -339,6 +339,36 @@ def _reference_correction(correction):
     return lines
 
 
+def claim_coverage_lines(claim_coverage: dict | None) -> list[str]:
+    """Present the recorded review extent without inferring semantic completeness."""
+    if claim_coverage is None:
+        return []
+
+    def value(key):
+        raw = claim_coverage.get(key)
+        return _text("unavailable" if raw is None else raw)
+
+    blocked = claim_coverage.get("blocked_claim_ids")
+    blocked_text = (
+        ", ".join(str(item) for item in blocked) or "none" if isinstance(blocked, list) else "unavailable"
+    )
+    return [
+        "",
+        "### Claim extraction coverage",
+        "",
+        f"Coverage check status: **{value('status')}**.",
+        f"Initial claims: {value('initial_claims')}; final claims: {value('final_claims')}.",
+        f"Source windows reviewed: {value('windows_reviewed')} / {value('windows_total')}; "
+        f"unreviewed: {value('windows_unreviewed')}.",
+        f"Unresolved observations: {value('unresolved_observations')}; "
+        f"blocked claim IDs: {_text(blocked_text)}.",
+        f"Coverage audit: {value('audit_path')}.",
+        "Model-based coverage checks cannot prove exhaustive claim extraction. "
+        "Retained claims remain available when the coverage check is incomplete.",
+        "",
+    ]
+
+
 def verification_limitations(
     *,
     issues=None,
@@ -347,11 +377,17 @@ def verification_limitations(
     table_coverage=None,
     table_context_coverage=None,
     writing_coverage=None,
+    claim_coverage: dict | None = None,
     anonymity_policy=None,
     token_usage=None,
 ) -> list[str]:
     """Make coverage and cost uncertainty visible even when there are no findings."""
     limitations = list(issues or [])
+    if claim_coverage is not None and claim_coverage.get("status") != "complete":
+        limitations.append(
+            "Claim extraction coverage check is incomplete: "
+            f"status {claim_coverage.get('status', 'unavailable')}; see the overview and coverage audit."
+        )
     if writing_coverage is not None:
         missing = writing_coverage.get("failed", 0) + writing_coverage.get("unavailable", 0)
         if missing:
@@ -418,6 +454,7 @@ def render_markdown(
     table_coverage=None,
     table_context_coverage=None,
     writing_coverage=None,
+    claim_coverage: dict | None = None,
     anonymity_policy=None,
     token_usage=None,
     _checked=False,
@@ -443,6 +480,7 @@ def render_markdown(
         "|---|---:|",
     ]
     lines.extend(f"| {status.value} | {review.summary_counts[status]} |" for status in STATUS_ORDER)
+    lines += claim_coverage_lines(claim_coverage)
     execution = execution_summary(review)
     execution_lines = [
         "",
@@ -681,6 +719,7 @@ def render_markdown(
         table_coverage=table_coverage,
         table_context_coverage=table_context_coverage,
         writing_coverage=writing_coverage,
+        claim_coverage=claim_coverage,
         anonymity_policy=anonymity_policy,
         token_usage=token_usage,
     )
@@ -722,6 +761,7 @@ def write_review(
     table_coverage=None,
     table_context_coverage=None,
     writing_coverage=None,
+    claim_coverage: dict | None = None,
     anonymity_policy=None,
     presentation="full",
 ) -> dict:
@@ -740,6 +780,7 @@ def write_review(
             table_context_coverage=table_context_coverage,
             writing_coverage=writing_coverage,
             anonymity_policy=anonymity_policy,
+            **({"claim_coverage": claim_coverage} if claim_coverage is not None else {}),
         )
     if presentation != "full":
         raise ValueError("Unknown report presentation")
@@ -757,6 +798,7 @@ def write_review(
         table_coverage=table_coverage,
         table_context_coverage=table_context_coverage,
         writing_coverage=writing_coverage,
+        claim_coverage=claim_coverage,
         anonymity_policy=anonymity_policy,
         token_usage=token_usage,
     )
