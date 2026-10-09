@@ -425,6 +425,8 @@ def _table_materials(material: SharedMaterials, rows, pdf, images_dir: Path, bbo
         table = TableMaterial(
             id=f"table_{len(material.tables) + 1}",
             block_id=block_id,
+            parser_row_index=row_number,
+            parser_bbox_space=bbox_space,
             anchor=next(iter(caption_anchors)) if len(caption_anchors) == 1 and not ambiguous else "",
             loc=block.loc if block else None,
             caption=caption,
