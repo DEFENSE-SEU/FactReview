@@ -40,6 +40,9 @@ independently true or false conclusions that should not share one final claim st
 An existing scoped comparison with its original table source need not repeat every baseline cell
 in conditions. Preserve necessary measurements, metric definitions, units and independent facts.
 For a missing qualifier, explain how its absence changes verification of that existing assertion.
+Identify the materially different interpretation or verification setting that the omission permits,
+and check whether the existing text/conditions already exclude it. Section transitions and
+comparative narration alone do not establish a missing condition.
 Additional mechanism explanations and table details are not automatically necessary qualifiers;
 do not expand the original assertion's scope while correcting it. Separately checkable, material
 extra facts can be reported as independent missing conclusions.
@@ -49,12 +52,25 @@ relationship is ambiguous. missing_conclusion has no target; all other definite 
 existing claim. needs is a multi-label subset, never automatically all four branches. Return every
 reviewed block ID in its supplied order. Empty observations require an explanation; this is a
 model judgment about the supplied window, not a guarantee of whole-paper recall.
+For a complete review, list all supplied block IDs in order; overlapping markdown-only IDs cannot
+substitute for original parsed block IDs. For a partial review, list only the IDs actually reviewed
+in order and explain the omitted ranges explicitly; do not claim complete coverage.
 Select original whole-block IDs as sources; do not write quotes or locations. For every
 REQUIRED_CLAIM_CHECKS entry, separately record atomicity and governing-qualifier coverage.
 Use short proposition descriptions and closed condition IDs in assertion_groups; do not retype
 claim excerpts. Groups may share a condition ID when one condition contains separate assertions.
+single_conclusion and shared_settings require exactly ONE assertion_group, which may contain all
+condition IDs; independent_conclusions requires at least TWO groups. shared_settings means the
+same asserted relationship across settings; an explicitly joint configuration can stay together.
+Sharing an experiment, table or dataset alone does not establish one conclusion.
 Independent conclusions require a current merged_conclusions observation; missing governing
 qualifiers require a current missing_qualifier_or_condition observation on that same claim.
+For each claim, compare nearby section/footnote scope that actually governs it, including dataset,
+split, label budget and selection scope, with its own text/conditions. Explain the matching values
+or the missing restriction. Source bindings do not replace the claim's semantic fields.
+claim_checks.observation_ids may select only this window's observations whose target_claim_id
+equals that checked claim. A target-null missing independent fact is not linked to an existing
+claim check.
 Preserved means the claim's own text/conditions and sources retain all governing limitations;
 a separate scope claim does not supply them. Use unresolved when the connection is unclear.
 Return only the versioned JSON contract supplied outside DATA_JSON."""
@@ -96,6 +112,11 @@ baseline cell in conditions; necessary values, metric definitions, units and ind
 must remain. A separate scope claim cannot replace qualifiers on every governed claim.
 Require a missing qualifier to change verification of the existing assertion; additional mechanism
 explanations or table details do not by themselves justify expanding its original scope.
+Identify the materially different interpretation or verification setting that the alleged omission
+permits, and whether existing text/conditions already exclude it. A section transition or comparative
+narration alone does not establish missing scope. Compare governing nearby section/footnote
+dataset, split, label-budget and selection scope with each new claim's own text/conditions; explain
+matching values or missing restrictions. Source bindings do not replace these semantic fields.
 Return one observation_decision per supplied observation. confirmed means its reported problem
 is supported; dismiss_observation means the original observation is demonstrably unfounded.
 Use unresolved for uncertainty. Return one change_decision per supplied candidate:
@@ -109,6 +130,10 @@ For every new claim in every candidate, return new_claim_checks with its one-bas
 short assertion groups over its exact condition IDs, and governing qualifiers.
 An accepted change requires every new claim to be single_conclusion/shared_settings with all
 governing qualifiers preserved. Link each check to current observation IDs for that candidate.
+single_conclusion/shared_settings requires exactly ONE assertion_group, which may contain all
+condition IDs. independent_conclusions requires at least TWO groups. shared_settings describes
+the same asserted relationship across settings, including an explicitly joint configuration;
+sharing an experiment, table or dataset alone does not establish one conclusion.
 Do not infer preserved qualifiers merely from the presence of a source quote or another claim.
 Return the versioned JSON contract."""
 
@@ -188,10 +213,20 @@ class AssertionGroup(Contract):
 
 
 class ClaimCheck(Contract):
-    atomicity: Literal["single_conclusion", "shared_settings", "independent_conclusions", "unresolved"]
-    assertion_groups: list[AssertionGroup]
-    governing_qualifiers: Literal["preserved", "missing", "unresolved"]
-    observation_ids: list[StrictStr]
+    atomicity: Literal["single_conclusion", "shared_settings", "independent_conclusions", "unresolved"] = (
+        Field(
+            description="shared_settings is the same asserted relationship across settings or an explicitly joint configuration. Merely sharing an experiment, table or dataset does not establish one conclusion."
+        )
+    )
+    assertion_groups: list[AssertionGroup] = Field(
+        description="Exactly one group for single_conclusion/shared_settings; at least two for independent_conclusions. A group may include all condition IDs; separate groups may reuse a condition ID."
+    )
+    governing_qualifiers: Literal["preserved", "missing", "unresolved"] = Field(
+        description="Compare actually governing section/footnote dataset, split, label-budget and selection scope with this claim's own text/conditions. Explain matching values or a materially different interpretation allowed by a missing restriction; check whether existing semantics already exclude it. Source presence alone does not establish preserved qualifiers; section transitions alone do not establish a missing qualifier."
+    )
+    observation_ids: list[StrictStr] = Field(
+        description="Current-claim review: only current-window observations targeted to this exact claim, never target-null independent omissions. New-claim validation: only observation IDs of the fixed candidate's action."
+    )
     reason: StrictStr = Field(min_length=1)
 
 

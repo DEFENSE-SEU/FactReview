@@ -2,6 +2,18 @@
 
 ## Current extraction coverage correction
 
+Current pushed source is `e6401b5aebd48da344987fe855a22515f33d51b1`. Genuine coverage v3 (`fixmatch-coverage-live-v3/actual-de8e5667121f`) has finished with partial coverage and strict failure: 16 requests, 755401 known tokens, one failed request with unavailable usage. Thirteen adopted changes reconstruct 80 claims from the original60; independent source/accounting checks pass. The two-page whole native v4 (`full-native-verified-v4/actual-13f2c04b8c9a`) continues on its immutable e640 snapshot. No complete scientific or integration pass is claimed.
+
+| Current checkpoint | verdict | evidence | correction / limit |
+|---|---|---|---|
+| Versioned whole-block selection and explicit per-claim checks | pass | Frozen source `32fe2c89...`; 38 necessary mocked controls and independent source review below. | Mechanical checks cannot certify model judgment or whole-paper coverage. |
+| Current wheel contains the new module and CLI controls | pass | `coverage-wheel-smoke-e640/review.md`, `final-result.json`; wheel `2608cae2...`; 191 exact source modules, isolated imports and four flags. | One build/install, no full regression; runtime 3.12.10, syntax-only 3.11 check. Initial smoke-harness error preserved. |
+| Genuine-paper semantic correction after e640 | fail | `fixmatch-coverage-v3-mechanical-independent/` confirms immutable sources/reconstruction; final main/appendix reviews under `fixmatch-coverage-live-v3/` confirm013/043 splits and the retained ablation/selection-scope omissions. | 38/62 required checks completed; 24 unreviewed. New054 hold lacks necessity,065 still merges assertions,079 repeats existing measurements. |
+| Existing assertion-group, qualifier and source-ID contracts are stated to the model | pass | Prompt-only leaf `afff40dd...`, `claim-coverage-check-prompt-clarification/`; unchanged38 controls pass. Independent AST/schema review: `claim-coverage-check-prompt-independent/`. | Actual effect awaits at most two focused decision probes. No automatic regrouping, relaxed gate or new model round. |
+| Complete native integration after e640 | unresolved | Fresh run `full-native-verified-v4/actual-13f2c04b8c9a`. | Synthetic integration scope; all original service/accounting/semantic failures remain visible. |
+
+### Previous genuine run and implementation record
+
 The second actual coverage run, `fixmatch-coverage-live-v2/actual-227e5798445d`, is complete on pushed `708efd3f01a94b572760702cb117d43d74d237f6`. All 18 logical/physical requests returned with 823752 known tokens and no unavailable usage. The final request crossed its 800000-known-token threshold, so the original mechanical result remains failed. Coverage is partial: 60 initial claims become 78 through 18 additions and six revisions, with zero splits, eight unresolved observations and blocked claims034/060. Five windows are fully reviewed and one is partial; none remains unreviewed. Counts do not establish semantic completeness.
 
 | Frozen semantic review item | Latest actual outcome |
