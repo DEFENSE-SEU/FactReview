@@ -7,8 +7,9 @@ from enum import StrEnum
 from typing import Annotated, Any, Literal, Self
 from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_serializer, model_validator
 
+from schemas.code_joint import CodeJointBinding
 from schemas.limitations import VerificationLimitation
 from schemas.reference import ReferenceCorrection
 from schemas.theory_concern import TheoryConcernReview
@@ -113,16 +114,51 @@ class Evidence(Contract):
     overturnable: bool = True
     aligned: bool | None = None
     provenance: ExecutionProvenance | None = None
+    code_joint_binding: CodeJointBinding | None = None
+
+    @model_serializer(mode="wrap")
+    def serialize_joint(self, handler):
+        result = handler(self)
+        if self.code_joint_binding is None:
+            result.pop("code_joint_binding", None)
+        return result
 
     @model_validator(mode="after")
     def check_pointer_and_alignment(self) -> Self:
         pointer = self.pointer
+        joint = self.code_joint_binding
+        if joint is not None:
+            if (
+                self.source != "code"
+                or self.direction != "support"
+                or self.covered != [joint.condition_id]
+                or not self.additional_pointers
+                or len(joint.members) != 1 + len(self.additional_pointers)
+            ):
+                raise ValueError("Code joint binding requires one-condition multi-source code support")
+            import json
+            from hashlib import sha256
+
+            for member, source in zip(joint.members, [pointer, *self.additional_pointers], strict=True):
+                fingerprint = sha256(
+                    json.dumps(
+                        source.model_dump(mode="json"),
+                        sort_keys=True,
+                        ensure_ascii=False,
+                        separators=(",", ":"),
+                        allow_nan=False,
+                    ).encode()
+                ).hexdigest()
+                if not source.quote.strip() or source.line is None or member.pointer_sha256 != fingerprint:
+                    raise ValueError("Code joint pointer identity is incomplete or mismatched")
         if self.additional_pointers:
-            if self.source != "paper_internal" or self.direction != "support":
+            if joint is None and (self.source != "paper_internal" or self.direction != "support"):
                 raise ValueError("additional pointers require paper_internal support evidence")
             seen = {(pointer.locator, pointer.page, pointer.line, pointer.key, pointer.quote)}
             for additional in self.additional_pointers:
-                if not additional.quote.strip() or not (additional.page or (additional.key or "").strip()):
+                if joint is None and (
+                    not additional.quote.strip() or not (additional.page or (additional.key or "").strip())
+                ):
                     raise ValueError("additional paper pointers require an exact quote and page or key")
                 identity = (
                     additional.locator,

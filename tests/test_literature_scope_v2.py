@@ -93,6 +93,7 @@ def test_one_recognized_topic_produces_three_distinct_intents(tmp_path, topic):
 @pytest.mark.parametrize("topic", ["image classification", "machine translation"])
 async def test_dispatch_runs_single_domain_claim_and_global_related_work(tmp_path, monkeypatch, topic):
     materials, claim = inputs(tmp_path, topic)
+    Path(materials.markdown_path).write_text(materials.markdown, encoding="utf-8")
     prior = {
         "id": "1901.00001",
         "arxiv_id": "1901.00001",
@@ -107,7 +108,7 @@ async def test_dispatch_runs_single_domain_claim_and_global_related_work(tmp_pat
         payload = json.loads(kwargs["prompt"].split("\nDATA_JSON:\n")[1])
         calls.append(payload["claim"])
         is_claim = payload["claim"] is not None
-        return {
+        response = {
             "status": "ok",
             "comparisons": [
                 {
@@ -123,6 +124,18 @@ async def test_dispatch_runs_single_domain_claim_and_global_related_work(tmp_pat
                 }
             ],
         }
+        if not is_claim:
+            target = payload["manuscript_targets"][0]
+            response["comparisons"][0]["omission_assessment"] = {
+                "version": "omission-v1",
+                "decision": "important_missing",
+                "basis": "method_positioning",
+                "target_source_id": target["source_id"],
+                "target_quote": target["source_quote"],
+                "external_role": "scientific_contribution",
+                "reason": "This prior shared operator informs the positioning of the manuscript's method for the same task.",
+            }
+        return response
 
     result = await verify_claims(
         [claim], materials, tmp_path / "verification", submission_deadline="2021-01-01", call=model

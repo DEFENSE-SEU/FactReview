@@ -67,8 +67,19 @@ async def verify_claims(
     if branches is None:
         from verification.code import verify_code
         from verification.experiments import verify_experiments
-        from verification.literature import verify_literature
+        from verification.literature import _claim_source_excerpts, verify_literature
         from verification.theory import verify_theory
+
+        global_targets = []
+        for original in claims:
+            try:
+                global_targets.extend(
+                    {**source, "claim_id": original.id}
+                    for source in _claim_source_excerpts(original, materials)
+                )
+            except ValueError:
+                # Preserve a visible unavailable target without borrowing another claim's source.
+                global_targets.append({"claim_id": original.id})
 
         async def literature(claim, materials):
             return await verify_literature(
@@ -77,6 +88,7 @@ async def verify_claims(
                 submission_deadline=submission_deadline,
                 call=call,
                 output_dir=output_dir,
+                manuscript_targets=global_targets if claim is None else None,
             )
 
         branches = {

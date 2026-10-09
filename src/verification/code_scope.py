@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import uuid
+from pathlib import Path
 from typing import Annotated, Literal
 
 from pydantic import Field, StringConstraints
@@ -13,6 +14,7 @@ from llm.diagnostics import redact_provider_details, sanitized_endpoint
 from schemas.claim import Claim, Contract, NonEmpty
 from schemas.materials import SharedMaterials
 from screening import checks
+from screening.visual_audit import redacted_record
 
 ExactID = Annotated[str, StringConstraints(min_length=1)]
 
@@ -20,7 +22,14 @@ ExactID = Annotated[str, StringConstraints(min_length=1)]
 class CodeConditionScope(Contract):
     condition_id: ExactID
     required_facets: list[
-        Literal["implementation", "empirical_outcome", "novelty", "availability", "uncertain"]
+        Literal[
+            "implementation",
+            "repository_contents",
+            "empirical_outcome",
+            "novelty",
+            "availability",
+            "uncertain",
+        ]
     ] = Field(min_length=1)
     claim_source_ids: list[ExactID] = Field(min_length=1)
     rationale: NonEmpty
@@ -29,6 +38,12 @@ class CodeConditionScope(Contract):
 class BridgeQuote(Contract):
     block_id: ExactID
     quote: NonEmpty
+
+
+class CodeSourceUse(Contract):
+    source_index: int = Field(ge=0, strict=True)
+    role: Literal["implementation", "configuration", "artifact_contents", "link"]
+    rationale: NonEmpty
 
 
 class CodeScopeDecision(Contract):
@@ -42,6 +57,7 @@ class CodeScopeDecision(Contract):
     bridge_quotes: list[BridgeQuote]
     missing_qualifiers: list[NonEmpty]
     rationale: NonEmpty
+    source_uses: list[CodeSourceUse] = Field(default_factory=list)
 
 
 class CodeScopeOutput(Contract):
@@ -93,17 +109,31 @@ def _claim_sources(claim, materials):
 
 
 def review_code_scope(
-    claim: Claim, materials: SharedMaterials, items, sources: dict[str, str], source_scope: dict, *, call=None
+    claim: Claim,
+    materials: SharedMaterials,
+    items,
+    sources: dict[str, str],
+    source_scope: dict,
+    *,
+    call=None,
+    candidate_indices=None,
+    joint_members=None,
+    first_response=None,
 ):
     """Keep valid condition/item decisions when another decision is malformed."""
     cfg = checks.resolve_llm_config()
+    indices = list(range(len(items))) if candidate_indices is None else candidate_indices
+    members = joint_members or {}
     catalog = _claim_sources(claim, materials)
     relevant = {item.paper_block_id for item in items} | {row["block_id"] for row in catalog.values()}
     positions = {index for index, block in enumerate(materials.blocks) if block.id in relevant}
     positions = {near for index in positions for near in (index - 1, index, index + 1)}
     paper = {block.id: block for index, block in enumerate(materials.blocks) if index in positions}
     code_lines = {}
-    for item in items:
+    for original_index, item in zip(indices, items, strict=True):
+        if original_index in members:
+            # Joint sufficiency can consume only the explicitly declared ranges.
+            continue
         lines = sources[item.file].splitlines()
         selected = code_lines.setdefault(item.file, {})
         for index in range(
@@ -122,6 +152,10 @@ def review_code_scope(
         "source_scope": source_scope,
         "output_schema": CodeScopeOutput.model_json_schema(),
     }
+    if members:
+        payload.update(candidate_indices=indices, joint_members=members)
+    elif indices != list(range(len(items))):
+        payload["candidate_indices"] = indices
     system = (
         "Independently review the applicability and complete coverage of each Code candidate. "
         "Return exactly one conditions entry per claim condition, and one items entry for each "
@@ -146,6 +180,19 @@ def review_code_scope(
         "context with uncertain. Do not invent execution evidence or claim statuses. "
         "Copy bridge quotes verbatim, preserving whitespace and mathematical markup."
     )
+    if members:
+        system += (
+            " Joint candidates explicitly declare all their code members in joint_members, keyed by "
+            "original candidate index; candidate_indices maps candidate_items order to those indices. "
+            "Judge each joint as one observation, never union separate partial candidates. Its decisive "
+            "code sources are only those exact declared member lines, not another candidate or nearby "
+            "context. Give source_uses naming every source_index exactly once, its role and why it "
+            "contributes to this condition. Verify the actual cross-file links and selected configuration; "
+            "do not substitute unused/dead/optional paths. repository_contents means only the supplied "
+            "frozen repository's local artifact contents. availability still includes public URL access "
+            "or external release completeness and cannot be established by local files. Keep empirical "
+            "outcomes and novelty separate. Single-source items must leave source_uses empty."
+        )
     stats = run_stats.stats_path()
     audit_path = stats.parent / "code_scope_reviews" / f"{uuid.uuid4().hex}.json" if stats else None
     audit = {
@@ -156,9 +203,22 @@ def review_code_scope(
         "system": system,
         "request": payload,
     }
+    if members:
+        import hashlib
+
+        audit.update(
+            repository_root=str(Path(materials.repository.root).resolve()),
+            paper_source_hashes={
+                str(Path(name).resolve()): hashlib.sha256(Path(name).read_bytes()).hexdigest()
+                for name in (materials.markdown_path, materials.source_pdf)
+                if Path(name).is_file()
+            },
+        )
+    if first_response is not None:
+        audit["first_response"] = first_response
     scopes, decisions, issues = {}, {}, []
     condition_ids = {condition.id for condition in claim.conditions}
-    expected = {(index, cid) for index, item in enumerate(items) for cid in item.covered}
+    expected = {(index, cid) for index, item in zip(indices, items, strict=True) for cid in item.covered}
     seen_conditions, seen_items = set(), set()
     try:
         response = checks.ask(system, payload, module="verification.code.scope", call=call)
@@ -210,11 +270,19 @@ def review_code_scope(
                 key = (parsed.item_index, parsed.condition_id)
                 if key not in expected:
                     raise ValueError("Scope decision references a foreign candidate/condition pair")
+                if parsed.item_index in members:
+                    supplied = [use.source_index for use in parsed.source_uses]
+                    if sorted(supplied) != list(range(len(members[parsed.item_index]))):
+                        raise ValueError("Joint Code scope must consume every declared member exactly once")
+                elif parsed.source_uses:
+                    raise ValueError("Single-source Code scope cannot consume joint members")
                 for bridge in parsed.bridge_quotes:
                     if bridge.block_id not in paper:
                         raise ValueError("Bridge references an unsupplied manuscript block")
                     checks.grounded_paper_pointer(materials, paper[bridge.block_id], bridge.quote)
                 parsed.rationale = redact_provider_details(parsed.rationale, cfg)
+                for use in parsed.source_uses:
+                    use.rationale = redact_provider_details(use.rationale, cfg)
                 decisions[key] = parsed
             except (ValueError, TypeError) as exc:
                 issues.append(f"Code candidate scope unconfirmed for {key}: {exc}")
@@ -232,8 +300,14 @@ def review_code_scope(
         validated_items=[row.model_dump(mode="json") for row in decisions.values()],
     )
     if audit_path:
-        audit_path.parent.mkdir(parents=True, exist_ok=True)
-        audit_path.write_text(
-            json.dumps(redact_provider_details(audit, cfg), ensure_ascii=False, indent=2), encoding="utf-8"
-        )
+        try:
+            audit_path.parent.mkdir(parents=True, exist_ok=True)
+            audit_path.write_text(
+                json.dumps(redacted_record(audit, cfg), ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+        except OSError as exc:
+            if first_response is None:
+                raise
+            issues.append(redact_provider_details(f"Joint Code scope audit unavailable: {exc}", cfg))
+            audit_path = None
     return scopes, decisions, issues, audit_path

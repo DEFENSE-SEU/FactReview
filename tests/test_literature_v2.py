@@ -114,7 +114,26 @@ def comparison(paper, *, relation="different", purpose="novelty", covered=None, 
     }
 
 
-def model(*rows):
+def model(*rows, omission=False):
+    if omission:
+
+        def respond(**kwargs):
+            payload = json.loads(kwargs["prompt"].split("\nDATA_JSON:\n")[1])
+            target = payload["manuscript_targets"][0]
+            comparisons = json.loads(json.dumps(rows))
+            for row in comparisons:
+                row["omission_assessment"] = {
+                    "version": "omission-v1",
+                    "decision": "important_missing",
+                    "basis": "evaluation_baseline" if row["purpose"] == "baseline" else "method_positioning",
+                    "target_source_id": target["source_id"],
+                    "target_quote": target["source_quote"],
+                    "external_role": "scientific_contribution",
+                    "reason": "The earlier relation-composition mechanism provides a comparison for this link-prediction method.",
+                }
+            return {"status": "ok", "comparisons": comparisons}
+
+        return Mock(side_effect=respond)
     return Mock(return_value={"status": "ok", "comparisons": list(rows)})
 
 
@@ -458,7 +477,14 @@ async def test_attached_citation_support_and_global_uncited_findings(claim, mate
         submission_deadline="2021-01-31",
         searcher=searcher,
         reader=reader,
-        call=model(comparison(paper, purpose="related_work", relation="partial", covered=[])),
+        call=model(comparison(paper, purpose="related_work", relation="partial", covered=[]), omission=True),
+        manuscript_targets=[
+            {
+                "source_block_id": "b1",
+                "source_quote": materials.blocks[0].text,
+                "loc": materials.blocks[0].loc.model_dump(mode="json"),
+            }
+        ],
     )
     assert not global_result.findings  # The paper is already in the bibliography.
     materials.bibliography = []
@@ -468,7 +494,14 @@ async def test_attached_citation_support_and_global_uncited_findings(claim, mate
         submission_deadline="2021-01-31",
         searcher=searcher,
         reader=reader,
-        call=model(comparison(paper, purpose="baseline", relation="partial", covered=[])),
+        call=model(comparison(paper, purpose="baseline", relation="partial", covered=[]), omission=True),
+        manuscript_targets=[
+            {
+                "source_block_id": "b1",
+                "source_quote": materials.blocks[0].text,
+                "loc": materials.blocks[0].loc.model_dump(mode="json"),
+            }
+        ],
     )
     assert global_result.findings[0].kind == "baseline"
     assert global_result.findings[0].evidence[0].pointer.quote

@@ -181,6 +181,23 @@ def execution_summary(review: FinalReview) -> dict:
     }
 
 
+def _code_joint_integrity(claim):
+    from verification.code_joint import checked_joint_sources
+
+    lines = []
+    for index, evidence in enumerate(claim.evidence):
+        try:
+            checked_joint_sources(evidence, claim)
+        except (OSError, ValueError, KeyError, TypeError, IndexError) as exc:
+            lines += [
+                "",
+                f"**Current Code source integrity is unavailable (evidence {index + 1}).** "
+                + _text(str(exc)),
+                "The evidence and claim status retain the historical verification; its recorded joint sources no longer validate.",
+            ]
+    return lines
+
+
 def _theory_derivations(claim, _navigation=None):
     if not claim.theory_derivations:
         return []
@@ -490,6 +507,7 @@ def render_markdown(
                     f"- {_text(ref.source_block_id)}; {_location(ref.loc)}; "
                     f"conditions: {_text(', '.join(ref.covered))}. Quote: {_text(ref.source_quote)}"
                 )
+        lines.extend(_code_joint_integrity(claim))
         lines += ["", f"Evidence needs: {', '.join(claim.needs) or 'none'}.", "", "Evidence:", ""]
         if not claim.evidence:
             lines.append("No evidence is available for assessment.")

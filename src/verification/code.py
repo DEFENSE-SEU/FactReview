@@ -8,6 +8,7 @@ import os
 import re
 import uuid
 from collections import Counter
+from copy import deepcopy
 from pathlib import Path
 from typing import Literal
 
@@ -20,6 +21,8 @@ from schemas.limitations import VerificationLimitation
 from schemas.materials import SharedMaterials
 from screening import checks
 from screening.checks import ask
+from screening.visual_audit import redacted_record
+from verification.code_joint import checked_joint_sources, make_binding
 from verification.code_scope import review_code_scope
 from verification.code_sources import CodeSourceContext
 from verification.contracts import BranchResult
@@ -103,13 +106,17 @@ def _scope_summary(scope: dict, claim: Claim) -> dict:
     return summary
 
 
-class CodeItem(Contract):
+class CodeSourceSpan(Contract):
     file: NonEmpty
     line: int = Field(ge=1)
     quote: str = Field(
         min_length=1,
         description="Exact contiguous full source lines starting at line; preserve indentation and whitespace.",
     )
+
+
+class CodeItem(CodeSourceSpan):
+    additional_sources: list[CodeSourceSpan] = Field(default_factory=list, max_length=8)
     paper_block_id: NonEmpty
     paper_quote: NonEmpty = Field(
         description="Verbatim contiguous substring of paper_block_id's text, preserving math and whitespace."
@@ -192,7 +199,13 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
         "math, paraphrase, or join disjoint passages. "
         "source_scope lists omitted files and the source budget. An omitted file has not been inspected; "
         "do not infer missing implementations or repository-wide agreement from this selection. "
-        "Only cite supplied files. Never execute or change code. Do not invent status or sufficiency fields.",
+        "Only cite supplied files. Never execute or change code. Do not invent status or sufficiency fields. "
+        "When one condition requires multiple files, explicitly propose ONE support item with primary "
+        "file/line/quote and additional_sources containing every other exact source range needed. "
+        "Such a joint item must cover exactly one condition. Establish the actual cross-file links "
+        "and all original qualifiers; do not automatically merge separate partial observations. "
+        "additional_sources=[] retains single-source behavior. Local file contents do not establish "
+        "public URL availability, a measured execution result, or external release completeness.",
         {
             "claim": claim.model_dump(mode="json"),
             "allowed_condition_ids": [condition.id for condition in claim.conditions],
@@ -205,40 +218,158 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
         call=call,
     )
     frozen.check(claim, materials)
+    response = deepcopy(response)
+    parse_issues = []
+    invalid_joint_rows = []
+    parsed_items = []
     try:
-        output = CodeOutput.model_validate(response)
+        raw_items = response.get("items") if isinstance(response, dict) else None
+        has_joint = isinstance(raw_items, list) and any(
+            isinstance(row, dict) and "additional_sources" in row and row["additional_sources"] != []
+            for row in raw_items
+        )
+        if has_joint:
+            if set(response) - {"items", "issues"}:
+                raise ValueError("Unknown Code response fields")
+            output = CodeOutput(items=[], issues=response.get("issues", []))
+            for index, row in enumerate(raw_items):
+                try:
+                    parsed_items.append((index, CodeItem.model_validate(row)))
+                except ValueError as exc:
+                    if (
+                        not isinstance(row, dict)
+                        or "additional_sources" not in row
+                        or row["additional_sources"] == []
+                    ):
+                        raise
+                    parse_issues.append(
+                        f"Joint Code candidate {index} invalid: {redact_provider_details(str(exc), cfg)}"
+                    )
+                    invalid_joint_rows.append((index, row))
+        else:
+            output = CodeOutput.model_validate(response)
+            parsed_items = list(enumerate(output.items))
     except ValueError as exc:
         raise ValueError(redact_provider_details(str(exc), cfg)) from None
-    result = BranchResult(issues=[*scope_issues, *redact_provider_details(output.issues, cfg)])
+    result = BranchResult(issues=[*scope_issues, *parse_issues, *redact_provider_details(output.issues, cfg)])
     validated = []
-    for item in output.items:
-        if item.file not in sources:
-            raise ValueError("Code evidence references a file outside the repository index")
-        lines = sources[item.file].splitlines()
-        quoted_lines = item.quote.splitlines()
-        if not item.quote.strip() or lines[item.line - 1 : item.line - 1 + len(quoted_lines)] != quoted_lines:
-            raise ValueError("Code evidence quote does not match its indexed source lines")
-        paper = _paper_pointer(materials, item.paper_block_id, item.paper_quote)
-        covered = _covered(claim, item.covered)
-        _fully_supported(covered, item.fully_supported_conditions)
-        validated.append((item, paper, covered))
+    joint_members = {}
+    root = Path(materials.repository.root).resolve(strict=True)
+    hashes = {entry.path: entry.sha256 for entry in materials.repository.files}
+
+    def joint_failure(index, covered, error):
+        reason = f"Joint Code candidate {index} unavailable: {redact_provider_details(str(error), cfg)}"
+        result.issues.append(reason)
+        if covered:
+            result.verification_limitations.append(
+                VerificationLimitation(
+                    claim_id=claim.id,
+                    condition_ids=covered,
+                    stage="Code",
+                    kind="evidence_validation_failed",
+                    reason=reason,
+                )
+            )
+
+    for index, row in invalid_joint_rows:
+        try:
+            covered = _covered(claim, row.get("covered", []))
+        except (ValueError, TypeError):
+            covered = []
+        joint_failure(index, covered, "The explicit joint candidate failed schema validation")
+    for index, item in parsed_items:
+        covered = []
+        try:
+            covered = _covered(claim, item.covered)
+            _fully_supported(covered, item.fully_supported_conditions)
+            if item.additional_sources and (len(covered) != 1 or item.direction != "support"):
+                raise ValueError("Joint Code requires one condition and support direction")
+            members, seen = [], set()
+            for ordinal, span in enumerate([item, *item.additional_sources]):
+                if span.file not in sources:
+                    raise ValueError("Code evidence references a file outside the repository index")
+                lines, quoted_lines = sources[span.file].splitlines(), span.quote.splitlines()
+                if (
+                    not span.quote.strip()
+                    or lines[span.line - 1 : span.line - 1 + len(quoted_lines)] != quoted_lines
+                ):
+                    raise ValueError("Code evidence quote does not match its indexed source lines")
+                key = (span.file, span.line, span.quote)
+                if key in seen:
+                    raise ValueError("Joint Code contains a duplicate source")
+                seen.add(key)
+                pointer = EvidencePointer(
+                    locator=str((root / span.file).resolve()), line=span.line, quote=span.quote
+                )
+                members.append(
+                    {
+                        "source_index": ordinal,
+                        "file": span.file,
+                        "pointer": pointer.model_dump(mode="json"),
+                        "artifact_sha256": hashes[span.file],
+                    }
+                )
+            paper = _paper_pointer(materials, item.paper_block_id, item.paper_quote)
+            validated.append((index, item, paper, covered, members))
+            if item.additional_sources:
+                joint_members[index] = members
+        except (ValueError, KeyError) as exc:
+            if not item.additional_sources:
+                raise
+            joint_failure(index, covered, exc)
     if not validated:
+        if has_joint and run_stats.stats_path() is not None:
+            path = run_stats.stats_path().parent / "code_scope_reviews" / f"{uuid.uuid4().hex}.json"
+            try:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(
+                    json.dumps(
+                        redacted_record(
+                            {
+                                "claim_id": claim.id,
+                                "first_response": response,
+                                "state": "no_grounded_candidate",
+                                "issues": result.issues,
+                            },
+                            cfg,
+                        ),
+                        ensure_ascii=False,
+                        indent=2,
+                    ),
+                    encoding="utf-8",
+                )
+                result.issues.append(f"Joint Code rejected candidate audit: {path}")
+            except OSError as exc:
+                result.issues.append(
+                    redact_provider_details(f"Joint Code candidate audit unavailable: {exc}", cfg)
+                )
         frozen.check(claim, materials)
         return result
     scopes, decisions, issues, audit = review_code_scope(
-        claim, materials, output.items, sources, summary, call=scope_call or call
+        claim,
+        materials,
+        [row[1] for row in validated],
+        sources,
+        summary,
+        call=scope_call or call,
+        candidate_indices=[row[0] for row in validated],
+        joint_members=joint_members,
+        first_response=response if has_joint else None,
     )
     frozen.check(claim, materials)
     result.issues.extend(issues)
-    root = Path(materials.repository.root).resolve(strict=True)
-    hashes = {entry.path: entry.sha256 for entry in materials.repository.files}
-    for name in {item.file for item in output.items}:
+    for name in {
+        span.file
+        for _, item in parsed_items
+        for span in [item, *item.additional_sources]
+        if span.file in sources
+    }:
         path = root / name
         if path.is_symlink() or not path.resolve(strict=True).is_relative_to(root):
             raise ValueError(f"Indexed file escapes repository: {name}")
         if hashlib.sha256(path.read_bytes()).hexdigest() != hashes[name]:
             raise ValueError(f"Indexed repository file changed during verification: {name}")
-    for index, (item, paper, covered) in enumerate(validated):
+    for index, item, paper, covered, members in validated:
         detail = redact_provider_details(item.detail, cfg)
         note = f"{item.aspect}: {detail}; paper {paper.locator} [{paper.key}]: {paper.quote}"
         if item.direction == "support":
@@ -255,7 +386,12 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
             )
             if valid and item.direction == "support":
                 valid = (
-                    scope.required_facets == ["implementation"]
+                    (
+                        bool(scope.required_facets)
+                        and set(scope.required_facets) <= {"implementation", "repository_contents"}
+                        if item.additional_sources
+                        else scope.required_facets == ["implementation"]
+                    )
                     and decision.relation == "supports_implementation"
                     and decision.full_condition
                     and cid in item.fully_supported_conditions
@@ -279,6 +415,13 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
                     note += f"; bridge {pointer.locator} [{pointer.key}]: {pointer.quote}"
         if audit:
             note += f"; scope_audit={audit}; candidate_index={index}"
+        binding = None
+        if item.additional_sources:
+            try:
+                binding = make_binding(claim, covered[0], index, members, audit)
+            except (OSError, ValueError) as exc:
+                joint_failure(index, covered, exc)
+                continue
         evidence = Evidence(
             source="code",
             pointer=EvidencePointer(
@@ -293,7 +436,15 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
             concern=item.direction == "flaw" and confirmed == covered,
             affects_claim=confirmed == covered,
             overturnable=True,
+            additional_pointers=[EvidencePointer.model_validate(row["pointer"]) for row in members[1:]],
+            code_joint_binding=binding,
         )
+        if binding:
+            try:
+                checked_joint_sources(evidence, claim)
+            except (OSError, ValueError, KeyError, TypeError, IndexError) as exc:
+                joint_failure(index, covered, exc)
+                continue
         result.evidence.append(evidence)
         if confirmed and confirmed != covered:
             # Retain the original observation's scope as non-decisive, alongside
@@ -310,4 +461,12 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
                 )
             )
     frozen.check(claim, materials)
+    retained = []
+    for evidence in result.evidence:
+        try:
+            checked_joint_sources(evidence, claim)
+            retained.append(evidence)
+        except (OSError, ValueError, KeyError, TypeError, IndexError) as exc:
+            joint_failure(evidence.code_joint_binding.candidate_index, evidence.covered, exc)
+    result.evidence = retained
     return result

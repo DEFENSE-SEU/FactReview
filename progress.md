@@ -1,5 +1,15 @@
 # FactReview v2 progress
 
+## Latest phase 4 follow-up: qualified omissions and multi-file Code sources
+
+Literature now uses explicit omission qualification in its existing comparison response and binds both the actual manuscript target and retrieved scientific passage. The dispatcher supplies original extracted claim excerpts for global review. Missing or invalid qualification stays in audit, with no author-facing omission accusation. The independent reviewer reproduced four conflicts with whitespace-padded purposes; the final leaf `976d38b7623f272b8a7e37760664ae615db9b54bad7e298cdcdf9dd18b314ff2` normalizes only duplicate rejection identity. The actual acceptance path stays strict. Final independent regression: 151 passes. The authorized fixture migration preserves all 121 existing assertion ASTs and the original scientific inputs.
+
+Code now records one explicit multi-file support candidate as one canonical Evidence with ordered pointers and a typed audit/source binding. The existing independent scope call must consume every declared member and establish the complete original condition. The local repository_contents facet cannot establish public availability or measured outcomes. Current source/audit changes revoke stale advice and appear in both report layouts while preserving historical scientific records. Fifty new tests, 301 related tests and eight additional root controls pass. Final hashes are in `runs/v2_method_delivery/code-joint-source-implementation/freeze.json`.
+
+Decisions: preserve all earlier actual failures; record fixed-response request/schema changes explicitly. The original claim003 replay remains Unverified, and old broad Literature overlap is not upgraded into qualified importance. No new actual model quality claim is made. Independent reports are in `literature-omission-independent/review.md` and `code-joint-independent/review.md` under `runs/v2_method_delivery/`.
+
+Next: run one unified frozen regression and clean installed-package smoke, then prepare and run the complete native pipeline with the original strict execution requirements. Docker daemon and the selected CPU Python image are available. Continue the active goal.
+
 ## Latest phase 4 follow-up: Theory heading and execution evidence responsibility
 
 The reviewed Theory visual source is `836a80d3a23cda286225b4e64f2a67ae1cb70f77fade1f2c0d49ab59dc014e2f`. It accepts a finite Appendix-prefix heading only with exact, unique, loaded, same-page source binding and a frozen complete block layout. The original direct matcher is unchanged. Independent review found and retained the initial unselected-heading mutation failure; the final lifecycle rejects it explicitly. Author regression: 173 passes. Independent regression: 34 passes. The original 474 visual replay retains its three responses, 49 protected files, partial derivation and Unverified outcome.

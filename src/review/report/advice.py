@@ -119,6 +119,10 @@ def theory_source_integrity(claim: Claim) -> dict[str, str]:
 def _local_files(claim, ledger):
     """Hash available local evidence artifacts without fetching remote locators."""
     files = theory_source_integrity(claim)
+    from verification.code_joint import checked_joint_sources
+
+    for evidence in claim.evidence:
+        files.update(checked_joint_sources(evidence, claim))
     locators = [p.locator for e in claim.evidence for p in [e.pointer, *e.additional_pointers]]
     for record in claim.theory_derivations:
         if record.audit_pointer:
