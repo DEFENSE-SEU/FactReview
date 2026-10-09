@@ -56,6 +56,8 @@ class TableMaterial(BaseModel):
 
     id: str
     block_id: str
+    parser_row_index: int | None = None
+    parser_bbox_space: Literal["normalized_1000", "pdf_points"] | None = None
     anchor: str = ""
     loc: ClaimLocation | None = None
     caption: str = ""
