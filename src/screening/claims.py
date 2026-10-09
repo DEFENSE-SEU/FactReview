@@ -85,6 +85,7 @@ qualifiers, and include their exact source_refs on that claim. Another extracted
 claim does not supply this claim's conditions or sources. Preserve uncertainty
 when the connection is ambiguous; do not infer a connection from adjacency alone.
 Return status='ok' and claims=[] only when the paper contains no eligible claims.
+Before returning, check the proposed claims against all supplied passages for omitted independent, review-relevant assertions. For each retained conclusion, make its governing qualifiers explicit in text or conditions; a sentence appearing in source_quote or source_refs alone does not establish that its independent assertion or qualifiers have been extracted. Keep joint conclusions together, preserve uncertainty where source relationships are ambiguous, and add only source-grounded omissions.
 """
 
 
