@@ -1,6 +1,18 @@
 # FactReview v2 progress
 
-## 当前 Phase5：关闭普通 Docker 的旧 None 资格绕过
+## 当前 Phase5：有限值流核验与真实只读 Docker 部署
+
+新增 runtime_flow.py：从原 claim、完整 condition、资源合同和实际源码重建四角色绑定；独立解释有界 JSON 数值表达式，并与十个实际调用事件的参数、返回、父关系和顺序核对。数据/权重参与只覆盖 AST 实际引用的数值选择器。科学资格、alignment、support 保持 false，stdout 来源尚未绑定。源码和 JSON 先最多读取65,537字节，超出65,536字节即 unresolved，避免先加载整份大文件。
+
+必要验证：三个新离线控制通过，精确类型反例原红与修后结果保留。容量变化仅复验一个受影响控制1/.64s；测试字节和15个断言保持。独审原报告682c2c54、容量增量f500b864 / evidencecf3ef036确认两份最终源码身份；没有全套或旧绿色组复放。
+
+新手工 Docker 部署使用已固定的本地Python3.11镜像，无模型、检索、训练，执行一次。源码/观测器只读、scratch独立；实际Python3.11.16完成并产生10个事件，stdout为1，运行后同名容器已不存在。原v1准备因闭合参数解析器拒绝manual --network而中止，0执行，记录保留；v2在完成生产保护后只增加network=none。独审c3e0e2bd / evidencec0520fba核21项收据通过。范围是production launcher/observer部署，未经过docker_runner构建/输出解析或runtime_flow消费，不能推断科学正确或商用完成。
+
+输出：runs/v2_method_delivery/runtime-flow-implementation/frozen-final-v2/、runtime-flow-independent/review-final-v2.md；runtime-observer-docker-validation-v1/与v2/原记录及独审报告。上一批已推送并核精确远端a03cbc08a0288b0a6a616b50254420278e67f90e；本批Phase5仅提交/推送refactor/method-v2，收据在runtime-flow-implementation/delivery.json。不开PR、不改main、原actual失败保持。
+
+Decisions / Next action：接线须认证实际只读launcher、配置和报告来源，并使用实际运行时producer的Code identity；host3.12不能编译冒认3.11。现有完整命令不会请求proposal，缺命令补全后又与原plan命令核不一致；后续明确以原plan和独立实际request分别绑定，保持作者命令和实验条件。若启用已有命令能力补全，每计划最多一次refinement且记录真实调用。随后闭合严格stdout、逐条件科学角色与实际资源元数据。通用模型、无标量分析、genuine M2/M5、全论文覆盖和整体验收仍开放，goal active。
+
+## 历史 a03 Phase5：关闭普通 Docker 的旧 None 资格绕过
 
 已修复：生产 docker_runner 由程序写入 environment.transport=docker，作者 raw JSON 不参与该字段。普通 Docker 输出现在统一经过消费资格护栏，旧None合同也不能凭 dataset/metric/settings/value 标签生成证据。原0退出、数值、日志保留；缺消费关系记录unresolved，不新增系统故障。version2完整released-predictions重算分支先执行且不变；无transport的明确自定义runner只保留受信operator/test注入兼容，不能据此声称独立复现。
 
