@@ -7,7 +7,6 @@ in runtime output; target conditions are never substituted for missing output.
 
 from __future__ import annotations
 
-import difflib
 import hashlib
 import json
 import math
@@ -38,6 +37,17 @@ from schemas.materials import SharedMaterials
 from schemas.review import DeliveryCheck
 from util.subprocess_runner import CommandResult, persist_command_result, run_command
 
+from .repair_evidence import (
+    TEXT_BUDGET,
+    SourceReadUnavailable,
+    bounded_source,
+    changes_with_raw,
+    file_diffs,
+    fresh_round,
+    inventory,
+    plain_path,
+    request_diff,
+)
 from .tools.docker import _IMPORT_TO_PIP, docker_cmd, docker_ensure_paper_image, docker_run_paper_image
 from .tools.log_metrics import _iter_json_objects
 from .tools.paper_tables import _metric_key
@@ -230,6 +240,7 @@ def _refine(
 ) -> tuple[list[str], str | None, dict]:
     from .runtime_launch import bind_source_sites
 
+    workspace = plain_path(workspace)
     configured_mapping = config.output_mappings.get(plan.id)
     telemetry = {
         "mode": "deterministic",
@@ -269,14 +280,34 @@ def _refine(
                     pass
             return None
 
-        files = {}
-        for relative in [plan.task.entry_script, plan.task.config, "README.md"]:
+        files, source_scope, unavailable = {}, {}, []
+        total_bytes = 0
+        for relative in dict.fromkeys([plan.task.entry_script, plan.task.config, "README.md"]):
             if relative:
                 path = _inside(workspace, relative)
                 if path.is_file():
-                    files[relative] = path.read_text(encoding="utf-8", errors="replace")
+                    raw, source_scope[relative] = bounded_source(Path(workspace) / relative)
+                    if raw is not None and total_bytes + len(raw) <= TEXT_BUDGET:
+                        total_bytes += len(raw)
+                        files[relative] = raw.decode("utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
+                    else:
+                        source_scope[relative].update(complete=False, reason="source_capacity")
+                        unavailable.append(relative)
+                else:
+                    source_scope[relative] = {"complete": False, "reason": "source_unavailable",
+                                              "size": None, "sha256": None}
+                    unavailable.append(relative)
+        read_scope = {"read": list(files), "unavailable": unavailable, "sources": source_scope,
+                      "byte_limit_per_source": 65536, "total_byte_limit": TEXT_BUDGET}
+        if not command and any(
+            name and source_scope[name].get("reason") == "source_capacity"
+            for name in (plan.task.entry_script, plan.task.config)
+        ):
+            raise SourceReadUnavailable(
+                "command refinement requires complete entry/config source; source capacity exceeded", read_scope,
+            )
         before_tokens, started = token_count(), time.monotonic()
-        input_payload = {"plan": plan.model_dump(mode="json"), "files": files}
+        input_payload = {"plan": plan.model_dump(mode="json"), "files": files, "source_read_scope": read_scope}
         if flow_scope:
             from .resource_contract import _scientific_claim
             from .runtime_science import read_science_sources
@@ -313,6 +344,8 @@ def _refine(
             + json.dumps(OutputMapping.model_json_schema())
             + " "
             "Use the original entry script, conditions and evaluation logic. Never invent metrics. "
+            "source_read_scope declares complete supplied files and read gaps. Unread or over-capacity files "
+            "cannot supply source locations or scientific roles. Never reconstruct missing source from a prefix. "
             "You may also return source_sites, at most eight objects with only path, qualname and "
             "firstlineno, identifying synchronous Python functions in the supplied files. "
             "These are candidate locations for observing actual calls, with no semantic, alignment "
@@ -362,6 +395,7 @@ def _refine(
             else None,
             "token_source": str(stats_path()) if stats_path() else "unavailable",
             "output_mapping": configured_mapping.model_dump() if configured_mapping else None,
+            "source_read_scope": read_scope,
             "source_sites": bind_source_sites(
                 response.get("source_sites"), workspace=workspace, supplied_files=files,
             ),
@@ -1142,6 +1176,9 @@ def _execute_plans(
                     raise ValueError("read-only released source changed during execution")
             except (ValueError, OSError, RuntimeError, AttributeError, TypeError) as exc:
                 del claim.evidence[previous_evidence:]
+                if operation == "refinement" and isinstance(exc, SourceReadUnavailable):
+                    row["refinement"] = {"mode": "unavailable", "source_read_scope": exc.source_read_scope,
+                                         "tokens": 0, "runtime_seconds": 0.0}
                 if operation == "refinement" and not plan.task.command and config.refine_with_llm:
                     reason = f"Requested command refinement failed ({type(exc).__name__})"
                     row["operation_failures"].append(ExecutionOperationFailure(
@@ -1614,34 +1651,20 @@ def _execute_graph(
         before = request.model_dump(mode="json")
         try:
             workspace = Path(request.workspace)
-            before_files = {
-                path.relative_to(workspace).as_posix(): path.read_bytes()
-                for path in workspace.rglob("*")
-                if path.is_file()
-            }
+            evidence = fresh_round(Path(request.run_dir), workspace, record["round"])
+            record["file_audit"] = {"evidence_directory": str(evidence), "before_complete": False,
+                                    "after_complete": False}
+            before_files = inventory(workspace, evidence / "before")
+            record["before_file_manifest"] = before_files
+            record["file_audit"]["before_complete"] = True
             proposal = repairer(request.model_copy(deep=True), outcome.model_copy(deep=True))
-            after_files = {
-                path.relative_to(workspace).as_posix(): path.read_bytes()
-                for path in workspace.rglob("*")
-                if path.is_file()
-            }
-            if before_files != after_files:
-                record["unauthorized_file_diffs"] = {
-                    path: "".join(
-                        difflib.unified_diff(
-                            before_files.get(path, b"")
-                            .decode("utf-8", errors="replace")
-                            .splitlines(keepends=True),
-                            after_files.get(path, b"")
-                            .decode("utf-8", errors="replace")
-                            .splitlines(keepends=True),
-                            fromfile=path + ".before",
-                            tofile=path + ".after",
-                        )
-                    )
-                    for path in before_files.keys() | after_files.keys()
-                    if before_files.get(path) != after_files.get(path)
-                }
+            after_files = inventory(workspace)
+            changes = changes_with_raw(before_files, after_files, workspace, evidence / "after_callback")
+            record["after_file_manifest"] = after_files
+            record["file_audit"]["after_complete"] = True
+            if changes:
+                record["unauthorized_file_changes"] = changes
+                record["unauthorized_file_diffs"], record["file_diff_display"] = file_diffs(changes)
                 raise ValueError("repair callback directly changed repository files")
             if proposal is None:
                 record["reason"] = "no permitted infrastructure repair available"
@@ -1652,27 +1675,17 @@ def _execute_graph(
             proposal = Repair.model_validate(proposal)
             record["proposal"] = proposal.model_dump()
             updated = _apply_repair(request, proposal)
-            record["accepted"] = True
-            record["diff"] = "".join(
-                difflib.unified_diff(
-                    (json.dumps(before, indent=2) + "\n").splitlines(keepends=True),
-                    (json.dumps(updated.model_dump(mode="json"), indent=2) + "\n").splitlines(keepends=True),
-                    fromfile="request.before.json",
-                    tofile="request.after.json",
-                )
+            record["diff"], record["request_diff_display"], record["request_raw_evidence"] = request_diff(
+                before, updated.model_dump(mode="json"), evidence,
             )
-            record["file_diffs"] = {
-                path.relative_to(workspace).as_posix(): "".join(
-                    difflib.unified_diff(
-                        [],
-                        path.read_text(encoding="utf-8").splitlines(keepends=True),
-                        fromfile="/dev/null",
-                        tofile=path.relative_to(workspace).as_posix(),
-                    )
-                )
-                for path in workspace.rglob("*")
-                if path.is_file() and path.relative_to(workspace).as_posix() not in before_files
-            }
+            repaired_files = inventory(workspace)
+            record["file_changes"] = changes_with_raw(before_files, repaired_files, workspace, evidence / "after_repair")
+            record["after_file_manifest"] = repaired_files
+            record["file_diffs"], record["file_diff_display"] = file_diffs(
+                record["file_changes"], added_from_null=True,
+                remaining=TEXT_BUDGET - len(record["diff"].encode("utf-8")),
+            )
+            record["accepted"] = True
             _json(Path(request.run_dir) / f"repair_{updated.repair_round}.json", record)
             state.update(request=updated, retry=True)
         except Exception as exc:

@@ -9,6 +9,7 @@ import sys
 import uuid
 from pathlib import Path, PurePosixPath
 
+from .repair_evidence import SOURCE_BYTES, bounded_source, plain_path
 from .runtime_observer import prepare_site
 
 # Official CPython v3.11.0 Python/stdlib_module_names.h (305 names).
@@ -112,7 +113,7 @@ def bind_source_sites(proposals, *, workspace, supplied_files):
     """Bind only exact proposals from the current refinement's actual file text."""
     result = {"version": "python-source-sites-v1", "status": "unresolved", "sites": [], "unresolved": []}
     try:
-        root = _path(workspace)
+        root = _path(plain_path(Path(workspace)))
         if not root.is_dir() or type(supplied_files) is not dict:
             raise ValueError("supplied_source_unavailable")
         if type(proposals) is not list or not 1 <= len(proposals) <= 8:
@@ -120,11 +121,23 @@ def bind_source_sites(proposals, *, workspace, supplied_files):
         seen = set()
         for index, proposal in enumerate(proposals):
             try:
-                leaf, path = _site(proposal, root, hashed=False)
-                if type(supplied_files.get(leaf["path"])) is not str:
-                    raise ValueError("source_site_not_supplied")
-                if path.read_text(encoding="utf-8", errors="replace") != supplied_files[leaf["path"]]:
+                if type(proposal) is not dict or set(proposal) != {"path", "qualname", "firstlineno"}:
+                    raise ValueError("site_fields_not_closed")
+                relative = _relative(proposal["path"])
+                supplied = supplied_files.get(relative)
+                if type(supplied) is not str or len(supplied) > SOURCE_BYTES:
+                    raise ValueError("source_site_not_supplied_or_over_capacity")
+                candidate = _path(plain_path(root / relative))
+                if not candidate.is_relative_to(root):
+                    raise ValueError("site_source_unavailable")
+                raw, scope = bounded_source(candidate)
+                if raw is None or not scope["complete"]:
+                    raise ValueError("source_site_over_capacity")
+                if raw.decode("utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n") != supplied:
                     raise ValueError("supplied_source_changed")
+                leaf, _path_unused = _site(proposal, root, hashed=False)
+                if leaf["sha256"] != scope["sha256"]:
+                    raise ValueError("source_site_identity_changed_after_complete_read")
                 key = (leaf["path"], leaf["qualname"], leaf["firstlineno"])
                 if key in seen:
                     raise ValueError("duplicate_source_site")
