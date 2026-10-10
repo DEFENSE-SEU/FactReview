@@ -36,8 +36,8 @@ This matrix incorporates the current corrections. Historical passing matrices be
 |---|---|---|
 | 1. Tests retain their scientific assertions | affected controls pass | Current whole-suite result unavailable; old assertion preservation and narrowly strengthened late-PDF controls recorded. |
 | 2. Seven-stage orchestration | structurally verified | Real all-stage outputs remain partial; synthetic orchestration cannot prove genuine-paper accuracy. |
-| 3. Upfront uncapped, independently checkable claims | open | Genuine scope omissions, false qualifier findings and incomplete independent recheck remain. |
-| 4. Claim conditions and source/evidence bindings | bounded verification | Mechanical identities pass; semantic carrier applicability requires further repair. |
+| 3. Upfront uncapped, independently checkable claims | v4 necessary mock and independent source review pass; actual open | Source directory, condition partition, authoritative atoms and independent third-only targets are implemented without a claim cap. Original actual omissions/false qualifier findings remain; genuine v4 recall and materiality are unmeasured. |
+| 4. Claim conditions and source/evidence bindings | bounded mechanical verification | Independent source-condition mismatch counterexample retained and repaired; byte-identical probe plus direct guards pass9 controls. Actual source governance and semantic carrier sufficiency remain open. |
 | 5. Needs-based peer dispatch | verified | Global failures now have explicit delivery records; actual evidence adequacy remains separate. |
 | 6. Genuine VLM image/caption/body inputs | bounded actual verification | Full-paper visual quality and unavailable context operations remain open. |
 | 7. Literature cutoff, concurrency and self-exclusion | bounded verification | Query delivery/pagination facts pass necessary mock and independent checks; condition-level scientific scope adequacy and current absence support remain open. |
@@ -47,7 +47,9 @@ This matrix incorporates the current corrections. Historical passing matrices be
 | 11. Four statuses and safe one-way v1 adapter | verified at targeted checkpoints | Historical in_conflict remains questioned without reassessment. |
 | 12. Four-part report, advice and honest delivery | bounded delivery repair verified | Late-teaser healthy PDF sync and formatter fallback pass necessary controls/local navigation/independent review; requested advice service failures, filesystem failure and whole-flow quality remain open. |
 | 13. Original baseline and explicit blockers | recorded | Original actual failures remain intact; latest whole-flow strict acceptance still fails. |
-| 14. Progress and delivery match the workspace | reviewed checkpoint, goal active | Late-teaser phase7 is delivered2a2805d; phase4 paging final independent review and exact six-file hashes pass and are being checkpointed. Overall framework remains incomplete. |
+| 14. Progress and delivery match the workspace | reviewed checkpoint, goal active | PDF phase7/paging phase4 delivered as2a2805d/2e83a8a. Coverage phase3 final-v3 independent and root eight-file hash reviews pass and are being checkpointed. Literature adequacy review and current-source native integration remain pending. Overall framework remains incomplete. |
+
+Current phase3 evidence: `original-recheck-semantic-v4-implementation/` and `original-recheck-semantic-v4-independent/review-final.md` (ddb2591e). Necessary initial97 controls pass; independent mismatch repair adds9 narrow controls without repeating that group. All external boundaries are mocked. Existing219 assertions retain218 exactly, with one explicit exhaustive count upgrade to include partial. Root final-v3 frozen/evidence hashes match; earlier preflight is labelled by its v2 source snapshot. These controls do not establish actual entailment, materiality or extraction recall.
 
 ## Current phase 4 correction: exclusive execution decision
 

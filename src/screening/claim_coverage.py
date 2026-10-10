@@ -17,6 +17,18 @@ from common import run_stats
 from llm.client import llm_json, resolve_llm_config
 from schemas.claim import Claim, ClaimLocation, Condition, Contract, EvidenceNeed, NonEmpty
 from schemas.materials import MaterialBlock, SharedMaterials
+from screening.claim_scope import (
+    SCOPE_DIMENSIONS as SCOPE_DIMENSIONS,
+)
+from screening.claim_scope import (
+    ScopeAtom,
+    ScopeGroup,
+    ScopeSourceReview,
+    check_scope,
+)
+from screening.claim_scope import (
+    scope_context as _scope_context,
+)
 from screening.claims import ClaimExtractionOutput, ExtractedClaim, _ground_claims, _location
 from screening.visual_audit import redacted_record
 
@@ -345,6 +357,17 @@ class CoverageReviewV3(Contract):
     explanation: StrictStr = Field(min_length=1)
 
 
+class CurrentClaimReviewV4(CurrentClaimReviewV3):
+    scope_groups: list[ScopeGroup] = Field(min_length=1)
+    scope_atoms: list[ScopeAtom]
+    source_reviews: list[ScopeSourceReview]
+
+
+class CoverageReviewV4(CoverageReviewV3):
+    schema_version: Literal["claim-coverage-v4"]
+    claim_reviews: list[CurrentClaimReviewV4]
+
+
 _REVIEW_SYSTEM_V3 = (
     _REVIEW_SYSTEM.split("Select original whole-block IDs as sources;", 1)[0]
     + """
@@ -424,6 +447,11 @@ class CoverageValidationV3(CoverageValidationV2):
     observation_links: list[OriginalObservationLink]
 
 
+class CoverageValidationV4(CoverageValidationV3):
+    schema_version: Literal["claim-coverage-validation-v4"]
+    original_claim_reviews: list[CurrentClaimReviewV4]
+
+
 _VALIDATION_SYSTEM_V3 = (
     _VALIDATION_SYSTEM
     + """
@@ -444,6 +472,40 @@ a definite problem. Unresolved review links only to uncertain observations and p
 New problems are audit findings awaiting later correction, never automatic scientific evidence.
 Use claim-coverage-validation-v3. Retain the existing three stages and call budgets.
 """
+)
+
+_SCOPE_SYSTEM_V4 = """
+Use the mandatory v4 scope table as the sole authority for governing-qualifier declarations.
+SCOPE_CONTEXT lists all original bindings and conservatively selected nearby/heading candidates,
+with mechanical visibility. Candidates are possible governing sources; decide their actual relevance.
+Review every listed source once with affected closed condition IDs. Unavailable stays unavailable,
+requires unresolved scope and never implies a missing qualifier. Background facts and appendix
+locations alone do not change verification settings or conclusion boundaries.
+Other original blocks whose bodies are actually supplied may have explicit source_reviews and atom spans; unloaded IDs cannot be used.
+Partition all original condition IDs into compact disjoint scope_groups. Each group closes all six
+dimensions; use not_governing with no atom IDs only after considering the supplied sources.
+Store each atomic restriction once in scope_atoms with exact character start/end in original block
+text (Python string offsets). Atomic means one restriction with one preservation/materiality judgment.
+Separate label budget, sampling, augmentation and selection restrictions even in one source sentence.
+For preserved atoms, preserved_indices reference every matching preserved_qualifiers entry exactly
+once: unchanged restriction/source IDs and own claim semantic leaf path/value, covering every affected
+condition. No IDs, source_refs, another claim, or merely related method word is a semantic carrier.
+For missing atoms, finding_index references exactly one matching missing qualifier finding, with same
+restriction/source/condition IDs. effect names the source setting, a materially different alternative,
+original_permits_alternative and the exact original assertion leaf path/value; explanation equals the
+indexed material_effect. If existing semantics exclude the alternative, do not report it as missing.
+Every raw preserved/missing field must have exactly one table index. These fields are indexed views,
+never independently adjudicated prose. Unresolved atoms have no preservation/missing index or effect.
+Dimension atom_ids close all relevant atoms. States aggregate unresolved, then missing, then preserved;
+no atoms means not_governing or explicit unresolved. Resolved cannot coexist with unresolved scope.
+Source visibility does not count original window blocks as reviewed. Retain three stages and budgets.
+"""
+_REVIEW_SYSTEM_V4 = _REVIEW_SYSTEM_V3.replace("claim-coverage-v3", "claim-coverage-v4") + _SCOPE_SYSTEM_V4
+_VALIDATION_SYSTEM_V4 = (
+    _VALIDATION_SYSTEM_V3.replace("claim-coverage-validation-v3", "claim-coverage-validation-v4").replace(
+        "claim-coverage-v3", "claim-coverage-v4"
+    )
+    + _SCOPE_SYSTEM_V4
 )
 
 
@@ -529,6 +591,8 @@ def _supplemental_sources(
     materials_digest,
     source_hashes,
     char_limit,
+    *,
+    preloaded_ids=(),
 ):
     """Rebind pending sources without assigning claims or changing reviewed coverage."""
     loaded, unavailable, by_id, size = [], [], {}, 0
@@ -568,7 +632,7 @@ def _supplemental_sources(
                 }
                 if key in by_id:
                     by_id[key]["bindings"].append(provenance)
-                elif size + len(text) > min(char_limit, 24_000):
+                elif key not in preloaded_ids and size + len(text) > min(char_limit, 24_000):
                     unavailable.append(
                         {**identity, "block_id": key, "reason": "Supplemental character budget exceeded"}
                     )
@@ -576,7 +640,7 @@ def _supplemental_sources(
                     item = {"block": copy.deepcopy(frozen_original[key]), "bindings": [provenance]}
                     loaded.append(item)
                     by_id[key] = item
-                    size += len(text)
+                    size += 0 if key in preloaded_ids else len(text)
         except (ValueError, KeyError, TypeError) as exc:
             unavailable.append({**identity, "reason": str(exc)})
     return loaded, unavailable
@@ -599,7 +663,11 @@ def _claim_carrier(claim, path):
     return value
 
 
-def _lower_v3(review, required, registry, blocks, markdown, supplemental_ids):
+def _check_scope(row, claim, context, blocks):
+    return check_scope(row, claim, context, blocks, _claim_carrier)
+
+
+def _lower_v3(review, required, registry, blocks, markdown, supplemental_ids, *, scope_context=None):
     """Normalize explicit v3 declarations once; old v2 outputs never enter here."""
     allowed = set(review.reviewed_block_ids) | set(supplemental_ids)
     by_id = {row["claim_id"]: row for row in registry}
@@ -645,6 +713,9 @@ def _lower_v3(review, required, registry, blocks, markdown, supplemental_ids):
             claim = by_id[key]
             if row.claim_digest != claim["digest"] or row.claim_digest != required_ids[key]["digest"]:
                 raise ValueError("V3 claim digest differs from the current required claim")
+            if isinstance(row, CurrentClaimReviewV4):
+                context = next((c for c in (scope_context or []) if c["claim_id"] == key), None)
+                _check_scope(row, claim, context, {k: v for k, v in blocks.items() if k in allowed})
             ids = {c["id"] for c in claim["conditions"]}
             used = list(source_ids(row.source_block_ids))
             covered = set()
@@ -787,13 +858,17 @@ def _lower_v3(review, required, registry, blocks, markdown, supplemental_ids):
     ), audit
 
 
-def _original_recheck(response, required, registry, observations, decisions, blocks, markdown):
+def _original_recheck(
+    response, required, registry, observations, decisions, blocks, markdown, scope_context=None
+):
     """Reuse exact v3 grounding; only the model may link scientifically identical problems."""
-    if not isinstance(response, CoverageValidationV3):
+    if not isinstance(response, CoverageValidationV4):
         return (
             [],
             {
-                "status": "legacy_unreviewed",
+                "status": "legacy_scope_unreviewed"
+                if isinstance(response, CoverageValidationV3)
+                else "legacy_unreviewed",
                 "required": len(required),
                 "completed": 0,
                 "errors": [],
@@ -801,8 +876,8 @@ def _original_recheck(response, required, registry, observations, decisions, blo
             },
             {},
         )
-    surrogate = CoverageReviewV3(
-        schema_version="claim-coverage-v3",
+    surrogate = CoverageReviewV4(
+        schema_version="claim-coverage-v4",
         context_id=response.context_id,
         window_id=response.window_id,
         reviewed_block_ids=list(blocks),
@@ -810,7 +885,10 @@ def _original_recheck(response, required, registry, observations, decisions, blo
         new_findings=[],
         explanation="Independent original-claim recheck.",
     )
-    lowered, audit = _lower_v3(surrogate, required, registry, blocks, markdown, set())
+    lowered, audit = _lower_v3(
+        surrogate, required, registry, blocks, markdown, set(), scope_context=scope_context
+    )
+    audit["version"] = "claim-coverage-v4-scope-lowering-v1"
     errors = [f"{row['raw_path']}: {row['error']}" for row in audit["errors"]]
     completed = sum(
         row.atomicity != "unresolved" and row.governing_qualifiers != "unresolved"
@@ -1316,9 +1394,11 @@ def review_claim_coverage(
             legacy = {
                 "claim-coverage-v1": CoverageReview,
                 "claim-coverage-v2": CoverageReviewV2,
+                "claim-coverage-v3": CoverageReviewV3,
                 "claim-coverage-followup-v1": CoverageFollowup,
                 "claim-coverage-validation-v1": CoverageValidation,
                 "claim-coverage-validation-v2": CoverageValidationV2,
+                "claim-coverage-validation-v3": CoverageValidationV3,
             }
             parser = legacy.get(raw.get("schema_version"), schema) if isinstance(raw, dict) else schema
             parsed = parser.model_validate(raw)
@@ -1374,17 +1454,42 @@ def review_claim_coverage(
                 if observation["state"] in {"unresolved", "invalid"}
             ]
             check()
-            supplements, unavailable = _supplemental_sources(
-                unresolved,
-                {row["claim_id"] for row in required},
+            unavailable = []
+            target_ids = {row["claim_id"] for row in required}
+
+            def history_loader(history, target_ids=target_ids, ids=ids, unavailable=unavailable):
+                def load(remaining, loaded_ids):
+                    loaded, failures = _supplemental_sources(
+                        history,
+                        target_ids,
+                        ids,
+                        blocks,
+                        frozen_blocks,
+                        materials.markdown,
+                        coverage["materials_digest"],
+                        files,
+                        remaining,
+                        preloaded_ids=loaded_ids,
+                    )
+                    unavailable.extend(failures)
+                    return loaded
+
+                return load
+
+            scope_context, supplements = _scope_context(
+                registry,
+                required,
                 ids,
                 blocks,
-                frozen_blocks,
                 materials.markdown,
-                coverage["materials_digest"],
-                files,
                 window_chars,
+                validate=lambda key: _whole_block(key, blocks, set(blocks), materials.markdown),
+                history_loader=history_loader(
+                    [r for r in unresolved if r.get("target_claim_id") is not None]
+                ),
+                background_loader=history_loader([r for r in unresolved if r.get("target_claim_id") is None]),
             )
+            window["scope_context"] = copy.deepcopy(scope_context)
             window["supplemental_sources"] = {
                 "loaded_block_ids": [row["block"]["id"] for row in supplements],
                 "characters": sum(len(row["block"]["text"]) for row in supplements),
@@ -1401,10 +1506,11 @@ def review_claim_coverage(
                 "previous_unresolved_observations": unresolved,
                 "review_only_block_ids": [key for key in ids if key not in original_block_ids],
                 "supplemental_sources": supplements,
+                "scope_context": scope_context,
             }
             coverage["budget"]["review_calls"] += 1
             try:
-                review = request(_REVIEW_SYSTEM_V3, payload, CoverageReviewV3, "screening.claims.coverage")
+                review = request(_REVIEW_SYSTEM_V4, payload, CoverageReviewV4, "screening.claims.coverage")
                 selected = set(review.reviewed_block_ids)
                 if (
                     not selected
@@ -1416,6 +1522,7 @@ def review_claim_coverage(
                     )
                 supplemental_ids = set()
                 lowering_errors = []
+                scope_reviewed = isinstance(review, CoverageReviewV4)
                 explicit_review = isinstance(review, CoverageReviewV3)
                 if explicit_review:
                     supplemental_ids = {row["block"]["id"] for row in supplements}
@@ -1426,6 +1533,13 @@ def review_claim_coverage(
                         blocks,
                         materials.markdown,
                         supplemental_ids,
+                        scope_context=scope_context,
+                    )
+                    lowering["version"] = (
+                        "claim-coverage-v4-scope-lowering-v1"
+                        if isinstance(audit["attempts"][-1]["response"], dict)
+                        and audit["attempts"][-1]["response"].get("schema_version") == "claim-coverage-v4"
+                        else lowering["version"]
                     )
                     audit["attempts"][-1]["v3_lowering"] = lowering
                     audit["attempts"][-1]["normalized_response"] = review.model_dump(mode="json")
@@ -1496,6 +1610,11 @@ def review_claim_coverage(
                 selected,
             )
             window["claim_check_errors"].extend(lowering_errors)
+            window["scope_protocol"] = "claim-coverage-v4" if scope_reviewed else "legacy_scope_unreviewed"
+            if not scope_reviewed:
+                for checked in window["claim_checks"]:
+                    checked["state"] = "unreviewed"
+                window["claim_check_errors"].append("Legacy first review does not close v4 scope obligations")
             if window["claim_check_errors"] or any(r["state"] != "checked" for r in window["claim_checks"]):
                 window["status"] = "partially_reviewed"
             review = review.model_copy(update={"observations": valid_observations})
@@ -1525,9 +1644,36 @@ def review_claim_coverage(
                 window["original_recheck"]["status"] = "legacy_unreviewed"
                 continue
             source_ids = set(ids) | supplemental_ids
-            for c in current:
-                if c.id in {o.target_claim_id for o in review.observations}:
-                    source_ids.update(_source_ids(c))
+            additional_required = [
+                {"claim_id": r["claim_id"], "digest": r["digest"]}
+                for r in registry
+                if r["claim_id"] in {o.target_claim_id for o in review.observations}
+                and r["claim_id"] not in target_ids
+            ]
+            if additional_required:
+                extra_context, supplements = _scope_context(
+                    registry,
+                    [*required, *additional_required],
+                    ids,
+                    blocks,
+                    materials.markdown,
+                    window_chars,
+                    already_loaded=supplements,
+                    validate=lambda key: _whole_block(key, blocks, set(blocks), materials.markdown),
+                )
+                source_ids.update(r["block"]["id"] for r in supplements)
+                scope_context = extra_context
+                window["validation_scope_context"] = copy.deepcopy(scope_context)
+                window["followup_target_scope_context"] = [
+                    r for r in extra_context if r["claim_id"] not in target_ids
+                ]
+                window["supplemental_sources"].update(
+                    loaded_block_ids=[r["block"]["id"] for r in supplements],
+                    characters=sum(len(r["block"]["text"]) for r in supplements),
+                )
+            validation_required = [*required, *additional_required]
+            window["validation_required_original_claim_reviews"] = copy.deepcopy(validation_required)
+            window["original_recheck"]["required"] = len(validation_required)
             source_ids = [key for key in blocks if key in source_ids]
             followup_payload = {
                 "window_id": window["id"],
@@ -1536,6 +1682,7 @@ def review_claim_coverage(
                 "previous_unresolved_observations": unresolved,
                 "blocks": [blocks[key].model_dump(mode="json") for key in source_ids],
                 "review_only_block_ids": [key for key in source_ids if key not in original_block_ids],
+                "scope_context": scope_context,
             }
             accepted = []
             if not review.observations:
@@ -1650,7 +1797,7 @@ def review_claim_coverage(
                     for o in review.observations
                 ],
                 "candidates": candidates,
-                "required_original_claim_reviews": required,
+                "required_original_claim_reviews": validation_required,
                 "required_new_claim_checks": [
                     {
                         "candidate_id": c["candidate_id"],
@@ -1664,9 +1811,9 @@ def review_claim_coverage(
             coverage["budget"]["validation_calls"] += 1
             try:
                 validation = request(
-                    _VALIDATION_SYSTEM_V3,
+                    _VALIDATION_SYSTEM_V4,
                     validation_payload,
-                    CoverageValidationV3,
+                    CoverageValidationV4,
                     "screening.claims.coverage_validation",
                 )
                 decisions, observation_decisions, bindings, errors = _validated_semantics(
@@ -1678,12 +1825,13 @@ def review_claim_coverage(
                 )
                 fresh, recheck, links = _original_recheck(
                     validation,
-                    required,
+                    validation_required,
                     registry,
                     review.observations,
                     observation_decisions,
                     {key: blocks[key] for key in source_ids},
                     materials.markdown,
+                    scope_context,
                 )
                 window["original_recheck"] = recheck
                 audit["attempts"][-1]["original_recheck"] = copy.deepcopy(recheck)

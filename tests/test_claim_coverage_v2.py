@@ -19,6 +19,7 @@ FIXTURE = Path(__file__).parent / "fixtures" / "claim_coverage_fixmatch.json"
 CFG = LLMConfig(
     provider="mock", model="coverage", api_key="coverage-secret-123", base_url="https://provider.invalid/v1"
 )
+_MOCK_OBSERVATION_IDS = {}
 
 
 @pytest.fixture(autouse=True)
@@ -121,7 +122,7 @@ def claim_check(claim, observations=()):
     }
 
 
-def review(payload, observations, *, legacy=False):
+def review(payload, observations, *, legacy=False, legacy_v2=False):
     response = {
         "schema_version": "claim-coverage-v1" if legacy else "claim-coverage-v2",
         "context_id": payload["context_id"],
@@ -146,6 +147,12 @@ def review(payload, observations, *, legacy=False):
             }
             for r in payload["required_claim_checks"]
         ]
+    _MOCK_OBSERVATION_IDS[payload["window_id"]] = {}
+    if not legacy and not legacy_v2 and "scope_context" in payload:
+        from tests.claim_scope_mock import review_v4
+
+        response, aliases = review_v4(payload, observations, response)
+        _MOCK_OBSERVATION_IDS[payload["window_id"]] = aliases
     return response
 
 
@@ -165,6 +172,9 @@ def action(payload, obs, kind, proposals):
 
 def followup(payload, actions, *, legacy=False):
     actions = copy.deepcopy(actions)
+    aliases = _MOCK_OBSERVATION_IDS.get(payload["window_id"], {})
+    for row in actions:
+        row["observation_ids"] = [aliases.get(key, key) for key in row["observation_ids"]]
     if not legacy:
         for row in actions:
             for claim in row["claims"]:
@@ -283,6 +293,14 @@ def validation(payload, *, original_problems=True):
                 }
             )
         raw["original_claim_reviews"].append(row)
+    if "scope_context" in payload:
+        from tests.claim_scope_mock import with_scope
+
+        raw["schema_version"] = "claim-coverage-validation-v4"
+        claims = {c["claim_id"]: c for c in payload["current_claims"]}
+        raw["original_claim_reviews"] = [
+            with_scope(r, claims[r["claim_id"]], payload) for r in raw["original_claim_reviews"]
+        ]
     return raw
 
 
@@ -452,7 +470,12 @@ def test_uncertain_service_and_budget_boundaries_are_visible_and_do_not_block_al
     assert result.coverage["status"] != "complete"
     assert result.blocked_claim_ids == (["claim_007"] if mode == "followup_budget" else [])
     assert result.coverage["windows_total"] == 1
-    assert result.coverage["windows_reviewed"] + result.coverage["windows_unreviewed"] == 1
+    assert (
+        result.coverage["windows_reviewed"]
+        + result.coverage["windows_partial"]
+        + result.coverage["windows_unreviewed"]
+        == 1
+    )
 
 
 def test_later_window_sees_adopted_claims_and_split_inherits_earlier_unresolved_problem(tmp_path):
@@ -555,7 +578,7 @@ def test_windows_pack_headings_keep_block_only_footnotes_and_markdown_only_spans
             return validation(p)
         raw = review(p, [])
         return {k: raw[k] for k in ("context_id", "window_id", "reviewed_block_ids", "explanation")} | {
-            "schema_version": "claim-coverage-v3",
+            "schema_version": "claim-coverage-v4" if "scope_context" in p else "claim-coverage-v3",
             "claim_reviews": [],
             "new_findings": [],
         }
@@ -686,7 +709,7 @@ def test_partial_review_keeps_exact_unread_ranges_and_rejects_source_borrowing(t
         if kw["module"] == "screening.claims.coverage_validation":
             return validation(p)
         if kw["module"] == "screening.claims.coverage":
-            raw = review(p, [bad, good])
+            raw = review(p, [bad, good], legacy_v2=True)
             raw["reviewed_block_ids"] = ["b1"]
             return raw
         assert p["observations"] == [good]
@@ -750,7 +773,14 @@ def test_actual_semantic_regressions_require_independent_bound_decisions(tmp_pat
                 else:
                     assert candidate_row["old_claims"] == [extracted(initial[0])]
                     assert "all labeled data" in candidate_row["new_claims"][0]["text"]
-            raw["observation_decisions"][0].update(
+            next(
+                r
+                for r in raw["observation_decisions"]
+                if r["observation_id"]
+                == _MOCK_OBSERVATION_IDS[p["window_id"]].get(
+                    original["observations"][0]["id"], original["observations"][0]["id"]
+                )
+            ).update(
                 verdict="dismiss_observation",
                 reason="The headline is already within the existing and revised scoped result.",
             )
@@ -860,7 +890,7 @@ def test_required_current_claim_check_gap_is_partial_without_invented_block(tmp_
 
     def call(**kw):
         p = json.loads(kw["prompt"].split("DATA_JSON:\n", 1)[1])
-        raw = review(p, [])
+        raw = review(p, [], legacy_v2=True)
         if mode == "missing":
             raw["claim_checks"] = []
         elif mode == "independent_without_observation":

@@ -1,5 +1,17 @@
 # FactReview v2 progress
 
+## Current phase3: source-bound original scope review v4
+
+The native first/third coverage responses now share an authoritative atom table, six scope dimensions, exact condition partitions and a complete visible source directory. Whole supplemental blocks share the existing bounded input budget; no required claim count is capped. Atom sources bind original digest/span and declared conditions. Missing restrictions require a changed verification setting or conclusion boundary; preserved restrictions use an actual semantic carrier in the original claim. The model still judges scientific applicability and materiality. Legacy responses remain readable without completing the current review or clearing pending findings. Third-only targets are independently required and never backfill the first review's counts.
+
+Necessary mocked controls:97 pass in14.45s at the implementation checkpoint; no external calls. Independent review found a source declared for c2 could support an atom for c1. The exact failed probe and output remain unchanged. The repaired condition-subset guard and its persistent control pass9 direct controls in0.22s, including a byte-identical copy of the original probe. No repeated97-test group or whole suite. Original219 Assert ASTs retain218 unchanged and one explicit exhaustive-window count upgrade including partial. Final independent reviewddb2591e, final-v3 freeze and root hash review match all eight files; production scope6a6cc94f.
+
+Evidence: `original-recheck-semantic-v4-implementation/{implementation.md,evidence-final-v3.json,root-independent-review-v3.json}` and `original-recheck-semantic-v4-independent/review-final.md`. The pure original-input preflight retains73 claims; six windows require29/23/15/8/0/0 reviews. The fixed23-required window has57 conditions and92 source-directory entries. First/third empty-candidate prompts measure179358/183406 characters at the labelled v2 snapshot; actual token admission and semantic success are unmeasured. Original actual037 scope omission and026/033 false qualifier findings are retained.
+
+Decisions: directory visibility and declared source-condition closure are program checks; source governance and entailment remain model judgments. Additional sources must have actually supplied full original bodies and exact spans. Unavailable material stays partial. Existing three-call budget and candidate/adoption guards remain.
+
+Next action: checkpoint the reviewed phase3 files, finish independent condition-level Literature adequacy review, then declare the current source for a new bounded native integration. Docker daemon29.8.2 and the existing pinned Python image were restored without deleting files; this readiness does not prove execution. The overall goal is active and genuine whole-flow acceptance remains open.
+
 ## Current phase4: observed retrieval pagination
 
 Implemented native arXiv/Semantic Scholar/OpenAlex pagination with explicit per-query budgets and observed scope records. Defaults preserve1 page/8 results. Healthy candidates survive later-page failures; normalization failure retains actual raw page counts. Cutoff filtering records filtered/retained counts without modifying raw paging evidence. Remote complete declarations remain audit metadata and cannot authorize current absence support. Config fields reach both adapter construction paths; existing arXiv per-request16 cap remains visible in actual page limits, and Semantic Scholar's relevance1,000 cap stops as provider_limit.
