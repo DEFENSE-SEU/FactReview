@@ -364,6 +364,8 @@ def claim_coverage_lines(claim_coverage: dict | None) -> list[str]:
         f"Claim checks across source windows: {value('claim_checks_completed')} / "
         f"{value('claim_checks_required')}; unreviewed: {value('claim_checks_unreviewed')}. "
         "A claim may be checked in more than one window.",
+        f"Independent original-claim reviews: {value('original_claim_reviews_completed')} / "
+        f"{value('original_claim_reviews_required')}.",
         f"Proposed-claim checks passed: {value('candidate_claim_checks_passed')} / "
         f"{value('candidate_claim_checks_required')}.",
         f"Unresolved observations: {value('unresolved_observations')}; "

@@ -179,11 +179,11 @@ def followup(payload, actions, *, legacy=False):
     }
 
 
-def validation(payload):
+def validation(payload, *, original_problems=True):
     """Explicit offline semantic oracle; this helper makes no model-quality claim."""
     source_ids = [b["id"] for b in payload["blocks"]]
-    return {
-        "schema_version": "claim-coverage-validation-v2",
+    raw = {
+        "schema_version": "claim-coverage-validation-v3",
         "context_id": payload["context_id"],
         "window_id": payload["window_id"],
         "change_decisions": [
@@ -215,6 +215,75 @@ def validation(payload):
             for row in payload["observations"]
         ],
     }
+
+    # Independent semantic judgments are injected explicitly, alongside the unchanged
+    # candidate/observation verdicts. These mocks do not establish model correctness.
+    raw["original_claim_reviews"], raw["observation_links"] = [], []
+    required = {r["claim_id"] for r in payload["required_original_claim_reviews"]}
+    for claim in payload["current_claims"]:
+        if claim["claim_id"] not in required:
+            continue
+        index = len(raw["original_claim_reviews"])
+        ids = [c["id"] for c in claim["conditions"]]
+        own = (
+            [r for r in payload["observations"] if r["observation"]["target_claim_id"] == claim["claim_id"]]
+            if original_problems
+            else []
+        )
+        merged = any(r["observation"]["kind"] == "merged_conclusions" for r in own)
+        uncertain = any(r["observation"]["kind"] == "uncertain" for r in own)
+        groups = [ids[:1], ids[1:] or ids[:1]] if merged else [ids]
+        row = {
+            "claim_id": claim["claim_id"],
+            "claim_digest": claim["digest"],
+            "state": "unresolved" if uncertain else "resolved",
+            "assertion_groups": [
+                {
+                    "proposition": "Explicit mock assertion " + str(i),
+                    "condition_ids": partition,
+                    "source_block_ids": source_ids,
+                }
+                for i, partition in enumerate(groups)
+            ],
+            "findings": [],
+            "preserved_qualifiers": [],
+            "source_block_ids": source_ids,
+            "reason": "Explicit independent original-claim semantic oracle.",
+        }
+        for existing in own:
+            o = existing["observation"]
+            if o["kind"] == "merged_conclusions":
+                suffix = "/assertion_groups"
+            elif o["kind"] == "uncertain":
+                suffix = "/state"
+            else:
+                suffix = f"/findings/{len(row['findings'])}"
+                finding = {
+                    "kind": o["kind"],
+                    "condition_ids": ids,
+                    "source_block_ids": [b["block_id"] for b in o["sources"]],
+                    "reason": o["reason"],
+                }
+                if o["kind"] == "missing_qualifier_or_condition":
+                    finding.update(
+                        restriction=o["reason"],
+                        material_effect="Mock declares a materially different verification setting.",
+                    )
+                else:
+                    finding["needs"] = [
+                        n for n in ("Literature", "Theory", "Code", "Experiments") if n not in claim["needs"]
+                    ][:1]
+                row["findings"].append(finding)
+            raw["observation_links"].append(
+                {
+                    "review_path": f"/original_claim_reviews/{index}" + suffix,
+                    "observation_id": existing["observation_id"],
+                    "observation_digest": existing["observation_digest"],
+                    "reason": "Mock explicitly identifies the same scientific gap.",
+                }
+            )
+        raw["original_claim_reviews"].append(row)
+    return raw
 
 
 def caller(observations, kind, proposals, mutate=None, *, legacy_followup=False):
@@ -482,7 +551,14 @@ def test_windows_pack_headings_keep_block_only_footnotes_and_markdown_only_spans
     def call(**kw):
         p = json.loads(kw["prompt"].split("DATA_JSON:\n", 1)[1])
         observed.extend(b["text"] for b in p["blocks"])
-        return review(p, [])
+        if kw["module"] == "screening.claims.coverage_validation":
+            return validation(p)
+        raw = review(p, [])
+        return {k: raw[k] for k in ("context_id", "window_id", "reviewed_block_ids", "explanation")} | {
+            "schema_version": "claim-coverage-v3",
+            "claim_reviews": [],
+            "new_findings": [],
+        }
 
     result = m.review_claim_coverage(paper, [], call=call, output_dir=tmp_path)
     assert result.coverage["status"] == "complete" and result.coverage["windows_total"] == 1
@@ -662,7 +738,7 @@ def test_actual_semantic_regressions_require_independent_bound_decisions(tmp_pat
         assert [c.model_dump(mode="json") for c in claims] == initial
         if mode == "service_failure":
             raise RuntimeError("Independent validation service unavailable")
-        raw = validation(p)
+        raw = validation(p, original_problems=case != "dismiss")
         if case == "duplicate":
             assert len(p["candidates"]) == 2  # Both same-batch changes are visible before adoption.
             for candidate_row, decision in zip(p["candidates"], raw["change_decisions"], strict=True):
@@ -823,6 +899,8 @@ def test_candidate_atomicity_and_qualifiers_are_required_before_acceptance(tmp_p
         row = raw["change_decisions"][0]
         if mode == "legacy_missing_checks":
             raw["schema_version"] = "claim-coverage-validation-v1"
+            raw.pop("original_claim_reviews")
+            raw.pop("observation_links")
             row.pop("new_claim_checks")
         elif mode == "joint_configuration":
             row["new_claim_checks"][0]["atomicity"] = "shared_settings"

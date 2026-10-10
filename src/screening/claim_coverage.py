@@ -406,6 +406,47 @@ class CoverageValidationV2(CoverageValidation):
     change_decisions: list[CoverageChangeDecisionV2]
 
 
+class OriginalObservationLink(Contract):
+    review_path: StrictStr = Field(
+        description="Closed pointer to a lowered problem: /original_claim_reviews/N/assertion_groups for multiple groups, /findings/J for a resolved finding, or /state for unresolved."
+    )
+    observation_id: StrictStr
+    observation_digest: StrictStr
+    reason: StrictStr = Field(
+        min_length=1,
+        description="Why this declaration and the existing observation describe the same scientific problem, beyond sharing a kind or target.",
+    )
+
+
+class CoverageValidationV3(CoverageValidationV2):
+    schema_version: Literal["claim-coverage-validation-v3"]
+    original_claim_reviews: list[CurrentClaimReviewV3]
+    observation_links: list[OriginalObservationLink]
+
+
+_VALIDATION_SYSTEM_V3 = (
+    _VALIDATION_SYSTEM
+    + """
+Independently re-review every REQUIRED_ORIGINAL_CLAIM_REVIEWS entry against unchanged original
+claim text/conditions and governing sources, including when the first reviewer reported no problem.
+Return original_claim_reviews using the explicit source, digest and qualifier-carrier contract.
+Judge original claims independently from the candidates; candidates cannot supply their missing
+qualifiers or erase their independent conclusions. Use resolved/unresolved and groups/findings as
+in claim-coverage-v3. A preserved source alone is not a preserved carrier in the claim semantics.
+For each lowered problem that is the SAME scientific problem as one supplied observation, return
+one observation_link with its exact observation ID/digest and a reason for that equivalence.
+Use /original_claim_reviews/N/assertion_groups only when multiple groups declare a merge;
+/findings/J only for a resolved finding; /state only for an unresolved review. Each pointer and
+observation can be linked once. Shared kind or target alone does not establish equivalence.
+Leave genuinely new problems unlinked. Do not link preserved qualifiers or problem-free groups.
+A definite same-problem link requires a confirmed observation decision; unresolved cannot dismiss
+a definite problem. Unresolved review links only to uncertain observations and preserves uncertainty.
+New problems are audit findings awaiting later correction, never automatic scientific evidence.
+Use claim-coverage-validation-v3. Retain the existing three stages and call budgets.
+"""
+)
+
+
 @dataclass
 class ClaimCoverageResult:
     claims: list[Claim]
@@ -565,7 +606,12 @@ def _lower_v3(review, required, registry, blocks, markdown, supplemental_ids):
     required_ids = {row["claim_id"]: row for row in required}
     counts = Counter(row.claim_id.strip() for row in review.claim_reviews)
     observations, checks = [], []
-    audit = {"version": "claim-coverage-v3-lowering-v1", "mappings": [], "errors": []}
+    audit = {
+        "version": "claim-coverage-v3-lowering-v1",
+        "mappings": [],
+        "errors": [],
+        "observation_origins": {},
+    }
 
     def source_ids(ids):
         if not ids or len(set(ids)) != len(ids):
@@ -580,6 +626,7 @@ def _lower_v3(review, required, registry, blocks, markdown, supplemental_ids):
 
     def observation(kind, target, ids, reason, path, raw):
         identifier = "v3_" + _digest([review.context_id, path, raw, kind])[:24]
+        audit["observation_origins"][identifier] = path
         return SelectedObservation(
             id=identifier,
             kind=kind,
@@ -738,6 +785,88 @@ def _lower_v3(review, required, registry, blocks, markdown, supplemental_ids):
         claim_checks=checks,
         explanation=review.explanation,
     ), audit
+
+
+def _original_recheck(response, required, registry, observations, decisions, blocks, markdown):
+    """Reuse exact v3 grounding; only the model may link scientifically identical problems."""
+    if not isinstance(response, CoverageValidationV3):
+        return (
+            [],
+            {
+                "status": "legacy_unreviewed",
+                "required": len(required),
+                "completed": 0,
+                "errors": [],
+                "link_errors": [],
+            },
+            {},
+        )
+    surrogate = CoverageReviewV3(
+        schema_version="claim-coverage-v3",
+        context_id=response.context_id,
+        window_id=response.window_id,
+        reviewed_block_ids=list(blocks),
+        claim_reviews=response.original_claim_reviews,
+        new_findings=[],
+        explanation="Independent original-claim recheck.",
+    )
+    lowered, audit = _lower_v3(surrogate, required, registry, blocks, markdown, set())
+    errors = [f"{row['raw_path']}: {row['error']}" for row in audit["errors"]]
+    completed = sum(
+        row.atomicity != "unresolved" and row.governing_qualifiers != "unresolved"
+        for row in lowered.claim_checks
+    )
+    if completed != len(required):
+        errors.append("Independent original-claim recheck omitted or invalidated required claims")
+    old = {o.id: o for o in observations}
+    by_path = {}
+    for o in lowered.observations:
+        path = audit["observation_origins"][o.id].replace("/claim_reviews/", "/original_claim_reviews/", 1)
+        if o.kind in {"merged_conclusions", "uncertain"}:
+            path += "/assertion_groups" if o.kind == "merged_conclusions" else "/state"
+        by_path[path] = o
+    path_counts = Counter(link.review_path for link in response.observation_links)
+    id_counts = Counter(link.observation_id for link in response.observation_links)
+    linked, link_errors = {}, []
+    for link in response.observation_links:
+        try:
+            new, existing = by_path[link.review_path], old[link.observation_id]
+            if path_counts[link.review_path] != 1 or id_counts[link.observation_id] != 1:
+                raise ValueError("Original recheck links must have unique pointers and observation IDs")
+            if link.observation_digest != _digest(existing.model_dump(mode="json")):
+                raise ValueError("Original recheck link observation digest changed")
+            if new.target_claim_id != existing.target_claim_id or new.kind != existing.kind:
+                raise ValueError("Original recheck link target or kind differs")
+            decision = decisions.get(existing.id)
+            if (
+                decision is None
+                or decision.verdict == "dismiss_observation"
+                or (new.kind != "uncertain" and decision.verdict != "confirmed")
+            ):
+                raise ValueError("Original recheck problem conflicts with its linked observation decision")
+            linked[new.id] = link.model_dump(mode="json")
+        except (KeyError, ValueError) as exc:
+            link_errors.append(f"Original recheck link {link.review_path}: {exc}")
+    # Any invalid link prevents decisions from clearing pending: malformed associations cannot
+    # make fresh problems disappear. Healthy candidates can be revalidated in a later review.
+    if link_errors:
+        linked = {}
+    errors.extend(link_errors)
+    status = "returned" if not errors else "partially_validated"
+    return (
+        lowered.observations,
+        {
+            "status": status,
+            "required": len(required),
+            "completed": completed,
+            "errors": errors,
+            "link_errors": link_errors,
+            "lowering": audit,
+            "normalized_response": lowered.model_dump(mode="json"),
+            "links": linked,
+        },
+        linked,
+    )
 
 
 def _restore_claim(candidate, blocks, allowed, markdown):
@@ -935,6 +1064,8 @@ def coverage_summary(coverage):
         "claim_checks_required",
         "claim_checks_completed",
         "claim_checks_unreviewed",
+        "original_claim_reviews_required",
+        "original_claim_reviews_completed",
         "candidate_claim_checks_required",
         "candidate_claim_checks_passed",
         "unresolved_observations",
@@ -1187,6 +1318,7 @@ def review_claim_coverage(
                 "claim-coverage-v2": CoverageReviewV2,
                 "claim-coverage-followup-v1": CoverageFollowup,
                 "claim-coverage-validation-v1": CoverageValidation,
+                "claim-coverage-validation-v2": CoverageValidationV2,
             }
             parser = legacy.get(raw.get("schema_version"), schema) if isinstance(raw, dict) else schema
             parsed = parser.model_validate(raw)
@@ -1220,6 +1352,12 @@ def review_claim_coverage(
                 if _source_ids(c) & set(ids)
             ]
             window["required_claim_checks"] = required
+            window["original_recheck"] = {
+                "status": "not_run",
+                "required": len(required),
+                "completed": 0,
+                "errors": [],
+            }
             if window["characters"] > window_chars:
                 window["status"] = "not_reviewed_oversized_block"
                 continue
@@ -1278,7 +1416,8 @@ def review_claim_coverage(
                     )
                 supplemental_ids = set()
                 lowering_errors = []
-                if isinstance(review, CoverageReviewV3):
+                explicit_review = isinstance(review, CoverageReviewV3)
+                if explicit_review:
                     supplemental_ids = {row["block"]["id"] for row in supplements}
                     review, lowering = _lower_v3(
                         review,
@@ -1382,7 +1521,8 @@ def review_claim_coverage(
                         ),
                     }
                 )
-            if not review.observations:
+            if not review.observations and not explicit_review:
+                window["original_recheck"]["status"] = "legacy_unreviewed"
                 continue
             source_ids = set(ids) | supplemental_ids
             for c in current:
@@ -1398,7 +1538,9 @@ def review_claim_coverage(
                 "review_only_block_ids": [key for key in source_ids if key not in original_block_ids],
             }
             accepted = []
-            if coverage["budget"]["followup_calls"] >= max_followup_calls:
+            if not review.observations:
+                window["followup_status"] = "not_needed"
+            elif coverage["budget"]["followup_calls"] >= max_followup_calls:
                 window["followup_status"] = "not_run_budget"
             else:
                 coverage["budget"]["followup_calls"] += 1
@@ -1508,6 +1650,7 @@ def review_claim_coverage(
                     for o in review.observations
                 ],
                 "candidates": candidates,
+                "required_original_claim_reviews": required,
                 "required_new_claim_checks": [
                     {
                         "candidate_id": c["candidate_id"],
@@ -1521,9 +1664,9 @@ def review_claim_coverage(
             coverage["budget"]["validation_calls"] += 1
             try:
                 validation = request(
-                    _VALIDATION_SYSTEM,
+                    _VALIDATION_SYSTEM_V3,
                     validation_payload,
-                    CoverageValidationV2,
+                    CoverageValidationV3,
                     "screening.claims.coverage_validation",
                 )
                 decisions, observation_decisions, bindings, errors = _validated_semantics(
@@ -1533,6 +1676,43 @@ def review_claim_coverage(
                     {key: blocks[key] for key in source_ids},
                     materials.markdown,
                 )
+                fresh, recheck, links = _original_recheck(
+                    validation,
+                    required,
+                    registry,
+                    review.observations,
+                    observation_decisions,
+                    {key: blocks[key] for key in source_ids},
+                    materials.markdown,
+                )
+                window["original_recheck"] = recheck
+                audit["attempts"][-1]["original_recheck"] = copy.deepcopy(recheck)
+                if recheck["errors"]:
+                    errors.extend(recheck["errors"])
+                if (
+                    recheck["status"] != "returned"
+                    or recheck["errors"]
+                    or recheck["completed"] != recheck["required"]
+                ):
+                    # An incomplete independent original review cannot authorize adoption
+                    # or dismissal, including saved legacy responses without this review.
+                    decisions, observation_decisions = {}, {}
+                for observation in fresh:
+                    link = links.get(observation.id)
+                    if link:
+                        continue
+                    key = f"{window['id']}:original:{observation.id}"
+                    pending[key] = {observation.target_claim_id} if observation.kind != "uncertain" else set()
+                    if observation.kind != "uncertain":
+                        confirmed_targets.add(observation.target_claim_id)
+                recheck["findings"] = [
+                    {
+                        **o.model_dump(mode="json"),
+                        "pending_key": f"{window['id']}:original:{o.id}",
+                        "linked_observation": links.get(o.id),
+                    }
+                    for o in fresh
+                ]
                 audit["attempts"][-1]["selected_source_bindings"] = bindings
                 audit["attempts"][-1]["selected_new_claim_checks"] = [
                     {
@@ -1653,6 +1833,8 @@ def review_claim_coverage(
             and all(
                 w["status"] == "reviewed"
                 and w.get("validation_status", "returned") == "returned"
+                and w["original_recheck"]["status"] == "returned"
+                and w["original_recheck"]["completed"] == w["original_recheck"]["required"]
                 and w.get("followup_status", "returned") != "failed"
                 and not w.get("rejected_actions")
                 and not w.get("missing_dispositions")
@@ -1679,7 +1861,16 @@ def review_claim_coverage(
             observation["blocked_claim_ids"] = sorted(
                 pending.get(f"{window['id']}:{observation['id']}", set())
             )
+    for window in coverage["windows"]:
+        for finding in window.get("original_recheck", {}).get("findings", []):
+            finding["blocked_claim_ids"] = sorted(pending.get(finding["pending_key"], set()))
     coverage.update(
+        original_claim_reviews_required=sum(
+            w.get("original_recheck", {}).get("required", 0) for w in coverage["windows"]
+        ),
+        original_claim_reviews_completed=sum(
+            w.get("original_recheck", {}).get("completed", 0) for w in coverage["windows"]
+        ),
         claim_checks_required=sum(len(w.get("required_claim_checks", [])) for w in coverage["windows"]),
         claim_checks_completed=sum(
             r["state"] == "checked" for w in coverage["windows"] for r in w.get("claim_checks", [])
