@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 
 from .resource_contract import _fingerprint, _relative
-from .runtime_launch import _bootstrap_scope, _path, protect_observer_docker_argv
+from .runtime_launch import _bootstrap_scope, _bounded_metric_bytes, _path, protect_observer_docker_argv
 from .runtime_observer import _snapshot
 
 _PREPARE = {"version", "status", "unresolved", "scope_limits", "original_command", "workspace", "trusted_dir",
@@ -101,7 +101,7 @@ def read_observer_receipt(request, outcome):
         _check(type(result["returncode"]) is int and result["returncode"] == 0 and not result["operation_failures"]
                and env.get("transport") == "docker" and env.get("process_termination", {}).get("kind") == "completed",
                "producer_process_not_known_completed")
-        _check(type(req["repair_round"]) is int and 0 <= req["repair_round"] <= 3 and req["metric_output"] is None,
+        _check(type(req["repair_round"]) is int and 0 <= req["repair_round"] <= 3 and (req["metric_output"] is None or type(req["metric_output"]) is str),
                "unsupported_attempt_or_output")
         root, run = _path(req["workspace"]), _path(req["run_dir"])
         attempt, scratch = _path(run / f"attempt_{req['repair_round']}"), _path(run / "runtime_scratch")
@@ -113,10 +113,15 @@ def read_observer_receipt(request, outcome):
         raw = {key: _read(path, 32 * 1024 * 1024 if key in {"report", "stdout"} else 2 * 1024 * 1024)
                for key, path in paths.items()}
         audit, config, report = (_json(raw[key]) for key in ("launch", "config", "report"))
-        _check(type(audit) is dict and set(audit) == _PREPARE | _REPORT_FACTS and audit["status"] == "observed"
+        prepare_fields = _PREPARE | ({"metric_file"} if req["metric_output"] is not None else set())
+        observer_env = env.get("runtime_observer")
+        _check(type(observer_env) is dict, "unknown_launch_environment")
+        capture = observer_env.get("capture")
+        _check(set(observer_env) == set(audit) | ({"capture"} if req["metric_output"] is not None else set()), "unknown_capture_environment")
+        _check(type(audit) is dict and set(audit) == prepare_fields | _REPORT_FACTS and audit["status"] == "observed"
                and audit["unresolved"] == [] and audit["report_status"] == "completed" and audit["report_unresolved"] == []
-               and _same(audit, env.get("runtime_observer")), "unknown_or_changed_launch_audit")
-        prepared = {key: audit[key] for key in _PREPARE}
+               and _same(audit, {key: value for key, value in observer_env.items() if key != "capture"}), "unknown_or_changed_launch_audit")
+        prepared = {key: audit[key] for key in prepare_fields}
         prepared["status"] = "ready"
         sealed = {key: value for key, value in prepared.items() if key not in {"unresolved", "request_sha256"}}
         _check(_sha(json.dumps(sealed, sort_keys=True, ensure_ascii=True).encode()) == audit["request_sha256"], "prepare_seal_mismatch")
@@ -175,9 +180,38 @@ def read_observer_receipt(request, outcome):
                and _same(audit["package_files"], {"observer.py": _sha(raw["observer"]), "config.json": _sha(raw["config"])}), "observer_package_changed")
         bootstrap = _bootstrap_scope(root, _path(root / entry), _path(root / workdir), req["config"]["python_version"])
         bootstrap.update(cache_path="/workspace/run_dir/.pycache", cache_absent_at_prepare=True)
-        _check(_same(bootstrap, audit["bootstrap_scope"]) and _same(audit["mounts"], {
+        expected_mounts = {
             "/app": {"source": str(root), "mode": "ro"}, "/factreview-observer": {"source": str(trusted), "mode": "ro"},
-            "/workspace/run_dir": {"source": str(scratch), "mode": "rw"}}), "protection_identity_changed")
+            "/workspace/run_dir": {"source": str(scratch), "mode": "rw"}}
+        file_output = None
+        if req["metric_output"] is not None:
+            leaf = audit["metric_file"]
+            placeholder = root / workdir / _relative(req["metric_output"])
+            target = "/app/" + placeholder.relative_to(root).as_posix()
+            source = output.parent / "metric_output.json"
+            _check(type(leaf) is dict and _same(leaf, {"relative_path": req["metric_output"],
+                "workspace_placeholder": str(placeholder), "capture_path": str(source), "container_path": target,
+                "initial_sha256": _sha(b""), "initial_bytes": 0, "original_absent": True})
+                and placeholder.relative_to(root).as_posix() not in manifest
+                and _bounded_metric_bytes(placeholder) == b"", "metric_output_identity_or_source_changed")
+            expected_mounts[target] = {"source": str(source), "mode": "rw"}
+            metadata_path, host_copy = attempt / "metric_file_capture.json", attempt / "raw_metric_file.json"
+            metadata_raw, captured_raw = _bounded_metric_bytes(metadata_path), _bounded_metric_bytes(host_copy)
+            record = _json(metadata_raw)
+            _check(type(capture) is dict and _same(capture, {"record": record,
+                "metadata": {"path": str(metadata_path), "sha256": _sha(metadata_raw)}}), "metric_capture_environment_changed")
+            _check(_same(record, {"version": "observer-json-file-capture-v1", "metric_output": req["metric_output"],
+                "workdir": workdir, "repair_round": req["repair_round"], "launch_path": str(paths["launch"]),
+                "launch_sha256": _sha(raw["launch"]), "prepare_request_sha256": audit["request_sha256"],
+                "capture_path": str(source), "host_copy": str(host_copy), "sha256": _sha(captured_raw),
+                "bytes": len(captured_raw), "original_absent": True})
+                and captured_raw and captured_raw == _bounded_metric_bytes(source)
+                and result["logs"].get("raw_metric_file") == str(host_copy)
+                and result["logs"].get("metric_file_capture") == str(metadata_path), "metric_capture_bytes_or_identity_changed")
+            file_output = {"payload": _json(captured_raw), "evidence_refs": {
+                "raw_metric_file": {"path": str(host_copy), "sha256": _sha(captured_raw)},
+                "metric_file_capture": {"path": str(metadata_path), "sha256": _sha(metadata_raw)}}}
+        _check(_same(bootstrap, audit["bootstrap_scope"]) and _same(audit["mounts"], expected_mounts), "protection_identity_changed")
         runs = [argv for argv in result["commands"] if type(argv) is list and argv[:2] == ["docker", "run"]]
         _check(len(runs) == 1, "actual_run_argv_not_unique")
         argv = runs[0]
@@ -242,13 +276,16 @@ def read_observer_receipt(request, outcome):
         _check(_path(result["logs"]["stdout"]) in {_path(paths["stdout"]), attempt / "stdout.log"}
                and _read(result["logs"]["stdout"], 32 * 1024 * 1024).decode("utf-8").replace("\r\n", "\n") == result["stdout"], "stdout_pointer_or_bytes_changed")
         refs = {key: {"path": str(path), "sha256": _sha(raw[key])} for key, path in paths.items()}
-        return {"status": "received", "report": report, "run_identity": {"command": command, "cwd": cwd, "runtime_root": "/app",
+        received = {"status": "received", "report": report, "run_identity": {"command": command, "cwd": cwd, "runtime_root": "/app",
             "repair_round": req["repair_round"], "launch_sha256": _sha(raw["launch"]), "config_sha256": _sha(raw["config"]),
             "request_sha256": _fingerprint(req), "actual_argv_sha256": _fingerprint(argv), "source_sha256": hashes}, "evidence_refs": refs,
             "producer_code_identity": {"basis": "fixed_observer_actual_runtime_prepare_and_match", "sites": report["sites"], "interpreter": interpreter},
             "scientific_qualification": False, "alignment": False, "support": False,
             "limits": ["caller_request_and_outcome_origin_must_be_trusted", "in_process_author_tampering_not_excluded",
                        "internal_hashes_are_not_authentication", "proxy_history_not_reconstructed", "scientific_roles_and_stdout_metric_binding_unproved"]}
+        if file_output is not None:
+            received["metric_file_output"] = file_output
+        return received
     except (ValueError, TypeError, KeyError, IndexError, AttributeError, OSError, OverflowError, RecursionError) as exc:
         return {"status": "unresolved", "reason": str(exc) if type(exc) is ValueError else type(exc).__name__,
                 "scientific_qualification": False, "alignment": False, "support": False}

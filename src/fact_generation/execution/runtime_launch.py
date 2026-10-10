@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import stat
 import sys
 import uuid
 from pathlib import Path, PurePosixPath
@@ -188,7 +189,7 @@ def _bootstrap_scope(root, entry, working, runtime_python):
 
 def prepare_observer_launch(original_command, *, entry_script, workdir, workspace, metric_output,
                             source_sites, trusted_dir, runtime_dir, repair_round, runtime_python=None):
-    """Prepare a fresh stdout-only direct-script launch without changing author argv."""
+    """Prepare a protected direct-script launch preserving author argv/output path."""
     result = {"version": "readonly-python-observer-v1", "status": "unresolved", "unresolved": [],
               "scope_limits": ["source_linked_events_only", "scientific_consumption_not_established",
                                "in_process_tampering_not_excluded", "native_threads_children_uncovered",
@@ -200,8 +201,6 @@ def prepare_observer_launch(original_command, *, entry_script, workdir, workspac
         result["original_command"] = original_command.copy()
         if original_command[0] not in {"python", "python3"} or original_command[1].startswith("-"):
             raise ValueError("observer_direct_python_only")
-        if metric_output is not None:
-            raise ValueError("observer_stdout_only_protection_layout_unresolved")
         root, scratch, trusted = _path(workspace), _path(runtime_dir), _path(trusted_dir, exists=False)
         if not root.is_dir() or not scratch.is_dir() or trusted.exists() or not trusted.parent.is_dir():
             raise ValueError("observer_paths_not_fresh_or_available")
@@ -244,6 +243,17 @@ def prepare_observer_launch(original_command, *, entry_script, workdir, workspac
         audit_dir = _path(scratch / attempt, exists=False)
         if audit_dir.exists():
             raise ValueError("observer_audit_path_not_fresh")
+        metric_file = None
+        if metric_output is not None:
+            relative_output = _relative(metric_output)
+            placeholder = _path(plain_path(working / relative_output), exists=False)
+            if (Path(relative_output).suffix != ".json" or placeholder.exists()
+                    or not placeholder.is_relative_to(root) or ".factreview" in placeholder.parts):
+                raise ValueError("observer_output_path_not_fresh_json")
+            metric_file = {"relative_path": relative_output, "workspace_placeholder": str(placeholder),
+                           "capture_path": str(audit_dir / "metric_output.json"),
+                           "container_path": "/app/" + placeholder.relative_to(root).as_posix(),
+                           "initial_sha256": _sha(b""), "initial_bytes": 0, "original_absent": True}
         config = {"entry": script_token, "args": original_command[2:], "cwd": container_cwd,
                   "sites": [dict(site, path="/app/" + site["path"]) for site in leaves],
                   "output": f"/workspace/run_dir/{attempt}/events.json"}
@@ -253,6 +263,13 @@ def prepare_observer_launch(original_command, *, entry_script, workdir, workspac
         # All checks precede any package creation; failed creation is retained for audit.
         trusted.mkdir(exist_ok=False)
         audit_dir.mkdir(exist_ok=False)
+        if metric_file is not None:
+            placeholder.parent.mkdir(parents=True, exist_ok=True)
+            plain_path(placeholder)
+            with placeholder.open("xb"):
+                pass
+            with Path(metric_file["capture_path"]).open("xb"):
+                pass
         for name, content in (("observer.py", observer_bytes), ("config.json", config_bytes)):
             with (trusted / name).open("xb") as stream:
                 stream.write(content)
@@ -264,6 +281,10 @@ def prepare_observer_launch(original_command, *, entry_script, workdir, workspac
             mounts={"/app": {"source": str(root), "mode": "ro"},
                     "/factreview-observer": {"source": str(trusted), "mode": "ro"},
                     "/workspace/run_dir": {"source": str(scratch), "mode": "rw"}})
+        if metric_file is not None:
+            result["metric_file"] = metric_file
+            result["mounts"][metric_file["container_path"]] = {
+                "source": metric_file["capture_path"], "mode": "rw"}
         sealed = {key: value for key, value in result.items() if key != "unresolved"}
         result["request_sha256"] = _sha(json.dumps(sealed, sort_keys=True, ensure_ascii=True).encode())
     except (ValueError, OSError, TypeError, SyntaxError) as exc:
@@ -334,6 +355,8 @@ def protect_observer_docker_argv(argv, *, launch):
                     raise ValueError("observer_scratch_not_writable")
                 if target == "/factreview-observer" and mode != "ro":
                     raise ValueError("observer_package_not_readonly")
+                if target not in {"/app", "/workspace/run_dir", "/factreview-observer"} and mode != "rw":
+                    raise ValueError("observer_output_not_writable")
                 mounts[target] = source
                 if target == "/app":
                     value = f"{source}:/app:ro" if option != "--mount" else f"type=bind,source={source},target=/app,readonly"
@@ -359,11 +382,113 @@ def protect_observer_docker_argv(argv, *, launch):
         valid_cwd = {expected_cwd} | ({"/app/.", "/app/"} if expected_cwd == "/app" else set())
         if not pythonpath_present:
             raise ValueError("bootstrap_pythonpath_not_declared")
-        if set(mounts) not in ({"/app", "/workspace/run_dir"}, {"/app", "/workspace/run_dir", "/factreview-observer"}) or len(cwd) != 1 or cwd[0] not in valid_cwd:
+        output = launch.get("metric_file")
+        output_target = output["container_path"] if output is not None else None
+        allowed = {"/app", "/workspace/run_dir", "/factreview-observer"} | ({output_target} if output_target else set())
+        if (not {"/app", "/workspace/run_dir"}.issubset(mounts) or not set(mounts).issubset(allowed)
+                or set(launch["mounts"]) != allowed or len(cwd) != 1 or cwd[0] not in valid_cwd):
             raise ValueError("incomplete_protection_layout")
         if "/factreview-observer" not in mounts:
             rewritten.extend(["-v", launch["trusted_dir"] + ":/factreview-observer:ro"])
+        if output_target and output_target not in mounts:
+            rewritten.extend(["-v", output["capture_path"] + ":" + output_target + ":rw"])
         result.update(status="ready", argv=["docker", "run", *rewritten, image, *wrapper])
     except (ValueError, TypeError, KeyError, IndexError) as exc:
         result["unresolved"].append({"reason": exc.args[0] if type(exc) is ValueError else "unknown_docker_launch_layout"})
     return result
+
+
+def _bounded_metric_bytes(path, *, limit=1048576):
+    path = _path(plain_path(Path(path)))
+    before = path.stat()
+    if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1:
+        raise ValueError("metric_capture_not_plain_regular")
+    with path.open("rb") as stream:
+        raw = stream.read(limit + 1)
+    after = plain_path(path).stat()
+    fields = ("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns")
+    if len(raw) > limit or len(raw) != before.st_size or any(
+        getattr(before, field) != getattr(after, field) for field in fields
+    ):
+        raise ValueError("metric_capture_changed_or_over_capacity")
+    return raw
+
+
+def capture_metric_file_output(launch, *, metric_output, workdir, repair_round, runtime_dir, attempt_dir):
+    """Capture actual fresh mounted bytes, retaining separate launch/record identities."""
+    try:
+        scratch = _path(plain_path(Path(runtime_dir)))
+        attempt = _path(plain_path(Path(attempt_dir)))
+        launch_path = _path(plain_path(attempt / "runtime_observer_launch.json"))
+        launch_raw = _bounded_metric_bytes(launch_path)
+        if (type(launch) is not dict or json.loads(launch_raw) != launch or launch.get("status") != "observed"
+                or launch.get("report_status") != "completed" or launch.get("report_unresolved") != []
+                or launch.get("unresolved") != [] or launch.get("runtime_dir") != str(scratch)
+                or launch.get("trusted_dir") != str(attempt / "observer_trusted")
+                or launch.get("original_workdir") != workdir or attempt.name != f"attempt_{repair_round}"):
+            raise ValueError("metric_capture_launch_identity_unknown")
+        sealed = {key: value for key, value in launch.items()
+                  if key not in {"unresolved", "request_sha256", "report_status", "report_sha256", "report_unresolved"}}
+        sealed["status"] = "ready"
+        if _sha(json.dumps(sealed, sort_keys=True, ensure_ascii=True).encode()) != launch["request_sha256"]:
+            raise ValueError("metric_capture_prepare_seal_changed")
+        leaf = launch["metric_file"]
+        source = _path(plain_path(Path(leaf["capture_path"])))
+        placeholder = _path(plain_path(Path(leaf["workspace_placeholder"])))
+        expected = Path(launch["workspace"]) / workdir / _relative(metric_output)
+        if (set(leaf) != {"relative_path", "workspace_placeholder", "capture_path", "container_path", "initial_sha256", "initial_bytes", "original_absent"}
+                or leaf["relative_path"] != metric_output or placeholder != _path(plain_path(expected))
+                or not source.is_relative_to(scratch) or source.parent != Path(launch["audit_output"]).parent
+                or source.name != "metric_output.json" or leaf["initial_bytes"] != 0
+                or leaf["original_absent"] is not True or leaf["initial_sha256"] != _sha(b"")
+                or _bounded_metric_bytes(placeholder) != b""
+                or leaf["container_path"] != "/app/" + placeholder.relative_to(Path(launch["workspace"])).as_posix()
+                or launch["mounts"].get(leaf["container_path"]) != {"source": str(source), "mode": "rw"}):
+            raise ValueError("metric_capture_output_identity_changed")
+        raw = _bounded_metric_bytes(source)
+        if not raw:
+            raise ValueError("metric_output_not_produced")
+        host_copy = _path(plain_path(attempt / "raw_metric_file.json"), exists=False)
+        metadata_path = _path(plain_path(attempt / "metric_file_capture.json"), exists=False)
+        record = {"version": "observer-json-file-capture-v1", "metric_output": metric_output,
+                  "workdir": workdir, "repair_round": repair_round, "launch_path": str(launch_path),
+                  "launch_sha256": _sha(launch_raw), "prepare_request_sha256": launch["request_sha256"],
+                  "capture_path": str(source), "host_copy": str(host_copy), "sha256": _sha(raw),
+                  "bytes": len(raw), "original_absent": True}
+        metadata = (json.dumps(record, sort_keys=True, ensure_ascii=True, indent=2) + "\n").encode()
+        with host_copy.open("xb") as stream:
+            stream.write(raw)
+        with metadata_path.open("xb") as stream:
+            stream.write(metadata)
+        return raw, {"record": record, "metadata": {"path": str(metadata_path), "sha256": _sha(metadata)}}
+    except (OSError, TypeError, KeyError, AttributeError, json.JSONDecodeError) as exc:
+        raise ValueError("metric_capture_unavailable") from exc
+
+
+def discard_empty_metric_placeholder(launch, *, source_manifest):
+    """Failed-attempt cleanup only; retain scratch output and all audit history."""
+    result = {"status": "unresolved", "reason": "metric_placeholder_cleanup_unavailable"}
+    try:
+        if type(launch) is not dict or launch.get("status") not in {"ready", "observed"}:
+            return result
+        sealed = {key: value for key, value in launch.items()
+                  if key not in {"unresolved", "request_sha256", "report_status", "report_sha256", "report_unresolved", "capture"}}
+        sealed["status"] = "ready"
+        if _sha(json.dumps(sealed, sort_keys=True, ensure_ascii=True).encode()) != launch["request_sha256"]:
+            return result
+        root = _path(plain_path(Path(launch["workspace"])))
+        leaf = launch["metric_file"]
+        path = _path(plain_path(Path(leaf["workspace_placeholder"])))
+        relative = path.relative_to(root).as_posix()
+        if (type(source_manifest) is not dict or any(type(k) is not str or type(v) is not str
+                for k, v in source_manifest.items()) or relative in source_manifest
+                or path != _path(plain_path(root / launch["original_workdir"] / _relative(leaf["relative_path"])))
+                or leaf["original_absent"] is not True or leaf["initial_bytes"] != 0
+                or leaf["initial_sha256"] != _sha(b"") or leaf["container_path"] != "/app/" + relative
+                or _bounded_metric_bytes(path) != b""):
+            return result
+        path.unlink()
+        return {"status": "removed", "path": str(path), "sha256": _sha(b""),
+                "original_absent": True, "source_manifest_absent": True}
+    except (ValueError, OSError, TypeError, KeyError, AttributeError):
+        return result

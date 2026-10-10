@@ -2,9 +2,9 @@
 
 ## 当前回归修复与真实执行 checkpoint（2026-10-11）
 
-Task：继续完整三层框架，目标active；Phase0–7历史实现保留，Phase8整体验收未完成。授权分支`refactor/method-v2`源码checkpoint740fea880ab8554a1336cedd217689c3f787e65a已推送。当前兼容夹具与真实接口缺陷修复按阶段继续提交，完整目标未暂停。
+Task：继续完整三层框架，目标active；Phase0–7历史实现保留，Phase8整体验收未完成。授权分支`refactor/method-v2`源码checkpoint1ef0ad1ec47f9debd4fab0eb78605b4b534a750f已推送。当前兼容夹具与真实接口缺陷修复按阶段继续提交，完整目标未暂停。
 
-Completed：原默认pytest唯一全套结果56failed/3687passed/3原deselected/0skipped，310.59s，原414源码/测试身份在运行前后相同。必要修复已关闭39原失败：coverage/report/SDK18、arxiv/literature10、pipeline/visual7、资源identity/path4。各组保留原科学断言，明确当前wire或delivery metadata迁移；没有修改markers、跳过或降级科学正例。另17项执行/framework/完整pipeline科学正例仍开放，最后全套尚未重跑。
+Completed：原默认pytest唯一全套结果56failed/3687passed/3原deselected/0skipped，310.59s，原414源码/测试身份在运行前后相同。必要修复已关闭全部56原失败：coverage/report/SDK18、arxiv/literature10、pipeline/visual7、资源identity/path4、执行/framework/共享科学正例17；最终默认全套尚未重跑。科学夹具迁移保留462原Assert中的460项；两项明确迁移为严格protected mount合同、完整作者发布数据反证从Questioned加强为Flawed，新增4项强反证与2项完整多指标保留断言。没有修改markers、跳过或降级科学正例；旧失败均保留。
 
 Completed：原L2计划进入默认execute_plans实际L3，actual0b197a433cb3/supervised9599deeba3da，13.532s/rc0；真实2次image inspect和1次author Docker run，固定image ID，原python -I -S scripts/evaluate.py完整命令，auto/train0/该验证repair0。完整4行发布预测由host重算3/4=.75，原条件aligned/consistent，生成1条execution support Evidence。原5条不足paper evidence与claim unverified保持，未重放assessment。独审22事实闭合；Root读完整host measurement。范围限发布预测全量测量，没有一般NN推理、训练、动态消费或商业完成证明。
 
@@ -16,9 +16,11 @@ Outputs：原56失败与各组日志位于final-default-regression-independent-v
 
 Completed：整篇first/discovery请求schema现在明确required精确版本，两个必要完整公开请求控制通过（.86s），原consumer与历史raw不变。原judge的raw/qualified-derived双候选歧义也已修复：恰一正式科学qualified derived作为权威，raw完整保留；同条件value/unit/variance矛盾明确拒绝，多个候选仍拒绝，projection-v2与缺科学证明保护保持。新增四必要控制4pass/4.55s，原完整source-science控制1pass/1.93s；独审修正一处新测试插入位置后确认所有原函数AST完全保持。真实新源模型效果待验证。
 
-Open issues：剩余17个回归含实际资源科学消费正例；完整canonical/native输出文件及全量rank-analysis支持正在按实际source、host重算、observer和独立语义合同实现，禁止mock qualified或删原raw来取得绿色。整篇召回/原子性/M2/M5、联合paper evidence、一般NN/多condition及当前完整公开入口报告交付继续开放。整体商业级完成尚无证据。
+Open issues：最终必要默认全套仍待运行。完整canonical/native输出文件与rank-analysis按实际source、host重算、observer和独立语义合同实现，所有原资格守卫保持。整篇召回/原子性/M2/M5、联合paper evidence、一般NN/多condition及当前完整公开入口报告交付继续开放。整体商业级完成尚无证据。
 
-Completed：发布rank完整MRR及protected canonical stdout第一阶段已实现并独审，三个产品文件和一个必要测试文件；两个必要控制通过。严格positive-int rank全行保留、全分母mean reciprocal rank、原config所有额外条件type-aware/SHA绑定，无paper值参与host测量。原source/资源/条件/完整六角色与metered semantic资格守卫保持，raw/mapping不回填，host数学fraction与未声明Observation.unit=None分列。绿后仅已认证entry全文/SHA附context的静态增量明确记录。范围限stdout，outfile仍需fresh单fileRW mount、真实host原bytes捕获与receipt闭合；不得从customrunner自报环境授予资格。相关报告partition-rank-analysis-implementation-v1/，原失败全留。Single正在用当前合同升级原正例；完整旧失败组尚未冻结关闭。
+Completed：发布rank完整MRR及protected canonical stdout第一阶段已实现并独审，三个产品文件和一个必要测试文件；两个必要控制通过。严格positive-int rank全行保留、全分母mean reciprocal rank、原config所有额外条件type-aware/SHA绑定，无paper值参与host测量。原source/资源/条件/完整六角色与metered semantic资格守卫保持，raw/mapping不回填，host数学fraction与未声明Observation.unit=None分列。绿后仅已认证entry全文/SHA附context的静态增量明确记录。相关报告partition-rank-analysis-implementation-v1/，原失败全留。
+
+Completed：fresh JSON outfile producer已冻结并通过独审。原工作树/source/data/config保持只读，仅原metric路径的全新单文件RW mount可写；host独占保存原bytes和独立metadata，receipt核原source manifest、actual argv、最终launch SHA、原缺失/空占位、实际scratch/hostcopy bytes。原parser/decoder/raw stdout保持，host全量rank重算仍必须独立metered semantic审核。一个必要新offline函数真红1/.86s→绿1/1.15s，19Assert完整保持；动态args.out/atomic rename/未知写关系继续unresolved。Root默认docker_runner接线只在失败后核原manifest并移除仍空的自有占位，原Docker失败、scratch和历史均保留。原file isolation已绿；原native多指标正例最初因单decoded限制失败后，生产consumer改为按原mapping selector严格唯一选目标，全部5项raw/decoded/mapping留审计；此原失败与新增正式failure→cleanup→repair控制同次2pass/1.70s，其他绿组未复跑。报告partition-outputfile-analysis-implementation-v1/及default-regression-execution-science-fixtures-v1/。
 
 Next action：关闭上述具体科学与接口失败，独立审核并提交授权分支；最终必要默认全套一次，再冻结当前源进行完整公开入口Materials→L1/VLM→四分支L2→非空真实L3→assessment/advice→JSON/MD/PDF/SVG验证。已有失败原件保持，不做无变化付费重跑。checks.md当前原14表第1项fail，另13项原窄合同保持；整体目标active。
 

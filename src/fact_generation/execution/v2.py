@@ -703,6 +703,21 @@ def docker_runner(request: RunRequest) -> RunOutcome:
     finally:
         if result is None or result.returncode != 0:
             cleanup = _cleanup_container(container_name, request.run_dir, logs)
+            if observer_audit.get("status") == "ready" and observer_audit.get("metric_file") is not None:
+                from .runtime_launch import discard_empty_metric_placeholder
+
+                try:
+                    source_manifest = json.loads(
+                        _inside(run_dir, "source_manifest.json").read_text(encoding="utf-8")
+                    )
+                    placeholder_cleanup = discard_empty_metric_placeholder(
+                        observer_audit, source_manifest=source_manifest,
+                    )
+                except (ValueError, OSError, TypeError, AttributeError):
+                    placeholder_cleanup = {
+                        "status": "unresolved", "reason": "metric_placeholder_cleanup_unavailable",
+                    }
+                observer_audit["metric_placeholder_cleanup"] = placeholder_cleanup
     persist_command_result(result, logs, prefix="run")
     if result.termination in {"launch_failed", "communication_failed", "unfinished"}:
         operation_failures.append(ExecutionOperationFailure(
@@ -752,10 +767,26 @@ def docker_runner(request: RunRequest) -> RunOutcome:
     issue = ""
     try:
         if request.metric_output:
-            source = _inside(Path(request.workspace) / request.workdir, request.metric_output)
-            if before_output is not None and source.stat().st_mtime_ns == before_output:
-                raise ValueError("metric output was not refreshed by this execution")
-            payload = json.loads(source.read_text(encoding="utf-8"))
+            if observer_audit.get("status") == "observed" and observer_audit.get("metric_file") is not None:
+                from .runtime_launch import capture_metric_file_output
+
+                raw_bytes, capture = capture_metric_file_output(
+                    observer_audit, metric_output=request.metric_output, workdir=request.workdir,
+                    repair_round=request.repair_round, runtime_dir=runtime_dir, attempt_dir=logs,
+                )
+                observer_logs.update(
+                    raw_metric_file=capture["record"]["host_copy"],
+                    metric_file_capture=capture["metadata"]["path"],
+                )
+                # The saved launch record is already final. Capture is a
+                # separately hashed host artifact, never a new launch seal.
+                observer_audit["capture"] = capture
+                payload = json.loads(raw_bytes.decode("utf-8"))
+            else:
+                source = _inside(Path(request.workspace) / request.workdir, request.metric_output)
+                if before_output is not None and source.stat().st_mtime_ns == before_output:
+                    raise ValueError("metric output was not refreshed by this execution")
+                payload = json.loads(source.read_text(encoding="utf-8"))
         else:
             lines = [
                 line.removeprefix("FACTREVIEW_OBSERVATIONS=")
