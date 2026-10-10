@@ -81,7 +81,9 @@ def review(payload, *, groups=1, findings=(), state="resolved"):
             raw["claim_reviews"] = [with_scope(raw["claim_reviews"][0], c, payload)]
         else:
             raw["claim_reviews"] = []
-    return raw
+    from tests.claim_scope_mock import current_wire
+
+    return current_wire(raw, payload) if "scope_wire_version" in payload else raw
 
 
 QUALIFIER = {

@@ -1,5 +1,17 @@
 # FactReview v2 progress
 
+## Current phase3 checkpoint: compact v5 source and atom wire
+
+Task: remove redundant declarations while preserving full scientific input, explicit governing-scope decisions and independent adoption checks. Outputs: `src/screening/claim_coverage.py`, new `claim_coverage_wire.py`, new v5 controls and three explicit old fixture migrations; exact evidence under `runs/v2_method_delivery/coverage-wire-v5-implementation/` and `coverage-wire-v5-independent/`.
+
+Completed: default first/third review requests use v5. Shared metadata roundtrips exactly; per-claim source/condition edges and all body text remain. Each model atom declares its own state, carriers or full missing effect; generated compatibility views retain raw/generated digests and paths. Explicit source partition, original scope checker, link identity and adoption guards remain strict. Five new groups and13 different old affected cases pass;229 old Assert ASTs, original scope-checker bytes and1217 protected hashes remain unchanged. Fixture translation requires the existing strict checker to accept the original declaration. Same-atom duplicate carriers reject; independent review7908ef97 and root six-file/frozen/evidence identities pass. Original red results and freezes remain retained, with no extra live calls.
+
+Decisions: v1-v4 responses remain auditable and cannot claim completed v5 original reviews or authorize changes. Reusing one original whole-text semantic carrier across different atoms is allowed when the original guards and actual model judgment establish its scope. Compact serialization measurements describe characters only; no actual token saving or scientific improvement is inferred.
+
+Open issues: original genuine failure, M2/M5 semantics, whole-paper coverage and hard future-response token bounds remain open. The grounded SearchPlan batch is independently reviewed and still excluded from this phase3 commit. Phase7 I/O is delivered52d51dd9468b7175988cb499a6b435d688a25369 and exactly remotely verified.
+
+Next action: commit/push this reviewed phase3 batch, separately deliver phase4 SearchPlan, then run a fresh source-frozen bounded native coverage validation. All natural source windows and73 original claims stay intact; remaining unreviewed work must remain explicit. The overall goal stays active.
+
 ## Current phase7 checkpoint: single-file report history I/O recovery
 
 Task: retain the original report failure, last validated scientific snapshot and independent delivery when an owned history file raises OSError. Outputs: `src/review/recovery.py`, `src/pipeline_v2.py`, `tests/test_report_history_io_v2.py`; exact evidence under `runs/v2_method_delivery/report-history-io-implementation/` and `report-history-io-independent/`.

@@ -301,7 +301,9 @@ def validation(payload, *, original_problems=True):
         raw["original_claim_reviews"] = [
             with_scope(r, claims[r["claim_id"]], payload) for r in raw["original_claim_reviews"]
         ]
-    return raw
+    from tests.claim_scope_mock import current_wire
+
+    return current_wire(raw, payload) if "scope_wire_version" in payload else raw
 
 
 def caller(observations, kind, proposals, mutate=None, *, legacy_followup=False):

@@ -2,7 +2,60 @@
 
 import copy
 
+from screening.claim_coverage_wire import unpack_scope_payload
 from screening.claim_scope import SCOPE_DIMENSIONS
+
+
+def current_wire(raw, payload):
+    """Migrate explicit happy fixtures only when the current request is v5 packed."""
+    if "scope_wire_version" not in payload:
+        return raw
+    from schemas.materials import MaterialBlock
+    from screening import claim_coverage as m
+
+    expanded = unpack_scope_payload(payload)
+    key = "claim_reviews" if "claim_reviews" in raw else "original_claim_reviews"
+    claims = {c["claim_id"]: c for c in expanded["current_claims"]}
+    contexts = {c["claim_id"]: c for c in expanded["scope_context"]}
+    blocks = {b["id"]: MaterialBlock.model_validate(b) for b in expanded["blocks"]}
+    blocks.update({r["block"]["id"]: MaterialBlock.model_validate(r["block"])
+                   for r in expanded.get("supplemental_sources", [])})
+    try:
+        for row in raw[key]:
+            claim = claims[row["claim_id"]]
+            if row["claim_digest"] != claim["digest"]:
+                return raw
+            m._check_scope(m.CurrentClaimReviewV4.model_validate(row), claim, contexts[row["claim_id"]], blocks)
+    except (ValueError, KeyError, IndexError, TypeError):
+        # Invalid historic/negative fixtures stay invalid; no declaration is filled.
+        return raw
+    result = copy.deepcopy(raw)
+    maps = []
+    for row in result[key]:
+        views, findings, reviews = row.pop("preserved_qualifiers"), row.pop("findings"), row.pop("source_reviews")
+        other, paths = [], {}
+        for i, finding in enumerate(findings):
+            if finding["kind"] != "missing_qualifier_or_condition":
+                paths[i] = "/other_findings/" + str(len(other))
+                other.append(finding)
+        for i, atom in enumerate(row["scope_atoms"]):
+            atom["carriers"] = [{"claim_path": views[j]["claim_path"], "claim_value": views[j]["claim_value"]}
+                                for j in atom.pop("preserved_indices")]
+            finding_index = atom.pop("finding_index")
+            if finding_index is not None:
+                paths[finding_index] = "/scope_atoms/" + str(i)
+        row["other_findings"] = other
+        row["source_review_groups"] = [
+            {"source_ids": [r["block_id"]], **{k: v for k, v in r.items() if k != "block_id"}}
+            for r in reviews
+        ]
+        maps.append(paths)
+    for link in result.get("observation_links", []):
+        parts = link["review_path"].split("/")
+        if len(parts) == 5 and parts[3] == "findings":
+            link["review_path"] = "/original_claim_reviews/" + parts[2] + maps[int(parts[2])][int(parts[4])]
+    result["schema_version"] = "claim-coverage-v5" if key == "claim_reviews" else "claim-coverage-validation-v5"
+    return result
 
 
 def review_v4(payload, observations, legacy):
@@ -95,10 +148,11 @@ def review_v4(payload, observations, legacy):
         path = "/new_findings/" + str(len(raw["new_findings"]))
         aliases[o["id"]] = "v3_" + m._digest([payload["context_id"], path, row, row["kind"]])[:24]
         raw["new_findings"].append(row)
-    return raw, aliases
+    return current_wire(raw, payload), aliases
 
 
 def with_scope(row, claim, payload):
+    payload = unpack_scope_payload(payload)
     context = next(c for c in payload["scope_context"] if c["claim_id"] == claim["claim_id"])
     ids = [c["id"] for c in claim["conditions"]]
     blocks = {b["id"]: b for b in payload["blocks"]}
