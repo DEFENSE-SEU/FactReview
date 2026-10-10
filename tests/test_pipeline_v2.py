@@ -22,6 +22,8 @@ from common import run_stats
 from fact_generation.execution.v2 import Observation, RunOutcome
 from llm.client import LLMConfig
 from preprocessing.parse.mineru_adapter import MineruParseResult
+from schemas.claim import ClaimStatus
+from schemas.review import FinalReview
 from tests.literature_scope_fixtures import native_response, scientific_response
 from verification import literature
 
@@ -900,3 +902,39 @@ def test_concurrent_pipelines_keep_usage_and_parent_context_isolated(
     assert parent.read_text(encoding="utf-8") == '{"parent":true}'
     assert os.environ["FACTREVIEW_RUN_STATS_PATH"] == str(parent)
     assert os.environ["FACTREVIEW_ACTIVE_STATS_MODULE"] == "parse"
+
+
+def _assert_strict_gate(summary):
+    assert summary["gate"] == "strict"
+    review = FinalReview.model_validate_json(Path(summary["outputs"]["report_json"]).read_text(encoding="utf-8"))
+    assert review.gate == "strict"
+    assert all(claim.status == claim.gate_status["strict"].status for claim in review.claims)
+    expected = {status.value: 0 for status in ClaimStatus}
+    for claim in review.claims:
+        expected[claim.gate_status["strict"].status.value] += 1
+    assert summary["counts"] == expected
+    assert "Claim gate: strict." in Path(summary["outputs"]["report_markdown"]).read_text(encoding="utf-8")
+    assert "Claim gate: strict" in Path(summary["outputs"]["teaser_image"]).read_text(encoding="utf-8")
+    return review
+
+
+def test_strict_gate_reaches_review_report_and_teaser(tiny_inputs, monkeypatch):
+    tiny_inputs[0].gate = "strict"
+    summary, *_ = run_tiny(tiny_inputs, monkeypatch, render_pdf=False)
+    review = _assert_strict_gate(summary)
+    lenient = sum(claim.gate_status["lenient"].status == ClaimStatus.SUPPORTED for claim in review.claims)
+    assert summary["counts"]["supported"] < lenient
+
+
+def test_claim_gate_environment_variable_selects_tier(tiny_inputs, monkeypatch):
+    from common.config import get_settings
+
+    tiny_inputs[0].gate = ""
+    monkeypatch.delenv("FACTREVIEW_CLAIM_GATE", raising=False)
+    monkeypatch.setenv("CLAIM_GATE", "strict")
+    get_settings.cache_clear()
+    try:
+        summary, *_ = run_tiny(tiny_inputs, monkeypatch, render_pdf=False)
+    finally:
+        get_settings.cache_clear()
+    _assert_strict_gate(summary)
