@@ -457,6 +457,10 @@ def parse_args() -> argparse.Namespace:
         help="Maximum independent reviews before adopting claim corrections (default: 12)",
     )
     p.add_argument(
+        "--claim-coverage-original-batch-size", type=int, default=None,
+        help="Explicit original-review batch size (e.g. 3); each batch and final decision uses the existing validation call cap. Omit for the legacy single-request path.",
+    )
+    p.add_argument(
         "--training-budget",
         type=int,
         default=0,
