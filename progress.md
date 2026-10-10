@@ -10,7 +10,9 @@ Root narrow changes are frozen in `native-contract-clarification-implementation/
 
 Decisions: keep every original failure and consumed identity unchanged. A syntactic structural choice does not prove scientific scope or execution. The separate read-only domain audit1c0f11b4 confirms25 grounded/46 legacy finite term families can suppress arbitrary-domain active search. Design a single source-bound concept producer/typed leaf contract with actual semantic role judgments; no per-paper vocabulary additions or fabricated role defaults. General execution, genuine M2/M5, whole-paper coverage and operational commercial quality remain open.
 
-Next action: independently review and deliver the two narrow phase batches, then review the generic source-bound search design and implement its supported contract. Any later real validation requires a new exact source identity and single authorization, with every existing14 gate retained; no identical resampling of failed actuals. Overall goal remains active.
+Phase4 is committed as2b73a13: definition connector, exact adequacy keys and two new controls. The separately reviewed Phase3 full-directory clarification is included in the next phase commit; all source/condition/atom/adoption consumers stay unchanged. Push and exact remote verification follow the two phase commits.
+
+Next action: deliver the reviewed Phase3 clarification, then review the generic source-bound search design and implement its supported contract. Any later real validation requires a new exact source identity and single authorization, with every existing14 gate retained; no identical resampling of failed actuals. Overall goal remains active.
 
 ## Historical phase8: exact-source admission checkpoint, subsequently failed
 

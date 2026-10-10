@@ -626,6 +626,13 @@ _VALIDATION_SYSTEM_V5 = (
     + """Independently re-review ALL required_original_claim_reviews against unchanged original
 claims and supplied scope using claim-coverage-validation-v5. Candidates cannot supply original
 qualifiers or erase independent conclusions. Return original_claim_reviews in the v5 wire.
+For each claim, the COMPLETE required source directory is scope_context's matching claim_id
+entry: every sources[].source_id, including adjacent candidates. required_original_claim_reviews
+source_block_ids lists original claim bindings only; it is not the scope review directory.
+Explicitly partition all matching scope_context source IDs in source_review_groups. Judge an
+irrelevant adjacent source explicitly with its condition_ids and reason; never omit it or infer
+considered/irrelevant from its candidate relationship. Shared source_catalog metadata does not
+replace this per-claim directory or declare any source reviewed.
 For the SAME scientific problem as a supplied observation, explicitly link exact ID/digest and
 reason via /original_claim_reviews/N/assertion_groups for multiple groups, /scope_atoms/J only
 for a missing atom, /other_findings/J only for a resolved finding, or /state for unresolved.
