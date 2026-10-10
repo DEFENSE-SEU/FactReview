@@ -1,5 +1,13 @@
 # FactReview v2 progress
 
+## Current checkpoint: phase4 requested operation delivery (2026-10-10)
+
+The no-condition Literature failure omission from immutable v6 is repaired at the producer and dispatcher. Actual service/protocol/identity errors now retain claim-linked operation records with exact provider/paper/audit provenance, without inventing condition scope or changing valid Supported citation evidence. Strict Literature/verification/claim/component/state/system guards reject foreign records; the adjacent global preconstructed-instance system-responsibility guard is also explicit. Abstract-only and scientific insufficiency keep their existing meaning.
+
+Seventeen different necessary mock controls (11new/6old) passed at their directly affected checkpoints. Original3failed/6passed, independent claim/global responsibility reds, old baseline pipeline failure and intermediate incomplete mock migration remain preserved. The shared fixture now supplies current native observed paging and the same-response scientific adequacy wire; original comparisons and139 assertions are exact. Five other old files preserve167 assertions and their bytes. All308 original actual files and v1 freeze remain unchanged. Final4-file freeze/evidence and independent review1253bfd2 match. Evidence: `unbound-literature-operation-implementation/{review-final-v2.md,evidence-final-v2.json,frozen-final-v2/}` and `unbound-literature-operation-independent/review-final.md`. No new actual success is claimed.
+
+Phase3 canonical coordinates are delivered as33c6bdb8f9137dc85ec3df51c52759cc7c591f03, remotely verified. The genuine v4 controller uses that exact197-file Git source and archive20fa04fc, preserves1005 protected inputs and explicitly rejects extra source files, caches and links. Final declaration is still a draft awaiting independent approval and prepared identity review. Full native v6 remains terminal partial on013859e. Report appendix size and experiment joint contracts are open; report usability design proceeds independently. The goal remains active. This entry and the current14-check matrix are the current pointers; the following sections preserve historical checkpoints.
+
 ## Current checkpoint: phase3 canonical source coordinates (2026-10-10)
 
 The latest phase3 correction supplies program-computed zero-based Python/codepoint whole-block spans only for actual visible source bodies, binds that additive metadata into the existing context digest, and explicitly distinguishes Markdown-global provenance. Scalar carrier/item-path guidance and the existing rejection diagnostic now match the unchanged validator. No scientific guard, source text, coverage count, model stage or call budget was weakened. Independent review c4dfd9b6 and root three-file/freeze/evidence checks match. Sixteen different necessary mock controls passed through their recorded narrow repairs; all248 old assertions and original test bytes remain unchanged. Evidence: `coverage-source-coordinates-implementation/` and `coverage-source-coordinates-independent/`.
@@ -8,7 +16,7 @@ Full-native v6 on immutable013859e has finished with partial delivery:37logical/
 
 In progress: root is repairing operation-level delivery for actual Literature requests with no condition binding, without changing the supported citation claim. Necessary mocked checks exposed a shared pipeline fixture missing the newly required scientific search-adequacy wire; its original failed result is retained and no assertion is being weakened. The genuine73-claim/244-block v4 controller remains draft, with complete source-file/bytecode guards being added; it awaits the final committed source and independent preparation review. No live genuine request has been admitted. The overall goal remains active.
 
-This entry and the current14-check matrix are the current pointers. Lower sections preserve their frozen historical checkpoints, including earlier "Current" labels and original failures. Phase4 scientific search adequacy is delivered as013859ea00e8509fa023d4c656701dcd4a136401; lower pending checkpoint wording is historical.
+Lower sections preserve their frozen historical checkpoints, including earlier "Current" labels and original failures. Phase4 scientific search adequacy is delivered as013859ea00e8509fa023d4c656701dcd4a136401; lower pending checkpoint wording is historical.
 
 ## Current phase4: condition-level scientific search adequacy
 
