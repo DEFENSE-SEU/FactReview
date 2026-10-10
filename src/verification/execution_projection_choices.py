@@ -43,6 +43,9 @@ from verification.execution_projection_semantics import (
 )
 
 VERSION = "released-predictions-choice-v1"
+REGISTRY_VERSION = "released-predictions-choice-registry-v2"
+CONTEXT_VERSION = "released-predictions-choice-context-v2"
+RECIPE_FACTS_VERSION = "released-predictions-recipe-facts-v2"
 MAX_CHOICES = 16
 MAX_COMBINATION_CHECKS = 128
 MAX_RESOURCE_BYTES = 8 * 1024 * 1024
@@ -414,6 +417,22 @@ def _candidate(claim, condition, materials, catalog, sources, recipe, entry, con
         runtime_target=runtime.model_dump(mode="json"),
         sample_count=count,
         repository_hashes=recipe["repository_hashes"],
+        repository_recipe_facts={
+            "version": RECIPE_FACTS_VERSION,
+            "recipe": "exact_match_accuracy",
+            "rule_version": "entry-recipe-full-list-v1",
+            "recipe_sha256": file_hash(Path(__file__).with_name("execution_projection.py")),
+            "resources": {
+                role: {"path": name, "sha256": recipe["repository_hashes"][name]}
+                for role, name in (("entry", entry), ("configuration", config), ("data", data))
+            },
+            "configuration": copy.deepcopy(cfg),
+            "whole_rows_count": count,
+            "denominator": recipe["denominator"],
+            "unfiltered": True,
+            "label_key": recipe["label_key"],
+            "prediction_key": recipe["prediction_key"],
+        },
         sources={sid: sources[sid] for sid in sorted(used)},
     )
 
@@ -431,7 +450,7 @@ def build_choice_registry(claim, materials):
         code_hashes=_code_hashes(),
     )
     registry = dict(
-        version=VERSION,
+        version=REGISTRY_VERSION,
         status="structural_choices_only",
         snapshot=snapshot,
         candidates={},
@@ -571,15 +590,22 @@ def build_choice_registry(claim, materials):
 
 
 def choice_context(registry):
-    return copy.deepcopy(
-        {
-            k: registry[k]
-            for k in ("version", "status", "registry_sha256", "candidates", "unavailable", "budget")
-        }
-    )
+    context = {
+        k: registry[k]
+        for k in ("version", "status", "registry_sha256", "candidates", "unavailable", "budget")
+    }
+    if registry["version"] == REGISTRY_VERSION:
+        context.update(
+            version=CONTEXT_VERSION,
+            registry_version=REGISTRY_VERSION,
+            choice_wire_version=VERSION,
+        )
+    return copy.deepcopy(context)
 
 
 def revalidate_registry(registry, claim, materials, *, downstream=False):
+    if registry.get("version") != REGISTRY_VERSION:
+        raise ProjectionError("Historical choice registry cannot be upgraded for current execution")
     body = {k: v for k, v in registry.items() if k != "registry_sha256"}
     if digest(body) != registry.get("registry_sha256"):
         raise ProjectionError("Choice registry content changed")

@@ -1,5 +1,17 @@
 # FactReview v2 progress
 
+## 当前 Phase4 资源事实接线与整篇真实复审（2026-10-11）
+
+本轮继续整体目标，未暂停。Phase4最小接线只改execution_projection_choices.py、experiments.py并新增一个public mock：从原entry_recipe返回已索引entry/config/data路径、SHA、完整配置、全量行数/分母、固定键和有限实现身份。entry_recipe与204旧测试保持；facts不含numerator/测得accuracy，不赋confirmed/covered，不扩paper来源权限。registry/context/facts使用明确v2 domain，selection/review/record wire保持v1；历史可读，当前执行拒绝隐式升级，并重建原候选核全部资源。原19科学binding及完整conditions/source守卫保持，candidate/obligation ID按新摘要重算。
+
+仅一个必要public函数做同全文red1fail/1.17s→green1pass/1.02s；全19显式mock确认才有计划，sample unresolved、资源变化或重封假facts继续拒绝。原paper conditions=[]的缺项和0paper evidence保留。Ruff首次import顺序错误后只整理顶层import，函数及28Assert AST相同；最终三文件Ruff通过，未重复pytest/旧组/实际服务。独审2091d2a7/e2ce44e4关闭22facts/449原件，Root414b9b2e和4e2afa51完整读diff/report并核三冻结文件及449当前原件。新真实模型效果待新source验证；五路径交付及完整Git归档另见released-prediction-recipe-facts-root-v1/delivery.json。
+
+整篇v2先经19项控制器独审和13项prepared独审，Root核62与258当前原件；唯一prepare09bd3fb2a9bd/manifest69b09e9f、授权37719b73与新消费标记均保留。actual6ae3f8d19b10/supervisedfe9c551d676c固定15239d3，629.422s后terminal_measured/rc1：main20logical/20physical/1,100,476known，readiness171独立，总1,100,647known，0retry/unknown/blocked，货币费用未知。全六自然窗实际运行，15机械checks通过；science仍partial，first12/75、third13/75、26pending。第3/4窗返回15/8条first记录，实际完成数按production state计；末两窗2revisions使finalclaims75，不能写全局零采纳。Rootc8d62f2a核完整215源/31目录、控制、公开原回应和终态；终态独审正在推进，旧失败及四个科学成功false旗标保留。
+
+前两窗原29/23义务和73完整registry确已供给，实际reviews/reviewed blocks为空，先被原非空block门槛拒绝。模型自述response budget不足，具体生成根因未定。新首轮分批设计经独审：每窗一完整discovery（含0claim窗）与size3子批，父/子packedcontext、完整原科学材料及raw分别绑定；仅一次统一lowering，child不扩discovery reviewed权限，任何缺项/坏source/unresolved/预算失败整窗partial并关闭followup/third/adoption，继续其他窗。None默认和旧调用预算保持，显式新参数透传。两项必要public mock和最小实现进行中；未来first32+followup6+validation48/main86仅新身份候选，不能沿用旧60/6权限，soft3M不保证全部动态义务完成。
+
+Decisions：当前聊天GPT-6.1 Sol，FactReview仍openai-codex/GPT-5.5；auto批准、训练预算0、修复默认且上限3保持。只做必要验证、旧断言保留；私有provider/model/stdout/stderr内容不读，仅opaque SHA/size。当前14项7pass/6unresolved/1fail，Phase8整体验收未通过。下一步：交付本Phase4源码→完整新source归档与L2 v3真实验证；并行完成Phase3首轮分批及两个必要mock/独审→新身份整篇验证；健康原public计划才进入真实L3，不手造计划或强制额外LLM。开放项包括全篇召回/原子性/M2/M5、有效L2→L3、联合paper证据资格、普通NN/复杂预处理/多condition、报告质量与旧整体失败。goal active，未改main或新建PR。
+
 ## 当前 Phase3 首轮完整输出合同（2026-10-11）
 
 最新Phase8文档checkpoint已提交并推送4cd1bc7961828829fa3a0f28d20e588e32efa41b，精确远端一致；claim008-public-experiments-native-root-v2/delivery.json00211bdd绑定两个文档路径。它记录真实L2两角色完整19义务/18confirmed+1unresolved、0plan/5insufficient论文证据/0L3、50239known与旧失败保持。历史Phase0–8源码阶段记录保留，Phase8完整验收仍开放；当前14项7pass/6unresolved/1fail。
