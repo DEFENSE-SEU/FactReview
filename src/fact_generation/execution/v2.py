@@ -791,6 +791,40 @@ def _revalidate_targets(plan, claim, materials, ledger, phase):
         return {}, reason
 
 
+def _resource_origin(plan, materials):
+    value = {
+        "plan": plan.model_dump(mode="json"),
+        "repository": materials.repository.model_dump(mode="json") if materials.repository else None,
+    }
+    return hashlib.sha256(json.dumps(
+        value, sort_keys=True, ensure_ascii=False, allow_nan=False,
+    ).encode("utf-8")).hexdigest()
+
+
+def _revalidate_resources(plan, claim, materials, ledger, point):
+    from .resource_contract import validate_resource_contract
+
+    record = {"point": point, "state": "invalid", "contract_sha256": None, "reason": ""}
+    ledger["resource_validation"].append(record)
+    try:
+        if _resource_origin(plan, materials) != ledger["resource_origin_sha256"]:
+            raise ValueError("Execution plan or repository index changed from original intake")
+        contract = validate_resource_contract(plan, claim, materials)
+        if contract is None:
+            record.update(state="unbound", reason="Resource selection is unbound; runtime consumption is unverified")
+        else:
+            record.update(
+                state="bound",
+                contract_sha256=hashlib.sha256(contract.model_dump_json().encode("utf-8")).hexdigest(),
+                reason="Candidate identity only; runtime consumption remains unverified",
+            )
+        return ""
+    except (ValueError, OSError, TypeError, AttributeError, KeyError) as exc:
+        reason = f"Execution resource identity unavailable: {exc}"
+        record["reason"] = reason
+        return reason
+
+
 def execute_plans(
     plans, claims, materials, output_dir, *, config=None, runner=None, approver=None, repairer=None
 ) -> ExecutionResult:
@@ -811,14 +845,18 @@ def execute_plans(
     ordered = sorted(
         plans, key=lambda p: (order[p.priority], p.feasibility != "ready", p.run_mode == "training")
     )
-    for number, plan in enumerate(ordered):
-        claim = by_id.get(plan.claim_id)
+    intakes = [
+        (plan, plan.model_dump(mode="json"), _resource_origin(plan, materials))
+        for plan in ordered
+    ]
+    for number, (plan, original_plan, resource_origin) in enumerate(intakes):
+        claim = by_id.get(original_plan["claim_id"])
         if claim is None:
-            raise ValueError(f"plan refers to unknown claim: {plan.claim_id}")
+            raise ValueError(f"plan refers to unknown claim: {original_plan['claim_id']}")
         run_dir = output / f"run_{number:04d}"
         run_dir.mkdir(exist_ok=False)
         row = {
-            "plan": plan.model_dump(mode="json"),
+            "plan": original_plan,
             "approval_mode": config.approval_mode,
             "training_budget": config.training_budget,
             "training_used_before": training_budget["used"],
@@ -831,6 +869,8 @@ def execute_plans(
             "tolerance_profile": "alignment",
             "config": config.model_dump(mode="json"),
             "operation_failures": [],
+            "resource_origin_sha256": resource_origin,
+            "resource_validation": [],
         }
         result.ledger.append(row)
         reason = execution_blocker or (plan.blocker if plan.feasibility == "blocked" else "")
@@ -841,6 +881,8 @@ def execute_plans(
             )
         if not reason:
             _, reason = _revalidate_targets(plan, claim, materials, row, "before_approval")
+            if not reason:
+                reason = _revalidate_resources(plan, claim, materials, row, "before_approval")
             if reason:
                 result.issues.append(f"{plan.id}: {reason}")
         if not reason and plan.run_mode == "training":
@@ -862,6 +904,8 @@ def execute_plans(
                     ).model_dump())
                 if not reason:
                     _, reason = _revalidate_targets(plan, claim, materials, row, "after_approval")
+                    if not reason:
+                        reason = _revalidate_resources(plan, claim, materials, row, "after_approval")
                     if reason:
                         result.issues.append(f"{plan.id}: {reason}")
         if not reason:
@@ -1011,6 +1055,8 @@ def _execute_graph(
     def run(state):
         request = state["request"]
         _, binding_issue = _revalidate_targets(request.plan, claim, materials, ledger, "before_run")
+        if not binding_issue:
+            binding_issue = _revalidate_resources(request.plan, claim, materials, ledger, "before_run")
         if binding_issue:
             issues.append(f"{request.plan.id}: {binding_issue}")
             state.update(
@@ -1023,7 +1069,9 @@ def _execute_graph(
             for binding in request.plan.target_bindings.values():
                 if binding.version == 2:
                     check_request(request, binding)
-            if any(binding.version == 2 for binding in request.plan.target_bindings.values()):
+            if request.plan.task.resource_contract is not None or any(
+                binding.version == 2 for binding in request.plan.target_bindings.values()
+            ):
                 changed_before = protected_changes(request.workspace)
                 if changed_before:
                     raise ValueError("execution workspace changed before run: " + ", ".join(changed_before))
@@ -1108,6 +1156,8 @@ def _execute_graph(
         from verification.experiment_targets import runtime_target_issue
 
         bindings, binding_issue = _revalidate_targets(request.plan, claim, materials, ledger, "before_judge")
+        if not binding_issue:
+            binding_issue = _revalidate_resources(request.plan, claim, materials, ledger, "before_judge")
         if binding_issue:
             issues.append(f"{request.plan.id}: {binding_issue}")
             state.update(reason=binding_issue, stop=True)

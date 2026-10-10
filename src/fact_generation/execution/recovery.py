@@ -27,6 +27,23 @@ def _linked(path):
     return path.is_symlink() or getattr(path, "is_junction", lambda: False)()
 
 
+def _historical_plan(value):
+    """Normalize only absent additive task defaults, retaining the raw ledger."""
+    if not isinstance(value, dict) or not isinstance(value.get("task"), dict):
+        return value
+    result, task = dict(value), dict(value["task"])
+    for key, default in (("data_paths", []), ("weight_paths", []), ("resource_contract", None)):
+        task.setdefault(key, default)
+    result["task"] = task
+    return result
+
+
+def _historical_request(value):
+    result = dict(value)
+    result["plan"] = _historical_plan(result.get("plan"))
+    return result
+
+
 def _validate_record(row, expected, directory):
     from .v2 import ExecutionOperationFailure, RunOutcome, RunRequest
 
@@ -46,8 +63,10 @@ def _validate_record(row, expected, directory):
     }
     if (
         not required.issubset(row)
-        or set(row) - required - {"workspace", "refinement", "operation_failures"}
-        or _encoded(row["plan"]) != _encoded(expected)
+        or set(row) - required - {
+            "workspace", "refinement", "operation_failures", "resource_origin_sha256", "resource_validation",
+        }
+        or _encoded(_historical_plan(row["plan"])) != _encoded(expected)
     ):
         raise ValueError("incomplete record or changed plan snapshot")
     if type(row["approved"]) is not bool or not isinstance(row["reason"], str):
@@ -71,6 +90,30 @@ def _validate_record(row, expected, directory):
             for item in failures
         ):
             raise ValueError("invalid producer-declared operation failures")
+    if "resource_origin_sha256" in row and (
+        not isinstance(row["resource_origin_sha256"], str)
+        or not re.fullmatch(r"[0-9a-f]{64}", row["resource_origin_sha256"])
+    ):
+        raise ValueError("invalid original resource identity")
+    if "resource_validation" in row:
+        checks = row["resource_validation"]
+        if not isinstance(checks, list):
+            raise ValueError("invalid resource validation records")
+        for check in checks:
+            if (
+                not isinstance(check, dict)
+                or set(check) != {"point", "state", "contract_sha256", "reason"}
+                or check["point"] not in {"before_approval", "after_approval", "before_run", "before_judge"}
+                or check["state"] not in {"unbound", "bound", "invalid"}
+                or not isinstance(check["reason"], str) or not check["reason"].strip()
+                or (check["contract_sha256"] is not None and (
+                    not isinstance(check["contract_sha256"], str)
+                    or not re.fullmatch(r"[0-9a-f]{64}", check["contract_sha256"])
+                ))
+                or (check["state"] == "bound" and check["contract_sha256"] is None)
+                or (check["state"] == "unbound" and check["contract_sha256"] is not None)
+            ):
+                raise ValueError("invalid resource validation record")
     if row["attempts"] and not row["approved"]:
         raise ValueError("attempts recorded without approval")
     if not row["attempts"] and not row["reason"].strip():
@@ -87,7 +130,7 @@ def _validate_record(row, expected, directory):
             # remains mandatory and exact; recovery returns the original bytes.
             serialized_outcome.pop("operation_failures")
         if (
-            _encoded(request.model_dump(mode="json")) != _encoded(attempt["request"])
+            _encoded(request.model_dump(mode="json")) != _encoded(_historical_request(attempt["request"]))
             or _encoded(serialized_outcome) != _encoded(outcome_data)
             or _encoded(request.plan.model_dump(mode="json")) != _encoded(expected)
             or _encoded(request.config.model_dump(mode="json")) != _encoded(config)
