@@ -1,6 +1,18 @@
 # FactReview v2 progress
 
-## 当前 Phase5：只读观测接线与执行证据资格
+## 当前 Phase5：关闭普通 Docker 的旧 None 资格绕过
+
+已修复：生产 docker_runner 由程序写入 environment.transport=docker，作者 raw JSON 不参与该字段。普通 Docker 输出现在统一经过消费资格护栏，旧None合同也不能凭 dataset/metric/settings/value 标签生成证据。原0退出、数值、日志保留；缺消费关系记录unresolved，不新增系统故障。version2完整released-predictions重算分支先执行且不变；无transport的明确自定义runner只保留受信operator/test注入兼容，不能据此声称独立复现。
+
+必要验证：只新增一个mock边界，原红1/.83s→原函数断言不变绿色1/.69s。此前已绿组没有复放；Ruff/diff通过。恢复唯一新的BoolOp谓词之后，整个生产AST与e704已审源相同，旧fixture及11Assert函数不变，新函数9Assert与原红相同。无模型、检索、Docker、进程、网络或新actual。独审85d3fc5ad1ce194e37c1bed926372b010a62ebd5a0eccc02d0d7026bcf78c82a / evidence128223419c9bb716c3760afa5c2ecdd7665a216f70a834dadc3be9d2a23a73b1；Root已读全文并核身份。独审工具最初误把含新红函数的文件当旧基线，原失败保留，随后读取此前已审冻结核各自AST，没有改程序或断言。
+
+输出：execution-unbound-docker-implementation/frozen-final/两文件、evidence-final.json73253dca、red/green；execution-unbound-docker-independent/review.md与evidence.json。此前Phase5已推送且精确远端e70466fb2ca97aad14cbfbecf3a847e94600c2d9；本批仍只提交/推送授权refactor/method-v2，精确收据保存在execution-unbound-docker-implementation/delivery.json。不开PR、不改main、不动历史实际数据。
+
+Decisions：生产后端须进入统一资格核验；显式注入接口由操作者负责，不作为独立复现凭据。模型选择侧问已核当前聊天原运行记录model=gpt-6.1-sol、effort=ultra；FactReview既有模型配置未改变。
+
+Open issues / Next action：子agent当前实现独立runtime_flow.py/test_runtime_flow_v2.py有限JSON直线actual event/独立AST值流，后续独审再接原同一次_refine与逐condition资格。它目前只证明机械值流，科学模型/全部设置与raw来源仍未闭合；同实际解释器Code identity、通用权重应用、无标量分析、genuine M2/M5与全论文覆盖、新真实部署和商业整体验收继续。goal active，原14-check当前矩阵与所有历史失败保持。
+
+## 历史 e704 Phase5：只读观测接线与执行证据资格
 
 本批完成：原缺命令的同一次补全响应可提出源码调用位置，程序核实际可见源码；既有命令不增加模型调用。普通 stdout Python 运行将作者仓库与观测器包分别只读挂载，scratch 独立可写，原命令/环境/工作目录与科学设置保留。作者原输出和观测报告分开保存；承诺观测且零退出却缺报告形成现有 typed 执行失败。旧 ledger 只在比较副本补 source_sites=None，不恢复科学证据。
 

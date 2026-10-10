@@ -66,3 +66,23 @@ def test_matching_metadata_and_observed_tag_do_not_qualify_selected_resources(or
     assert result.delivery_checks == []
     assert claim.model_dump(mode="json") == original_claim
     assert {path.name: path.read_bytes() for path in root.iterdir() if path.is_file()} == original_files
+
+
+def test_unbound_docker_output_cannot_enter_legacy_metadata_support(original_inputs, tmp_path):
+    plan, claim, materials = original_inputs
+    assert plan.task.resource_contract is None
+    result = v2.execute_plans(
+        [plan], [claim], materials, tmp_path / "unbound", config={"max_attempts": 0},
+        runner=lambda request: v2.RunOutcome(
+            returncode=0, observations=[observation()], environment={"transport": "docker"},
+        ),
+    )
+    assert not result.claims[0].evidence
+    row = result.ledger[0]
+    assert row["resource_validation"][0]["state"] == "unbound"
+    assert row["attempts"][0]["returncode"] == 0
+    assert row["attempts"][0]["observations"][0]["value"] == 0.9
+    assert row["alignment"][0]["aligned"] is False
+    assert row["alignment"][0]["consumption"]["status"] == "unresolved"
+    assert "consumption" in row["reason"].lower()
+    assert result.delivery_checks == [] and not claim.evidence

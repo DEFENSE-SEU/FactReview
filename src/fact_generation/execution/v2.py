@@ -1279,9 +1279,11 @@ def _execute_graph(
                     invalid_comparisons.append(reason)
                     issues.append(f"{request.plan.id}: {reason}")
                     continue
-            elif request.plan.task.resource_contract is not None:
-                # A selected file identity and matching output labels do not
-                # establish its use in this condition's actual computation.
+            elif (request.plan.task.resource_contract is not None
+                  or outcome.environment.get("transport") == "docker"):
+                # Selected identities and matching labels do not establish use
+                # in this condition's actual computation. Docker declares its
+                # transport here; author output cannot supply environment data.
                 # Source sites currently record calls without scientific roles
                 # or a checked data/model/prediction/metric flow contract.
                 reason = f"{condition.id}: actual resource consumption remains unverified"
