@@ -348,6 +348,7 @@ def run_v2_pipeline(
             if summary["stages"]["verification"] == "ok":
                 summary["outputs"]["verification"] = str(root / "verification" / "verification.json")
             claims, ledger = verification.claims, []
+            execution_delivery_checks = []
             verified = [c.model_copy(deep=True) for c in claims]
 
             def recover_execution(exc):
@@ -409,6 +410,7 @@ def run_v2_pipeline(
                     recover=recover_execution,
                 )
                 claims, ledger = execution.claims, execution.ledger
+                execution_delivery_checks = execution.delivery_checks
                 summary["issues"].extend(execution.issues)
             else:
                 skip_stage("execution", "Execution disabled; released artifacts were not run.")
@@ -429,7 +431,9 @@ def run_v2_pipeline(
             )
             review = checked_delivery(
                 review, stages=summary["stages"], extraction_status=screening.claim_extraction_status,
-                additional_checks=[*screening.delivery_checks, *verification.delivery_checks],
+                additional_checks=[
+                    *screening.delivery_checks, *verification.delivery_checks, *execution_delivery_checks,
+                ],
                 **{name: summary[name] for name in (
                     "claim_coverage", "writing_coverage", "figure_coverage", "table_coverage",
                     "figure_context_coverage", "table_context_coverage",
