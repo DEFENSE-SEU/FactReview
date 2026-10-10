@@ -1,6 +1,20 @@
 # FactReview v2 progress
 
-## 当前回归修复与真实执行 checkpoint（2026-10-11）
+## 当前完整框架 checkpoint（2026-10-11）
+
+Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支与远端为42fb6bf68c144c3ec484c8735266f65249733d4b；本轮继续执行，不暂停目标。
+
+Completed：最终默认全套仅运行一次，3754passed/3原默认deselected/0skipped/0fail/0error，exit0；pytest538.61s、wrapper541.797s。419源码/测试/config身份前后完全一致，原断言、marker及外部mock保持。报告final-default-regression-final-path-fixtures-v1/report.md；原56失败、后续12失败及所有局部红绿记录完整保留。原14验收第1项现通过，另13项窄合同保持；科学及商业完成仍需独立证据。
+
+Prepared：full-public-pipeline-native-delivery-v1/frozen-final-v6通过离线独审；Root唯一--prepare成功生成prepared-f72730c0a511/manifest.json。完整生产源固定f2786581b713c8ed39c18d39ad3d204b165b530d、216files/31dirs，与42fb的生产源相同；后者仅测试/docs变化。prepared源/输入/控制器独审进行中，之后写该身份的新授权，唯一supervised真实公开入口调用；原实际和授权不复用。
+
+Open issues：真实完整入口Materials→L1/VLM→四分支L2→非空L3→assessment/advice→JSON/MD/三PDF/SVG尚待当前验证。发现ordinary L3将完整Claim条件数限制为1，违背同一结论跨settings保留一条Claim的规格；正常L2 v3自身也限一决策。先修逐计划单正式条件的ordinary L3接线，保完整Claim/源上下文、逐条件Evidence、全部科学资格与状态聚合；后续显式版本化L2多决策和条件关联全文语义另行独审，旧19义务及legacy/v3守卫保留。一般NN推理、整篇召回/原子性/M2/M5及联合paper evidence仍开放。
+
+Decisions：已有repair3上限3、auto加可选interactive并记录模式、training0、deadline及获准arxiv fallback、集中原容差、v1 conflict→questioned保持。不会因mock全套通过或两页材料实际成功宣告商业完成。当前fixed f278实际证据与随后多条件源码/测试证据分别绑定各自身份。
+
+Next action：闭合prepared独审并执行唯一真实公开入口；并行实现独审后的ordinary多条件接线与一项必要公共mock，阶段提交/推送及checks/progress更新继续。某项服务或能力受阻时推进其他框架工作。
+
+## 历史回归修复与真实执行 checkpoint（2026-10-11）
 
 Task：继续完整三层框架，目标active；Phase0–7历史实现保留，Phase8整体验收未完成。授权分支`refactor/method-v2`生产源码checkpointf2786581b713c8ed39c18d39ad3d204b165b530d已推送并核精确远端。当前兼容夹具与真实接口缺陷修复按阶段继续提交，完整目标未暂停。
 
