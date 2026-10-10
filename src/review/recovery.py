@@ -14,7 +14,7 @@ from review.report.v2 import (
 from schemas.review import DeliveryCheck, FinalReview
 
 
-def interrupted_report_history(directory: Path):
+def interrupted_report_history(directory: Path, *, errors=None):
     """Index owned export files without adopting their interrupted contents."""
     names = {
         "json": "final_review.json", "markdown": "final_review.md",
@@ -25,12 +25,17 @@ def interrupted_report_history(directory: Path):
     result = {}
     for key, name in names.items():
         path = directory / name
-        if path.is_file() and path.resolve().is_relative_to(directory.resolve()):
-            data = path.read_bytes()
-            result[key] = {
-                "path": str(path), "sha256": hashlib.sha256(data).hexdigest(),
-                "size_bytes": len(data), "role": "interrupted_writer_history",
-            }
+        try:
+            if path.is_file() and path.resolve().is_relative_to(directory.resolve()):
+                data = path.read_bytes()
+                result[key] = {
+                    "path": str(path), "sha256": hashlib.sha256(data).hexdigest(),
+                    "size_bytes": len(data), "role": "interrupted_writer_history",
+                }
+        except OSError as exc:
+            if errors is None:
+                raise
+            errors[key] = {"path": str(path), "error_type": type(exc).__name__}
     return result
 
 
@@ -94,16 +99,29 @@ def finalize_teaser_review(review, output_dir: Path, *, prior_outputs, report_su
     names = {"pdf": "final_review.pdf", "appendix_pdf": "technical_appendix.pdf",
              "bundle_pdf": "review_bundle.pdf"}
     prior_delivery = {}
+    checks = []
     for key, value in prior_outputs.items():
         if not key.startswith("report_") or key.endswith("_error"):
             continue
         path = Path(value)
-        if path.is_file():
-            data = path.read_bytes()
-            prior_delivery[key.removeprefix("report_")] = {
-                "path": str(path), "sha256": hashlib.sha256(data).hexdigest(),
-                "size_bytes": len(data), "role": "prior_delivery_history",
+        try:
+            if path.is_file():
+                data = path.read_bytes()
+                prior_delivery[key.removeprefix("report_")] = {
+                    "path": str(path), "sha256": hashlib.sha256(data).hexdigest(),
+                    "size_bytes": len(data), "role": "prior_delivery_history",
+                }
+        except OSError as exc:
+            name = key.removeprefix("report_")
+            prior_delivery[name] = {
+                "path": str(path), "role": "unavailable_prior_delivery_history",
+                "error_type": type(exc).__name__,
             }
+            checks.append(DeliveryCheck(
+                stage="report", component=name + ".history", state="unavailable",
+                reason=f"Prior artifact history could not be read ({type(exc).__name__}); no content or hash was adopted.",
+            ))
+    review = checked_delivery(review, additional_checks=checks)
     if not report_succeeded:
         # Earlier writer recovery has already retained the last validated
         # records. Never re-enter that failed formatter or adopt its PDFs.
@@ -120,6 +138,9 @@ def finalize_teaser_review(review, output_dir: Path, *, prior_outputs, report_su
                                     reason="Prior canonical PDFs lack their validated report JSON; no PDF was adopted."))
     if report_succeeded and source_json:
         try:
+            if any(prior_delivery.get(key, {}).get("role") == "unavailable_prior_delivery_history"
+                   for key in ("json", "manifest") if key == "json" or manifest_provided):
+                raise ValueError("Prior canonical metadata is already recorded as unavailable")
             saved = FinalReview.model_validate_json(Path(source_json).read_text("utf-8"))
             source_ok = _scientific_records(saved) == _scientific_records(review)
             if not source_ok:
@@ -141,7 +162,8 @@ def finalize_teaser_review(review, output_dir: Path, *, prior_outputs, report_su
                 continue
             path = Path(value)
             metadata = prior_delivery.get(key)
-            valid = (metadata is not None and path.name == name and path.parent.resolve() == origin.resolve())
+            valid = (metadata is not None and metadata.get("role") == "prior_delivery_history"
+                     and path.name == name and path.parent.resolve() == origin.resolve())
             if manifest_provided:
                 entry = source_manifest["artifacts"].get(key)
                 valid = valid and isinstance(entry, dict) and entry.get("role") == "current_delivery" and (
@@ -168,10 +190,20 @@ def finalize_teaser_review(review, output_dir: Path, *, prior_outputs, report_su
             checks.append(DeliveryCheck(stage="report", component="pdf_delivery_finalization", state="incomplete",
                                         reason="Static PDF package finalization failed; prior files remain unchanged."))
         result = checked_delivery(review, additional_checks=checks)
-        history = interrupted_report_history(output_dir)
+        history_errors = {}
+        history = interrupted_report_history(output_dir, errors=history_errors)
         # A late package failure can occur after a healthy correction has
         # retained its first-pass bytes. Keep that owned history discoverable.
-        for key, metadata in interrupted_report_history(output_dir / "pdf_history").items():
+        nested_errors = {}
+        for key, metadata in interrupted_report_history(output_dir / "pdf_history", errors=nested_errors).items():
             history["history_" + key] = metadata
+        history_errors.update({"history_" + key: metadata for key, metadata in nested_errors.items()})
+        if history_errors:
+            result = checked_delivery(result, additional_checks=[DeliveryCheck(
+                stage="report", component="report_history", state="unavailable",
+                reason="Interrupted static history could not be completely read; per-file errors are retained in the fallback manifest.",
+            )])
         return _minimal_package(result, output_dir / "fallback", prior_delivery, history=history,
-                                errors={"static_delivery_error": type(exc).__name__})
+                                errors={"static_delivery_error": type(exc).__name__, **(
+                                    {"history_errors": history_errors} if history_errors else {}
+                                )})

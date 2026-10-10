@@ -498,14 +498,20 @@ def run_v2_pipeline(
 
             def recover_report(exc):
                 nonlocal review
-                history = interrupted_report_history(root / "review" / "report")
+                history_errors = {}
+                history = interrupted_report_history(root / "review" / "report", errors=history_errors)
                 for key, artifact in history.items():
                     summary["outputs"]["history_report_" + key] = artifact["path"]
                 checks = [DeliveryCheck(
                     stage="report", component="report_writer", state="failed",
                     reason=f"Report writer raised {type(exc).__name__}. Audit: {root / 'full_pipeline_summary.json'}#/stage_errors/report",
                 )]
-                if any(key.endswith("pdf") for key in history):
+                if history_errors:
+                    checks.append(DeliveryCheck(
+                        stage="report", component="report_history", state="unavailable",
+                        reason="Interrupted report history could not be completely read; per-file errors are retained in artifact_history_errors.json.",
+                    ))
+                if any(key.endswith("pdf") for key in (*history, *history_errors)):
                     checks.append(DeliveryCheck(
                         stage="report", component="pdf_delivery_finalization", state="incomplete",
                         reason="PDF files written before the report failure are retained as interrupted history; final delivery export is incomplete.",
@@ -518,6 +524,10 @@ def run_v2_pipeline(
                     path = root / "review" / "report_recovery" / "artifact_history.json"
                     _save(path, history)
                     summary["outputs"]["history_report_artifacts"] = str(path)
+                if history_errors:
+                    path = root / "review" / "report_recovery" / "artifact_history_errors.json"
+                    _save(path, history_errors)
+                    summary["outputs"]["history_report_errors"] = str(path)
                 return recovered
 
             outputs = stage("report", report_stage, recover=recover_report)
