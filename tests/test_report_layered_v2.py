@@ -334,7 +334,9 @@ def test_advice_checked_once_valid_text_retained_invalid_basis_unavailable(tmp_p
         assert v2._text(result.claims[i].advice.items[0].text) in text
     assert "Advice unavailable" in text and result.model_dump(mode="json") == before
     manifest = json.loads(Path(output["manifest"]).read_text("utf-8"))
-    assert manifest["checked_changes"] == {"advice_claim_indices": [1], "reference_finding_indices": []}
+    assert manifest["checked_changes"] == {
+        "delivery_fields": [], "advice_claim_indices": [1], "reference_finding_indices": []
+    }
 
 
 def test_malicious_text_cannot_create_anchors_links_or_images(tmp_path):

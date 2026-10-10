@@ -200,7 +200,9 @@ def test_switch_from_codex_to_openai_vision_uses_openai_connection(
         fallback = resolve_llm_config() if provide_fallback else None
         cfg = resolve_vlm_config(fallback=fallback)
         assert llm_json("Inspect pixels", "Check", cfg, images=[str(image_file)]) == {"findings": []}
-    assert constructor == {"api_key": "openai-key", "base_url": "https://openai-compatible.invalid/v1"}
+    assert constructor == {
+        "api_key": "openai-key", "base_url": "https://openai-compatible.invalid/v1", "max_retries": 0
+    }
     assert request["model"] == "openai-vision-model"
     assert request["messages"][-1]["content"][1]["type"] == "image_url"
 

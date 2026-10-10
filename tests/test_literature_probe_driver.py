@@ -459,14 +459,31 @@ def test_retrieval_diagnostics_redact_configured_endpoint_and_key(setup, monkeyp
 
 
 def test_cached_unrelated_reader_failure_is_visible_and_does_not_fake_unresolved(setup):
+    from verification.literature import _reader_question
+    from verification.literature_omissions import OmissionContext
+
     case = setup[1]["cases"][1]
     cachepath = Path(case["cache_path"])
     cache = probe._load(cachepath)
     for query in cache["queries"]:
         query["response"]["papers"] = [PAPER]
+    material = SharedMaterials.model_validate(probe._load(Path(case["source_run"]) / "materials/materials.json"))
+    claim = Claim.model_validate(case["raw_claim"])
+    excerpts = probe._claim_source_excerpts(claim, material)
+    question = _reader_question(claim, PAPER, set(), excerpts, OmissionContext(material, excerpts))
     cache["reads"] = [
-        {"id": PAPER["arxiv_id"], "response": {"success": False, "error": "Historical download failure"}}
+        {"id": PAPER["arxiv_id"], "question": question,
+         "response": {"success": False, "error": "Historical download failure"}}
     ]
+    with pytest.raises(ValueError, match="Cached reader request differs"):
+        asyncio.run(probe.Cache(cache).read_papers(items=[{"id": PAPER["arxiv_id"], "question": question + " altered scope"}]))
+    legacy = deepcopy(cache)
+    legacy["reads"][0].pop("question")
+    with pytest.raises(ValueError, match="Cached reader request differs"):
+        asyncio.run(probe.Cache(legacy).read_papers(items=[{"id": PAPER["arxiv_id"], "question": question}]))
+    assert asyncio.run(probe.Cache(legacy).read_papers(items=[{
+        "id": PAPER["arxiv_id"], "question": "Describe the mechanism, target setting, and evaluation protocol."
+    }])) == cache["reads"][0]["response"]
     _json(cachepath, cache)
     change_plan(setup, lambda p: p["protected_files"].update({str(cachepath): probe._hash(cachepath)}))
     directory, result = run(setup, ["original-unresolved"], mode="original-cache")

@@ -34,7 +34,23 @@ def compare(**kwargs):
 
 
 async def test_default_dispatch_citation_has_no_expansion_and_global_stays_active(tmp_path, monkeypatch):
+    from pathlib import Path
+
+    from schemas.claim import ClaimLocation, ClaimSourceRef
+    from tests.test_literature_literal_concepts_v2 import planning_response
+
     claim, material = inputs(tmp_path)
+    start = 0
+    for block in material.blocks:
+        block.text += " The proof uses induction for finite graphs, checked through theorem verification."
+        block.loc = ClaimLocation(page=block.loc.page, char_start=start, char_end=start + len(block.text))
+        start += len(block.text) + 1
+    material.markdown = "\n".join(block.text for block in material.blocks)
+    Path(material.markdown_path).write_text(material.markdown, encoding="utf-8")
+    claim.loc, claim.source_quote = material.blocks[0].loc, material.blocks[0].text
+    claim.source_refs = [ClaimSourceRef(source_block_id=block.id, source_quote=block.text,
+                                       loc=block.loc, covered=[f"c{i}"])
+                         for i, block in enumerate(material.blocks, 1)]
     searcher, reader, _ = boundaries()
     real = literature.verify_literature
     received = []
@@ -42,8 +58,19 @@ async def test_default_dispatch_citation_has_no_expansion_and_global_stays_activ
         received.append((c.id if c else None, kwargs.get("expand_uncited")))
         return await real(c, m, searcher=searcher, reader=reader, **kwargs)
     monkeypatch.setattr(literature, "verify_literature", wrapped)
-    result = await verify_claims([claim], material, tmp_path / "audit", submission_deadline="2022-01-01", call=compare)
+    planning_calls = []
+
+    def model(**kwargs):
+        if kwargs["module"] == "verification.literature.planning":
+            planning_calls.append(kwargs["module"])
+            request = json.loads(kwargs["prompt"].split("\nCONCEPT_DATA_JSON:\n", 1)[1])
+            return planning_response(request, {"mechanism": "induction", "target setting": "finite graphs",
+                                               "evaluation protocol baseline": "theorem verification"})
+        return compare(**kwargs)
+
+    result = await verify_claims([claim], material, tmp_path / "audit", submission_deadline="2022-01-01", call=model)
     assert received == [("claim", False), (None, False)]
+    assert planning_calls == ["verification.literature.planning"]
     assert searcher.search.await_count == 3
     assert reader.read_papers.await_count == 2
     assert {cid for e in result.claims[0].evidence for cid in e.covered} == {"c1", "c2"}
