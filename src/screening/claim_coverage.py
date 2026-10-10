@@ -668,7 +668,7 @@ def _digest(value):
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
 
-def _prompt_schema(schema):
+def _prompt_schema(schema, payload=None):
     displayed = schema.model_json_schema()
     if schema is CoverageValidationV5:
         priority = ("schema_version", "context_id", "window_id", "original_claim_reviews", "observation_links")
@@ -680,6 +680,20 @@ def _prompt_schema(schema):
         displayed["required"] = [key for key in priority if key in required] + [
             key for key in required if key not in priority
         ]
+        if payload is not None:
+            for key in ("context_id", "window_id"):
+                properties[key]["const"] = payload[key]
+            rows = payload["required_original_claim_reviews"]
+            originals = properties["original_claim_reviews"]
+            originals.update(minItems=len(rows), maxItems=len(rows))
+            if rows:
+                originals["prefixItems"] = [
+                    {"allOf": [originals["items"], {"properties": {
+                        "claim_id": {"const": row["claim_id"]},
+                        "claim_digest": {"const": row["digest"]},
+                    }}]}
+                    for row in rows
+                ]
     return displayed
 
 
@@ -1568,7 +1582,7 @@ def review_claim_coverage(
         try:
             raw = (call or llm_json)(
                 prompt="OUTPUT_SCHEMA:\n"
-                + json.dumps(_prompt_schema(schema), ensure_ascii=False)
+                + json.dumps(_prompt_schema(schema, payload), ensure_ascii=False)
                 + "\nDATA_JSON:\n"
                 + json.dumps(payload, ensure_ascii=False),
                 system=system,
