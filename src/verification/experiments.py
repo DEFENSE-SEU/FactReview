@@ -509,6 +509,15 @@ class ExperimentsOutputV3(Contract):
     issues: list[str] = Field(default_factory=list)
 
 
+class ExperimentsOutputV3PaperOnly(ExperimentsOutputV3):
+    """The same wire with only the none branch, sent when execution is not requested."""
+
+    execution: NoExecutionDecision
+
+
+_NON_EVIDENCE_KINDS = {"ref_text", "page_number", "header", "footer"}
+
+
 def lower_execution_response(raw):
     """Validate explicit new wire; preserve raw objects when producing the internal view."""
     from pathlib import Path
@@ -2070,6 +2079,38 @@ def _probe_joint_binding(claim, materials, raw, scope, bounded):
     return {"binding_issues": typed, "blocking_errors": blockers, "decision": decision}
 
 
+def _scope_schema(execution_review):
+    """The scope schema; without execution review its unused review arrays are omitted."""
+    schema = CatalogScopeReviewV2.model_json_schema()
+    if execution_review:
+        return schema
+    for key in ("plan_projection_reviews", "execution_choice_reviews"):
+        schema["properties"].pop(key)
+    defs = schema.get("$defs", {})
+    while True:
+        text = json.dumps({k: v for k, v in schema.items() if k != "$defs"}) + json.dumps(defs)
+        unused = [name for name in defs if f'"#/$defs/{name}"' not in text]
+        if not unused:
+            return schema
+        for name in unused:
+            defs.pop(name)
+
+
+_SCOPE_EXECUTION_REVIEW = (
+    "For each non-null plan target projection independently return one plan_projection_reviews decision, even when candidate_items is empty. "
+    "execution_projection_context.request_choices is a versioned structural menu under each config. Its roles, source lexical hits and prose candidates do not establish applicability or full support. Review the entire original claim and all original fields; do not inherit a decision from a catalog hint. "
+    "Keep these decisions separate from paper support. Review the unchanged whole claim and condition, every original field path, "
+    "its selected exact paper sources and released repository definition. Confirm only an absolute fixed released-prediction "
+    "exact-match fraction whose dataset/split, model, complete sample scope and every qualifier are retained. "
+    "Inference/training provenance, comparisons, population generalizations, filtering, unknown runtime obligations or "
+    "unsupported definitions must remain unresolved. Source IDs must identify each required original passage; field path "
+    "coverage alone is insufficient. Configuration/code supplied for plans grants no additional paper-support/joint access. "
+    "For released-predictions-v2, use the matching versioned plan review schema and the exact proposal_sha256 supplied in execution_projection_semantics_context.proposals. Independently review each unchanged atom, field binding and claim span; keep each atom's exact unique source ID set and every original mapping. The separate v2 context does not alter v1 decisions or grant paper/joint access. All original text must satisfy the finite recipe and retain its meaning; unknown predicates, inference, derived metrics and positive generalizations remain unresolved even if positions are covered. "
+    "For explicit released-predictions-choice-v1 selections return execution_choice_reviews, one exact candidate/condition identity with one review per supplied obligation_id. Inspect each complete original field, whole claim, atom and source meaning independently. The program's structural candidate grants no semantic confirmation. Do not retype source sets, offsets or atom mappings; confirm the supplied obligations only if their full original meaning is retained, otherwise return unresolved. Never add a selection or upgrade null/unresolved. This is separate from plan_projection_reviews for legacy plans. "
+    "The separate execution_choice_context v2 repository_recipe_facts records the indexed entry/config/data paths and SHA, complete configuration, unfiltered whole-file row count and denominator, fixed JSON keys and finite recipe implementation. These are resource measurement facts. Paper sources establish the claimed fixed sample, split and conclusion scope; retain every original sample atom and all original obligations. The sample atom fixed_released_predictions/all_records describes the candidate's whole-resource measurement boundary, and the paper sample quote need not itself declare repository release. Independently assess correspondence between that resource and the paper's sample, dataset, model and every qualifier using the complete supplied sources and facts; unresolved correspondence stays unresolved. Resource facts alone do not prove the same paper predictions, active weights, inference, training or population performance. They grant no confirmed decision, paper-support or additional source access. "
+)
+
+
 def _scope_review(
     claim,
     materials,
@@ -2090,11 +2131,30 @@ def _scope_review(
 ):
     """Independent semantic review; its grounded structural/numeric gates fail closed."""
     from common import run_stats
+    from verification.experiment_scope_context import (
+        alias_ids,
+        candidate_block_ids,
+        condition_groups,
+        dealias,
+        local_catalog,
+        local_materials,
+        scope_block_ids,
+    )
 
     joint_catalogs = joint_catalogs or {}
+    execution_review = projection_reviews is not None or bool(choice_selections)
+    if execution_review:
+        # Execution projections/choices are audited against the whole paper.
+        context_ids = {block.id for block in materials.blocks}
+    else:
+        # Claim-local context: IDs outside it are unknown to the resolvers below.
+        context_ids = scope_block_ids(claim, materials, candidate_block_ids(output))
+        if catalog is not None:
+            catalog = local_catalog(catalog, context_ids, condition_groups(claim))
+    context_materials = local_materials(materials, context_ids)
     payload = {
         "claim": claim.model_dump(mode="json"),
-        "paper_blocks": [block.model_dump() for block in materials.blocks],
+        "paper_blocks": [block.model_dump() for block in context_materials.blocks],
         "candidate_items": [item.model_dump() for item in output.items],
         "candidate_plans": [plan.model_dump(mode="json") for plan in output.plans],
         "single_source_candidate_indices": [
@@ -2113,7 +2173,7 @@ def _scope_review(
             },
             "bridge_condition_field": "SourceBridge.condition_field uses metric or settings.KEY, unlike setting_scopes.",
         },
-        "output_schema": CatalogScopeReviewV2.model_json_schema(),
+        "output_schema": _scope_schema(execution_review),
     }
     if any(target.projection is not None for plan in output.plans for target in plan.targets):
         from verification.execution_projection import projection_context
@@ -2147,7 +2207,14 @@ def _scope_review(
         payload["execution_choice_context"] = choice_context(choice_registry)
         payload["execution_choices"] = copy.deepcopy(raw_choices)
         payload["selection_expansions"] = copy.deepcopy(choice_selections)
-    audit = {"claim_id": claim.id, "input": copy.deepcopy(payload)}
+    aliases = {}
+    if not execution_review:
+        # Short handles replace hash IDs on the wire; the response is mapped back
+        # before any resolver runs, so validation sees only original IDs.
+        payload, aliases = alias_ids(payload)
+    audit = {"claim_id": claim.id, "input": copy.deepcopy(payload), "context_block_ids": sorted(context_ids)}
+    if aliases:
+        audit["id_aliases"] = aliases
     if choice_selections:
         audit["choice_registry"] = copy.deepcopy(choice_registry)
         audit["first_pass_response"] = copy.deepcopy(first_choice_response)
@@ -2205,23 +2272,15 @@ def _scope_review(
             "does not require invented numerical comparisons. Explain applicability with exact grounds; uncertainty "
             "or missing review information must remain unverified, without creating a new flaw. Place limitations that do not block the stated result in nonblocking_notes; "
             "unresolved_qualifiers is reserved for actual missing claim requirements. A complete condition can combine its table and connected definition/setup passages. "
-            "For each non-null plan target projection independently return one plan_projection_reviews decision, even when candidate_items is empty. "
-            "execution_projection_context.request_choices is a versioned structural menu under each config. Its roles, source lexical hits and prose candidates do not establish applicability or full support. Review the entire original claim and all original fields; do not inherit a decision from a catalog hint. "
-            "Keep these decisions separate from paper support. Review the unchanged whole claim and condition, every original field path, "
-            "its selected exact paper sources and released repository definition. Confirm only an absolute fixed released-prediction "
-            "exact-match fraction whose dataset/split, model, complete sample scope and every qualifier are retained. "
-            "Inference/training provenance, comparisons, population generalizations, filtering, unknown runtime obligations or "
-            "unsupported definitions must remain unresolved. Source IDs must identify each required original passage; field path "
-            "coverage alone is insufficient. Configuration/code supplied for plans grants no additional paper-support/joint access. "
-            "For released-predictions-v2, use the matching versioned plan review schema and the exact proposal_sha256 supplied in execution_projection_semantics_context.proposals. Independently review each unchanged atom, field binding and claim span; keep each atom's exact unique source ID set and every original mapping. The separate v2 context does not alter v1 decisions or grant paper/joint access. All original text must satisfy the finite recipe and retain its meaning; unknown predicates, inference, derived metrics and positive generalizations remain unresolved even if positions are covered. "
-            "For explicit released-predictions-choice-v1 selections return execution_choice_reviews, one exact candidate/condition identity with one review per supplied obligation_id. Inspect each complete original field, whole claim, atom and source meaning independently. The program's structural candidate grants no semantic confirmation. Do not retype source sets, offsets or atom mappings; confirm the supplied obligations only if their full original meaning is retained, otherwise return unresolved. Never add a selection or upgrade null/unresolved. This is separate from plan_projection_reviews for legacy plans. "
-            "The separate execution_choice_context v2 repository_recipe_facts records the indexed entry/config/data paths and SHA, complete configuration, unfiltered whole-file row count and denominator, fixed JSON keys and finite recipe implementation. These are resource measurement facts. Paper sources establish the claimed fixed sample, split and conclusion scope; retain every original sample atom and all original obligations. The sample atom fixed_released_predictions/all_records describes the candidate's whole-resource measurement boundary, and the paper sample quote need not itself declare repository release. Independently assess correspondence between that resource and the paper's sample, dataset, model and every qualifier using the complete supplied sources and facts; unresolved correspondence stays unresolved. Resource facts alone do not prove the same paper predictions, active weights, inference, training or population performance. They grant no confirmed decision, paper-support or additional source access. "
-            "Plans without a projection need no projection decision. Do not append, rewrite or merge candidates.",
+            + (_SCOPE_EXECUTION_REVIEW if execution_review else "")
+            + "Plans without a projection need no projection decision. Do not append, rewrite or merge candidates."
+            + (" IDs are short program handles such as #12; copy them exactly." if aliases else ""),
             payload,
             module="verification.experiments.scope",
             call=call,
         )
         audit["response"] = copy.deepcopy(response)
+        response = dealias(response, aliases)
         pristine = copy.deepcopy(joint_catalogs) if binding_repair_rounds else {}
         diagnostics = {}
         paper_response = {
@@ -2230,7 +2289,7 @@ def _scope_review(
             if key not in {"plan_projection_reviews", "execution_choice_reviews"}
         }
         conditions, decisions, errors, locations = _decode_scope(
-            paper_response, claim, materials, output, catalog, joint_catalogs, diagnostics=diagnostics
+            paper_response, claim, context_materials, output, catalog, joint_catalogs, diagnostics=diagnostics
         )
         if projection_reviews is not None:
             from verification.execution_projection import decode_projection_reviews
@@ -2469,6 +2528,76 @@ def _plan(
     )
 
 
+_FIRST_PASS_PAPER = (
+    "Check this experimental claim from the paper alone in five aspects: correspondence "
+    "(an experiment for every assertion), fairness (same data/budget/tuning), isolation "
+    "(credited components ablated), stability (variance/seeds/significance for small gaps), "
+    "consistency (abstract/text/table numbers). List all five in checked_aspects. Return output_schema JSON. Every item needs "
+    "an exact located paper quote and a concrete detail. paper_support stays paper-internal. "
+    "covered must be a nonempty list of distinct exact strings from allowed_condition_ids, the IDs "
+    "in claim.conditions. Every plan target condition_id must also come from that list, with no "
+    "duplicate targets. Never use claim.id, block IDs, datasets, or metric names as condition IDs. "
+    "Only include conditions the item actually addresses. Omit items or execution targets that cannot be tied to "
+    "allowed conditions and explain the limitation in issues; return empty items and execution kind=none when needed. "
+    "For paper_support, explicitly list fully_supported_conditions only when this one item "
+    "establishes the ENTIRE condition and every relevant claim qualifier, including its dataset, "
+    "metric, comparisons, and settings. A setup description or one component's result provides "
+    "partial support when the condition asserts more. Leave the list empty then and explain the "
+    "uncovered parts in detail. The paper's assertion by itself does not establish its conclusion. "
+    "When one located passage needs connected definitions/setup/results, you may propose ONE NEW paper_support item per condition with additional_sources (exact block_id/quote pairs). Such a joint candidate covers exactly one condition; its primary plus additional passages must together establish every qualifier before fully_supported_conditions can include it. Keep separate partial observations unchanged. Do not join disjoint passages into any quote or automatically merge partial flags. The configured joint_source_limit includes the primary source; do not exceed it. "
+    "Declare the COMPLETE member set in that candidate now. When a selected table relies on metric/setup definitions outside the table, include both those definitions and the exact manuscript passage explicitly referencing that numbered table to connect them. Definitions and the exact manuscript table reference may be different members; a definition need not repeat the table number. The cited passages must connect the same task, dataset and applicable settings; topic overlap alone is insufficient. One exact member may serve multiple roles; do not duplicate it. A table-reference passage emitted only as another partial item grants this joint candidate no access; the independent scope review cannot append it. Preserve missing-reference or unresolved-qualifier limitations and leave fully_supported_conditions empty when the complete condition is not established. "
+    "Copy every quote verbatim as one contiguous substring of its selected paper block's text, "
+    "and copy value_context verbatim from within quote. Preserve mathematical markup, whitespace, "
+    "punctuation, and spelling exactly; do not normalize math, paraphrase, or join disjoint passages. "
+    "large_gap_no_variance is a non-decisive note. text_table_contradiction requires two "
+    "quoted numerical passages for the same target condition, dataset, metric, and every setting, "
+    "on the same scale. Each value_context must identify those labels and one unique numeric value; "
+    "preserve explicit units and percentage markers. Different splits/seeds/models, ambiguous "
+    "multi-value tables, or unresolved unit conversions do not establish a contradiction. "
+)
+
+_FIRST_PASS_EXECUTION = (
+    "For a target claim with re-obtainable reported numbers, emit one explicit execution decision. "
+    "A plan must use the exact metric named by its target condition. Never replace an abstract "
+    "quality or qualitative condition with a different numerical metric such as MRR. When no "
+    "reported number matches the condition's metric, omit that target/plan and explain in issues. "
+    "Include candidate entry script/config only from the supplied repository index; unknown commands/metric output "
+    "remain for L3. Every plan target quotes the exact paper numeric token, metric, and dataset; "
+    "copy full table headers when needed. For multi-value quotes, supply an exact value_context "
+    "substring identifying the target dataset/metric and its unique reported value. Ambiguous "
+    "whole-table references remain blocked until the target is resolved. Include actual indexed data/weight paths. "
+    "Execution targets require an absolute measurement for the original subject, dataset, metric and all settings. "
+    "A gap, improvement, percentage-point change, ratio, comparator score or one case of a composite condition "
+    "cannot replace that absolute target. Unknown target bindings remain blocked. Preserve the complete original "
+    "sentence or native table; a narrowed value_context cannot remove its governing subject or scope. "
+    "Keep plans with missing code, data, weights, or budget as blocked with a reason. Priority follows "
+    "the link to the paper's core contribution. Emit no execution evidence or final verdict. "
+    "For released prediction-file evaluation you may explicitly propose released-predictions-v1 projection using "
+    "the provided original field inventory, paper source/number selectors and indexed resources. The first recipe "
+    "only computes full-list exact-match accuracy as a fraction. Classify every original semantic leaf without "
+    "editing it, choose exact source IDs for each role, and retain sample scope and conclusion boundaries. "
+    "Use execution_projection_context.request_choices for exact repository-relative entry/config/data identifiers, number_id-only prose choices and per-config field roles. Set data_paths to exactly [projection.data_path], keeping config and entry in their separate fields. A field with no supported role remains unresolved. Explicitly select source_ids, using complete_source_ids or combined lexical hits only as syntax hints; never add omitted sources automatically. Every choice still requires independent semantic review and final binding. "
+    "The original reported accuracy is a target, not a runtime setting. A combined dataset/split must have an "
+    "exact identity in the released config. Unknown obligations stay unresolved. Projection requires the actual "
+    "released evaluator/data/config, a prose number_id, one original condition and evaluation mode; omit weights "
+    "only for this released-predictions resource mode. It does not prove model inference or training. "
+    "The explicit released-predictions-v2 alternative can retain a qualified original metric/condition through source-grounded finite atoms. It preserves every original field and claim character span; select canonical identity/metric only from the actual config, full exact-match definition, complete fixed sample and explicit negative boundaries. Classify arbitrary field keys by their entire values; direct config keys retain runtime precedence. Use execution_projection_semantics_context as a separate version domain, without rewriting the original claim or condition. Each atom must have original condition-scoped paper source IDs; every field and claim fragment lists exactly its finite obligations. Unknown residue cannot be discharged by labeling it irrelevant. Do not convert null/old responses into a proposal or add a model stage. "
+    "Return schema_version=experiments-execution-v3 and exactly one required execution object: "
+    "{kind:choice, selection:<explicit released-predictions-choice-v1 select>} or "
+    "{kind:legacy, plan:<one plan>} or {kind:none, rationale:<reason execution is unresolved or not requested>}. "
+    "These branches are mutually exclusive. Do not output top-level plans or execution_choices, or put a legacy plan beside a choice. "
+    "Prefer execution_choice_context when a complete structural candidate exists: explicitly select its exact condition_id and candidate_id in execution.selection. "
+    "Inspect the full original field/claim obligations and sources before selecting. This finite menu does not grant semantic support. "
+    "Do not retype its resource paths, values, source sets, offsets or atom mappings. If no candidate can be selected and no valid legacy target is proposed, use kind=none. "
+    "A choice already specifies the single target; do not repeat it as a legacy plan. None and existing null projections are never automatically upgraded. "
+    "Use projection=null for ordinary model-inference/v1 targets. No support flag is granted by a proposal."
+)
+
+_FIRST_PASS_NO_EXECUTION = (
+    "Execution verification is not requested in this run. Return schema_version=experiments-execution-v3 "
+    "with execution {kind:none, rationale:\"execution verification not requested\"} and no plan or choice."
+)
+
 def verify_experiments(
     claim: Claim,
     materials: SharedMaterials,
@@ -2476,6 +2605,7 @@ def verify_experiments(
     call=None,
     scope_call=None,
     scope_binding_repair_rounds=None,
+    execution_requested=True,
 ) -> BranchResult:
     if scope_binding_repair_rounds is None:
         from common.config import get_settings
@@ -2516,78 +2646,35 @@ def verify_experiments(
     except (ValueError, OSError, TypeError, KeyError) as exc:
         choice_registry = None
         choice_inputs = {"unavailable": str(exc)}
-    first_response = ask(
-        "Check this experimental claim from the paper alone in five aspects: correspondence "
-        "(an experiment for every assertion), fairness (same data/budget/tuning), isolation "
-        "(credited components ablated), stability (variance/seeds/significance for small gaps), "
-        "consistency (abstract/text/table numbers). List all five in checked_aspects. Return output_schema JSON. Every item needs "
-        "an exact located paper quote and a concrete detail. paper_support stays paper-internal. "
-        "covered must be a nonempty list of distinct exact strings from allowed_condition_ids, the IDs "
-        "in claim.conditions. Every plan target condition_id must also come from that list, with no "
-        "duplicate targets. Never use claim.id, block IDs, datasets, or metric names as condition IDs. "
-        "Only include conditions the item actually addresses. Omit items or execution targets that cannot be tied to "
-        "allowed conditions and explain the limitation in issues; return empty items and execution kind=none when needed. "
-        "For paper_support, explicitly list fully_supported_conditions only when this one item "
-        "establishes the ENTIRE condition and every relevant claim qualifier, including its dataset, "
-        "metric, comparisons, and settings. A setup description or one component's result provides "
-        "partial support when the condition asserts more. Leave the list empty then and explain the "
-        "uncovered parts in detail. The paper's assertion by itself does not establish its conclusion. "
-        "When one located passage needs connected definitions/setup/results, you may propose ONE NEW paper_support item per condition with additional_sources (exact block_id/quote pairs). Such a joint candidate covers exactly one condition; its primary plus additional passages must together establish every qualifier before fully_supported_conditions can include it. Keep separate partial observations unchanged. Do not join disjoint passages into any quote or automatically merge partial flags. The configured joint_source_limit includes the primary source; do not exceed it. "
-        "Declare the COMPLETE member set in that candidate now. When a selected table relies on metric/setup definitions outside the table, include both those definitions and the exact manuscript passage explicitly referencing that numbered table to connect them. Definitions and the exact manuscript table reference may be different members; a definition need not repeat the table number. The cited passages must connect the same task, dataset and applicable settings; topic overlap alone is insufficient. One exact member may serve multiple roles; do not duplicate it. A table-reference passage emitted only as another partial item grants this joint candidate no access; the independent scope review cannot append it. Preserve missing-reference or unresolved-qualifier limitations and leave fully_supported_conditions empty when the complete condition is not established. "
-        "Copy every quote verbatim as one contiguous substring of its selected paper block's text, "
-        "and copy value_context verbatim from within quote. Preserve mathematical markup, whitespace, "
-        "punctuation, and spelling exactly; do not normalize math, paraphrase, or join disjoint passages. "
-        "large_gap_no_variance is a non-decisive note. text_table_contradiction requires two "
-        "quoted numerical passages for the same target condition, dataset, metric, and every setting, "
-        "on the same scale. Each value_context must identify those labels and one unique numeric value; "
-        "preserve explicit units and percentage markers. Different splits/seeds/models, ambiguous "
-        "multi-value tables, or unresolved unit conversions do not establish a contradiction. "
-        "For a target claim with re-obtainable reported numbers, emit one explicit execution decision. "
-        "A plan must use the exact metric named by its target condition. Never replace an abstract "
-        "quality or qualitative condition with a different numerical metric such as MRR. When no "
-        "reported number matches the condition's metric, omit that target/plan and explain in issues. "
-        "Include candidate entry script/config only from the supplied repository index; unknown commands/metric output "
-        "remain for L3. Every plan target quotes the exact paper numeric token, metric, and dataset; "
-        "copy full table headers when needed. For multi-value quotes, supply an exact value_context "
-        "substring identifying the target dataset/metric and its unique reported value. Ambiguous "
-        "whole-table references remain blocked until the target is resolved. Include actual indexed data/weight paths. "
-        "Execution targets require an absolute measurement for the original subject, dataset, metric and all settings. "
-        "A gap, improvement, percentage-point change, ratio, comparator score or one case of a composite condition "
-        "cannot replace that absolute target. Unknown target bindings remain blocked. Preserve the complete original "
-        "sentence or native table; a narrowed value_context cannot remove its governing subject or scope. "
-        "Keep plans with missing code, data, weights, or budget as blocked with a reason. Priority follows "
-        "the link to the paper's core contribution. Emit no execution evidence or final verdict. "
-        "For released prediction-file evaluation you may explicitly propose released-predictions-v1 projection using "
-        "the provided original field inventory, paper source/number selectors and indexed resources. The first recipe "
-        "only computes full-list exact-match accuracy as a fraction. Classify every original semantic leaf without "
-        "editing it, choose exact source IDs for each role, and retain sample scope and conclusion boundaries. "
-        "Use execution_projection_context.request_choices for exact repository-relative entry/config/data identifiers, number_id-only prose choices and per-config field roles. Set data_paths to exactly [projection.data_path], keeping config and entry in their separate fields. A field with no supported role remains unresolved. Explicitly select source_ids, using complete_source_ids or combined lexical hits only as syntax hints; never add omitted sources automatically. Every choice still requires independent semantic review and final binding. "
-        "The original reported accuracy is a target, not a runtime setting. A combined dataset/split must have an "
-        "exact identity in the released config. Unknown obligations stay unresolved. Projection requires the actual "
-        "released evaluator/data/config, a prose number_id, one original condition and evaluation mode; omit weights "
-        "only for this released-predictions resource mode. It does not prove model inference or training. "
-        "The explicit released-predictions-v2 alternative can retain a qualified original metric/condition through source-grounded finite atoms. It preserves every original field and claim character span; select canonical identity/metric only from the actual config, full exact-match definition, complete fixed sample and explicit negative boundaries. Classify arbitrary field keys by their entire values; direct config keys retain runtime precedence. Use execution_projection_semantics_context as a separate version domain, without rewriting the original claim or condition. Each atom must have original condition-scoped paper source IDs; every field and claim fragment lists exactly its finite obligations. Unknown residue cannot be discharged by labeling it irrelevant. Do not convert null/old responses into a proposal or add a model stage. "
-        "Return schema_version=experiments-execution-v3 and exactly one required execution object: "
-        "{kind:choice, selection:<explicit released-predictions-choice-v1 select>} or "
-        "{kind:legacy, plan:<one plan>} or {kind:none, rationale:<reason execution is unresolved or not requested>}. "
-        "These branches are mutually exclusive. Do not output top-level plans or execution_choices, or put a legacy plan beside a choice. "
-        "Prefer execution_choice_context when a complete structural candidate exists: explicitly select its exact condition_id and candidate_id in execution.selection. "
-        "Inspect the full original field/claim obligations and sources before selecting. This finite menu does not grant semantic support. "
-        "Do not retype its resource paths, values, source sets, offsets or atom mappings. If no candidate can be selected and no valid legacy target is proposed, use kind=none. "
-        "A choice already specifies the single target; do not repeat it as a legacy plan. None and existing null projections are never automatically upgraded. "
-        "Use projection=null for ordinary model-inference/v1 targets. No support flag is granted by a proposal.",
-        {
+    # Bibliography entries and running headers carry no experimental evidence.
+    paper_blocks = [b.model_dump() for b in materials.blocks if b.kind not in _NON_EVIDENCE_KINDS]
+    if execution_requested:
+        system = _FIRST_PASS_PAPER + _FIRST_PASS_EXECUTION
+        payload = {
             "claim": claim.model_dump(mode="json"),
             "allowed_condition_ids": [condition.id for condition in claim.conditions],
             "joint_source_limit": source_limit,
-            "paper_blocks": [b.model_dump() for b in materials.blocks],
+            "paper_blocks": paper_blocks,
             "repository_index": materials.repository.model_dump() if materials.repository else None,
             "execution_projection_context": projection_inputs,
             "execution_projection_semantics_context": semantic_inputs,
             "execution_choice_context": choice_inputs,
             "target_catalog": catalog_prompt(target_catalog),
             "output_schema": ExperimentsOutputV3.model_json_schema(),
-        },
+        }
+    else:
+        # No plan can run, so the execution menus and catalog are not sent.
+        system = _FIRST_PASS_PAPER + _FIRST_PASS_NO_EXECUTION
+        payload = {
+            "claim": claim.model_dump(mode="json"),
+            "allowed_condition_ids": [condition.id for condition in claim.conditions],
+            "joint_source_limit": source_limit,
+            "paper_blocks": paper_blocks,
+            "output_schema": ExperimentsOutputV3PaperOnly.model_json_schema(),
+        }
+    first_response = ask(
+        system,
+        payload,
         module="verification.experiments",
         call=choice_privacy.capture(call),
     )
