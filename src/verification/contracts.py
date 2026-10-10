@@ -4,6 +4,7 @@ from pydantic import Field
 
 from schemas.claim import AuthorQuestion, Contract, Evidence, ExecutionPlan, Finding, TheoryRecord
 from schemas.limitations import VerificationLimitation
+from schemas.review import DeliveryCheck
 
 
 class BranchResult(Contract):
@@ -14,6 +15,7 @@ class BranchResult(Contract):
     issues: list[str] = Field(default_factory=list)
     theory_derivations: list[TheoryRecord] = Field(default_factory=list)
     verification_limitations: list[VerificationLimitation] = Field(default_factory=list)
+    delivery_checks: list[DeliveryCheck] = Field(default_factory=list)
 
 
 class RejectedPlan(ValueError):

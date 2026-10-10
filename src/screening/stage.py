@@ -8,6 +8,7 @@ from pydantic import Field
 
 from schemas.claim import Claim, Contract, Finding
 from schemas.materials import SharedMaterials
+from schemas.review import DeliveryCheck
 from screening.checks import check_tables, check_writing
 from screening.claim_coverage import coverage_summary, review_claim_coverage
 from screening.claims import ClaimExtractionError, extract_claims
@@ -33,6 +34,7 @@ class ScreeningResult(Contract):
     claim_extraction_status: Literal["ok", "failed"] = "ok"
     claim_coverage: dict = Field(default_factory=lambda: {"status": "not_run"})
     blocked_claim_ids: list[str] = Field(default_factory=list)
+    delivery_checks: list[DeliveryCheck] = Field(default_factory=list)
 
 
 class ScreeningFailure(ClaimExtractionError):
@@ -135,7 +137,10 @@ def screen_paper(
         ),
         (
             "references",
-            lambda: check_bibliography(materials, output_dir, checker=reference_checker, call=call),
+            lambda: check_bibliography(
+                materials, output_dir, checker=reference_checker, call=call,
+                delivery_checks=result.delivery_checks,
+            ),
         ),
     ):
         try:

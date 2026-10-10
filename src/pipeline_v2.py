@@ -18,11 +18,12 @@ from fact_generation.execution.v2 import ExecutionResult, execute_plans
 from fact_generation.execution.v2_config import ExecutionConfig
 from preprocessing.materials import index_repository, parse_materials
 from review.delivery import checked_delivery
+from review.recovery import interrupted_report_history, write_recovery_review
 from review.report.advice import generate_advice
 from review.report.v2 import verification_limitations, write_review
-from review.teaser.v2 import write_teaser
+from review.teaser.v2 import teaser_payload, write_teaser
 from schemas.limitations import VerificationLimitation
-from schemas.review import FinalReview
+from schemas.review import DeliveryCheck, FinalReview
 from screening.stage import ScreeningFailure, screen_paper
 from util.paper_input import infer_paper_key, materialize_paper_pdf
 from util.run_layout import build_run_dir, make_run_id
@@ -428,6 +429,7 @@ def run_v2_pipeline(
             )
             review = checked_delivery(
                 review, stages=summary["stages"], extraction_status=screening.claim_extraction_status,
+                additional_checks=[*screening.delivery_checks, *verification.delivery_checks],
                 **{name: summary[name] for name in (
                     "claim_coverage", "writing_coverage", "figure_coverage", "table_coverage",
                     "figure_context_coverage", "table_context_coverage",
@@ -438,6 +440,7 @@ def run_v2_pipeline(
 
             def report_stage():
                 nonlocal review
+                review.advice_requested = True
                 advice = generate_advice(review, root / "review" / "advice", call=call)
                 review = advice.review
                 review.advice_requested = True
@@ -484,14 +487,72 @@ def run_v2_pipeline(
                 }
                 return rendered
 
-            outputs = stage("report", report_stage)
+            def recovery_context():
+                return {
+                    "issues": summary["issues"], "token_usage": summary.get("model_usage"),
+                    **{name: summary.get(name) for name in (
+                        "figure_coverage", "figure_context_coverage", "table_coverage",
+                        "table_context_coverage", "writing_coverage", "claim_coverage", "anonymity_policy",
+                    )},
+                }
+
+            def recover_report(exc):
+                nonlocal review
+                history = interrupted_report_history(root / "review" / "report")
+                for key, artifact in history.items():
+                    summary["outputs"]["history_report_" + key] = artifact["path"]
+                checks = [DeliveryCheck(
+                    stage="report", component="report_writer", state="failed",
+                    reason=f"Report writer raised {type(exc).__name__}. Audit: {root / 'full_pipeline_summary.json'}#/stage_errors/report",
+                )]
+                if any(key.endswith("pdf") for key in history):
+                    checks.append(DeliveryCheck(
+                        stage="report", component="pdf_delivery_finalization", state="incomplete",
+                        reason="PDF files written before the report failure are retained as interrupted history; final delivery export is incomplete.",
+                    ))
+                review = checked_delivery(review, stages={"report": "failed"}, additional_checks=checks)
+                review, recovered = write_recovery_review(
+                    review, root / "review" / "report_recovery", **recovery_context(),
+                )
+                if history:
+                    path = root / "review" / "report_recovery" / "artifact_history.json"
+                    _save(path, history)
+                    summary["outputs"]["history_report_artifacts"] = str(path)
+                return recovered
+
+            outputs = stage("report", report_stage, recover=recover_report)
             summary["outputs"].update(
                 {f"report_{name}": path for name, path in outputs.items() if not name.endswith("_error")}
             )
             for name, detail in outputs.items():
                 if name.endswith("_error") and detail:
                     summary["stage_errors"][f"report_{name.removesuffix('_error')}"] = detail
-            outputs = stage("teaser", lambda: write_teaser(review, root / "review" / "teaser"))
+            def recover_teaser(exc):
+                nonlocal review
+                checks = [DeliveryCheck(
+                    stage="teaser", component="teaser_writer", state="failed",
+                    reason=f"Teaser writer raised {type(exc).__name__}. Audit: {root / 'full_pipeline_summary.json'}#/stage_errors/teaser",
+                )]
+                if any(key.startswith("report_") and key.endswith("pdf") for key in summary["outputs"]):
+                    checks.append(DeliveryCheck(
+                        stage="report", component="pdf_delivery_finalization", state="incomplete",
+                        reason="A late teaser failure changed delivery status; earlier PDFs are retained as history.",
+                    ))
+                review = checked_delivery(review, stages={"teaser": "failed"}, additional_checks=checks)
+                review, recovered = write_recovery_review(
+                    review, root / "review" / "delivery_recovery", **recovery_context(),
+                )
+                # Retain every successful earlier artifact under an explicit
+                # historical role; the new paths carry final partial metadata.
+                for key in list(summary["outputs"]):
+                    if key.startswith("report_"):
+                        summary["outputs"]["history_" + key] = summary["outputs"].pop(key)
+                summary["outputs"].update({"report_" + key: value for key, value in recovered.items()})
+                payload = root / "review" / "teaser_recovery" / "teaser.json"
+                _save(payload, teaser_payload(review))
+                return {"json": str(payload)}
+
+            outputs = stage("teaser", lambda: write_teaser(review, root / "review" / "teaser"), recover=recover_teaser)
             summary["outputs"].update({f"teaser_{name}": path for name, path in outputs.items()})
             summary["counts"] = {status.value: count for status, count in review.summary_counts.items()}
         except Exception as exc:
@@ -517,6 +578,10 @@ def run_v2_pipeline(
             }
             if "review" in locals():
                 final_delivery = checked_delivery(review, stages=summary["stages"])
+                summary["advice"] = {
+                    state: sum(c.advice is not None and c.advice.state == state for c in final_delivery.claims)
+                    for state in ("generated", "unavailable")
+                }
                 summary["run_status"] = final_delivery.run_status
                 summary["incomplete_stages"] = final_delivery.incomplete_stages
                 summary["delivery_checks"] = [item.model_dump(mode="json") for item in final_delivery.delivery_checks]
