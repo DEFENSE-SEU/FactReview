@@ -44,6 +44,8 @@ def _historical_request(value):
     result.setdefault("source_sites", None)
     result.setdefault("source_flow", None)
     result.setdefault("source_flow_files", {})
+    result.setdefault("source_science", None)
+    result.setdefault("source_science_files", {})
     return result
 
 
