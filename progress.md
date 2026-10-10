@@ -1,6 +1,16 @@
 # FactReview v2 progress
 
-## 当前 Phase8 真实实验核验与整篇复审准备（2026-10-11）
+## 当前 Phase3 首轮完整输出合同（2026-10-11）
+
+最新Phase8文档checkpoint已提交并推送4cd1bc7961828829fa3a0f28d20e588e32efa41b，精确远端一致；claim008-public-experiments-native-root-v2/delivery.json00211bdd绑定两个文档路径。它记录真实L2两角色完整19义务/18confirmed+1unresolved、0plan/5insufficient论文证据/0L3、50239known与旧失败保持。历史Phase0–8源码阶段记录保留，Phase8完整验收仍开放；当前14项7pass/6unresolved/1fail。
+
+首轮CoverageReviewV5输出展示schema新增一个分支：actual required_claim_checks的minItems=maxItems、按位claim_id/claim_digest，以及实际packed context/window const。原items/$defs/科学scope字段、lowering、legacy/消费者、raw记录、模型调用与预算保持；去该if全module AST回原。必要新public mock一个函数/20Assert，完整同bytes red1failed/.47s→green1passed/.48s；完整两原主张first2/2可complete，缺行raw1/2且third2/2仍partial/零changes/revisions。所有LLM/网络/process外界mock或禁止。
+
+唯一受影响旧test曾断言首轮const absent；按已有授权精准升级为actual context/window exactconst，15→16Assert，其余14原科学/调用/guard断言保留，逆元数据迁移全test AST同原。该唯一old function一次1passed/.37s，changed3fileRuffpass；未复旧组/全套/paid。作者d2a1fde5/2eb9b180及三源冻结；独审20041c71/09a434d8关闭20facts/26原件，Root8e4d2998核全部身份；Roota17d0805核418baseline的416未改路径、同fulltest红绿及5公开fixtures。当前仅三个批准source/test连同checks/progress五路径交付，精确Git/remote/文件身份另见first-pass-review-output-contract-root-v1/delivery.json。
+
+everyrequired原提示已经存在；当前只强化给模型看的闭合元数据，provider未强制schema，真实29required→3raw→2checked的充分根因与科学效果未证。既有实际、sample设计与418整篇冻结保持。418整篇controller独审23静态facts/52原件通过，明确其request_returned标签曾只数attempt；新v2设计214d429e规定attempted/status/returned分开、失败attempt也核身份。下一步以交付的新source建立完整215归档、新v2窄增量独审→唯一准备/预检/授权→整篇六窗真实复审；sample来源职责设计另续。Goal active，完整科学验收未完成，不改main或新建PR。
+
+## 历史 Phase8 真实实验核验与整篇复审准备（2026-10-11）
 
 Phase3三个合同描述的源码及checks/progress已提交并推送，精确远端418dfe82c3ceadcca327fbbdff29303e11aec253；交付收据original-recheck-contract-clarification-implementation-v1/delivery.json保持。历史Phase0–8源码阶段记录保留，Phase8完整验收开放，当前14项仍为7pass/6unresolved/1fail。聊天模型已实核GPT-6.1-sol，产品调用保持openai-codex/GPT-5.5。
 

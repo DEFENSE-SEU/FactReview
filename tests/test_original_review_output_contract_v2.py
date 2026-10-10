@@ -61,7 +61,8 @@ def test_public_original_review_contract_covers_every_required_identity(tmp_path
         assert bound["claim_digest"]["const"] == required_row["digest"]
     for key in ("context_id", "window_id"):
         assert third["schema"]["properties"][key]["const"] == third["payload"][key]
-    assert "const" not in calls[0]["schema"]["properties"]["context_id"]
+    assert calls[0]["schema"]["properties"]["context_id"]["const"] == calls[0]["payload"]["context_id"]
+    assert calls[0]["schema"]["properties"]["window_id"]["const"] == calls[0]["payload"]["window_id"]
     assert result.coverage["status"] == "complete" and not result.coverage["revisions"]
     assert result.coverage["original_claim_reviews_completed"] == result.coverage["original_claim_reviews_required"] == 2
     assert result.coverage["budget"]["validation_calls"] == 1
