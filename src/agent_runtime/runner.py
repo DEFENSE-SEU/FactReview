@@ -119,6 +119,9 @@ def _build_paper_adapter() -> PaperSearchAdapter:
             semantic_scholar_api_key=settings.semantic_scholar_api_key,
             openalex_base_url=settings.openalex_base_url,
             openalex_api_key=settings.openalex_api_key,
+            page_size=settings.paper_search_page_size,
+            max_pages=settings.paper_search_max_pages,
+            max_results=settings.paper_search_max_results,
         ),
         read_cfg=PaperReadConfig(
             base_url=settings.paper_read_base_url,

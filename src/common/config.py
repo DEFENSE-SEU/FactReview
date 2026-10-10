@@ -95,6 +95,9 @@ class Settings(BaseSettings):
     paper_search_timeout_seconds: int = 120
     paper_search_health_endpoint: str = "/health"
     paper_search_health_timeout_seconds: int = 5
+    paper_search_page_size: int = Field(default=8, ge=1, le=100)
+    paper_search_max_pages: int = Field(default=1, ge=1, le=100)
+    paper_search_max_results: int = Field(default=8, ge=1, le=10_000)
 
     paper_read_base_url: str | None = None
     paper_read_api_key: str | None = None

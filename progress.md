@@ -1,5 +1,15 @@
 # FactReview v2 progress
 
+## Current phase4: observed retrieval pagination
+
+Implemented native arXiv/Semantic Scholar/OpenAlex pagination with explicit per-query budgets and observed scope records. Defaults preserve1 page/8 results. Healthy candidates survive later-page failures; normalization failure retains actual raw page counts. Cutoff filtering records filtered/retained counts without modifying raw paging evidence. Remote complete declarations remain audit metadata and cannot authorize current absence support. Config fields reach both adapter construction paths; existing arXiv per-request16 cap remains visible in actual page limits, and Semantic Scholar's relevance1,000 cap stops as provider_limit.
+
+Necessary mock verification:17 distinct new controls pass in0.27s, Ruff passes. The two directly affected old test files had34 pass and remain byte-identical. Independent review found an OpenAlex contradictory terminal total and a received-page count lost on normalization error. Their original red scripts/results remain preserved; both unchanged scripts pass2 controls in0.41s after repair. Six final source/test hashes match independent freeze. Evidence: `retrieval-pagination-implementation/{review.md,evidence-final.json,final-verification.json}` and `retrieval-pagination-independent/review.md`. No actual retrieval/LLM/Docker calls were made; official API documents were checked. No new complete=true or scientific sufficiency was manufactured.
+
+Decisions: strict bounds apply to requests and retained candidate counts; missing/inconsistent paging evidence stays unknown or protocol_failed. Query success and exhaustion are separately recorded. Scientific scope adequacy, complete candidate reading, scope-bound absence and current-model contract remain open.
+
+Next action: checkpoint/push reviewed paging, then add condition-level search_adequacy to the same literature comparison response. Continue original-claim source semantics in parallel. The overall goal remains active.
+
 ## Current phase7: late-teaser PDF final delivery
 
 Implemented shared static full/layered export from the last validated review. A late teaser failure now produces healthy canonical PDFs in a fresh delivery package with the final partial status, new page navigation and per-PDF snapshots. Exact canonical keys, matching original JSON and manifest role/name/hash checks determine eligibility; history and interrupted writer outputs remain independently indexed. Static failure falls back to minimal Markdown and validated JSON without re-entering the failed formatter. The whole writer recovery entry also explicitly skips narrative formatting after a writer exception.
@@ -8,7 +18,7 @@ Necessary verification:24 initial distinct controls include two genuine local PD
 
 Decisions: only the historically manifest-free full package uses that explicit compatibility path. Provided malformed manifests and layered packages without their manifest cannot authorize PDF export. Healthy files can receive at most one correction when a new failure changes the status/stage set; failed initial exports and failed corrections are not retried. Scientific records, advice and ledger remain equal to the validated snapshot. Filesystem failure and actual service advice quality remain open.
 
-Next action: checkpoint/push this reviewed phase7 correction, complete independent paging review, and implement original-claim semantic closure plus condition-level literature search adequacy. Overall goal remains active; the14-item matrix does not certify commercial readiness.
+Delivered as2a2805dce9a795c486f6e1d823590a1efeced9a9, pushed with exact remote verification. Paging independent review has also passed. Next implement original-claim semantic closure plus condition-level literature search adequacy. Overall goal remains active; the14-item matrix does not certify commercial readiness.
 
 ## Current phase7: explicit nested delivery completeness
 
