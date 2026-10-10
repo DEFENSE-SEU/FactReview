@@ -1254,6 +1254,18 @@ def _execute_graph(
             state["stop"] = True
         attempt = Path(request.run_dir) / f"attempt_{request.repair_round}"
         attempt.mkdir(parents=True, exist_ok=True)
+        if request.source_flow is not None:
+            from .runtime_flow import validate_builtin_flow
+
+            flow_validation = validate_builtin_flow(
+                request.source_flow, plan=request.plan, claim=claim, materials=materials,
+                supplied_files=request.source_flow_files, source_sites=request.source_sites,
+                runtime_request=request, runtime_outcome=outcome,
+            )
+            flow_path = attempt / "source_flow_validation.json"
+            _json(flow_path, flow_validation)
+            outcome.logs["source_flow_validation"] = str(flow_path)
+            outcome.environment["source_flow_validation"] = flow_validation
         (attempt / "stdout.log").write_text(outcome.stdout, encoding="utf-8")
         (attempt / "stderr.log").write_text(outcome.stderr, encoding="utf-8")
         _json(attempt / "observations.json", [item.model_dump(mode="json") for item in outcome.observations])

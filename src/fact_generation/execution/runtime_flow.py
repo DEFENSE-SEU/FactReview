@@ -2,9 +2,9 @@
 
 Only one-file straight-line Python with two JSON reads and bounded numeric return
 expressions is interpreted. No author code, callback, getter, eval or exec runs here.
-The consumer must run in the observer's exact interpreter to check full code identity;
-cross-interpreter host compilation is explicitly unresolved. Caller must freeze the
-original plan/request and authenticate the readonly observer receipt separately.
+Direct reports require the observer's exact interpreter for full code identity.
+Production requests authenticate the fixed observer receipt before pure AST checks;
+code identities remain actual-runtime producer facts. Caller freezes original inputs.
 """
 
 from __future__ import annotations
@@ -257,28 +257,48 @@ def _json_file(path):
 
 
 def validate_builtin_flow(binding, *, plan, claim, materials, supplied_files, source_sites,
-                          observer_report=None, run_request=None, raw_value=None):
-    """Witness only finite source-flow; raw stdout and scientific qualification stay unresolved.
+                          observer_report=None, run_request=None, raw_value=None,
+                          runtime_request=None, runtime_outcome=None):
+    """Witness finite value edges; paper roles never receive scientific qualification.
 
-    run_request is the independently frozen runner request, not an author report.
-    Same-interpreter validation can run in the trusted container; host/runtime
-    version differences must not be accepted by a host-compiled code fingerprint.
+    Direct reports require same-interpreter CodeType validation and do not bind stdout.
+    A production request/outcome is authenticated here from readonly captured bytes,
+    using actual-runtime code facts without host compilation. No caller receipt flag
+    can substitute for this check. Caller input origin remains an explicit premise.
     """
     try:
         _require(type(binding) is dict and binding.get("status") == "bound", "unbound_flow")
         rebuilt = bind_builtin_flow(binding["proposal"], plan=plan, claim=claim, materials=materials,
                                     supplied_files=supplied_files, source_sites=source_sites)
         _require(_same(rebuilt, binding) and rebuilt["status"] == "bound", "changed_binding")
-        report, request = observer_report, run_request
+        receipt = None
+        if runtime_request is not None or runtime_outcome is not None:
+            _require(runtime_request is not None and runtime_outcome is not None
+                     and observer_report is None and run_request is None, "mixed_or_partial_producer_inputs")
+            _require(_same(runtime_request.plan.model_dump(mode="json"), plan.model_dump(mode="json"))
+                     and _same(runtime_request.source_flow, binding)
+                     and _same(runtime_request.source_flow_files, supplied_files)
+                     and _same(runtime_request.source_sites, source_sites), "changed_original_request_flow")
+            from .runtime_receipt import read_observer_receipt
+
+            receipt = read_observer_receipt(runtime_request, runtime_outcome)
+            _require(receipt["status"] == "received", "producer_receipt_unresolved: " + receipt.get("reason", "unknown"))
+            report = receipt["report"]
+            request = {key: receipt["run_identity"][key] for key in
+                       ("command", "cwd", "runtime_root", "repair_round", "launch_sha256", "config_sha256")}
+        else:
+            report, request = observer_report, run_request
         _require(type(report) is dict and report.get("version") == "python-source-events-v1"
                  and report.get("unresolved") == [] and report.get("execution", {}).get("status") == "completed", "incomplete_observation")
-        _require(type(report["interpreter"]["version"]) is str and report["interpreter"]["version"] == sys.version
-                 and type(report["interpreter"]["optimize"]) is int and report["interpreter"]["optimize"] == sys.flags.optimize,
-                 "cross_interpreter_code_identity_unresolved")
+        if receipt is None:
+            _require(type(report["interpreter"]["version"]) is str and report["interpreter"]["version"] == sys.version
+                     and type(report["interpreter"]["optimize"]) is int and report["interpreter"]["optimize"] == sys.flags.optimize,
+                     "cross_interpreter_code_identity_unresolved")
         _require(type(request) is dict and set(request) == {"command", "cwd", "runtime_root", "repair_round", "launch_sha256", "config_sha256"}
                  and type(request["repair_round"]) is int and 0 <= request["repair_round"] <= 3
                  and all(type(request[key]) is str and re.fullmatch(r"[a-f0-9]{64}", request[key]) for key in ("launch_sha256", "config_sha256"))
-                 and request["command"] == plan.task.command and request["command"] in (["python", plan.task.entry_script], ["python3", plan.task.entry_script]),
+                 and (request["command"] == plan.task.command or (receipt is not None and plan.task.command == []))
+                 and request["command"] in (["python", plan.task.entry_script], ["python3", plan.task.entry_script]),
                  "missing_or_changed_run_request")
         runtime_root = request["runtime_root"]
         _require(type(runtime_root) is str and request["cwd"] == runtime_root and report["entry"]["cwd"] == runtime_root
@@ -287,13 +307,19 @@ def validate_builtin_flow(binding, *, plan, claim, materials, supplied_files, so
         _require(report["entry"]["path"] == entry_path and report["entry"]["sha256"] == binding["source_sha256"], "entry_identity_mismatch")
         source = supplied_files[plan.task.entry_script]
         functions, resources, label_keys = _tree(binding["proposal"], source, source_sites["sites"])
-        compiled = compile(source.encode("utf-8"), entry_path, "exec", dont_inherit=True, optimize=sys.flags.optimize)
-        codes = {code.co_name: code for code in compiled.co_consts if type(code) is types.CodeType}
+        codes = None
+        if receipt is None:
+            compiled = compile(source.encode("utf-8"), entry_path, "exec", dont_inherit=True, optimize=sys.flags.optimize)
+            codes = {code.co_name: code for code in compiled.co_consts if type(code) is types.CodeType}
         actual_sites = report["sites"]
         _require(type(actual_sites) is list and len(actual_sites) == 4, "actual_sites_missing")
         for index, selected in enumerate(source_sites["sites"]):
             expected = {"path": entry_path, "sha256": binding["source_sha256"], "qualname": selected["qualname"],
-                        "firstlineno": selected["firstlineno"], "code_sha256": _code_sha(codes[selected["qualname"]])}
+                        "firstlineno": selected["firstlineno"]}
+            # The authenticated fixed observer prepares and matches full CodeType
+            # identity in its own interpreter. Host code only checks source AST.
+            expected["code_sha256"] = (_code_sha(codes[selected["qualname"]]) if codes is not None else
+                                        receipt["producer_code_identity"]["sites"][index]["code_sha256"])
             _require(_same(actual_sites[index], expected) and report["source_hashes_after"].get(entry_path) == binding["source_sha256"], "actual_code_identity_mismatch")
         events = report["events"]
         roles = binding["proposal"]["roles"]
@@ -347,6 +373,15 @@ def validate_builtin_flow(binding, *, plan, claim, materials, supplied_files, so
             _require(sensitive, "input_or_weights_no_observed_numeric_influence")
         _require(any(_eval(metric.body[0].value, dict(zip(_params(metric), (predicted, labels + delta), strict=True))) != value
                      for delta in (1, -1, 2)), "labels_no_observed_numeric_influence")
+        raw_binding = "unresolved"
+        if receipt is not None:
+            _require(runtime_outcome.stdout == str(value) + "\n", "stdout_not_exact_driver_return")
+            raw_binding = {"status": "bound", "value": value,
+                           "stdout": receipt["evidence_refs"]["stdout"],
+                           "observer_report": receipt["evidence_refs"]["report"],
+                           "driver_return_pointer": "/events/9/value", "metric_return_pointer": "/events/8/value"}
+            if raw_value is None:
+                raw_value = value
         _require(type(raw_value) is type(value) and _number(raw_value) == value, "raw_value_mismatch")
         references = {
             "source_roles": {role: {"path": plan.task.entry_script, "sha256": binding["source_sha256"],
@@ -359,13 +394,19 @@ def validate_builtin_flow(binding, *, plan, claim, materials, supplied_files, so
             "conditions": binding["resource_contract"]["condition_sha256"],
             "request_identity": {key: request[key] for key in ("launch_sha256", "config_sha256", "repair_round")},
         }
+        if receipt is not None:
+            references.update(producer_receipt=receipt["evidence_refs"], producer_code_identity=receipt["producer_code_identity"],
+                              original_runtime_request_sha256=receipt["run_identity"]["request_sha256"],
+                              actual_argv_sha256=receipt["run_identity"]["actual_argv_sha256"])
         return {"status": "witnessed", "version": VERSION, "value": value,
                 "data_participation": True, "weights_participation": True, "labels_participation": True,
                 "request_sha256": _sha(request), "observer_sha256": _sha(report), "binding_sha256": _sha(binding),
                 "evidence_refs": references,
-                "raw_output_binding": "unresolved", "scientific_qualification": False, "alignment": False, "support": False,
+                "raw_output_binding": raw_binding, "scientific_qualification": False, "alignment": False, "support": False,
                 "limits": ["bounded_numeric_sensitivity_only", "paper_roles_remain_proposals",
-                           "readonly_launcher_receipt_requires_independent_authentication", "in_process_tampering_not_excluded"]}
+                           "caller_input_origin_must_be_trusted", "in_process_tampering_not_excluded"]
+                           + (["internal_hashes_are_not_authentication"] if receipt is not None else
+                              ["readonly_launcher_receipt_requires_independent_authentication"])}
     except (ValueError, TypeError, KeyError, IndexError, AttributeError, OSError, SyntaxError, OverflowError,
             ZeroDivisionError, RecursionError) as exc:
         return _failure(str(exc) if type(exc) is ValueError else type(exc).__name__)
