@@ -1,5 +1,17 @@
 # FactReview v2 progress
 
+## Current phase7 checkpoint: single-file report history I/O recovery
+
+Task: retain the original report failure, last validated scientific snapshot and independent delivery when an owned history file raises OSError. Outputs: `src/review/recovery.py`, `src/pipeline_v2.py`, `tests/test_report_history_io_v2.py`; exact evidence under `runs/v2_method_delivery/report-history-io-implementation/` and `report-history-io-independent/`.
+
+Completed: per-file history errors now record only path/error class; failed content receives no hash or canonical role. Prior JSON/manifest already recorded unavailable is not read again for source validation and cannot authorize a PDF. Static fallback also isolates nested history read errors. Nine distinct necessary mocked cases passed at their affected checkpoints;93 old Assert ASTs and normalized old test sources, plus1005 protected files, remain unchanged. Original red results, first freeze, corrected inspector and the independent metadata counterexample are preserved. Final reviewf4758ce3 and root three-file/freeze/evidence identities pass; no new full suite or live services were run.
+
+Decisions: catch only per-file OSError within owned history collection; keep existing raising behavior for callers that omit the error collector. Never adopt unreadable bytes or retry unavailable metadata. Scientific records, assessment, advice and ledger retain the validated snapshot. Phase4 purpose routing is already delivered5a86593ee94485e3fac961ce0068aaadce262703 and remotely verified.
+
+Open issues: truly unwritable recovery storage and actual OS-lock integration remain unverified. Genuine scientific coverage, M2/M5 semantics, retrieval adequacy and full current-version integration remain incomplete. Independently reviewed v5 coverage wire and grounded SearchPlan changes are separate frozen batches in the working tree; they are excluded from this phase7 commit.
+
+Next action: commit/push this reviewed phase7 batch, then separately checkpoint/push phase3 v5 wire and phase4 SearchPlan. Prepare a fresh bounded real validation on their exact source without changing historical failed actuals. The overall goal remains active.
+
 ## Current phase4 checkpoint: retrieval purpose and condition-bound reading
 
 The default v2 dispatcher disables repeated generic uncited expansion for citation-only claims. Explicit novelty conditions and the independent global missing-work/baseline review retain active search; the False option cannot disable these duties. Public direct Literature calls keep their existing expansion default for compatibility, recorded separately in retrieval_routing. Reader requests carry actual claim text/location, the source's citation/novelty condition IDs and complete settings, intersecting located excerpts, or verified global manuscript targets. No new model stage or identity/author search was added.

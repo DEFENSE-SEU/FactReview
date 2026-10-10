@@ -12,6 +12,8 @@ After fixed-rule assessment, the report agent writes per-claim advice with local
 
 When extraction fails, independent writing, visual and reference checks can still produce an explicitly partial report. A later verification or execution failure retains the last complete claim snapshot and any recoverable execution audit records. The failed stage remains visible in the summary and CLI result; counts describe retained claims only.
 
+If an owned report history file cannot be read during recovery, its path and error class are recorded separately without adopting contents or inventing a hash. Recovery preserves the original failure and the last validated scientific records, continues independent delivery, and excludes unreadable prior metadata from PDF eligibility. A directory that cannot accept recovery writes remains a storage limitation.
+
 | Status | Evidence rule |
 |---|---|
 | `supported` | Sufficient support covers every condition, with no concern affecting the claim. |
