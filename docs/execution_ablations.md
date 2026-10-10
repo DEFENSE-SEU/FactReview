@@ -1,0 +1,58 @@
+# Execution ablations
+
+Switches for the L3 execution ablations (§5.3 of `method_v2_spec.md`). Each one is a CLI flag of
+`src/pipeline_full.py` and, where noted, a field of `ExecutionConfig` (`src/fact_generation/execution/v2_config.py`)
+that can also be set through `--execution-config`. A CLI flag given explicitly overrides the JSON file.
+
+| Ablation | Switch | Default (main experiment) | Ablation setting |
+|---|---|---|---|
+| No execution | `--run-execution` | off: L3 is skipped and the execution stage is recorded as disabled | run without `--run-execution` |
+| No alignment rule | `--alignment` / `alignment` | `strict`: dataset, metric and settings must all equal the claim condition | `relaxed` |
+| Repair rounds 0–3 | `--max-attempts` / `max_attempts` | `3` | `0`, `1`, `2`, `3` |
+| Repair proposer | `--repairer` / `repairer` | `default`: only adds a missing dependency after `ModuleNotFoundError` | `llm` |
+| Approval mode | `--approval-mode` / `approval_mode` | `auto` | — |
+| Training budget | `--training-budget` / `training_budget` | `0` (no training runs) | — |
+
+The main experiment runs with `--run-execution`, `--approval-mode auto` and `--training-budget 0`.
+
+## Alignment
+
+With `relaxed`, an observation whose dataset equals the claim condition's dataset is compared with
+the paper number and becomes execution evidence; metric and settings are not checked. When several
+observations share that dataset, the one with the claimed metric is chosen; if that still leaves
+more than one, or none, the condition stays unaligned. Unit checks, released-resource checks and the
+tolerance rules are unchanged. The evidence note and each `alignment` ledger entry record
+`alignment_mode`.
+
+`relaxed` covers these checks:
+
+- candidate selection in `execute_plans` (`src/fact_generation/execution/v2.py`);
+- the source-flow binding in `bind_builtin_flow` and `validate_builtin_flow`
+  (`src/fact_generation/execution/runtime_flow.py`), which then requires only `condition.dataset`
+  instead of dataset, metric, `settings.model` and `settings.split`;
+- the actual-metadata check in `build_consumption_context`
+  (`src/fact_generation/execution/runtime_science.py`), which also stops requiring the condition
+  settings to be observable model/split/sample_count; the semantic review receives only the
+  `condition/dataset` and `condition/description` obligations, and the paper/source role
+  obligations stay.
+
+These checks stay strict under `relaxed`:
+
+- binding the paper number at planning time (`src/verification/experiment_targets.py`) locates the
+  scalar by dataset, split and metric in the claim text, so a condition without a metric never
+  reaches execution;
+- the released-predictions binding at planning time (`src/verification/execution_projection.py`)
+  requires the released config's `metric` to equal `condition.metric`;
+- the released-predictions measurement (`prediction_measurement.py`) requires the author output to
+  equal the released config it read;
+- the actual partition must be the one the source-science proposal selected.
+
+## Repair
+
+The default repairer only proposes dependencies, so path, launch-argument and wrapper repairs never
+occur and runs with `--max-attempts 1..3` can be identical. Use `--repairer llm` for the repair-round
+ablation. The LLM repairer (`llm_repair` in `src/fact_generation/execution/v2.py`) first applies the
+default dependency fix; otherwise it sends the command, dependencies and the last 4000 characters of
+stdout/stderr to `llm_json` and asks for one repair or `null`. Its proposal passes through the same
+`Repair` schema and `_apply_repair` whitelist as any other repairer, and a rejected proposal ends the
+repair loop with an `execution.repair` failure in the ledger.

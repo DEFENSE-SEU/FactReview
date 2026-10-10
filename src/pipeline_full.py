@@ -421,6 +421,13 @@ def parse_args() -> argparse.Namespace:
         help="Report layout: full detail, or primary report with complete technical appendix and linked PDF bundle",
     )
     p.add_argument(
+        "--gate",
+        choices=("lenient", "default", "strict"),
+        default="",
+        help="Claim gate tier used as each claim's status (default: CLAIM_GATE or default); "
+        "all three tiers are recorded in gate_status",
+    )
+    p.add_argument(
         "--anonymity-policy",
         choices=("unspecified", "required", "not_required"),
         default="unspecified",
@@ -528,6 +535,18 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--max-attempts", type=int, choices=range(4), default=3, help="Maximum repair rounds, capped at 3"
+    )
+    p.add_argument(
+        "--alignment",
+        choices=("strict", "relaxed"),
+        default="strict",
+        help="Execution alignment (ablation: relaxed compares any run on the claimed dataset; default: strict)",
+    )
+    p.add_argument(
+        "--repairer",
+        choices=("default", "llm"),
+        default="default",
+        help="Execution repair proposer (default: dependency-only; llm proposes whitelisted repairs)",
     )
     p.add_argument(
         "--no-pdf-extract",

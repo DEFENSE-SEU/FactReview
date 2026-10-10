@@ -11,8 +11,9 @@ import uuid
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from assessment import assess_claims
+from assessment import assess_claims, gate_claims
 from common import run_stats
+from common.config import get_settings
 from fact_generation.execution.recovery import recover_execution_records
 from fact_generation.execution.v2 import ExecutionResult, execute_plans
 from fact_generation.execution.v2_config import ExecutionConfig
@@ -379,6 +380,8 @@ def run_v2_pipeline(
                     ("max_attempts", "max_attempts", 3),
                     ("approval_mode", "approval_mode", "auto"),
                     ("training_budget", "training_budget", 0),
+                    ("alignment", "alignment", "strict"),
+                    ("repairer", "repairer", "default"),
                     ("execution_docker_build_timeout_sec", "docker_build_timeout_seconds", 3600),
                 ):
                     if not config_path or argument in overrides:
@@ -414,14 +417,17 @@ def run_v2_pipeline(
                 summary["issues"].extend(execution.issues)
             else:
                 skip_stage("execution", "Execution disabled; released artifacts were not run.")
+            gate = getattr(args, "gate", "") or get_settings().claim_gate
+            summary["gate"] = gate
             if screening.claim_extraction_status == "failed":
                 skip_stage("assessment", "Assessment skipped because claim extraction failed.")
             else:
-                claims = stage("assessment", lambda: assess_claims(claims))
+                claims = stage("assessment", lambda: gate_claims(assess_claims(claims), gate))
             incomplete = [name for name in STAGES if summary["stages"][name] == "failed"]
             review = FinalReview(
                 paper_key=key,
                 run_id=run_id,
+                gate=gate,
                 claims=claims,
                 findings=screening.findings + verification.findings,
                 ledger=ledger,

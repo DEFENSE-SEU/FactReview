@@ -29,6 +29,9 @@ class ClaimStatus(StrEnum):
     UNVERIFIED = "unverified"
 
 
+GateLevel = Literal["lenient", "default", "strict"]
+
+
 class EvidenceNeed(StrEnum):
     LITERATURE = "Literature"
     THEORY = "Theory"
@@ -400,6 +403,13 @@ class TheoryVisualRecord(TheoryDerivationRecord):
 TheoryRecord = TheoryDerivationRecord | TheoryVisualRecord
 
 
+class GateOutcome(Contract):
+    """A claim's status under one gate tier; reasons name the missing evidence."""
+
+    status: ClaimStatus
+    reasons: list[str] = Field(default_factory=list)
+
+
 class Claim(Contract):
     """The same record is enriched from extraction through final assessment."""
 
@@ -416,10 +426,20 @@ class Claim(Contract):
     questions: list[AuthorQuestion] = Field(default_factory=list)
     evidence: list[Evidence] = Field(default_factory=list)
     status: ClaimStatus = ClaimStatus.UNVERIFIED
+    # Empty before assessment; "lenient" holds the unfiltered rule status.
+    gate_status: dict[GateLevel, GateOutcome] = Field(default_factory=dict)
     notes: list[str] = Field(default_factory=list)
     advice: ClaimAdvice | None = None
     theory_derivations: list[TheoryRecord] = Field(default_factory=list)
     verification_limitations: list[VerificationLimitation] = Field(default_factory=list)
+
+    @model_serializer(mode="wrap")
+    def serialize_gate(self, handler):
+        # Ungated records keep their historical serialization and hashes.
+        result = handler(self)
+        if not self.gate_status:
+            result.pop("gate_status", None)
+        return result
 
     @model_validator(mode="after")
     def check_references(self) -> Self:

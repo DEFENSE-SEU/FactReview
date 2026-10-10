@@ -20,6 +20,7 @@ def teaser_payload(review: FinalReview) -> dict:
         "incomplete_stages": review.incomplete_stages,
         "delivery_checks": [check.model_dump(mode="json") for check in review.delivery_checks],
         "execution": execution_summary(review),
+        **({"gate": review.gate} if review.gate else {}),
         "counts": {status.value: review.summary_counts[status] for status in STATUS_ORDER},
         "claims": [
             {
@@ -56,6 +57,9 @@ def write_teaser(review: FinalReview, output_dir: Path) -> dict[str, str]:
         elements.append(f'<text x="32" y="{y}" font-size="17">{escape(line)}</text>')
         y += 22
     y += 26
+    if review.gate:
+        elements.append(f'<text x="32" y="{y}" font-size="14">Claim gate: {review.gate}</text>')
+        y += 24
     execution = payload["execution"]
     elements.append(
         f'<text x="32" y="{y}" font-size="14">Recorded execution attempts: {execution["recorded_attempts"]}; claims with aligned execution evidence: {execution["claims_with_aligned_execution_evidence"]}.</text>'
