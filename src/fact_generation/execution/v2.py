@@ -35,6 +35,7 @@ from schemas.claim import (
     FiniteNumber,
 )
 from schemas.materials import SharedMaterials
+from schemas.review import DeliveryCheck
 from util.subprocess_runner import CommandResult, persist_command_result, run_command
 
 from .tools.docker import _IMPORT_TO_PIP, docker_cmd, docker_ensure_paper_image, docker_run_paper_image
@@ -72,6 +73,24 @@ class Observation(Contract):
         return value
 
 
+class ExecutionOperationFailure(Contract):
+    """Producer-declared failures; process exit codes do not assign responsibility."""
+
+    component: Literal[
+        "execution.approval", "execution.snapshot", "execution.refinement",
+        "execution.environment", "execution.runner", "execution.cleanup",
+        "execution.repair", "execution.integrity",
+    ]
+    reason: str = Field(min_length=1)
+
+
+class ExecutionOperationError(RuntimeError):
+    """A system operation failed before an ordinary execution outcome existed."""
+
+
+_NONRECOVERABLE_OPERATIONS = frozenset({"execution.cleanup", "execution.integrity"})
+
+
 class RunOutcome(Contract):
     returncode: int
     stdout: str = ""
@@ -83,6 +102,7 @@ class RunOutcome(Contract):
     runtime_seconds: float = Field(default=0, ge=0)
     tokens: int = Field(default=0, ge=0)
     issue: str = ""
+    operation_failures: list[ExecutionOperationFailure] = Field(default_factory=list)
 
 
 class RunRequest(Contract):
@@ -117,6 +137,7 @@ class ExecutionResult(Contract):
     claims: list[Claim]
     ledger: list[dict[str, Any]] = Field(default_factory=list)
     issues: list[str] = Field(default_factory=list)
+    delivery_checks: list[DeliveryCheck] = Field(default_factory=list)
 
 
 def _json(path: Path, value: Any) -> None:
@@ -236,7 +257,15 @@ def _refine(
                 if path.is_file():
                     files[relative] = path.read_text(encoding="utf-8", errors="replace")
         before_tokens, started = token_count(), time.monotonic()
-        response = llm_json(
+        def request_completion(*args, **kwargs):
+            try:
+                return llm_json(*args, **kwargs)
+            except Exception as exc:
+                raise ExecutionOperationError(
+                    f"Refinement service failed ({type(exc).__name__})"
+                ) from exc
+
+        response = request_completion(
             json.dumps({"plan": plan.model_dump(mode="json"), "files": files}),
             "Refine this supplied execution plan using released entry scripts and configs. "
             "Return JSON command (argv list), metric_output (relative JSON path or null), and optional "
@@ -403,6 +432,10 @@ def docker_runner(request: RunRequest) -> RunOutcome:
                 returncode=1,
                 issue=f"Isolated prediction environment unavailable: {exc}",
                 environment={"transport": "docker", "python": request.config.python_version},
+                operation_failures=[ExecutionOperationFailure(
+                    component="execution.environment",
+                    reason=f"Isolated prediction environment preparation failed ({type(exc).__name__})",
+                )],
             )
     else:
         build_context = logs / "build_context"
@@ -429,6 +462,9 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             environment={"transport": "docker", "python": request.config.python_version},
             commands=build_commands,
             logs={"build": str(logs / "build")},
+            operation_failures=[ExecutionOperationFailure(
+                component="execution.environment", reason="Docker image preparation did not finish",
+            )],
         )
     container_name = "factreview-" + uuid.uuid4().hex
     command = docker_run_paper_image(
@@ -454,10 +490,14 @@ def docker_runner(request: RunRequest) -> RunOutcome:
     before_output = output_path.stat().st_mtime_ns if output_path and output_path.is_file() else None
     result = None
     cleanup = None
+    operation_failures = []
     try:
         try:
             result = run_command(command, cwd=request.run_dir, timeout_sec=request.config.timeout_seconds)
         except Exception as exc:
+            operation_failures.append(ExecutionOperationFailure(
+                component="execution.runner", reason=f"Docker transport failed ({type(exc).__name__})",
+            ))
             result = CommandResult(
                 command, request.run_dir, 127, "", f"{type(exc).__name__}: {exc}", time.monotonic() - start
             )
@@ -498,6 +538,9 @@ def docker_runner(request: RunRequest) -> RunOutcome:
         observations = []
         issue = f"invalid metric output: {exc}"
     if cleanup and cleanup["status"] == "failed":
+        operation_failures.append(ExecutionOperationFailure(
+            component="execution.cleanup", reason="Docker container cleanup did not finish",
+        ))
         issue = (
             f"Docker container cleanup failed for {container_name}; the container may still be running: "
             f"{cleanup['stderr']}" + (f"; {issue}" if issue else "")
@@ -514,6 +557,10 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             observations = []
             execution_returncode = 1
             issue = f"Isolated prediction environment revalidation failed: {exc}"
+            operation_failures.append(ExecutionOperationFailure(
+                component="execution.environment",
+                reason=f"Isolated prediction environment revalidation failed ({type(exc).__name__})",
+            ))
     return RunOutcome(
         returncode=execution_returncode,
         stdout=result.stdout,
@@ -539,6 +586,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
         },
         runtime_seconds=time.monotonic() - start,
         issue=issue,
+        operation_failures=operation_failures,
     )
 
 
@@ -741,6 +789,7 @@ def execute_plans(
         raise ValueError("duplicate claim or plan identifiers")
     training_budget = {"used": 0}
     execution_blocker = ""
+    blocking_operations = []
     order = {"high": 0, "medium": 1, "low": 2}
     ordered = sorted(
         plans, key=lambda p: (order[p.priority], p.feasibility != "ready", p.run_mode == "training")
@@ -764,9 +813,15 @@ def execute_plans(
             "paper_target_validation": [],
             "tolerance_profile": "alignment",
             "config": config.model_dump(mode="json"),
+            "operation_failures": [],
         }
         result.ledger.append(row)
         reason = execution_blocker or (plan.blocker if plan.feasibility == "blocked" else "")
+        if execution_blocker:
+            row["operation_failures"].extend(
+                ExecutionOperationFailure(component=component, reason=execution_blocker).model_dump()
+                for component in blocking_operations
+            )
         if not reason:
             _, reason = _revalidate_targets(plan, claim, materials, row, "before_approval")
             if reason:
@@ -784,7 +839,10 @@ def execute_plans(
                     if not approver(plan.model_copy(deep=True), plan.estimated_cost):
                         reason = "operator declined plan"
                 except Exception as exc:
-                    reason = f"operator approval unavailable: {exc}"
+                    reason = f"operator approval unavailable ({type(exc).__name__})"
+                    row["operation_failures"].append(ExecutionOperationFailure(
+                        component="execution.approval", reason=reason,
+                    ).model_dump())
                 if not reason:
                     _, reason = _revalidate_targets(plan, claim, materials, row, "after_approval")
                     if reason:
@@ -792,9 +850,11 @@ def execute_plans(
         if not reason:
             row["approved"] = True
             previous_evidence = len(claim.evidence)
+            operation = "snapshot"
             try:
                 manifest = _snapshot(materials, run_dir / "workspace")
                 _json(run_dir / "source_manifest.json", manifest)
+                operation = "refinement"
                 command, metric_output, refinement = _refine(plan, run_dir / "workspace", config)
                 row["refinement"] = refinement
                 request = RunRequest(
@@ -809,6 +869,7 @@ def execute_plans(
                     output_mapping=refinement.get("output_mapping"),
                 )
                 row["workspace"] = request.workspace
+                operation = "run"
                 reason = _execute_graph(
                     request, claim, materials, row, runner, repairer, result.issues, manifest, training_budget
                 )
@@ -816,19 +877,60 @@ def execute_plans(
                     _sha(_inside(Path(materials.repository.root), path)) != sha
                     for path, sha in manifest.items()
                 ):
+                    row["operation_failures"].append(ExecutionOperationFailure(
+                        component="execution.integrity",
+                        reason="read-only released source changed during execution",
+                    ).model_dump())
                     raise ValueError("read-only released source changed during execution")
             except (ValueError, OSError, RuntimeError, AttributeError, TypeError) as exc:
                 del claim.evidence[previous_evidence:]
-                reason = str(exc)
+                if operation == "refinement" and not plan.task.command and config.refine_with_llm:
+                    reason = f"Requested command refinement failed ({type(exc).__name__})"
+                    row["operation_failures"].append(ExecutionOperationFailure(
+                        component="execution.refinement", reason=reason,
+                    ).model_dump())
+                elif operation == "snapshot" and isinstance(exc, OSError):
+                    reason = f"Execution workspace preparation failed ({type(exc).__name__})"
+                    row["operation_failures"].append(ExecutionOperationFailure(
+                        component="execution.snapshot", reason=reason,
+                    ).model_dump())
+                elif operation == "run" and isinstance(exc, OSError):
+                    reason = f"Execution record persistence failed ({type(exc).__name__})"
+                    row["operation_failures"].append(ExecutionOperationFailure(
+                        component="execution.runner", reason=reason,
+                    ).model_dump())
+                else:
+                    reason = str(exc)
                 result.issues.append(f"{plan.id}: {reason}")
-        if any(
-            attempt.get("environment", {}).get("container_cleanup", {}).get("status") == "failed"
-            for attempt in row["attempts"]
-        ):
-            execution_blocker = f"execution stopped after {plan.id}: Docker container cleanup failed; remaining plans were not run"
+        if not execution_blocker:
+            blocking_operations = sorted({failure["component"] for failure in row["operation_failures"]
+                                          if failure["component"] in _NONRECOVERABLE_OPERATIONS})
+            if blocking_operations:
+                labels = {"execution.cleanup": "Docker container cleanup failed",
+                          "execution.integrity": "execution integrity failed"}
+                execution_blocker = (
+                    f"execution stopped after {plan.id}: "
+                    + "; ".join(labels[component] for component in blocking_operations)
+                    + "; remaining plans were not run"
+                )
         row["reason"] = reason
         projected = any(getattr(binding, "version", None) == 2 for binding in plan.target_bindings.values())
-        if reason and projected:
+        if row["operation_failures"]:
+            from schemas.limitations import VerificationLimitation
+
+            for index, failure in enumerate(row["operation_failures"]):
+                audit = f"{run_dir / 'ledger.json'}#/operation_failures/{index}"
+                result.delivery_checks.append(DeliveryCheck(
+                    stage="execution", component=failure["component"],
+                    state="failed" if row["approved"] else "unavailable",
+                    reason=f"{failure['reason']}. Audit: {audit}", claim_id=claim.id,
+                ))
+            claim.verification_limitations.append(VerificationLimitation(
+                claim_id=claim.id, condition_ids=plan.condition_ids,
+                stage="execution", kind="stage_failed",
+                reason=f"Execution system operation incomplete. Audit: {run_dir / 'ledger.json'}#/operation_failures",
+            ))
+        elif reason and projected:
             from schemas.limitations import VerificationLimitation
 
             claim.verification_limitations.append(
@@ -926,10 +1028,27 @@ def _execute_graph(
             outcome = RunOutcome.model_validate(runner(request.model_copy(deep=True)))
         except Exception as exc:
             outcome = RunOutcome(
-                returncode=1, issue=f"runner error: {exc}", runtime_seconds=time.monotonic() - begin
+                returncode=1, issue=f"runner error ({type(exc).__name__})",
+                runtime_seconds=time.monotonic() - begin,
+                operation_failures=[ExecutionOperationFailure(
+                    component="execution.runner",
+                    reason=f"Runner service or outcome protocol failed ({type(exc).__name__})",
+                )],
             )
+        if outcome.operation_failures:
+            # An explicit failed system operation cannot yield scientific
+            # evidence, even if a contradictory runner reports exit code zero.
+            outcome.returncode = 1
+            outcome.observations = []
+            outcome.issue = outcome.issue or "; ".join(item.reason for item in outcome.operation_failures)
+            if any(item.component in _NONRECOVERABLE_OPERATIONS for item in outcome.operation_failures):
+                state["stop"] = True
         cleanup = outcome.environment.get("container_cleanup")
         if isinstance(cleanup, dict) and cleanup.get("status") == "failed":
+            if not any(item.component == "execution.cleanup" for item in outcome.operation_failures):
+                outcome.operation_failures.append(ExecutionOperationFailure(
+                    component="execution.cleanup", reason="Docker container cleanup did not finish",
+                ))
             state["stop"] = True
             issues.append(f"{request.plan.id}: {outcome.issue}")
         changed = protected_changes(request.workspace)
@@ -937,6 +1056,9 @@ def _execute_graph(
             outcome.returncode = 1
             outcome.observations = []
             outcome.issue = "execution modified protected released files: " + ", ".join(changed)
+            outcome.operation_failures.append(ExecutionOperationFailure(
+                component="execution.integrity", reason="Execution modified protected released files",
+            ))
             state["stop"] = True
         attempt = Path(request.run_dir) / f"attempt_{request.repair_round}"
         attempt.mkdir(parents=True, exist_ok=True)
@@ -955,6 +1077,7 @@ def _execute_graph(
         )
         state.update(
             outcome=outcome,
+            operation_failures=[item.model_dump() for item in outcome.operation_failures],
             reason=outcome.issue
             if outcome.returncode == 0
             else f"execution failed (return code {outcome.returncode}): {outcome.issue or outcome.stderr[-1000:]}",
@@ -1225,7 +1348,11 @@ def _execute_graph(
             _json(Path(request.run_dir) / f"repair_{updated.repair_round}.json", record)
             state.update(request=updated, retry=True)
         except Exception as exc:
+            reason = f"Repair service or proposal validation failed ({type(exc).__name__})"
             record["reason"] = str(exc)
+            failure = ExecutionOperationFailure(component="execution.repair", reason=reason).model_dump()
+            record["operation_failure"] = failure
+            state.setdefault("operation_failures", []).append(failure)
             state.update(retry=False, reason=f"{state['reason']}; rejected repair: {exc}")
         return state
 
@@ -1251,4 +1378,5 @@ def _execute_graph(
     )
     workflow.add_conditional_edges("repair", lambda state: "run" if state.get("retry") else END)
     state = workflow.compile().invoke({"request": initial, "reason": ""}, {"recursion_limit": 20})
+    ledger["operation_failures"].extend(state.get("operation_failures", []))
     return state["reason"]

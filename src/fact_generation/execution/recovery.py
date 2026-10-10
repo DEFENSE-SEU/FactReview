@@ -28,7 +28,7 @@ def _linked(path):
 
 
 def _validate_record(row, expected, directory):
-    from .v2 import RunOutcome, RunRequest
+    from .v2 import ExecutionOperationFailure, RunOutcome, RunRequest
 
     required = {
         "plan",
@@ -46,7 +46,7 @@ def _validate_record(row, expected, directory):
     }
     if (
         not required.issubset(row)
-        or set(row) - required - {"workspace", "refinement"}
+        or set(row) - required - {"workspace", "refinement", "operation_failures"}
         or _encoded(row["plan"]) != _encoded(expected)
     ):
         raise ValueError("incomplete record or changed plan snapshot")
@@ -63,6 +63,14 @@ def _validate_record(row, expected, directory):
     for field in ("attempts", "repairs", "alignment", "paper_target_validation"):
         if not isinstance(row[field], list) or any(not isinstance(item, dict) for item in row[field]):
             raise ValueError("invalid execution record list")
+    if "operation_failures" in row:
+        failures = row["operation_failures"]
+        if not isinstance(failures, list) or any(
+            not isinstance(item, dict)
+            or _encoded(ExecutionOperationFailure.model_validate(item).model_dump()) != _encoded(item)
+            for item in failures
+        ):
+            raise ValueError("invalid producer-declared operation failures")
     if row["attempts"] and not row["approved"]:
         raise ValueError("attempts recorded without approval")
     if not row["attempts"] and not row["reason"].strip():
@@ -73,9 +81,14 @@ def _validate_record(row, expected, directory):
         request = RunRequest.model_validate(attempt.get("request"))
         outcome_data = {key: value for key, value in attempt.items() if key != "request"}
         outcome = RunOutcome.model_validate(outcome_data)
+        serialized_outcome = outcome.model_dump(mode="json")
+        if "operation_failures" not in outcome_data:
+            # Historical outcomes predate this additive field. Every other key
+            # remains mandatory and exact; recovery returns the original bytes.
+            serialized_outcome.pop("operation_failures")
         if (
             _encoded(request.model_dump(mode="json")) != _encoded(attempt["request"])
-            or _encoded(outcome.model_dump(mode="json")) != _encoded(outcome_data)
+            or _encoded(serialized_outcome) != _encoded(outcome_data)
             or _encoded(request.plan.model_dump(mode="json")) != _encoded(expected)
             or _encoded(request.config.model_dump(mode="json")) != _encoded(config)
             or Path(request.run_dir).resolve() != directory
