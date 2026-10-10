@@ -1,6 +1,16 @@
 # FactReview v2 progress
 
-## 当前 Phase5：同次补全绑定完整科学主张与源码角色
+## 当前 Phase5：认证固定运行时 producer 收据
+
+新增 runtime_receipt.py：原独立冻结RunRequest与可信生产RunOutcome是来源前提，程序核只读observer/config原字节、source manifest与资源/完整条件、原command/workdir/sites、唯一实际Docker argv/environment、host审计位置、运行时源码与事件栈及捕获stdout。实际CodeType身份由固定observer在实际interpreter prepare/match；host不编译不同版本。内部SHA不充当签名，received始终保持scientific_qualification/alignment/support=false。
+
+必要验证：初版两个离线控制通过，原fixture缺producer输出与Windows换行失败保留。未知环境/事件守卫仅复验受影响函数。独审发现arguments=True仍received，原反例红1/1.07s保留；窄修为exactdict与producer闭合snapshot类型/键/256节点/12深度/字节和aggregate预算，新增控制同字节红1/.86s→绿1/1.35s，旧两函数/断言AST不变且未重复绿。独审原同字节反例只复放一次绿1/1.18s，无实际服务、作者执行或全套。
+
+输出：runtime-receipt-implementation/frozen-final-v2/、review-final-v2.mde83da3c8/evidence4353348c；runtime-receipt-independent/review-final-v2.mdb14e0aec/evidencebefd7358。最终source9a32647c/test9c437cf1全部冻结身份一致，Root已读完整报告/增量并核身份。上一批精确远端aff98e0a0dfd8fe552718b1c1c35ecab8a7223d7；本批仅提交/推送refactor/method-v2，收据runtime-receipt-implementation/delivery.json。不开PR、不改main。
+
+Next action：独审并交付未提交的纯AST有限consumer及run节点记录。consumer内部读原receipt、核plan/flow/files/sites，严格绑定stdout到driverreturn，科学资格仍false；v2审计接线由子agent实施。随后闭合逐condition真实模型/指标/数据split科学角色与生产部署。通用模型与分析、genuine覆盖/M2/M5、整体验收仍开放；旧actual失败与a03手工Docker记录不改，goal active。
+
+## 历史 aff98 Phase5：同次补全绑定完整科学主张与源码角色
 
 已接线：普通原资源合同计划的同一次refinement响应同时提供source_sites和flow_proposal。程序传入规范的原主张九科学字段、原完整条件、primary/source_refs实际论文块和实际读取源码，再重建候选绑定；已有非空命令也能补全核验能力，每计划至多一次logical模型请求并记录用量。原argv和metric_output保持，缺命令只生成实际RunRequest命令，原plan不回写。禁用补全、未绑定上下文和version2 recipe保留旧路径。RunRequest携带source_flow与source_flow_files；旧记录仅在比较副本补默认值，不恢复证据。
 
