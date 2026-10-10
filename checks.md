@@ -6,6 +6,9 @@
 | Full-native v5 execution and complete accounting | fail | 0 plans/0 Docker;38 logical/physical requests,150304 known tokens,10 missing usage records. Vacuous source/lineage checks provide no execution coverage. Original failure remains unchanged. |
 | Complete measured-scope description consumption | static/mock pass | Four new controls pass in0.94s. Exact original v5 claim/material replay changes structural eligibility0→1 with all11 fields retained; no new plan/model/Docker. |
 | Independent original-claim recheck closure | mock/static/independent pass | Final67 necessary cases in6.64s. Original stale-digest safety probe now leaves old pending and0 adoption; first failed implementation/result retained. Final review cfa194e9 and5 source/test hashes match. Actual semantic quality remains unverified. |
+| Accurate unavailable execution diagnostics | static/offline replay/independent pass | `execution-unavailable-diagnostic/`: original0071→1 and0080→0; nullable-metric control remains unavailable;276 original non-cache files unchanged. Guards and continue retained, zero external calls. Independent reviewf38a98f4. |
+| Nested failures propagate partial delivery to canonical JSON/teaser | fail; correction design in progress | Original v5 has incomplete coverage, visual context and advice, while canonical run_status and teaser say completed. Current source only aggregates top-level exceptions. Existing textual limitations do not prove delivery-state consistency. |
+| Production retrieval scope and partial results contract | unresolved | `retrieval-scope-design/`: six actual top-8 successes have no scope-completeness record. Existing results are compared, but absence remains unsupported. Empty successful results and partial batch errors are incorrectly classified; no production correction yet. |
 
 The new independent original review uses the existing third stage and budget. Exact same-problem links can resolve a known observation through the existing candidate contract; new unlinked problems cannot be silently cleared by that action. Incomplete, invalid or legacy original rechecks cannot authorize adoption/dismissal. Independent review counts are delivered; initial reviewed ranges/counts are not backfilled. Old16 test functions and99 assertions remain unchanged. No new actual LLM/service/Docker call proves M2/M5 repair yet.
 
@@ -14,7 +17,7 @@ The new independent original review uses the existing third stage and budget. Ex
 | Describe existing grouped action constraints explicitly | static pass; independent review pass | Only `_FOLLOWUP_SYSTEM` changed;70 other AST nodes unchanged. Compile/Ruff/diff pass; independent report40463bf9. No additional tests or model calls. |
 | Actual extraction quality after this clarification | unverified | This does not repair historical outputs or prove recall. M2/M5 remain open. Full-native v5 is separately pinned to d2b0ff8. |
 
-Latest implementation checkpoint: `d2b0ff8764e5ba55ab6b0a09b3e1a17552638f16`, pushed and remotely verified. Current actual evidence and its limitations are recorded below. The original14-item engineering table is explicitly historical; it does not certify current whole-paper scientific accuracy.
+Historical v5 source checkpoint: `d2b0ff8764e5ba55ab6b0a09b3e1a17552638f16`, pushed and remotely verified before the later phase3/4 corrections above. Current delivered implementation before the next correction is `d2e632642be3f09e5ad57ab996cdbd91dfcc8e32`. The original14-item engineering table is explicitly historical; it does not certify current whole-paper scientific accuracy.
 
 ## Current phase 4 correction: exclusive execution decision
 
