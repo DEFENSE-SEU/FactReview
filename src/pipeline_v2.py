@@ -17,6 +17,7 @@ from fact_generation.execution.recovery import recover_execution_records
 from fact_generation.execution.v2 import ExecutionResult, execute_plans
 from fact_generation.execution.v2_config import ExecutionConfig
 from preprocessing.materials import index_repository, parse_materials
+from review.delivery import checked_delivery
 from review.report.advice import generate_advice
 from review.report.v2 import verification_limitations, write_review
 from review.teaser.v2 import write_teaser
@@ -425,6 +426,13 @@ def run_v2_pipeline(
                 incomplete_stages=incomplete,
                 execution_requested=bool(getattr(args, "run_execution", False)),
             )
+            review = checked_delivery(
+                review, stages=summary["stages"], extraction_status=screening.claim_extraction_status,
+                **{name: summary[name] for name in (
+                    "claim_coverage", "writing_coverage", "figure_coverage", "table_coverage",
+                    "figure_context_coverage", "table_context_coverage",
+                )},
+            )
             _save(root / "assessment" / "assessed_review.json", review.model_dump(mode="json"))
             summary["outputs"]["assessment_snapshot"] = str(root / "assessment" / "assessed_review.json")
 
@@ -432,6 +440,8 @@ def run_v2_pipeline(
                 nonlocal review
                 advice = generate_advice(review, root / "review" / "advice", call=call)
                 review = advice.review
+                review.advice_requested = True
+                review = checked_delivery(review)
                 summary["issues"].extend(advice.issues)
                 summary["advice"] = advice.counts
                 if (root / "review" / "advice").is_dir():
@@ -505,6 +515,15 @@ def run_v2_pipeline(
             summary["stages"] = {
                 name: "skipped" if value == "pending" else value for name, value in summary["stages"].items()
             }
+            if "review" in locals():
+                final_delivery = checked_delivery(review, stages=summary["stages"])
+                summary["run_status"] = final_delivery.run_status
+                summary["incomplete_stages"] = final_delivery.incomplete_stages
+                summary["delivery_checks"] = [item.model_dump(mode="json") for item in final_delivery.delivery_checks]
+            else:
+                summary["incomplete_stages"] = [name for name in STAGES if summary["stages"][name] == "failed"]
+                summary["run_status"] = "partial" if summary["incomplete_stages"] else "completed"
+                summary["delivery_checks"] = []
             summary["duration_seconds"] = time.perf_counter() - started
             for module, record in run_stats.read(root / "run_stats.json")["modules"].items():
                 if record["status"] == "pending":

@@ -796,6 +796,31 @@ def test_concurrent_pipelines_keep_usage_and_parent_context_isolated(
     first_parsing, second_parsing, first_finished = Event(), Event(), Event()
     original_args, original_parser = tiny_inputs
 
+    # This fixture exercises concurrent usage ownership. Give its independent
+    # screening boundary explicit successful coverage under the current schema.
+    # Real extraction still exercises each thread's model/statistics context.
+    def complete_screening(materials, output_dir, *, call, **kwargs):
+        from screening.claims import extract_claims
+        from screening.stage import ScreeningFailure, ScreeningResult
+
+        try:
+            claims = extract_claims(materials, call=call)
+        except Exception as exc:
+            raise ScreeningFailure(str(exc), ScreeningResult(
+                claims=[], claim_extraction_status="failed",
+            )) from exc
+        result = ScreeningResult(
+            claims=claims, claim_coverage={"status": "complete"},
+            figure_coverage={"total": len(materials.figures), "checked": len(materials.figures)},
+            table_coverage={"total": len(materials.tables), "checked": len(materials.tables)},
+            writing_coverage={"total": 1, "checked": 1},
+        )
+        output_dir.mkdir(parents=True, exist_ok=True)
+        (output_dir / "screening.json").write_text(result.model_dump_json(indent=2), encoding="utf-8")
+        return result
+
+    monkeypatch.setattr(pipeline_v2, "screen_paper", complete_screening)
+
     def run(index):
         args = SimpleNamespace(**vars(original_args))
         args.paper_key = f"parallel-{index}"
@@ -817,6 +842,10 @@ def test_concurrent_pipelines_keep_usage_and_parent_context_isolated(
                 run_stats.record_llm_call(usage={"input_tokens": index}, model=f"run-{index}")
                 if first_fails and index == 11:
                     return {"status": "error", "error": "intentional first-run failure"}
+            if kwargs["module"] == "report_generation":
+                from tests.test_report_advice_v2 import payload, valid_response
+
+                return valid_response(payload(kwargs))
             return boundary(**kwargs)
 
         try:

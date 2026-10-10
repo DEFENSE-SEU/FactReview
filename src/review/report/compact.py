@@ -178,6 +178,9 @@ def _compact_markdown(review, nav, context):
         "|---|---:|",
     ]
     lines.extend(f"| {s.value} | {review.summary_counts[s]} |" for s in v2.STATUS_ORDER)
+    from review.delivery import delivery_lines
+
+    lines += delivery_lines(review)
     lines += v2.claim_coverage_lines(context.get("claim_coverage"))
     lines += ["", "Execution coverage: " + _json(v2.execution_summary(review)) + ".", ""]
     for key in (
@@ -524,7 +527,9 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
             "Layered report requires a fresh output directory; existing artifacts are retained"
         )
     original = review.model_dump(mode="json", exclude={"review_markdown"})
-    checked = v2._checked_report(review)
+    from review.delivery import checked_delivery
+
+    checked = checked_delivery(v2._checked_report(review), **context)
     snapshot = checked.model_dump(mode="json", exclude={"review_markdown"})
     v2.validate_publication_language(
         [snapshot, context.get("issues") or [], (context.get("token_usage") or {}).get("warnings", [])]
@@ -615,6 +620,35 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
         raise ValueError("Layered rendering changed input review records")
     if checked.model_dump(mode="json", exclude={"review_markdown"}) != snapshot:
         raise ValueError("Layered rendering changed checked review records")
+    export_errors = {key: value for key, value in outputs.items() if key.endswith("_error")}
+    if export_errors:
+        from review.delivery import delivery_lines
+        from schemas.review import DeliveryCheck
+
+        checks = [DeliveryCheck(stage="report", component=key.removesuffix("_error"),
+                                state="failed", reason=reason) for key, reason in export_errors.items()]
+        if any(key.endswith("pdf") for key in outputs):
+            checks.append(DeliveryCheck(
+                stage="report", component="pdf_delivery_finalization", state="incomplete",
+                reason="Successful PDFs are preserved with pre-export delivery metadata; finalization is pending.",
+            ))
+        checked = checked_delivery(checked, additional_checks=checks)
+        # Preserve evidence text, source anchors and existing page navigation.
+        # Healthy PDFs remain traceable; their late-status finalization is explicit.
+        detail = "\n".join(delivery_lines(checked))
+        main = main.replace(f"delivery: {snapshot['run_status']};", f"delivery: {checked.run_status};", 1)
+        main = main.replace(
+            f"Incomplete stages: {v2._text(', '.join(snapshot['incomplete_stages']) or 'none recorded')}.",
+            f"Incomplete stages: {v2._text(', '.join(checked.incomplete_stages))}.", 1,
+        )
+        main += "\n" + detail
+        appendix += "\n**Partial review — report export incomplete.**\n" + detail
+        bundle = _pdf_markdown(main, bundle=True) + "\n\n" + _pdf_markdown(appendix, bundle=True)
+        for key, text in (("markdown", main), ("appendix_markdown", appendix), ("bundle_markdown", bundle)):
+            Path(outputs[key]).write_text(text, encoding="utf-8")
+        checked.review_markdown = main
+        snapshot = checked.model_dump(mode="json", exclude={"review_markdown"})
+        artifact.write_text(checked.model_dump_json(indent=2), encoding="utf-8")
     locations = {}
     for pointer in _paths(snapshot):
         main_target, appendix_target = _nearest(pointer, nav.main), _nearest(pointer, nav.appendix)
@@ -641,6 +675,10 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
         "checked_records_sha256": _digest(snapshot),
         "checked_records_equal_input": original == snapshot,
         "checked_changes": {
+            "delivery_fields": [
+                key for key in ("run_status", "incomplete_stages", "delivery_checks")
+                if original[key] != snapshot[key]
+            ],
             "advice_claim_indices": [
                 i for i, c in enumerate(snapshot["claims"]) if c["advice"] != original["claims"][i]["advice"]
             ],

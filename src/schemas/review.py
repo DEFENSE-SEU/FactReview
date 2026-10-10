@@ -9,6 +9,17 @@ from pydantic import Field
 from schemas.claim import Claim, ClaimStatus, Contract, Finding, NonEmpty
 
 
+class DeliveryCheck(Contract):
+    """A requested operation that the system could not finish."""
+
+    stage: Literal["materials", "screening", "verification", "execution", "assessment", "report", "teaser"]
+    component: NonEmpty
+    state: Literal["failed", "incomplete", "unavailable"]
+    responsibility: Literal["system"] = "system"
+    reason: NonEmpty
+    claim_id: str | None = None
+
+
 class FinalReview(Contract):
     paper_key: NonEmpty
     run_id: NonEmpty
@@ -20,6 +31,8 @@ class FinalReview(Contract):
     incomplete_stages: list[str] = Field(default_factory=list)
     # None preserves the unspecified context of historical artifacts.
     execution_requested: bool | None = None
+    advice_requested: bool | None = None
+    delivery_checks: list[DeliveryCheck] = Field(default_factory=list)
 
     @property
     def summary_counts(self) -> dict[ClaimStatus, int]:
