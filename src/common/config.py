@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -145,6 +146,12 @@ class Settings(BaseSettings):
     pdf_title_font_size: int = 15
     pdf_body_font_size: int = 10
     pdf_page_margin: int = 48
+
+    # Claim gate tier reported as each claim's status; all three are always recorded.
+    claim_gate: Literal["lenient", "default", "strict"] = Field(
+        default="default",
+        validation_alias=AliasChoices("FACTREVIEW_CLAIM_GATE", "CLAIM_GATE"),
+    )
 
     # Evaluation status threshold (absolute delta, directional by metric type)
     eval_status_threshold: float = 0.05
