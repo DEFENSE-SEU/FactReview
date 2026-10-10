@@ -10,7 +10,7 @@ from fact_generation.execution.tools import docker
 from preprocessing.materials import index_repository
 from schemas.claim import Claim, ClaimLocation, Condition, ExecutionPlan, ExecutionTask, PaperTargetPassage
 from schemas.materials import MaterialBlock, SharedMaterials
-from tests.execution_science_fixtures import accuracy_fixture, record_observer
+from tests.execution_science_fixtures import accuracy_fixture, record_metric_file, record_observer
 from util.subprocess_runner import CommandResult
 from verification.experiment_targets import bind_execution_target
 
@@ -100,8 +100,12 @@ def test_container_writes_cannot_overwrite_host_audit_and_valid_observations_sur
             path.name for path in writable.iterdir()
         )
         trusted = run_dir / "attempt_0" / "observer_trusted"
-        assert set(mounts) == {f"{writable}:/workspace/run_dir", f"{workspace}:/app:ro",
-                               f"{trusted}:/factreview-observer:ro"}
+        allowed = {f"{writable}:/workspace/run_dir", f"{workspace}:/app:ro",
+                   f"{trusted}:/factreview-observer:ro"}
+        if metric_file:
+            slot = next(mount for mount in mounts if mount.endswith(":/app/metrics.json:rw"))
+            allowed.add(slot)
+        assert set(mounts) == allowed
         assert {path.name for path in trusted.iterdir()} == {"config.json", "observer.py"}
         # Same allowed container-relative write as the original vulnerability,
         # now confined to scratch instead of replacing the host-owned manifest.
@@ -109,10 +113,12 @@ def test_container_writes_cannot_overwrite_host_audit_and_valid_observations_sur
         (writable / "artifacts").mkdir(exist_ok=True)
         (writable / "artifacts" / "output.txt").write_text("runtime output", encoding="utf-8")
         if metric_file:
-            (workspace / "metrics.json").write_text(json.dumps(payload), encoding="utf-8")
+            record_metric_file(command, "metrics.json", payload)
         seen.update(manifest=manifest, before=before, mounts=mounts, workspace=workspace)
         record_observer(command, cwd, payload)
-        return CommandResult(command, str(cwd), 0, "FACTREVIEW_OBSERVATIONS=" + json.dumps(payload), "", 0.01)
+        stdout = json.dumps({"ok": True, "out": "metrics.json"}) if metric_file else "FACTREVIEW_OBSERVATIONS=" + json.dumps(payload)
+        return CommandResult(command, str(cwd), 0, stdout, "", 0.01,
+                             termination="completed")
 
     monkeypatch.setattr(v2, "run_command", transport)
     result = v2.execute_plans(

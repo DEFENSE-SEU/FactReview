@@ -149,6 +149,9 @@ def test_docker_producer_classifies_explicit_operation_failures_only(
 def test_repaired_operation_failure_is_history_and_policy_block_is_not_system_failure(
     execution_inputs, tmp_path, monkeypatch
 ):
+    from tests.execution_science_fixtures import accuracy_fixture, record_observer
+
+    payload = accuracy_fixture(execution_inputs, monkeypatch)
     builds = []
 
     def builder(*args, **kwargs):
@@ -156,9 +159,11 @@ def test_repaired_operation_failure_is_history_and_policy_block_is_not_system_fa
         return len(builds) > 1, "fixture-image"
 
     monkeypatch.setattr(v2, "docker_ensure_paper_image", builder)
-    monkeypatch.setattr(v2, "run_command", lambda command, cwd, timeout_sec: CommandResult(
-        command, cwd, 0, json.dumps({"observations": [observation().model_dump()]}), "", .01
-    ))
+    def transport(command, cwd, timeout_sec):
+        record_observer(command, cwd, payload)
+        return CommandResult(command, cwd, 0, json.dumps(payload), "", .01, termination="completed")
+
+    monkeypatch.setattr(v2, "run_command", transport)
     result = _execute(
         execution_inputs, tmp_path / "repaired", v2.docker_runner,
         repairer=lambda *args: v2.Repair(dependencies=["numpy"], reason="fixture environment repair"),

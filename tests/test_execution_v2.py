@@ -22,6 +22,15 @@ from schemas.claim import (
     PaperTargetPassage,
 )
 from schemas.materials import MaterialBlock, SharedMaterials
+from tests.execution_science_fixtures import (
+    accuracy_fixture,
+    analysis_source,
+    finish_source,
+    install_science_model,
+    record_metric_file,
+    record_observer,
+    released_statistics,
+)
 from util.subprocess_runner import CommandResult
 
 
@@ -355,19 +364,23 @@ def test_blocked_kept_and_order_is_priority_then_ready_then_mode(inputs, tmp_pat
 
 
 def test_default_runner_uses_mocked_docker_transport_and_actual_stdout(inputs, tmp_path, monkeypatch):
+    payload = accuracy_fixture(inputs, monkeypatch)
     seen = []
     monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "test-image:1"))
 
     def docker_command(**kwargs):
+        from fact_generation.execution.tools.docker import docker_run_paper_image
+
         seen.append(kwargs)
-        return ["docker", "run", "test-image:1", *kwargs["cmd"]]
+        return docker_run_paper_image(**kwargs)
 
     monkeypatch.setattr(v2, "docker_run_paper_image", docker_command)
 
     def transport(command, cwd, timeout_sec):
         assert command[:2] == ["docker", "run"]
-        payload = {"observations": [observation().model_dump(mode="json")]}
-        return CommandResult(command, cwd, 0, "FACTREVIEW_OBSERVATIONS=" + json.dumps(payload), "", 0.2)
+        record_observer(command, cwd, payload)
+        return CommandResult(command, cwd, 0, "FACTREVIEW_OBSERVATIONS=" + json.dumps(payload), "", 0.2,
+                             termination="completed")
 
     monkeypatch.setattr(v2, "run_command", transport)
     result = run(inputs, tmp_path, None)
@@ -628,14 +641,24 @@ def test_compgcn_author_json_decoded_by_default_docker_path(inputs, tmp_path, mo
         "hits@3": 0.365,
         "hits@10": 0.514,
     }
+    plan.task.metric_output = "metrics/result.json"
+    released_statistics(inputs, rows=[{"rank": 2} for _ in range(34)] + [{"rank": 4} for _ in range(66)],
+                        model="CompGCN")
+    expression = ("{'ok': True, 'split': data['settings']['split'], 'dataset': data['dataset'], "
+                  "'score_func': data['settings']['score_func'], 'opn': data['settings']['opn'], "
+                  "'ckpt': '/app/checkpoints/author', 'mrr': value, 'mr': 194, "
+                  "'hits@1': 0.245, 'hits@3': 0.365, 'hits@10': 0.514}")
+    finish_source(inputs, analysis_source("eval.py", plan.task.data_paths[0], "test",
+                                         payload_expression=expression, metric="MRR", file_output="metrics/result.json"))
+    install_science_model(monkeypatch)
+    monkeypatch.setattr("fact_generation.execution.tools.docker._docker_proxy_env", lambda _: {})
     monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "fixture-image"))
-    monkeypatch.setattr(v2, "docker_run_paper_image", lambda **kwargs: ["docker", "run", "fixture-image"])
 
     def transport(cmd, cwd, timeout_sec):
-        target = Path(cwd) / "workspace" / "metrics" / "result.json"
-        target.parent.mkdir()
-        target.write_text(json.dumps(author_json), encoding="utf-8")
-        return CommandResult(cmd, cwd, 0, '{"ok": true, "out": "metrics/result.json"}', "", 0.2)
+        record_metric_file(cmd, "metrics/result.json", author_json)
+        record_observer(cmd, cwd, author_json)
+        return CommandResult(cmd, cwd, 0, '{"ok": true, "out": "metrics/result.json"}', "", 0.2,
+                             termination="completed")
 
     monkeypatch.setattr(v2, "run_command", transport)
     result = run(inputs, tmp_path, None)
@@ -645,6 +668,10 @@ def test_compgcn_author_json_decoded_by_default_docker_path(inputs, tmp_path, mo
     raw = json.loads(Path(attempt["logs"]["raw_output"]).read_text())
     audit = json.loads(Path(attempt["logs"]["output_mapping"]).read_text())
     assert raw == author_json and any(item["metric_path"] == ["mrr"] for item in audit["selectors"])
+    assert len(attempt["observations"]) == len(audit["selectors"]) == 5
+    assert {row["metric"].lower(): row["value"] for row in attempt["observations"]} == {
+        "mrr": .335, "mr": 194, "hits@1": .245, "hits@3": .365, "hits@10": .514,
+    }
 
 
 def test_explicit_nested_output_mapping_reads_only_runtime_values():
@@ -941,14 +968,15 @@ def test_failed_docker_attempt_cleans_only_its_named_container(
 
 
 def test_successful_docker_run_does_not_issue_cleanup(inputs, tmp_path, monkeypatch):
+    payload = accuracy_fixture(inputs, monkeypatch)
     monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "test-image:1"))
     commands = []
 
     def transport(command, cwd, timeout_sec):
         commands.append(command)
         assert command[1] == "run" and "--name" in command
-        payload = {"observations": [observation().model_dump()]}
-        return CommandResult(command, cwd, 0, json.dumps(payload), "", 0.1)
+        record_observer(command, cwd, payload)
+        return CommandResult(command, cwd, 0, json.dumps(payload), "", 0.1, termination="completed")
 
     monkeypatch.setattr(v2, "run_command", transport)
     result = run(inputs, tmp_path, None)
@@ -989,6 +1017,7 @@ def test_failed_container_cleanup_stops_repairs_and_records_issue(
 
 
 def test_docker_repair_uses_a_fresh_container_name(inputs, tmp_path, monkeypatch):
+    payload = accuracy_fixture(inputs, monkeypatch)
     monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "test-image:1"))
     names = []
 
@@ -998,8 +1027,9 @@ def test_docker_repair_uses_a_fresh_container_name(inputs, tmp_path, monkeypatch
             names.append(name)
             if len(names) == 1:
                 return CommandResult(command, cwd, 1, "", "missing dependency", 0.1)
+            record_observer(command, cwd, payload)
             return CommandResult(
-                command, cwd, 0, json.dumps({"observations": [observation().model_dump()]}), "", 0.1
+                command, cwd, 0, json.dumps(payload), "", 0.1, termination="completed"
             )
         assert command == ["docker", "rm", "--force", names[-1]]
         return CommandResult(command, cwd, 0, names[-1], "", 0.1)

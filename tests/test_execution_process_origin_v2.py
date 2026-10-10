@@ -9,7 +9,7 @@ import pytest
 
 from fact_generation.execution import v2
 from tests import test_execution_v2 as execution_fixtures
-from tests.test_execution_v2 import observation
+from tests.execution_science_fixtures import accuracy_fixture, record_observer
 from util import subprocess_runner as process
 
 execution_inputs = execution_fixtures.inputs
@@ -105,6 +105,7 @@ def test_docker_consumer_uses_declared_origin_without_inferring_from_codes(
 
 
 def test_origin_is_history_after_real_infrastructure_repair(execution_inputs, tmp_path, monkeypatch):
+    payload = accuracy_fixture(execution_inputs, monkeypatch)
     plan, claim, materials = execution_inputs
     monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "fixture-image"))
     runs = []
@@ -117,8 +118,9 @@ def test_origin_is_history_after_real_infrastructure_repair(execution_inputs, tm
                     command, cwd, 127, "", "fixture launch failure", .01,
                     termination="launch_failed", exception_type="FileNotFoundError",
                 )
+            record_observer(command, cwd, payload)
             return process.CommandResult(
-                command, cwd, 0, json.dumps({"observations": [observation().model_dump()]}), "", .01,
+                command, cwd, 0, json.dumps(payload), "", .01,
                 termination="completed",
             )
         return process.CommandResult(command, cwd, 0, "", "", .01, termination="completed")
