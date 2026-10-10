@@ -321,7 +321,7 @@ class PreservedQualifier(Contract):
     source_block_ids: list[StrictStr] = Field(min_length=1)
     restriction: StrictStr = Field(min_length=1)
     claim_path: StrictStr = Field(
-        description="Exact JSON pointer to /text or a value under /conditions in this current claim. A source quote or another claim is not a carrier."
+        description="Exact JSON pointer to /text or a nonempty scalar semantic leaf under /conditions in this current claim. A list/dict container, null or empty string cannot be a carrier. For an array choose the actual array item leaf path, such as /conditions/0/settings/qualifiers/0, or /text when its unchanged semantics entail the restriction. A source quote or another claim is not a carrier."
     )
     claim_value: Any = Field(description="Unchanged value at claim_path, including its JSON type.")
 
@@ -482,14 +482,25 @@ Review every listed source once with affected closed condition IDs. Unavailable 
 requires unresolved scope and never implies a missing qualifier. Background facts and appendix
 locations alone do not change verification settings or conclusion boundaries.
 Other original blocks whose bodies are actually supplied may have explicit source_reviews and atom spans; unloaded IDs cannot be used.
+Each visible directory source provides block_local_whole_span={start:0,end:len(block.text)};
+unavailable sources have null. visible_source_spans supplies the same program-computed ranges
+for every actual supplied block body, including blocks outside the directory. IDs alone supply no range.
+trusted_span remains a Markdown-global source location; never use it as a block-relative atom span.
 Partition all original condition IDs into compact disjoint scope_groups. Each group closes all six
 dimensions; use not_governing with no atom IDs only after considering the supplied sources.
-Store each atomic restriction once in scope_atoms with exact character start/end in original block
-text (Python string offsets). Atomic means one restriction with one preservation/materiality judgment.
+Store each atomic restriction once in scope_atoms with exact zero-based block-relative start and
+exclusive end in original block.text (Python string codepoint offsets, without normalization;
+never byte/UTF-16 offsets). Select the canonical whole-block range when that actual source is
+scientifically relevant to the atomic restriction; copying its supplied numbers avoids guessing
+character counts. A whole-block citation still requires the actual atomic restriction and source
+relevance judgment. Atomic means one restriction with one preservation/materiality judgment.
 Separate label budget, sampling, augmentation and selection restrictions even in one source sentence.
 For preserved atoms, preserved_indices reference every matching preserved_qualifiers entry exactly
 once: unchanged restriction/source IDs and own claim semantic leaf path/value, covering every affected
 condition. No IDs, source_refs, another claim, or merely related method word is a semantic carrier.
+Each carrier is a nonempty scalar semantic leaf. List/dict containers, null and empty strings
+cannot carry preservation. For arrays choose an actual item leaf path or the unchanged /text
+when its semantics cover the restriction. A scalar path alone establishes no semantic entailment.
 For missing atoms, finding_index references exactly one matching missing qualifier finding, with same
 restriction/source/condition IDs. effect names the source setting, a materially different alternative,
 original_permits_alternative and the exact original assertion leaf path/value; explanation equals the
@@ -524,6 +535,16 @@ def _digest(value):
 def _file_hash(path):
     file = Path(path)
     return hashlib.sha256(file.read_bytes()).hexdigest() if file.is_file() else None
+
+
+def _visible_source_spans(payload):
+    """Canonical ranges come only from actual supplied unchanged block bodies."""
+    supplied = [*payload["blocks"], *(row["block"] for row in payload.get("supplemental_sources", []))]
+    spans = {}
+    for block in supplied:
+        key, text = block["id"], block["text"]
+        spans.setdefault(key, {"block_id": key, "block_local_whole_span": {"start": 0, "end": len(text)}})
+    return list(spans.values())
 
 
 def _claim_registry(claims):
@@ -1364,6 +1385,7 @@ def review_claim_coverage(
 
     def request(system, payload, schema, module):
         check()
+        payload = {**payload, "visible_source_spans": _visible_source_spans(payload)}
         if safe(payload) != payload:
             raise ValueError(
                 "Coverage input contains provider credentials; original source fields cannot be transformed"

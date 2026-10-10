@@ -40,8 +40,12 @@ def fingerprint(value):
 
 class ScopeSpan(Contract):
     block_id: StrictStr
-    start: StrictInt = Field(ge=0)
-    end: StrictInt = Field(gt=0)
+    start: StrictInt = Field(
+        ge=0, description="Zero-based block-relative Python string codepoint offset in this block.text; never a Markdown-global, byte or UTF-16 offset."
+    )
+    end: StrictInt = Field(
+        gt=0, description="Block-relative Python string codepoint offset with exclusive end in this block.text, at most len(block.text). The supplied block_local_whole_span is a canonical whole-block range."
+    )
 
 
 class ScopeEffect(Contract):
@@ -319,6 +323,9 @@ def scope_context(
                 trusted_span=list(_trusted_span(blocks[key], markdown))
                 if key in blocks and _trusted_span(blocks[key], markdown) is not None
                 else None,
+                block_local_whole_span={"start": 0, "end": len(blocks[key].text)}
+                if state in {"in_window", "loaded"} and key in blocks
+                else None,
             )
         context["complete"] = all(s["availability"] != "unavailable" for s in context["sources"])
     return contexts, extras
@@ -378,7 +385,9 @@ def check_scope(row, claim, context, blocks, carrier):
             if condition not in affected or set(affected) != {condition}:
                 raise ValueError("V4 condition carrier cannot supply another condition's scope")
         if actual is None or isinstance(actual, (dict, list)) or actual == "":
-            raise ValueError("V4 carrier must be an actual nonempty semantic leaf")
+            raise ValueError(
+                "V4 carrier must be an actual nonempty scalar semantic leaf; list/dict containers forbidden"
+            )
 
     for atom in row.scope_atoms:
         closed(atom.condition_ids, ids, "atom conditions")
