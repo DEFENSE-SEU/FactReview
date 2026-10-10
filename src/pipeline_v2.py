@@ -379,6 +379,8 @@ def run_v2_pipeline(
                     ("max_attempts", "max_attempts", 3),
                     ("approval_mode", "approval_mode", "auto"),
                     ("training_budget", "training_budget", 0),
+                    ("alignment", "alignment", "strict"),
+                    ("repairer", "repairer", "default"),
                     ("execution_docker_build_timeout_sec", "docker_build_timeout_seconds", 3600),
                 ):
                     if not config_path or argument in overrides:
