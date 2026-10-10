@@ -426,7 +426,7 @@ def _refine(
 
             telemetry["flow_binding"] = bind_builtin_flow(
                 response.get("flow_proposal"), plan=plan, claim=claim, materials=materials,
-                supplied_files=files, source_sites=telemetry["source_sites"],
+                supplied_files=files, source_sites=telemetry["source_sites"], alignment=config.alignment,
             )
             telemetry["flow_files"] = (
                 {plan.task.entry_script: files[plan.task.entry_script]}
@@ -1437,7 +1437,7 @@ def _execute_graph(
             flow_validation = validate_builtin_flow(
                 request.source_flow, plan=request.plan, claim=claim, materials=materials,
                 supplied_files=request.source_flow_files, source_sites=request.source_sites,
-                runtime_request=request, runtime_outcome=outcome,
+                runtime_request=request, runtime_outcome=outcome, alignment=request.config.alignment,
             )
             flow_path = attempt / "source_flow_validation.json"
             _json(flow_path, flow_validation)

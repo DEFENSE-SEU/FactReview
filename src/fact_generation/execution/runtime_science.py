@@ -76,7 +76,7 @@ def build_consumption_context(proposal, *, plan, claim, materials, request, outc
     _require(all(row.version == 1 for row in targets.values()), "ordinary_target_required")
     flow = validate_builtin_flow(request.source_flow, plan=plan, claim=claim, materials=materials,
         supplied_files=request.source_flow_files, source_sites=request.source_sites,
-        runtime_request=request, runtime_outcome=outcome)
+        runtime_request=request, runtime_outcome=outcome, alignment=request.config.alignment)
     _require(flow["status"] == "witnessed" and type(flow.get("raw_output_binding")) is dict,
              "authenticated_actual_flow_unavailable: " + flow.get("reason", "unknown"))
     condition = plan.target_conditions[0]
