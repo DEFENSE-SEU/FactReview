@@ -63,7 +63,17 @@ def test_full_and_layered_keep_coverage_visible_without_reassessment(tmp_path, s
             assert "c\\-blocked" in markdown
         saved = json.loads(Path(outputs["json"]).read_text("utf-8"))
         saved.pop("review_markdown")
-        assert saved == snapshot
+        delivery = {"run_status", "incomplete_stages", "delivery_checks"}
+        assert {k: v for k, v in saved.items() if k not in delivery} == {
+            k: v for k, v in snapshot.items() if k not in delivery
+        }
+        assert saved["run_status"] == ("completed" if status == "complete" else "partial")
+        assert saved["incomplete_stages"] == ([] if status == "complete" else ["screening"])
+        assert saved["delivery_checks"] == ([] if status == "complete" else [{
+            "stage": "screening", "component": "claim_coverage", "state": "incomplete",
+            "responsibility": "system", "reason": "Requested claim_coverage checks are incomplete.",
+            "claim_id": None,
+        }])
         if presentation == "layered":
             manifest = json.loads(Path(outputs["manifest"]).read_text("utf-8"))
             assert manifest["delivery_context"]["claim_coverage"] == coverage

@@ -92,7 +92,13 @@ def test_one_recognized_topic_produces_three_distinct_intents(tmp_path, topic):
 @pytest.mark.asyncio
 @pytest.mark.parametrize("topic", ["image classification", "machine translation"])
 async def test_dispatch_runs_single_domain_claim_and_global_related_work(tmp_path, monkeypatch, topic):
+    from tests.test_literature_literal_concepts_v2 import planning_response
+
     materials, claim = inputs(tmp_path, topic)
+    text = f"Our novel {topic} method uses residual blocks, evaluated by ablation."
+    loc = ClaimLocation(page=1, char_start=0, char_end=len(text))
+    materials.markdown = materials.blocks[0].text = claim.text = claim.source_quote = text
+    materials.blocks[0].loc = claim.loc = loc
     Path(materials.markdown_path).write_text(materials.markdown, encoding="utf-8")
     prior = {
         "id": "1901.00001",
@@ -103,8 +109,14 @@ async def test_dispatch_runs_single_domain_claim_and_global_related_work(tmp_pat
     adapter = boundaries([prior], complete=False)
     monkeypatch.setattr("verification.literature._default_adapter", lambda: adapter)
     calls = []
+    planning_calls = []
 
     def model(**kwargs):
+        if kwargs["module"] == "verification.literature.planning":
+            planning_calls.append(kwargs["module"])
+            request = json.loads(kwargs["prompt"].split("\nCONCEPT_DATA_JSON:\n", 1)[1])
+            return planning_response(request, {"mechanism": "residual blocks", "target setting": topic,
+                                               "evaluation protocol baseline": "ablation"})
         payload = json.loads(kwargs["prompt"].split("\nDATA_JSON:\n")[1])
         calls.append(payload["claim"])
         is_claim = payload["claim"] is not None
@@ -142,16 +154,17 @@ async def test_dispatch_runs_single_domain_claim_and_global_related_work(tmp_pat
     )
     assert adapter.search.await_count == 6
     queries = [call.kwargs["query"] for call in adapter.search.await_args_list]
-    expected = literature_queries(claim, materials)
+    expected = ["residual blocks", f"residual blocks {topic}", "residual blocks ablation"]
     assert queries[:3] == queries[3:] == expected
+    assert planning_calls == ["verification.literature.planning"]
     assert adapter.read_papers.await_count == 2
     assert [c is None for c in calls] == [False, True]
     assert assess_claim(result.claims[0]).status == "questioned"
     assert any(finding.kind == "related_work" for finding in result.findings)
     for identifier in ("c1", "global"):
         audit = read_audit(materials, identifier)
-        assert audit["query_terms"] == [topic]
-        assert audit["query_policy"] == "closed_technical_vocabulary"
+        assert audit["query_terms"] == ["residual blocks", topic, "ablation"]
+        assert audit["query_policy"] == "literal_source_concepts_v2"
         assert len(audit["query_intents"]) == 3
         assert not audit["adequate_for_no_close_prior_work"]
 

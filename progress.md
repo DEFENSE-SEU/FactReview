@@ -1,6 +1,26 @@
 # FactReview v2 progress
 
-## 当前整体框架 checkpoint（2026-10-11）
+## 当前回归修复与真实执行 checkpoint（2026-10-11）
+
+Task：继续完整三层框架，目标active；Phase0–7历史实现保留，Phase8整体验收未完成。授权分支`refactor/method-v2`源码checkpoint740fea880ab8554a1336cedd217689c3f787e65a已推送。当前兼容夹具与真实接口缺陷修复按阶段继续提交，完整目标未暂停。
+
+Completed：原默认pytest唯一全套结果56failed/3687passed/3原deselected/0skipped，310.59s，原414源码/测试身份在运行前后相同。必要修复已关闭39原失败：coverage/report/SDK18、arxiv/literature10、pipeline/visual7、资源identity/path4。各组保留原科学断言，明确当前wire或delivery metadata迁移；没有修改markers、跳过或降级科学正例。另17项执行/framework/完整pipeline科学正例仍开放，最后全套尚未重跑。
+
+Completed：原L2计划进入默认execute_plans实际L3，actual0b197a433cb3/supervised9599deeba3da，13.532s/rc0；真实2次image inspect和1次author Docker run，固定image ID，原python -I -S scripts/evaluate.py完整命令，auto/train0/该验证repair0。完整4行发布预测由host重算3/4=.75，原条件aligned/consistent，生成1条execution support Evidence。原5条不足paper evidence与claim unverified保持，未重放assessment。独审22事实闭合；Root读完整host measurement。范围限发布预测全量测量，没有一般NN推理、训练、动态消费或商业完成证明。
+
+Completed with failure：整篇双分批v3 actualb5acca4e6731/supervised99c9b63a8bc0终态rc1/wall388.015s；10logical/10physical主调用663791known、readiness171独立，retry/unknown/blocked为0。73原主张未变，75跨窗first及original职责均0完成，20unresolved保留，revisions0。四个first child省略schema_version；原请求JSON schema有默认值并未列required，严格consumer却要求显式声明，独审定位为确定producer接口缺陷。修复仅使请求合同明确必填及精确版本，保持consumer、预算、全材料、全部失败原响应；不能补写历史响应或重放采纳。六完整窗未截断，末两零职责窗discovery已完成。
+
+Decisions：产品默认repair3且上限3、auto批准及可选interactive并记mode、training0、已批准deadline/arxiv fallback、旧metric容差集中、v1 conflict→questioned保持。三项完整命令的customrunner单元只显式关闭无关LLMrefinement，全部消费/身份负断言保持。安全path异常只公开三种固定原因并归execution.integrity，沿原nonrecoverable政策停止，不输出输入路径。视觉正例PDF实际绘表并给匹配crop，原缺bbox负例保持；报告因科学不足生成合法Unverified建议。
+
+Outputs：原56失败与各组日志位于final-default-regression-independent-v1/；兼容修复default-regression-coverage-report-images-fix-v1/、default-regression-pipeline-visual-fix-v1/；Root四项default-regression-root-path-intake-fix-v1/；真实L3 claim008-public-plan-l3-native-validation-v1/及actual-independent-v1/；整篇wholepaper-original-batching-native-validation-v3/。私有model/provider/process日志仅opaque SHA/size。
+
+Completed：整篇first/discovery请求schema现在明确required精确版本，两个必要完整公开请求控制通过（.86s），原consumer与历史raw不变。原judge的raw/qualified-derived双候选歧义也已修复：恰一正式科学qualified derived作为权威，raw完整保留；同条件value/unit/variance矛盾明确拒绝，多个候选仍拒绝，projection-v2与缺科学证明保护保持。新增四必要控制4pass/4.55s，原完整source-science控制1pass/1.93s；独审修正一处新测试插入位置后确认所有原函数AST完全保持。真实新源模型效果待验证。
+
+Open issues：剩余17个回归含实际资源科学消费正例；完整canonical/native输出文件及全量rank-analysis支持正在按实际source、host重算、observer和独立语义合同实现，禁止mock qualified或删原raw来取得绿色。整篇召回/原子性/M2/M5、联合paper evidence、一般NN/多condition及当前完整公开入口报告交付继续开放。整体商业级完成尚无证据。
+
+Next action：关闭上述具体科学与接口失败，独立审核并提交授权分支；最终必要默认全套一次，再冻结当前源进行完整公开入口Materials→L1/VLM→四分支L2→非空真实L3→assessment/advice→JSON/MD/PDF/SVG验证。已有失败原件保持，不做无变化付费重跑。checks.md当前原14表第1项fail，另13项原窄合同保持；整体目标active。
+
+## 历史整体框架 checkpoint（2026-10-11）
 
 Task：继续完成完整三层FactReview框架、必要验证与可追溯交付，目标active，Phase8整体未完成。当前聊天GPT-6.1 Sol；产品内部openai-codex/GPT-5.5。`refactor/method-v2` 已推送源码checkpoint85441552924a12519c7bded87feee98c9006c0e1；当前一个Phase4文字增量待本次提交。此前Phase0–8源码记录及失败原件均保留。
 

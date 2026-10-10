@@ -580,7 +580,7 @@ def test_windows_pack_headings_keep_block_only_footnotes_and_markdown_only_spans
             return validation(p)
         raw = review(p, [])
         return {k: raw[k] for k in ("context_id", "window_id", "reviewed_block_ids", "explanation")} | {
-            "schema_version": "claim-coverage-v4" if "scope_context" in p else "claim-coverage-v3",
+            "schema_version": "claim-coverage-v5" if "scope_wire_version" in p else "claim-coverage-v3",
             "claim_reviews": [],
             "new_findings": [],
         }

@@ -62,7 +62,9 @@ class Transport:
                 return httpx.Response(
                     status,
                     headers=headers,
-                    content=b"%PDF-mocked" if "/pdf/" in url else b"<feed/>",
+                    content=b"%PDF-mocked"
+                    if "/pdf/" in url
+                    else b'<feed xmlns="http://www.w3.org/2005/Atom"/>',
                     request=httpx.Request("GET", url, **kwargs),
                 )
 

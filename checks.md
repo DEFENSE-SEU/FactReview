@@ -1,6 +1,37 @@
 # FactReview v2 acceptance checks
 
-## Current checkpoint (2026-10-11)
+## Current regression and native-execution checkpoint (2026-10-11)
+
+The branch source checkpoint is `740fea880ab8554a1336cedd217689c3f787e65a`, pushed and exact remote verified. Phase0–7 implementation history is retained; Phase8 whole-framework delivery remains open and the goal is active.
+
+The once-only default pytest run ended with **56 failed, 3687 passed, 3 original deselected, 0 skipped** (310.59s). Original source/test bytes were unchanged during that run. Necessary repairs have closed39 original failures:18 coverage/report/SDK compatibility,10 arxiv/literature contracts,7 pipeline/visual delivery and4 execution identity/path controls. Their original assertions and failure records remain; the pending17 execution/framework/scientific-positive failures are being addressed. There is no current full-suite pass. The next full run follows concrete repairs, rather than repeating unchanged failures.
+
+Original L2 public plan actual `0b197a433cb3` completed the default L3 path with real Docker in13.532s: two image inspections and one author run, zero model calls, training or repairs. Full four-row host measurement gives3/4=0.75; alignment and consistency pass, and one execution support Evidence is recorded. The original plan/resources/command are preserved. Independent review `claim008-public-plan-l3-actual-independent-v1/report.md` confirms the bounded chain. The claim remains unverified because this standalone execution does not rerun assessment. Fixed released predictions do not prove general model inference or commercial completion.
+
+Wholepaper dual-batch v3 actual `b5acca4e6731` ended with rc1 after388.015s:10 logical/10 physical main calls,663791 known tokens plus separate readiness171, no retry/unknown usage. All73 original claims remain, with75 first/original review duties and20 unresolved observations; completed duties are0/75. Four first batches omitted schema_version, which the displayed output schema permitted despite a strict consumer requirement. The request contract now explicitly requires that field; two necessary public-request controls pass, while the strict consumer and original failed responses remain. Real effect of the new source is pending. All six complete source windows remain. Final claims73, revisions0, fullpaper/fullpipeline/commercial flags false.
+
+The actual judge's raw/qualified-derived ambiguity is also repaired. A unique source-qualified observation is selected while the original raw output remains in audit; conflicting values, units or variance reject comparison. Four necessary controls and one unchanged original source-science control pass. Independent review confirmed that every original test function remains unchanged. Full canonical/file output and rank-analysis support are still being implemented and do not inherit qualification from these local checks.
+
+| Original acceptance check | Current verdict | Evidence / next work |
+|---|---|---|
+| 1. pytest passes without weakening or skipping | fail | Preserved56-failure default run;39 repaired,17 pending, final full run required. |
+| 2. Materials → L1 → L2 → optional L3 → assessment → report → teaser | pass | Public entry, seven-stage records and bounded real L2→L3; full current delivery remains open. |
+| 3. Uncapped extraction and splitting | pass | Original controls and full73-claim input; long-paper recall/atomicity remains open. |
+| 4. Claim locations/conditions/needs and evidence pointers | pass | Source-bound schemas and original actual plan/evidence. |
+| 5. Dispatch follows needs | pass | Production dispatcher and retained controls. |
+| 6. Crop/caption/body references and visual categories | pass | Current real crop fixtures and preserved actual VLM evidence. |
+| 7. Cutoff/concurrent window/self-exclusion/restrictions | pass | Preserved policy and source-bound retrieval controls. |
+| 8. Experiments-only linked feasible prioritized plans | pass | Actual L2 public high/ready plan after19 confirmations. |
+| 9. Aligned-only execution evidence and bounded repairs | pass | Actual original-plan L3 with full host measurement; general scientific-output support remains open. |
+| 10. Ordered assessment rules | pass | Existing pure rule controls remain. |
+| 11. Four statuses and safe legacy adapter | pass | Preserved conflict→questioned one-way provenance. |
+| 12. Report structure without accept/reject advice | pass | Existing report guards and artifact evidence. |
+| 13. Baseline completion or reported blocker | pass with reported blocker | Original comparison and explicit integration limitations retained. |
+| 14. progress reflects current workspace | pass | Current failures, repairs, terminal actuals and next actions recorded. |
+
+This table describes the original fourteen contracts. Whole-framework completion also requires the pending scientific and actual-delivery work; no commercial completion is claimed.
+
+## Historical preceding checkpoint (2026-10-11)
 
 Branch `refactor/method-v2` has source checkpoint `85441552924a12519c7bded87feee98c9006c0e1` pushed. The current phase4 change adds one grounded semantic-role instruction for descriptive joint evidence with no numerical comparisons; schemas, validators, original responses, budgets and scientific conditions are unchanged. Independent review `joint-semantic-role-prompt-clarification-independent-v1/report.md` closes13 facts; Root receipt `joint-semantic-role-prompt-clarification-v1/root-review-closure.json` (383a4e58) closes that review and the actual L2 review. Provider effect of the new instruction remains unverified. No test was weakened or skipped for this change.
 

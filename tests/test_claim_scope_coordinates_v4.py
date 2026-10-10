@@ -97,9 +97,13 @@ def test_native_first_and_third_bind_visible_body_metadata_in_context_without_ex
         modules.append(kwargs["module"])
         assert payload["context_id"] == m._digest({k: v for k, v in payload.items() if k != "context_id"})
         assert payload["visible_source_spans"] == m._visible_source_spans(payload)
-        for context in payload["scope_context"]:
+        from screening.claim_coverage_wire import unpack_scope_payload
+
+        expanded = unpack_scope_payload(payload)
+        for context in expanded["scope_context"]:
             for source in context["sources"]:
                 assert "block_local_whole_span" in source
+                assert source["block_id"] in payload["source_catalog"]
         if kwargs["module"] == "screening.claims.coverage":
             return review(payload, [])
         assert kwargs["module"] == "screening.claims.coverage_validation"

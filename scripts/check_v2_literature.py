@@ -199,9 +199,18 @@ class Cache:
         return self._get("metadata_lookups", "id", identifier)
 
     async def read_papers(self, *, items):
+        if len(items) != 1:
+            raise ValueError("Cached reader request differs")
+        rows = [row for row in self.audit["reads"] if row["id"] == items[0]["id"]]
+        if len(rows) != 1:
+            raise ValueError(f"Cache miss or ambiguous request: reads/{items[0]['id']}")
+        expected_question = rows[0].get(
+            "question", "Describe the mechanism, target setting, and evaluation protocol."
+        )
         if (
-            len(items) != 1
-            or items[0].get("question") != "Describe the mechanism, target setting, and evaluation protocol."
+            not isinstance(expected_question, str)
+            or not expected_question
+            or items[0].get("question") != expected_question
         ):
             raise ValueError("Cached reader request differs")
         return self._get("reads", "id", items[0]["id"])

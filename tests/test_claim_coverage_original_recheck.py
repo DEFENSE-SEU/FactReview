@@ -18,7 +18,10 @@ def offline(monkeypatch):
 
 def revalidated(p, *, groups=1, findings=(), state="resolved", link=False):
     raw = validation(p)
-    row = review(p, groups=groups, findings=findings, state=state)["claim_reviews"][0]
+    from screening.claim_coverage_wire import unpack_scope_payload
+
+    # Build the explicit historical semantic fixture before one current-wire conversion.
+    row = review(unpack_scope_payload(p), groups=groups, findings=findings, state=state)["claim_reviews"][0]
     raw.update(
         schema_version="claim-coverage-validation-v4"
         if "scope_context" in p
@@ -44,7 +47,9 @@ def revalidated(p, *, groups=1, findings=(), state="resolved", link=False):
                     "reason": "Independent mock identifies the exact same original assertion problem.",
                 }
             )
-    return raw
+    from tests.claim_scope_mock import current_wire
+
+    return current_wire(raw, p)
 
 
 def run(tmp_path, *, first_groups=1, first_findings=(), validate=None, budget=12, first_selected=None):
@@ -86,7 +91,11 @@ def test_clean_first_review_still_rechecks_and_new_qualifier_blocks(tmp_path):
     check = result.coverage["windows"][0]["original_recheck"]
     assert check["completed"] == 1 and len(check["findings"]) == 1
     assert check["findings"][0]["blocked_claim_ids"] == ["claim_001"]
-    assert audit["attempts"][1]["response"]["original_claim_reviews"][0]["findings"] == [QUALIFIER]
+    from screening.claim_coverage_wire import expand_scope_row
+
+    raw = audit["attempts"][1]["response"]
+    assert raw["schema_version"] == "claim-coverage-validation-v5"
+    assert expand_scope_row(raw["original_claim_reviews"][0])[0]["findings"] == [QUALIFIER]
     assert audit["original_claims"] == audit["result_claims"]
 
 
@@ -122,8 +131,8 @@ def test_invalid_or_conflicting_link_cannot_clear_pending(tmp_path, corrupt):
         elif corrupt == "closed_pointer":
             link["review_path"] = "/original_claim_reviews/0/preserved_qualifiers/0"
         elif corrupt == "kind":
-            raw["original_claim_reviews"][0]["findings"] = [QUALIFIER]
-            link["review_path"] = "/original_claim_reviews/0/findings/0"
+            raw["original_claim_reviews"][0] = review(p, findings=[QUALIFIER])["claim_reviews"][0]
+            link["review_path"] = "/original_claim_reviews/0/scope_atoms/0"
         elif corrupt == "duplicate":
             raw["observation_links"].append(copy.deepcopy(link))
         else:
