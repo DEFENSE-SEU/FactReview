@@ -125,7 +125,7 @@ def _statement_meaning(text, runtime, value, count):
     from verification.experiment_targets import _scalar_match
 
     normalized = text.strip().rstrip(".! ")
-    separators = list(re.finditer(r",\s*(computed\s+(?:as|by)|with|over)\s+", normalized, re.I))
+    separators = list(re.finditer(r",\s*(computed\s+(?:as|by)|where|with|over)\s+", normalized, re.I))
     pieces = [("scalar", normalized[: separators[0].start()] if separators else normalized)]
     pieces.extend(
         (
