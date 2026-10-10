@@ -37,6 +37,7 @@ def candidate(original):
 
 def test_candidate_real_refinement_preserves_legacy_and_original_judge(tmp_path, monkeypatch):
     plan, claim, materials, original = fixture(tmp_path)
+    original['analysis'].update(rank_selector=None, config_settings_selector={})
     wire = candidate(original)
     before = claim.model_dump(mode='json'), plan.model_dump(mode='json')
     calls = []
@@ -84,6 +85,7 @@ def test_exact_localization_snapshot_rejections_and_version_isolation(tmp_path, 
     from fact_generation.execution.partition_analysis_wire import freeze_sources, localize_candidate
     from fact_generation.execution.runtime_science import read_science_sources
     plan, claim, materials, original = fixture(tmp_path)  # noqa: RUF059
+    original['analysis'].update(rank_selector=None, config_settings_selector={})
     root = Path(materials.repository.root)
     files, _ = read_science_sources(plan, materials, root)
     paper = [{'id': b.id, 'text': b.text, 'loc': b.loc.model_dump(mode='json')} for b in materials.blocks]

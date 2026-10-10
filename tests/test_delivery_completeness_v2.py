@@ -12,8 +12,8 @@ from review.teaser.v2 import write_teaser
 from schemas.claim import Claim, Condition
 from schemas.limitations import VerificationLimitation
 from schemas.review import FinalReview
+from tests.test_pipeline_v2 import ModelBoundary, run_tiny
 from tests.test_pipeline_v2 import offline_boundaries as offline_boundaries
-from tests.test_pipeline_v2 import run_tiny
 from tests.test_pipeline_v2 import tiny_inputs as tiny_inputs
 from tests.test_report_advice_v2 import generate
 from tests.test_report_advice_v2 import review as advice_review
@@ -87,7 +87,17 @@ def test_post_revalidation_stale_advice_updates_all_text_artifacts(tmp_path, mon
 
 
 def test_pipeline_nested_partial_keeps_operational_stages_and_outputs_consistent(tiny_inputs, monkeypatch):
-    summary, _, _, _ = run_tiny(tiny_inputs, monkeypatch, render_pdf=False)
+    healthy = ModelBoundary()
+
+    def incomplete_first_review(**kwargs):
+        response = healthy(**kwargs)
+        if kwargs["module"] == "screening.claims.coverage":
+            # Exercise a real incomplete nested receipt while retaining its
+            # original context, sources and other claim-review records.
+            response["claim_reviews"] = response["claim_reviews"][:-1]
+        return response
+
+    summary, _, _, _ = run_tiny(tiny_inputs, monkeypatch, call=incomplete_first_review, render_pdf=False)
     assert set(summary["stages"].values()) == {"ok"}
     saved = json.loads(Path(summary["outputs"]["report_json"]).read_text("utf-8"))
     teaser = json.loads(Path(summary["outputs"]["teaser_json"]).read_text("utf-8"))

@@ -120,6 +120,9 @@ def test_stdout_launcher_is_readonly_closed_and_preserves_docker_arguments(tmp_p
     ):
         refusal = protect_observer_docker_argv(invalid, launch=launch)
         assert refusal["status"] == "unresolved" and refusal["argv"] == invalid
+    metric_leaf = workspace / "sub/metrics.json"
+    metric_original = b'{"preexisting": true}\n'
+    metric_leaf.write_bytes(metric_original)
     for index, changes in enumerate((
         {"metric_output": "metrics.json"}, {"entry_script": "other.py"}, {"source_sites": {"status": "unresolved"}},
         {"trusted_dir": workspace / "trusted"}, {"runtime_dir": workspace},
@@ -129,6 +132,10 @@ def test_stdout_launcher_is_readonly_closed_and_preserves_docker_arguments(tmp_p
         refused = prepare_observer_launch(command, **candidate)
         assert refused["status"] == "unresolved" and refused["unresolved"]
         assert not (Path(candidate["trusted_dir"]) / "observer.py").exists()
+        if index == 0:
+            assert refused["unresolved"] == [{"reason": "observer_output_path_not_fresh_json"}]
+            assert metric_leaf.read_bytes() == metric_original
+            assert not Path(candidate["trusted_dir"]).exists()
     assert prepare_observer_launch(["bash", "eval.py"], **dict(inputs, trusted_dir=tmp_path / "shell"))["status"] == "unresolved"
     assert prepare_observer_launch(["python", "-I", "eval.py"], **dict(inputs, trusted_dir=tmp_path / "flags"))["status"] == "unresolved"
     assert prepare_observer_launch(command, **inputs)["status"] == "unresolved"
