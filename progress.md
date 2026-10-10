@@ -18,6 +18,8 @@ Completed：整篇first/discovery请求schema现在明确required精确版本，
 
 Open issues：剩余17个回归含实际资源科学消费正例；完整canonical/native输出文件及全量rank-analysis支持正在按实际source、host重算、observer和独立语义合同实现，禁止mock qualified或删原raw来取得绿色。整篇召回/原子性/M2/M5、联合paper evidence、一般NN/多condition及当前完整公开入口报告交付继续开放。整体商业级完成尚无证据。
 
+Completed：发布rank完整MRR及protected canonical stdout第一阶段已实现并独审，三个产品文件和一个必要测试文件；两个必要控制通过。严格positive-int rank全行保留、全分母mean reciprocal rank、原config所有额外条件type-aware/SHA绑定，无paper值参与host测量。原source/资源/条件/完整六角色与metered semantic资格守卫保持，raw/mapping不回填，host数学fraction与未声明Observation.unit=None分列。绿后仅已认证entry全文/SHA附context的静态增量明确记录。范围限stdout，outfile仍需fresh单fileRW mount、真实host原bytes捕获与receipt闭合；不得从customrunner自报环境授予资格。相关报告partition-rank-analysis-implementation-v1/，原失败全留。Single正在用当前合同升级原正例；完整旧失败组尚未冻结关闭。
+
 Next action：关闭上述具体科学与接口失败，独立审核并提交授权分支；最终必要默认全套一次，再冻结当前源进行完整公开入口Materials→L1/VLM→四分支L2→非空真实L3→assessment/advice→JSON/MD/PDF/SVG验证。已有失败原件保持，不做无变化付费重跑。checks.md当前原14表第1项fail，另13项原窄合同保持；整体目标active。
 
 ## 历史整体框架 checkpoint（2026-10-11）
