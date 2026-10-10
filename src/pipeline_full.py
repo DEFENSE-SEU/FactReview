@@ -461,6 +461,10 @@ def parse_args() -> argparse.Namespace:
         help="Explicit original-review batch size (e.g. 3); each batch and final decision uses the existing validation call cap. Omit for the legacy single-request path.",
     )
     p.add_argument(
+        "--claim-coverage-first-batch-size", type=int, default=None,
+        help="Explicit first-review batch size (e.g. 3); discovery and every claim batch use the existing review call cap. Omit for the legacy first request.",
+    )
+    p.add_argument(
         "--training-budget",
         type=int,
         default=0,

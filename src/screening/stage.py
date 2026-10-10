@@ -57,6 +57,7 @@ def screen_paper(
     claim_coverage_followup_calls=12,
     claim_coverage_validation_calls=12,
     claim_coverage_original_batch_size=None,
+    claim_coverage_first_batch_size=None,
 ):
     # Failed extraction cannot become an apparently successful review with zero claims.
     result = ScreeningResult(claims=[], anonymity_policy=anonymity_policy)
@@ -82,6 +83,8 @@ def screen_paper(
                 max_validation_calls=claim_coverage_validation_calls,
                 **({"original_review_batch_size": claim_coverage_original_batch_size}
                    if claim_coverage_original_batch_size is not None else {}),
+                **({"first_review_batch_size": claim_coverage_first_batch_size}
+                   if claim_coverage_first_batch_size is not None else {}),
             )
             result.claims = coverage.claims
             result.claim_coverage = coverage_summary(coverage.coverage)
