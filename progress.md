@@ -1,6 +1,20 @@
 # FactReview v2 progress
 
-## 当前 Phase3：绑定全部原主张复审的返回契约（2026-10-11）
+## 当前 Phase5：quote-only 候选与确定性原文定位交付（2026-10-11）
+
+最近已交付7c6b43456a12e6cca3c6f4fe69feedf6dfdb4849，Phase3 receipt e8359730c372f13bc9d58ef0e994f767a4dcba2f15f8ddca0cb7cc54ed7661d9，push/exact remote一致。当前quote-only final-v3作者6559960a/607a7ced，独审5c2cdff08a1188bb80b803205120192c2f0187596edc1119d8b2407eabf4c747/d60e3b3d14c8751ff1f3660b1a3f1035fd26e93640419c07168cc594ae91bca2，24事实与232 before/after原件完整闭合；Root逐hash核全部232及four current/freeze、完整读设计、helper/schema/tests、最终v2接线和独审报告。Root检查receipt另记。
+
+旧science_proposal_schema canonical-v1字面保持，新candidate schema closed六角色。调用前实际供给source/paper id/text/loc冻结，lexical plain_path先resolve、完整indexed SHA、UTF8、64KiB每源/192KiB总量及六来源限额；返回后核完整同一snapshot。find(first+1)排重叠，source raw CRLF/CR仅投影LF，用codepoint边界表找回原raw slice；paper保持原block text。LLM仍决定角色/引文，程序只定位原文；定位science/alignment/support始终false。
+
+一次analysis pure helper审计原wire/digest，legacy/unknown/null先digest再严格版本拒绝canonical None，原science_proposal交原消费者，绝不修旧错span或fallback。仅localized candidate派生canonical替换；实际字段science_proposal_localization。原command、metric_output、nonnull mapping、完整分区/重复记录、全部条件/description/义务、source授权、receipt、raw observation空、严格usage、独立semantic和原judge均保持。仅提示scalar-only输出mapping null，不静默改响应。
+
+两必要外部全mock控制首红2/1.03s→首绿2/1.03s，首次无独立pre-red执行前hash文件，报告保留证据限度；不能把final新增断言文件当原red。原positive AST保留、负控11Assert保留至14；两次audit补齐只复相应负控1/1.89s、1/1.08s，positive/旧绿/实际服务不重复。原lint两失败、作者/独审工具分类误差原件保留，最终Ruff通过。177捕获旧root test字节同，Root另coverage原件191全已核保持。所有历史失败继续可查，真实角色/引文选择与科学资格尚未验证。
+
+Decisions/Next action：精确提交four source/test和checks/progress；Single按controller更新设计82eb876c/4179334b只在新ignored validation-v2草案作最小更新，完整旧fixture/claim/condition与2logical/2physical/100k主预算、1/1/2000readiness、600/60/30、auto/train0/repair0保持。未来最后HEAD/archive全成员动态数量/newmanifest/prepare/auth/admission单独核，真实observer部署与原wire→canonical→RunRequest闭合。Finite独审最终controller后Root才批准唯一新actual，旧a75d不改、不重用准入。
+
+Open issues仍为整体14验收7pass/6unresolved/1fail、真实科学资格/整篇recall与M2/M5、主动模型/复杂预处理/多condition、文献充分性/native exhaustion、OS/daemon/ledger/file-count/磁盘配额。最新六full-native失败保持，不宣称整体完成或commercial通过。聊天GPT-6.1-sol，FactReview GPT-5.5；goal active，授权refactor分支，不改main/不开PR。
+
+## 历史 7c6 Phase3：绑定全部原主张复审的返回契约
 
 最近已交付62a0878f9d6692a5b511c1d2e874bc8f43c4429d，命令诊断receipt8f03db8f17bb5eca45363dcd214119f8880b154a44659da0c9a1c47a165c0bcc且远端相同。当前只改claim_coverage.py及一个new mock control；显示schema把当前完整required数量、逐位置id/digest和context/window绑定，保留items/$defs与全部科学字段。原pack_scope→input digest→audit input→prompt顺序、source/carrier/semantic/adoption/legacy/预算不变，whole module窄还原AST同。
 
