@@ -1,6 +1,22 @@
 # FactReview v2 progress
 
-## 当前 Phase3 合同澄清与 Phase8 有界真实验证（2026-10-11）
+## 当前 Phase8 真实实验核验与整篇复审准备（2026-10-11）
+
+Phase3三个合同描述的源码及checks/progress已提交并推送，精确远端418dfe82c3ceadcca327fbbdff29303e11aec253；交付收据original-recheck-contract-clarification-implementation-v1/delivery.json保持。历史Phase0–8源码阶段记录保留，Phase8完整验收开放，当前14项仍为7pass/6unresolved/1fail。聊天模型已实核GPT-6.1-sol，产品调用保持openai-codex/GPT-5.5。
+
+新的原claim008真实public verify_experiments调用使用完整原claim/materials、call=None/scope_call=None/repair0、fixed7007完整215源。新v2公开科学审计控制器与prepared独审分别通过26和19项有限核证；Root读完整报告并核对80控制原件、48准备原件及215源。prepared80f30778/manifestf598fc2e经唯一离线准备和预检后，建立新的10fb1e81授权及913ad827消费标记，原v1与其他actual保持。
+
+actual51391c21494f/supervised68fa4608196d在109.297s返回terminal_measured/rc0：main2logical/2physical/50068known、readiness171独立，共50239known，0retry/unknown/blocked；货币费用未知。15项机械核证成立，完整公开first-pass与scope实际请求/响应已保存。模型第一轮选择原结构候选；第二轮完整返回19个不同义务，18confirmed、sample_scope一项unresolved，总decision/classification unresolved。原消费者拒绝计划：0plans、5条sufficient=false论文证据、0L3。五个论文item/condition pair均实际返回；joint metric_definition缺少数值/桥consumer导致其中一对失去资格，随后报验证后的pair覆盖错误，两个原始错误保留。Root actual-inspection4045d07c核215运行源/31目录、protected/controller/metadata和scope输入/响应相等；独审9edfe068/b4f21a1b关闭22facts及280原件前后身份，Root3cfbd31b逐一复核280当前SHA/size。机械返回与科学计划资格分别记录；joint错误没有取消一个已经healthy的choice，当前choice独立因unresolved拒绝。
+
+因果诊断指向sample atom固定population=fixed_released_predictions/all_records=True，绑定source集仅有论文four fixed test predictions；公开实现和distributed predictions的另一个段落没有被自动授权为该condition来源。程序recipe检查完整4行发布资源；论文样本语义与发布资源测量需要明确职责并补足真实来源。保留全部19语义审核、wholeclaim/原conditions/source/snapshot及unresolved拒绝；禁止自动加covered、补确认或修改原科学输入。先设计通用最小修复，再做一项必要mock；本checkpoint未执行测试或重复真实样本。
+
+整篇六窗新控制器wholepaper-original-batching-native-validation-v1已冻结：source418/完整215源，原73主张、244parsed/284review块与66空默认身份桥保持。真实public参数review6/followup6/validation48/batch3；main60/60每logical一次physical、soft3Mknown，readiness1/1/2000独立、wall7200。初始29/23/15/8/0/0共75义务保持，后窗动态registry与新增义务由原消费者决定；first-pass、followup、original review、decision和pending分别保存。作者report44267a71/evidence3025bef1、16冻件/16静态facts，Root41648739核完整source map、source增量及9个保留核心AST。shared identity b008与local重序列化b59对象相同、各自完整SHA分别绑定；协调消息误指已独立勘误。当前等待独审，尚未prepare/auth/live。
+
+初轮缺行合同诊断另有明确边界：_REVIEW_SYSTEM_V5已有everyrequired指令，实际OUTPUT_SCHEMA首轮未绑定长度/按位身份；缺少schema元数据不是已证实充分根因。Finite受限实现首轮claim_reviews与实际required_claim_checks的min/max、ordered ID/digest与context/window const；保留科学schema/原消费者/所有partial拒绝。一项新public mock做同完整bytes红→绿；旧测试一个metadata断言原来要求首轮const absent，将精准升级为actual payload const相等并只复该受影响函数，原科学断言保留。sample修改暂留已交设计358ca8d5；整篇418稿paid暂缓，后续必须新源身份，旧冻结原件保持。
+
+Open issues：科学召回/原子性与M2/M5、上述sample-scope来源职责、论文联合证据numerical consumer、L2有效计划到L3、主动NN/复杂预处理/多condition、全报告质量、OS/daemon/容量及旧六native严格delivery失败。下一步：首轮合同补齐/必要验证及源码独审→提交新源；整篇控制器独审后用新源建立唯一准备/预检/授权→真实整篇复审；并行推进sample职责最小设计。本Phase8仅checks/progress交付，精确Git/remote/文件身份另见claim008-public-experiments-native-root-v2/delivery.json。goal active，不暂停、不提前complete、不改main或新建PR。
+
+## 历史 Phase3 合同澄清与 Phase8 有界真实验证（2026-10-11）
 
 此前batch交付refactor/method-v2精确源与远端7007b1b9624727d2bb99154110311e8a02b60259，九路径收据original-recheck-batching-root-v1/delivery.json保持。历史Phase0–8源码阶段记录保留，Phase8全框架验收开放；14项为7pass/6unresolved/1fail。上一目标轮取得新的真实终态及因果证据，属于progress；当前继续修合同及第二层到执行层。
 
