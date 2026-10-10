@@ -733,6 +733,10 @@ async def verify_literature(
             "service_failure", "search_protocol_failure", "metadata_protocol_failure",
             "reader_protocol_failure", "comparison_protocol_failure", "identity_conflict",
         }
+        unbound_failure = claim is not None and not ids and limited and category in {
+            "service_failure", "search_protocol_failure", "metadata_protocol_failure",
+            "reader_protocol_failure", "comparison_protocol_failure", "identity_conflict",
+        }
         event = {
             "operation": operation,
             "identifier": identifier,
@@ -741,12 +745,13 @@ async def verify_literature(
             "condition_ids": ids,
             "error": str(error),
             "pointer": f"{path}#/{pointer}",
-            "system_limited": bool(limited and ids) or global_failure,
+            "system_limited": bool(limited and ids) or global_failure or unbound_failure,
         }
         audit["context_events"].append(event)
-        if global_failure:
+        if global_failure or unbound_failure:
             result.delivery_checks.append(DeliveryCheck(
-                stage="verification", component="global_literature." + operation, state="failed",
+                stage="verification", component=("global_literature." if global_failure else "literature.") + operation,
+                state="failed", claim_id=claim.id if claim else None,
                 reason=diagnostic_copy(
                     f"{operation} ({category}) for {identifier or 'submitted comparison'}, "
                     f"provider={provider}: {error}. Audit: {event['pointer']}"

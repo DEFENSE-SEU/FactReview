@@ -35,8 +35,14 @@ async def _invoke(branch, claim, materials):
 
 
 def _validate_result(claim: Claim, name: EvidenceNeed, result: BranchResult):
-    if result.delivery_checks:
-        raise ValueError("Claim branches use scoped verification limitations, not global delivery checks")
+    if any(
+        name != EvidenceNeed.LITERATURE or check.stage != "verification" or check.claim_id != claim.id
+        or check.state != "failed" or check.responsibility != "system" or check.component not in {
+            "literature.search", "literature.lookup_metadata", "literature.read_papers", "literature.comparison",
+        }
+        for check in result.delivery_checks
+    ):
+        raise ValueError("Claim operation failures require their enclosing Literature/verification scope")
     if name != EvidenceNeed.EXPERIMENTS and result.plans:
         raise ValueError("Only Experiments may emit execution plans")
     if name != EvidenceNeed.THEORY and result.theory_derivations:
@@ -180,6 +186,7 @@ async def verify_claims(
         claim.verification_limitations.extend(output.verification_limitations)
         result.plans.extend(output.plans)
         result.findings.extend(output.findings)
+        result.delivery_checks.extend(output.delivery_checks)
         result.issues.extend(f"{claim.id}: {issue}" for issue in output.issues)
     if global_literature is not None:
         try:
@@ -193,7 +200,7 @@ async def verify_claims(
             ):
                 raise ValueError("Global literature produces findings/issues only")
             if any(
-                check.stage != "verification" or check.claim_id is not None
+                check.stage != "verification" or check.claim_id is not None or check.responsibility != "system"
                 or check.component not in {
                     "global_literature", "global_literature.search", "global_literature.lookup_metadata",
                     "global_literature.read_papers", "global_literature.comparison",

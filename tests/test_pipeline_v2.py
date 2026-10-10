@@ -22,6 +22,7 @@ from common import run_stats
 from fact_generation.execution.v2 import Observation, RunOutcome
 from llm.client import LLMConfig
 from preprocessing.parse.mineru_adapter import MineruParseResult
+from tests.literature_scope_fixtures import native_response, scientific_response
 from verification import literature
 
 ASPECTS = ["correspondence", "fairness", "isolation", "stability", "consistency"]
@@ -186,9 +187,7 @@ class ModelBoundary:
             return {"findings": []}
         if module == "verification_literature":
             data = json.loads(kwargs["prompt"].split("\nDATA_JSON:\n", 1)[1])
-            return {
-                "status": "ok",
-                "comparisons": [
+            return scientific_response(data, [
                     {
                         "paper_id": "2001.00001",
                         "purpose": "novelty",
@@ -201,8 +200,7 @@ class ModelBoundary:
                         "protocol": "Query latency versus predictive accuracy.",
                         "note": "Fixture distinct mechanism.",
                     }
-                ],
-            }
+                ])
         data = json.loads(kwargs["prompt"])
         blocks = data.get("paper_blocks", data.get("main_text", []))
         block = next(b for b in blocks if "A test MRR" in b["text"])
@@ -343,7 +341,7 @@ class RetrievalBoundary:
 
     async def search(self, *, query, cutoff_date):
         self.queries.append((query, cutoff_date.to_string()))
-        return {"success": True, "provider": "fixture", "complete": True, "papers": [self.paper], "count": 1}
+        return {**native_response(query, [self.paper], cutoff_date), "complete": True}
 
     async def read_papers(self, *, items):
         assert items[0]["id"] == self.paper["id"]
