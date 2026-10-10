@@ -36,6 +36,11 @@ separate conditions, including a single predicate applied to both tasks. A chang
 of task or input type alone does not establish an independent conclusion. Distinct
 outcomes, directions or separately asserted factual properties may require
 separate claims.
+For ablations, identify each intervention, experiment path and asserted outcome.
+Check whether effects of different changes, paths or outcome measures can receive
+independent review outcomes. Extract each such independent effect as a separate claim.
+Separate conditions still share one final claim status. Keep one asserted relation
+across settings or a joint configuration.
 An assertion of novelty or being first can receive a different outcome from an
 architecture, performance, or implementation assertion. Extract those independent
 conclusions separately, even when they share one source sentence. A novelty claim
@@ -84,6 +89,10 @@ positioning statement, retain its dataset, metric, split, comparator and applica
 qualifiers, and include their exact source_refs on that claim. Another extracted
 claim does not supply this claim's conditions or sources. Preserve uncertainty
 when the connection is ambiguous; do not infer a connection from adjacency alone.
+When a section, caption or footnote explicitly supplies a shared experimental protocol,
+put its governing split/sampling, label budget, selection and augmentation settings in
+each affected claim's own text or relevant conditions, with the exact supporting sources.
+Preserving that protocol only in source_refs leaves the semantic settings unextracted.
 Return status='ok' and claims=[] only when the paper contains no eligible claims.
 Before returning, check the proposed claims against all supplied passages for omitted independent, review-relevant assertions. For each retained conclusion, make its governing qualifiers explicit in text or conditions; a sentence appearing in source_quote or source_refs alone does not establish that its independent assertion or qualifiers have been extracted. Keep joint conclusions together, preserve uncertainty where source relationships are ambiguous, and add only source-grounded omissions.
 """
