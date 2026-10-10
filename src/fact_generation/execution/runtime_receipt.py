@@ -171,7 +171,8 @@ def read_observer_receipt(request, outcome):
             _check(_file_sha(root / relative) == resource["sha256"] == manifest.get(relative), "selected_resource_changed")
         output = _path(audit["audit_output"])
         relative_output = output.relative_to(scratch).as_posix()
-        _check(re.fullmatch(f"observer_attempt_{req['repair_round']}_[a-f0-9]{{32}}/events.json", relative_output), "unknown_producer_output_path")
+        _check(re.fullmatch(f"(?:observer_attempt_{req['repair_round']}_|o{req['repair_round']}_)[a-f0-9]{{32}}/events.json",
+                           relative_output), "unknown_producer_output_path")
         expected_config = {"entry": command[1], "args": command[2:], "cwd": cwd, "sites": runtime_sites,
                            "output": "/workspace/run_dir/" + relative_output}
         _check(_same(config, expected_config) and audit["container_cwd"] == cwd

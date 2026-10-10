@@ -2,9 +2,9 @@
 
 ## 当前回归修复与真实执行 checkpoint（2026-10-11）
 
-Task：继续完整三层框架，目标active；Phase0–7历史实现保留，Phase8整体验收未完成。授权分支`refactor/method-v2`源码checkpoint1ef0ad1ec47f9debd4fab0eb78605b4b534a750f已推送。当前兼容夹具与真实接口缺陷修复按阶段继续提交，完整目标未暂停。
+Task：继续完整三层框架，目标active；Phase0–7历史实现保留，Phase8整体验收未完成。授权分支`refactor/method-v2`源码checkpoint7bd4a47c79682dadc97d440418ad01d455541f42已推送并核精确远端。当前兼容夹具与真实接口缺陷修复按阶段继续提交，完整目标未暂停。
 
-Completed：原默认pytest唯一全套结果56failed/3687passed/3原deselected/0skipped，310.59s，原414源码/测试身份在运行前后相同。必要修复已关闭全部56原失败：coverage/report/SDK18、arxiv/literature10、pipeline/visual7、资源identity/path4、执行/framework/共享科学正例17；最终默认全套尚未重跑。科学夹具迁移保留462原Assert中的460项；两项明确迁移为严格protected mount合同、完整作者发布数据反证从Questioned加强为Flawed，新增4项强反证与2项完整多指标保留断言。没有修改markers、跳过或降级科学正例；旧失败均保留。
+Completed：此前默认pytest结果56failed/3687passed/3原deselected/0skipped，310.59s，原414源码/测试身份在运行前后相同。必要局部修复关闭该56原失败：coverage/report/SDK18、arxiv/literature10、pipeline/visual7、资源identity/path4、执行/framework/共享科学正例17；随后默认全套新终态记录如下。科学夹具迁移保留462原Assert中的460项；两项明确迁移为严格protected mount合同、完整作者发布数据反证从Questioned加强为Flawed，新增4项强反证与2项完整多指标保留断言。没有修改markers、跳过或降级科学正例；旧失败均保留。
 
 Completed：原L2计划进入默认execute_plans实际L3，actual0b197a433cb3/supervised9599deeba3da，13.532s/rc0；真实2次image inspect和1次author Docker run，固定image ID，原python -I -S scripts/evaluate.py完整命令，auto/train0/该验证repair0。完整4行发布预测由host重算3/4=.75，原条件aligned/consistent，生成1条execution support Evidence。原5条不足paper evidence与claim unverified保持，未重放assessment。独审22事实闭合；Root读完整host measurement。范围限发布预测全量测量，没有一般NN推理、训练、动态消费或商业完成证明。
 
@@ -16,7 +16,11 @@ Outputs：原56失败与各组日志位于final-default-regression-independent-v
 
 Completed：整篇first/discovery请求schema现在明确required精确版本，两个必要完整公开请求控制通过（.86s），原consumer与历史raw不变。原judge的raw/qualified-derived双候选歧义也已修复：恰一正式科学qualified derived作为权威，raw完整保留；同条件value/unit/variance矛盾明确拒绝，多个候选仍拒绝，projection-v2与缺科学证明保护保持。新增四必要控制4pass/4.55s，原完整source-science控制1pass/1.93s；独审修正一处新测试插入位置后确认所有原函数AST完全保持。真实新源模型效果待验证。
 
-Open issues：最终必要默认全套仍待运行。完整canonical/native输出文件与rank-analysis按实际source、host重算、observer和独立语义合同实现，所有原资格守卫保持。整篇召回/原子性/M2/M5、联合paper evidence、一般NN/多condition及当前完整公开入口报告交付继续开放。整体商业级完成尚无证据。
+Current default regression：固定7bd4a47唯一全套已终态12failed/3741passed/3原deselected/0errors/0skipped，pytest596.71s、wrapper599.782s；418源码/测试运行前后身份全同。原56失败的局部修复记录保留，本次新结果表明全套尚未通过。六framework失败联动于一个Windows长路径observer目录创建失败；两wire旧fixture缺新增默认字段、一launcher旧负例现为合法fresh文件、三shared pipeline/delivery夹具的真实输入合同正在修复。报告final-default-regression-after-repairs-v1/report.md及完整JUnit/log保留；只复必要失败节点。完整公开入口source7bd控制器静态独审已通过，prepare_enabled=false，0实际服务准入。
+
+Phase5 path repair：生产observer保留完整32hex nonce；正常槽超过Win32目录/文件UTF16容量时改紧凑槽，仍超则在任何package/placeholder创建前明确observer_path_capacity_exceeded。receipt仅增加严格紧凑格式，完整seal/config/source/resource/actual argv/host及科学资格守卫保持。必要新guard红1/.19s；首次绿阶段发现fixture write_text的CRLF字节差异，保该记录并改write_bytes，原所有断言保持后1pass/.11s。独审无必要阻断；没有缩framework根目录。原framework6+真实缺一首轮review的nestedpartial1同次7pass；另config2仍失败，其试加raw command不属普通L2合同，将撤销并仅为config测试供给明确完整launch输入。另wire2和launcher1全部旧断言保留后3pass，当前12中10已关闭。
+
+Open issues：关闭本次12默认回归失败；Windows路径容量须修生产行为，不能仅缩测试根路径。完整canonical/native输出文件与rank-analysis按实际source、host重算、observer和独立语义合同实现，所有原资格守卫保持。整篇召回/原子性/M2/M5、联合paper evidence、一般NN/多condition及当前完整公开入口报告交付继续开放。整体商业级完成尚无证据。
 
 Completed：发布rank完整MRR及protected canonical stdout第一阶段已实现并独审，三个产品文件和一个必要测试文件；两个必要控制通过。严格positive-int rank全行保留、全分母mean reciprocal rank、原config所有额外条件type-aware/SHA绑定，无paper值参与host测量。原source/资源/条件/完整六角色与metered semantic资格守卫保持，raw/mapping不回填，host数学fraction与未声明Observation.unit=None分列。绿后仅已认证entry全文/SHA附context的静态增量明确记录。相关报告partition-rank-analysis-implementation-v1/，原失败全留。
 
@@ -24,7 +28,7 @@ Completed：fresh JSON outfile producer已冻结并通过独审。原工作树/s
 
 Delivery：Phase5 producer源码已提交2c478aa，Phase8科学fixtures最终冻结并获独审。17原失败与1新增file-repair控制均通过；原source/target/resource、raw全指标、observer receipt、host measurement、metered semantic资格与judge均实际走生产路径，外部边界全mock。新增guard保留失败stderr/退出值、原scratch残片、空占位删除、全新重试container/capture与最终aligned/sufficient evidence。独审regression-science-outputfile-independent-v1/report.md；完整实际公开入口新控制器在准备阶段，source pending时禁止实际运行，尚无新模型/HTTP/Docker准入。
 
-Next action：关闭上述具体科学与接口失败，独立审核并提交授权分支；最终必要默认全套一次，再冻结当前源进行完整公开入口Materials→L1/VLM→四分支L2→非空真实L3→assessment/advice→JSON/MD/PDF/SVG验证。已有失败原件保持，不做无变化付费重跑。checks.md当前原14表第1项fail，另13项原窄合同保持；整体目标active。
+Next action：关闭当前12具体失败，独立审核并提交授权分支，再冻结当前源进行完整公开入口Materials→L1/VLM→四分支L2→非空真实L3→assessment/advice→JSON/MD/PDF/SVG验证。默认全套终态记录保留；已有失败原件保持，不做无变化付费重跑。checks.md当前原14表第1项fail，另13项原窄合同保持；整体目标active。
 
 ## 历史整体框架 checkpoint（2026-10-11）
 
