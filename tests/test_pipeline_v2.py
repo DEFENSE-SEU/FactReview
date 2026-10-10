@@ -124,6 +124,11 @@ class ModelBoundary:
     def __call__(self, **kwargs):
         module = kwargs["module"]
         self.calls.append(module)
+        if module == "verification.literature.planning":
+            from tests.test_literature_literal_concepts_v2 import planning_response
+            data = json.loads(kwargs["prompt"].split("\nCONCEPT_DATA_JSON:\n", 1)[1])
+            return planning_response(data, {"mechanism": "graph neural network", "target setting": "link prediction",
+                                            "evaluation protocol baseline": "inductive"})
         if module == "report_generation":
             data = json.loads(kwargs["prompt"].split("\nADVICE_DATA_JSON:\n", 1)[1])
             claim = data["claim"]

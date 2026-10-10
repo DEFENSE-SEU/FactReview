@@ -7,7 +7,7 @@ import json
 import re
 from copy import deepcopy
 
-from fact_generation.positioning.structured_query import StructuredPaperQuery
+from fact_generation.positioning.structured_query import parse_structured_query
 from verification.literature_search_plan import condition_eligible, plan_closed
 
 _PROVIDERS = {"arxiv": "arxiv_fallback", "openalex": "openalex", "semantic_scholar": "semantic_scholar"}
@@ -160,7 +160,7 @@ def build_search_scope(*, claim, queries, intents, query_records, cutoff, concur
                      and plan_closed(grounded_plan))
         for index, row in enumerate(rows):
             try:
-                query = StructuredPaperQuery.model_validate(grounded_plan["queries"][index])
+                query = parse_structured_query(grounded_plan["queries"][index])
                 observed = row["observed"]
                 expected = query.compile(start=0, limit=1)
                 valid = (row["query"] == expected.expression and row["intent"] == query.intent

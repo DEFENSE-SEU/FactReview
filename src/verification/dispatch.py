@@ -38,7 +38,7 @@ def _validate_result(claim: Claim, name: EvidenceNeed, result: BranchResult):
     if any(
         name != EvidenceNeed.LITERATURE or check.stage != "verification" or check.claim_id != claim.id
         or check.state != "failed" or check.responsibility != "system" or check.component not in {
-            "literature.search", "literature.lookup_metadata", "literature.read_papers", "literature.comparison",
+            "literature.search", "literature.lookup_metadata", "literature.read_papers", "literature.comparison", "literature.planning",
         }
         for check in result.delivery_checks
     ):
@@ -83,6 +83,7 @@ async def verify_claims(
         from verification.code import verify_code
         from verification.experiments import verify_experiments
         from verification.literature import _claim_source_excerpts, verify_literature
+        from verification.literature_search_concepts import plan_concepts
         from verification.theory import verify_theory
 
         global_targets = []
@@ -96,7 +97,15 @@ async def verify_claims(
                 # Preserve a visible unavailable target without borrowing another claim's source.
                 global_targets.append({"claim_id": original.id})
 
+        # Start one shared task without awaiting it here: other peer branches progress.
+        concept_future = asyncio.create_task(plan_concepts(
+            claims, materials, global_targets if global_literature is None else [],
+            call=call, output_dir=output_dir, blocked_claim_ids=blocked,
+        ))
+
         async def literature(claim, materials):
+            from verification.literature import _novelty_condition_ids
+            catalog = await concept_future if claim is None or _novelty_condition_ids(claim) else None
             return await verify_literature(
                 claim,
                 materials,
@@ -105,7 +114,8 @@ async def verify_claims(
                 output_dir=output_dir,
                 manuscript_targets=global_targets if claim is None else None,
                 expand_uncited=False,
-                search_policy="grounded",
+                search_policy="literal",
+                concept_catalog=catalog,
             )
 
         branches = {
@@ -205,7 +215,7 @@ async def verify_claims(
                 check.stage != "verification" or check.claim_id is not None or check.responsibility != "system"
                 or check.component not in {
                     "global_literature", "global_literature.search", "global_literature.lookup_metadata",
-                    "global_literature.read_papers", "global_literature.comparison",
+                    "global_literature.read_papers", "global_literature.comparison", "global_literature.planning",
                 }
                 for check in global_result.delivery_checks
             ):

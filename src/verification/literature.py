@@ -12,7 +12,7 @@ from typing import Any
 from urllib.parse import unquote, urlsplit
 
 from fact_generation.positioning.paper_search import PaperReadConfig, PaperSearchAdapter, PaperSearchConfig
-from fact_generation.positioning.structured_query import StructuredPaperQuery
+from fact_generation.positioning.structured_query import parse_structured_query
 from llm.client import LLMConfig, llm_json, resolve_llm_config
 from schemas.claim import AuthorQuestion, Claim, Evidence, EvidencePointer, Finding
 from schemas.limitations import VerificationLimitation
@@ -28,6 +28,7 @@ from verification.contracts import BranchResult
 from verification.literature_omissions import OmissionContext
 from verification.literature_search_plan import (
     build_grounded_plan,
+    build_literal_plan,
     condition_eligible,
     free_text_queries,
     query_strings,
@@ -689,6 +690,7 @@ async def verify_literature(
     manuscript_targets: list[dict[str, Any]] | None = None,
     expand_uncited: bool = True,
     search_policy: str = "legacy",
+    concept_catalog: dict | None = None,
 ) -> BranchResult:
     """Check one claim, or collect global uncited-neighbor findings with claim=None.
 
@@ -698,7 +700,7 @@ async def verify_literature(
     Direct callers retain legacy uncited expansion. The v2 dispatcher disables
     that expansion for claims without novelty; global/novelty searches remain active.
     """
-    if search_policy not in {"legacy", "grounded"}:
+    if search_policy not in {"legacy", "grounded", "literal"}:
         raise ValueError("Unknown literature search policy")
     result = BranchResult()
     directory = output_dir or Path(materials.markdown_path).parent / "verification" / "literature"
@@ -735,9 +737,9 @@ async def verify_literature(
     queries = [f"{' '.join(query_terms)} {intent}" for intent in _QUERY_INTENTS] if search_requested and query_terms else []
     purpose = ("global_omission" if claim is None else "claim_novelty" if novelty_ids
                else "compat_uncited" if expand_uncited else "citation_only")
-    if search_requested and not queries:
+    if search_policy != "literal" and search_requested and not queries:
         result.issues.append("Literature search scope inadequate: no recognized technical domain terms.")
-    if claim is None and not queries:
+    if search_policy != "literal" and claim is None and not queries:
         result.delivery_checks.append(DeliveryCheck(
             stage="verification", component="global_literature.search", state="unavailable",
             reason=("Requested global literature search has no reliable title/abstract or verified "
@@ -752,8 +754,20 @@ async def verify_literature(
     structured_capable = None
     transport = "legacy_global_seed" if claim is None else "legacy"
     query_intents = list(_QUERY_INTENTS) if queries else []
-    if search_policy == "grounded" and claim is not None and novelty_ids:
-        grounded_plan = build_grounded_plan(claim, materials, novelty_ids=novelty_ids)
+    if ((search_policy == "grounded" and claim is not None and novelty_ids)
+        or (search_policy == "literal" and (claim is None or novelty_ids))):
+        if search_policy == "literal":
+            from verification.literature_search_concepts import plan_concepts
+            if concept_catalog is None:
+                concept_catalog = await plan_concepts([claim] if claim else [], materials, manuscript_targets or [],
+                                                      call=call, output_dir=directory)
+            grounded_plan = build_literal_plan(claim, materials, concept_catalog, manuscript_targets=manuscript_targets)
+            if claim is None:
+                global_target_scope = {"policy": "literal_source_targets_v1", "targets": grounded_plan["conditions"],
+                                       "unavailable": concept_catalog["request"]["unavailable_targets"],
+                                       "limitations": ["Only supplied verified manuscript targets; remaining paper body not declared planned."]}
+        else:
+            grounded_plan = build_grounded_plan(claim, materials, novelty_ids=novelty_ids)
         provider = str(getattr(getattr(searcher, "search_cfg", None), "provider", "")).strip().lower().replace("-", "_")
         structured_capable = provider == "arxiv" and callable(getattr(searcher, "search_structured", None))
         transport = "structured_arxiv" if structured_capable else "degraded_legacy"
@@ -764,6 +778,13 @@ async def verify_literature(
             result.issues.append("Grounded structured query capability unavailable; safe legacy candidates remain usable, absence scope insufficient.")
         if any(not condition_eligible(grounded_plan, cid) for cid in novelty_ids):
             result.issues.append("Grounded query roles are partial, unknown or truncated; ineligible conditions cannot use search absence.")
+        if not queries:
+            result.issues.append("Literal search has no validated compilable scientific concepts; requested scope remains partial.")
+            if claim is None:
+                result.delivery_checks.append(DeliveryCheck(
+                    stage="verification", component="global_literature.search", state="unavailable",
+                    reason=f"Requested global search has no source-bound compilable concepts. Audit: {path}#/global_target_scope",
+                ))
     diagnostic_configs = []
     for boundary in (searcher, reader):
         for name in ("search_cfg", "read_cfg"):
@@ -814,7 +835,8 @@ async def verify_literature(
         "source_excerpts": source_excerpts,
         "source_refs": [ref.model_dump(mode="json") for ref in claim.source_refs] if claim else [],
         "source_available": source_available,
-        "query_policy": "grounded_source_concepts_v1" if grounded_plan is not None else "closed_technical_vocabulary",
+        "query_policy": ("literal_source_concepts_v2" if search_policy == "literal" and grounded_plan is not None
+                         else "grounded_source_concepts_v1" if grounded_plan is not None else "closed_technical_vocabulary"),
         "query_terms": query_terms,
         "retrieval_routing": {"purpose": purpose, "expand_uncited": expand_uncited,
                               "search_requested": search_requested, "transport": transport, "policy": search_policy,
@@ -828,6 +850,7 @@ async def verify_literature(
         "manuscript_targets": omission_context.payload(),
         "omission_target_unavailable": omission_context.unavailable,
         "omission_decisions": omission_context.decisions,
+        "concept_catalog": concept_catalog.get("audit", {"digest": concept_catalog["digest"]}) if concept_catalog else None,
     }
 
     def context_event(
@@ -857,11 +880,11 @@ async def verify_literature(
         provider = provider if isinstance(provider, str) and provider else "unknown"
         global_failure = claim is None and limited and category in {
             "service_failure", "search_protocol_failure", "metadata_protocol_failure",
-            "reader_protocol_failure", "comparison_protocol_failure", "identity_conflict",
+            "reader_protocol_failure", "comparison_protocol_failure", "identity_conflict", "planning_protocol_failure",
         }
         unbound_failure = claim is not None and not ids and limited and category in {
             "service_failure", "search_protocol_failure", "metadata_protocol_failure",
-            "reader_protocol_failure", "comparison_protocol_failure", "identity_conflict",
+            "reader_protocol_failure", "comparison_protocol_failure", "identity_conflict", "planning_protocol_failure",
         }
         event = {
             "operation": operation,
@@ -895,6 +918,19 @@ async def verify_literature(
             )
 
     unresolved_citation_ids = set()
+    if concept_catalog is not None and grounded_plan is not None:
+        units = {u["unit_id"]: u for u in concept_catalog["request"]["units"]}
+        for failure in concept_catalog["failures"]:
+            affected = [units[uid] for uid in failure["unit_ids"] if uid in units and
+                        (units[uid].get("claim_id") == claim.id if claim else units[uid]["purpose"] == "global_omission")]
+            if affected:
+                context_event("planning", "source_concepts", failure["category"],
+                              [u["condition"]["id"] for u in affected] if claim else [],
+                              "Source concept planning could not deliver its requested bound protocol", "concept_catalog",
+                              limited=True)
+        if grounded_plan["source_errors"] and not concept_catalog["failures"]:
+            context_event("planning", "source_concepts", "identity_conflict", novelty_ids,
+                          "Concept catalog/source identity changed or is invalid", "concept_catalog", limited=True)
     self_exclusion_available = bool(
         _title_tokens(materials.title) or len(" ".join(materials.abstract.split())) >= 80
     )
@@ -908,9 +944,16 @@ async def verify_literature(
     adequate = len(queries) == 3 and self_exclusion_available and source_available and not citation_issues
     for query_index, query in enumerate(queries):
         failure_category = None
+        if search_policy == "literal":
+            from verification.literature_search_concepts import catalog_current
+            if not catalog_current(concept_catalog, claim, materials, manuscript_targets):
+                context_event("planning", "source_concepts", "identity_conflict", novelty_ids,
+                              "Source/catalog identity changed before query admission", "concept_catalog", limited=True)
+                adequate = False
+                break
         try:
             if transport == "structured_arxiv":
-                typed_query = StructuredPaperQuery.model_validate(grounded_plan["queries"][query_index])
+                typed_query = parse_structured_query(grounded_plan["queries"][query_index])
                 response = await _invoke(searcher.search_structured, query=typed_query, cutoff_date=deadline)
             else:
                 response = await _invoke(getattr(searcher, "search", searcher), query=query, cutoff_date=deadline)
@@ -1330,7 +1373,9 @@ async def verify_literature(
         excluded=diagnostic_copy(audit["excluded"]), reads=diagnostic_copy(audit["reads"]), novelty_ids=novelty_ids,
         public_copy=diagnostic_copy,
         grounded_plan=grounded_plan, transport=transport,
-        plan_unchanged=(grounded_plan is None or build_grounded_plan(claim, materials, novelty_ids=novelty_ids)["digest"] == grounded_plan["digest"]),
+        plan_unchanged=(grounded_plan is None or (
+            build_literal_plan(claim, materials, concept_catalog, manuscript_targets=manuscript_targets)["digest"] == grounded_plan["digest"]
+            if search_policy == "literal" else build_grounded_plan(claim, materials, novelty_ids=novelty_ids)["digest"] == grounded_plan["digest"])),
     )
     audit["scientific_search_scope"] = search_scope
     for query_row in search_scope["queries"]:

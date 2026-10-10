@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import unicodedata
 from dataclasses import dataclass
 from typing import Literal
 from urllib.parse import urlencode
@@ -153,3 +154,66 @@ class StructuredPaperQuery(BaseModel):
             "https://export.arxiv.org/api/query?" + urlencode(params),
             digest(query.model_dump(mode="json")),
         )
+
+
+class LiteralQueryTerm(BaseModel):
+    """A source-validated literal; no raw expression or domain family vocabulary."""
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    concept_id: str = Field(min_length=1)
+    phrase: str = Field(min_length=1)
+    role: Literal["mechanism", "target setting", "evaluation protocol baseline"]
+    source_concept_ids: list[str]
+
+    @model_validator(mode="after")
+    def safe_literal(self):
+        if (not self.source_concept_ids or self.concept_id not in self.source_concept_ids
+            or len(set(self.source_concept_ids)) != len(self.source_concept_ids)
+            or self.phrase != self.phrase.strip() or not self.phrase.strip()
+            or any(not (unicodedata.category(c)[0] in "LMN" or c in " -'_\u2010\u2011\u2012\u2013\u2212") for c in self.phrase)
+            or re.search(r"\b(?:and|or|andnot)\b", self.phrase, re.I)):
+            raise ValueError("Unsafe or unresolved literal/source references")
+        return self
+
+
+class StructuredLiteralQuery(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    version: Literal["structured-arxiv-literal-query-v2"] = "structured-arxiv-literal-query-v2"
+    query_id: str = Field(pattern=r"^q[1-3]$")
+    intent: Literal["mechanism", "target setting", "evaluation protocol baseline"]
+    scope_kind: Literal["claim", "global"]
+    condition_ids: list[str]
+    target_ids: list[str]
+    groups: list[list[LiteralQueryTerm]]
+    participation: dict[str, dict[str, list[str]]]
+    plan_digest: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+    @model_validator(mode="after")
+    def closed_roles(self):
+        ids = self.condition_ids if self.scope_kind == "claim" else self.target_ids
+        other = self.target_ids if self.scope_kind == "claim" else self.condition_ids
+        roles = [self.intent] if len(self.groups) == 1 else ["mechanism", self.intent]
+        if (not ids or other or len(ids) != len(set(ids)) or set(self.participation) != set(ids)
+            or len(self.groups) != len(roles) or (self.intent == "mechanism" and len(self.groups) != 1)):
+            raise ValueError("Literal query units/groups are not closed")
+        for group, role in zip(self.groups, roles, strict=True):
+            if (not group or any(t.role != role for t in group)
+                or len({t.phrase.casefold() for t in group}) != len(group)):
+                raise ValueError("Literal role group is empty, duplicate or foreign")
+        for row in self.participation.values():
+            if set(row) != set(roles):
+                raise ValueError("Unit lacks actual query roles")
+            for group, role in zip(self.groups, roles, strict=True):
+                available = {sid for term in group for sid in term.source_concept_ids}
+                values = row[role]
+                if not values or len(values) != len(set(values)) or not set(values).issubset(available):
+                    raise ValueError("Unit role lacks original concept participation")
+        return self
+
+    # Compilation is independent of family vocabulary; all fields/operators are fixed.
+    compile = StructuredPaperQuery.compile
+
+
+def parse_structured_query(raw):
+    if isinstance(raw, dict) and raw.get("version") == "structured-arxiv-literal-query-v2":
+        return StructuredLiteralQuery.model_validate(raw)
+    return StructuredPaperQuery.model_validate(raw)
