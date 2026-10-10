@@ -22,6 +22,33 @@ import types
 from pathlib import Path
 
 
+def _source_identity(path):
+    """Complete source SHA with bounded buffers; reject changes during the read."""
+    before = path.stat()
+    digest, size = hashlib.sha256(), 0
+    with path.open("rb") as source:
+        while chunk := source.read(1048576):
+            digest.update(chunk)
+            size += len(chunk)
+    after = path.stat()
+    fields = ("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns")
+    if size != before.st_size or any(getattr(before, key) != getattr(after, key) for key in fields):
+        raise ValueError("source_changed_during_identity_read")
+    return {"sha256": digest.hexdigest(), "size": size}
+
+
+def _compile_source(path):
+    """Compile complete bytes in this interpreter/path; a prefix is never code."""
+    identity = _source_identity(path)
+    with path.open("rb") as source:
+        raw = source.read(65537)
+    if len(raw) > 65536:
+        raise ValueError("source_capacity")
+    if len(raw) != identity["size"] or hashlib.sha256(raw).hexdigest() != identity["sha256"]:
+        raise ValueError("source_changed_during_bounded_read")
+    return compile(raw, str(path), "exec", dont_inherit=True, optimize=sys.flags.optimize), identity
+
+
 def _code_sha(code):
     def constant(value):
         kind = type(value)
@@ -60,8 +87,7 @@ def prepare_site(path, qualname, firstlineno):
     if type(path) is not str or type(qualname) is not str or type(firstlineno) is not int or firstlineno < 1:
         raise ValueError("Site selectors require exact string paths/names and an integer source line")
     path = Path(path).resolve(strict=True)
-    source = path.read_bytes()
-    code = compile(source, str(path), "exec", dont_inherit=True, optimize=sys.flags.optimize)
+    code, identity = _compile_source(path)
     candidates, pending = [], [code]
     while pending:
         item = pending.pop()
@@ -71,7 +97,7 @@ def prepare_site(path, qualname, firstlineno):
     if len(candidates) != 1 or candidates[0].co_flags & (0x20 | 0x80 | 0x200):
         raise ValueError("Site must identify one non-generator synchronous code object")
     return {
-        "path": str(path), "sha256": hashlib.sha256(source).hexdigest(),
+        "path": str(path), "sha256": identity["sha256"],
         "qualname": qualname, "firstlineno": firstlineno, "code_sha256": _code_sha(candidates[0]),
     }
 
@@ -169,13 +195,14 @@ def run_observed(entry, args, cwd, sites, output, *, max_events=256, max_snapsho
                 raise ValueError("Site identity differs from current compiled source")
             identities[key] = (index, actual)
             report["sites"].append(actual)
-        entry_source = script.read_bytes()
-        entry_sha = hashlib.sha256(entry_source).hexdigest()
-        executable = compile(entry_source, str(script), "exec", dont_inherit=True, optimize=sys.flags.optimize)
+        executable, entry_identity = _compile_source(script)
+        entry_sha = entry_identity["sha256"]
         getprofile, setprofile = sys.getprofile, sys.setprofile
         if getprofile() is not None:
             raise ValueError("An existing profile hook cannot be replaced")
-    except (ValueError, OSError, TypeError, SyntaxError):
+    except (ValueError, OSError, TypeError, SyntaxError) as exc:
+        if type(exc) is ValueError and exc.args == ("source_capacity",):
+            unresolved("source_capacity")
         unresolved("startup_identity_or_request_invalid")
         if destination is not None:
             _write_report(destination, report)
@@ -303,8 +330,8 @@ def run_observed(entry, args, cwd, sites, output, *, max_events=256, max_snapsho
     report["source_hashes_after"] = {}
     for path, sha in expected.items():
         try:
-            actual = hashlib.sha256(Path(path).read_bytes()).hexdigest()
-        except OSError:
+            actual = _source_identity(Path(path))["sha256"]
+        except (OSError, ValueError):
             actual = None
         report["source_hashes_after"][path] = actual
         if actual != sha:

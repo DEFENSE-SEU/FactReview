@@ -1,6 +1,22 @@
 # FactReview v2 progress
 
-## 当前 Phase2：有界修复证据与完整来源供给；Phase8真实框架验证继续
+## 当前 Phase2：observer 完整源码容量；Phase8 真实科学失败继续定位（2026-10-11）
+
+最新已交付源码 d883470c93b9ed2b5904ada5ac0cb86cdb8f1878 已 push 并核精确远端；repair delivery.json SHA ca852dd7ab8ace839807fb32174f879f2dd534808e67ca830069e21c8e15745a。当前 observer 两模块与一个必要控制冻结 launch2d636cfb/observer5c8454c7/test3c3fb68d，作者0bc4907e/d2aab3dd，独审96834a18da210ad85d7dc1880b5dcda7e1267e7ce206dab208fa310333c13723/f2ed220da54e7edd0200410c601738a37912b4cdea3304af7d7e8a72e30cb1ed。18事实闭合、25保护文件相同、190此前test字节保留；独审unparse缩进工具误报原件保留，AST匹配修正未动产品/断言。
+
+Host 在 fresh trusted/audit 创建前核完整 entry；超量 unresolved并保留原argv。Producer1MiB流式全SHA，编译最多65536完整bytes，拒绝前缀；原CodeType/flags/exit/event/receipt保持。唯一必要全mock function27Assert，同字节红1/.82s→绿1/.50s、Ruff3pass，无旧组/整套/服务重复。编译器/import/native分配峰值、metadata/file-count/ledger、raw磁盘配额及TOCTOU仍open。
+
+真实L3 controller最终e5d378f5/1c9fc357、独审362f1068/409d5c7b固定c1完整212源/archivece9dc817；20完整冻结、26接口、14donor、8controller/8inputs均核。Root draft23775300/peer16adc5c5；prepare/preflight各一次0app/0API，prepared0e090649cee9/manifest5ec69951，Root preparedac166513逐字核212源。精确authfb4d6a4c/exclusive admission一次授权保留，工作树memory/observer不混入c1。
+
+新actual-a75d9e3267db/supervised-1cebcf095dd8运行32.312s，terminal_measured但科学未完成。真实GPT-5.5 refinement1logical/1physical5319known，readiness171另计；原execute_plans/default production Docker链运行完整作者脚本，Python3.11.16 receipt received、raw mse2/3及observations=[]保留。科学 unresolved/ValidationError/model_calls0，无semantic/derived/alignment/Supported；静态JSON/MD保持partial/advice未运行。独审正依据原proposal/schema定位字段，禁止回填actual或重启consumed授权。
+
+Decisions：聊天GPT-6.1-sol；FactReview保持openai-codex/GPT-5.5，训练默认0/auto记录、框架repair默认且上限3。本诊断repair0/build60/run30/wall600/main最多2physical、readiness1physical；不复跑旧绿组/旧paid sample，未知费用保持unknown，局部失败继续其他模块。
+
+Open issues：proposal结构/原文定位与真实语义资格、整篇原子性/coverage/M2/M5、主动模型/复杂预处理/多condition、文献充分性/native exhaustion、OS/daemon恢复、大ledger/file-count/磁盘配额、旧inline诊断/empty-task发现、全框架14验收。矩阵7pass/6unresolved/1fail，最新全native六strict失败保持。
+
+Next action：交付本Phase2精确observer三文件和checks/progress，独立delivery记录远端；只读独审新actual并修可复现结构问题。并行推进安全本地命令诊断和整篇coverage最小改进。goal active；不改main、不开PR、不提前complete。
+
+## 历史 d883 Phase2：有界修复证据与完整来源供给；Phase8真实框架验证继续
 
 精确远端refactor/method-v2为c1cbb9340695e1c88d42fe5acebbcbbded0ae424，Phase8职责text receipt codex-role-instructions-implementation/delivery.json SHAd755cd7c16fb7f039cbe40a2c17ac5c6f70bb4c342fdfd1fff487a7b42e89da6；此前Phase5 f1fa8e012820637c775abfcdcbe0f35119f55d7b完整分区运行接线receipt partition-analysis-runtime-delivery/delivery.json SHA56761047cf82da96e758801f9914260d66f849403e699a8d7c2e2ba34d9326fe；此前纯分析候选3f49b375/receipt DA52CA3D保持。此前 standalone计量583a6c3/b268e0db、共享stats64cd0ea/a2fa2ed8、提取职责639b45e/b9a0011e、流式hash82c6cfd/80cc066f与科学消费7a1612f/6cfa7409交付保持。仅推送已授权refactor/method-v2，不改main、不开PR。每次局部交付均保持整体goal active。
 

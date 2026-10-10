@@ -236,6 +236,9 @@ def prepare_observer_launch(original_command, *, entry_script, workdir, workspac
                 raise ValueError("duplicate_source_site")
             seen.add(key)
             leaves.append(leaf)
+        _, entry_scope = bounded_source(entry)
+        if not entry_scope["complete"]:
+            raise ValueError("observer_entry_source_capacity")
         container_cwd = "/app" + ("/" + relative_workdir if relative_workdir != "." else "")
         attempt = f"observer_attempt_{repair_round}_{uuid.uuid4().hex}"
         audit_dir = _path(scratch / attempt, exists=False)
@@ -246,7 +249,7 @@ def prepare_observer_launch(original_command, *, entry_script, workdir, workspac
                   "output": f"/workspace/run_dir/{attempt}/events.json"}
         observer_bytes = _path(Path(__file__).with_name("runtime_observer.py")).read_bytes()
         config_bytes = (json.dumps(config, ensure_ascii=True, sort_keys=True, indent=2) + "\n").encode()
-        source_hashes = {relative_entry: _sha(entry.read_bytes()), **{site["path"]: site["sha256"] for site in leaves}}
+        source_hashes = {relative_entry: entry_scope["sha256"], **{site["path"]: site["sha256"] for site in leaves}}
         # All checks precede any package creation; failed creation is retained for audit.
         trusted.mkdir(exist_ok=False)
         audit_dir.mkdir(exist_ok=False)
