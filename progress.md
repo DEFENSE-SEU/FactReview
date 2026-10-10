@@ -1,22 +1,22 @@
 # FactReview v2 progress
 
-## 当前 Phase5/8：科学消费实现与六窗真实覆盖并行
+## 当前 Phase5/8：科学消费独审与全文结果复核
 
-已交付分支refactor/method-v2远端a7f3b5c9356abe4917d7c42842e976709affb70e。当前新模型验证继续固定代码248e6aed8106cb17908ca1fd8fde84c38597812d和207文件Git归档0fb64bb6；当前工作源码的后续独立实现不进入这个冻结验证。两次Docker实际及原失败继续保留。
+分支refactor/method-v2已推送并核精确远端1d8abe6365009c67a0ef56417ffc08c3c8c4db1a。Phase2流式hash/有界依赖预览已交付，source-streaming-implementation/delivery.json SHA cf9021f8保存实际提交与远端；相关完整独审和必要控制均保持。执行._sha与repair全文件快照内存风险继续open。
 
-Phase2独立修补已完成：CodeSourceContext完整文件SHA改为1MiB流式读取，Docker依赖文本预览实际只读max_bytes（默认500000）；合法前缀/UTF-8/缺失或读取失败fallback保持，负值/非整数limit明确unavailable。两个helper外完整模块AST原样。一个必要mock控制禁止整文件分配、检查跨chunk完整尾部hash与UTF-8截断前缀/缺文件；同字节red1/.31s→green1/.18s，Ruff通过，0服务、原tests改动/复跑0。source-streaming-implementation/review.mdce1d3278/evidence95bdf67d与独审report.md138d258e/evidencedfe723da身份闭合。Root已完整读独审，记录source37de836a/docker1dd8390a/testd3163465。此批不授科学资格；execution._sha与repair全文件快照的checkpoint内存风险仍open。Phase2提交推送收据将保存source-streaming-implementation/delivery.json。
+本Phase8 provider修补仅两处生产变化：llm_json在timing/图像/auth/API前校验active stats模块；现有OpenAI兼容构造器明确max_retries=0。本地已装SDK默认2次隐式retry会使一逻辑调用发送3次、只写一次失败用量。一个必要真实SDK+离线MockTransport控制原字节red1/3.91s（3发送）→green1/.78s（1发送），非法module0发送，failed/unavailable各1、estimated0。Ruff通过；外部真实调用0，原tests改动/复跑0。其余完整模块AST与原一致；原Codex首pre-SSE显式计量重试保留。无stats的兼容入口及本地缺Anthropic SDK的重试默认仍open。
 
-coverage-v5-wholepaper-native-validation-v1已完成一次离线prepare与一次纯预检：prepared-9ff346eb2123/manifest.json SHA8d44d653，local-preflight SHAe8e9c4ba；73原claims/244parsed/284review、完整六窗，初始义务29/23/15/8/0/0。207完整树、四原输入、控制器与预览独审report-prepared.md424bf187/evidence-prepared.jsonf6ddcefd通过。Root已完整读报告和证据，不向模型提供gold或手写候选。
+作者provider-admission-implementation/review.md4a6babf5/evidence76043160；独审provider-admission-independent/report.mdbf850306/evidenceef35a72f核当前source c75baa68与test1c7928a9身份。Root完整读独审/控制/增量，准备本批Phase8提交推送，仅client、新单控制与checks/progress；科学消费五文件属于后续Phase5。收据保存provider-admission-implementation/delivery.json。
 
-独审发现监督器在非timeout异常退出且无终态时仍标unknown=false。Root在prepare前只修补此监督记录：缺/invalid/身份不符或计量不闭合的终态标partial_usage_unknown/unknown=true，timeout恒unknown；已计量的科学partial可保留metered。Popen/wait/kill与原预算不变，四必要纯控制通过，0app/provider/Docker调用。原supervisor/声明/协议及所有原审查版本保留。当前supervisor30561972、声明19ff94e3，新增审核再次核证。
+六窗真实actual-aaf5ec22263c固定source248e6aed、完整207文件archive0fb64bb6、原73claims/244parsed/284review blocks、prepared8d44d653/auth51de6648。一次性session91945结束rc1/wall1611.016s，前五窗三阶段returned，第六窗coverage returned，后两阶段在原1.5m软门槛阻断。boundary投影16logical/16physical、known1515352、missing_usage_records0；监督终态partial_usage_unknown/bound_terminal_usage_unknown/unknown_inflight_usage=true，计量整闭合不能宣称已通过。没有加预算或重复consumed授权；原阶段产物保留，独立agent正做科学结果审查。returned计数不能证明召回、完整third或M2/M5充分。
 
-Root闭合单次auth51de6648后启动监督器session91945；actual-aaf5ec22263c已创建不可重用admission，当前在途。原生公开API、call=None、三阶段各6、18logical/physical、known1.5m软门槛/readiness另1/1/2000/wall7200保持。没有扩大预算、私下重试或切换FactReview的GPT-5.5模型。终态用量、六窗科学覆盖和M2/M5独审均待实际结果，不提前判pass。
+Phase5最小科学消费final-v2冻结：独立paper定义/actual selector/完整单行partition/active模型和metric/原全部condition及qualifiers先闭合，然后最多1个独立语义审核。缺材料本地unknown且0审核调用。无继承stats时先创建独占attempt计量scope；缺/estimated/unavailable/failed记录不授资格。派生Observation独立保存，原raw不回写，仍由原judge核aligned/units/variance/tolerance/状态。必要正例与同值错误split反例通过；仅受影响positive计量控制复验1/1.25s，mock known14为fixture事实。最终报告d21f40b3/evidence d216b1e7/source diffc1877e84待Root/Native完整独审；未作真实科学完成声明。现有限制为单condition、有限单行JSON分区/参数模型，原Tiny平面材料仍0科学证据。
 
-Phase5并行子agent实现最小源绑定科学消费接口：先真实receipt/flow闭合，再核paper定义、actual data完整partition、active模型/参数、metric与全部condition/settings；每metadata指向实际已消费来源。机械TinyMSE原材料仍不足，0科学资格事实保持。缺材料本地unknown；足够的机械路径最多新增1个独立计量语义审核/plan。派生Observation独立保存，原raw observations不回写，继续经过原aligned/unit/variance/tolerance/四状态规则。仅必要正例和同值不同actual split反例；独审agent负责审核最终代码。
+Decisions：当前聊天GPT-6.1-sol，FactReview配置继续GPT-5.5；不切模型。新SDK政策用于消除不可见兼容provider重试，原Codex显式meter保持。用量软门槛允许在途结果越界，不能称硬货币限。单个阻断推进其他框架部分，goal active。
 
-Open issues：真实六窗召回/科学复核、完整普通推理与analysis、多样本/通用模型运行、文献充分性与native exhaustion、OS/daemon故障和大ledger/IO、整体14项验收。goal active；局部成功或单个阻断不暂停目标。
+Open issues：真实全文语义覆盖/完整third/M2/M5、普通推理与analysis、多样本/通用模型、文献充分性与native exhaustion、OS/daemon故障和大ledger/IO、checkpoint内存、当前14项整体验收。
 
-Next action：监测单次在途验证，保留其原partial/失败和费用事实；完成科学消费实现、必要mock控制及独立审核后提交推送授权分支。真实结果回来后逐窗审查再更新checks，保持原strict验收门槛。不开PR、不改main。
+Next action：交付本已独审provider补丁；继续科学消费五文件独审并单独Phase5交付，按六窗原产物科学复核更新checks。真实运行需要新的完整材料和独立身份，保留原partial/费用与失败。仅推送已授权分支，不开PR、不改main。
 
 ## 历史 a7f3b5c Phase8：真实生产 Docker 机械链与整篇覆盖推进
 
