@@ -1,6 +1,18 @@
 # FactReview v2 progress
 
-## 当前 Phase2：observer 完整源码容量；Phase8 真实科学失败继续定位（2026-10-11）
+## 当前 Phase2：安全命令诊断交付；Phase5 quote-only 候选接线（2026-10-11）
+
+最新已交付源码09925042067a2262e60516b8028a77705375f4eb已push并核精确远端，observer delivery.json SHA2874e455024853a1e9a2627bb11e320804bb12db4a09d872a99150624888c4ff。当前命令诊断只改v2.py，完整SHAfcf17305564b8e10a6db2b3e9ac310ee051620c5466c47b0b2540d1890cabf89；作者47417e15/a572f7e8、独审d8955b4c/5cd559a8、Root final948a8b0c。19独审事实、191旧test/9邻接源完整字节保留。仅原inline拒绝函数按相同字节红1/.86s→绿1/.66s、两个原Assert不变，Ruff1pass；不新增测试、不复跑旧绿组或服务。七处本地固定错误使用私有ValueError子类，全refinement catch仅该类显示固定原因，其余异常只显示类型；原命令/回滚/科学/repair/accounting守卫保持。动态provider隐私额外场景未新增测量。
+
+真实actual-a75d独审已闭合：report e3e700ccf960742a6b20d7b0f069eadbed4342509bc7dc8111c9ddc562abdc95/evidence2f2482c1bb44554301d40806de3eb2b6c82c77939bc1ece6c0fe6d469cfe0207。Root20608369/cdf3cc41逐字核112manifest产物、49安全原件与212源码映射。作者Docker运行成功、receipt received、raw mse2/3保持；5319主调用+171readiness known tokens，不推导费用。科学首先在analysis.paper/sources缺六exact role键处ValidationError，独立semantic0、derived0、alignment false、Unverified，静态partial/advice未运行。15quote全部唯一存在，14span错误；非null mapping索引stdout不存在metadata是后续静态阻断；实际三源LF原文，未归因为newline。固定c1原件不改、consumed授权不重用。
+
+quote-only设计9aacb7a4/5c1f8185与独审d93f28a22ec98e424f67c6560876fb5f0fcd87f266d5355acaff7bbeb2467306/a9028f0b0f7052d11ca3aa8494652ea86661bdadd66d72538d715511b98500a8已完整阅读，设计阻断0。Decisions：保留legacy science_proposal_schema，新增candidate字段，按version一次分派且失败不fallback；LLM选六角色和原文，程序只做精确唯一位置转换。find(first+1)拒绝重叠、调用前冻结paper/source、lexical plain_path/bounded_source先于resolve、严格raw-LF codepoint桥接，原wire与派生canonical/audit分存。旧v1错误span不修、nonnull mapping不删除、不补语义或literal metadata；原科学消费者/usage/judge保持。实现最多既定两必要全mock控制，原test不弱化。
+
+Open issues：整篇原子性/coverage/M2/M5、真实科学资格、主动模型/复杂预处理/多condition、文献充分性/native exhaustion、OS/daemon恢复、ledger/file-count/磁盘配额以及14项全框架验收。矩阵7pass/6unresolved/1fail；六最新full-native失败保持。coverage批次设计会扩大调用预算，暂留设计阶段，未自动提高预算或收费复跑。
+
+Next action：交付当前Phase2精确v2/checks/progress并核远端；由子agent实现quote-only最小接线，另一个agent独审，只跑必要mock。新真实诊断随后单独冻结新source/controller并审核，保留全部既有失败。聊天已从会话记录确认GPT-6.1-sol，FactReview仍openai-codex/GPT-5.5；训练0/auto模式、repair最多3保持。goal active，不改main、不建PR、不提前complete。
+
+## 历史 099 Phase2：observer 完整源码容量；Phase8 真实科学失败定位
 
 最新已交付源码 d883470c93b9ed2b5904ada5ac0cb86cdb8f1878 已 push 并核精确远端；repair delivery.json SHA ca852dd7ab8ace839807fb32174f879f2dd534808e67ca830069e21c8e15745a。当前 observer 两模块与一个必要控制冻结 launch2d636cfb/observer5c8454c7/test3c3fb68d，作者0bc4907e/d2aab3dd，独审96834a18da210ad85d7dc1880b5dcda7e1267e7ce206dab208fa310333c13723/f2ed220da54e7edd0200410c601738a37912b4cdea3304af7d7e8a72e30cb1ed。18事实闭合、25保护文件相同、190此前test字节保留；独审unparse缩进工具误报原件保留，AST匹配修正未动产品/断言。
 

@@ -99,6 +99,10 @@ class ExecutionOperationError(RuntimeError):
     """A system operation failed before an ordinary execution outcome existed."""
 
 
+class _CommandValidationError(ValueError):
+    """A local command rejection with a constant, safe diagnostic."""
+
+
 _NONRECOVERABLE_OPERATIONS = frozenset({"execution.cleanup", "execution.integrity"})
 
 
@@ -209,29 +213,29 @@ def _validate_command(
     command: list[str], workspace: Path, entry: str | None, workdir: str = ".", *, isolated_recipe=False
 ) -> None:
     if not command or any(not token or "\x00" in token for token in command):
-        raise ValueError("empty or invalid launch command")
+        raise _CommandValidationError("empty or invalid launch command")
     # A direct interpreter/script entry makes the repair boundary checkable.
     # Shell strings, inline Python, and alternate executables require a new plan.
     exe = command[0]
     if isolated_recipe:
         if command != ["python", "-I", "-S", entry] or workdir != ".":
-            raise ValueError("Released-predictions recipe requires its isolated standard-library interpreter")
+            raise _CommandValidationError("Released-predictions recipe requires its isolated standard-library interpreter")
         script = entry
     elif exe in {"python", "python3"}:
         if len(command) < 2 or command[1].startswith("-"):
-            raise ValueError("Python execution requires a released script")
+            raise _CommandValidationError("Python execution requires a released script")
         script = command[1]
     elif exe in {"bash", "sh"}:
         if len(command) < 2 or command[1].startswith("-"):
-            raise ValueError("shell execution requires a released script")
+            raise _CommandValidationError("shell execution requires a released script")
         script = command[1]
     else:
         script = exe
     candidate = _inside(workspace / workdir, script)
     if not candidate.is_file():
-        raise ValueError(f"entry script unavailable: {script}")
+        raise _CommandValidationError("entry script unavailable")
     if entry and candidate != _inside(workspace, entry):
-        raise ValueError("launch command changed the L2 entry script")
+        raise _CommandValidationError("launch command changed the L2 entry script")
 
 
 def _refine(
@@ -427,7 +431,7 @@ def _refine(
                 response["output_mapping"]
             ).model_dump()
         if not isinstance(command, list) or not all(isinstance(token, str) for token in command):
-            raise ValueError("refined command must be an argv list")
+            raise _CommandValidationError("refined command must be an argv list")
     _inside(workspace, plan.task.workdir)
     _validate_command(
         command,
@@ -1179,11 +1183,16 @@ def _execute_plans(
                 if operation == "refinement" and isinstance(exc, SourceReadUnavailable):
                     row["refinement"] = {"mode": "unavailable", "source_read_scope": exc.source_read_scope,
                                          "tokens": 0, "runtime_seconds": 0.0}
-                if operation == "refinement" and not plan.task.command and config.refine_with_llm:
-                    reason = f"Requested command refinement failed ({type(exc).__name__})"
-                    row["operation_failures"].append(ExecutionOperationFailure(
-                        component="execution.refinement", reason=reason,
-                    ).model_dump())
+                if operation == "refinement":
+                    reason = (
+                        f"Requested command refinement failed: {exc}"
+                        if isinstance(exc, _CommandValidationError)
+                        else f"Requested command refinement failed ({type(exc).__name__})"
+                    )
+                    if not plan.task.command and config.refine_with_llm:
+                        row["operation_failures"].append(ExecutionOperationFailure(
+                            component="execution.refinement", reason=reason,
+                        ).model_dump())
                 elif operation == "snapshot" and isinstance(exc, OSError):
                     reason = f"Execution workspace preparation failed ({type(exc).__name__})"
                     row["operation_failures"].append(ExecutionOperationFailure(
