@@ -5,7 +5,9 @@
 | Full-native v5 seven-stage orchestration and artifacts | pass with failed overall acceptance | `full-native-verified-v5/actual-35ce0611055b`:8 synthetic claims retained, Markdown/JSON/PDF/teaser gates pass; independent report d23f9eaa. |
 | Full-native v5 execution and complete accounting | fail | 0 plans/0 Docker;38 logical/physical requests,150304 known tokens,10 missing usage records. Vacuous source/lineage checks provide no execution coverage. Original failure remains unchanged. |
 | Complete measured-scope description consumption | static/mock pass | Four new controls pass in0.94s. Exact original v5 claim/material replay changes structural eligibility0→1 with all11 fields retained; no new plan/model/Docker. |
-| Independent original-claim recheck closure | repair pending | First59 mocked cases passed; independent stale-digest probe shows invalid original recheck still cleared old pending. Its red result is retained and blocks delivery of that implementation. |
+| Independent original-claim recheck closure | mock/static/independent pass | Final67 necessary cases in6.64s. Original stale-digest safety probe now leaves old pending and0 adoption; first failed implementation/result retained. Final review cfa194e9 and5 source/test hashes match. Actual semantic quality remains unverified. |
+
+The new independent original review uses the existing third stage and budget. Exact same-problem links can resolve a known observation through the existing candidate contract; new unlinked problems cannot be silently cleared by that action. Incomplete, invalid or legacy original rechecks cannot authorize adoption/dismissal. Independent review counts are delivered; initial reviewed ranges/counts are not backfilled. Old16 test functions and99 assertions remain unchanged. No new actual LLM/service/Docker call proves M2/M5 repair yet.
 
 | Latest follow-up correction | Verdict | Evidence / limit |
 |---|---|---|

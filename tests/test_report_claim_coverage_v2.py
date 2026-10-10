@@ -96,6 +96,7 @@ def test_coverage_reaches_full_and_layered_pdf_inputs(tmp_path, monkeypatch):
     assert len(captured) == 4
     assert all("Coverage check status: **failed**" in text for text in captured)
     assert all("Source windows reviewed: unavailable / unavailable" in text for text in captured)
+    assert all("Independent original-claim reviews: unavailable / unavailable" in text for text in captured)
 
 
 def test_unspecified_coverage_keeps_legacy_presentation(tmp_path):
