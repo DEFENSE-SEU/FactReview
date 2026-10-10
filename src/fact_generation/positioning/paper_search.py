@@ -5,7 +5,7 @@ import json
 import re
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlsplit, urlunsplit
 
 import httpx
 
@@ -48,14 +48,18 @@ class PaperSearchRuntimeState:
     health_url: str | None = None
     error: str | None = None
 
+    def __post_init__(self):
+        self.base_url = _public_url(self.base_url)
+        self.health_url = _public_url(self.health_url)
+
     def to_dict(self) -> dict:
         return {
             "enabled": bool(self.enabled),
             "started": bool(self.started),
             "availability": str(self.availability or "").strip(),
             "provider": str(self.provider or "").strip() or "remote",
-            "base_url": str(self.base_url or "").strip() or None,
-            "health_url": str(self.health_url or "").strip() or None,
+            "base_url": _public_url(self.base_url),
+            "health_url": _public_url(self.health_url),
             "error": str(self.error or "").strip() or None,
         }
 
@@ -111,37 +115,45 @@ class PaperSearchAdapter:
             if cutoff_date is not None:
                 payload["cutoff_date"] = cutoff_date.to_metadata()
             return payload
-        try:
-            provider = self._search_provider()
-            if provider == "remote":
-                result = await self._search_remote(query=query, question_list=question_list)
-            elif provider == "arxiv":
-                result = await self._search_arxiv_fallback(query=query, question_list=question_list)
-            elif provider == "semantic_scholar":
-                result = await self._search_semantic_scholar(query=query, question_list=question_list)
-            elif provider == "openalex":
-                result = await self._search_openalex(query=query, question_list=question_list)
-            else:
-                result = {
-                    "success": False,
-                    "error": "unsupported_provider",
-                    "provider": provider,
-                    "papers": [],
-                    "count": 0,
-                    "question_results": [],
-                }
-        except Exception as exc:
-            self._search_state_cache = PaperSearchRuntimeState(
-                enabled=bool(self.search_cfg.enabled),
-                started=False,
-                availability="became_unavailable_during_run",
-                provider=self._search_provider(),
-                base_url=self.search_cfg.base_url,
-                health_url=self._search_health_url(),
-                error=f"{type(exc).__name__}: {exc}",
-            )
-            raise
-
+        provider = self._search_provider()
+        questions = [str(q).strip() for q in (question_list or []) if str(q or "").strip()]
+        query_text = str(query or "").strip()
+        if query_text and query_text not in questions:
+            questions.insert(0, query_text)
+        if not questions:
+            return _empty_search_result(provider=provider, error="empty_query")
+        dispatch = {
+            "remote": self._search_remote, "arxiv": self._search_arxiv_fallback,
+            "semantic_scholar": self._search_semantic_scholar, "openalex": self._search_openalex,
+        }
+        results = []
+        for question in questions:
+            try:
+                # Each question owns its request failure; health/configuration
+                # state does not change when one query times out or fails.
+                result = await dispatch[provider](query=question, question_list=[question])
+            except Exception as exc:
+                result = _empty_search_result(provider=provider, error=_safe_request_error(exc))
+            results.append(result)
+        grouped = [{"question": question, "success": result["success"],
+                    "provider": result.get("provider", provider),
+                    "papers": result.get("papers", []), "count": len(result.get("papers", [])),
+                    **({"error": result["error"]} if result.get("error") else {})}
+                   for question, result in zip(questions, results, strict=True)]
+        if len(results) == 1:
+            result = {**results[0], "questions": questions, "question_results": grouped}
+        else:
+            papers, seen = [], set()
+            for row in grouped:
+                for paper in row["papers"]:
+                    key = str(paper.get("arxiv_id") or paper.get("id") or paper.get("url") or paper.get("title"))
+                    if key not in seen:
+                        seen.add(key)
+                        papers.append(paper)
+            succeeded = sum(row["success"] is True for row in grouped)
+            result = {"success": succeeded == len(grouped), "partial": 0 < succeeded < len(grouped),
+                      "query": questions[0], "questions": questions, "papers": papers,
+                      "count": len(papers), "question_results": grouped, "provider": results[0].get("provider", provider)}
         return _apply_cutoff_to_search_result(result, cutoff_date)
 
     async def read_papers(self, *, items: list[dict]) -> dict:
@@ -267,7 +279,7 @@ class PaperSearchAdapter:
                 provider=provider,
                 base_url=base_url,
                 health_url=health_url,
-                error=f"{type(exc).__name__}: {exc}",
+                error=_safe_request_error(exc),
             )
 
         self._search_state_cache = state
@@ -348,9 +360,17 @@ class PaperSearchAdapter:
 
         data = response.json()
         if isinstance(data, dict):
+            if not isinstance(data.get("success"), bool):
+                raise ValueError("invalid_remote_payload")
+            if data["success"] is False:
+                return _empty_search_result(provider="remote", error="remote_search_failed")
+            if data.get("error"):
+                raise ValueError("invalid_remote_payload")
+            _validated_paper_rows(data.get("papers"), "title")
+            data = {key: value for key, value in data.items() if key not in {"error", "message"}}
             return data
         if isinstance(data, list):
-            papers = [self._normalize_remote_paper_item(item) for item in data if isinstance(item, dict)]
+            papers = [self._normalize_remote_paper_item(item) for item in _validated_paper_rows(data, "title")]
             papers = [row for row in papers if row]
             questions = [q for q in (question_list or []) if str(q or "").strip()]
             query_text = str(query or "").strip()
@@ -366,7 +386,7 @@ class PaperSearchAdapter:
                 "question_results": [
                     {
                         "question": q,
-                        "success": bool(papers),
+                        "success": True,
                         "count": len(papers),
                         "papers": papers,
                     }
@@ -427,7 +447,7 @@ class PaperSearchAdapter:
                 )
                 response.raise_for_status()
                 payload = response.json()
-                rows = payload.get("data") if isinstance(payload, dict) else []
+                rows = _validated_search_rows(payload, "data", "title")
                 papers = [
                     self._normalize_semantic_scholar_item(item)
                     for item in (rows or [])
@@ -437,7 +457,7 @@ class PaperSearchAdapter:
                 question_results.append(
                     {
                         "question": q,
-                        "success": bool(papers),
+                        "success": True,
                         "count": len(papers),
                         "papers": papers,
                     }
@@ -500,7 +520,7 @@ class PaperSearchAdapter:
                 )
                 response.raise_for_status()
                 payload = response.json()
-                rows = payload.get("results") if isinstance(payload, dict) else []
+                rows = _validated_search_rows(payload, "results", "display_name", "title")
                 papers = [
                     self._normalize_openalex_item(item) for item in (rows or []) if isinstance(item, dict)
                 ]
@@ -508,7 +528,7 @@ class PaperSearchAdapter:
                 question_results.append(
                     {
                         "question": q,
-                        "success": bool(papers),
+                        "success": True,
                         "count": len(papers),
                         "papers": papers,
                     }
@@ -588,7 +608,7 @@ class PaperSearchAdapter:
             question_results.append(
                 {
                     "question": q,
-                    "success": bool(papers),
+                    "success": True,
                     "count": len(papers),
                     "papers": papers,
                 }
@@ -992,12 +1012,19 @@ class PaperSearchAdapter:
 
     def _parse_arxiv_feed(self, xml_text: str) -> list[dict]:
         root = ET.fromstring(xml_text)
+        if root.tag != "{http://www.w3.org/2005/Atom}feed":
+            raise ValueError("invalid_arxiv_feed")
         ns = {"atom": "http://www.w3.org/2005/Atom"}
         papers: list[dict] = []
 
         for entry in root.findall("atom:entry", ns):
             entry_id = entry.findtext("atom:id", default="", namespaces=ns)
             title = entry.findtext("atom:title", default="", namespaces=ns).strip()
+            if not title or not re.fullmatch(
+                r"https?://(?:export\.)?arxiv\.org/abs/(?:\d{4}\.\d{4,5}|[a-z.-]+/\d{7})(?:v\d+)?",
+                entry_id, re.I,
+            ):
+                raise ValueError("invalid_arxiv_entry")
             summary = entry.findtext("atom:summary", default="", namespaces=ns).strip()
             published = entry.findtext("atom:published", default="", namespaces=ns).strip()
             updated = entry.findtext("atom:updated", default="", namespaces=ns).strip()
@@ -1030,6 +1057,39 @@ class PaperSearchAdapter:
             )
 
         return papers
+
+
+def _public_url(value: str | None) -> str | None:
+    if not value:
+        return None
+    try:
+        parts = urlsplit(value)
+        return urlunsplit((parts.scheme, parts.netloc.rsplit("@", 1)[-1], parts.path, "", ""))
+    except ValueError:
+        return "unavailable_url"
+
+
+def _safe_request_error(exc: Exception) -> str:
+    # Exception messages and response bodies can echo credentials and complete
+    # request URLs. Keep only local type and the numeric HTTP status.
+    status = exc.response.status_code if isinstance(exc, httpx.HTTPStatusError) else None
+    return f"{type(exc).__name__}: request_failed" + (f" (HTTP {status})" if status is not None else "")
+
+
+def _validated_paper_rows(value, *title_keys):
+    if not isinstance(value, list) or any(
+        not isinstance(row, dict) or not any(
+            isinstance(row.get(key), str) and row[key].strip() for key in title_keys
+        ) for row in value
+    ):
+        raise ValueError("invalid_search_payload")
+    return value
+
+
+def _validated_search_rows(payload, rows_key, *title_keys):
+    if not isinstance(payload, dict) or payload.get("error") or payload.get("success") is False:
+        raise ValueError("invalid_search_payload")
+    return _validated_paper_rows(payload.get(rows_key), *title_keys)
 
 
 def _apply_cutoff_to_search_result(result: dict, cutoff: CutoffDate | None) -> dict:
