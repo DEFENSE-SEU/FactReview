@@ -195,12 +195,21 @@ def _description(text, cfg, count=None):
         scope += " " + re.escape(str(cfg["settings"]["split"]))
     metric = r"(?:exact[- ]match )?accuracy"
     layouts = (
-        re.escape(roles[0]) + " " + metric + " on " + scope,
-        scope + " " + metric + " for " + re.escape(roles[0]),
+        r"(?:Measured|Reported) " + re.escape(roles[0]) + " " + metric + " on " + scope,
+        r"(?:Measured|Reported) " + scope + " " + metric + " for " + re.escape(roles[0]),
     )
+    if isinstance(cfg["settings"].get("split"), str) and cfg["settings"]["split"]:
+        layouts += (
+            re.escape(roles[0])
+            + r" (?:measured|reported) "
+            + metric
+            + r" on (?:the )?"
+            + scope
+            + r"(?: set)?",
+        )
     for layout in layouts:
         match = re.fullmatch(
-            r"(?:Measured|Reported) " + layout + r"(?: (?:on|over) (?P<sample>.+))?",
+            layout + r"(?: (?:on|over) (?P<sample>.+))?",
             text.strip().rstrip(".! "),
             re.I,
         )

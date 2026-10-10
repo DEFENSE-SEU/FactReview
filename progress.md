@@ -1,5 +1,15 @@
 # FactReview v2 progress
 
+## Phase 4: measured-scope description word order
+
+The complete native v5 run finished at `full-native-verified-v5/actual-35ce0611055b` on d2b0ff8. All seven stages returned, with8 synthetic claims,0 plans and0 Docker attempts. Its overall strict verdict is failed. Independent review (`independent-actual-35ce0611055b/review.md`, SHA d23f9eaa) confirms38 logical/physical requests,150304 known tokens and10 missing usage records. One figure page-context request failed with upstream503; two Literature comparisons and seven advice requests failed with Daybreak Blue503. Retrieval incompleteness, original coverage0/8 and empty execution remain visible.192 prepared and192 runtime sources,6 input hashes and5 controllers match;417 actual files were unchanged during that independent review.
+
+The actual accuracy claim's original description, `ExactMatch measured accuracy on the MiniSet test set.`, was rejected by the finite binder despite complete source/materials and a uniquely compatible configuration. `_description` now accepts this complete word order only with an explicit split, exact escaped identities and the existing metric/sample grammar. Original layouts remain equivalent. No scientific field, source obligation, count witness or final semantic consumer requirement was removed.
+
+Verification:4 necessary mocked controls pass in0.94s; Ruff/format/diff checks pass. Independent source review is `finite-description-word-order-independent/review.md`. A separate read-only replay uses the exact original v5 claim/materials: frozen source gives0 structural candidates; corrected source gives1 and consumes all11 original leaves. Confirmations are explicitly injected, with no new model request, plan or Docker execution. Claim/material objects and276 actual non-cache files remain unchanged. See `finite-description-word-order-replay/{baseline.json,corrected.json}`. This does not reclassify the failed actual or prove a new semantic judgment.
+
+Next independent work: complete the original-claim recheck closure. Its first implementation passed59 necessary mock cases, but independent review found a stale original-review digest still allowed a candidate to clear pending. The original red probe is retained under `coverage-original-review-independent/`; repair and independent revalidation are required before that implementation can be committed. No repeated full-service run is planned while the service503 failures remain.
+
 ## Phase 3 follow-up action contract clarification
 
 The actual coverage continuation rejected two `revise` actions attached to merged-conclusion observations. The follow-up prompt now states the existing group-level contract: any uncertain observation requires unresolved; any merged observation permits a source-justified split or unresolved, and a simultaneous qualifier correction cannot authorize revise. A shared conclusion may remain unchanged for independent validation to dismiss an unfounded merge observation. No validator, schema, budget or adoption behavior changed.

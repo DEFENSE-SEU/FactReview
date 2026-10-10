@@ -1,5 +1,12 @@
 # FactReview v2 acceptance checks
 
+| Current full integration / correction | Verdict | Evidence / limit |
+|---|---|---|
+| Full-native v5 seven-stage orchestration and artifacts | pass with failed overall acceptance | `full-native-verified-v5/actual-35ce0611055b`:8 synthetic claims retained, Markdown/JSON/PDF/teaser gates pass; independent report d23f9eaa. |
+| Full-native v5 execution and complete accounting | fail | 0 plans/0 Docker;38 logical/physical requests,150304 known tokens,10 missing usage records. Vacuous source/lineage checks provide no execution coverage. Original failure remains unchanged. |
+| Complete measured-scope description consumption | static/mock pass | Four new controls pass in0.94s. Exact original v5 claim/material replay changes structural eligibility0→1 with all11 fields retained; no new plan/model/Docker. |
+| Independent original-claim recheck closure | repair pending | First59 mocked cases passed; independent stale-digest probe shows invalid original recheck still cleared old pending. Its red result is retained and blocks delivery of that implementation. |
+
 | Latest follow-up correction | Verdict | Evidence / limit |
 |---|---|---|
 | Describe existing grouped action constraints explicitly | static pass; independent review pass | Only `_FOLLOWUP_SYSTEM` changed;70 other AST nodes unchanged. Compile/Ruff/diff pass; independent report40463bf9. No additional tests or model calls. |
