@@ -188,16 +188,23 @@ async def test_single_topic_empty_results_do_not_certify_search_scope(tmp_path, 
 
 @pytest.mark.asyncio
 async def test_explicitly_complete_single_topic_scope_retains_scope_bounded_support(tmp_path):
+    from tests.literature_scope_fixtures import native_response, scientific_response
     materials, claim = inputs(tmp_path)
     adapter = boundaries(complete=True)
+    async def search(*, query, cutoff_date):
+        return native_response(query, [], cutoff_date)
+    adapter.search.side_effect = search
+    def scientific_call(**kwargs):
+        return scientific_response(json.loads(kwargs["prompt"].split("\nDATA_JSON:\n")[1]))
     result = await verify_literature(
-        claim, materials, submission_deadline="2021-01-01", searcher=adapter, reader=adapter, call=Mock()
+        claim, materials, submission_deadline="2021-01-01", searcher=adapter, reader=adapter, call=scientific_call
     )
     assert len(result.evidence) == 1 and result.evidence[0].sufficient
     scope = json.loads(result.evidence[0].pointer.quote)
     assert scope["query_terms"] == ["image classification"]
     assert scope["supported_novelty_conditions"] == ["novelty"]
-    assert all(query["complete"] is True for query in scope["queries"])
+    assert scope["native_exhausted"] and scope["scientific_search_adequacy"]["valid"]
+    assert all(query["search_coverage"]["queries"][0]["stop_reason"] == "provider_exhausted" for query in scope["queries"])
 
 
 @pytest.mark.asyncio

@@ -25,6 +25,7 @@ from util.cutoff_date import (
 )
 from verification.contracts import BranchResult
 from verification.literature_omissions import OmissionContext
+from verification.literature_search_scope import build_search_scope, validate_search_adequacy
 from verification.theory import _fully_supported, _support_note
 
 # Queries consist exclusively of this domain vocabulary and fixed scope words.
@@ -84,6 +85,21 @@ Quote only from sources[].passages[].text for the matching paper_id, preserving 
 characters, hyphenation and whitespace. sources[].paper is identity/context metadata;
 its abstract is quoteable only when the same text is explicitly supplied in that source's
 passages.
+When search_adequacy_requested is true, the SAME response must also contain
+search_adequacy {version:"literature-search-adequacy-v1", claim_id, scope_digest,
+source_ids:[all supplied paper IDs], conditions:[...]}. Copy the exact scope digest.
+Cover every search_scope.novelty_condition_ids exactly once. Each condition contains
+condition_id, state (adequate/inadequate/unresolved), queries (one row per actual
+query_id, exact intent, coverage covered/insufficient/unresolved, semantic reason),
+mechanism, setting, protocol (concrete coverage reasoning), limitations (nonempty
+strings), omission_risk. Assess the vocabulary, competing mechanisms, problem setting,
+evaluation design and important omission risks for EACH condition. Pagination exhaustion
+only describes the recorded index/query scope. It does not establish scientific coverage.
+Do not alter pagination facts or add unrequested IDs. Unsearched indexes and differently
+named work remain outside this bounded scope. Adequate requires all three actual query
+intents to meaningfully cover the condition. Empty sources require an explicit scientific
+judgment, and cannot by themselves establish novelty. Use inadequate/unresolved when
+the vocabulary, provider coverage or missing source context leaves meaningful uncertainty.
 Return JSON {"status":"ok","comparisons":[...]}. Each comparison must include
 paper_id, purpose (citation_support / novelty / related_work / baseline), relation
 (supports / contradicts / same / partial / different / unclear), quote (a verbatim
@@ -819,20 +835,6 @@ async def verify_literature(
                     boundary=searcher,
                     limited=True,
                 )
-        complete = (
-            valid_rows
-            and isinstance(question_results, list)
-            and response.get("success") is True
-            and bool(response.get("provider"))
-            and not any(response.get(key) for key in ("error", "truncated", "has_more"))
-            and response.get("complete") is True
-            and all(isinstance(row, dict) and row.get("success") is True for row in question_results)
-        )
-        adequate = adequate and complete
-        if not complete:
-            result.issues.append(
-                f"Search scope is incomplete or malformed (provider must declare complete=true): {query}"
-            )
         for row in papers if isinstance(papers, list) else []:
             if isinstance(row, dict):
                 row = _unbound_metadata(row)
@@ -871,6 +873,7 @@ async def verify_literature(
     seen = set()
     for candidate in candidates.values():
         citation_ids = candidate.get("citation_condition_ids", [])
+        read_condition_ids = sorted(set(citation_ids) | novelty_ids)
         if not self_exclusion_available:
             audit["excluded"].append({"paper": candidate, "reason": "self_exclusion_unavailable"})
             continue
@@ -1079,7 +1082,7 @@ async def verify_literature(
                 "read_papers",
                 paper_id,
                 failure_category,
-                citation_ids,
+                read_condition_ids,
                 failure_error,
                 read_pointer,
                 response=response,
@@ -1099,7 +1102,7 @@ async def verify_literature(
                 "read_papers",
                 paper_id,
                 "identity_conflict",
-                citation_ids,
+                read_condition_ids,
                 message,
                 read_pointer,
                 response=response,
@@ -1182,7 +1185,24 @@ async def verify_literature(
     ]
     comparisons = []
     comparison_response_valid = False
-    if read_rows:
+    search_scope = build_search_scope(
+        claim=claim, queries=queries, intents=_QUERY_INTENTS, query_records=diagnostic_copy(audit["queries"]),
+        cutoff=deadline.to_metadata(), concurrent_start=audit["concurrent_start"],
+        sources=read_rows, source_excerpts=source_excerpts,
+        self_exclusion=audit["self_exclusion"], source_guards=adequate,
+        excluded=diagnostic_copy(audit["excluded"]), reads=diagnostic_copy(audit["reads"]), novelty_ids=novelty_ids,
+        public_copy=diagnostic_copy,
+    )
+    audit["scientific_search_scope"] = search_scope
+    for query_row in search_scope["queries"]:
+        if not query_row["native_exhausted"]:
+            result.issues.append(
+                "Search scope is incomplete or malformed (observed native exhaustion required): "
+                + query_row["query"] + "; " + "; ".join(query_row["reasons"])
+            )
+    adequacy_requested = bool(novelty_ids and (read_rows or search_scope["zero_scope_eligible"]))
+    adequacy_response = {"valid": False, "errors": [], "decisions": {}}
+    if read_rows or search_scope["zero_scope_eligible"]:
         payload = {
             "claim": claim.model_dump(mode="json") if claim else None,
             "paper_title": materials.title,
@@ -1191,6 +1211,8 @@ async def verify_literature(
             "source_excerpts": source_excerpts,
             "manuscript_targets": omission_context.payload(),
             "bibliography": [row.text for row in materials.bibliography],
+            "search_adequacy_requested": adequacy_requested,
+            "search_scope": search_scope,
             "sources": [
                 {**row, "paper": {key: value for key, value in row["paper"].items() if key != "abstract"}}
                 for row in read_rows
@@ -1229,6 +1251,21 @@ async def verify_literature(
         ):
             comparisons = response["comparisons"]
             comparison_response_valid = True
+            if adequacy_requested:
+                adequacy_response = validate_search_adequacy(response, search_scope, claim.id)
+                if not adequacy_response["valid"]:
+                    context_event(
+                        "comparison", "search_adequacy", "comparison_protocol_failure", novelty_ids,
+                        "; ".join(adequacy_response["errors"]), "comparison_response/search_adequacy",
+                        response={"provider": getattr(cfg, "provider", None)}, limited=True,
+                    )
+                else:
+                    for cid, decision in adequacy_response["decisions"].items():
+                        if decision["state"] != "adequate":
+                            result.issues.append(f"Scientific search adequacy for {cid}: {decision['state']}; "
+                                                 + decision["omission_risk"])
+                        elif any(row["coverage"] != "covered" for row in decision["queries"]):
+                            result.issues.append(f"Scientific search adequacy for {cid}: query intent coverage remains insufficient.")
         else:
             adequate = False
             result.issues.append("Literature comparison model returned no valid comparison result.")
@@ -1249,10 +1286,11 @@ async def verify_literature(
                 limited=True,
             )
     audit["comparisons"] = comparisons
+    audit["search_adequacy_requested"] = adequacy_requested
+    audit["search_adequacy"] = adequacy_response
     by_id = {row["paper_id"]: row for row in read_rows}
-    compared_different = set()
     different_coverage: dict[str, set[str]] = {}
-    novelty_concern = False
+    novelty_concern = set()
     compared_citation_ids = set()
     content_question_sources: dict[str, set[str]] = {}
     location = claim.loc if claim else next((block.loc for block in materials.blocks if block.loc), None)
@@ -1321,14 +1359,13 @@ async def verify_literature(
         relevant = relation in {"same", "partial", "supports", "contradicts"}
         if purpose == "novelty":
             if relation == "different" and dimensions and period == "prior":
-                compared_different.add(row["paper_id"])
                 different_coverage.setdefault(row["paper_id"], set()).update(set(covered) & novelty_ids)
             covered = [condition_id for condition_id in covered if condition_id in novelty_ids]
             if not covered or relation not in {"same", "partial", "unclear"}:
                 continue
             if period != "prior":
                 continue
-            novelty_concern = True
+            novelty_concern.update(covered)
             sufficient = bool(relation == "same" and dimensions and covered and row["full_text"])
             result.evidence.append(
                 Evidence(
@@ -1394,13 +1431,30 @@ async def verify_literature(
                 result.findings.append(finding)
 
     prior_ids = {row["paper_id"] for row in read_rows if row["period"] == "prior"}
-    adequate = adequate and prior_ids.issubset(compared_different) and not novelty_concern
     supported_novelty_ids = sorted(
         condition_id
         for condition_id in novelty_ids
-        if adequate and all(condition_id in different_coverage.get(paper_id, set()) for paper_id in prior_ids)
+        if adequate and search_scope["native_exhausted"] and adequacy_response["valid"]
+        and adequacy_response["decisions"][condition_id]["state"] == "adequate"
+        and all(row["coverage"] == "covered" for row in adequacy_response["decisions"][condition_id]["queries"])
+        and (bool(read_rows) or search_scope["zero_scope_eligible"])
+        and condition_id not in novelty_concern
+        and all(condition_id in different_coverage.get(paper_id, set()) for paper_id in prior_ids)
     )
-    if claim and adequate and not novelty_ids:
+    audit["condition_scope_decisions"] = {
+        cid: {
+            "supported": cid in supported_novelty_ids,
+            "native_exhausted": search_scope["native_exhausted"],
+            "source_guards": adequate,
+            "scientific_protocol_valid": adequacy_response["valid"],
+            "scientific_state": adequacy_response["decisions"].get(cid, {}).get("state"),
+            "prior_comparison_coverage": {pid: cid in different_coverage.get(pid, set()) for pid in sorted(prior_ids)},
+            "prior_concern": cid in novelty_concern,
+            "explicit_source_or_raw_zero_gate": bool(read_rows or search_scope["zero_scope_eligible"]),
+        }
+        for cid in sorted(novelty_ids)
+    }
+    if claim and not novelty_ids:
         result.issues.append(
             "No explicitly bound historical-novelty conditions; search absence cannot support this claim. "
             "Capability and numeric-result conditions require their own evidence."
@@ -1410,9 +1464,8 @@ async def verify_literature(
             "Novelty comparisons do not cover every retrieved prior work for conditions: "
             + ", ".join(sorted(novelty_ids - set(supported_novelty_ids)))
         )
-    audit["adequate_for_no_close_prior_work"] = adequate and (
-        claim is None or (bool(novelty_ids) and set(supported_novelty_ids) == novelty_ids)
-    )
+    adequate = bool(novelty_ids and set(supported_novelty_ids) == novelty_ids)
+    audit["adequate_for_no_close_prior_work"] = adequate
     scope = {
         "deadline": deadline.to_string(),
         "concurrent_start": audit["concurrent_start"],
@@ -1436,6 +1489,10 @@ async def verify_literature(
         "excluded_count": len(audit["excluded"]),
         "adequate": adequate,
         "supported_novelty_conditions": supported_novelty_ids,
+        "scope_digest": search_scope["digest"],
+        "native_exhausted": search_scope["native_exhausted"],
+        "scientific_search_adequacy": adequacy_response,
+        "limitations": search_scope["limitations"],
     }
     audit["search_scope"] = json.dumps(scope, ensure_ascii=False, sort_keys=True)
     unresolved_comparisons = (
@@ -1474,7 +1531,8 @@ async def verify_literature(
                 covered=supported_novelty_ids,
                 direction="support",
                 sufficient=True,
-                note="No close prior work within the recorded search scope: " + audit["search_scope"],
+                note="No close prior work within the recorded provider indexes and query scope; "
+                "unindexed or differently named work remains outside this conclusion: " + audit["search_scope"],
             )
         )
     elif not adequate:
