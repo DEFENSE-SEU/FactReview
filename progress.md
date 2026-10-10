@@ -1,6 +1,20 @@
 # FactReview v2 progress
 
-## 当前 Phase1：初次提取原材料守卫；Phase3 真实复审仍失败
+## 当前 Phase3：完整原主张分批复审与全窗采纳守卫（2026-10-11）
+
+上一交付11228907c925d5204de83c05b28f802ca375c1d1已推送并核远端。当前五个产品模块、一个新测试文件及README接口说明完成独立审核；连同checks/progress共九个精确路径交付。新增可选 --claim-coverage-original-batch-size 3：完整主张逐批复审，保留全部条件、来源正文和review_only_block_ids，最后固定聚合原件做候选/观察决策。默认None保留原协议；每批及最终决策消耗原validation cap，不自动提高预算。任一缺行、重复/外来身份、错误digest/context、无效链接、unresolved或预算缺口使整窗partial、零采纳/零dismissal；已完成结果、原raw及pending仍可查。
+
+必要验证始终三个不同public mock函数：新增API初红3failed/.26s→首绿3passed/11.31s；聚合digest只复cross1passed/3.38s；来源/链接/cap0接线改变后受影响三个函数3passed/11.72s；review_only标记补齐只复positive1passed/4.26s。独审发现Unicode指针1０经旧\d及int变成ASCII10，12条原主张负控真实错误complete；最终仅收窄索引为[0-9]，同份完整测试red1failed/6.30s→green1passed/7.10s。原raw指针、12条复审与fresh findings保留，无最终决策委派，partial/零采纳。首38、v2 47、v3 48条断言全部保留至56；旧测试、61个原函数/类及科学消费者保持，373旧非改动路径不变。LLM、检索、Docker均mock；不复跑旧绿或整套，不把mock结果当真实科学质量证据。
+
+作者最终 frozen-final-v4/report593dfcfc/evidence7f049a23；独立reportb0f6929a/evidence91d6059c/verification930a5121闭合34事实、范围内阻断0；Root5b61609d最终源码核证和7cbb3244完整独审身份核证闭合377旧非cache、六current/frozen及35作者原件，README接口与预算准确。391cache仅保留原baseline身份声明，不宣称pytest后不变。v2/v3/红绿及真实976的完整失败原件保留。精确Git/remote/当前九文件身份另见runs/v2_method_delivery/original-recheck-batching-root-v1/delivery.json，文档不作自指hash。
+
+Decisions：本批不引入quote codec；既有12.13%字节设计不能证明token、科学质量或失败原因。batch size3可配，其最优值未验证；新的多批真实调用需要新的有界controller和身份，旧976一次准入不复用。当前Chat GPT-6.1-sol，FactReview GPT-5.5；规则auto、训练0、环境修复上限3保持。
+
+Open issues：历史Phase0–8阶段记录保留，Phase8完整验收仍未完成；14项仍7pass/6unresolved/1fail。真实全论文召回/M2/M5、原976四空数组0/23、文献/理论/代码科学充分性、LLM计划召回、主动NN/多条件、OS/daemon/容量、整体报告及六native严格delivery失败继续开放。不能由此程序交付宣称商业完整性。
+
+Next action：交付此Phase3后，Single准备真正public coverage入口的单来源窗口真实batch计划，保留全部73原registry与后续未审窗口；Finite并行准备原claim010的literal producer→正式typed arXiv→本地PDF reader→同响应adequacy流程。两条路线只在新完整Git源、controller/预算独审后执行各自一次有界实际，不并行付费，不代填旧答案、不重采样旧失败。Goal active，继续授权refactor分支，不改main/不新建PR。
+
+## 历史112交付前：初次提取材料身份守卫及固定d1真实复审
 
 最新已交付3854ff2fef46e869fe29ef234266455938e7b76f仅checks/progress，push/exactremote相同，外部delivery51f359e0a2bbb1ccbaef5a0998e8e79d4cf393201885908f44b88a05406f08e2；source仍d1。L3实际439a受限完整合成发布分区经独审35facts/Root4bbbeb06闭合，该结果及旧失败全部保留。当前goal active，整体7pass/6unresolved/1fail。
 
