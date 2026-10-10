@@ -113,6 +113,8 @@ def tiny_inputs(tmp_path):
         approval_mode="auto",
         training_budget=0,
         max_attempts=3,
+        # Delivery fixtures assert rule statuses; tests/test_claim_gate_v2.py covers the tiers.
+        gate="lenient",
     )
     return args, MockMinerU(parsed)
 
@@ -611,7 +613,8 @@ def test_compgcn_fixture_replay_preserves_reference_artifacts_and_records_limits
     assert comparison["reference_hashes_unchanged"]
     assert "fixtures" in module.__doc__
     assert comparison["comparison_limits"] and comparison["submission_deadline"] is None
-    assert comparison["fixture_counts"] == {"supported": 2, "flawed": 0, "questioned": 0, "unverified": 1}
+    # The default gate downgrades one core claim supported only by the paper itself.
+    assert comparison["fixture_counts"] == {"supported": 1, "flawed": 0, "questioned": 0, "unverified": 2}
     assert set(comparison["summary"]["stages"].values()) == {"ok"}
     root = Path(comparison["summary"]["run_dir"])
     assert (root / "comparison.json").is_file() and (root / "comparison.md").is_file()

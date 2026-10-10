@@ -421,6 +421,13 @@ def parse_args() -> argparse.Namespace:
         help="Report layout: full detail, or primary report with complete technical appendix and linked PDF bundle",
     )
     p.add_argument(
+        "--gate",
+        choices=("lenient", "default", "strict"),
+        default="",
+        help="Claim gate tier used as each claim's status (default: CLAIM_GATE or default); "
+        "all three tiers are recorded in gate_status",
+    )
+    p.add_argument(
         "--anonymity-policy",
         choices=("unspecified", "required", "not_required"),
         default="unspecified",
