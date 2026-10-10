@@ -1,6 +1,18 @@
 # FactReview v2 progress
 
-## 当前 Phase2：安全命令诊断交付；Phase5 quote-only 候选接线（2026-10-11）
+## 当前 Phase3：绑定全部原主张复审的返回契约（2026-10-11）
+
+最近已交付62a0878f9d6692a5b511c1d2e874bc8f43c4429d，命令诊断receipt8f03db8f17bb5eca45363dcd214119f8880b154a44659da0c9a1c47a165c0bcc且远端相同。当前只改claim_coverage.py及一个new mock control；显示schema把当前完整required数量、逐位置id/digest和context/window绑定，保留items/$defs与全部科学字段。原pack_scope→input digest→audit input→prompt顺序、source/carrier/semantic/adoption/legacy/预算不变，whole module窄还原AST同。
+
+作者report4063732a/evidencef1d1cbfd；独审e7c2fff1f957e683ad528c00f953679d6cf1ca56ceb31a74bdc23b7fa9456ca3/53975ff7752dc81bb46a5740d18d36e369fa159c9594bb49d1bda350ca77715b闭合23事实、21原件与191旧test/3邻接bytes。Root完整读独审、源码差异并逐核保存身份，root-final-inspection.json记录。本次单public control两原主张，red1/.97s→green1/.65s；原14Assert保留15，多一条独审要求audit input == actual packed DATA，因此红绿full test bytes不同，不伪称same-byte。Ruff2files pass。已安装Draft2020128离线检查验证实际输出schema接受完整两行、拒绝空/少/重复/陈旧digest/context/多行；无产品/test依赖新增，不复跑旧绿/整套/服务。
+
+Decisions：OUTPUT_SCHEMA仍是普通prompt描述，未知provider约束和真实效果保持unverified；不补行、不代填科学状态、不改paid预算，不启动32调用batch。一次局部producer修正不能清除ce08 0/23、六窗20/75、M2/M5或六full-native失败。
+
+并行Phase5 quote-only final-v3已冻结：6559960a/607a7ced，schema7eb2bbe9/helperb452a7f2/v2 07d37846/test2a1e1b7b。原legacy schema及消费者保持，精确唯一quote定位/Unicode raw-LF桥接/调用前snapshot/raw wire digest已闭合必要mock；Single独立源码核证进行中。本段不宣称其已交付或真实科学成功。新L3 controller更新设计82eb876c/4179334b已准备，未来新archive全清单/实际接口/observer部署仍待最终源码冻结；旧a75d不改、不复用准入。
+
+Open issues：全框架14项7pass/6unresolved/1fail、整篇recall/原子性与科学范围、真实角色/引文/semantic资格、主动模型/复杂预处理/多condition、文献充分性/native exhaustion及OS/ledger/file-count/磁盘配额。Next action：交付本Phase3精确4路径；Phase5独审通过后单独提交，再冻结新的真实Docker科学验证。聊天GPT-6.1-sol、FactReview GPT-5.5、训练0、auto和max3保持；goal active。
+
+## 历史 62a Phase2：安全命令诊断交付；Phase5 quote-only 候选接线
 
 最新已交付源码09925042067a2262e60516b8028a77705375f4eb已push并核精确远端，observer delivery.json SHA2874e455024853a1e9a2627bb11e320804bb12db4a09d872a99150624888c4ff。当前命令诊断只改v2.py，完整SHAfcf17305564b8e10a6db2b3e9ac310ee051620c5466c47b0b2540d1890cabf89；作者47417e15/a572f7e8、独审d8955b4c/5cd559a8、Root final948a8b0c。19独审事实、191旧test/9邻接源完整字节保留。仅原inline拒绝函数按相同字节红1/.86s→绿1/.66s、两个原Assert不变，Ruff1pass；不新增测试、不复跑旧绿组或服务。七处本地固定错误使用私有ValueError子类，全refinement catch仅该类显示固定原因，其余异常只显示类型；原命令/回滚/科学/repair/accounting守卫保持。动态provider隐私额外场景未新增测量。
 
