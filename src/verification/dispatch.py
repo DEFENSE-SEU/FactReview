@@ -73,6 +73,7 @@ async def verify_claims(
     global_literature: Callable | None = None,
     call=None,
     blocked_claim_ids: list[str] | None = None,
+    execution_requested: bool = True,
 ) -> VerificationResult:
     if len({claim.id for claim in claims}) != len(claims):
         raise ValueError("Claim identifiers must be unique")
@@ -124,7 +125,9 @@ async def verify_claims(
                 c, m, call=call, output_dir=output_dir / "theory_derivations"
             ),
             EvidenceNeed.CODE: lambda c, m: verify_code(c, m, call=call),
-            EvidenceNeed.EXPERIMENTS: lambda c, m: verify_experiments(c, m, call=call),
+            EvidenceNeed.EXPERIMENTS: lambda c, m: verify_experiments(
+                c, m, call=call, execution_requested=execution_requested
+            ),
         }
         global_literature = global_literature or literature
     result = VerificationResult(claims=[claim.model_copy(deep=True) for claim in claims])
