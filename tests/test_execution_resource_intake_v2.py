@@ -70,6 +70,7 @@ def test_selected_identity_is_checked_at_run_and_judge_without_consumption_claim
     plan, claim, materials = selected
     result = v2.execute_plans(
         [plan], [claim], materials, tmp_path / "healthy", runner=lambda req: v2.RunOutcome(returncode=0),
+        config={"refine_with_llm": False},
     )
     row = result.ledger[0]
     assert [(item["point"], item["state"]) for item in row["resource_validation"]] == [
@@ -82,7 +83,10 @@ def test_selected_identity_is_checked_at_run_and_judge_without_consumption_claim
         materials.repository.entry_scripts.append("other.json")
         return v2.RunOutcome(returncode=0, observations=[original_fixtures.observation()])
 
-    changed = v2.execute_plans([plan], [claim], materials, tmp_path / "changed", runner=mutate_index)
+    changed = v2.execute_plans(
+        [plan], [claim], materials, tmp_path / "changed", runner=mutate_index,
+        config={"refine_with_llm": False},
+    )
     assert changed.ledger[0]["resource_validation"][-1]["point"] == "before_judge"
     assert changed.ledger[0]["resource_validation"][-1]["state"] == "invalid"
     assert not changed.claims[0].evidence and changed.delivery_checks == []
@@ -103,7 +107,8 @@ def test_approval_cannot_replace_a_later_plans_original_resources(selected, tmp_
     runner = Mock(side_effect=lambda request: v2.RunOutcome(returncode=0))
     result = v2.execute_plans(
         [first, later], [claim], materials, tmp_path / "out",
-        config={"approval_mode": "interactive", "max_attempts": 0}, approver=approve, runner=runner,
+        config={"approval_mode": "interactive", "max_attempts": 0, "refine_with_llm": False},
+        approver=approve, runner=runner,
     )
     assert [call.args[0].plan.id for call in runner.call_args_list] == [first.id]
     assert result.ledger[1]["plan"]["task"]["data_paths"] == ["data.json"]

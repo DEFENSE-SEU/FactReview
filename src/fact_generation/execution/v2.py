@@ -103,6 +103,18 @@ class _CommandValidationError(ValueError):
     """A local command rejection with a constant, safe diagnostic."""
 
 
+class _ExecutionPathError(ValueError):
+    """A rejected execution path with a diagnostic containing no supplied path."""
+
+    def __init__(self, kind: Literal["relative", "escape", "linked"]):
+        self.reason = {
+            "relative": "expected a repository-relative path",
+            "escape": "path escapes repository",
+            "linked": "linked execution path is forbidden",
+        }.get(kind, "unsafe execution path")
+        super().__init__(self.reason)
+
+
 _NONRECOVERABLE_OPERATIONS = frozenset({"execution.cleanup", "execution.integrity"})
 
 
@@ -176,19 +188,19 @@ def _sha(path: Path) -> str:
 def _inside(root: Path, relative: str) -> Path:
     """Reject absolute, traversal, symlink and junction escapes on every OS."""
     if not relative or Path(relative).is_absolute() or re.match(r"^[A-Za-z]:", relative):
-        raise ValueError(f"expected a repository-relative path: {relative}")
+        raise _ExecutionPathError("relative")
     clean = relative.replace("\\", "/")
     if ".." in Path(clean).parts:
-        raise ValueError(f"path escapes repository: {relative}")
+        raise _ExecutionPathError("escape")
     root = root.resolve()
     path = root / clean
     for part in (path, *path.parents):
         if part == root:
             break
         if part.is_symlink() or getattr(part, "is_junction", lambda: False)():
-            raise ValueError(f"linked execution path is forbidden: {relative}")
+            raise _ExecutionPathError("linked")
     if not path.resolve().is_relative_to(root):
-        raise ValueError(f"path escapes repository: {relative}")
+        raise _ExecutionPathError("escape")
     return path
 
 
@@ -1361,6 +1373,14 @@ def _execute_graph(
             training_budget["used"] += 1
         try:
             outcome = RunOutcome.model_validate(runner(request.model_copy(deep=True)))
+        except _ExecutionPathError as exc:
+            outcome = RunOutcome(
+                returncode=1, issue=exc.reason,
+                runtime_seconds=time.monotonic() - begin,
+                operation_failures=[ExecutionOperationFailure(
+                    component="execution.integrity", reason=exc.reason,
+                )],
+            )
         except Exception as exc:
             outcome = RunOutcome(
                 returncode=1, issue=f"runner error ({type(exc).__name__})",
@@ -1477,7 +1497,33 @@ def _execute_graph(
             binding = bindings[condition.id]
             runtime_target = binding.projection.runtime_target if binding.version == 2 else condition
             paper_variance = condition.settings.get("reported_variance")
-            candidates = [item for item in [*outcome.observations, *derived] if aligned(item, runtime_target)]
+            raw_candidates = [item for item in outcome.observations if aligned(item, runtime_target)]
+            derived_candidates = [] if binding.version == 2 else [
+                item for item in derived if aligned(item, runtime_target)
+            ]
+            candidates = derived_candidates if derived_candidates else raw_candidates
+            if derived_candidates and len(raw_candidates) > 1:
+                candidates = [*raw_candidates, *derived_candidates]
+            if len(derived_candidates) == len(raw_candidates) == 1:
+                raw, measured = raw_candidates[0], derived_candidates[0]
+                if (
+                    raw.dataset != measured.dataset
+                    or _metric_key(raw.metric) != _metric_key(measured.metric)
+                    or json.dumps(raw.settings, sort_keys=True, allow_nan=False)
+                    != json.dumps(measured.settings, sort_keys=True, allow_nan=False)
+                    or raw.value != measured.value
+                    or raw.unit != measured.unit
+                    or raw.reported_variance != measured.reported_variance
+                ):
+                    reason = f"{condition.id}: author output conflicts with source-derived scientific observation"
+                    ledger["alignment"].append({
+                        "condition_id": condition.id, "aligned": False, "comparable": False,
+                        "reason": reason, "scientific_consumption": str(science_path),
+                        "raw_observations": outcome.logs["observations"],
+                    })
+                    invalid_comparisons.append(reason)
+                    issues.append(f"{request.plan.id}: {reason}")
+                    continue
             if len(candidates) != 1:
                 ledger["alignment"].append(
                     {

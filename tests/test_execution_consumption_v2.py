@@ -53,7 +53,7 @@ def test_matching_metadata_and_observed_tag_do_not_qualify_selected_resources(or
     assert v2.aligned(observation(), claim.conditions[0])
     result = v2.execute_plans(
         [plan], [claim], materials, tmp_path / "out", runner=metadata_only,
-        config={"max_attempts": 0},
+        config={"max_attempts": 0, "refine_with_llm": False},
     )
     assert calls == [["python", "eval.py"]]
     assert not result.claims[0].evidence

@@ -10,6 +10,7 @@ from fact_generation.execution.tools import docker
 from preprocessing.materials import index_repository
 from schemas.claim import Claim, ClaimLocation, Condition, ExecutionPlan, ExecutionTask, PaperTargetPassage
 from schemas.materials import MaterialBlock, SharedMaterials
+from tests.execution_science_fixtures import accuracy_fixture, record_observer
 from util.subprocess_runner import CommandResult
 from verification.experiment_targets import bind_execution_target
 
@@ -79,10 +80,9 @@ def test_container_writes_cannot_overwrite_host_audit_and_valid_observations_sur
     inputs, tmp_path, monkeypatch, metric_file
 ):
     plan, claim, materials = inputs
-    observed = {"dataset": "d1", "metric": "accuracy", "settings": {"split": "test", "seed": 1}, "value": 0.9}
-    payload = {"observations": [observed]}
     if metric_file:
         plan.task.metric_output = "metrics.json"
+    payload = accuracy_fixture(inputs, monkeypatch)
     seen = {}
 
     def transport(command, *, cwd, timeout_sec):
@@ -92,13 +92,17 @@ def test_container_writes_cannot_overwrite_host_audit_and_valid_observations_sur
         mounts = [command[i + 1] for i, arg in enumerate(command[:-1]) if arg == "-v"]
         run_mount = next(m for m in mounts if m.endswith(":/workspace/run_dir"))
         writable = Path(run_mount.removesuffix(":/workspace/run_dir"))
-        workspace = Path(next(m for m in mounts if m.endswith(":/app")).removesuffix(":/app"))
+        app_mount = next(m for m in mounts if ":/app" in m)
+        workspace = Path(app_mount.split(":/app", 1)[0])
         assert writable != run_dir
         assert writable.is_dir() and writable.is_relative_to(run_dir)
         assert {"source_manifest.json", "ledger.json", "attempt_0"}.isdisjoint(
             path.name for path in writable.iterdir()
         )
-        assert set(mounts) == {f"{writable}:/workspace/run_dir", f"{workspace}:/app"}
+        trusted = run_dir / "attempt_0" / "observer_trusted"
+        assert set(mounts) == {f"{writable}:/workspace/run_dir", f"{workspace}:/app:ro",
+                               f"{trusted}:/factreview-observer:ro"}
+        assert {path.name for path in trusted.iterdir()} == {"config.json", "observer.py"}
         # Same allowed container-relative write as the original vulnerability,
         # now confined to scratch instead of replacing the host-owned manifest.
         (writable / "source_manifest.json").write_text('{"forged":true}', encoding="utf-8")
@@ -107,6 +111,7 @@ def test_container_writes_cannot_overwrite_host_audit_and_valid_observations_sur
         if metric_file:
             (workspace / "metrics.json").write_text(json.dumps(payload), encoding="utf-8")
         seen.update(manifest=manifest, before=before, mounts=mounts, workspace=workspace)
+        record_observer(command, cwd, payload)
         return CommandResult(command, str(cwd), 0, "FACTREVIEW_OBSERVATIONS=" + json.dumps(payload), "", 0.01)
 
     monkeypatch.setattr(v2, "run_command", transport)
@@ -115,7 +120,7 @@ def test_container_writes_cannot_overwrite_host_audit_and_valid_observations_sur
         [claim],
         materials,
         tmp_path / "out",
-        config=v2.ExecutionConfig(refine_with_llm=False, max_attempts=0),
+        config=v2.ExecutionConfig(refine_with_llm=True, max_attempts=0),
         runner=v2.docker_runner,
     )
     assert seen["manifest"].read_bytes() == seen["before"]
@@ -149,3 +154,8 @@ def test_linked_runtime_scratch_rejected_before_transport(inputs, tmp_path, monk
     assert calls == []
     assert not result.claims[0].evidence
     assert "linked execution path" in result.ledger[0]["reason"]
+    assert result.ledger[0]["operation_failures"] == [{
+        "component": "execution.integrity", "reason": "linked execution path is forbidden",
+    }]
+    assert len(result.ledger[0]["attempts"]) == 1 and result.ledger[0]["repairs"] == []
+    assert str(tmp_path) not in result.ledger[0]["reason"]

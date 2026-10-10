@@ -205,6 +205,42 @@ def test_complete_actual_scope_creates_separate_observation_before_original_judg
     assert not missing.claims[0].evidence and missing_calls == []
 
 
+@pytest.mark.parametrize("changed_field,value", [(None, None), ("value", 2), ("unit", "percent"), ("reported_variance", 0.5)])
+def test_qualified_observation_keeps_matching_raw_and_rejects_conflicts(tmp_path, monkeypatch, changed_field, value):
+    original_runner = captured_runner
+    raw = {"dataset": "Benchmark", "metric": "mse", "settings": {"model": "Affine", "split": "test"}, "value": 1}
+    if changed_field:
+        raw[changed_field] = value
+    original_observation = v2.Observation.model_validate(raw).model_dump(mode="json")
+
+    def runner_factory(data, weights):
+        run = original_runner(data, weights)
+
+        def run_with_raw(request):
+            outcome = run(request)
+            outcome.observations = [v2.Observation.model_validate(raw)]
+            return outcome
+
+        return run_with_raw
+
+    monkeypatch.setattr(__name__ + ".captured_runner", runner_factory)
+    result, calls = run_case(tmp_path, monkeypatch)
+    row = result.ledger[0]
+    attempt = row["attempts"][0]
+    assert len(calls) == 1 and attempt["observations"] == [original_observation]
+    assert json.loads(Path(attempt["logs"]["observations"]).read_text(encoding="utf-8")) == [original_observation]
+    science = json.loads(Path(attempt["logs"]["scientific_consumption"]).read_text(encoding="utf-8"))
+    assert science["scientific_qualification"] and science["derived_observations"][0]["value"] == 1
+    if changed_field:
+        assert not result.claims[0].evidence and not row["alignment"][0]["comparable"]
+        assert "author output conflicts" in row["alignment"][0]["reason"]
+    else:
+        assert len(result.claims[0].evidence) == 1
+        assert result.claims[0].evidence[0].aligned and result.claims[0].evidence[0].sufficient
+        assert row["alignment"][0]["scientific_consumption"] == attempt["logs"]["scientific_consumption"]
+        assert result.claims[0].evidence[0].pointer.locator == attempt["logs"]["scientific_consumption"]
+
+
 def test_equal_actual_value_wrong_partition_cannot_alias_to_paper_split(tmp_path, monkeypatch):
     result, calls = run_case(tmp_path, monkeypatch, split="train")
     row = result.ledger[0]
