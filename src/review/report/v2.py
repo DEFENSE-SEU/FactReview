@@ -297,6 +297,7 @@ def _theory_derivations(claim, _navigation=None):
 
 
 def _checked_report(review):
+    from review.delivery import checked_delivery
     from review.report.advice import checked_review
     from screening.reference_corrections import checked_correction
 
@@ -304,7 +305,7 @@ def _checked_report(review):
     for finding in result.findings:
         if finding.reference_correction:
             finding.reference_correction = checked_correction(finding.reference_correction)
-    return result
+    return checked_delivery(result)
 
 
 def _reference_correction(correction):
@@ -487,7 +488,10 @@ def render_markdown(
         "| Status | Count |",
         "|---|---:|",
     ]
+    from review.delivery import delivery_lines
+
     lines.extend(f"| {status.value} | {review.summary_counts[status]} |" for status in STATUS_ORDER)
+    lines += delivery_lines(review)
     lines += claim_coverage_lines(claim_coverage)
     execution = execution_summary(review)
     execution_lines = [
@@ -792,7 +796,13 @@ def write_review(
         )
     if presentation != "full":
         raise ValueError("Unknown report presentation")
-    result = _checked_report(review)
+    from review.delivery import checked_delivery
+
+    result = checked_delivery(
+        _checked_report(review), figure_coverage=figure_coverage, figure_context_coverage=figure_context_coverage,
+        table_coverage=table_coverage, table_context_coverage=table_context_coverage,
+        writing_coverage=writing_coverage, claim_coverage=claim_coverage,
+    )
     validate_publication_language(
         [result.model_dump(), issues or [], (token_usage or {}).get("warnings", [])]
     )
@@ -856,4 +866,18 @@ def write_review(
             outputs["pdf"] = str(pdf)
         except Exception as exc:
             outputs["pdf_error"] = f"{type(exc).__name__}: {exc}"
+            from schemas.review import DeliveryCheck
+
+            result = checked_delivery(result, additional_checks=[DeliveryCheck(
+                stage="report", component="pdf", state="failed", reason=outputs["pdf_error"],
+            )])
+            result.review_markdown = render_markdown(
+                result, issues=issues, figure_coverage=figure_coverage,
+                figure_context_coverage=figure_context_coverage, table_coverage=table_coverage,
+                table_context_coverage=table_context_coverage, writing_coverage=writing_coverage,
+                claim_coverage=claim_coverage, anonymity_policy=anonymity_policy,
+                token_usage=token_usage, _checked=True,
+            )
+            markdown.write_text(result.review_markdown, encoding="utf-8")
+            artifact.write_text(result.model_dump_json(indent=2), encoding="utf-8")
     return outputs

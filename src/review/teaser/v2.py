@@ -19,6 +19,7 @@ def write_teaser(review: FinalReview, output_dir: Path) -> dict[str, str]:
         "paper_key": review.paper_key,
         "run_status": review.run_status,
         "incomplete_stages": review.incomplete_stages,
+        "delivery_checks": [check.model_dump(mode="json") for check in review.delivery_checks],
         "execution": execution_summary(review),
         "counts": {status.value: review.summary_counts[status] for status in STATUS_ORDER},
         "claims": [
