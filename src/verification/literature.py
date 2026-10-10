@@ -16,6 +16,7 @@ from llm.client import LLMConfig, llm_json, resolve_llm_config
 from schemas.claim import AuthorQuestion, Claim, Evidence, EvidencePointer, Finding
 from schemas.limitations import VerificationLimitation
 from schemas.materials import SharedMaterials
+from schemas.review import DeliveryCheck
 from screening.visual_audit import redacted_record, redaction_scope
 from util.cutoff_date import (
     concurrent_window_start,
@@ -709,6 +710,10 @@ async def verify_literature(
             ):
                 provider = "arxiv"
         provider = provider if isinstance(provider, str) and provider else "unknown"
+        global_failure = claim is None and limited and category in {
+            "service_failure", "search_protocol_failure", "metadata_protocol_failure",
+            "reader_protocol_failure", "comparison_protocol_failure", "identity_conflict",
+        }
         event = {
             "operation": operation,
             "identifier": identifier,
@@ -717,9 +722,17 @@ async def verify_literature(
             "condition_ids": ids,
             "error": str(error),
             "pointer": f"{path}#/{pointer}",
-            "system_limited": bool(limited and ids),
+            "system_limited": bool(limited and ids) or global_failure,
         }
         audit["context_events"].append(event)
+        if global_failure:
+            result.delivery_checks.append(DeliveryCheck(
+                stage="verification", component="global_literature." + operation, state="failed",
+                reason=diagnostic_copy(
+                    f"{operation} ({category}) for {identifier or 'submitted comparison'}, "
+                    f"provider={provider}: {error}. Audit: {event['pointer']}"
+                ),
+            ))
         if claim and limited and ids:
             result.verification_limitations.append(
                 VerificationLimitation(

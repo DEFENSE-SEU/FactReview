@@ -116,24 +116,52 @@ def test_requested_full_pdf_failure_is_recorded_without_retry(tmp_path, monkeypa
     assert len(calls) == 1 and json.loads(Path(other["json"]).read_text("utf-8"))["run_status"] == "completed"
 
 
-def test_layered_late_failure_preserves_healthy_pdfs_and_marks_pending_finalization(tmp_path, monkeypatch):
+@pytest.mark.parametrize("finalization_failure", [None, "Technical appendix", "Reading report"])
+def test_layered_late_failure_reexports_only_healthy_pdfs_and_preserves_history(tmp_path, monkeypatch, finalization_failure):
     calls = []
 
     def build(review, markdown, context, targets, title):
-        calls.append(title)
+        calls.append((title, review.run_status, list(review.incomplete_stages), markdown))
         if len(calls) == 3:
             raise RuntimeError("Fixture bundle failed")
-        return b"fixture PDF bytes"
+        if len(calls) > 3 and title == finalization_failure:
+            raise RuntimeError("Fixture finalization failed")
+        import re
+
+        targets.update({anchor: len(calls) + 10 for anchor in re.findall(r'id="([^"]+)"', markdown)})
+        return json.dumps({"status": review.run_status, "incomplete_stages": review.incomplete_stages,
+                           "call": len(calls), "title": title}).encode()
 
     monkeypatch.setattr("review.report.compact._build_pdf", build)
     original = seed()
     output = write_review(original, tmp_path / "layered", presentation="layered")
     saved = json.loads(Path(output["json"]).read_text("utf-8"))
     manifest = json.loads(Path(output["manifest"]).read_text("utf-8"))
-    assert len(calls) == 3 and "pdf" in output and "appendix_pdf" in output and "bundle_pdf_error" in output
+    assert len(calls) == 5 and "bundle_pdf_error" in output and "bundle_pdf" not in output
+    assert [row[0] for row in calls] == ["Technical appendix", "Reading report", "Reading report and technical appendix", "Technical appendix", "Reading report"]
     assert saved["run_status"] == "partial" and saved["claims"] == original.model_dump(mode="json")["claims"]
-    assert "pdf_delivery_finalization" in {c["component"] for c in saved["delivery_checks"]}
+    assert ("pdf_delivery_finalization" in {c["component"] for c in saved["delivery_checks"]}) == bool(finalization_failure)
+    for key, title, initial_call in (("appendix_pdf", "Technical appendix", 1), ("pdf", "Reading report", 2)):
+        history = json.loads(Path(output["history_" + key]).read_bytes())
+        assert history == {"status": "completed", "incomplete_stages": [], "call": initial_call, "title": title}
+        assert manifest["pdf_snapshots"]["history_" + key]["delivery"]["run_status"] == "completed"
+        if title == finalization_failure:
+            assert key not in output and key + "_finalization_error" in output
+            assert not (tmp_path / "layered" / Path(output["history_" + key]).name).exists()
+        else:
+            pdf = json.loads(Path(output[key]).read_bytes())
+            assert pdf["status"] == saved["run_status"] == "partial" and pdf["incomplete_stages"] == saved["incomplete_stages"] == ["report"]
+            assert manifest["pdf_snapshots"][key]["delivery"]["run_status"] == "partial"
+    assert all(row[1:3] == ("partial", ["report"]) for row in calls[3:])
     assert manifest["records_equal_saved_json"]
     for key, artifact in manifest["artifacts"].items():
         assert artifact["sha256"] == hashlib.sha256(Path(output[key]).read_bytes()).hexdigest()
     assert all("report export incomplete" in Path(output[key]).read_text("utf-8") for key in ("appendix_markdown", "bundle_markdown"))
+    if finalization_failure == "Technical appendix":
+        assert manifest["pdf_targets"]["appendix"] == {}
+        assert "technical_appendix.pdf, page" not in calls[-1][3]
+    else:
+        assert manifest["pdf_targets"]["appendix"]
+        assert all(page == 14 for page in manifest["pdf_targets"]["appendix"].values())
+    if finalization_failure:
+        assert "Fixture finalization failed" in Path(output["markdown"]).read_text("utf-8")

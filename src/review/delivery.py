@@ -56,7 +56,7 @@ def checked_delivery(review: FinalReview, *, stages=None, extraction_status=None
             add("report", "advice", "unavailable", "Requested claim advice is unavailable.", claim.id)
     unique = {}
     for record in records:
-        unique.setdefault((record.stage, record.component, record.state, record.claim_id), record)
+        unique.setdefault((record.stage, record.component, record.state, record.claim_id, record.reason), record)
     result.delivery_checks = list(unique.values())
     incomplete = set(result.incomplete_stages) | {record.stage for record in result.delivery_checks}
     result.incomplete_stages = [stage for stage in STAGES if stage in incomplete]

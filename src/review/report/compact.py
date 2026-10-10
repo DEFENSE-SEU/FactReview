@@ -521,6 +521,7 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
         "review_bundle.md",
         "review_bundle.pdf",
         "report_manifest.json",
+        "pdf_history",
     )
     if any((output_dir / name).exists() for name in names):
         raise FileExistsError(
@@ -599,12 +600,25 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
     artifact.write_text(checked.model_dump_json(indent=2), encoding="utf-8")
     outputs["json"] = str(artifact)
     pages = {key: {} for key in ("main", "appendix", "bundle")}
+    pdf_snapshots = {}
+    exports = (
+        ("technical_appendix.pdf", "appendix_pdf", "appendix", "Technical appendix"),
+        ("final_review.pdf", "pdf", "main", "Reading report"),
+        ("review_bundle.pdf", "bundle_pdf", "bundle", "Reading report and technical appendix"),
+    )
+
+    def pdf_snapshot(record, target, phase):
+        return {
+            "phase": phase,
+            "records_sha256": _digest(record.model_dump(mode="json", exclude={"review_markdown"})),
+            "delivery": {key: record.model_dump(mode="json")[key]
+                         for key in ("run_status", "incomplete_stages", "delivery_checks")},
+            "pages": dict(pages[target]),
+        }
+
     if render_pdf:
-        for name, key, text, target, title in (
-            ("technical_appendix.pdf", "appendix_pdf", appendix, "appendix", "Technical appendix"),
-            ("final_review.pdf", "pdf", main, "main", "Reading report"),
-            ("review_bundle.pdf", "bundle_pdf", bundle, "bundle", "Reading report and technical appendix"),
-        ):
+        for name, key, target, title in exports:
+            text = {"main": main, "appendix": appendix, "bundle": bundle}[target]
             try:
                 content = (
                     text if target == "bundle" else _pdf_markdown(text, appendix_pages=pages["appendix"])
@@ -613,6 +627,7 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
                 path = output_dir / name
                 path.write_bytes(data)
                 outputs[key] = str(path)
+                pdf_snapshots[key] = pdf_snapshot(checked, target, "initial")
             except Exception as exc:
                 outputs[key + "_error"] = f"{type(exc).__name__}: {exc}"
                 pages[target].clear()
@@ -627,23 +642,61 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
 
         checks = [DeliveryCheck(stage="report", component=key.removesuffix("_error"),
                                 state="failed", reason=reason) for key, reason in export_errors.items()]
-        if any(key.endswith("pdf") for key in outputs):
-            checks.append(DeliveryCheck(
-                stage="report", component="pdf_delivery_finalization", state="incomplete",
-                reason="Successful PDFs are preserved with pre-export delivery metadata; finalization is pending.",
-            ))
         checked = checked_delivery(checked, additional_checks=checks)
-        # Preserve evidence text, source anchors and existing page navigation.
-        # Healthy PDFs remain traceable; their late-status finalization is explicit.
-        detail = "\n".join(delivery_lines(checked))
-        main = main.replace(f"delivery: {snapshot['run_status']};", f"delivery: {checked.run_status};", 1)
-        main = main.replace(
-            f"Incomplete stages: {v2._text(', '.join(snapshot['incomplete_stages']) or 'none recorded')}.",
-            f"Incomplete stages: {v2._text(', '.join(checked.incomplete_stages))}.", 1,
-        )
-        main += "\n" + detail
-        appendix += "\n**Partial review — report export incomplete.**\n" + detail
-        bundle = _pdf_markdown(main, bundle=True) + "\n\n" + _pdf_markdown(appendix, bundle=True)
+        baseline_main, baseline_appendix = main, appendix
+
+        def final_texts(record):
+            detail = "\n".join(delivery_lines(record))
+            notice = "\nPDF delivery-status snapshots and per-file export details are recorded in report_manifest.json.\n"
+            final_main = baseline_main.replace(
+                f"delivery: {snapshot['run_status']};", f"delivery: {record.run_status};", 1,
+            ).replace(
+                f"Incomplete stages: {v2._text(', '.join(snapshot['incomplete_stages']) or 'none recorded')}.",
+                f"Incomplete stages: {v2._text(', '.join(record.incomplete_stages))}.", 1,
+            ) + "\n" + detail + notice
+            final_appendix = baseline_appendix.replace(
+                f"**Partial review — incomplete stages: {v2._text(', '.join(snapshot['incomplete_stages']))}.**",
+                f"**Partial review — incomplete stages: {v2._text(', '.join(record.incomplete_stages))}.**", 1,
+            ) + "\n**Partial review — report export incomplete.**\n" + detail + notice
+            final_bundle = _pdf_markdown(final_main, bundle=True) + "\n\n" + _pdf_markdown(final_appendix, bundle=True)
+            return final_main, final_appendix, final_bundle
+
+        healthy = [export for export in exports if export[1] in outputs]
+        if healthy:
+            history = output_dir / "pdf_history"
+            history.mkdir(exist_ok=False)
+        # Only initially successful PDFs are eligible for the one static
+        # status update. The failed initial export is never retried.
+        for name, key, target, title in healthy:
+            initial_path = Path(outputs.pop(key))
+            history_path = history / name
+            initial_path.rename(history_path)
+            outputs["history_" + key] = str(history_path)
+            pdf_snapshots["history_" + key] = pdf_snapshots.pop(key)
+            pages[target].clear()
+            final_main, final_appendix, final_bundle = final_texts(checked)
+            text = {"main": final_main, "appendix": final_appendix, "bundle": final_bundle}[target]
+            try:
+                content = text if target == "bundle" else _pdf_markdown(text, appendix_pages=pages["appendix"])
+                data = _build_pdf(checked, content, context, pages[target], title)
+                initial_path.write_bytes(data)
+                outputs[key] = str(initial_path)
+                pdf_snapshots[key] = pdf_snapshot(checked, target, "finalized")
+            except Exception as exc:
+                error = f"{type(exc).__name__}: {exc}"
+                outputs[key + "_finalization_error"] = error
+                pages[target].clear()
+                checked = checked_delivery(checked, additional_checks=[
+                    DeliveryCheck(stage="report", component=key + ".finalization", state="failed", reason=error),
+                    DeliveryCheck(stage="report", component="pdf_delivery_finalization", state="incomplete",
+                                  reason="A healthy PDF could not be synchronized; its initial bytes are retained in pdf_history."),
+                ])
+        main, appendix, bundle = final_texts(checked)
+        def nondelivery(value):
+            return {key: item for key, item in value.items()
+                    if key not in {"run_status", "incomplete_stages", "delivery_checks"}}
+        if nondelivery(checked.model_dump(mode="json", exclude={"review_markdown"})) != nondelivery(snapshot):
+            raise ValueError("PDF finalization changed non-delivery review records")
         for key, text in (("markdown", main), ("appendix_markdown", appendix), ("bundle_markdown", bundle)):
             Path(outputs[key]).write_text(text, encoding="utf-8")
         checked.review_markdown = main
@@ -707,8 +760,11 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
         "records": locations,
         "source_usages": source_usages,
         "pdf_targets": pages,
+        "pdf_snapshots": pdf_snapshots,
         "artifacts": {
-            key: {"name": Path(path).name, "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest()}
+            key: {"name": Path(path).relative_to(output_dir).as_posix(),
+                  "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest(),
+                  "role": "initial_pdf_history" if key.startswith("history_") else "current_delivery"}
             for key, path in outputs.items()
             if not key.endswith("_error")
         },

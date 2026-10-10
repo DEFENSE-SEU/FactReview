@@ -11,11 +11,10 @@ from schemas.review import FinalReview
 COLORS = {"flawed": "#b42318", "questioned": "#b54708", "unverified": "#475467", "supported": "#067647"}
 
 
-def write_teaser(review: FinalReview, output_dir: Path) -> dict[str, str]:
-    validate_publication_language(review.model_dump())
-    output_dir.mkdir(parents=True, exist_ok=True)
+def teaser_payload(review: FinalReview) -> dict:
+    """The same retained records are available even when visual export fails."""
     claims = ordered_claims(review)
-    payload = {
+    return {
         "paper_key": review.paper_key,
         "run_status": review.run_status,
         "incomplete_stages": review.incomplete_stages,
@@ -32,6 +31,13 @@ def write_teaser(review: FinalReview, output_dir: Path) -> dict[str, str]:
             for claim in claims
         ],
     }
+
+
+def write_teaser(review: FinalReview, output_dir: Path) -> dict[str, str]:
+    validate_publication_language(review.model_dump())
+    output_dir.mkdir(parents=True, exist_ok=True)
+    claims = ordered_claims(review)
+    payload = teaser_payload(review)
     data = output_dir / "teaser.json"
     data.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     prompt = output_dir / "teaser_prompt.md"

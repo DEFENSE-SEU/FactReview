@@ -13,11 +13,13 @@ from fact_generation.refcheck.refcheck import ReferenceCheckBundle
 from fact_generation.refcheck.refcheck import check_references_with_records as check_references
 from schemas.claim import Contract, Evidence, EvidencePointer, Finding, NonEmpty
 from schemas.materials import SharedMaterials
+from schemas.review import DeliveryCheck
 from screening.checks import ask, paper_finding
 from screening.reference_corrections import bibliographic_ids as _bibliographic_ids
 from screening.reference_corrections import bound_record, build_correction, printed_publication_venue
 from screening.reference_corrections import url_identifiers as _url_identifiers
 from screening.reference_warnings import workshop_publication_metadata
+from screening.visual_audit import redacted_record
 
 
 class ReferenceDecision(Contract):
@@ -71,22 +73,40 @@ def _reference_identity(row, block):
 
 
 def check_bibliography(
-    materials: SharedMaterials, output_dir: Path, *, checker=None, call=None
+    materials: SharedMaterials, output_dir: Path, *, checker=None, call=None, delivery_checks=None
 ) -> tuple[list[Finding], list[str]]:
     if not materials.bibliography:
         run_stats.record_module_status("reference_check", "skipped")
         return [], ["Reference check unavailable: parser supplied no bibliography entries."]
     with run_stats.timed_module("reference_check"):
         try:
-            findings, issues, status = _check_bibliography(materials, output_dir, checker=checker, call=call)
+            findings, issues, status = _check_bibliography(
+                materials, output_dir, checker=checker, call=call, delivery_checks=delivery_checks
+            )
         except Exception as exc:
             run_stats.record_module_status("reference_check", "failed", warning=str(exc))
+            _delivery_failure(
+                delivery_checks, "reference_checker", "failed",
+                f"Reference checking raised {type(exc).__name__}. Audit: {output_dir / 'reference_check.json'}",
+            )
             raise
+        if status == "failed":
+            _delivery_failure(
+                delivery_checks, "reference_checker", "failed",
+                f"Reference checker returned an unsuccessful or invalid result. Audit: {output_dir / 'reference_check.json'}",
+            )
         run_stats.record_module_status("reference_check", status, warning="; ".join(issues))
         return findings, issues
 
 
-def _check_bibliography(materials, output_dir, *, checker=None, call=None):
+def _delivery_failure(sink, component, state, reason):
+    if sink is not None:
+        sink.append(DeliveryCheck(
+            stage="screening", component=component, state=state, reason=redacted_record(reason, cfg=None)
+        ))
+
+
+def _check_bibliography(materials, output_dir, *, checker=None, call=None, delivery_checks=None):
     output_dir.mkdir(parents=True, exist_ok=True)
     path = output_dir / "bibliography.txt"
     path.write_text("\n\n".join(b.text for b in materials.bibliography), encoding="utf-8")
@@ -196,7 +216,8 @@ def _check_bibliography(materials, output_dir, *, checker=None, call=None):
             finding = finding.model_copy(update={"reference_correction": corrections[index]})
         findings.append(finding)
     checked_findings, validation_issues = _confirm_reference_candidates(
-        materials, candidates, result_path, output_dir, call=call, corrections=corrections
+        materials, candidates, result_path, output_dir, call=call, corrections=corrections,
+        delivery_checks=delivery_checks,
     )
     findings.extend(checked_findings)
     issues.extend(validation_issues)
@@ -229,7 +250,7 @@ def _check_bibliography(materials, output_dir, *, checker=None, call=None):
 
 
 def _confirm_reference_candidates(
-    materials, candidates, result_path, output_dir, *, call=None, corrections=None
+    materials, candidates, result_path, output_dir, *, call=None, corrections=None, delivery_checks=None
 ):
     """Keep parser-based metadata mismatches separate from PDF-confirmed defects."""
     findings, issues, audit = [], [], []
@@ -263,6 +284,11 @@ def _confirm_reference_candidates(
         audit.extend(records)
         page = next((page for page in materials.pages if page.page == page_number), None)
         if page is None or not Path(page.path).is_file():
+            _delivery_failure(
+                delivery_checks, "reference_pdf", "unavailable",
+                f"Original PDF page {page_number} is unavailable for reference confirmation. "
+                f"Audit: {output_dir / 'reference_validation.json'} (page {page_number}).",
+            )
             for record in records:
                 issues.append(
                     f"{record['candidate_id']}: reference mismatch unconfirmed; original PDF page image "
@@ -311,6 +337,11 @@ def _confirm_reference_candidates(
             if any(decision.page != page_number for decision in review.results):
                 raise ValueError("Reference validation returned an unrelated PDF page")
         except Exception as exc:
+            _delivery_failure(
+                delivery_checks, "reference_pdf", "failed",
+                f"Original PDF reference confirmation raised {type(exc).__name__} on page {page_number}. "
+                f"Audit: {output_dir / 'reference_validation.json'} (page {page_number}).",
+            )
             for record in records:
                 record.update(status="failed", error=str(exc))
                 issues.append(

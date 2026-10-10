@@ -10,6 +10,8 @@ from pydantic import Field
 from schemas.claim import Claim, Contract, EvidenceNeed, ExecutionPlan, Finding
 from schemas.limitations import VerificationLimitation
 from schemas.materials import SharedMaterials
+from schemas.review import DeliveryCheck
+from screening.visual_audit import redacted_record
 from verification.contracts import BranchResult, RejectedPlan
 
 
@@ -19,6 +21,7 @@ class VerificationResult(Contract):
     findings: list[Finding] = Field(default_factory=list)
     issues: list[str] = Field(default_factory=list)
     dispatched: dict[str, list[EvidenceNeed]] = Field(default_factory=dict)
+    delivery_checks: list[DeliveryCheck] = Field(default_factory=list)
 
 
 async def _invoke(branch, claim, materials):
@@ -32,6 +35,8 @@ async def _invoke(branch, claim, materials):
 
 
 def _validate_result(claim: Claim, name: EvidenceNeed, result: BranchResult):
+    if result.delivery_checks:
+        raise ValueError("Claim branches use scoped verification limitations, not global delivery checks")
     if name != EvidenceNeed.EXPERIMENTS and result.plans:
         raise ValueError("Only Experiments may emit execution plans")
     if name != EvidenceNeed.THEORY and result.theory_derivations:
@@ -187,10 +192,27 @@ async def verify_claims(
                 or global_result.verification_limitations
             ):
                 raise ValueError("Global literature produces findings/issues only")
+            if any(
+                check.stage != "verification" or check.claim_id is not None
+                or check.component not in {
+                    "global_literature", "global_literature.search", "global_literature.lookup_metadata",
+                    "global_literature.read_papers", "global_literature.comparison",
+                }
+                for check in global_result.delivery_checks
+            ):
+                raise ValueError("Global literature delivery checks require their verification/global scope")
             result.findings.extend(global_result.findings)
             result.issues.extend(global_result.issues)
+            result.delivery_checks.extend(global_result.delivery_checks)
         except Exception as exc:
             result.issues.append(f"Global literature search failed: {exc}")
+            result.delivery_checks.append(DeliveryCheck(
+                stage="verification", component="global_literature", state="failed",
+                reason=redacted_record(
+                    f"Global literature raised {type(exc).__name__}. Audit: {output_dir / 'verification.json'}#/issues",
+                    cfg=None,
+                ),
+            ))
     if len({plan.id for plan in result.plans}) != len(result.plans):
         raise ValueError("Execution plan identifiers must be unique")
     output_dir.mkdir(parents=True, exist_ok=True)
