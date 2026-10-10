@@ -155,3 +155,40 @@ def test_first_batch_failures_budget_unresolved_and_later_window_preserve_partia
     assert result.coverage["windows"][0]["first_batches"]["remaining_required_claim_ids"]
     assert result.coverage["windows"][1]["first_batches"]["planned_claim_batches"] == 0
     assert result.coverage["budget"]["review_calls"] == 4 and not result.coverage["revisions"]
+
+
+@pytest.mark.parametrize("module,schema_type,version", [
+    ("coverage_discovery", m.CoverageDiscoveryV1, "claim-coverage-discovery-v1"),
+    ("coverage_first_batch", m.CoverageFirstBatchV1, "claim-coverage-first-batch-v1"),
+])
+def test_first_request_requires_explicit_version_and_rejects_missing_response(tmp_path, module, schema_type, version):
+    paper, claims = inputs(1)
+    before = [c.model_dump(mode="json") for c in claims]
+    calls = []
+    valid = first_callback(calls)
+
+    def missing_version(**kw):
+        raw = valid(**kw)
+        if kw["module"].endswith(module):
+            schema = calls[-1][2]
+            assert "schema_version" in schema["required"]
+            assert schema["properties"]["schema_version"]["const"] == version
+            assert set(schema["required"]) == set(schema_type.model_json_schema()["required"]) | {"schema_version"}
+            assert f'schema_version="{version}"' in kw["system"]
+            assert schema_type.model_fields["schema_version"].default == version
+            assert raw.pop("schema_version") == version
+        return raw
+
+    result = m.review_claim_coverage(paper, claims, first_review_batch_size=3,
+        call=missing_version, output_dir=tmp_path)
+    assert result.coverage["status"] == "partial" and not result.coverage["revisions"]
+    assert result.coverage["claim_checks_required"] == 1 and result.coverage["claim_checks_completed"] == 0
+    assert [c.model_dump(mode="json") for c in result.claims] == before
+    assert [c.model_dump(mode="json") for c in claims] == before
+    assert not any(mod.endswith(("coverage_followup", "coverage_validation", "coverage_original_batch", "coverage_batch_decisions")) for mod, _, _ in calls)
+    audit = saved(tmp_path)
+    failed = [a for a in audit["attempts"] if a["module"].endswith(module)]
+    assert len(failed) == 1 and failed[0]["status"] == "failed"
+    assert "schema_version" not in failed[0]["response"]
+    assert failed[0]["error"] == "ValueError: First response must declare the exact requested protocol"
+    assert audit["original_claims"] == before
