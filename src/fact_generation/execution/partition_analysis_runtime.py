@@ -45,6 +45,47 @@ def _stdout_return(payload, receipt, request, source_files):
              and source == raw.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n"),
              "analysis_entry_source_changed")
     tree = ast.parse(source)
+    if request.metric_output is not None:
+        writes = [n for n in ast.walk(tree) if isinstance(n, ast.Call)
+                  and isinstance(n.func, ast.Attribute) and isinstance(n.func.value, ast.Name)
+                  and n.func.value.id == "json" and n.func.attr == "dump"]
+        _require(len(writes) == 1, "analysis_file_write_binding_unknown")
+        written = writes[0]
+        blocks = [n for n in tree.body if isinstance(n, ast.With) and len(n.items) == 1
+                  and len(n.body) == 1 and isinstance(n.body[0], ast.Expr) and n.body[0].value is written]
+        _require(len(blocks) == 1, "analysis_file_write_binding_unknown")
+        item = blocks[0].items[0]
+        opened = item.context_expr
+        _require(isinstance(opened, ast.Call) and isinstance(opened.func, ast.Name)
+                 and opened.func.id == "open" and len(opened.args) == 2
+                 and all(isinstance(n, ast.Constant) and type(n.value) is str for n in opened.args)
+                 and opened.args[0].value == request.metric_output and opened.args[1].value == "w"
+                 and len(opened.keywords) == 1 and opened.keywords[0].arg == "encoding"
+                 and isinstance(opened.keywords[0].value, ast.Constant) and opened.keywords[0].value.value == "utf-8"
+                 and isinstance(item.optional_vars, ast.Name) and len(written.args) == 2 and not written.keywords
+                 and isinstance(written.args[1], ast.Name) and written.args[1].id == item.optional_vars.id,
+                 "analysis_file_literal_path_or_encoding_unknown")
+        called = written.args[0]
+    else:
+        called = _printed_driver(tree)
+    _require(isinstance(called, ast.Call) and isinstance(called.func, ast.Name)
+             and not called.args and not called.keywords, "analysis_stdout_driver_unknown")
+    report = receipt["report"]
+    sites = [i for i, site in enumerate(report["sites"])
+             if site["path"] == "/app/" + entry and site["qualname"] == called.func.id]
+    _require(len(sites) == 1, "analysis_stdout_driver_not_observed")
+    events = [event for event in report["events"] if event["site"] == sites[0]]
+    _require(len(events) == 2 and events[0]["event"] == "call" and events[0]["arguments"] == {}
+             and events[0]["parent_invocation"] is None and events[1]["event"] == "return"
+             and events[0]["invocation"] == events[1]["invocation"]
+             and _digest(events[1]["value"]) == _digest(_snapshot(payload, 65536)),
+             "analysis_stdout_observed_return_conflicts")
+    return {"site": sites[0], "invocation": events[0]["invocation"],
+            "call_order": events[0]["order"], "return_order": events[1]["order"],
+            "output_transport": "fresh_json_file" if request.metric_output is not None else "stdout"}
+
+
+def _printed_driver(tree):
     prints = [n for n in ast.walk(tree) if isinstance(n, ast.Call)
               and isinstance(n.func, ast.Name) and n.func.id == "print"]
     _require(len(prints) == 1 and any(isinstance(n, ast.Expr) and n.value is prints[0]
@@ -59,25 +100,14 @@ def _stdout_return(payload, receipt, request, source_files):
     called = encoded.args[0]
     _require(isinstance(called, ast.Call) and isinstance(called.func, ast.Name)
              and not called.args and not called.keywords, "analysis_stdout_driver_unknown")
-    report = receipt["report"]
-    sites = [i for i, site in enumerate(report["sites"])
-             if site["path"] == "/app/" + entry and site["qualname"] == called.func.id]
-    _require(len(sites) == 1, "analysis_stdout_driver_not_observed")
-    events = [event for event in report["events"] if event["site"] == sites[0]]
-    _require(len(events) == 2 and events[0]["event"] == "call" and events[0]["arguments"] == {}
-             and events[0]["parent_invocation"] is None and events[1]["event"] == "return"
-             and events[0]["invocation"] == events[1]["invocation"]
-             and _digest(events[1]["value"]) == _digest(_snapshot(payload, 65536)),
-             "analysis_stdout_observed_return_conflicts")
-    return {"site": sites[0], "invocation": events[0]["invocation"],
-            "call_order": events[0]["order"], "return_order": events[1]["order"]}
+    return called
 
 
 def build_partition_runtime_context(proposal, *, plan, claim, materials, request, outcome, source_files):
     """Rebuild original inputs and actual producer/output facts before review."""
     parsed = PartitionRuntimeProposal.model_validate(proposal)
     _require(request.plan.model_dump(mode="json") == plan.model_dump(mode="json"), "analysis_original_plan_changed")
-    _require(request.metric_output is None and plan.run_mode == "analysis", "analysis_protected_stdout_required")
+    _require(plan.run_mode == "analysis", "analysis_run_mode_required")
     measured = analyze_partition(parsed.analysis.model_dump(mode="json"), plan=plan, claim=claim,
                                  materials=materials, workspace=request.workspace)
     _require(measured["host_measurement"] is not None, measured["reason"])
@@ -102,7 +132,11 @@ def build_partition_runtime_context(proposal, *, plan, claim, materials, request
     prefix = "FACTREVIEW_OBSERVATIONS="
     if text.startswith(prefix):
         text = text[len(prefix):]
-    payload = _json(text)
+    if request.metric_output is None:
+        payload = _json(text)
+    else:
+        _require("metric_file_output" in receipt, "analysis_metric_file_receipt_required")
+        payload = receipt["metric_file_output"]["payload"]
     _require(type(payload) is dict and _digest(payload) == _digest(_json(raw)), "analysis_stdout_raw_output_conflicts")
     return_binding = _stdout_return(payload, receipt, request, source_files)
     selector = parsed.raw_value_selector
@@ -125,12 +159,19 @@ def build_partition_runtime_context(proposal, *, plan, claim, materials, request
     _require(_digest([Observation.model_validate(row).model_dump(mode="json") for row in decoded])
              == _digest([row.model_dump(mode="json") for row in outcome.observations]),
              "analysis_decoded_observations_unsupported_or_changed")
+    selected_decoded = None
     if decoded:
-        _require(len(decoded) == len(mapping) == 1, "analysis_decoded_scope_ambiguous")
-        row, location = decoded[0], mapping[0]
-        expected_selector = ([*location["canonical_path"], "value"] if "canonical_path" in location
-                             else [*location["root_path"], *location["metric_path"]])
-        _require(selector == expected_selector and row.get("dataset") == facts["unreviewed_metadata"]["dataset"]
+        _require(type(mapping) is list and len(decoded) == len(mapping), "analysis_decoded_scope_ambiguous")
+        selected = [
+            (index, row, location)
+            for index, (row, location) in enumerate(zip(decoded, mapping, strict=True))
+            if selector == ([*location["canonical_path"], "value"] if "canonical_path" in location
+                            else [*location["root_path"], *location["metric_path"]])
+        ]
+        _require(len(selected) == 1, "analysis_decoded_scope_ambiguous")
+        index, row, location = selected[0]
+        selected_decoded = {"index": index, "location": location, "observation": row}
+        _require(row.get("dataset") == facts["unreviewed_metadata"]["dataset"]
                  and _metric_key(row.get("metric", "")) == _metric_key(facts["unreviewed_metadata"]["metric"])
                  and type(row.get("value")) in (int, float) and row["value"] == value,
                  "analysis_decoded_metric_conflicts")
@@ -156,8 +197,8 @@ def build_partition_runtime_context(proposal, *, plan, claim, materials, request
         "value": measured["host_measurement"]["value"]}
     if "sample_count" in condition.settings:
         observed["settings"]["sample_count"] = measured["host_measurement"]["sample_count"]
-    if decoded and decoded[0].get("unit") is not None:
-        observed["unit"] = decoded[0]["unit"]
+    if selected_decoded is not None and selected_decoded["observation"].get("unit") is not None:
+        observed["unit"] = selected_decoded["observation"]["unit"]
     _require(not any(key in condition.settings for key in ("unit", "units", "reported_variance")),
              "analysis_explicit_units_or_variance_unobserved")
     _require(aligned(Observation.model_validate(observed), condition), "analysis_actual_metadata_conflicts")
@@ -168,9 +209,12 @@ def build_partition_runtime_context(proposal, *, plan, claim, materials, request
             "authorized_sources": row["authorized_sources"]}
         catalog["source/"+role] = {**row["source"], "sha256": row["source_sha256"]}
     refs = {**receipt["evidence_refs"], "raw_output": raw_ref, "decoder_mapping": mapping_ref}
+    if request.metric_output is not None:
+        refs.update(receipt["metric_file_output"]["evidence_refs"])
     catalog["actual/analysis"] = {"measurement": facts, "runtime_receipt": receipt, "raw_payload": payload,
         "raw_value_selector": selector, "evidence_refs": refs, "model_inference_performed": False,
-        "runtime_decoded_observations": decoded, "observed_return_binding": return_binding,
+        "runtime_decoded_observations": decoded, "selected_decoded_metric": selected_decoded,
+        "observed_return_binding": return_binding,
         "actual_entry_source": source_files[request.plan.task.entry_script],
         "actual_entry_sha256": receipt["run_identity"]["source_sha256"][request.plan.task.entry_script],
         "author_data_to_metric_dynamic_consumption": "unproven",
@@ -184,7 +228,7 @@ def build_partition_runtime_context(proposal, *, plan, claim, materials, request
     context = {"version": "analysis-v1", "scientific_claim": facts["scientific_claim"], "condition": condition.model_dump(mode="json"),
         "plan": facts["original_plan"], "resource_contract": facts["resource_contract"],
         "paper_artifact_sha256": facts["paper_artifact_sha256"], "catalog": catalog, "obligations": obligations,
-        "actual_observation": observed, "limits": ["complete_released_partition_statistics_only", "protected_stdout_single_json_object",
+        "actual_observation": observed, "limits": ["complete_released_partition_statistics_only", "protected_stdout_single_json_object" if request.metric_output is None else "protected_fresh_literal_json_file",
         "decoded_raw_preserved_and_compared", "author_dynamic_consumption_unproven", "no_new_model_inference",
         "scientific_correspondence_requires_independent_review", "trusted_caller_and_runtime_receipt_premise"]}
     _require(len(json.dumps(context, ensure_ascii=True).encode()) <= 3145728, "analysis_runtime_context_capacity")
