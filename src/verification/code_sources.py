@@ -10,7 +10,13 @@ from pathlib import Path
 def _hash(path):
     candidate = Path(path)
     try:
-        return hashlib.sha256(candidate.read_bytes()).hexdigest() if candidate.is_file() else None
+        if not candidate.is_file():
+            return None
+        digest = hashlib.sha256()
+        with candidate.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
     except OSError:
         # Unavailable, unused artifacts retain the existing grounding contract.
         return None

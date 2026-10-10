@@ -128,12 +128,13 @@ _README_DEP_RE = re.compile(
 
 
 def _read_text_limited(path: Path, max_bytes: int = 500_000) -> str:
+    if type(max_bytes) is not int or max_bytes < 0:
+        return ""
     try:
-        data = path.read_bytes()
+        with path.open("rb") as stream:
+            data = stream.read(max_bytes)
     except Exception:
         return ""
-    if len(data) > max_bytes:
-        data = data[:max_bytes]
     return data.decode("utf-8", errors="ignore")
 
 
