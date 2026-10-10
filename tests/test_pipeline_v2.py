@@ -66,7 +66,7 @@ class MockMinerU:
 @pytest.fixture
 def tiny_inputs(tmp_path):
     body = (
-        "A test MRR is 0.4. We use Adam. Our novel graph neural network improves link prediction. "
+        "A test MRR is 0.4. We use Adam. Our novel graph neural network improves link prediction under inductive evaluation. "
         "The identity theorem states x = x. Proof. x = x by reflexivity. Figure 1 shows our model."
     )
     rows = [
@@ -156,7 +156,7 @@ class ModelBoundary:
                 ),
                 ("We use Adam.", [{"id": "optimizer", "description": "Configured optimizer"}], ["Code"]),
                 (
-                    "Our novel graph neural network improves link prediction.",
+                    "Our novel graph neural network improves link prediction under inductive evaluation.",
                     [{"id": "novelty", "description": "Novel mechanism"}],
                     ["Literature"],
                 ),
@@ -330,6 +330,7 @@ class ModelBoundary:
 class RetrievalBoundary:
     def __init__(self):
         self.queries = []
+        self.search_cfg = SimpleNamespace(provider="arxiv")
         self.paper = {
             "id": "2001.00001",
             "arxiv_id": "2001.00001",
@@ -342,6 +343,20 @@ class RetrievalBoundary:
     async def search(self, *, query, cutoff_date):
         self.queries.append((query, cutoff_date.to_string()))
         return {**native_response(query, [self.paper], cutoff_date), "complete": True}
+
+    async def search_structured(self, *, query, cutoff_date):
+        compiled = query.compile(start=0, limit=8)
+        self.queries.append((compiled.expression, cutoff_date.to_string()))
+        response = native_response(compiled.expression, [self.paper], cutoff_date)
+        scope = response["search_coverage"]["queries"][0]
+        scope.update(
+            query_mode=query.version,
+            plan_digest=query.plan_digest,
+            query_digest=compiled.digest,
+            endpoint="https://export.arxiv.org/api/query",
+        )
+        scope["pages"][0]["request"] = {"url": compiled.url, "params": compiled.params}
+        return response
 
     async def read_papers(self, *, items):
         assert items[0]["id"] == self.paper["id"]

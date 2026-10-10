@@ -11,6 +11,7 @@ from urllib.parse import quote_plus, urlsplit, urlunsplit
 import httpx
 
 from fact_generation.positioning.search_scope import SearchRows, paging_facts
+from fact_generation.positioning.structured_query import StructuredPaperQuery
 from preprocessing.parse.markdown_parser import parse_pdf_locally
 from util.arxiv_requests import ARXIV_REQUESTS
 from util.cutoff_date import CutoffDate, filter_papers
@@ -187,6 +188,22 @@ class PaperSearchAdapter:
         result["search_coverage"] = {
             "version": "search-coverage-v1", "queries": [row["search_coverage"] for row in grouped],
         }
+        return _apply_cutoff_to_search_result(result, cutoff_date)
+
+    async def search_structured(self, *, query: StructuredPaperQuery, cutoff_date: CutoffDate | None = None) -> dict:
+        query = StructuredPaperQuery.model_validate(query.model_dump(mode="json"))
+        compiled = query.compile(start=0, limit=min(16, self.search_cfg.page_size))
+        state = await self.get_search_runtime_state()
+        if self._search_provider() != "arxiv":
+            return _empty_search_result(provider=self._search_provider(), error="unsupported_structured_provider")
+        if not state.started:
+            return self._search_not_started_payload(state=state, query=compiled.expression, question_list=None)
+        result = await self._paged_query("arxiv", compiled.expression, structured_query=query)
+        grouped = {"question": compiled.expression, "success": result["success"], "partial": result["partial"],
+                   "provider": result["provider"], "papers": result["papers"], "count": result["count"],
+                   "search_coverage": result["search_coverage"], **({"error":result["error"]} if result.get("error") else {})}
+        result = {**result, "questions":[compiled.expression], "question_results":[grouped],
+                  "search_coverage":{"version":"search-coverage-v1","queries":[result["search_coverage"]]}}
         return _apply_cutoff_to_search_result(result, cutoff_date)
 
     async def read_papers(self, *, items: list[dict]) -> dict:
@@ -466,15 +483,20 @@ class PaperSearchAdapter:
                 "partial": any(r["partial"] for r in results), "papers": papers, "count": len(papers),
                 "question_results": results, "query": questions[0], "questions": questions}
 
-    async def _paged_query(self, provider, question):
+    async def _paged_query(self, provider, question, *, structured_query=None):
         cfg = self.search_cfg
         scope = {
             "version": "search-coverage-v1", "provider": provider, "query": question,
-            "translated_query": self._question_to_arxiv_query(question) if provider == "arxiv" else question,
+            "translated_query": (question if structured_query is not None else
+                                 self._question_to_arxiv_query(question) if provider == "arxiv" else question),
             "endpoint": _public_url(self._provider_base_url(provider)),
             "limits": {"page_size": cfg.page_size, "max_pages": cfg.max_pages, "max_results": cfg.max_results},
             "pages": [], "raw_count": 0, "exhausted": None, "stop_reason": "provider_unknown",
         }
+        if structured_query is not None:
+            compiled = structured_query.compile(start=0, limit=min(16, cfg.page_size))
+            scope.update(query_mode=structured_query.version, plan_digest=structured_query.plan_digest,
+                         query_digest=compiled.digest)
         papers, seen, seen_cursors = [], set(), set()
         offset, cursor, error = 0, "*", None
         if provider == "semantic_scholar":
@@ -490,7 +512,13 @@ class PaperSearchAdapter:
                     "request_cursor_sha256": hashlib.sha256(cursor.encode()).hexdigest() if provider == "openalex" else None}
             scope["pages"].append(page)
             try:
-                rows, payload, response_hash, endpoint = await self._search_page(provider, question, offset, cursor, limit)
+                if structured_query is not None:
+                    compiled = structured_query.compile(start=offset, limit=limit)
+                    page["request"] = {"url":compiled.url, "params":compiled.params}
+                    rows = await self._arxiv_request(compiled.url)
+                    payload, response_hash, endpoint = rows.metadata, rows.response_sha256, "https://export.arxiv.org/api/query"
+                else:
+                    rows, payload, response_hash, endpoint = await self._search_page(provider, question, offset, cursor, limit)
                 page.update(status="ok", raw_count=len(rows), response_sha256=response_hash)
                 scope["raw_count"] += len(rows)
                 scope["endpoint"] = _public_url(endpoint)
@@ -806,11 +834,13 @@ class PaperSearchAdapter:
             f"search_query=all:{query}&start={start}&max_results={max(1, min(16, max_results))}"
         )
 
+        return await self._arxiv_request(url)
+
+    async def _arxiv_request(self, url: str):
         async with ARXIV_REQUESTS.slot(), httpx.AsyncClient(timeout=45) as client:
             response = await client.get(url, headers=self._arxiv_headers())
             ARXIV_REQUESTS.observe_retry_after(response.status_code, response.headers.get("Retry-After"))
         response.raise_for_status()
-
         return SearchRows(self._parse_arxiv_feed(response.text), response.text, wire_bytes=response.content)
 
     async def _arxiv_fetch_single(self, arxiv_id: str) -> dict | None:
