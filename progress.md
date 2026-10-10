@@ -1,5 +1,19 @@
 # FactReview v2 progress
 
+## Current phase4 checkpoint: grounded SearchPlan and exact typed arXiv scope
+
+Task: use actual manuscript concepts for explicit novelty conditions and bind them to actual retrieval requests without manufacturing absence support. Outputs: `src/verification/literature_search_plan.py`, `literature_search_scope.py`, `literature.py`, `dispatch.py`, `src/fact_generation/positioning/structured_query.py`, `paper_search.py`, new bounded controls and the explicit pipeline fixture migration. Evidence: `runs/v2_method_delivery/literature-search-plan-implementation/` and `literature-search-plan-independent/`.
+
+Completed: source quotes/location/spans/hashes and condition-covered concepts form a bounded six-family plan. Actual source abstract passages are allowed; metadata, bibliography and identity fields cannot seed terms. Shared terms preserve separate per-condition witnesses. Typed arXiv compilation binds query/plan digests to actual HTTP URL/params and each page; legacy direct APIs remain compatible. Missing roles, truncation, degraded provider capability and unknown/unexhausted scope fail closed for absence. Positive/concern evidence still uses original guards, with scientific adequacy in the existing comparison. Eight new and five directly affected old mocked cases passed;16 old files/539 assertions unchanged, migrated pipeline139 Assert ASTs unchanged,1217 protected hashes unchanged. Independent review05113f0a and root eight-file/freeze/evidence identities pass. Original red results and inspector corrections are preserved.
+
+Decisions: default v2 explicit novelty uses grounded policy. Citation-only claims keep the purpose route; global missing-work review remains active and explicitly labelled legacy_global_seed. Unsupported structured capacity records degraded_legacy rather than fabricating a failed operation; actual typed transport failures retain system delivery checks. The happy integration fixture now supplies a source-grounded protocol role and a compiler-bound native mock; its four Supported and other139 original assertions are unchanged. No real provider, retrieval or Docker calls occurred in this implementation.
+
+Delivered earlier: phase3 v5 wire43b1588ee4cf68c39852986aa2b19b162f169e4c and phase7 I/O52d51dd9468b7175988cb499a6b435d688a25369 are pushed and exactly remotely verified. All original actual failures and protection hashes remain intact.
+
+Open issues: finite seed vocabulary/global structured search, true scientific retrieval adequacy, genuine M2/M5 scope/carriers, complete current-version integration and strict future-response token bounds remain unresolved. Tests and source contracts do not certify commercial review quality.
+
+Next action: commit/push this reviewed phase4 batch; prepare a new exact-source native v5 first-window coverage check and a complementary changed-input full-flow check. Their natural unreviewed windows, result caps, measured usage and remaining scientific limits must be recorded. Goal remains active; no new PR is authorized.
+
 ## Current phase3 checkpoint: compact v5 source and atom wire
 
 Task: remove redundant declarations while preserving full scientific input, explicit governing-scope decisions and independent adoption checks. Outputs: `src/screening/claim_coverage.py`, new `claim_coverage_wire.py`, new v5 controls and three explicit old fixture migrations; exact evidence under `runs/v2_method_delivery/coverage-wire-v5-implementation/` and `coverage-wire-v5-independent/`.

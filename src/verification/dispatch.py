@@ -105,6 +105,7 @@ async def verify_claims(
                 output_dir=output_dir,
                 manuscript_targets=global_targets if claim is None else None,
                 expand_uncited=False,
+                search_policy="grounded",
             )
 
         branches = {

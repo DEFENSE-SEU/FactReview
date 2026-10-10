@@ -7,6 +7,9 @@ import json
 import re
 from copy import deepcopy
 
+from fact_generation.positioning.structured_query import StructuredPaperQuery
+from verification.literature_search_plan import condition_eligible, plan_closed
+
 _PROVIDERS = {"arxiv": "arxiv_fallback", "openalex": "openalex", "semantic_scholar": "semantic_scholar"}
 _HASH = re.compile(r"[a-f0-9]{64}")
 
@@ -138,7 +141,7 @@ def _native_query(query, response, cutoff):
 
 def build_search_scope(*, claim, queries, intents, query_records, cutoff, concurrent_start,
                        sources, source_excerpts, self_exclusion, source_guards, excluded, reads, novelty_ids,
-                       public_copy=deepcopy):
+                       public_copy=deepcopy, grounded_plan=None, transport="legacy", plan_unchanged=True):
     rows = []
     for index, query in enumerate(queries):
         response = query_records[index]["response"] if index < len(query_records) else {}
@@ -151,6 +154,34 @@ def build_search_scope(*, claim, queries, intents, query_records, cutoff, concur
     native = len(rows) == len(query_records) == len(intents) == 3 and len({row["query"] for row in rows}) == 3 and all(
         row["native_exhausted"] for row in rows
     )
+    grounded_conditions = {}
+    if grounded_plan is not None:
+        bound = bool(plan_unchanged and transport == "structured_arxiv"
+                     and plan_closed(grounded_plan))
+        for index, row in enumerate(rows):
+            try:
+                query = StructuredPaperQuery.model_validate(grounded_plan["queries"][index])
+                observed = row["observed"]
+                expected = query.compile(start=0, limit=1)
+                valid = (row["query"] == expected.expression and row["intent"] == query.intent
+                         and observed["query_mode"] == query.version
+                         and observed["plan_digest"] == grounded_plan["digest"] == query.plan_digest
+                         and observed["query_digest"] == expected.digest
+                         and observed["translated_query"] == expected.expression
+                         and observed["endpoint"] == "https://export.arxiv.org/api/query")
+                for page in observed["pages"]:
+                    wire = query.compile(start=page["offset"], limit=page["limit"])
+                    valid = valid and page["request"] == {"url":wire.url,"params":wire.params}
+                bound = bound and valid
+                if not valid:
+                    row["native_exhausted"] = False
+                    row["reasons"].append("structured query/plan/actual HTTP binding disagrees")
+            except (ValueError, KeyError, IndexError, TypeError):
+                bound = False
+                row["native_exhausted"] = False
+                row["reasons"].append("grounded query transport is unavailable or malformed")
+        native = bool(native and bound and len(grounded_plan["queries"]) == 3 and grounded_plan["distinct_queries"])
+        grounded_conditions = {cid: bool(native and condition_eligible(grounded_plan,cid)) for cid in novelty_ids}
     raw_zero = native and all(row["observed"]["raw_count"] == 0 for row in rows)
     # The comparison payload already supplies passage text. Bind that exact
     # text through hashes here rather than doubling full-text prompt cost.
@@ -187,6 +218,11 @@ def build_search_scope(*, claim, queries, intents, query_records, cutoff, concur
              "zero_scope_eligible": bool(raw_zero and source_guards and not excluded and not reads and not sources
                                          and novelty_ids and claim),
              "limitations": ["Only recorded provider indexes and the three recorded query intents are searched."]}
+    if grounded_plan is not None:
+        scope.update(version="literature-search-scope-v2", policy="strict-native-grounded-exhaustion-v1",
+                     grounded_plan=deepcopy(grounded_plan), grounded_conditions=grounded_conditions,
+                     transport=transport, plan_unchanged=bool(plan_unchanged))
+        scope["zero_scope_eligible"] = bool(scope["zero_scope_eligible"] and any(grounded_conditions.values()))
     # Content hashes bind the untouched scientific inputs. Public metadata is
     # redacted before computing the scope digest, so saved snapshots stay exact.
     scope = public_copy(scope)

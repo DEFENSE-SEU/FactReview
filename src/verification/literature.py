@@ -12,6 +12,7 @@ from typing import Any
 from urllib.parse import unquote, urlsplit
 
 from fact_generation.positioning.paper_search import PaperReadConfig, PaperSearchAdapter, PaperSearchConfig
+from fact_generation.positioning.structured_query import StructuredPaperQuery
 from llm.client import LLMConfig, llm_json, resolve_llm_config
 from schemas.claim import AuthorQuestion, Claim, Evidence, EvidencePointer, Finding
 from schemas.limitations import VerificationLimitation
@@ -25,6 +26,12 @@ from util.cutoff_date import (
 )
 from verification.contracts import BranchResult
 from verification.literature_omissions import OmissionContext
+from verification.literature_search_plan import (
+    build_grounded_plan,
+    condition_eligible,
+    free_text_queries,
+    query_strings,
+)
 from verification.literature_search_scope import build_search_scope, validate_search_adequacy
 from verification.theory import _fully_supported, _support_note
 
@@ -97,7 +104,9 @@ evaluation design and important omission risks for EACH condition. Pagination ex
 only describes the recorded index/query scope. It does not establish scientific coverage.
 Do not alter pagination facts or add unrequested IDs. Unsearched indexes and differently
 named work remain outside this bounded scope. Adequate requires all three actual query
-intents to meaningfully cover the condition. Empty sources require an explicit scientific
+intents to meaningfully cover the condition. For grounded scope v2, respect the
+original concept/source/condition participation and recorded missing roles. Do not
+fill missing query dimensions or transfer another condition's source authority. Empty sources require an explicit scientific
 judgment, and cannot by themselves establish novelty. Use inadequate/unresolved when
 the vocabulary, provider coverage or missing source context leaves meaningful uncertainty.
 Return JSON {"status":"ok","comparisons":[...]}. Each comparison must include
@@ -677,6 +686,7 @@ async def verify_literature(
     output_dir: Path | None = None,
     manuscript_targets: list[dict[str, Any]] | None = None,
     expand_uncited: bool = True,
+    search_policy: str = "legacy",
 ) -> BranchResult:
     """Check one claim, or collect global uncited-neighbor findings with claim=None.
 
@@ -686,6 +696,8 @@ async def verify_literature(
     Direct callers retain legacy uncited expansion. The v2 dispatcher disables
     that expansion for claims without novelty; global/novelty searches remain active.
     """
+    if search_policy not in {"legacy", "grounded"}:
+        raise ValueError("Unknown literature search policy")
     result = BranchResult()
     directory = output_dir or Path(materials.markdown_path).parent / "verification" / "literature"
     filename = re.sub(r"[^a-zA-Z0-9_-]", "_", claim.id if claim else "global") + "-search-audit.json"
@@ -734,6 +746,22 @@ async def verify_literature(
         adapter = _default_adapter()
         searcher = searcher or adapter
         reader = reader or adapter
+    grounded_plan = None
+    structured_capable = None
+    transport = "legacy_global_seed" if claim is None else "legacy"
+    query_intents = list(_QUERY_INTENTS) if queries else []
+    if search_policy == "grounded" and claim is not None and novelty_ids:
+        grounded_plan = build_grounded_plan(claim, materials, novelty_ids=novelty_ids)
+        provider = str(getattr(getattr(searcher, "search_cfg", None), "provider", "")).strip().lower().replace("-", "_")
+        structured_capable = provider == "arxiv" and callable(getattr(searcher, "search_structured", None))
+        transport = "structured_arxiv" if structured_capable else "degraded_legacy"
+        queries = query_strings(grounded_plan) if structured_capable else free_text_queries(grounded_plan)
+        query_intents = [row["intent"] for row in grounded_plan["queries"]]
+        query_terms = list(dict.fromkeys(term["phrase"] for row in grounded_plan["queries"] for group in row["groups"] for term in group))
+        if not structured_capable:
+            result.issues.append("Grounded structured query capability unavailable; safe legacy candidates remain usable, absence scope insufficient.")
+        if any(not condition_eligible(grounded_plan, cid) for cid in novelty_ids):
+            result.issues.append("Grounded query roles are partial, unknown or truncated; ineligible conditions cannot use search absence.")
     diagnostic_configs = []
     for boundary in (searcher, reader):
         for name in ("search_cfg", "read_cfg"):
@@ -784,12 +812,15 @@ async def verify_literature(
         "source_excerpts": source_excerpts,
         "source_refs": [ref.model_dump(mode="json") for ref in claim.source_refs] if claim else [],
         "source_available": source_available,
-        "query_policy": "closed_technical_vocabulary",
+        "query_policy": "grounded_source_concepts_v1" if grounded_plan is not None else "closed_technical_vocabulary",
         "query_terms": query_terms,
         "retrieval_routing": {"purpose": purpose, "expand_uncited": expand_uncited,
-                              "search_requested": search_requested},
+                              "search_requested": search_requested, "transport": transport, "policy": search_policy,
+                              "structured_capable": structured_capable,
+                              "degraded_reason": "Structured arXiv capability unavailable; actual free-text queries cannot establish grounded absence" if transport == "degraded_legacy" else None},
+        "grounded_search_plan": grounded_plan,
         "global_target_scope": global_target_scope,
-        "query_intents": list(_QUERY_INTENTS) if queries else [],
+        "query_intents": query_intents,
         "citation_issues": citation_issues,
         "context_events": [],
         "manuscript_targets": omission_context.payload(),
@@ -873,10 +904,14 @@ async def verify_literature(
         )
     audit["novelty_condition_ids"] = sorted(novelty_ids)
     adequate = len(queries) == 3 and self_exclusion_available and source_available and not citation_issues
-    for query in queries:
+    for query_index, query in enumerate(queries):
         failure_category = None
         try:
-            response = await _invoke(getattr(searcher, "search", searcher), query=query, cutoff_date=deadline)
+            if transport == "structured_arxiv":
+                typed_query = StructuredPaperQuery.model_validate(grounded_plan["queries"][query_index])
+                response = await _invoke(searcher.search_structured, query=typed_query, cutoff_date=deadline)
+            else:
+                response = await _invoke(getattr(searcher, "search", searcher), query=query, cutoff_date=deadline)
         except Exception as exc:
             response = {"success": False, "error": f"{type(exc).__name__}: {exc}", "papers": []}
             failure_category = "service_failure"
@@ -887,6 +922,11 @@ async def verify_literature(
         else:
             raw_response = response
         audit["queries"].append({"query": query, "response": response})
+        if grounded_plan is not None:
+            audit["queries"][-1].update(
+                query_id=grounded_plan["queries"][query_index]["query_id"], intent=query_intents[query_index],
+                planned_expression=query_strings(grounded_plan)[query_index], transport=transport,
+            )
         if raw_response is not response:
             audit["queries"][-1]["raw_response"] = raw_response
         if not failure_category and (response.get("success") is False or response.get("error")):
@@ -1281,12 +1321,14 @@ async def verify_literature(
     comparisons = []
     comparison_response_valid = False
     search_scope = build_search_scope(
-        claim=claim, queries=queries, intents=_QUERY_INTENTS, query_records=diagnostic_copy(audit["queries"]),
+        claim=claim, queries=queries, intents=query_intents, query_records=diagnostic_copy(audit["queries"]),
         cutoff=deadline.to_metadata(), concurrent_start=audit["concurrent_start"],
         sources=read_rows, source_excerpts=source_excerpts,
         self_exclusion=audit["self_exclusion"], source_guards=adequate,
         excluded=diagnostic_copy(audit["excluded"]), reads=diagnostic_copy(audit["reads"]), novelty_ids=novelty_ids,
         public_copy=diagnostic_copy,
+        grounded_plan=grounded_plan, transport=transport,
+        plan_unchanged=(grounded_plan is None or build_grounded_plan(claim, materials, novelty_ids=novelty_ids)["digest"] == grounded_plan["digest"]),
     )
     audit["scientific_search_scope"] = search_scope
     for query_row in search_scope["queries"]:
@@ -1530,6 +1572,7 @@ async def verify_literature(
         condition_id
         for condition_id in novelty_ids
         if adequate and search_scope["native_exhausted"] and adequacy_response["valid"]
+        and (grounded_plan is None or search_scope["grounded_conditions"].get(condition_id, False))
         and adequacy_response["decisions"][condition_id]["state"] == "adequate"
         and all(row["coverage"] == "covered" for row in adequacy_response["decisions"][condition_id]["queries"])
         and (bool(read_rows) or search_scope["zero_scope_eligible"])
@@ -1539,6 +1582,7 @@ async def verify_literature(
     audit["condition_scope_decisions"] = {
         cid: {
             "supported": cid in supported_novelty_ids,
+            **({"grounded_plan_eligible": search_scope["grounded_conditions"].get(cid, False)} if grounded_plan is not None else {}),
             "native_exhausted": search_scope["native_exhausted"],
             "source_guards": adequate,
             "scientific_protocol_valid": adequacy_response["valid"],
