@@ -76,6 +76,15 @@ def test_catalog_exact_roundtrip_and_conflicting_or_foreign_metadata():
             unpack(broken)
 
 
+def test_atom_schema_rejects_native_non_governing_placeholder():
+    row, _claim, _context, _blocks = preserved_row()
+    atom = compact_row(row)["scope_atoms"][0]
+    atom.update(state="not_governing", carriers=[], effect=None)
+    with pytest.raises(ValueError):
+        m.ScopeAtomV5.model_validate(atom)
+    assert "not_governing" not in m.ScopeAtomV5.model_json_schema()["properties"]["state"]["enum"]
+
+
 def test_single_atom_authority_retains_carriers_effects_and_scope_guards():
     assert hasattr(m, "CurrentClaimReviewV5")
     for builder in [preserved_row, missing_row]:
