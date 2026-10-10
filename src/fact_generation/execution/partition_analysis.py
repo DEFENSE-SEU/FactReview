@@ -109,7 +109,7 @@ def analyze_partition(proposal, *, plan, claim, materials, workspace, max_bytes=
                  and type(max_rows) is int and 0 < max_rows <= 65536, "invalid_analysis_capacity")
         parsed = PartitionAnalysisProposal.model_validate(proposal)
         scientific = _scientific_claim(claim)
-        _require(plan.run_mode == "analysis" and len(plan.condition_ids) == len(scientific["conditions"]) == 1,
+        _require(plan.run_mode == "analysis" and len(plan.condition_ids) == 1,
                  "single_complete_analysis_condition_required")
         contract = validate_resource_contract(plan, claim, materials)
         _require(contract is not None, "unbound_analysis_resources")
