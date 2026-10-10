@@ -34,16 +34,16 @@ def offline(monkeypatch):
         monkeypatch.setattr(v2, name, forbidden)
 
 
-def inputs(tmp_path, split="test", complete=True):
+def inputs(tmp_path, split="test", complete=True, model="Affine", metric="mse"):
     root = tmp_path / "repo"
     root.mkdir()
     source = SOURCE.replace('data["x"]', f'data["partitions"]["{split}"][0]["x"]')
     source = source.replace('data["label"]', f'data["partitions"]["{split}"][0]["label"]')
     source = source.replace("return predictions - labels", "return (predictions - labels) * (predictions - labels)")
     (root / "eval.py").write_text(source, encoding="utf-8")
-    data = {"dataset": "Benchmark", "metric": "mse", "partitions": {
+    data = {"dataset": "Benchmark", "metric": metric, "partitions": {
         "test": [{"x": 3, "label": 5}], "train": [{"x": 3, "label": 5}]}}
-    weights = {"model": "Affine", "w": 2}
+    weights = {"model": model, "w": 2}
     (root / "data.json").write_text(json.dumps(data), encoding="utf-8")
     (root / "weights.json").write_text(json.dumps(weights), encoding="utf-8")
     definition = ("Benchmark is the explicitly constructed two-partition benchmark: test is the complete "
@@ -155,8 +155,8 @@ def captured_runner(data, weights):
     return run
 
 
-def run_case(tmp_path, monkeypatch, split="test", complete=True):
-    plan, claim, materials, _source, _definition, data, weights = inputs(tmp_path, split, complete)
+def run_case(tmp_path, monkeypatch, split="test", complete=True, alignment="strict", **actual):
+    plan, claim, materials, _source, _definition, data, weights = inputs(tmp_path, split, complete, **actual)
     original = claim.model_dump(mode="json")
     calls = []
     def scope(prompt, system, cfg, *, module):
@@ -178,7 +178,7 @@ def run_case(tmp_path, monkeypatch, split="test", complete=True):
                 for key, value in context["obligations"].items()], "unresolved": []}
     monkeypatch.setattr("llm.client.llm_json", scope)
     monkeypatch.setattr("llm.client.resolve_llm_config", lambda: None)
-    result = v2.execute_plans([plan], [claim], materials, tmp_path / "out", config={"max_attempts": 0}, runner=captured_runner(data, weights))
+    result = v2.execute_plans([plan], [claim], materials, tmp_path / "out", config={"max_attempts": 0, "alignment": alignment}, runner=captured_runner(data, weights))
     assert claim.model_dump(mode="json") == original
     return result, calls
 
@@ -214,3 +214,20 @@ def test_equal_actual_value_wrong_partition_cannot_alias_to_paper_split(tmp_path
     audit = json.loads(Path(row["attempts"][0]["logs"]["scientific_consumption"]).read_text(encoding="utf-8"))
     assert not audit["scientific_qualification"] and audit["derived_observations"] == []
     assert "partition" in audit["reason"] and result.delivery_checks == []
+
+
+def test_relaxed_alignment_reaches_docker_consumption_check(tmp_path, monkeypatch):
+    # Actual model and metric differ from the condition; only the dataset matches.
+    for name in ("strict", "relaxed"):
+        (tmp_path / name).mkdir()
+    strict, strict_calls = run_case(tmp_path / "strict", monkeypatch, model="Linear", metric="squared_error")
+    assert not strict.claims[0].evidence and strict_calls == []
+    audit = json.loads(Path(strict.ledger[0]["attempts"][0]["logs"]["scientific_consumption"]).read_text(encoding="utf-8"))
+    assert "conflicts_with_target" in audit["reason"]
+    relaxed, calls = run_case(tmp_path / "relaxed", monkeypatch, alignment="relaxed", model="Linear", metric="squared_error")
+    evidence = relaxed.claims[0].evidence
+    assert len(evidence) == 1 and evidence[0].aligned and evidence[0].direction == "support"
+    assert "alignment=relaxed" in evidence[0].note
+    assert set(calls[0]["context"]["obligations"]) >= {"condition/dataset"}
+    assert not any(key.startswith(("condition/metric", "condition/settings")) for key in calls[0]["context"]["obligations"])
+    assert relaxed.ledger[0]["alignment"][0]["alignment_mode"] == "relaxed"

@@ -52,13 +52,16 @@ CASES = [
     (["Experiments"], ["paper_internal"], False, (S, S, U)),
     (["Experiments"], ["execution"], True, (S, S, S)),
     (["Experiments"], ["execution"], False, (S, S, S)),
-    (["Experiments"], ["paper_internal", "code"], True, (S, U, U)),
+    (["Experiments"], ["paper_internal", "code"], True, (S, S, U)),
+    (["Experiments"], ["code"], False, (S, S, S)),
+    (["Code"], ["execution"], True, (S, S, S)),
     (["Literature"], ["literature"], True, (S, S, S)),
     (["Literature", "Theory"], ["literature"], True, (S, U, U)),
     (["Literature", "Theory"], ["literature"], False, (S, S, U)),
     (["Literature", "Theory"], ["literature", "theory"], False, (S, S, S)),
     (["Code", "Experiments"], ["code", "execution"], True, (S, S, S)),
-    (["Code", "Experiments"], ["code", "paper_internal"], True, (S, U, U)),
+    (["Code", "Experiments"], ["code", "paper_internal"], True, (S, S, U)),
+    (["Code", "Experiments"], ["code", "paper_internal"], False, (S, S, S)),
     ([], ["paper_internal"], True, (S, S, S)),
 ]
 
@@ -90,7 +93,16 @@ def test_released_artifact_recomputation_satisfies_strict_experiments():
         recomputation_pointer="runs/eval/recompute.json",
     )
     items = [evidence("execution", provenance=provenance)]
-    assert tiers(claim(["Experiments"], items, core=False)) == {"lenient": S, "default": S, "strict": S}
+    for core in (True, False):
+        assert tiers(claim(["Experiments"], items, core=core)) == {"lenient": S, "default": S, "strict": S}
+
+
+def test_strict_reports_missing_execution_for_core_experiments():
+    (gated,) = gate_claims(assess_claims([claim(["Experiments"], [evidence("code")])]), "strict")
+    assert gated.status == U and gated.gate_status["default"].status == S
+    assert gated.gate_status["strict"].reasons == [
+        "no aligned execution or released data/logs recomputation for core Experiments claim"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -111,7 +123,7 @@ def test_selected_tier_sets_status_and_records_reason(level, status):
     assert gated.status == status
     assert gated.gate_status["lenient"].status == S
     assert gated.gate_status["default"].reasons == [
-        "no sufficient independent Experiments support (source execution)"
+        "no sufficient independent Experiments support (sources execution/code)"
     ]
     assert any(note.startswith(f"Gate ({level}):") for note in gated.notes) == (status == U)
     assert Claim.model_validate(gated.model_dump(mode="json")) == gated

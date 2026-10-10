@@ -80,8 +80,10 @@ def build_consumption_context(proposal, *, plan, claim, materials, request, outc
     _require(flow["status"] == "witnessed" and type(flow.get("raw_output_binding")) is dict,
              "authenticated_actual_flow_unavailable: " + flow.get("reason", "unknown"))
     condition = plan.target_conditions[0]
-    _require(set(condition.settings).issubset({"model", "split", "sample_count"})
-             and {"model", "split"}.issubset(condition.settings), "unobserved_condition_settings")
+    mode = request.config.alignment
+    # relaxed ablation: only the dataset is matched, so condition settings need not be observable.
+    _require(mode == "relaxed" or (set(condition.settings).issubset({"model", "split", "sample_count"})
+             and {"model", "split"}.issubset(condition.settings)), "unobserved_condition_settings")
     index = {row.path: row for row in materials.repository.files}
     root = Path(materials.repository.root).resolve(strict=True)
     catalog, source_hashes, actual_files = {}, {}, {}
@@ -143,7 +145,7 @@ def build_consumption_context(proposal, *, plan, claim, materials, request, outc
     # Exact actual facts cannot be renamed to make the target fit. Metric equivalence
     # remains the established program rule; source semantics are still reviewed.
     from .v2 import Observation, aligned
-    _require(aligned(Observation.model_validate(observed), condition), "actual_metadata_or_partition_conflicts_with_target")
+    _require(aligned(Observation.model_validate(observed), condition, mode), "actual_metadata_or_partition_conflicts_with_target")
     facts = {"actual_observation": observed, "data": data, "weights": weights,
         "partition_selector": partition, "actual_numeric_selectors": actual_rows,
         "dataset_selector": parsed.dataset_selector, "metric_selector": parsed.metric_selector,
@@ -151,7 +153,9 @@ def build_consumption_context(proposal, *, plan, claim, materials, request, outc
         "flow": flow, "source_files": actual_files, "source_sha256": source_hashes}
     catalog["actual/consumption"] = facts
     obligations = {role: ["paper/"+role, "source/"+role, "actual/consumption"] for role in ROLES}
-    for key in ("dataset", "metric", "description", *["settings/"+name for name in condition.settings]):
+    matched = ("dataset", "description") if mode == "relaxed" else (
+        "dataset", "metric", "description", *["settings/"+name for name in condition.settings])
+    for key in matched:
         role = {"dataset": "dataset", "metric": "metric", "settings/model": "model", "settings/split": "split",
                 "settings/sample_count": "population"}.get(key, "qualifiers")
         obligations["condition/"+key] = obligations[role]

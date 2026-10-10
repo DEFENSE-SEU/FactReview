@@ -24,6 +24,16 @@ more than one, or none, the condition stays unaligned. Unit checks, released-res
 tolerance rules are unchanged. The evidence note and each `alignment` ledger entry record
 `alignment_mode`.
 
+`relaxed` applies on every path that compares an observation with the claim condition: candidate
+selection in `execute_plans` (`src/fact_generation/execution/v2.py`) and, for Docker runs with a
+source-science proposal, the actual-metadata check in `build_consumption_context`
+(`src/fact_generation/execution/runtime_science.py`). There it also skips the requirement that the
+condition settings be observable model/split/sample_count, and the semantic review receives only
+the `condition/dataset` and `condition/description` obligations; the paper/source role obligations
+stay. Two checks are not relaxed because they verify resource use and not condition matching: the
+released-predictions measurement (`prediction_measurement.py`) still requires the author output to
+equal the released config it read, and the actual partition must be the one the proposal selected.
+
 ## Repair
 
 The default repairer only proposes dependencies, so path, launch-argument and wrapper repairs never

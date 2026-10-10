@@ -172,6 +172,7 @@ def _compact_markdown(review, nav, context):
         f"Run: {v2._text(review.run_id)}; delivery: {review.run_status}; "
         f"execution requested: {_json(review.execution_requested)}.",
         f"Incomplete stages: {v2._text(', '.join(review.incomplete_stages) or 'none recorded')}.",
+        *([f"Claim gate: {review.gate}."] if review.gate else []),
         "Counts describe retained records. Missing checks cannot establish an absence of paper problems.",
         "",
         "| Status | Count |",
