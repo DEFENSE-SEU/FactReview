@@ -330,6 +330,16 @@ def _refine(
                 {"id": block.id, "text": block.text, "loc": block.loc.model_dump(mode="json")}
                 for block in materials.blocks if block.id in source_ids
             ]
+            if plan.run_mode == "analysis":
+                from schemas.partition_analysis import PartitionRuntimeCandidate
+
+                from .partition_analysis_wire import freeze_sources
+
+                input_payload["science_proposal_candidate_schema"] = PartitionRuntimeCandidate.model_json_schema()
+                science_snapshot = freeze_sources(
+                    workspace=workspace, supplied_files=science_files,
+                    paper_sources=input_payload["paper_sources"], materials=materials,
+                )
         def request_completion(*args, **kwargs):
             try:
                 return llm_json(*args, **kwargs)
@@ -355,10 +365,15 @@ def _refine(
             "These are candidate locations for observing actual calls, with no semantic, alignment "
             "or sufficiency grant. Do not supply hashes, verified flags or unread source locations. "
             + (
-                "For analysis plans return partition-runtime-v1 science_proposal matching science_proposal_schema. "
+                "For analysis plans prefer partition-runtime-candidate-v2 science_proposal matching "
+                "science_proposal_candidate_schema; science_proposal_schema preserves canonical-v1 compatibility. "
                 "Select one complete released JSON partition with actual label/prediction and dataset/model/metric "
-                "selectors, six unique exact paper/source codepoint definitions and raw_value_selector pointing "
-                "to a named numeric stdout JSON metric. Supply original scientific_claim and all source obligations "
+                "selectors. paper and sources each require exactly dataset, split, model, metric, population, "
+                "qualifiers. Each candidate paper leaf has only block_id and quote; each source leaf only path "
+                "and quote. Select unique exact original quotes; do not supply guessed spans. raw_value_selector "
+                "points to a named numeric stdout JSON metric. Use output_mapping null when stdout contains only "
+                "named numeric metrics without dataset/settings fields; never invent output metadata. "
+                "Supply original scientific_claim and all source obligations "
                 "without changing any condition. Full source evidence must establish dataset origin, actual split "
                 "membership/population, released prediction model provenance, metric formula/units and all qualifiers. "
                 "Host full-partition recomputation is the measurement authority; no new inference or author dynamic "
@@ -419,6 +434,18 @@ def _refine(
             )
             telemetry.update(science_proposal=response.get("science_proposal"),
                              science_files=science_files, science_read_scope=science_read_scope)
+            if plan.run_mode == "analysis":
+                from .partition_analysis_wire import localize_candidate
+
+                wire = response.get("science_proposal")
+                telemetry["science_proposal_wire"] = wire
+                localization = localize_candidate(
+                    wire, snapshot=science_snapshot, workspace=workspace, supplied_files=science_files,
+                    paper_sources=input_payload["paper_sources"], materials=materials,
+                )
+                telemetry["science_proposal_localization"] = localization
+                if localization["status"] == "localized":
+                    telemetry["science_proposal"] = localization["canonical"]
         else:
             telemetry.update(flow_binding={"status": "unresolved", "reason": "Original paper/resource scope unavailable"},
                              flow_files={})
