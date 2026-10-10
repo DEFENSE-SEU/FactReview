@@ -1,6 +1,16 @@
 # FactReview v2 progress
 
-## 当前 Phase5：认证值流消费与执行审计记录
+## 当前 Phase4：补齐 MSE 绝对回归量目标
+
+发现现有绝对量表排除了常规回归误差指标。仅新增mse/mean squared error两个规范名称，源句/完整prose、主张/模型/数据集/划分/settings、数值token、绝对与比较量、单位、容差和目标重建规则保持。删两literal后整个experiment_targets模块AST等原。
+
+必要验证：一个source-bound控制含两个名称正例及七类无来源/未知residual/相对提升/条件或指标不符负例。最初红1/.72s包含未到达的schema字段笔误，原记录保留；修正确pointer字段后的红1/.59s与最终绿1/.50s测试字节同。Ruff通过，未改或重复旧测试，未调用服务、作者代码或actual prepare。MSE名字识别不授运行或科学资格。
+
+输出：mse-target-implementation/frozen-final/、review.md0ed5206d/evidencefc9904eb；独审mse-target-independent/review.md2c1c4795/evidenceff46e5f3。最终sourcefc83a589/test521ce97d匹配全部冻结，Root已读完整报告/增量并核hash。上一批消费接线精确远端287bd6b47a23ed7cd4ec001672e9e99304052588；本批仅Phase4提交/推送refactor/method-v2，收据mse-target-implementation/delivery.json。不开PR、不改main。
+
+Next action：启动新的有界生产Docker机械链部署，先固定最终HEAD/相关源码/输入并review一次性driver。新独立Tiny样例用平方误差源码、x3/label5/weight2及合法MSE源句，目标绑定先于flow；原残差源码/句式仍保留其静态阻断事实。只替换模型refinement为明确固定fixture proposal，实际builder/runner/observer/receipt/consumer与ledger不mock；build60/run30、0训练/LLM/文献，冷build可能pip网络。daemon29.8.2和本地stock已核，RepoDigest为python@sha256:9c900dea9e8fb7e16277c179b555cc72d29a352dbc33cff48ad5a0412fd5bfc7。机械部署预期科学三false/0alignment，不推断论文复现。完整科学gate、通用模型/分析、genuine覆盖/M2/M5及整体验收继续，goal active。
+
+## 历史 287bd6 Phase5：认证值流消费与执行审计记录
 
 有限consumer内部重新读取固定producer收据，先核原完整plan、flow、实际supplied_files/sites，再用纯AST与原JSON重建十个调用事件及参数/返回/数值影响。认证实际runtime的CodeType事实可在host不跨版本编译；默认直接报告仍要求原exact interpreter/整数optimize/完整CodeType检查。原空plan命令仅在认证分支接受实际python/python3+exactentry，原plan不回写。stdout必须严格等于重建driverreturn加一次换行，引用原stdout/report SHA和事件值；科学资格、alignment、support始终false。
 

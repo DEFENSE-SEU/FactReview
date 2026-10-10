@@ -45,6 +45,8 @@ _ABSOLUTE_METRICS = {
     "rouge-2",
     "latency",
     "training time",
+    "mse",
+    "mean squared error",
 }
 _UNITS = {
     "%": "%",
