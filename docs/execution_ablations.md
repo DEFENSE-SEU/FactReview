@@ -24,15 +24,28 @@ more than one, or none, the condition stays unaligned. Unit checks, released-res
 tolerance rules are unchanged. The evidence note and each `alignment` ledger entry record
 `alignment_mode`.
 
-`relaxed` applies on every path that compares an observation with the claim condition: candidate
-selection in `execute_plans` (`src/fact_generation/execution/v2.py`) and, for Docker runs with a
-source-science proposal, the actual-metadata check in `build_consumption_context`
-(`src/fact_generation/execution/runtime_science.py`). There it also skips the requirement that the
-condition settings be observable model/split/sample_count, and the semantic review receives only
-the `condition/dataset` and `condition/description` obligations; the paper/source role obligations
-stay. Two checks are not relaxed because they verify resource use and not condition matching: the
-released-predictions measurement (`prediction_measurement.py`) still requires the author output to
-equal the released config it read, and the actual partition must be the one the proposal selected.
+`relaxed` covers these checks:
+
+- candidate selection in `execute_plans` (`src/fact_generation/execution/v2.py`);
+- the source-flow binding in `bind_builtin_flow` and `validate_builtin_flow`
+  (`src/fact_generation/execution/runtime_flow.py`), which then requires only `condition.dataset`
+  instead of dataset, metric, `settings.model` and `settings.split`;
+- the actual-metadata check in `build_consumption_context`
+  (`src/fact_generation/execution/runtime_science.py`), which also stops requiring the condition
+  settings to be observable model/split/sample_count; the semantic review receives only the
+  `condition/dataset` and `condition/description` obligations, and the paper/source role
+  obligations stay.
+
+These checks stay strict under `relaxed`:
+
+- binding the paper number at planning time (`src/verification/experiment_targets.py`) locates the
+  scalar by dataset, split and metric in the claim text, so a condition without a metric never
+  reaches execution;
+- the released-predictions binding at planning time (`src/verification/execution_projection.py`)
+  requires the released config's `metric` to equal `condition.metric`;
+- the released-predictions measurement (`prediction_measurement.py`) requires the author output to
+  equal the released config it read;
+- the actual partition must be the one the source-science proposal selected.
 
 ## Repair
 

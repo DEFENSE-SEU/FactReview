@@ -34,7 +34,7 @@ def offline(monkeypatch):
         monkeypatch.setattr(v2, name, forbidden)
 
 
-def inputs(tmp_path, split="test", complete=True, model="Affine", metric="mse"):
+def inputs(tmp_path, split="test", complete=True, model="Affine", metric="mse", condition=None):
     root = tmp_path / "repo"
     root.mkdir()
     source = SOURCE.replace('data["x"]', f'data["partitions"]["{split}"][0]["x"]')
@@ -51,11 +51,13 @@ def inputs(tmp_path, split="test", complete=True, model="Affine", metric="mse"):
         "the released coefficient w=2, without preprocessing. mse is the mean squared prediction "
         "error over the complete test partition, containing exactly one row. No training-history claim is made.")
     (root / "README.md").write_text(definition, encoding="utf-8")
-    quote = "On Benchmark test, model Affine reports mse 1."
+    condition = condition or {"dataset": "Benchmark", "metric": "mse", "settings": {"model": "Affine", "split": "test"}}
+    scope = " ".join(["Benchmark", *([condition["settings"]["split"]] if "split" in condition["settings"] else [])])
+    quote = f"On {scope}, model Affine reports mse 1."
     paper = quote + "\n" + (definition if complete else "")
     md = tmp_path / "paper.md"
     md.write_text(paper, encoding="utf-8")
-    condition = Condition(id="c1", dataset="Benchmark", metric="mse", settings={"model": "Affine", "split": "test"})
+    condition = Condition(id="c1", **condition)
     loc = ClaimLocation(page=1, char_start=0, char_end=len(quote))
     refs = [ClaimSourceRef(source_block_id="b", source_quote=definition,
         loc=ClaimLocation(page=1, char_start=len(quote)+1, char_end=len(paper)), covered=["c1"])] if complete else []
@@ -99,7 +101,7 @@ def refinement(plan, workspace, config, *, claim, materials):
         "paper": paper, "sources": sources}
     return list(plan.task.command), None, {"source_sites": sites, "flow_binding": bind_builtin_flow(flow,
         plan=plan, claim=claim, materials=materials, supplied_files={"eval.py": source}, source_sites=sites),
-        "flow_files": {"eval.py": source}, "science_proposal": proposal, "science_files": files}
+        "flow_files": {"eval.py": source}, "science_proposal": proposal, "science_files": files, "flow_proposal": flow}
 
 
 def captured_runner(data, weights):
@@ -169,7 +171,7 @@ def run_case(tmp_path, monkeypatch, split="test", complete=True, alignment="stri
             return {"command": list(plan.task.command), "metric_output": None,
                 "source_sites": [{key: row[key] for key in ("path", "qualname", "firstlineno")}
                                  for row in proposed["source_sites"]["sites"]],
-                "flow_proposal": proposed["flow_binding"]["proposal"], "science_proposal": proposed["science_proposal"]}
+                "flow_proposal": proposed["flow_proposal"], "science_proposal": proposed["science_proposal"]}
         calls.append(payload)
         run_stats.record_llm_call(module=module, provider="mock", model="mock", usage={"input_tokens": 10, "output_tokens": 4, "total_tokens": 14})
         context = payload["context"]
@@ -231,3 +233,17 @@ def test_relaxed_alignment_reaches_docker_consumption_check(tmp_path, monkeypatc
     assert set(calls[0]["context"]["obligations"]) >= {"condition/dataset"}
     assert not any(key.startswith(("condition/metric", "condition/settings")) for key in calls[0]["context"]["obligations"])
     assert relaxed.ledger[0]["alignment"][0]["alignment_mode"] == "relaxed"
+
+
+def test_relaxed_flow_binding_accepts_condition_without_split(tmp_path, monkeypatch):
+    # The paper number binds on dataset, model and metric; the flow binding must not demand a split.
+    condition = {"dataset": "Benchmark", "metric": "mse", "settings": {"model": "Affine"}}
+    for name in ("strict", "relaxed"):
+        (tmp_path / name).mkdir()
+    strict, strict_calls = run_case(tmp_path / "strict", monkeypatch, condition=condition)
+    assert not strict.claims[0].evidence and strict_calls == []
+    assert strict.ledger[0]["attempts"][0]["environment"]["source_flow_validation"]["reason"] == "unbound_flow"
+    assert "paper_model_or_all_condition_proposals_missing" in json.dumps(strict.ledger[0])
+    relaxed, calls = run_case(tmp_path / "relaxed", monkeypatch, alignment="relaxed", condition=condition)
+    evidence = relaxed.claims[0].evidence
+    assert len(evidence) == 1 and evidence[0].aligned and evidence[0].direction == "support" and len(calls) == 1
