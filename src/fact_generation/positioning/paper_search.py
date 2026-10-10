@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import re
 import xml.etree.ElementTree as ET
@@ -9,6 +10,7 @@ from urllib.parse import quote_plus, urlsplit, urlunsplit
 
 import httpx
 
+from fact_generation.positioning.search_scope import SearchRows, paging_facts
 from preprocessing.parse.markdown_parser import parse_pdf_locally
 from util.arxiv_requests import ARXIV_REQUESTS
 from util.cutoff_date import CutoffDate, filter_papers
@@ -28,6 +30,15 @@ class PaperSearchConfig:
     semantic_scholar_api_key: str | None = None
     openalex_base_url: str = "https://api.openalex.org"
     openalex_api_key: str | None = None
+    page_size: int = 8
+    max_pages: int = 1
+    max_results: int = 8
+
+    def __post_init__(self):
+        for name, maximum in (("page_size", 100), ("max_pages", 100), ("max_results", 10_000)):
+            value = getattr(self, name)
+            if type(value) is not int or not 1 <= value <= maximum:
+                raise ValueError(f"Invalid paper search {name}")
 
 
 @dataclass
@@ -138,6 +149,12 @@ class PaperSearchAdapter:
         grouped = [{"question": question, "success": result["success"],
                     "provider": result.get("provider", provider),
                     "papers": result.get("papers", []), "count": len(result.get("papers", [])),
+                    "partial": result.get("partial", False),
+                    "search_coverage": result.get("search_coverage") or {
+                        "version": "search-coverage-v1", "provider": provider, "query": question,
+                        "exhausted": None, "stop_reason": "request_failed", "pages": [],
+                    },
+                    **({"legacy_complete_declared": result["complete"]} if "complete" in result else {}),
                     **({"error": result["error"]} if result.get("error") else {})}
                    for question, result in zip(questions, results, strict=True)]
         if len(results) == 1:
@@ -151,9 +168,25 @@ class PaperSearchAdapter:
                         seen.add(key)
                         papers.append(paper)
             succeeded = sum(row["success"] is True for row in grouped)
-            result = {"success": succeeded == len(grouped), "partial": 0 < succeeded < len(grouped),
+            result = {"success": succeeded == len(grouped),
+                      "partial": 0 < succeeded < len(grouped) or any(row["partial"] for row in grouped),
                       "query": questions[0], "questions": questions, "papers": papers,
                       "count": len(papers), "question_results": grouped, "provider": results[0].get("provider", provider)}
+        if provider == "remote":
+            # An external boolean has no page provenance. Retain it for audit,
+            # while keeping current support-by-absence unavailable.
+            if "complete" in result:
+                result["legacy_complete_declared"] = result.pop("complete")
+            for question, row in zip(questions, grouped, strict=True):
+                row["search_coverage"] = {
+                    "version": "search-coverage-v1", "provider": "remote", "query": question,
+                    "exhausted": None, "stop_reason": "provider_unknown", "pages": [],
+                }
+            if len(grouped) == 1:
+                result["search_coverage"] = grouped[0]["search_coverage"]
+        result["search_coverage"] = {
+            "version": "search-coverage-v1", "queries": [row["search_coverage"] for row in grouped],
+        }
         return _apply_cutoff_to_search_result(result, cutoff_date)
 
     async def read_papers(self, *, items: list[dict]) -> dict:
@@ -329,6 +362,11 @@ class PaperSearchAdapter:
             "papers": [],
             "count": 0,
             "question_results": [],
+            "search_coverage": {"version": "search-coverage-v1", "queries": [
+                {"provider": state.provider, "query": question, "exhausted": None,
+                 "stop_reason": "not_started", "pages": [], "query_attempted": False}
+                for question in questions
+            ]},
             "retry_required": False,
             "next_action": "enter_retrieval_disabled_mode",
             "next_steps": [
@@ -400,163 +438,143 @@ class PaperSearchAdapter:
             "count": 0,
         }
 
-    async def _search_semantic_scholar(
-        self,
-        *,
-        query: str | None,
-        question_list: list[str] | None,
-    ) -> dict:
-        questions = [q for q in (question_list or []) if str(q or "").strip()]
-        query_text = str(query or "").strip()
-        if query_text and query_text not in questions:
-            questions = [query_text, *questions]
+    async def _search_semantic_scholar(self, *, query=None, question_list=None):
+        return await self._paged_search("semantic_scholar", query, question_list)
+
+    async def _search_openalex(self, *, query=None, question_list=None):
+        return await self._paged_search("openalex", query, question_list)
+
+    async def _paged_search(self, provider, query, question_list):
+        questions = [str(q).strip() for q in (question_list or []) if str(q or "").strip()]
+        if query and str(query).strip() not in questions:
+            questions.insert(0, str(query).strip())
         if not questions:
-            return _empty_search_result(provider="semantic_scholar", error="empty_query")
+            return _empty_search_result(provider=provider, error="empty_query")
+        # Public search dispatches one query at a time; keep the private API
+        # accepting its historical question-list form as well.
+        results = [await self._paged_query(provider, question) for question in questions]
+        if len(results) == 1:
+            return results[0]
+        papers, seen = [], set()
+        for result in results:
+            for paper in result["papers"]:
+                key = str(paper.get("id") or paper.get("arxiv_id") or paper.get("url") or paper.get("title"))
+                if key not in seen:
+                    seen.add(key)
+                    papers.append(paper)
+        return {"provider": provider, "success": all(r["success"] for r in results),
+                "partial": any(r["partial"] for r in results), "papers": papers, "count": len(papers),
+                "question_results": results, "query": questions[0], "questions": questions}
 
-        base_url = self._provider_base_url("semantic_scholar") or "https://api.semanticscholar.org/graph/v1"
-        url = f"{base_url.rstrip('/')}/paper/search"
-        fields = ",".join(
-            [
-                "paperId",
-                "title",
-                "abstract",
-                "url",
-                "year",
-                "authors",
-                "externalIds",
-                "openAccessPdf",
-                "citationCount",
-                "venue",
-                "publicationDate",
-            ]
-        )
-        headers: dict[str, str] = {}
-        api_key = str(self.search_cfg.semantic_scholar_api_key or "").strip()
-        if api_key:
-            headers["x-api-key"] = api_key
-
-        all_papers: list[dict] = []
-        seen: set[str] = set()
-        question_results: list[dict] = []
-        async with httpx.AsyncClient(timeout=max(20, int(self.search_cfg.timeout_seconds))) as client:
-            for q in questions:
-                response = await client.get(
-                    url,
-                    headers=headers,
-                    params={"query": q, "limit": 8, "fields": fields},
-                )
-                response.raise_for_status()
-                payload = response.json()
-                rows = _validated_search_rows(payload, "data", "title")
-                papers = [
-                    self._normalize_semantic_scholar_item(item)
-                    for item in (rows or [])
-                    if isinstance(item, dict)
-                ]
-                papers = [paper for paper in papers if paper.get("title")]
-                question_results.append(
-                    {
-                        "question": q,
-                        "success": True,
-                        "count": len(papers),
-                        "papers": papers,
-                    }
-                )
-                for paper in papers:
-                    key = str(
-                        paper.get("arxiv_id")
-                        or paper.get("semantic_scholar_id")
-                        or paper.get("url")
-                        or paper.get("title")
-                        or ""
-                    )
-                    if key and key in seen:
-                        continue
-                    if key:
-                        seen.add(key)
-                    all_papers.append(paper)
-
-        return {
-            "success": True,
-            "query": questions[0],
-            "questions": questions,
-            "papers": all_papers,
-            "count": len(all_papers),
-            "question_results": question_results,
-            "provider": "semantic_scholar",
+    async def _paged_query(self, provider, question):
+        cfg = self.search_cfg
+        scope = {
+            "version": "search-coverage-v1", "provider": provider, "query": question,
+            "translated_query": self._question_to_arxiv_query(question) if provider == "arxiv" else question,
+            "endpoint": _public_url(self._provider_base_url(provider)),
+            "limits": {"page_size": cfg.page_size, "max_pages": cfg.max_pages, "max_results": cfg.max_results},
+            "pages": [], "raw_count": 0, "exhausted": None, "stop_reason": "provider_unknown",
         }
-
-    async def _search_openalex(
-        self,
-        *,
-        query: str | None,
-        question_list: list[str] | None,
-    ) -> dict:
-        questions = [q for q in (question_list or []) if str(q or "").strip()]
-        query_text = str(query or "").strip()
-        if query_text and query_text not in questions:
-            questions = [query_text, *questions]
-        if not questions:
-            return _empty_search_result(provider="openalex", error="empty_query")
-
-        base_url = self._provider_base_url("openalex") or "https://api.openalex.org"
-        url = f"{base_url.rstrip('/')}/works"
-        api_key = str(self.search_cfg.openalex_api_key or "").strip()
-
-        all_papers: list[dict] = []
-        seen: set[str] = set()
-        question_results: list[dict] = []
-        async with httpx.AsyncClient(timeout=max(20, int(self.search_cfg.timeout_seconds))) as client:
-            for q in questions:
-                params = {
-                    "search": q,
-                    "per-page": 8,
-                }
-                if api_key:
-                    params["api_key"] = api_key
-                response = await client.get(
-                    url,
-                    params=params,
-                )
-                response.raise_for_status()
-                payload = response.json()
-                rows = _validated_search_rows(payload, "results", "display_name", "title")
-                papers = [
-                    self._normalize_openalex_item(item) for item in (rows or []) if isinstance(item, dict)
-                ]
-                papers = [paper for paper in papers if paper.get("title")]
-                question_results.append(
-                    {
-                        "question": q,
-                        "success": True,
-                        "count": len(papers),
-                        "papers": papers,
-                    }
-                )
-                for paper in papers:
-                    key = str(
-                        paper.get("arxiv_id")
-                        or paper.get("openalex_id")
-                        or paper.get("doi")
-                        or paper.get("url")
-                        or paper.get("title")
-                        or ""
-                    )
-                    if key and key in seen:
-                        continue
-                    if key:
+        papers, seen, seen_cursors = [], set(), set()
+        offset, cursor, error = 0, "*", None
+        if provider == "semantic_scholar":
+            scope["limits"]["provider_result_cap"] = 1_000
+        for _ in range(cfg.max_pages):
+            limit = min(cfg.page_size, cfg.max_results - scope["raw_count"],
+                        16 if provider == "arxiv" else 100,
+                        1_000 - offset if provider == "semantic_scholar" else cfg.page_size)
+            if limit <= 0:
+                scope["stop_reason"] = "provider_limit" if provider == "semantic_scholar" and offset >= 1_000 else "result_budget"
+                break
+            page = {"index": len(scope["pages"]), "offset": offset, "limit": limit,
+                    "request_cursor_sha256": hashlib.sha256(cursor.encode()).hexdigest() if provider == "openalex" else None}
+            scope["pages"].append(page)
+            try:
+                rows, payload, response_hash, endpoint = await self._search_page(provider, question, offset, cursor, limit)
+                page.update(status="ok", raw_count=len(rows), response_sha256=response_hash)
+                scope["raw_count"] += len(rows)
+                scope["endpoint"] = _public_url(endpoint)
+                normalize = {"semantic_scholar": self._normalize_semantic_scholar_item,
+                             "openalex": self._normalize_openalex_item, "arxiv": lambda row: row}[provider]
+                # A malformed provider may overrun its requested page. Keep
+                # the observed count, but never exceed the candidate budget.
+                accepted_rows = rows[:limit]
+                normalized = [normalize(row) for row in accepted_rows]
+                normalized = [row for row in normalized if row.get("title")]
+                page["normalized_count"] = len(normalized)
+                page["normalization_dropped_count"] = len(accepted_rows) - len(normalized)
+                page["budget_dropped_count"] = len(rows) - len(accepted_rows)
+                for paper in normalized:
+                    key = str(paper.get("id") or paper.get("arxiv_id") or paper.get("url") or paper.get("title"))
+                    if key not in seen:
                         seen.add(key)
-                    all_papers.append(paper)
+                        papers.append(paper)
+                facts, continuation = paging_facts(provider, payload, offset=offset, cursor=cursor,
+                                                  limit=limit, returned=len(rows))
+                page.update(facts)
+                totals = {p["provider_total"] for p in scope["pages"] if p.get("provider_total") is not None}
+                if len(totals) > 1:
+                    raise ValueError("changing_paging_total")
+                scope["exhausted"] = facts["exhausted"]
+                if scope["exhausted"] is True:
+                    scope["stop_reason"] = "provider_exhausted"
+                    break
+                if continuation is None:
+                    scope["stop_reason"] = "provider_unknown"
+                    break
+                if scope["raw_count"] >= cfg.max_results:
+                    scope["stop_reason"] = "result_budget"
+                    break
+                if provider == "semantic_scholar" and continuation >= 1_000:
+                    scope["stop_reason"] = "provider_limit"
+                    break
+                if provider == "openalex":
+                    if continuation in seen_cursors:
+                        raise ValueError("repeated_paging_cursor")
+                    seen_cursors.add(continuation)
+                    cursor = continuation
+                    offset += len(rows)
+                else:
+                    offset = continuation
+                scope["stop_reason"] = "request_budget"
+            except Exception as exc:
+                error = _safe_request_error(exc)
+                page.update(status="failed", error=error)
+                scope.update(exhausted=None, stop_reason="protocol_failed" if isinstance(exc, ValueError) else "request_failed")
+                break
+        scope["normalized_count"] = len(papers)
+        scope["retained_count"] = len(papers)
+        return {"success": error is None, "partial": error is not None and any(p.get("raw_count") is not None for p in scope["pages"]),
+                "provider": "arxiv_fallback" if provider == "arxiv" else provider,
+                "query": question, "papers": papers, "count": len(papers), "search_coverage": scope,
+                **({"error": error} if error else {})}
 
-        return {
-            "success": True,
-            "query": questions[0],
-            "questions": questions,
-            "papers": all_papers,
-            "count": len(all_papers),
-            "question_results": question_results,
-            "provider": "openalex",
-        }
+    async def _search_page(self, provider, question, offset, cursor, limit):
+        if provider == "arxiv":
+            kwargs = {"max_results": limit, **({"start": offset} if offset else {})}
+            rows = await self._arxiv_query(question, **kwargs)
+            return rows, getattr(rows, "metadata", None), getattr(rows, "response_sha256", None), "https://export.arxiv.org/api/query"
+        headers = {}
+        base = self._provider_base_url(provider)
+        if provider == "semantic_scholar":
+            endpoint = base.rstrip("/") + "/paper/search"
+            fields = "paperId,title,abstract,url,year,authors,externalIds,openAccessPdf,citationCount,venue,publicationDate"
+            params = {"query": question, "offset": offset, "limit": limit, "fields": fields}
+            if self.search_cfg.semantic_scholar_api_key:
+                headers["x-api-key"] = self.search_cfg.semantic_scholar_api_key
+            rows_key, title_keys = "data", ("title",)
+        else:
+            endpoint = base.rstrip("/") + "/works"
+            params = {"search": question, "per_page": limit, "cursor": cursor}
+            if self.search_cfg.openalex_api_key:
+                params["api_key"] = self.search_cfg.openalex_api_key
+            rows_key, title_keys = "results", ("display_name", "title")
+        async with httpx.AsyncClient(timeout=max(20, int(self.search_cfg.timeout_seconds))) as client:
+            response = await client.get(endpoint, headers=headers, params=params)
+        response.raise_for_status()
+        payload = response.json()
+        rows = _validated_search_rows(payload, rows_key, *title_keys)
+        return rows, payload, hashlib.sha256(response.content).hexdigest(), endpoint
 
     async def _read_remote(self, items: list[dict]) -> dict:
         assert self.read_cfg.base_url is not None
@@ -580,56 +598,8 @@ class PaperSearchAdapter:
             "items": [],
         }
 
-    async def _search_arxiv_fallback(
-        self,
-        *,
-        query: str | None,
-        question_list: list[str] | None,
-    ) -> dict:
-        questions = [q for q in (question_list or []) if str(q or "").strip()]
-        if not questions and query:
-            questions = [query]
-        if not questions:
-            return {
-                "success": False,
-                "error": "empty_query",
-                "papers": [],
-                "count": 0,
-                "question_results": [],
-                "provider": "arxiv_fallback",
-            }
-
-        all_papers: list[dict] = []
-        seen: set[str] = set()
-        question_results: list[dict] = []
-
-        for q in questions:
-            papers = await self._arxiv_query(q, max_results=8)
-            question_results.append(
-                {
-                    "question": q,
-                    "success": True,
-                    "count": len(papers),
-                    "papers": papers,
-                }
-            )
-            for paper in papers:
-                key = str(paper.get("arxiv_id") or paper.get("url") or "")
-                if key and key in seen:
-                    continue
-                if key:
-                    seen.add(key)
-                all_papers.append(paper)
-
-        return {
-            "success": True,
-            "query": questions[0],
-            "questions": questions,
-            "papers": all_papers,
-            "count": len(all_papers),
-            "question_results": question_results,
-            "provider": "arxiv_fallback",
-        }
+    async def _search_arxiv_fallback(self, *, query=None, question_list=None):
+        return await self._paged_search("arxiv", query, question_list)
 
     async def _read_arxiv_fallback(self, items: list[dict]) -> dict:
         normalized = [item for item in items if isinstance(item, dict)]
@@ -828,12 +798,12 @@ class PaperSearchAdapter:
                 break
         return evidence
 
-    async def _arxiv_query(self, question: str, *, max_results: int) -> list[dict]:
+    async def _arxiv_query(self, question: str, *, max_results: int, start: int = 0) -> list[dict]:
         tokens = self._question_to_arxiv_query(question)
         query = quote_plus(tokens)
         url = (
             "https://export.arxiv.org/api/query?"
-            f"search_query=all:{query}&start=0&max_results={max(1, min(16, max_results))}"
+            f"search_query=all:{query}&start={start}&max_results={max(1, min(16, max_results))}"
         )
 
         async with ARXIV_REQUESTS.slot(), httpx.AsyncClient(timeout=45) as client:
@@ -841,7 +811,7 @@ class PaperSearchAdapter:
             ARXIV_REQUESTS.observe_retry_after(response.status_code, response.headers.get("Retry-After"))
         response.raise_for_status()
 
-        return self._parse_arxiv_feed(response.text)
+        return SearchRows(self._parse_arxiv_feed(response.text), response.text, wire_bytes=response.content)
 
     async def _arxiv_fetch_single(self, arxiv_id: str) -> dict | None:
         clean = arxiv_id.strip()
@@ -1119,6 +1089,10 @@ def _apply_cutoff_to_search_result(result: dict, cutoff: CutoffDate | None) -> d
                 continue
             sub_papers = row.get("papers") if isinstance(row.get("papers"), list) else []
             sub_kept, sub_dropped = filter_papers(sub_papers, cutoff)
+            coverage = row.get("search_coverage")
+            if isinstance(coverage, dict):
+                coverage.update(cutoff_date=cutoff.to_metadata(), filtered_out_count=len(sub_dropped),
+                                retained_count=len(sub_kept))
             rebuilt.append(
                 {
                     **row,

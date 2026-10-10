@@ -144,6 +144,9 @@ def _default_adapter() -> PaperSearchAdapter:
             semantic_scholar_api_key=cfg.semantic_scholar_api_key,
             openalex_base_url=cfg.openalex_base_url,
             openalex_api_key=cfg.openalex_api_key,
+            page_size=cfg.paper_search_page_size,
+            max_pages=cfg.paper_search_max_pages,
+            max_results=cfg.paper_search_max_results,
         ),
         PaperReadConfig(
             base_url=cfg.paper_read_base_url,
@@ -1424,6 +1427,7 @@ async def verify_literature(
                 if isinstance(row["response"].get("papers"), list)
                 else None,
                 "complete": row["response"].get("complete"),
+                "search_coverage": row["response"].get("search_coverage"),
             }
             for row in audit["queries"]
         ],
