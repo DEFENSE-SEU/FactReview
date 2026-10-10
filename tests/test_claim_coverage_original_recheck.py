@@ -20,7 +20,11 @@ def revalidated(p, *, groups=1, findings=(), state="resolved", link=False):
     raw = validation(p)
     row = review(p, groups=groups, findings=findings, state=state)["claim_reviews"][0]
     raw.update(
-        schema_version="claim-coverage-validation-v3", original_claim_reviews=[row], observation_links=[]
+        schema_version="claim-coverage-validation-v4"
+        if "scope_context" in p
+        else "claim-coverage-validation-v3",
+        original_claim_reviews=[row],
+        observation_links=[],
     )
     if link:
         for existing in p["observations"]:

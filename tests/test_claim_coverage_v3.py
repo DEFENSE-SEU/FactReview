@@ -45,7 +45,7 @@ def review(payload, *, groups=1, findings=(), state="resolved"):
     c = payload["current_claims"][0]
     all_ids = [x["id"] for x in c["conditions"]]
     partitions = [all_ids] if groups == 1 else [[i] for i in all_ids]
-    return {
+    raw = {
         "schema_version": "claim-coverage-v3",
         "context_id": payload["context_id"],
         "window_id": payload["window_id"],
@@ -72,6 +72,16 @@ def review(payload, *, groups=1, findings=(), state="resolved"):
         "new_findings": [],
         "explanation": "Offline explicit-v3 review.",
     }
+    if "scope_context" in payload:
+        from tests.claim_scope_mock import with_scope
+
+        raw["schema_version"] = "claim-coverage-v4"
+        # A no-required-claim window is used by explicit untargeted finding controls.
+        if any(s["claim_id"] == c["claim_id"] for s in payload["scope_context"]):
+            raw["claim_reviews"] = [with_scope(raw["claim_reviews"][0], c, payload)]
+        else:
+            raw["claim_reviews"] = []
+    return raw
 
 
 QUALIFIER = {
@@ -140,7 +150,7 @@ def test_legacy_v2_missing_merge_stays_unreviewed(tmp_path):
 
     def call(**kw):
         p = json.loads(kw["prompt"].split("DATA_JSON:\n", 1)[1])
-        r = old_review(p, [])
+        r = old_review(p, [], legacy_v2=True)
         row = r["claim_checks"][0]
         row.update(
             atomicity="independent_conclusions",
@@ -369,6 +379,7 @@ def test_historical_background_public_context_and_version_boundary(tmp_path, leg
                         "reason": "Source outside original v2 window.",
                     }
                 ],
+                legacy_v2=True,
             )
             return r
         return review(p, findings=[QUALIFIER])
