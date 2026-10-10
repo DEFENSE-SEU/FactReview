@@ -180,11 +180,21 @@ def _coerce_usage(value: Any) -> dict[str, int]:
     total_count = counts.get("total_tokens", 0)
     if total_count <= 0:
         total_count = input_count + output_count
-    return {
+    result = {
         "input_tokens": input_count,
         "output_tokens": output_count,
         "total_tokens": total_count,
     }
+    # Responses API breakdowns: cached prompt prefix and reasoning share of output.
+    for target, parent, key in (
+        ("cached_input_tokens", "input_tokens_details", "cached_tokens"),
+        ("reasoning_output_tokens", "output_tokens_details", "reasoning_tokens"),
+    ):
+        details = value.get(parent)
+        raw = details.get(key) if isinstance(details, dict) else None
+        if type(raw) is int and raw >= 0:
+            result[target] = raw
+    return result
 
 
 def _extract_usage(payload: dict[str, Any]) -> dict[str, int]:
