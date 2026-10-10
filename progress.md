@@ -1,5 +1,23 @@
 # FactReview v2 progress
 
+## 当前整体框架 checkpoint（2026-10-11）
+
+Task：继续完成完整三层FactReview框架、必要验证与可追溯交付，目标active，Phase8整体未完成。当前聊天GPT-6.1 Sol；产品内部openai-codex/GPT-5.5。`refactor/method-v2` 已推送源码checkpoint85441552924a12519c7bded87feee98c9006c0e1；当前一个Phase4文字增量待本次提交。此前Phase0–8源码记录及失败原件均保留。
+
+Completed：新L2正式actual-ec15490ac163/supervised-586491786bc6在固定0ac源完成，2/2主调用49136+readiness171=49307known、wall90.125s、rc0。真实19个choice义务全confirmed，原生产Experiments生成1个high/ready evaluation plan；原c1与全部限制保持。5条paper evidence全insufficient，联合角色错误公开保留，L3尚未发生。独审57875f6f/b1624d4d关闭26facts/291原件；Root383a4e58关闭当前全原件。该四行固定预测材料只证明受限集成链，不证明总体性能、排名或商业完成。
+
+Decisions：唯一产品修改细化descriptive/noncomparative joint且comparisons=[]时的grounded result/protocol/other_qualifier角色；机械metric/setup/table角色仍必须有真正number/cell/bridge消费者。原prompt已有该合同，新文字仅澄清特殊情形。禁止补比较、自动改raw角色或提升sufficiency。新增一行删除后整个源码bytes/AST等于before；独审c37c39d5/a520c19c关闭13facts/9原件，真实模型改进尚未验证。产品默认修复3轮上限3、auto批准、training0及旧决策保持。
+
+Outputs：`runs/v2_method_delivery/joint-semantic-role-prompt-clarification-v1/`、`joint-semantic-role-prompt-clarification-independent-v1/`、`claim008-public-experiments-native-v3-actual-independent-v1/`、`wholepaper-original-batching-native-v3-prepared-independent-v1/`、`acceptance-contract-independent-v1/`。报告与完整证据位于各目录report.md/evidence.json；checks.md新增原14合同表，并保留较广工程矩阵和全部历史。
+
+Running：整篇双分批v3唯一actual-b5acca4e6731（session71584），固定854完整216源。prepared177daa30d43d/manifest f35e24b5、auth6dcdb2dc、admission46a4d5cb；prepared独审643f32e0/6741d501关闭32facts/294原件。原73完整主张/244parsed/284review块和66空默认bridge保持；first32/followup6/validation48、两类batch3、main86各一次physical/soft6M、readiness1/1/2000、wall7200。完成数和科学质量待终态，旧v2的12/75first、13/75third、26pending、2append/final75保持。Coverage测试agent仅执行一次当前默认pytest最终回归，外部unit边界mock；不添加新测试或修改原markers/断言。
+
+Open issues：独审在尚未运行的L3 final-v2控制器中发现确定源布局阻断：原计划registry的8个code_hash键包含L2原runtime绝对路径，复制到新路径后原revalidate_registry会拒绝。旧draft/final-v2与blocked-final-v2.json保留，0实际准入。Finite正在最窄修正为精确import原L2完整源根ep3-a-585f3a461866，完整SHA/set/import守卫绑定原根，输出/prepared/auth/admission仍新建；原plan/registry/code/__file__/consumer不改。Single增量独审后才执行。其他开放项包括整篇召回/原子性/M2/M5、联合paper evidence、正常NN/多condition能力、完整报告与原六native系统失败。
+
+原14合同独审显示12条原窄合同已满足，pytest和最新文档同步当时未决；本checkpoint同步后为13满足/1 pytest待结果，其中第13条按明确允许的reported-blocker分支通过。此前较广工程质量7pass/6unresolved/1fail独立保留，完整目标未获完成。正常证据不足或缺资源应诚实Unverified；真实系统/合同失败仍需修复并记录partial，不能通过提升科学状态掩盖。
+
+Next action：取得当前整篇真实终态与逐窗独审；并行完成原正式public plan的L3源布局修正/增量独审与真实Docker执行，再将当前完整入口的report/teaser/JSON/PDF及操作失败一致性收敛交付。一次默认回归结束后记录真实结果。阶段提交并推送仅授权分支，不改main或新建PR；所有private provider/model/stdout/stderr仅opaque SHA/size。
+
 ## 当前交付与首轮分批审核（2026-10-11）
 
 Phase4五路径已提交并推送0ac3e7eaac4ad2ea98601be1ac17503aaecec520，精确远端相同。released-prediction-recipe-facts-root-v1/delivery.json83d2c7d9绑定两个产品文件、新必要mock和checks/progress；canonical完整src+RefCopilot/src归档source-0ac3e7e.tar ab32dd38、identity a924e03e包含215 regular/31目录/214 Python，与152只两产品文件变，另213全字节相同。仅两变更canonical模块AST parse一次，旧完整214闭合保留；Phase3工作树未进入此归档，0重复pytest或服务。该新源将用于独立身份L2 v3 public真实验证，旧51391的0plan保持。
