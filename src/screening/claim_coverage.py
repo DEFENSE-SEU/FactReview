@@ -757,6 +757,22 @@ def _digest(value):
 
 def _prompt_schema(schema, payload=None):
     displayed = schema.model_json_schema()
+    if schema is CoverageReviewV5 and payload is not None:
+        properties = displayed["properties"]
+        for key in ("context_id", "window_id"):
+            if key in properties:
+                properties[key]["const"] = payload[key]
+        rows = payload["required_claim_checks"]
+        originals = properties["claim_reviews"]
+        originals.update(minItems=len(rows), maxItems=len(rows))
+        if rows:
+            originals["prefixItems"] = [
+                {"allOf": [originals["items"], {"properties": {
+                    "claim_id": {"const": row["claim_id"]},
+                    "claim_digest": {"const": row["digest"]},
+                }}]}
+                for row in rows
+            ]
     if schema in (CoverageValidationV5, OriginalRecheckBatchV1):
         priority = ("schema_version", "context_id", "window_id", "original_claim_reviews", "observation_links")
         properties = displayed["properties"]
