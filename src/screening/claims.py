@@ -341,6 +341,7 @@ def extract_claims(
             output = ClaimExtractionOutput.model_validate(request(prompt, _SYSTEM, "screening.claims"))
         except Exception as exc:
             raise ClaimExtractionError(f"Claim extraction failed: {exc}") from exc
+        _check_repair_materials(materials, snapshot)
         for round_index in range(max_source_repairs + 1):
             results, invalid = _ground_claims(output, blocks, materials.markdown)
             audit["attempts"][-1]["source_errors"] = invalid
