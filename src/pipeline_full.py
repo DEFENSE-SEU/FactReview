@@ -530,6 +530,18 @@ def parse_args() -> argparse.Namespace:
         "--max-attempts", type=int, choices=range(4), default=3, help="Maximum repair rounds, capped at 3"
     )
     p.add_argument(
+        "--alignment",
+        choices=("strict", "relaxed"),
+        default="strict",
+        help="Execution alignment (ablation: relaxed compares any run on the claimed dataset; default: strict)",
+    )
+    p.add_argument(
+        "--repairer",
+        choices=("default", "llm"),
+        default="default",
+        help="Execution repair proposer (default: dependency-only; llm proposes whitelisted repairs)",
+    )
+    p.add_argument(
         "--no-pdf-extract",
         action="store_true",
         help="Pass through to external execution stage (skip MinerU in execution prepare).",
