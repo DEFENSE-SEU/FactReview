@@ -12,6 +12,7 @@ from typing import Annotated, Any, Literal
 
 from pydantic import Field, model_validator
 
+from fact_generation.execution.resource_contract import build_resource_contract
 from schemas.claim import (
     AuthorQuestion,
     Claim,
@@ -2449,6 +2450,13 @@ def _plan(
         task=ExecutionTask(
             entry_script=candidate.entry_script,
             config=candidate.config,
+            data_paths=list(candidate.data_paths),
+            weight_paths=list(candidate.weight_paths),
+            resource_contract=build_resource_contract(
+                claim, materials, condition_ids=ids, entry_script=candidate.entry_script,
+                config=candidate.config, data_paths=candidate.data_paths,
+                weight_paths=candidate.weight_paths,
+            ),
             command=["python", "-I", "-S", candidate.entry_script] if released_predictions else [],
         ),
         run_mode=candidate.run_mode,

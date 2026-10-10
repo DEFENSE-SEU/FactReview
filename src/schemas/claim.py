@@ -460,9 +460,34 @@ class Claim(Contract):
         return self
 
 
+class ExecutionResourceSelection(Contract):
+    """An indexed candidate resource; its role does not prove runtime consumption."""
+
+    role: Literal["entry", "config", "data", "weights"]
+    path: str = Field(min_length=1)
+    sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+
+
+class ExecutionResourceContract(Contract):
+    """Rebuildable plan-wide selection identity, independent of runtime alignment."""
+
+    version: Literal["released-resource-selection-v1"] = "released-resource-selection-v1"
+    selection_scope: Literal["plan_wide_candidates"] = "plan_wide_candidates"
+    claim_id: NonEmpty
+    claim_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+    condition_ids: list[NonEmpty] = Field(min_length=1)
+    # Cover all original claim conditions, including those outside this plan.
+    condition_sha256: dict[NonEmpty, Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]]
+    resources: list[ExecutionResourceSelection] = Field(default_factory=list)
+
+
 class ExecutionTask(Contract):
     entry_script: str | None = None
     config: str | None = None
+    data_paths: list[str] = Field(default_factory=list)
+    weight_paths: list[str] = Field(default_factory=list)
+    # None is readable history, and never grants a resource binding.
+    resource_contract: ExecutionResourceContract | None = None
     command: list[str] = Field(default_factory=list)
     workdir: str = "."
     metric_output: str | None = None
