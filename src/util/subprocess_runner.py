@@ -6,6 +6,7 @@ import subprocess
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 from .fs import ensure_dir, write_text
 from .verbose import is_verbose
@@ -19,6 +20,11 @@ class CommandResult:
     stdout: str
     stderr: str
     duration_sec: float
+    # None preserves the unknown origin of historical/uninstrumented results.
+    termination: Literal[
+        "completed", "launch_failed", "communication_failed", "timed_out", "unfinished"
+    ] | None = None
+    exception_type: str | None = None
 
 
 def _tail(text: str, n: int = 2000) -> str:
@@ -190,6 +196,8 @@ def run_command(
     env: dict[str, str] | None = None,
 ) -> CommandResult:
     start = time.time()
+    proc = None
+    termination, exception_type = "completed", None
     effective_timeout = None if timeout_sec is None or int(timeout_sec) <= 0 else int(timeout_sec)
     if is_verbose():
         try:
@@ -221,6 +229,7 @@ def run_command(
             out, err = proc.communicate(timeout=effective_timeout)
             rc = proc.returncode
         except subprocess.TimeoutExpired as e:
+            termination, exception_type = "timed_out", type(e).__name__
             _close_windows_job(windows_job)
             windows_job = None
             _kill_process_tree(proc)
@@ -237,6 +246,8 @@ def run_command(
             _close_windows_job(windows_job)
         if rc is None:
             rc = 124
+            termination = "unfinished"
+            _kill_process_tree(proc)
         out = out or ""
         err = err or ""
     except Exception as e:
@@ -244,6 +255,10 @@ def run_command(
         rc = 127
         out = ""
         err = f"{type(e).__name__}: {e}"
+        termination = "launch_failed" if proc is None else "communication_failed"
+        exception_type = type(e).__name__
+        if proc is not None:
+            _kill_process_tree(proc)
     dur = time.time() - start
     if is_verbose():
         try:
@@ -261,6 +276,8 @@ def run_command(
         stdout=out,
         stderr=err,
         duration_sec=dur,
+        termination=termination,
+        exception_type=exception_type,
     )
 
 
@@ -275,7 +292,8 @@ def persist_command_result(
     err_path = logs / f"{prefix}_stderr.log"
     write_text(
         cmd_path,
-        f"cwd: {result.cwd}\ncmd: {' '.join(result.cmd)}\nrc: {result.returncode}\nsec: {result.duration_sec:.3f}\n",
+        f"cwd: {result.cwd}\ncmd: {' '.join(result.cmd)}\nrc: {result.returncode}\nsec: {result.duration_sec:.3f}\n"
+        f"termination: {result.termination or 'unknown'}\nexception_type: {result.exception_type or ''}\n",
     )
     write_text(out_path, result.stdout)
     write_text(err_path, result.stderr)

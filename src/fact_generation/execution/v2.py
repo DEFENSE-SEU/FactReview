@@ -330,6 +330,8 @@ def _cleanup_container(name: str, run_dir: str, logs: Path) -> dict:
         )
     persist_command_result(result, logs, prefix="cleanup")
     absent = bool(
+        result.termination in {None, "completed"}
+        and
         re.fullmatch(
             r"(?:Error response from daemon: )?No such container: " + re.escape(name),
             result.stderr.strip(),
@@ -344,6 +346,9 @@ def _cleanup_container(name: str, run_dir: str, logs: Path) -> dict:
         "stdout": result.stdout,
         "stderr": result.stderr,
         "runtime_seconds": result.duration_sec,
+        "process_termination": {
+            "kind": result.termination or "unknown", "exception_type": result.exception_type,
+        },
     }
     _json(logs / "container_cleanup.json", audit)
     return audit
@@ -505,6 +510,12 @@ def docker_runner(request: RunRequest) -> RunOutcome:
         if result is None or result.returncode != 0:
             cleanup = _cleanup_container(container_name, request.run_dir, logs)
     persist_command_result(result, logs, prefix="run")
+    if result.termination in {"launch_failed", "communication_failed", "unfinished"}:
+        operation_failures.append(ExecutionOperationFailure(
+            component="execution.runner",
+            reason=f"Docker subprocess {result.termination}"
+            + (f" ({result.exception_type})" if result.exception_type else ""),
+        ))
     payload = None
     issue = ""
     try:
@@ -547,6 +558,9 @@ def docker_runner(request: RunRequest) -> RunOutcome:
         )
     after_commands = []
     execution_returncode = result.returncode
+    if operation_failures:
+        execution_returncode = 1
+        observations = []
     if projected:
         try:
             _, inspect_command, confirmed = _prediction_image(request, logs, frozen_id=image)
@@ -581,6 +595,9 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             "python": request.config.python_version,
             "container_name": container_name,
             "writable_runtime_directory": str(runtime_dir),
+            "process_termination": {
+                "kind": result.termination or "unknown", "exception_type": result.exception_type,
+            },
             **({"container_cleanup": cleanup} if cleanup else {}),
             **({"prediction_recipe_environment": recipe_environment} if recipe_environment else {}),
         },
