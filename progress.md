@@ -1,6 +1,22 @@
 # FactReview v2 progress
 
-## 当前 Phase4：补齐 MSE 绝对回归量目标
+## 当前 Phase8：真实生产 Docker 机械链与整篇覆盖推进
+
+已交付代码精确远端248e6aed8106cb17908ca1fd8fde84c38597812d。两个新独立one-shot都固定此HEAD、21相关源码、新四文件平方误差fixture；真实execute_plans/builder/runner/observer/receipt/consumer/ledger不mock，仅_refine替换为明确的固定源码proposal。build60s/run30s、auto审批、training0/repair0、真实LLM/检索0。正常框架repair默认3保持。目标/资源先绑再flow，原residual样例及全部历史失败不改。
+
+第一实际tiny-mse-flow-docker-actual-v1/actual-de83d7d5ac68：精确paper cache缺失，生产build明确timed_out/TimeoutExpired、rc124/62.212s；镜像metadata步骤DONE，FROM/base步骤未DONE，尚无RUN或作者程序运行。框架记录execution.environment、0Observation/证据。driver后续image断言遮住原失败，不能当成镜像替换证据。wall64.937s，当前可列举容器集合恢复；BuildKit后台任务和Windows后代清理未独立证明。独审tiny-mse-flow-docker-independent-v1/review.md3e450890/evidencecd1e7fe4。
+
+第二实际tiny-mse-flow-docker-legacy-v1/actual-478f8b182a42：只在启动进程设置DOCKER_BUILDKIT=0，并finally恢复此前值；官方Docker文档仍提供该显式选项，Linux legacy builder已deprecated，本次不修改产品默认或global/image-store设置。新driver只补绑定此环境及优先生产失败诊断，两处插入删除后文本/AST等原。独审草稿789ab719/e2cc7044。原source、fixture、Dockerfile、资源、模型/指标、预算均同，禁止stock重tag或绕过构建。真实cold build rc0/34.505s，整链wall38.562s，脚本completed0/stdout1、CPython3.11.16、10事件、host receipt received、flow witnessed/strict stdout bound；原claim/plan/输入保持，容器集合恢复。0Observation/科学证据/对齐，scientific_qualification/alignment/support仍false。终态独审final-review.md38ef3e58/evidence-final.jsonb452eaa9通过此机械范围；Root已完整读报告/事件与阶段投影并核二文件SHA。只有两RO挂载和独立RW scratch；无stock retag，paper image00a6afd8与stock不同。独审静态检查器五次形状假设错误原script保留，未产生测试或实际执行重试；原draft与第一次失败不改。
+
+Decisions：明确基础镜像展开阻断后改变构建器选择才启动第二个独立身份，未重复原consumed授权或扩大时间预算。冷build含正常pip网络，不能称完全离线。机械成功检验真实执行审计链；paper模型、数据划分和指标语义继续独立资格核验。必要测试沿已冻结源码结果，无源码改动，不新增或复跑测试。
+
+整篇覆盖独审claim-coverage-next-step-review/review.md216209d8/evidence120a8438纠正了旧记录的来源解释：genuine原73claims/244parsed/284review/六窗，后五窗因review/followup/validation预算各1而not_reviewed_budget；当前公开三默认各12完整传递，提取无数量cap。genuine三append和v7两split的候选来源都在actual input.blocks，v7第三轮遗漏已供给邻近scope_context目录的声明。现有正文loader与准确目录提示已具备，不需要新loader或放宽check_scope；所有原partial/0adopt/M2/M5未知保持。新coverage-v5-wholepaper-native-validation-v1已固化Git248e6aed src+RefCopilot/src207regular source files/archive0fb64bb6；六controller bytes与原draft同，原四输入不改，三预算各6、最多18logical/physical，known aggregate soft1.5m tokens、readiness另1/1/2000、wall2h。author review-final.mda3da7b1a/evidence-final.json8d554b57，Native final源码/控制器独审中；没有prepare/live/付费。软门槛非货币硬限，持续在途响应及超时未知费用如实记录。sourcepin继续248，无需随随后仅文档提交HEAD更新。
+
+Open issues：逐condition科学数据/split/active模型/指标消费、generic inference/analysis、genuine M2/M5与全篇recall、文献充分性与native exhaustion、真实OS/daemon故障和大ledger/IO、当前整套验收仍开放。最新两个部署不改变原整流v7失败；goal active，不因局部跑通暂停或complete。
+
+Next action：提交/推送本Phase8已独审记录，delivery写production-docker-checkpoint/delivery.json。六窗final source/controller独审后，root离线prepare/pure-preflight，复核prepared闭合后独立one-shot启动真实验证；子agent并行设计最小的科学消费资格接口/必要反例。仅推送授权refactor/method-v2，不开PR、不改main；局部成功不结束goal。
+
+## 历史 248e6 Phase4：补齐 MSE 绝对回归量目标
 
 发现现有绝对量表排除了常规回归误差指标。仅新增mse/mean squared error两个规范名称，源句/完整prose、主张/模型/数据集/划分/settings、数值token、绝对与比较量、单位、容差和目标重建规则保持。删两literal后整个experiment_targets模块AST等原。
 
