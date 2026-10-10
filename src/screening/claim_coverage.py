@@ -325,7 +325,14 @@ class NeedsFinding(Contract):
     kind: Literal["missing_needs"]
     condition_ids: list[StrictStr] = Field(min_length=1)
     source_block_ids: list[StrictStr] = Field(min_length=1)
-    needs: list[EvidenceNeed] = Field(min_length=1)
+    needs: list[EvidenceNeed] = Field(
+        min_length=1,
+        description=(
+            "Distinct required evidence branches absent from this unchanged claim's needs. "
+            "List only newly missing routing labels. An already assigned branch whose evidence "
+            "has not yet been collected does not establish a missing_needs finding."
+        ),
+    )
     reason: StrictStr = Field(min_length=1)
 
 
@@ -496,7 +503,16 @@ class CoverageValidationV4(CoverageValidationV3):
 
 class OriginalObservationLinkV5(OriginalObservationLink):
     review_path: StrictStr = Field(
-        description="Explicit same problem in /original_claim_reviews/N/assertion_groups (merge), /scope_atoms/J (missing atom), /other_findings/J (resolved finding), or /state (unresolved). No generated indexed views exist in the raw v5 response."
+        description=(
+            "Exact raw pointer /original_claim_reviews/N/assertion_groups for at least two "
+            "independent conclusions, /original_claim_reviews/N/scope_atoms/J for a missing atom, "
+            "/original_claim_reviews/N/other_findings/J for a resolved finding, or "
+            "/original_claim_reviews/N/state for an unresolved review. The linked observation "
+            "must have this review's same non-null target_claim_id and scientific problem kind. "
+            "A single assertion group, preserved atom or /assertion_groups/J cannot supply a link. "
+            "Emit no link when these criteria fail; an empty observation_links list is valid. "
+            "No generated indexed views exist in the raw v5 response."
+        ),
     )
 
 
@@ -696,7 +712,11 @@ each restriction with this claim's own semantic text/condition leaves; source bi
 another claim cannot supply its qualifiers. An extra mechanism detail or section transition
 alone does not justify expanding scope. A missing qualifier must permit a materially
 different verification setting, after checking whether the original already excludes it.
-Use other_findings for source-grounded missing_needs or uncertainty. Preserve unresolved
+Use other_findings for source-grounded missing_needs or uncertainty. A missing_needs finding
+lists only distinct required branches absent from this original claim's unchanged needs.
+An already assigned branch without collected evidence does not establish a missing routing
+label. Judge routing against the source; evidence collection belongs to later verification.
+Preserve unresolved
 scope rather than inventing preservation, materiality, direction or a definite problem.
 Candidates and their acceptance are not this request's responsibility; do not rewrite claims,
 retrieve, execute, judge truth or make publication recommendations. For the SAME scientific

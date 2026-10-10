@@ -1,6 +1,26 @@
 # FactReview v2 progress
 
-## 当前 Phase3：完整原主张分批复审与全窗采纳守卫（2026-10-11）
+## 当前 Phase3 合同澄清与 Phase8 有界真实验证（2026-10-11）
+
+此前batch交付refactor/method-v2精确源与远端7007b1b9624727d2bb99154110311e8a02b60259，九路径收据original-recheck-batching-root-v1/delivery.json保持。历史Phase0–8源码阶段记录保留，Phase8全框架验收开放；14项为7pass/6unresolved/1fail。上一目标轮取得新的真实终态及因果证据，属于progress；当前继续修合同及第二层到执行层。
+
+真实original batch首版本在类型化SharedMaterials新增66个空默认字段处停止，主模型/就绪均未委派；原supervisor保守partial_usage_unknown保持。离线诊断确认73原Claim完整typed相等，materials只新增10figure×4与13table×2空默认、无删除/变更。新v2仅明确桥接这66个固定空默认，原raw字节、typed全dump和完整原schema分别绑定，投影回raw全digest严格相等；没有修改论文科学内容。旧v1失败及消费标记保留，未复用授权。
+
+v2唯一实际actual-71b20b9abe3e/supervised-d330a1a2fd6c固定7007/完整215源、66默认bridge、新prepared4fbd/new auth36280501。真实public review_claim_coverage一次、首窗29义务、十个最多3条完整主张批次全部返回；仅18条通过、11条invalid，3原link errors，decision_status=not_run_incomplete_originals，零采纳。完整73主张原样，整篇75复审义务18完成，首窗partial、后5窗not_reviewed_budget。Main11logical/11physical249176input+48434output=297610known，readiness171独立，总297781，wall617.953s/terminal_measured/rc1；unknown/blocked/retry均0，货币未知。Root actual-inspection d0330f54核215runtime、19protected/controller与24actual/supervisor身份，18机械checks全部true；机械协议通过与科学未完成分别记录。独审f8e6dc18/d312ea3a关闭18checks及477原件前后，Root8e5ce501逐个复核477身份；协议有效行的科学判断仍需独立证据，不能据此宣称全部正确。
+
+具体因果：11条missing_needs都列出原claim已经标注的分支，reason抱怨那些分支还没有证据。三条link分别使用单assertion group、合同外子索引或preserved atom；聚合prefix/offset正确，部分目标为null也不能与原主张问题绑定。现有拒绝正确，原失败不改。当前唯一源修改澄清NeedsFinding.needs与OriginalObservationLinkV5.review_path两项description，并补原batch system的漏标含义。字段/类型/enum/minItems、整个validator/lowering/aggregation/消费者/预算及原测试保持，逆还原三处文字后整个module AST相同。作者report129af77a/evidenceb487418e/source891f3620；独审466afd53/2412b55a关闭25静态facts及17有限inputs，Roote5fd9737读全文报告并复核所有17身份。源码和文档增量已获范围内批准，真实效果未验证。此可逆文字修改0tests/app/服务，不重跑旧绿组；新模型质量尚未验证。
+
+另一有界真实literal文献actual-9002c7f8512b已独审闭合：固定7007/full215，真实verify_literature call=None、literal producer→typed arXiv→local PDF reader→同响应comparison/adequacy。真实15GET含4PDF重定向，四篇成功读文各5页段、原336字原句/完整claim条件保留。4比较为3partial+1different，sourcequote均对应实际reader；三条concern evidence sufficient=false，判断与具体归纳设置的限制仍完整。两query页未穷尽、另literal零结果query穷尽；adequacy=inadequate/native exhaustion=false/absence支持false，未运行最终judge。Main2/2/18371known+readiness171=18542，wall88.125s/rc0，0retry/unknown/blocked。Single独审8806b784/f3848063关闭34facts及264原件前后；Root7ee04ffd和7539c829核实际/独审identity。完整流程质量与文献充分性继续开放，旧native失败不能由此清除。
+
+原claim008当前7007纯候选诊断已证明1个exact_match_accuracy candidate和19原科学义务（全Claim/SharedMaterials typed exact、4固定预测/0.75/原no-repeat/no-population/no-ranking限制），0LLM/检索/Docker/作者程序。历史be3e空候选原因未定，不新增重复accuracy算法。新public verify_experiments(call=None, scope_call=None, scope_binding_repair_rounds=0)控制器初稿16freeze/完整215src/2logical2physical/每logical1physical、readiness另1/1/2000、main soft100k/wall600；26独审facts范围内通过。原scope/first-pass产品audit保存正常返回，但早期malformed五aspect/类型失败可能先raise，因此v2新控制器从未改动的真实in-memory meter rows单独保全public科学请求/返回，canonical JSON/redaction改变科学字段时拒绝。新report e914d8f2/evidence34918715/17冻件，Rootb076b9aa核完整driver逆AST和17current/frozen、13protected、7controller；budget/delegate/科学消费者保持，等待独立v2delta审核。私有model-boundary/provider内容不解析，旧v1冻结保留；现在未prepare/auth/paid，不以诊断candidate代替模型选择。
+
+Decisions：聊天GPT-6.1-sol（当前turn_context实核），FactReview维持openai-codex/GPT-5.5；auto模式、训练预算0、环境修复默认且上限3。只做必要验证，外部mock单元约束和原测试保留。新实际只允许新身份/新一次性授权，未知费用不猜，局部失败推进其他模块。未新增测试或复跑旧paid样本。
+
+Open issues：整篇独立原子性/召回与M2/M5、当前11路由与3link无效的模型输出质量、科学文献/理论/代码充分性、真实LLM计划及L2→L3接续、主动NN/多condition/复杂预处理、OS/daemon/容量配额、整体报告及旧六native严格delivery失败。商业完整性仍未验证。
+
+Next action：本Phase3精确source/checks/progress三路径按批准提交并推送已授权refactor分支，exact Git/remote/文件身份另见original-recheck-contract-clarification-implementation-v1/delivery.json，文档不作自指hash；claim008新public audit控制器另冻结独审→一次prepare/preflight→新一次性有界真实L2。真实合格计划才能进入L3，0plan/未知原样记录并修原因。Goal active，不改main、不新建PR、不暂停或提前complete。
+
+## 历史7007交付前：完整原主张分批复审与全窗采纳守卫（2026-10-11）
 
 上一交付11228907c925d5204de83c05b28f802ca375c1d1已推送并核远端。当前五个产品模块、一个新测试文件及README接口说明完成独立审核；连同checks/progress共九个精确路径交付。新增可选 --claim-coverage-original-batch-size 3：完整主张逐批复审，保留全部条件、来源正文和review_only_block_ids，最后固定聚合原件做候选/观察决策。默认None保留原协议；每批及最终决策消耗原validation cap，不自动提高预算。任一缺行、重复/外来身份、错误digest/context、无效链接、unresolved或预算缺口使整窗partial、零采纳/零dismissal；已完成结果、原raw及pending仍可查。
 
