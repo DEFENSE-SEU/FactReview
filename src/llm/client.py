@@ -236,6 +236,8 @@ def llm_json(
     """
     Minimal JSON response helper for the providers used in the execution stage.
     """
+    if run_stats.stats_path() is not None:
+        module = run_stats.validate_module(module or run_stats.current_module() or "")
     t0 = time.monotonic()
     usage: dict[str, Any] = {}
     text = ""
@@ -339,7 +341,7 @@ def llm_json(
         else:
             from openai import OpenAI
 
-            client = OpenAI(api_key=cfg.api_key, base_url=cfg.base_url)
+            client = OpenAI(api_key=cfg.api_key, base_url=cfg.base_url, max_retries=0)
             kwargs: dict[str, Any] = {
                 "model": cfg.model,
                 "messages": [
