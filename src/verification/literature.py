@@ -97,8 +97,10 @@ search_adequacy {version:"literature-search-adequacy-v1", claim_id, scope_digest
 source_ids:[all supplied paper IDs], conditions:[...]}. Copy the exact scope digest.
 Cover every search_scope.novelty_condition_ids exactly once. Each condition contains
 condition_id, state (adequate/inadequate/unresolved), queries (one row per actual
-query_id, exact intent, coverage covered/insufficient/unresolved, semantic reason),
-mechanism, setting, protocol (concrete coverage reasoning), limitations (nonempty
+query, with exactly these keys: query_id, intent, coverage, reason). Copy the actual
+query_id and exact intent; coverage is covered/insufficient/unresolved; reason is a
+nonempty string explaining semantic coverage. Do not use semantic_reason as a key.
+The condition also contains mechanism, setting, protocol (concrete coverage reasoning), limitations (nonempty
 strings), omission_risk. Assess the vocabulary, competing mechanisms, problem setting,
 evaluation design and important omission risks for EACH condition. Pagination exhaustion
 only describes the recorded index/query scope. It does not establish scientific coverage.
