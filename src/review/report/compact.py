@@ -395,12 +395,18 @@ def _compact_markdown(review, nav, context):
             "",
             _json(summary),
             "",
-            nav.link(path, "Complete ledger") + ".",
+            nav.link(path, "Execution details and exact raw ledger location") + ".",
         ]
         if isinstance(attempts, list):
             for attempt_index, attempt in enumerate(attempts, 1):
                 if isinstance(attempt, dict):
                     fields = (
+                        "commands",
+                        "environment",
+                        "logs",
+                        "observations",
+                        "runtime_seconds",
+                        "tokens",
                         "status",
                         "success",
                         "returncode",
@@ -416,6 +422,12 @@ def _compact_markdown(review, nav, context):
                         f"- Attempt {attempt_index}: "
                         + _json({k: attempt[k] for k in fields if k in attempt})
                     )
+                    request = attempt.get("request")
+                    if isinstance(request, dict):
+                        lines.append("  - Launch request: " + _json({
+                            k: request[k] for k in ("command", "workdir", "metric_output", "repair_round", "config", "dependencies", "output_mapping")
+                            if k in request
+                        }))
         for item in entry.get("alignment", []):
             if isinstance(item, dict):
                 # Only omit the large bound paper/source snapshots. Keep every
@@ -563,7 +575,11 @@ def _write_layered_package(review, output_dir: Path, *, render_pdf=True, static=
         for index in _selection(items)[0]:
             target = path + f"/evidence/{index}"
             nav.main[target] = _anchor(target, main=True)
-    appendix = v2.render_markdown(checked, **context, _checked=True, _navigation=nav)
+    from review.report.ledger import LedgerRendering
+
+    ledger_rendering = LedgerRendering(nav, checked.ledger)
+    appendix = v2.render_markdown(checked, **context, _checked=True, _navigation=nav,
+                                 _ledger_renderer=ledger_rendering)
     appendix = _attach_markers(appendix)
     source_usages = []
     occurrences = v2._source_index(v2.ordered_claims(checked), checked.findings)
@@ -743,6 +759,11 @@ def _write_layered_package(review, output_dir: Path, *, render_pdf=True, static=
             "bundle_main_page": pages["bundle"].get(main_target),
             "bundle_appendix_page": pages["bundle"].get(appendix_target),
         }
+        if any(pointer == row["json_pointer"] or pointer.startswith(row["json_pointer"] + "/")
+               for row in ledger_rendering.records):
+            # The record key already is the exact raw JSON pointer. A locator
+            # page does not promise that its whole raw value is printed there.
+            locations[pointer]["pdf_location_role"] = "raw_json_locator"
     all_evidence = [e for c in checked.claims for e in c.evidence] + [
         e for f in checked.findings for e in f.evidence
     ]
@@ -789,6 +810,9 @@ def _write_layered_package(review, output_dir: Path, *, render_pdf=True, static=
         "delivery_context": context,
         "selection": selection,
         "records": locations,
+        "ledger_rendering": ledger_rendering.records,
+        "ledger_raw_artifact": "final_review.json",
+        "ledger_rendering_digest": "SHA-256 of UTF-8 JSON; ensure_ascii=False, sort_keys=True, separators=(',', ':')",
         "source_usages": source_usages,
         "pdf_targets": pages,
         "pdf_snapshots": pdf_snapshots,

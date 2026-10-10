@@ -1,5 +1,21 @@
 # FactReview v2 progress
 
+## Current phase7 checkpoint: auditable layered ledger presentation
+
+The independently reviewed renderer preserves every canonical JSON field and ledger value. Each run prints complete operational facts; identical target bindings expand once with exact pointer/hash and links, while only the binding's direct machine registry catalog is located in canonical JSON. Unknown fields and nested lookalike catalogs stay printed. Full default behavior is unchanged; ordinary and recovery layered exports use the same helper. Manifest raw locator roles distinguish a location from a promise that every raw child is printed there.
+
+Nine different necessary controls pass at their affected checkpoints. The original76 layered Assert ASTs all remain; one input fixture explicitly applies its already supplied failed figure coverage before its snapshot, adding four stronger delivery/scientific-record assertions. Three other old test files retain their bytes and145 assertions. Original red results, the baseline old-fixture failure, an unknown-nested-catalog counterexample and the new test's Markdown escaping correction are retained. No whole suite, model, service, Docker or new full pipeline run was used.
+
+The immutable v6 object was rendered into fresh offline directories. Final appendix720397→190340 bytes and253→53 pages; main13/bundle61 pages, all9472 raw paths, seven artifact hashes and direct PDF destinations match. All non-Markdown values, ledger, original partial stages and1005 protected inputs remain unchanged. Final manifest is4.97MB; intermediate7.20MB output remains evidence. Independent review4285b36c and root five-current/frozen/evidence checks pass. Evidence: `execution-ledger-render-implementation/{review.md,evidence-final.json,root-review.json}` and `execution-ledger-render-independent/{review.md,evidence.json}`.
+
+Decisions: retain complete scientific/canonical records; reduce repeated presentation only within a run; expose machine catalogs through exact raw JSON locators rather than repeated pages. No fixed page-count or commercial/scientific completion is promised. README now explains those reading locations.
+
+Genuine v4 on immutable33c6bdb has ended: `actual-f44bbb4039ce`,5logical/5physical/388653 measured tokens,0unknown, sixth independent validation blocked before provider admission. Declared350000 known-token limit and full pair/third-wire checks fail; returned native records, exact original/source preservation and measured reconciliation pass. Readiness is separate. Scientific/adoption review is pending; do not retarget or resample the original. A pre-call known-usage gate cannot guarantee the cost of the next response, and this overrun is retained as failure.
+
+The independent query-purpose auditdd15bb86 confirms background claim001 had3 searches and14 uncited reads, while original global had7 manuscript targets and0queries. The next bounded phase4 change separates citation-only routing, binds reader questions to actual conditions, and retains explicit global missing-work duties. Core search concepts, structured provider expressions and genuine semantic coverage remain later work; author identity search stays forbidden. The overall goal is active.
+
+This entry and the current14-check matrix are the current pointers. Later sections preserve historical checkpoints and pending wording.
+
 ## Current phase8 checkpoint: measured whole-flow delivery and genuine v4 launch
 
 Phase4 operation-delivery correction is delivered asd2af4ca2c99160dbcd510ae38d1f6731a0b985e4, pushed and exactly remotely verified. Full-native v6's original terminal result is preserved at `full-native-verified-v6/actual-da847148e61a/`: all seven stages completed,37logical/37physical/391033 measured tokens,0missing/extra/blocked, separate readiness1/1/96. The whole-flow Docker run is nonempty: one high/ready plan, one evaluation on the pinned image, released exact-match accuracy0.75 aligned with its MiniSet/test/ExactMatch definition, gap0/tolerance0.02, auto approval recorded, training0/repair0/max3. All7 generated advice, JSON/summary/teaser and three PDF delivery snapshots agree on partial. Independent review e6f4116a verifies197 exact source files and287 protected inputs; original operation/coverage failures remain.

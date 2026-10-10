@@ -210,6 +210,16 @@ def pdf_navigation(path):
 
 def test_layered_complete_records_selection_context_and_exact_source_links(tmp_path, monkeypatch):
     original = fixture_review()
+    from review.delivery import checked_delivery
+
+    initial_claims = [claim.model_dump(mode="json") for claim in original.claims]
+    original = checked_delivery(original, figure_coverage={"total": 3, "checked": 1, "failed": 2})
+    assert original.run_status == "partial"
+    assert original.incomplete_stages == ["screening", "verification"]
+    assert any(check.stage == "screening" and check.component == "figure_coverage"
+               and check.state == "incomplete" and check.responsibility == "system"
+               for check in original.delivery_checks)
+    assert [claim.model_dump(mode="json") for claim in original.claims] == initial_claims
     before = original.model_dump(mode="json")
     calls = []
     checked = v2._checked_report
