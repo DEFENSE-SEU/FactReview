@@ -238,6 +238,7 @@ def llm_json(
     """
     if run_stats.stats_path() is not None:
         module = run_stats.validate_module(module or run_stats.current_module() or "")
+        run_stats.read_initialized()
     t0 = time.monotonic()
     usage: dict[str, Any] = {}
     text = ""
