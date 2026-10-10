@@ -4,7 +4,7 @@ from typing import Annotated, Literal
 from pydantic import Field, StrictInt, StrictStr, field_validator
 
 from schemas.claim import Contract
-from schemas.runtime_science import ROLES, PaperDefinition, SourceDefinition
+from schemas.runtime_science import ROLES, ObligationDecision, PaperDefinition, SourceDefinition
 
 VERSION = "released-partition-analysis-v1"
 Selector = Annotated[list[StrictStr | StrictInt], Field(min_length=1, max_length=12)]
@@ -38,3 +38,25 @@ class PartitionAnalysisProposal(Contract):
         if set(values) != set(ROLES):
             raise ValueError("all_analysis_source_roles_required")
         return values
+
+
+class PartitionRuntimeProposal(Contract):
+    """Untrusted selections; measured authority remains the complete host partition."""
+
+    version: Literal["partition-runtime-v1"]
+    analysis: PartitionAnalysisProposal
+    raw_value_selector: Selector
+
+    @field_validator("raw_value_selector")
+    @classmethod
+    def bounded_runtime_selector(cls, values):
+        return PartitionAnalysisProposal.bounded_selector(values)
+
+
+class PartitionAnalysisReview(Contract):
+    version: Literal["analysis-v1"]
+    context_digest: str = Field(pattern=r"^[a-f0-9]{64}$")
+    condition_id: str = Field(min_length=1)
+    measurement_scope: Literal["released_statistics", "requires_inference", "unresolved"]
+    obligations: list[ObligationDecision] = Field(min_length=1)
+    unresolved: list[str]
