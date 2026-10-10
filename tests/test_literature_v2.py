@@ -11,6 +11,7 @@ import pytest
 
 from schemas.claim import Claim, ClaimLocation, Condition
 from schemas.materials import MaterialBlock, SharedMaterials
+from tests.literature_scope_fixtures import native_response, scientific_response
 from util.cutoff_date import concurrent_window_start, parse_submission_deadline, publication_relation
 from verification.literature import literature_queries, verify_literature
 
@@ -68,8 +69,22 @@ def boundaries(papers, *, complete=True):
             "complete": complete,
             "papers": papers,
             "count": len(papers),
+            "observed_native": True,
         }
     )
+    async def observed_search(*, query, cutoff_date):
+        configured = searcher.search.return_value
+        if not configured.get("observed_native") or not isinstance(configured.get("papers"), list) or not all(
+            isinstance(row, dict) for row in configured["papers"]
+        ):
+            return configured
+        response = native_response(query, configured["papers"], cutoff_date, exhausted=configured["complete"])
+        # Explicit negative overrides remain malformed/failed inputs.
+        for key in ("question_results", "success", "error", "truncated", "has_more"):
+            if key in configured and (key != "success" or configured[key] is not True):
+                response[key] = configured[key]
+        return response
+    searcher.search.side_effect = observed_search
     reader = Mock()
     by_id = {row["id"]: row for row in papers}
 
@@ -131,10 +146,13 @@ def model(*rows, omission=False):
                     "external_role": "scientific_contribution",
                     "reason": "The earlier relation-composition mechanism provides a comparison for this link-prediction method.",
                 }
-            return {"status": "ok", "comparisons": comparisons}
+            return scientific_response(payload, comparisons)
 
         return Mock(side_effect=respond)
-    return Mock(return_value={"status": "ok", "comparisons": list(rows)})
+    def respond(**kwargs):
+        payload = json.loads(kwargs["prompt"].split("\nDATA_JSON:\n")[1])
+        return scientific_response(payload, rows)
+    return Mock(side_effect=respond)
 
 
 @pytest.mark.parametrize(
@@ -400,6 +418,9 @@ async def test_post_cutoff_and_review_pages_are_excluded_before_read(claim, mate
         "url": "https://openreview.net/forum?id=submission",
     }
     searcher, reader = boundaries([paper, review])
+    # This control deliberately returns unfiltered legacy rows to exercise
+    # Literature's own cutoff/review guard; the original assertions stay intact.
+    searcher.search.return_value.pop("observed_native")
     call = model()
     result = await verify_literature(
         claim, materials, submission_deadline="2021-01-31", searcher=searcher, reader=reader, call=call
@@ -626,7 +647,7 @@ async def test_literature_model_uses_shared_keyword_call_contract(claim, materia
         assert "retrieved literature" in system
         assert cfg.provider
         assert module == "verification_literature"
-        return {"status": "ok", "comparisons": [comparison(paper)]}
+        return scientific_response(json.loads(prompt.split("\nDATA_JSON:\n")[1]), [comparison(paper)])
 
     result = await verify_literature(
         claim, materials, submission_deadline="2021-01-31", searcher=searcher, reader=reader, call=call
@@ -825,12 +846,12 @@ async def test_empty_selected_corpus_needs_explicit_provider_completeness(claim,
     if remaining == "review":
         paper["url"] = "https://openreview.net/forum?id=submission"
     searcher, reader = boundaries([] if remaining == "empty" else [paper])
-    searcher.search.return_value.pop("complete")
+    searcher.search.return_value.pop("observed_native")
     result = await verify_literature(
         claim, materials, submission_deadline="2021-01-31", searcher=searcher, reader=reader, call=model()
     )
     assert not result.evidence
-    assert any("provider must declare complete=true" in issue for issue in result.issues)
+    assert any("observed native exhaustion required" in issue for issue in result.issues)
     reader.read_papers.assert_not_awaited()
 
 

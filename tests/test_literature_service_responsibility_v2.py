@@ -326,7 +326,7 @@ async def test_top_n_incomplete_search_is_not_service_failure(tmp_path):
     )
     assert not result.verification_limitations
     assert not any(e["category"] == "service_failure" for e in audit["context_events"])
-    assert any("complete=true" in i for i in result.issues)
+    assert any("observed native exhaustion required" in i for i in result.issues)
 
 
 @pytest.mark.asyncio
