@@ -37,7 +37,13 @@ def test_late_writer_failure_keeps_last_review_and_other_delivery_work(tiny_inpu
 def test_late_teaser_failure_preserves_successful_pdf_as_labeled_history(tiny_inputs, monkeypatch):
     writer = Mock(side_effect=RuntimeError("Fixture teaser failed"))
     monkeypatch.setattr(pipeline_v2, "write_teaser", writer)
-    monkeypatch.setattr("review.report.pdf_renderer.build_review_report_pdf", lambda **kwargs: b"preserved mock PDF")
+    pdf_calls = []
+    def build(**kwargs):
+        pdf_calls.append(kwargs)
+        if len(pdf_calls) > 1:
+            raise RuntimeError("Fixture static export failed")
+        return b"preserved mock PDF"
+    monkeypatch.setattr("review.report.pdf_renderer.build_review_report_pdf", build)
     summary, _, _, _ = run_tiny(tiny_inputs, monkeypatch, render_pdf=True)
     assert writer.call_count == 1
     assert Path(summary["outputs"]["history_report_pdf"]).read_bytes() == b"preserved mock PDF"

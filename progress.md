@@ -1,5 +1,15 @@
 # FactReview v2 progress
 
+## Current phase7: late-teaser PDF final delivery
+
+Implemented shared static full/layered export from the last validated review. A late teaser failure now produces healthy canonical PDFs in a fresh delivery package with the final partial status, new page navigation and per-PDF snapshots. Exact canonical keys, matching original JSON and manifest role/name/hash checks determine eligibility; history and interrupted writer outputs remain independently indexed. Static failure falls back to minimal Markdown and validated JSON without re-entering the failed formatter. The whole writer recovery entry also explicitly skips narrative formatting after a writer exception.
+
+Necessary verification:24 initial distinct controls include two genuine local PDF navigation controls; no actual provider/Docker was called. Independent review found provided empty/non-object manifests could bypass validation or escape recovery, and a whole writer failure could call the failed Markdown formatter twice. Both original red probes are retained. Their unchanged scripts pass3 controls in5.38s after the repairs; nine persistent manifest controls and directly affected existing controls also pass. Original16 recovery Assert ASTs and public full/layered wrapper signatures remain identical. Final independent review3038b8a4 and root exact six-file frozen checks pass. Evidence: `late-teaser-finalization-implementation/{review.md,evidence-final.json,independent/final-independent-review.md,root-independent-review.json}`. The original freeze and failed results remain available.
+
+Decisions: only the historically manifest-free full package uses that explicit compatibility path. Provided malformed manifests and layered packages without their manifest cannot authorize PDF export. Healthy files can receive at most one correction when a new failure changes the status/stage set; failed initial exports and failed corrections are not retried. Scientific records, advice and ledger remain equal to the validated snapshot. Filesystem failure and actual service advice quality remain open.
+
+Next action: checkpoint/push this reviewed phase7 correction, complete independent paging review, and implement original-claim semantic closure plus condition-level literature search adequacy. Overall goal remains active; the14-item matrix does not certify commercial readiness.
+
 ## Current phase7: explicit nested delivery completeness
 
 The whole-framework audit at `framework-completion-current-d2e6326/review.md` found that the actual v5 canonical JSON and teaser reported completed despite incomplete claim coverage, visual context, Literature comparisons and advice. The core correction adds additive DeliveryCheck records, aggregates explicit requested-operation failures during assessment/advice/rendering, and keeps JSON, Markdown, teaser and summary consistent when the report and teaser return successfully. Operational stage status remains separate; healthy downstream work continues. Scientific claim statuses/evidence are unchanged. Unverified, absent author resources, disabled/declined execution and policy budgets do not independently cause system failure.
@@ -16,9 +26,9 @@ Layered report export now preserves successful pre-error PDF bytes as history an
 
 Whole report/teaser exceptions now save the last checked scientific review as partial canonical JSON/Markdown and continue healthy downstream work. Recovery teaser JSON uses the same payload function as ordinary export. Advice is marked requested before the call and final counts derive from the final checked review. Necessary controls:original2 red, final3 pass in5.37s; one affected existing advice control passes in0.23s. Independent review found a late whole-writer counterexample: an already written PDF lacked historical registration. The root fix indexes only known owned artifacts, with their hash/size/history role and explicit PDF-finalization limitation. The exact unchanged independent probe passes once in4.90s. Final independent reviewe2bbb283 finds no blocking defect within this recovery boundary; all four frozen hashes match. No failed writer or model is retried, and original red evidence remains unchanged.
 
-Decisions: retain interrupted artifacts without adopting their scientific contents; recovery uses the last validated review. Late-teaser PDFs remain explicitly historical until static canonical synchronization is implemented; a filesystem failure can still prevent emergency output. Preserve all red evidence. The unrelated untracked data_collection directory remains untouched.
+Decisions at that earlier recovery checkpoint: retain interrupted artifacts without adopting their scientific contents; recovery uses the last validated review. The later phase7 correction above adds healthy canonical synchronization. A filesystem failure can still prevent emergency output. Preserve all red evidence. The unrelated untracked data_collection directory remains untouched.
 
-Next action: checkpoint/push the reviewed producer/export correction, and implement the independently designed late-teaser static PDF update. Continue the genuine claim-semantic and retrieval-adequacy work in parallel. The overall goal remains active.
+The producer/export correction was committed/pushed as32ceebb. Its late-teaser follow-up is implemented and independently reviewed above. Continue the genuine claim-semantic and retrieval-adequacy work in parallel. The overall goal remains active.
 
 ## Current phase4: query delivery isolation
 
