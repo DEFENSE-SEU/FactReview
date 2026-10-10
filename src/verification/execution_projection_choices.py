@@ -461,10 +461,23 @@ def build_choice_registry(claim, materials):
             if r["finite_metric_scope_compatible"]
         }
         if len(decompositions) != 1:
+            if not configs:
+                reason = "No usable configuration in the finite released-prediction context"
+            elif not any(
+                isinstance(condition.metric, str)
+                and row["configuration"]["metric"] in {"accuracy", "exact-match accuracy"}
+                and _metric(condition.metric, row["configuration"]) is not None
+                for row in configs.values()
+            ):
+                reason = "No configuration matches the claimed metric under the finite exact-match accuracy recipe"
+            elif not decompositions:
+                reason = "No metric-compatible configuration matches the claimed dataset/split"
+            else:
+                reason = "Multiple dataset/split decompositions match the claimed scope"
             registry["unavailable"].append(
                 dict(
                     condition_id=condition.id,
-                    reason="Dataset/split decomposition is ambiguous or unavailable",
+                    reason=reason,
                 )
             )
             continue
