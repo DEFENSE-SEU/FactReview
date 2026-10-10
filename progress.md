@@ -1,6 +1,16 @@
 # FactReview v2 progress
 
-## 当前 Phase4 资源事实接线与整篇真实复审（2026-10-11）
+## 当前交付与首轮分批审核（2026-10-11）
+
+Phase4五路径已提交并推送0ac3e7eaac4ad2ea98601be1ac17503aaecec520，精确远端相同。released-prediction-recipe-facts-root-v1/delivery.json83d2c7d9绑定两个产品文件、新必要mock和checks/progress；canonical完整src+RefCopilot/src归档source-0ac3e7e.tar ab32dd38、identity a924e03e包含215 regular/31目录/214 Python，与152只两产品文件变，另213全字节相同。仅两变更canonical模块AST parse一次，旧完整214闭合保留；Phase3工作树未进入此归档，0重复pytest或服务。该新源将用于独立身份L2 v3 public真实验证，旧51391的0plan保持。
+
+整篇终态独审4c4367d6/b14124fc关闭28facts/291原件；Root f148365d逐一核当前原件同。75是73原主张及032/033跨窗重复义务，first12/75、third13/75、26pending、2append/final75与1,100,647known保持。前两窗52个空返回被原reviewed-block门槛拒绝；另11首轮行在原source/carrier/group守卫拒绝。第三轮8批23raw有一批缺parent/batch身份，20行合法聚合再拒7，仅13有效；未完整窗不进decision。末窗两真实append忠实保留block215/Table8全部数值和条件、block227完整10%ImageNet定义，状态仍unverified/evidence空，L2/L3未核。初模型称footnote未供给与真实supplement不符，原reason保留。科学partial、整体四成功false与旧失败均保持。
+
+首轮分批六路径已冻结：作者58dd20fe/69299c49，Root35bfced3核六current/frozen、379baseline仅四原产品改、205旧tests相同、38原Assert同。两必要public控制红2fail/.45；首实现negative通过而positive mock寻找本批外合组目标失败，全部断言保留后只修fixture选择并复positive1pass/2.10；negative不重复。最终Ruff六文件通过，测试完整AST同corrected green。绿后新增exact protocol声明守卫和提前完整planned计数仅静态闭合，动态结果对应原冻结绿源，未冒充最终全字节重测。独审6686d954/bf87eaf1关闭20facts/447原件且0阻断，Root46e08f62逐一核所有当前身份；63旧科学函数/类及四模块逆AST保持，15个不同公开mock原件完整父/pack/context/raw/global映射经独审。两项绿后version/plan metadata增量静态证明边界明确。八路径独立Phase3交付与完整新归档另见first-pass-claim-review-batching-root-v1/delivery.json；真实新源效果待新controller。仅显式参数启用，None及原科学消费者/预算保持。
+
+Decisions及整体14项7pass/6unresolved/1fail保持；Phase0–8历史源码记录保留，Phase8整体未完成。新整篇双分批设计采用first32/followup6/validation48/main86各一次physical，readiness1/1/2000、wall7200；按旧20次公开known均值套70约3.851666M、套86约4.7320468M，仅规划情景且未来mix不同。Root将新候选known soft从3M定为6M，完整科学上下文保留，货币未知、在途可越界、实际完成不能由估算保证；预算决策另见first-pass-claim-review-batching-root-v1/wholepaper-budget-decision.json，须独立新design/controller审核与唯一授权，旧60/3M准入保持消费状态。下一步：Phase3八路径提交/完整新归档→新身份整篇验证；并行完成固定0ac新源L2 v3控制器独审、唯一prepare/preflight及实际验证，健康原public计划再进入L3。未暂停目标，未改main或新开PR。
+
+## 历史 Phase4 资源事实接线与整篇真实复审 checkpoint（2026-10-11）
 
 本轮继续整体目标，未暂停。Phase4最小接线只改execution_projection_choices.py、experiments.py并新增一个public mock：从原entry_recipe返回已索引entry/config/data路径、SHA、完整配置、全量行数/分母、固定键和有限实现身份。entry_recipe与204旧测试保持；facts不含numerator/测得accuracy，不赋confirmed/covered，不扩paper来源权限。registry/context/facts使用明确v2 domain，selection/review/record wire保持v1；历史可读，当前执行拒绝隐式升级，并重建原候选核全部资源。原19科学binding及完整conditions/source守卫保持，candidate/obligation ID按新摘要重算。
 
