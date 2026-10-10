@@ -1,6 +1,24 @@
 # FactReview v2 progress
 
-## 当前 Phase5：quote-only 候选与确定性原文定位交付（2026-10-11）
+## 当前 Phase8：真实 L3 新提案到证据链闭合，整体目标继续
+
+Phase5 exact6 paths已交付 d1efacab51167547242e7e6a3ab91ba71d4d1a87 并push/精确remote相同，delivery1a73492af222a09c23891f22fd9d59a169a7578be18940107352d3f1cf97e326。此前7c6 Phase3输出schema、62a诊断、099 observer和d883完整源容量交付保留；本检查点仅更新checks/progress，不修改产品或测试。
+
+新ignored complete-partition-native-docker-validation-v2基于唯一d1全Git archive92ce60c3，214成员/213Python+1role，无overlay。作者24事实、独审7378b909/2f653cf4三十事实、Root72456623完整diff/协议及Git blob相连。唯一offline prepare/preflight各一次0app/0calls，新manifest9560ed6f/source cp-p-f1ffb7f5203a；prepared独审4aeb0ff3/a14622f8十五事实，Roota1bbff7e闭合214source/31dirs。
+
+Root精确auth79dc538d/root授权d5f6da33后唯一实际439a70eb86cf（supervised5f33ad545f0a，runtime cp-a-d1c8acb25d61）terminal_measured rc0/wall78.672s。真实public execute_plans、原refine和默认builder/runner、new observer SHA5c8454c7真实部署、真实GPT-5.5独立semantic和原judge/assessment全部连接。模型返回candidate-v2，paper/source各六roles、十二精确定位；原wire/digest/precall snapshot→canonical→实际RunRequest保持。十三role/condition/description/settings/authority义务由第二个真实调用确认，qualification与原alignment阶段分开，最终一条derived observation值2/3、一条support evidence、Supported。
+
+全部三条原test记录2/1、2/1、2/2分别保留，train10/0排除；raw stdout named scalar2/3、raw observations=[]和原missing-dataset decoder issue保持，mapping=null来自实际原响应。actualreceipt含真实3.11.16 interpreter、driver call/return None；测量权威为完整released partition host重算。规则auto、train0、诊断repair0，正式默认max3保持，builder进程变量finally恢复。静态JSON/MD为partial/report，advice=None；wholepaper/fullpipeline/accuracy/commercial/new-inference/author-dynamic-consumption均false。
+
+Main真实2logical/2physical7181+19237=26418known，readiness独立1/1/171，总26589known；unknown/blocked均0，没有重采样或额外报告请求，货币费用未知。Root完整读两原response、原13义务与来源和scope；root-actual-artifact-inspection89a06ac4闭合原109manifest条目/全部110regular artifacts/运行214source+31dirs。Finite actual独审report90dc74efe428972f892b0d5b7e169c3f0aecfc9af6562cb46ccc4b20934c7c9d/evidenceb5eec67dbd6cb47972e3461fa7edc4ed9a5c4047ce0af2a7a9ec423dd1a1b850/verification0eb9973c完成35原件事实、阻断0；Root再完整stream110actual/113旧a75d/26metadata/各214prepared与runtime映射，root-actual-peer-review4bbbeb065cd79355f8f90d11f592e302fe188ad8fa5aaa00be1d657db1b324ce关闭同行身份。独审曾错误沿用旧112file口径，原脚本/初件保留，只修自己的当前113口径；实际before/after一直相等，不推测历史新增原因。旧a75d/role-readiness/ce08/六窗与六full-native失败原件保持。
+
+工具限定记录：Root最初误把prepared独审before25/after239视为全集相等；实际before25保持，after加214source，239现值全核相同。随后误接续supervisor由exact_root_authorization_absent在app/env/admission/provider前拒绝，0paid admission且没有actual/supervised目录；root-preauthorization-tool-error保留。正确精确auth成功后才本次唯一actual。此工具错误没有改产品/test或减断言。Windows DirEntry cached nlink与完整Path.lstat不同的独审工具初件亦保留；只确认当前nlink1，运行期hardlink/TOCTOU不授保证。
+
+Decisions/Next action：下一原主张复审native design-v3 6b1ad00d/4fa6831a，经Single独审f7fcef02/227e9e6d十八事实通过；v1/v2不准确guard名称保留历史，准确lexical plain来自L3 8e2，原role-v3计量9592。Single只建新ignored original-review-output-contract-native-validation-v1固定全d1源/controller freeze完成：reportcb1ba5dc/evidence080e8212/frozend794b13c/declaration6ef2f4b9/sourceidentityc16e39db，34静态事实、15freeze/7controllers/12protected，Finite正在独审；原73/94/23/5/7/window/context/full DATA、两处schema同finalpayload、原science consumers/0adoption、1main/1physical/soft300k+ready1/1/2000/wall1200保持，无hardlink新增实现/探针/tests/services。须另Finite+Root审controller/prepared后才有新唯一auth，两个actual不并行。
+
+Open issues：整体仍7pass/6unresolved/1fail，Phase8整体验收未完成；真实论文recall/M2/M5、code/theory/literature adequacy、plan recall、复杂preprocessing/主动NN/多condition、OS/daemon/ledger/file-count/磁盘及动态source边界、整体报告与六native严格delivery失败仍待推进。当前chat GPT-6.1-sol；FactReview runtime GPT-5.5。Goal active，继续授权refactor分支，不改main/不开PR。本轮没有复跑旧绿/整套或新增产品测试。
+
+## 历史 d1交付前 Phase5：quote-only 候选与确定性原文定位交付（2026-10-11）
 
 最近已交付7c6b43456a12e6cca3c6f4fe69feedf6dfdb4849，Phase3 receipt e8359730c372f13bc9d58ef0e994f767a4dcba2f15f8ddca0cb7cc54ed7661d9，push/exact remote一致。当前quote-only final-v3作者6559960a/607a7ced，独审5c2cdff08a1188bb80b803205120192c2f0187596edc1119d8b2407eabf4c747/d60e3b3d14c8751ff1f3660b1a3f1035fd26e93640419c07168cc594ae91bca2，24事实与232 before/after原件完整闭合；Root逐hash核全部232及four current/freeze、完整读设计、helper/schema/tests、最终v2接线和独审报告。Root检查receipt另记。
 
