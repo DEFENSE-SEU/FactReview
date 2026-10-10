@@ -968,6 +968,34 @@ def _revalidate_resources(plan, claim, materials, ledger, point):
 def execute_plans(
     plans, claims, materials, output_dir, *, config=None, runner=None, approver=None, repairer=None
 ) -> ExecutionResult:
+    """Reuse active accounting, or exclusively own output_dir/execution_stats.json."""
+    from common import run_stats
+
+    active = run_stats.stats_path()
+    if active is not None:
+        run_stats.read_initialized(active)
+        return _execute_plans(
+            plans, claims, materials, output_dir, config=config, runner=runner,
+            approver=approver, repairer=repairer,
+        )
+    stats = Path(output_dir).absolute() / "execution_stats.json"
+    for path in (stats, *stats.parents):
+        if path.is_symlink() or getattr(path, "is_junction", lambda: False)():
+            raise ValueError("linked execution accounting path")
+    stats.parent.mkdir(parents=True, exist_ok=True)
+    with stats.open("x", encoding="utf-8"):
+        pass  # Reserve this new ledger; existing history cannot be overwritten.
+    with run_stats.run_scope(stats):
+        run_stats.read_initialized(stats)
+        return _execute_plans(
+            plans, claims, materials, output_dir, config=config, runner=runner,
+            approver=approver, repairer=repairer,
+        )
+
+
+def _execute_plans(
+    plans, claims, materials, output_dir, *, config=None, runner=None, approver=None, repairer=None
+) -> ExecutionResult:
     """Execute supplied plans; final claim status remains the assessment layer's job."""
     config = config if isinstance(config, ExecutionConfig) else ExecutionConfig.model_validate(config or {})
     runner = runner or docker_runner
