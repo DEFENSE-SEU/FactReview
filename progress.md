@@ -1,5 +1,25 @@
 # FactReview v2 progress
 
+## 当前 Phase5：只读观测接线与执行证据资格
+
+本批完成：原缺命令的同一次补全响应可提出源码调用位置，程序核实际可见源码；既有命令不增加模型调用。普通 stdout Python 运行将作者仓库与观测器包分别只读挂载，scratch 独立可写，原命令/环境/工作目录与科学设置保留。作者原输出和观测报告分开保存；承诺观测且零退出却缺报告形成现有 typed 执行失败。旧 ledger 只在比较副本补 source_sites=None，不恢复科学证据。
+
+独审发现并修复启动遮蔽：保留原反例红，标准库/startup 同名文件、包、扩展、未知导入环境、未知 minor 和任何已有共享 .pycache 都使观测 unresolved；原合法运行和缓存字节保留。官方 CPython3.11 的305名称与 host 名单联合预检，不把配置版本当实际解释器身份。最终原字节反例只复放一次1/.18s绿色；作者中间绿时点另存。可信 image 的标准库/site hooks 与进程内作者行为仍有限制。
+
+修复另一实际假支持：新 resource_contract 普通计划即使输出完全匹配 dataset/metric/settings/value 并带 observed/completed 标签，也缺少实际数据/划分、active模型与指标关系。本批在数值 gap/tolerance/evidence之前记录 consumption unresolved，不产生支持/差异证据；保留0退出与raw观测，不登记系统故障。原None兼容与完整released-predictions host重算分支保留。手动None+真实Docker仍可进入旧元数据支持路径，这条边界明确开放，不能作为商业科学消费证明。
+
+必要验证：6个不同新mock边界函数、4个直接原控制与1个原字节最终独审反例。具体变化只重跑受影响函数；无全套/新跳过/真实模型、检索、Docker或进程调用。消费原红1/.94s保留，修后同函数1/.79s绿；原legacy支持与完整作者数据差异2/1.17s绿。helper最后缓存控制1/.59s，root受改动的transport控制1/.82s绿。原171文件/5972断言规范化字节保持；1217保护文件和296实际文件未变。
+
+最终证据：runtime-observer-wiring-implementation/frozen-final-v2/十一文件与evidence-final-v2.json（7bddbc6f），消费gate单项证据在execution-consumption-gate-implementation/，helper final-v2作者证据f705fe28。独审review-final.md SHA363798ea67d680c7db47de6b309cc08e6b7078482bcfba8a33897fb1e1a8e895 / evidence-final.json SHA20dcaf5a7f287959cb07be8450455898e7f41e2da82958b854c0b6e01c9576d1。Root已全文读报告/变更并核十一文件与报告摘要。初版冻结、失败与所有旧actual结论保持。
+
+交付：此前standalone observer已推送并精确远端核a0c7e72808242ee3d3d79303174bf6e62854de0d；本批按Phase5提交并推送已授权refactor/method-v2，精确提交/远端收据存runtime-observer-wiring-implementation/delivery.json。不开PR、不改main。独立agent正在新runtime_flow.py/test_runtime_flow_v2.py建立有限JSON直线实际值流；这两文件属于后续单独批次，不属于本批冻结。
+
+Decisions：源调用与文件身份只作观察事实；缺可核消费关系保留Unverified。缓存不删除、不换Python flags以获得绿。最小必要测试与独立agent审核继续；整体goal保持active。
+
+Open issues：通用模型权重实际应用、每condition完整数据→推理→预测→metric→raw关系、无标量分析、旧None真实资格、真实只读部署、genuine M2/M5与全论文覆盖、真实OS/daemon故障和全框架商业验收。
+
+Next action：完成有限builtin/source-flow合同，由独立agent审；在同一已有_refine中绑定原源码角色和条件，接逐项运行资格，再用新精确源码做真实全流程验证。所有旧失败actual保持原样，不重复旧失败样本求绿。
+
 ## Current phase5: source-linked Python events and CLI termination
 
 Completed this batch: new standalone runtime_observer.py records specified source-linked synchronous Python call/return/unwind events with invocation, parent and order. Program source SHA and complete code identity are rebuilt in the actual interpreter/path/optimization flags; model code hashes cannot authorize a site. Only bounded exact-builtin snapshots are projected, with tagged tuple/list/dict and finite scalar restrictions. Source pre/post facts and missing/change/capacity/profile/thread/child/native limits remain explicit. Temporary argv/path/main/cwd/profile state is restored; only the disposable CLI installs an audit hook.
