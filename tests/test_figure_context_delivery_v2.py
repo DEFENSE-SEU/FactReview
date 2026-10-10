@@ -41,7 +41,7 @@ def test_context_failure_counts_are_independent_of_successful_crops(
         return [], []
 
     monkeypatch.setattr("screening.stage.check_figures", figures)
-    result = screen_paper(visual_materials, tmp_path / "screening")
+    result = screen_paper(visual_materials, tmp_path / "screening", call=fixtures.ModelBoundary())
     assert result.figure_coverage["checked"] == (1 if crash else 3)
     assert result.figure_context_coverage == {
         "total": 3,

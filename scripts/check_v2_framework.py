@@ -22,6 +22,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 import pymupdf
+from tests.execution_science_fixtures import (
+    analysis_source,
+    record_observer,
+    science_model,
+    statistics_definition,
+)
 
 from llm.client import LLMConfig
 from pipeline_v2 import STAGES, run_v2_pipeline
@@ -66,7 +72,7 @@ def condition(identifier, dataset=None, split=None, description=""):
     return {"id": identifier, "description": description}
 
 
-def make_inputs(name: str, directory: Path):
+def make_inputs(name: str, directory: Path, *, released_rows=None):
     rows = [text_row("# Synthetic framework validation", heading=True)]
     claims = []
 
@@ -137,25 +143,38 @@ def make_inputs(name: str, directory: Path):
     else:
         rows[0]["text"] = "# Synthetic image classification analysis"
         claim(
-            "FixtureVision test accuracy is 0.75.",
+            "On FixtureVision test, model ReleasedModel reports accuracy is 0.75.",
             [condition("test", "FixtureVision", "test")],
             ["Experiments"],
             "unverified" if name.endswith("misaligned") else "supported",
         )
         claim(
-            "FixtureVision train accuracy is 0.75.",
+            "On FixtureVision train, model ReleasedModel reports accuracy is 0.75.",
             [condition("train", "FixtureVision", "train")],
             ["Experiments"],
             "unverified",
         )
+        for row in claims:
+            row["conditions"][0]["settings"]["model"] = "ReleasedModel"
         repo = directory / "repository"
         (repo / "tools").mkdir(parents=True)
-        (repo / "tools/evaluate.py").write_text(RUNTIME_SCRIPT, encoding="utf-8")
+        split = "validation" if name.endswith("misaligned") else "test"
+        artifact = {"dataset": "FixtureVision", "metric": "accuracy", "model": "ReleasedModel",
+                    "settings": {"split": split, "model": "ReleasedModel"},
+                    "partitions": {split: released_rows if released_rows is not None else
+                                   [{"label": 1, "prediction": 1}, {"label": 1, "prediction": 1},
+                                    {"label": 0, "prediction": 1}, {"label": 1, "prediction": 1}]}}
+        definition = statistics_definition(artifact)
+        rows.append(text_row(definition))
+        source = analysis_source("tools/evaluate.py", "data/correct.json", split,
+            payload_expression="{'context': {'dataset': data['dataset'], 'split': data['settings']['split']}, 'measurements': {'accuracy': value}}")
+        (repo / "tools/evaluate.py").write_text(source, encoding="utf-8")
+        (repo / "README.md").write_text(definition, encoding="utf-8")
         save(
             repo / "configs/runtime.json",
             {"dataset": "FixtureVision", "split": "validation" if name.endswith("misaligned") else "test"},
         )
-        save(repo / "data/correct.json", [1, 1, 0, 1])
+        save(repo / "data/correct.json", artifact)
     markdown_parts = []
     for row in rows:
         caption = row.get("image_caption", "")
@@ -226,7 +245,11 @@ class FixedModel:
 
     def __call__(self, **kwargs):
         module = kwargs["module"]
-        prompt = kwargs["prompt"].split("\nPAPER_DATA_JSON:\n", 1)[-1]
+        prompt = kwargs["prompt"]
+        for marker in ("\nPAPER_DATA_JSON:\n", "DATA_JSON:\n", "\nADVICE_DATA_JSON:\n"):
+            if marker in prompt:
+                prompt = prompt.split(marker, 1)[1]
+                break
         payload = json.loads(prompt)
         record = {
             "module": module,
@@ -243,6 +266,26 @@ class FixedModel:
             raise
 
     def respond(self, module, payload):
+        if module in {"screening.claims.coverage", "screening.claims.coverage_validation"}:
+            from tests.test_claim_coverage_v2 import review, validation
+
+            return review(payload, []) if module == "screening.claims.coverage" else validation(payload)
+        if module == "report_generation":
+            from common import run_stats
+
+            run_stats.record_llm_call(module=module, provider="mock", model="framework-fixture",
+                usage={"input_tokens": 7, "output_tokens": 3, "total_tokens": 10})
+            claim = payload["claim"]
+            if claim["status"] == "unverified":
+                items = [{"text": "Complete the recorded check for this uncovered condition.",
+                          "condition_ids": [row["condition_id"]], "basis_refs": row["required_basis_refs"],
+                          **({"action": row["required_action"]} if row["required_action"] else {})}
+                         for row in payload["item_requirements"]["conditions"]]
+            else:
+                items = [{"text": "Use the located evidence under the stated condition.",
+                          "condition_ids": [row["id"] for row in claim["conditions"]],
+                          "basis_refs": [key for key in payload["basis"] if key.startswith("/evidence/")]}]
+            return {"status": "ok", "claim_id": claim["id"], "items": items}
         if module == "screening.claims":
             return {
                 "status": "ok",
@@ -253,6 +296,10 @@ class FixedModel:
                             b["id"] for b in payload["blocks"] if b["text"] == row["text"]
                         ),
                         "source_quote": row["text"],
+                        "source_refs": ([{"source_block_id": b["id"], "source_quote": b["text"],
+                                          "covered": [row["conditions"][0]["id"]]}
+                                         for b in payload["blocks"] if "complete released partition" in b["text"]]
+                                        if self.scenario.startswith("mapped_runtime") else []),
                         "conditions": row["conditions"],
                         "needs": row["needs"],
                         "importance": "core",
@@ -430,6 +477,7 @@ class FixedModel:
                         "blocker": "Released repository absent" if missing else "",
                         "priority": "high",
                         "data_paths": [] if missing else ["data/correct.json"],
+                        "config": None if missing else "configs/runtime.json",
                         "estimated_cost": "Synthetic CPU analysis; training remains disabled",
                     }
                 ],
@@ -444,12 +492,14 @@ def no_external(*args, **kwargs):
 def mock_docker_command(command, *, cwd, timeout_sec):
     if command[:2] != ["docker", "run"]:
         raise AssertionError(f"Unexpected mocked Docker operation: {command[:2]}")
-    mount = next(value for value in command if value.endswith(":/app"))
-    repository = Path(mount.removesuffix(":/app"))
+    mount = next(value for value in command if ":/app" in value)
+    repository = Path(mount.split(":/app", 1)[0])
     config = json.loads((repository / "configs/runtime.json").read_text())
-    values = json.loads((repository / "data/correct.json").read_text())
-    output = {"context": config, "measurements": {"accuracy": sum(values) / len(values)}}
-    return CommandResult(command, cwd, 0, json.dumps(output), "", 0.01)
+    artifact = json.loads((repository / "data/correct.json").read_text())
+    values = artifact["partitions"][config["split"]]
+    output = {"context": config, "measurements": {"accuracy": sum(row["label"] == row["prediction"] for row in values) / len(values)}}
+    record_observer(command, cwd, output)
+    return CommandResult(command, cwd, 0, json.dumps(output), "", 0.01, termination="completed")
 
 
 def validate_case(name, summary, claims, parser, model):
@@ -539,7 +589,7 @@ def validate_case(name, summary, claims, parser, model):
                 pointer["key"].startswith("chars:")
                 and source.read_text(encoding="utf-8")[start:end]
                 == pointer["quote"]
-                == "FixtureVision test accuracy is 0.75."
+                == "On FixtureVision test, model ReleasedModel reports accuracy is 0.75."
                 and hashlib.sha256(source.read_bytes()).hexdigest() == binding["artifact_sha256"]
                 and binding["value"] == analysis["plan"]["y_paper"]["test"] == 0.75
                 and binding["quantity_kind"] == "absolute_measurement"
@@ -588,7 +638,7 @@ def run_case(name: str, root: Path, *, real_docker=False):
         "max_attempts": 0,
         "approval_mode": "auto",
         "training_budget": 0,
-        "refine_with_llm": False,
+        "refine_with_llm": True,
         "timeout_seconds": 45,
         "docker_build_timeout_seconds": 180,
         "docker_options": {
@@ -631,12 +681,17 @@ def run_case(name: str, root: Path, *, real_docker=False):
             stack.enter_context(patch(target, no_external))
         for target in (
             "screening.claims.resolve_llm_config",
+            "screening.claim_coverage.resolve_llm_config",
             "screening.checks.resolve_llm_config",
+            "review.report.advice.resolve_llm_config",
             "verification.literature.resolve_llm_config",
         ):
             stack.enter_context(patch(target, lambda: LLMConfig("mock", "framework-fixture", None, None)))
         stack.enter_context(patch("verification.literature._default_adapter", lambda: retrieval))
         if not docker_enabled:
+            stack.enter_context(patch("llm.client.resolve_llm_config", lambda: LLMConfig("mock", "framework-fixture", None, None)))
+            stack.enter_context(patch("llm.client.llm_json", science_model()))
+            stack.enter_context(patch("fact_generation.execution.tools.docker._docker_proxy_env", lambda _: {}))
             stack.enter_context(patch("subprocess.run", no_external))
             stack.enter_context(patch("subprocess.Popen", no_external))
             stack.enter_context(

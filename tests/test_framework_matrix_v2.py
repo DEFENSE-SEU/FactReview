@@ -10,7 +10,6 @@ import pymupdf
 import pytest
 
 from fact_generation.execution import v2 as execution
-from util.subprocess_runner import CommandResult
 
 
 @pytest.fixture(scope="module")
@@ -236,17 +235,15 @@ def test_native_runtime_metadata_controls_alignment_and_training_never_runs(matr
 def test_wrong_runtime_value_fails_the_matrix_instead_of_copying_expected_result(
     script, tmp_path, monkeypatch
 ):
-    original = script.mock_docker_command
+    original = script.make_inputs
+    # Author a stronger synthetic released-data counterexample before resource
+    # freezing. The paper remains .75; all ten actual records yield .1.
+    released_rows = [{"label": 1, "prediction": 1}] + [{"label": 0, "prediction": 1} for _ in range(9)]
 
-    def changed(command, **kwargs):
-        result = original(command, **kwargs)
-        payload = json.loads(result.stdout)
-        payload["measurements"]["accuracy"] = 0.1
-        return CommandResult(
-            result.cmd, result.cwd, result.returncode, json.dumps(payload), result.stderr, result.duration_sec
-        )
+    def changed(name, directory):
+        return original(name, directory, released_rows=released_rows)
 
-    monkeypatch.setattr(script, "mock_docker_command", changed)
+    monkeypatch.setattr(script, "make_inputs", changed)
     decoder = Mock(wraps=execution.decode_output)
     monkeypatch.setattr(execution, "decode_output", decoder)
     manifest = script.run_matrix(tmp_path, scenarios=["mapped_runtime"])
@@ -254,9 +251,14 @@ def test_wrong_runtime_value_fails_the_matrix_instead_of_copying_expected_result
     assert decoder.call_count == 1
     assert decoder.call_args.args[0]["measurements"]["accuracy"] == 0.1
     case = manifest["cases"][0]
-    assert case["observed_statuses"]["claim_001"] == "questioned"
+    assert case["observed_statuses"]["claim_001"] == "flawed"
     assert not case["checks"]["claim_statuses"]
     assert Path(manifest["root"], "manifest.json").is_file()
+    review = json.loads(Path(case["paths"]["report_json"]).read_text(encoding="utf-8"))
+    evidence = next(row for row in review["claims"][0]["evidence"] if row["source"] == "execution")
+    assert evidence["sufficient"] and evidence["aligned"] and not evidence["overturnable"]
+    assert evidence["provenance"]["released_artifact"]
+    assert evidence["provenance"]["environment_explanation_possible"] is False
 
 
 def test_cli_reports_failure_exit_code_and_preserves_manifest_location(script, tmp_path, monkeypatch, capsys):

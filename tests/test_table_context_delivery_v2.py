@@ -41,7 +41,7 @@ def test_table_context_failure_preserves_crop_coverage(visual_materials, tmp_pat
         return [], []
 
     monkeypatch.setattr("screening.stage.check_visual_tables", tables)
-    result = screen_paper(visual_materials, tmp_path / "screening")
+    result = screen_paper(visual_materials, tmp_path / "screening", call=fixtures.ModelBoundary())
     assert result.table_coverage["checked"] == (1 if crash else 2)
     assert result.table_context_coverage == {
         "total": 2,

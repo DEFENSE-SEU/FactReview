@@ -22,6 +22,8 @@ Completed：发布rank完整MRR及protected canonical stdout第一阶段已实�
 
 Completed：fresh JSON outfile producer已冻结并通过独审。原工作树/source/data/config保持只读，仅原metric路径的全新单文件RW mount可写；host独占保存原bytes和独立metadata，receipt核原source manifest、actual argv、最终launch SHA、原缺失/空占位、实际scratch/hostcopy bytes。原parser/decoder/raw stdout保持，host全量rank重算仍必须独立metered semantic审核。一个必要新offline函数真红1/.86s→绿1/1.15s，19Assert完整保持；动态args.out/atomic rename/未知写关系继续unresolved。Root默认docker_runner接线只在失败后核原manifest并移除仍空的自有占位，原Docker失败、scratch和历史均保留。原file isolation已绿；原native多指标正例最初因单decoded限制失败后，生产consumer改为按原mapping selector严格唯一选目标，全部5项raw/decoded/mapping留审计；此原失败与新增正式failure→cleanup→repair控制同次2pass/1.70s，其他绿组未复跑。报告partition-outputfile-analysis-implementation-v1/及default-regression-execution-science-fixtures-v1/。
 
+Delivery：Phase5 producer源码已提交2c478aa，Phase8科学fixtures最终冻结并获独审。17原失败与1新增file-repair控制均通过；原source/target/resource、raw全指标、observer receipt、host measurement、metered semantic资格与judge均实际走生产路径，外部边界全mock。新增guard保留失败stderr/退出值、原scratch残片、空占位删除、全新重试container/capture与最终aligned/sufficient evidence。独审regression-science-outputfile-independent-v1/report.md；完整实际公开入口新控制器在准备阶段，source pending时禁止实际运行，尚无新模型/HTTP/Docker准入。
+
 Next action：关闭上述具体科学与接口失败，独立审核并提交授权分支；最终必要默认全套一次，再冻结当前源进行完整公开入口Materials→L1/VLM→四分支L2→非空真实L3→assessment/advice→JSON/MD/PDF/SVG验证。已有失败原件保持，不做无变化付费重跑。checks.md当前原14表第1项fail，另13项原窄合同保持；整体目标active。
 
 ## 历史整体框架 checkpoint（2026-10-11）

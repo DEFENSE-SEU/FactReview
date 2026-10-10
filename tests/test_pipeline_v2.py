@@ -22,10 +22,21 @@ from common import run_stats
 from fact_generation.execution.v2 import Observation, RunOutcome
 from llm.client import LLMConfig
 from preprocessing.parse.mineru_adapter import MineruParseResult
+from tests.execution_science_fixtures import (
+    DOCKER_PRODUCER,
+    analysis_source,
+    install_science_model,
+    record_observer,
+    statistics_definition,
+)
 from tests.literature_scope_fixtures import native_response, scientific_response
 from verification import literature
 
 ASPECTS = ["correspondence", "fairness", "isolation", "stability", "consistency"]
+RANK_ARTIFACT = {"dataset": "A", "metric": "MRR", "model": "ReleasedRankModel",
+                 "settings": {"split": "test", "model": "ReleasedRankModel"},
+                 "partitions": {"test": [{"rank": rank} for rank in (2, 2, 2, 4, 4)]}}
+RANK_DEFINITION = statistics_definition(RANK_ARTIFACT)
 
 
 @pytest.fixture(autouse=True)
@@ -43,10 +54,12 @@ def offline_boundaries(monkeypatch):
         return LLMConfig("mock", "fixture", None, None)
 
     monkeypatch.setattr("screening.claims.resolve_llm_config", cfg)
+    monkeypatch.setattr("screening.claim_coverage.resolve_llm_config", cfg)
     monkeypatch.setattr("screening.checks.resolve_llm_config", cfg)
     monkeypatch.setattr("review.report.advice.resolve_llm_config", cfg)
     monkeypatch.setattr(literature, "resolve_llm_config", cfg)
     monkeypatch.setattr("screening.claims.llm_json", forbidden)
+    monkeypatch.setattr("screening.claim_coverage.llm_json", forbidden)
     monkeypatch.setattr("screening.checks.llm_json", forbidden)
     monkeypatch.setattr(literature, "llm_json", forbidden)
     monkeypatch.setattr("fact_generation.execution.v2.docker_runner", forbidden)
@@ -68,7 +81,7 @@ def tiny_inputs(tmp_path):
     body = (
         "A test MRR is 0.4. We use Adam. Our novel graph neural network improves link prediction under inductive evaluation. "
         "The identity theorem states x = x. Proof. x = x by reflexivity. Figure 1 shows our model."
-    )
+    ) + "\nOn A test, model ReleasedRankModel reports MRR is 0.4.\n" + RANK_DEFINITION
     rows = [
         {
             "type": "text",
@@ -78,7 +91,11 @@ def tiny_inputs(tmp_path):
         },
         {"type": "text", "text": "## Abstract", "text_level": 1, "page_idx": 0},
         {"type": "text", "text": body, "page_idx": 0},
-        {"type": "table", "text": "Method | Time (s)\nTiny | 0.1", "page_idx": 0},
+        {
+            "type": "table", "text": "Method | Time (s)\nTiny | 0.1", "page_idx": 0,
+            "table_caption": "Table 1: Runtime in seconds.",
+            "bbox": [30, 300, 180, 365], "bbox_space": "pdf_points",
+        },
         {
             "type": "image",
             "image_caption": "Figure 1: Tiny model.",
@@ -95,10 +112,23 @@ def tiny_inputs(tmp_path):
         page.insert_textbox((25, 25, 375, 180), body, fontsize=10)
         page.draw_rect((30, 200, 160, 260))
         page.insert_text((40, 230), "Tiny model")
+        page.insert_text((32, 315), "Table 1: Runtime in seconds.", fontsize=9)
+        page.draw_rect((30, 325, 180, 365))
+        page.draw_line((30, 345), (180, 345))
+        page.draw_line((110, 325), (110, 365))
+        page.insert_text((35, 338), "Method", fontsize=9)
+        page.insert_text((115, 338), "Time (s)", fontsize=9)
+        page.insert_text((35, 358), "Tiny", fontsize=9)
+        page.insert_text((115, 358), "0.1", fontsize=9)
         pdf.save(paper)
     repository = tmp_path / "repo"
     repository.mkdir()
-    (repository / "eval.py").write_text("optimizer = 'Adam'\nprint('fixture evaluation')\n", encoding="utf-8")
+    source = "optimizer = 'Adam'\n" + analysis_source("eval.py", "statistics.json", "test", metric="MRR",
+        payload_expression="{'observations': [{'dataset': data['dataset'], 'metric': data['metric'], 'settings': data['settings'], 'value': value}]}")
+    (repository / "eval.py").write_text(source, encoding="utf-8")
+    (repository / "statistics.json").write_text(json.dumps(RANK_ARTIFACT), encoding="utf-8")
+    (repository / "configuration.json").write_text(json.dumps(RANK_ARTIFACT["settings"]), encoding="utf-8")
+    (repository / "README.md").write_text(RANK_DEFINITION, encoding="utf-8")
     (repository / "data.csv").write_text("id,value\n1,0.4\n", encoding="utf-8")
     (repository / "weights.pt").write_bytes(b"fixture weights; never loaded")
     parsed = MineruParseResult(markdown, rows, None, "mock", {"fixture": True}, "mock-mineru")
@@ -109,7 +139,7 @@ def tiny_inputs(tmp_path):
         repository_root=str(repository),
         submission_deadline="2021-01-31",
         run_execution=True,
-        execution_no_llm=True,
+        execution_no_llm=False,
         approval_mode="auto",
         training_budget=0,
         max_attempts=3,
@@ -124,6 +154,13 @@ class ModelBoundary:
     def __call__(self, **kwargs):
         module = kwargs["module"]
         self.calls.append(module)
+        if module in {"screening.claims.coverage", "screening.claims.coverage_validation"}:
+            from tests.test_claim_coverage_v2 import review, validation
+
+            payload = json.loads(kwargs["prompt"].split("DATA_JSON:\n", 1)[1])
+            if module == "screening.claims.coverage":
+                return review(payload, [])
+            return validation(payload)
         if module == "verification.literature.planning":
             from tests.test_literature_literal_concepts_v2 import planning_response
             data = json.loads(kwargs["prompt"].split("\nCONCEPT_DATA_JSON:\n", 1)[1])
@@ -132,6 +169,23 @@ class ModelBoundary:
         if module == "report_generation":
             data = json.loads(kwargs["prompt"].split("\nADVICE_DATA_JSON:\n", 1)[1])
             claim = data["claim"]
+            if claim["status"] == "unverified":
+                run_stats.record_llm_call(
+                    module=module, provider="mock", model="fixture",
+                    usage={"input_tokens": 7, "output_tokens": 3, "total_tokens": 10},
+                )
+                return {
+                    "status": "ok", "claim_id": claim["id"],
+                    "items": [
+                        {
+                            "text": "Complete the recorded verification check for this uncovered condition.",
+                            "condition_ids": [row["condition_id"]],
+                            "basis_refs": row["required_basis_refs"],
+                            **({"action": row["required_action"]} if row["required_action"] else {}),
+                        }
+                        for row in data["item_requirements"]["conditions"]
+                    ],
+                }
             assert claim["status"] == "supported"
             run_stats.record_llm_call(
                 module=module,
@@ -155,8 +209,8 @@ class ModelBoundary:
             block = next(b for b in payload["blocks"] if "A test MRR" in b["text"])
             rows = [
                 (
-                    "A test MRR is 0.4.",
-                    [{"id": "a", "dataset": "A", "metric": "MRR", "settings": {"split": "test"}}],
+                    "On A test, model ReleasedRankModel reports MRR is 0.4.",
+                    [{"id": "a", "dataset": "A", "metric": "MRR", "settings": RANK_ARTIFACT["settings"]}],
                     ["Experiments"],
                 ),
                 ("We use Adam.", [{"id": "optimizer", "description": "Configured optimizer"}], ["Code"]),
@@ -178,6 +232,8 @@ class ModelBoundary:
                         "text": text,
                         "source_block_id": block["id"],
                         "source_quote": text,
+                        "source_refs": [{"source_block_id": block["id"], "source_quote": RANK_DEFINITION,
+                                         "covered": ["a"]}] if needs == ["Experiments"] else [],
                         "conditions": conditions,
                         "needs": needs,
                         "importance": "core",
@@ -185,10 +241,15 @@ class ModelBoundary:
                     for text, conditions, needs in rows
                 ],
             }
-        if module in {"screening_writing", "screening_tables", "screening_figures"}:
+        if module in {"screening_writing", "screening_tables", "screening_figures", "screening_tables.visual"}:
             if module == "screening_figures":
                 assert kwargs["images"] and Path(kwargs["images"][0]).is_file()
                 assert "Figure 1 shows our model." in kwargs["prompt"]
+            if module == "screening_tables.visual":
+                assert kwargs["images"] and Path(kwargs["images"][0]).is_file()
+                data = json.loads(kwargs["prompt"])
+                assert data["caption"] == "Table 1: Runtime in seconds."
+                assert data["printed_size_verified"] is True
             return {"findings": []}
         if module == "verification_literature":
             data = json.loads(kwargs["prompt"].split("\nDATA_JSON:\n", 1)[1])
@@ -214,7 +275,7 @@ class ModelBoundary:
                 "conditions": [
                     {
                         "condition_id": "a",
-                        "claim_quote": "A test MRR is 0.4.",
+                        "claim_quote": "On A test, model ReleasedRankModel reports MRR is 0.4.",
                         "assertion": "descriptive",
                         "matched_controls_required": False,
                         "uncertainty_sensitive": False,
@@ -229,7 +290,7 @@ class ModelBoundary:
                         "item_index": 0,
                         "condition_id": "a",
                         "applicability": "applicable",
-                        "grounds": [{"block_id": block["id"], "quote": "A test MRR is 0.4."}],
+                        "grounds": [{"block_id": block["id"], "quote": "On A test, model ReleasedRankModel reports MRR is 0.4."}],
                         "rationale": "The exact target score and setting are reported.",
                         "full_support": True,
                         "qualifiers_complete": True,
@@ -302,7 +363,7 @@ class ModelBoundary:
                         "aspect": "correspondence",
                         "kind": "paper_support",
                         "block_id": block["id"],
-                        "quote": "A test MRR is 0.4.",
+                        "quote": "On A test, model ReleasedRankModel reports MRR is 0.4.",
                         "covered": ["a"],
                         "fully_supported_conditions": ["a"],
                         "detail": "The paper reports the target value.",
@@ -315,17 +376,18 @@ class ModelBoundary:
                                 "condition_id": "a",
                                 "reported": {
                                     "block_id": block["id"],
-                                    "quote": "A test MRR is 0.4.",
+                                    "quote": "On A test, model ReleasedRankModel reports MRR is 0.4.",
                                     "token": "0.4",
                                 },
                             }
                         ],
                         "entry_script": "eval.py",
-                        "run_mode": "evaluation",
+                        "run_mode": "analysis",
                         "feasibility": "ready",
                         "priority": "high",
-                        "data_paths": ["data.csv"],
-                        "weight_paths": ["weights.pt"],
+                        "config": "configuration.json",
+                        "data_paths": ["statistics.json"],
+                        "weight_paths": [],
                     }
                 ],
             }
@@ -385,14 +447,22 @@ def run_tiny(tiny_inputs, monkeypatch, *, call=None, runner=None, render_pdf=Tru
     model = call or ModelBoundary()
     retrieval = RetrievalBoundary()
     monkeypatch.setattr(literature, "_default_adapter", lambda: retrieval)
-    runner = runner or Mock(
-        return_value=RunOutcome(
-            returncode=0,
-            stdout="fixture execution",
-            observations=[Observation(dataset="A", metric="MRR", settings={"split": "test"}, value=0.4)],
-            environment={"transport": "mock-docker"},
-        )
-    )
+    install_science_model(monkeypatch)
+    if runner is None:
+        from fact_generation.execution import v2 as execution
+
+        payload = {"observations": [{"dataset": "A", "metric": "MRR", "settings": RANK_ARTIFACT["settings"], "value": .4}]}
+
+        def transport(command, cwd, timeout_sec):
+            from util.subprocess_runner import CommandResult
+
+            record_observer(command, cwd, payload)
+            return CommandResult(command, cwd, 0, json.dumps(payload), "", .01, termination="completed")
+
+        monkeypatch.setattr(execution, "docker_ensure_paper_image", lambda *a, **kw: (True, "fixture-image"))
+        monkeypatch.setattr(execution, "run_command", transport)
+        monkeypatch.setattr("fact_generation.execution.tools.docker._docker_proxy_env", lambda _: {})
+        runner = Mock(side_effect=DOCKER_PRODUCER)
     summary = pipeline_v2.run_v2_pipeline(
         args,
         parser=parser,
@@ -432,7 +502,7 @@ def test_real_v2_stages_with_mocked_external_services_render_pdf_and_svg(tiny_in
     assert model.calls.count("screening.claims") == 1
     assert model.calls.count("report_generation") == 4
     assert summary["advice"] == {"generated": 4, "unavailable": 0}
-    assert summary["table_coverage"] == {"total": 1, "checked": 0, "failed": 0, "unavailable": 1}
+    assert summary["table_coverage"] == {"total": 1, "checked": 1, "failed": 0, "unavailable": 0}
     assert stats["report_generation"]["token_usage"]["requests"] == 4
     assert stats["report_generation"]["token_usage"]["total_tokens"] == 40
     assert summary["model_usage"]["total_tokens"] >= 40
