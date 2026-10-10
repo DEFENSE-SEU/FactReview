@@ -1,10 +1,10 @@
 # FactReview v2 progress
 
-## 当前 Phase1/2/5/8：提取职责改进与通用执行设计
+## 当前 Phase1/2/5/8：提取职责交付与通用分析实施
 
-已交付refactor/method-v2精确远端7a1612ff78f4e9b86807c30d1a2ab1d2d79a19dd。Phase5有限科学消费receipt scientific-consumption-accounting-final-v3/delivery.json SHA6cfa7409；Phase8 provider请求准入receipt6353871e和此前Phase2 source-streaming receiptcf9021f8均完成。每批独立提交推送，原源码freeze/红/实际结果保持，不改main、不开PR。
+已交付refactor/method-v2精确远端82c6cfdad2c66a318ab69ba5a31afa49a8591cc7，Phase2 execution hash receipt execution-hash-streaming-implementation/delivery.json SHA80cc066f02c8baf0b4707e7158bd0a2711f4bb26513f9baa4ab9566dc3a32fdd。此前精确远端7a1612ff78f4e9b86807c30d1a2ab1d2d79a19dd保留。Phase5有限科学消费receipt scientific-consumption-accounting-final-v3/delivery.json SHA6cfa7409；Phase8 provider请求准入receipt6353871e和此前Phase2 source-streaming receiptcf9021f8均完成。每批独立提交推送，原源码freeze/红/实际结果保持，不改main、不开PR。
 
-本Phase2只改production execution._sha：完整文件按1MiB流式SHA累积，仓库复制前、资源和workspace保护、repair同内容检查仍使用完整digest，原文件异常传播。一必要新的checkpoint控制禁止整文件分配/无界读，核第一chunk后不同尾字节和missing-file异常；同bytes red1/1.80s→green1/1.08s。Ruff通过；旧tests/服务/actual0复跑。移除_sha后完整模块AST与已独审科学版本相同。作者review355392f2/evidence9052a659，独审report89a9badc/evidence9f1a953b；Root完整读报告和增量并核source55aa8ad5/test156c58db。此批待Phase2单独交付，receipt写execution-hash-streaming-implementation/delivery.json。repair前后完整workspace bytes、旧_refine无界文件读取和大ledger/statistics I/O继续open。
+本Phase2只改production execution._sha：完整文件按1MiB流式SHA累积，仓库复制前、资源和workspace保护、repair同内容检查仍使用完整digest，原文件异常传播。一必要新的checkpoint控制禁止整文件分配/无界读，核第一chunk后不同尾字节和missing-file异常；同bytes red1/1.80s→green1/1.08s。Ruff通过；旧tests/服务/actual0复跑。移除_sha后完整模块AST与已独审科学版本相同。作者review355392f2/evidence9052a659，独审report89a9badc/evidence9f1a953b；Root完整读报告和增量并核source55aa8ad5/test156c58db。此批已单独Phase2交付，receipt完整且HEAD/remote82c6cfd精确一致。repair前后完整workspace bytes、旧_refine无界文件读取和大ledger/statistics I/O继续open。
 
 科学消费7a1612f当前支持单condition/完整单行JSON分区/有限参数模型。原完整科学claim/source/condition及actual分区、model/metric/source-flow重建后，最多一个独立semantic feature logical请求；known-only计量后派生Observation单独保存，原raw=[]/stdout保留，由原judge核target/units/variance/tolerance/provenance/状态。不同actual split同数值0审核/0证据；缺定义正常unknown。原坏继承stats→delegate1且覆盖旧文件仍qualified的独审反例保留红；raw initialized计量guard修复后原probe+affectedpositive2/2.27s，tracked原3Assert不变、单次1/.11s绿。完整独审report04ed1b2c/evidence3829f3f7通过有限接口；真实科学资格、原Tiny平面材料、通用网络和多样本仍open。
 
@@ -12,13 +12,17 @@
 
 六个首轮raw均v5，五个返回third也v5；末窗后两轮beforeprovider预算阻断，没有降级first的证据。16logical/16physical全部returned、known1515352/input1391386/output123966、missing0，严格与stats/driver一致；readiness独立。原1.5m软门槛在最后在途响应越界15352后阻断下轮，没有增加预算/重试。supervisor原partial_usage_unknown/bound_terminal_usage_unknown由其no_blocked合取要求触发；没有失联或仍在途provider请求证据。终态标签和旧222文件不改。没有输出cap/finishreason/truncation证据，前两窗省略义务的JSON完整，不能归因长度截断。
 
-Phase1子agent当前仅改初提取/第三轮职责提示与schema展示次序：强调可各自改变验证结果的独立结论、章级协议进入相关claim自身语义，third先完整原复核再候选。模型schema/wire成员、validator、原source/condition/全义务和预算保持；不靠减少required、回填候选或复跑原actual求绿。可逆提示无需镜像实现测试，独立审source与AST/展示成员相等，实际质量继续open。另一独立agent按现spec及execution/observer/resource/CodeScope设计通用Torch/多样本/analysis最小接口，尚不实施。
+Phase1提取职责增量已完成并通过完整独审：仅两个源 claims.py89671b00、claim_coverage.pyfba85591，强调可各自改变验证结果的独立消融结论、明确章节协议进入受影响claim自身text/conditions；third先全部原复核，再处理所有候选/观察。schema展示仅调整顺序，全部members/nested values/required次数保留；原validator、context/input、全义务、lowering、计数和预算不变。独审reportb0305a85/evidence4be59468、作者reviewa7f9c5f3/evidence4f120904/source.diff85e87e66；Root完整读取两方报告/证据/源码差异并核当前freeze，恢复三个prompt和展示delta后两个完整AST等原。可逆提示无需镜像实现测试，无旧tests/actual/LLM复跑；科学效果继续open。此批单独Phase1提交交付，receipt写claim-extraction-review-priorities-implementation/delivery.json。
 
-Decisions：聊天GPT-6.1-sol；FactReview维持openai-codex/GPT-5.5。仅必要边界测试，LLM/检索/Docker外界全部mock；已绿组/整套/旧付费样本不重复。provider兼容SDK零hidden retry，原Codex显式metered最多2physical/1logical保持；standalone整个refinement计量及缺Anthropic SDK政策仍open。单个阻断继续其他工作，goal active。
+后续Phase8共享严格计量准入已经实施，独审中，未并入本Phase1提交。common.read_initialized复用原science完整initialized字段及exact非负token/count规则；client在首个refinement认证/图像/API前核active history，science薄wrapper。新必要坏stats控制 corrected red1/.52s→same bytes green1/.70s，两条直接旧positive唯一2/2.74s；初fixture base_url失败原红绿保留并不算行为证据。作者reviewdc856d4d/evidencef2a1ddf0；等待Finite独审，不宣布超出范围的完整计量/Anthropic/外部竞态。
+
+通用消费设计已完成：general-scientific-consumption-extension-design/design.md9681fed3/evidencef7f3b7ec。先完整released分区analysis，随后批处理值流与固定版本Torch；源/metadata同名及相等结果不能证明模型实际参与。新agent当前只实施纯partition_analysis helper/new schema/至多三个必要离线control，不修改正在审核的science/client/stats源、原raw或judge。新helper单独产host measurement/context，未接线或审核时scientific/alignment/support均false，未证inference/settings保持unknown。
+
+Decisions：聊天GPT-6.1-sol；FactReview维持openai-codex/GPT-5.5。仅必要边界测试，LLM/检索/Docker外界全部mock；已绿组/整套/旧付费样本不重复。provider兼容SDK零hidden retry，原Codex显式metered最多2physical/1logical保持；共享active stats首refinement准入修补待独审；无active兼容/缺Anthropic SDK政策与外部竞态仍open。单个阻断继续其他工作，goal active。
 
 Open issues：完整独立复核/全篇原子性与科学scope、通用模型及多样本/analysis、真实semantic资格、文献充分性/native exhaustion、OS/daemon故障及大ledger/IO、repair内存、当前14项整体验收。
 
-Next action：Phase2交付已独审hash修补；审核Phase1提取职责增量并交付，然后按通用执行设计推进科学链扩展。新的真实验证先固定完整材料/新source/controller/admission，保留所有原partial/费用/失败，不重复consumed授权。
+Next action：单独交付已独审Phase1提取增量；完整独审共享严格stats入口后Phase8交付，并继续纯多样本analysis实现与接线。新的真实验证先固定完整材料/新source/controller/admission，保留所有原partial/费用/失败，不重复consumed授权。
 
 ## 历史 a7f3b5c Phase8：真实生产 Docker 机械链与整篇覆盖推进
 
