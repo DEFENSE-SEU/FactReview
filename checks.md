@@ -1,6 +1,33 @@
 # FactReview v2 acceptance checks
 
-## Current regression and native-execution checkpoint (2026-10-11)
+## Current full-framework checkpoint (2026-10-11)
+
+The exact branch and remote checkpoint is `42fb6bf68c144c3ec484c8735266f65249733d4b`. The final default regression ran once: **3754 passed, 3 original default deselected, 0 skipped, 0 failures/errors**, exit0, pytest538.61s/wrapper541.797s. All419 source/test/config identities are identical before and after. Existing assertions, marker selection and external mocks remain. Report: `runs/v2_method_delivery/final-default-regression-final-path-fixtures-v1/report.md`. Both preceding failed default runs and every necessary repair record remain.
+
+The full public-entry controller's v6 offline preparation has completed as `prepared-f72730c0a511`. It uses the complete216-file canonical production snapshot `f2786581b713c8ed39c18d39ad3d204b165b530d`; the later42fb checkpoint changes tests/docs only. Prepared independent review and fresh prepared-bound authorization precede its sole live admission. No current live completion is claimed. Phase0–7 implementation history remains; Phase8 whole-framework delivery and the goal remain active.
+
+A confirmed additional gap is recorded in `multi-condition-execution-gap-design-v1/report.md`: ordinary L3 currently rejects a multi-condition claim even when its plan targets one formal condition. The ordinary L2 v3 producer also allows only one decision. Per-plan singleton targets, complete original claim/source context, condition-specific evidence and all scientific gates must remain. Ordinary L3 correction and a separately versioned L2 protocol need implementation and meaningful public mock verification. General neural inference and whole-paper quality remain open.
+
+| Original acceptance check | Current verdict | Evidence / limitation |
+|---|---|---|
+| 1. pytest passes without weakening or skipping | pass | Exact42fb default3754passed; original3deselected;419 identities unchanged. |
+| 2. Materials → L1 → L2 → optional L3 → assessment → report → teaser | pass | Original entry/stage controls and bounded real L2→L3; current full actual remains pending. |
+| 3. Uncapped extraction and splitting | pass | Existing controls and73-claim input; recall and atomicity remain open. |
+| 4. Claim locations/conditions/needs and evidence pointers | pass | Source-bound schemas and original actual evidence. |
+| 5. Dispatch follows needs | pass | Production dispatcher and retained controls. |
+| 6. Crop/caption/body references and visual categories | pass | Real crop fixtures and retained actual VLM evidence. |
+| 7. Cutoff/concurrent window/self-exclusion/restrictions | pass | Existing source-bound retrieval policy controls. |
+| 8. Experiments-only linked feasible prioritized plans | pass | Actual public high/ready plan; full multi-condition producer remains open. |
+| 9. Aligned-only execution evidence and bounded repairs | pass | Bounded actual original-plan host measurement; general inference remains open. |
+| 10. Ordered assessment rules | pass | Retained pure rule controls. |
+| 11. Four statuses and safe legacy adapter | pass | Conflict→questioned one-way provenance retained. |
+| 12. Report structure without accept/reject advice | pass | Report guards and existing artifact evidence. |
+| 13. Baseline completion or reported blocker | pass with reported blocker | Existing comparison and explicit integration limitations. |
+| 14. progress reflects current workspace | pass | Final regression, pending actual and additional capability gaps recorded. |
+
+These fourteen original contracts do not certify commercial completion. Current full actual, long-paper recall/atomicity, M2/M5, joint paper evidence, multi-condition production and general model inference still require their own evidence.
+
+## Historical regression and native-execution checkpoint (2026-10-11)
 
 The branch production checkpoint is `f2786581b713c8ed39c18d39ad3d204b165b530d`, pushed and exact remote verified. Phase0–7 implementation history is retained; Phase8 whole-framework delivery remains open and the goal is active.
 
