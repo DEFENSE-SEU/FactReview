@@ -117,10 +117,10 @@ def analyze_partition(proposal, *, plan, claim, materials, workspace, max_bytes=
         targets = validate_plan_targets(plan, claim, materials)
         _require(all(row.version == 1 for row in targets.values()), "ordinary_analysis_target_required")
         condition = plan.target_conditions[0]
-        _require(set(condition.settings).issubset({"model", "split", "sample_count"})
-                 and {"model", "split"}.issubset(condition.settings), "unobserved_analysis_settings")
+        _require({"model", "split"}.issubset(condition.settings), "unobserved_analysis_settings")
         _require(parsed.artifact_path in plan.task.data_paths, "analysis_artifact_outside_original_data_selection")
-        _require(parsed.label_selector != parsed.prediction_selector, "analysis_label_prediction_selectors_identical")
+        if parsed.metric_definition != "mean_reciprocal_rank":
+            _require(parsed.label_selector != parsed.prediction_selector, "analysis_label_prediction_selectors_identical")
         _require(type(parsed.partition_selector[-1]) is str
                  and type(condition.settings["split"]) is str
                  and parsed.partition_selector[-1] == condition.settings["split"], "actual_partition_conflicts_with_target")
@@ -140,16 +140,44 @@ def analyze_partition(proposal, *, plan, claim, materials, workspace, max_bytes=
         if "sample_count" in condition.settings:
             count = condition.settings["sample_count"]
             _require(type(count) is int and count == len(partition), "analysis_complete_sample_count_conflicts")
+        extra_settings = set(condition.settings) - {"model", "split", "sample_count"}
+        _require(set(parsed.config_settings_selector) == extra_settings, "analysis_setting_selector_coverage")
+        config, selected_config = {}, None
+        if extra_settings:
+            _require(plan.task.config is not None, "analysis_selected_configuration_missing")
+            config_raw = _read(_actual_file(root, plan.task.config), 65536)
+            _require(config_raw == _read(_actual_file(working, plan.task.config), 65536)
+                     and hashlib.sha256(config_raw).hexdigest() == index[plan.task.config].sha256,
+                     "analysis_configuration_changed")
+            config = json.loads(config_raw.decode("utf-8"), object_pairs_hook=_object, parse_constant=_constant)
+            _require(type(config) is dict, "analysis_configuration_object_required")
+            selected_config = {"path": plan.task.config, "sha256": index[plan.task.config].sha256,
+                               "configuration": config, "selectors": parsed.config_settings_selector}
+        actual_settings = {"model": _select(data, parsed.model_selector), "split": parsed.partition_selector[-1]}
+        if "sample_count" in condition.settings:
+            actual_settings["sample_count"] = len(partition)
+        for name, selector in parsed.config_settings_selector.items():
+            value = _select(config, selector)
+            _require(_digest(value) == _digest(condition.settings[name]), "analysis_configuration_setting_conflicts")
+            actual_settings[name] = value
         metadata = {role: _select(data, getattr(parsed, role + "_selector")) for role in ("dataset", "model", "metric")}
         _require(all(type(v) is str and v.strip() and len(v) <= 128 for v in metadata.values()), "analysis_metadata_type_invalid")
         _require(metadata["dataset"] == condition.dataset and metadata["model"] == condition.settings["model"],
                  "analysis_metadata_conflicts_with_original_condition")
         canonical = {"accuracy": "exact_match_fraction", "exact-match accuracy": "exact_match_fraction",
-                     "mse": "mean_squared_error", "mean squared error": "mean_squared_error"}
+                     "mse": "mean_squared_error", "mean squared error": "mean_squared_error",
+                     "mrr": "mean_reciprocal_rank", "mean reciprocal rank": "mean_reciprocal_rank"}
         _require(canonical.get(metadata["metric"].lower()) == canonical.get((condition.metric or "").lower())
                  == parsed.metric_definition, "analysis_metric_definition_conflicts")
         rows, terms = [], []
         for i, row in enumerate(partition):
+            if parsed.metric_definition == "mean_reciprocal_rank":
+                rank = _select(row, parsed.rank_selector)
+                _require(type(rank) is int and rank > 0 and rank.bit_length() <= 256,
+                         "analysis_rank_positive_integer_required")
+                rows.append({"index": i, "rank": rank})
+                terms.append(1 / rank)
+                continue
             label = _scalar(_select(row, parsed.label_selector), numeric=parsed.metric_definition == "mean_squared_error")
             prediction = _scalar(_select(row, parsed.prediction_selector), numeric=parsed.metric_definition == "mean_squared_error")
             if parsed.metric_definition == "exact_match_fraction":
@@ -164,7 +192,7 @@ def analyze_partition(proposal, *, plan, claim, materials, workspace, max_bytes=
         _require(math.isfinite(total), "nonfinite_analysis_aggregate")
         measurement = {"metric_definition": parsed.metric_definition, "value": total / len(rows),
                        "sample_count": len(rows), "aggregate": total,
-                       "unit": "fraction" if parsed.metric_definition == "exact_match_fraction" else None,
+                       "unit": "fraction" if parsed.metric_definition in {"exact_match_fraction", "mean_reciprocal_rank"} else None,
                        "measurement_authority": "independent host recomputation of complete released partition"}
         from verification.code_scope import _claim_sources
         authorized = _claim_sources(claim, materials)
@@ -212,6 +240,7 @@ def analyze_partition(proposal, *, plan, claim, materials, workspace, max_bytes=
                    "catalog": catalog, "source_files": texts, "artifact_sha256": index[parsed.artifact_path].sha256,
                    "artifact_path": parsed.artifact_path, "rows": rows, "host_measurement": measurement,
                    "unreviewed_metadata": metadata, "paper_artifact_sha256": paper_hashes,
+                   "actual_settings": actual_settings, "selected_config": selected_config,
                    "limits": {"max_bytes": max_bytes, "max_rows": max_rows}}
         context["context_digest"] = _digest(context)
         _require(len(json.dumps(context, ensure_ascii=True, allow_nan=False).encode()) <= 2097152, "analysis_context_capacity")

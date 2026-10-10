@@ -12,6 +12,8 @@ Wholepaper dual-batch v3 actual `b5acca4e6731` ended with rc1 after388.015s:10 l
 
 The actual judge's raw/qualified-derived ambiguity is also repaired. A unique source-qualified observation is selected while the original raw output remains in audit; conflicting values, units or variance reject comparison. Four necessary controls and one unchanged original source-science control pass. Independent review confirmed that every original test function remains unchanged. Full canonical/file output and rank-analysis support are still being implemented and do not inherit qualification from these local checks.
 
+Complete released-rank MRR analysis and protected canonical stdout now have a separately reviewed implementation. Two necessary controls verify full positive-integer rank denominators, independent host values and exact source/config bindings; no y_paper value enters measurement. Host-derived output still needs metered independent semantic qualification and the original judge. Output-file capture is the next implementation step; its launch and receipt guards remain strict until the new producer path is complete. This does not clear the pending original scientific-positive regression group or establish general model inference.
+
 | Original acceptance check | Current verdict | Evidence / next work |
 |---|---|---|
 | 1. pytest passes without weakening or skipping | fail | Preserved56-failure default run;39 repaired,17 pending, final full run required. |
