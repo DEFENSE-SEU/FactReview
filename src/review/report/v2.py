@@ -468,6 +468,7 @@ def render_markdown(
     token_usage=None,
     _checked=False,
     _navigation=None,
+    _ledger_renderer=None,
 ) -> str:
     review = review if _checked else _checked_report(review)
     claims = ordered_claims(review)
@@ -750,6 +751,9 @@ def render_markdown(
     for index, entry in enumerate(review.ledger, 1):
         if _navigation:
             lines.extend(_navigation("ledger", index - 1))
+        if _ledger_renderer is not None:
+            lines += [f"### Run {index}", "", *_ledger_renderer(entry, index - 1)]
+            continue
         lines += [
             f"### Run {index}",
             "",
