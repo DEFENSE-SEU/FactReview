@@ -1,8 +1,8 @@
 # FactReview v2 progress
 
-## 当前 Phase5：完整发布分区运行接线交付，整体验收继续
+## 当前 Phase8：共享Codex职责说明交付，Phase5运行接线已推送
 
-精确远端refactor/method-v2为3f49b375b2c768192219e7a94dd21e3eb09e04be，纯分析候选receipt partition-analysis-implementation/delivery.json SHA DA52CA3D。此前 standalone计量583a6c3/b268e0db、共享stats64cd0ea/a2fa2ed8、提取职责639b45e/b9a0011e、流式hash82c6cfd/80cc066f与科学消费7a1612f/6cfa7409交付保持。仅推送已授权refactor/method-v2，不改main、不开PR。每次局部交付均保持整体goal active。
+精确远端refactor/method-v2为f1fa8e012820637c775abfcdcbe0f35119f55d7b，完整分区运行接线receipt partition-analysis-runtime-delivery/delivery.json SHA56761047cf82da96e758801f9914260d66f849403e699a8d7c2e2ba34d9326fe；此前纯分析候选3f49b375/receipt DA52CA3D保持。此前 standalone计量583a6c3/b268e0db、共享stats64cd0ea/a2fa2ed8、提取职责639b45e/b9a0011e、流式hash82c6cfd/80cc066f与科学消费7a1612f/6cfa7409交付保持。仅推送已授权refactor/method-v2，不改main、不开PR。每次局部交付均保持整体goal active。
 
 本Phase5完整发布分区运行接线已冻结并独审通过：report e9d23cbb8107f142426c7c0576fea6b55eafb8e1e7d7ffc4e4a01dcefb1edaf9，evidence7511daf88284eafdf2890f29b2da2d9d356850ad0ddf16a4dee5ada9213dfda6。只改runtime_science.py、v2.py、partition_analysis schema、新partition_analysis_runtime.py与3-function必要测试。Root完整读报告/证据/源码增量并核最终5源与frozen-final-v3 exact，47作者文件前后不变、9依赖与41旧断言完整保留。git diff --check发现schema多余EOF空行，Root只移除该空行，完整AST相同，schema SHA9213564a→31e0c526；原v3冻结保持，另eof-whitespace.json记录，不重跑测试。核证receipt partition-analysis-runtime-delivery/root-final-inspection.json SHA4968cff2c88bd8f065f1b5ee451f99a87a70bca208e54c60aae47dbb9779fd87。
 
@@ -14,15 +14,15 @@
 
 旧六窗actual-aaf5ec22263c完整73claims/244parsed/284review仍20/75/0adopt、M2/M5 atomicity与scope open；16known调用1515352tokens闭合，末窗两阶段beforeprovider软预算阻断与原保守supervisor标签保留。全部旧actual/source/失败不改，最新全native六项strict delivery失败保持。局部源码/mocks/机械运行不清除这些科学缺口。
 
-共享Codex instructions旧固定GPT-5 execution coding角色与L1/L2/L3/advice共享client科学职责不一致。独立单text修正report ecf3d34f/evidence04d083b9认可通用角色与caller system契约/required rows/真实不确定性/资料不可信要求。此text单独Phase8提交，本Phase5排除；模型/transport/重试/计量/parser/guard未改变。0/23因果及新科学效果未验证。直接Agents SDK路径和非Codex provider不加载此text，loader失败旧fallback仍open。
+共享Codex instructions旧固定GPT-5 execution coding角色与L1/L2/L3/advice共享client科学职责不一致。独立单text修正report ecf3d34f/evidence04d083b9认可通用角色与caller system契约/required rows/真实不确定性/资料不可信要求。本Phase8仅此text+checks/progress独立提交，已交付Phase5没有混入；模型/transport/重试/计量/parser/guard未改变。0/23因果及新科学效果未验证。直接Agents SDK路径和非Codex provider不加载此text，loader失败旧fallback仍open。
 
-repair-memory-design/review.md02df2724/evidence19a2a15f已完成只读设计，尚未实施：_refine旧预览及repair前后全workspace bytes无界；完整SHA/size manifest、workspace外流式raw before/changed-after证据与有界小diff可保留所有尾部/增删变化。后续仅一必要全mock大文件尾部/删除/新增/oversized source控制；不改变max3/infrastructure/实验保护，也不将裁剪源当完整材料。
+repair-memory-design/review.md02df2724/evidence19a2a15f已完成只读设计，尚未实施：_refine旧预览及repair前后全workspace bytes无界；完整SHA/size manifest、workspace外流式raw before/changed-after证据与有界小diff可保留所有尾部/增删变化。独审补查发现bind_source_sites→prepare_site对未完整供给大.py仍无界读，实施范围包含在_site之前拒绝源读取缺口。该批从f1fa8e0精确base由single_recheck_controller_review独立实施，Root不并行改这些源；仅一必要全mock大文件尾部/删除/新增/oversized source控制；不改变max3/infrastructure/实验保护，也不将裁剪源当完整材料。
 
 Decisions：聊天GPT-6.1-sol；FactReview维持openai-codex/GPT-5.5。只做必要验证，LLM/检索/Docker外界mock，旧绿组/整套/旧付费sample不重复。预算/费用缺失保持unknown；新真实验证须新的source/controller/input/admission，consumed授权绝不复用。训练默认0、auto模式记录、repair默认且上限3；单个阻断继续其他工作。
 
 Open issues：整篇科学原子性与独立复核召回/M2/M5、真实analysis资格、通用主动模型/复杂预处理/多condition、文献充分性/native exhaustion、实际OS/daemon恢复、repair及大ledger内存、全流程14项整体验收。
 
-Next action：分别交付本Phase5运行接线与已独审Phase8 Codex职责text；新冻结source上的有界真实复核检验职责效果，保留旧0/23与费用。并行实施最小repair内存修复及受限真实analysis验证设计，不暂停目标。
+Next action：Phase5运行接线已推送并精确核远端，当前单独交付已独审Phase8 Codex职责text；新冻结source上的有界真实复核检验职责效果，保留旧0/23与费用。并行实施最小repair内存修复及受限真实analysis验证设计，不暂停目标。
 
 ## 历史 a7f3b5c Phase8：真实生产 Docker 机械链与整篇覆盖推进
 
