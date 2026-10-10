@@ -1,6 +1,16 @@
 # FactReview v2 progress
 
-## 当前 Phase5：有限值流核验与真实只读 Docker 部署
+## 当前 Phase5：同次补全绑定完整科学主张与源码角色
+
+已接线：普通原资源合同计划的同一次refinement响应同时提供source_sites和flow_proposal。程序传入规范的原主张九科学字段、原完整条件、primary/source_refs实际论文块和实际读取源码，再重建候选绑定；已有非空命令也能补全核验能力，每计划至多一次logical模型请求并记录用量。原argv和metric_output保持，缺命令只生成实际RunRequest命令，原plan不回写。禁用补全、未绑定上下文和version2 recipe保留旧路径。RunRequest携带source_flow与source_flow_files；旧记录仅在比较副本补默认值，不恢复证据。
+
+必要验证：两个新离线控制原红2/.86s→同AST绿2/.65s，直接原补全1/.58s及历史恢复1/.68s。独审指出初版漏source_refs/importance；新增真实补充来源反例红1/.77s，使用原resource_contract规范字段并提供实际引用块后同函数绿1/.58s。原11Assert保持，新增3为14；只复验受影响函数，未重跑已绿组/全套，无服务或新actual。
+
+独审execution-flow-refinement-independent/review-final-v2.md6f79d131 / evidencedc199306核三最终源8b8e22f3、06ddef26、707443a8，Root已读全文并核hash。_execute_graph全部科学比较和_apply_repair保持原AST。原红、初版freeze/报告、字段遗漏及首次元数据检查记录保持。上一批精确远端f429fd004483fd0a4d95055f4e6357ef7b202c94；本批Phase5只提交/推送refactor/method-v2，收据execution-flow-refinement-implementation/delivery.json。
+
+Next action：独立认证运行时producer收据，接实际命令身份和跨运行时纯AST消费，再闭合严格stdout及逐condition科学角色。候选bound仅传递，尚未消费或授资格；缺命令的原plan/actualrequest consumer差异仍开放。此前真实只读Docker验证仍固定于a03源，不授权本批。通用模型、无标量分析、genuine覆盖/M2/M5、完整生产构建/解析及整体验收继续，goal active；不改main、不开PR。
+
+## 历史 f429 Phase5：有限值流核验与真实只读 Docker 部署
 
 新增 runtime_flow.py：从原 claim、完整 condition、资源合同和实际源码重建四角色绑定；独立解释有界 JSON 数值表达式，并与十个实际调用事件的参数、返回、父关系和顺序核对。数据/权重参与只覆盖 AST 实际引用的数值选择器。科学资格、alignment、support 保持 false，stdout 来源尚未绑定。源码和 JSON 先最多读取65,537字节，超出65,536字节即 unresolved，避免先加载整份大文件。
 

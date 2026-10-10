@@ -42,6 +42,8 @@ def _historical_request(value):
     result = dict(value)
     result["plan"] = _historical_plan(result.get("plan"))
     result.setdefault("source_sites", None)
+    result.setdefault("source_flow", None)
+    result.setdefault("source_flow_files", {})
     return result
 
 
