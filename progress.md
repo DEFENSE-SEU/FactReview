@@ -2,7 +2,7 @@
 
 ## 当前回归修复与真实执行 checkpoint（2026-10-11）
 
-Task：继续完整三层框架，目标active；Phase0–7历史实现保留，Phase8整体验收未完成。授权分支`refactor/method-v2`源码checkpoint7bd4a47c79682dadc97d440418ad01d455541f42已推送并核精确远端。当前兼容夹具与真实接口缺陷修复按阶段继续提交，完整目标未暂停。
+Task：继续完整三层框架，目标active；Phase0–7历史实现保留，Phase8整体验收未完成。授权分支`refactor/method-v2`生产源码checkpointf2786581b713c8ed39c18d39ad3d204b165b530d已推送并核精确远端。当前兼容夹具与真实接口缺陷修复按阶段继续提交，完整目标未暂停。
 
 Completed：此前默认pytest结果56failed/3687passed/3原deselected/0skipped，310.59s，原414源码/测试身份在运行前后相同。必要局部修复关闭该56原失败：coverage/report/SDK18、arxiv/literature10、pipeline/visual7、资源identity/path4、执行/framework/共享科学正例17；随后默认全套新终态记录如下。科学夹具迁移保留462原Assert中的460项；两项明确迁移为严格protected mount合同、完整作者发布数据反证从Questioned加强为Flawed，新增4项强反证与2项完整多指标保留断言。没有修改markers、跳过或降级科学正例；旧失败均保留。
 
@@ -20,7 +20,11 @@ Current default regression：固定7bd4a47唯一全套已终态12failed/3741pass
 
 Phase5 path repair：生产observer保留完整32hex nonce；正常槽超过Win32目录/文件UTF16容量时改紧凑槽，仍超则在任何package/placeholder创建前明确observer_path_capacity_exceeded。receipt仅增加严格紧凑格式，完整seal/config/source/resource/actual argv/host及科学资格守卫保持。必要新guard红1/.19s；首次绿阶段发现fixture write_text的CRLF字节差异，保该记录并改write_bytes，原所有断言保持后1pass/.11s。独审无必要阻断；没有缩framework根目录。原framework6+真实缺一首轮review的nestedpartial1同次7pass；另config2仍失败，其试加raw command不属普通L2合同，将撤销并仅为config测试供给明确完整launch输入。另wire2和launcher1全部旧断言保留后3pass，当前12中10已关闭。
 
-Open issues：关闭本次12默认回归失败；Windows路径容量须修生产行为，不能仅缩测试根路径。完整canonical/native输出文件与rank-analysis按实际source、host重算、observer和独立语义合同实现，所有原资格守卫保持。整篇召回/原子性/M2/M5、联合paper evidence、一般NN/多condition及当前完整公开入口报告交付继续开放。整体商业级完成尚无证据。
+Phase8 final affected repairs：本次12原失败必要复核现全部通过：framework6+nestedpartial1为7pass/15.05s，随后只复config2为2pass/5.33s，wire2pass/1.08s、launcher1pass/.60s。config首次重试失败原件保留，非法共享raw command已撤；仅该配置函数在typed计划输入供应真实indexed eval.py完整command后调用原execute_plans，原配置/RunRequest/ledger断言全留，缺observer/science资格与mock transport失败仍如实记录，不赋Supported或qualified。四变更测试268原Assert全部保持，新增5guards。Windows生产独审windows-path-capacity-independent-v1/、wire独审partition-wire-additive-defaults-independent-v1/及共享合同独审已闭合。最终默认全套待新checkpoint一次；Phase8整体仍未完成。
+
+Source for next actual：f278658完整canonical archive216files/31dirs/215Python，较7bd只launch/receipt两文件变、214完全相同。full-public候选frozen-final-v5绑定该源，所有预算/8原输入/控制器逻辑保持，prepare_enabled=false；将在必要最终回归与独审后做独立新准备身份及唯一实际准入。
+
+Open issues：取得当前最终默认全套结果；当前12原失败的必要局部控制已通过，Windows路径已修生产且原根不缩。完整canonical/native输出文件与rank-analysis按实际source、host重算、observer和独立语义合同实现，所有原资格守卫保持。整篇召回/原子性/M2/M5、联合paper evidence、一般NN/多condition及当前完整公开入口报告交付继续开放。整体商业级完成尚无证据。
 
 Completed：发布rank完整MRR及protected canonical stdout第一阶段已实现并独审，三个产品文件和一个必要测试文件；两个必要控制通过。严格positive-int rank全行保留、全分母mean reciprocal rank、原config所有额外条件type-aware/SHA绑定，无paper值参与host测量。原source/资源/条件/完整六角色与metered semantic资格守卫保持，raw/mapping不回填，host数学fraction与未声明Observation.unit=None分列。绿后仅已认证entry全文/SHA附context的静态增量明确记录。相关报告partition-rank-analysis-implementation-v1/，原失败全留。
 

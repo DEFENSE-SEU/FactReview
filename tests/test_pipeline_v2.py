@@ -742,6 +742,17 @@ def test_execution_config_loads_and_only_explicit_cli_options_override_it(
     ]
     monkeypatch.setattr(sys, "argv", argv)
     args = pipeline_full.parse_args()
+    real_execute = pipeline_v2.execute_plans
+
+    def supplied_launch(plans, claims, materials, out_dir, **kwargs):
+        # This configuration control supplies the already indexed fixture
+        # command to the typed execution input; ordinary L2 remains unchanged.
+        assert len(plans) == 1 and plans[0].task.command == []
+        assert plans[0].task.entry_script == "eval.py" and (Path(materials.repository.root) / "eval.py").is_file()
+        plans[0].task.command = ["python", "eval.py"]
+        return real_execute(plans, claims, materials, out_dir, **kwargs)
+
+    monkeypatch.setattr(pipeline_v2, "execute_plans", supplied_launch)
     summary, _, _, runner = run_tiny((args, parser), monkeypatch, render_pdf=False)
     assert summary["stage_errors"] == {}
     request = runner.call_args.args[0]
