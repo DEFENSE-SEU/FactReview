@@ -9,9 +9,12 @@ from copy import deepcopy
 from fact_generation.positioning.structured_query import (
     INTENTS,
     SEEDS,
+    LiteralQueryTerm,
     QueryTerm,
+    StructuredLiteralQuery,
     StructuredPaperQuery,
     digest,
+    parse_structured_query,
 )
 
 
@@ -190,7 +193,7 @@ def build_grounded_plan(claim, materials, *, novelty_ids):
 
 def query_strings(plan):
     return [
-        StructuredPaperQuery.model_validate(q).compile(start=0, limit=1).expression for q in plan["queries"]
+        parse_structured_query(q).compile(start=0, limit=1).expression for q in plan["queries"]
     ]
 
 
@@ -210,6 +213,8 @@ def condition_eligible(plan, cid):
 
 def plan_closed(plan):
     """Every condition witness must be an actual original-covered concept in its query."""
+    if isinstance(plan, dict) and plan.get("version") == "literal-search-plan-v2":
+        return _literal_plan_closed(plan)
     try:
         if plan["digest"] != plan_digest(plan) or not plan["queries"]:
             return False
@@ -247,4 +252,109 @@ def plan_closed(plan):
                         return False
         return True
     except (ValueError, TypeError, KeyError):
+        return False
+
+
+def build_literal_plan(claim, materials, catalog, *, manuscript_targets=None):
+    from verification.literature_search_concepts import catalog_current, scientific_claim_digest
+
+    current = catalog_current(catalog, claim, materials, manuscript_targets)
+    units = [u for u in catalog["request"]["units"] if
+             (u.get("claim_id") == claim.id if claim is not None else u["purpose"] == "global_omission")]
+    reviews = {u["unit_id"]: u for u in catalog["units"]}
+    mapping = {u["unit_id"]: u["condition"]["id"] if claim is not None else u["target_source_id"] for u in units}
+    failed = {uid for f in catalog["failures"] for uid in f["unit_ids"]}
+    concepts = []
+    if current:
+        for item in catalog["concepts"]:
+            ids = [mapping[uid] for uid in item["unit_ids"] if uid in mapping]
+            if ids:
+                concepts.append({**deepcopy(item), "condition_ids": sorted(set(ids))})
+    # Six distinct literals PER search plan. All excluded concepts remain visible.
+    phrases = list(dict.fromkeys(c["phrase"].casefold() for c in concepts))
+    omitted = [c["concept_id"] for c in concepts if c["phrase"].casefold() not in phrases[:6]]
+    selected = [c for c in concepts if c["concept_id"] not in omitted]
+    groups = {}
+    for role in INTENTS:
+        unique = {}
+        for c in selected:
+            if c["role"] != role:
+                continue
+            key = c["phrase"].casefold()
+            if key not in unique:
+                unique[key] = {"concept_id": c["concept_id"], "phrase": c["phrase"], "role": role, "source_concept_ids": []}
+            unique[key]["source_concept_ids"].append(c["concept_id"])
+        groups[role] = [LiteralQueryTerm.model_validate(t) for t in unique.values()]
+    queries = []
+    for role in INTENTS:
+        if not groups[role]:
+            continue
+        role_units = {i for c in selected if c["role"] == role for i in c["condition_ids"]}
+        mechanism_units = {i for c in selected if c["role"] == "mechanism" for i in c["condition_ids"]}
+        # Retain a legitimate setting/protocol-only unit's candidate search scope.
+        roles = ["mechanism", role] if role != "mechanism" and role_units.issubset(mechanism_units) else [role]
+        ids = sorted({i for i in mapping.values() if all(any(c["role"] == r and i in c["condition_ids"] for c in selected) for r in roles)})
+        if not ids:
+            continue
+        queries.append(StructuredLiteralQuery(
+            query_id=f"q{len(queries) + 1}", intent=role, scope_kind="claim" if claim else "global",
+            condition_ids=ids if claim else [], target_ids=[] if claim else ids,
+            groups=[groups[r] for r in roles], participation={i: {r: [c["concept_id"] for c in selected if c["role"] == r and i in c["condition_ids"]] for r in roles} for i in ids},
+            plan_digest="0" * 64,
+        ).model_dump(mode="json"))
+    expressions = [parse_structured_query(q).compile(start=0, limit=1).expression for q in queries]
+    distinct = bool(expressions) and len(expressions) == len(set(expressions))
+    conditions = {}
+    for uid, cid in mapping.items():
+        available = [r for r in INTENTS if any(c["role"] == r and cid in c["condition_ids"] for c in selected)]
+        truncated = any(cid in c["condition_ids"] and c["concept_id"] in omitted for c in concepts)
+        review = reviews.get(uid)
+        eligible = bool(claim and current and uid not in failed and review and
+                        all(review["roles"][r]["status"] == "present" for r in INTENTS) and
+                        len(available) == 3 and not truncated and distinct and len(queries) == 3)
+        conditions[cid] = {"available_roles": available, "missing_roles": [r for r in INTENTS if r not in available],
+                           "truncated": truncated, "eligible": eligible,
+                           "role_review": deepcopy(review), "planning_failed": uid in failed}
+    plan = {"version": "literal-search-plan-v2", "claim_id": claim.id if claim else None,
+            "claim_sha256": scientific_claim_digest(claim) if claim else None,
+            "catalog_digest": catalog["digest"], "catalog_audit": deepcopy(catalog.get("audit")),
+            "input_digest": catalog["input_digest"], "scope_kind": "claim" if claim else "global",
+            "concepts": concepts, "queries": queries, "conditions": conditions,
+            "source_errors": [] if current else ["Concept source/catalog identity unavailable or changed"],
+            "omitted_concepts": omitted, "distinct_queries": distinct,
+            "limitations": ["Only source-bound literal concepts and recorded provider indexes are searched; semantic role/target coverage remains bounded."]}
+    plan["digest"] = plan_digest(plan)
+    for q in plan["queries"]:
+        q["plan_digest"] = plan["digest"]
+    return plan
+
+
+def _literal_plan_closed(plan):
+    try:
+        if plan["digest"] != plan_digest(plan) or not plan["queries"] or plan["source_errors"]:
+            return False
+        concepts = {c["concept_id"]: c for c in plan["concepts"]}
+        if len(concepts) != len(plan["concepts"]):
+            return False
+        for raw in plan["queries"]:
+            q = StructuredLiteralQuery.model_validate(raw)
+            if q.plan_digest != plan["digest"] or q.scope_kind != plan["scope_kind"]:
+                return False
+            q.compile(start=0, limit=1)
+            for group in q.groups:
+                for term in group:
+                    for sid in term.source_concept_ids:
+                        c = concepts[sid]
+                        if sid in plan["omitted_concepts"] or c["phrase"].casefold() != term.phrase.casefold() or c["role"] != term.role:
+                            return False
+            for cid, roles in q.participation.items():
+                if cid not in plan["conditions"]:
+                    return False
+                for role, ids in roles.items():
+                    actual = {sid for group in q.groups for term in group for sid in term.source_concept_ids
+                              if concepts[sid]["role"] == role and cid in concepts[sid]["condition_ids"]}
+                    if set(ids) != actual:
+                        return False
+        return True
+    except (ValueError, KeyError, TypeError):
         return False

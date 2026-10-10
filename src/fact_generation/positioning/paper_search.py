@@ -11,7 +11,7 @@ from urllib.parse import quote_plus, urlsplit, urlunsplit
 import httpx
 
 from fact_generation.positioning.search_scope import SearchRows, paging_facts
-from fact_generation.positioning.structured_query import StructuredPaperQuery
+from fact_generation.positioning.structured_query import StructuredPaperQuery, parse_structured_query
 from preprocessing.parse.markdown_parser import parse_pdf_locally
 from util.arxiv_requests import ARXIV_REQUESTS
 from util.cutoff_date import CutoffDate, filter_papers
@@ -191,7 +191,7 @@ class PaperSearchAdapter:
         return _apply_cutoff_to_search_result(result, cutoff_date)
 
     async def search_structured(self, *, query: StructuredPaperQuery, cutoff_date: CutoffDate | None = None) -> dict:
-        query = StructuredPaperQuery.model_validate(query.model_dump(mode="json"))
+        query = parse_structured_query(query.model_dump(mode="json"))
         compiled = query.compile(start=0, limit=min(16, self.search_cfg.page_size))
         state = await self.get_search_runtime_state()
         if self._search_provider() != "arxiv":
