@@ -1,6 +1,18 @@
 # FactReview v2 progress
 
-## 当前 Phase5：认证固定运行时 producer 收据
+## 当前 Phase5：认证值流消费与执行审计记录
+
+有限consumer内部重新读取固定producer收据，先核原完整plan、flow、实际supplied_files/sites，再用纯AST与原JSON重建十个调用事件及参数/返回/数值影响。认证实际runtime的CodeType事实可在host不跨版本编译；默认直接报告仍要求原exact interpreter/整数optimize/完整CodeType检查。原空plan命令仅在认证分支接受实际python/python3+exactentry，原plan不回写。stdout必须严格等于重建driverreturn加一次换行，引用原stdout/report SHA和事件值；科学资格、alignment、support始终false。
+
+run节点在protected检查后、普通attempt保存前调用consumer，原claim/materials与actualrequest/outcome保持。结果写attempt_N/source_flow_validation.json、logs/environment，再进入原ledger；未携带flow时没有调用。raw0exit、stdout/stderr、issue和observations原样，原judge/repair/训练/审批分支不改，机械witnessed不能产生新Observation或科学证据。历史环境/日志字典能保持附加审计，恢复仍不采纳证据。
+
+必要验证：consumer原接口红2/1.00s→同AST绿2/2.21s；受影响原direct控制1/.74s。receipt快照守卫变更后只复验一个positive1/.95s，前后四源hash一致，初次green未冻结依赖身份如实记录。子agent完成一个run-hook离线集成红1/.87s→同函数绿1/.84s，同时核无flow不调用与witnessed仍不授alignment。无旧绿组/全套/服务或新actual重跑。consumer其余函数AST原样；移除run唯一新增If后整个v2 AST等aff98。
+
+输出：runtime-flow-receipt-implementation/frozen-final/与独审review.mda894ec05/evidence92ec8ee3；runtime-flow-consumption-wiring-implementation/frozen-final/与独审review.md36c190f0/evidenceda5a87fd。最终源6c6d40c7/test3cd2e715、v2 3bf04d15/testa7050f36身份全部一致，Root已读完整报告/增量并核hash。上一批精确远端415193a4d43000edd377fb13a22eebc1edebd0a8；本批仅提交/推送refactor/method-v2，两个delivery.json记同一消费commit。不开PR、不改main。
+
+Next action：完成独立的MSE绝对回归量target修补并审核，随后新的one-shot生产Docker机械部署。准备阶段发现原residual不在闭合绝对量表、原句式也未绑定；原阻断保留，禁止给减法输出添加accuracy语义。新actual将明确使用平方误差源码/合法MSE论文句式，原flow fixture不改。冷builder即便无依赖也升级pip，需要精确缓存或明确60秒冷构建预算；driver未启动。之后闭合逐condition模型/split/指标科学资格与通用执行。genuine覆盖/M2/M5、整体验收仍开放，goal active。
+
+## 历史 415193 Phase5：认证固定运行时 producer 收据
 
 新增 runtime_receipt.py：原独立冻结RunRequest与可信生产RunOutcome是来源前提，程序核只读observer/config原字节、source manifest与资源/完整条件、原command/workdir/sites、唯一实际Docker argv/environment、host审计位置、运行时源码与事件栈及捕获stdout。实际CodeType身份由固定observer在实际interpreter prepare/match；host不编译不同版本。内部SHA不充当签名，received始终保持scientific_qualification/alignment/support=false。
 
