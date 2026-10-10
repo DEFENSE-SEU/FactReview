@@ -1,5 +1,7 @@
 # FactReview v2 acceptance checks
 
+Current checkpoint (2026-10-10): canonical local source spans/scalar guidance pass necessary mock and independent review (`coverage-source-coordinates-implementation/`, independent c4dfd9b6). All248 existing assertions and test bytes remain unchanged. Full-native v6 on013859e is terminal partial; its immutable original review is `full-native-verified-v6/independent-actual-da847148e61a/review.md` (e6f4116a). Lower result tables retain historical frozen checkpoints. The current14-check matrix below controls the present completion claim.
+
 | Current full integration / correction | Verdict | Evidence / limit |
 |---|---|---|
 | Full-native v5 seven-stage orchestration and artifacts | pass with failed overall acceptance | `full-native-verified-v5/actual-35ce0611055b`:8 synthetic claims retained, Markdown/JSON/PDF/teaser gates pass; independent report d23f9eaa. |
@@ -34,20 +36,20 @@ This matrix incorporates the current corrections. Historical passing matrices be
 
 | Check | Current verdict | Remaining acceptance limit |
 |---|---|---|
-| 1. Tests retain their scientific assertions | affected controls pass | Current whole-suite result unavailable; old assertion preservation and narrowly strengthened late-PDF controls recorded. |
+| 1. Tests retain their scientific assertions | necessary controls pass; one stale fixture open | Current whole-suite result unavailable. The pipeline producer control exposes a shared mock missing current search_adequacy; its original failure is retained. No assertion weakening or skip. |
 | 2. Seven-stage orchestration | structurally verified | Real all-stage outputs remain partial; synthetic orchestration cannot prove genuine-paper accuracy. |
-| 3. Upfront uncapped, independently checkable claims | v4 necessary mock and independent source review pass; actual open | Source directory, condition partition, authoritative atoms and independent third-only targets are implemented without a claim cap. Original actual omissions/false qualifier findings remain; genuine v4 recall and materiality are unmeasured. |
-| 4. Claim conditions and source/evidence bindings | bounded mechanical verification | Independent source-condition mismatch counterexample retained and repaired; byte-identical probe plus direct guards pass9 controls. Actual source governance and semantic carrier sufficiency remain open. |
+| 3. Upfront uncapped, independently checkable claims | v4 necessary mock/independent review pass; actual partial | Full-native v6 has7 initial checks and4/7 independent original rechecks. New canonical source-coordinate/scalar guidance is verified locally; genuine73-claim v4 recall/materiality remains unmeasured. |
+| 4. Claim conditions and source/evidence bindings | bounded mechanical verification | Source-condition and original span/container guards remain strict. Sixteen necessary coordinate/carrier controls pass with248 unchanged old assertions. Original v6 three rejected reviews remain unchanged; actual scientific governance/entailment is open. |
 | 5. Needs-based peer dispatch | verified | Global failures now have explicit delivery records; actual evidence adequacy remains separate. |
 | 6. Genuine VLM image/caption/body inputs | bounded actual verification | Full-paper visual quality and unavailable context operations remain open. |
-| 7. Literature cutoff, concurrency and self-exclusion | necessary mock and independent scope review pass; actual open | Native observed exhaustion plus same-response condition-level adequacy gate absence support; partial concrete comparisons remain. Actual scientific search adequacy is unmeasured. Explicit uncited reader failures now retain typed responsibility for affected conditions. |
-| 8. Experiments-only prioritized execution plans | structurally verified | Latest whole actual has zero plans; nonempty genuine whole-flow verification remains open. |
-| 9. Alignment and bounded environment repairs | bounded actual verification | Single released-prediction Docker evidence does not cover general whole-flow execution. |
+| 7. Literature cutoff, concurrency and self-exclusion | necessary mock/independent review; actual bounded | V6 three searches legally hit result budgets and cannot support absence; one uncited non-novelty reading timeout lacks a structured operation record and is being repaired. Genuine search adequacy remains open. |
+| 8. Experiments-only prioritized execution plans | nonempty bounded whole-flow actual | V6 retains one high/ready evaluation plan and one Docker run. Experiment joint-source failures remain explicit; general genuine-paper plans remain open. |
+| 9. Alignment and bounded environment repairs | bounded actual verification | V6 one released-prediction accuracy measurement0.75 is aligned/consistent, auto mode recorded, training0/repairs0/max3. General scientific execution/repair coverage remains open. |
 | 10. Fixed ordered assessment rules | verified at targeted checkpoints | No changed assessment behavior is claimed by this delivery correction. |
 | 11. Four statuses and safe one-way v1 adapter | verified at targeted checkpoints | Historical in_conflict remains questioned without reassessment. |
-| 12. Four-part report, advice and honest delivery | bounded delivery repair verified | Late-teaser healthy PDF sync and formatter fallback pass necessary controls/local navigation/independent review; requested advice service failures, filesystem failure and whole-flow quality remain open. |
+| 12. Four-part report, advice and honest delivery | bounded whole-flow partial artifacts verified | V6 retains7 generated advice and matching JSON/summary/teaser/three PDF partial snapshots. The uncited operation omission is open; appendix size, genuine scientific quality and filesystem-failure delivery remain open. |
 | 13. Original baseline and explicit blockers | recorded | Original actual failures remain intact; latest whole-flow strict acceptance still fails. |
-| 14. Progress and delivery match the workspace | reviewed checkpoint, goal active | PDF phase7/paging phase4/coverage phase3 delivered as2a2805d/2e83a8a/64fce50. Literature phase4 final-v2 independent and root seven-file/history/evidence reviews pass and are being checkpointed. Current-source native integration and genuine v4 semantic review remain pending. Overall framework remains incomplete. |
+| 14. Progress and delivery match the workspace | reviewed checkpoint, goal active | Phase4 scientific adequacy delivered013859e; reviewed phase3 canonical spans are this checkpoint. Unbound-operation producer/fixture and genuine-controller file guards are explicitly in progress. V6 remains immutable partial; overall framework remains incomplete. |
 
 Current phase3 evidence: `original-recheck-semantic-v4-implementation/` and `original-recheck-semantic-v4-independent/review-final.md` (ddb2591e). Necessary initial97 controls pass; independent mismatch repair adds9 narrow controls without repeating that group. All external boundaries are mocked. Existing219 assertions retain218 exactly, with one explicit exhaustive count upgrade to include partial. Root final-v3 frozen/evidence hashes match; earlier preflight is labelled by its v2 source snapshot. These controls do not establish actual entailment, materiality or extraction recall.
 
