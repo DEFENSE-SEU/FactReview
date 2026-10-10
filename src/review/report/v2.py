@@ -796,9 +796,36 @@ def write_review(
         )
     if presentation != "full":
         raise ValueError("Unknown report presentation")
+    return _write_full_package(
+        review, output_dir, issues=issues, render_pdf=render_pdf, token_usage=token_usage,
+        figure_coverage=figure_coverage, figure_context_coverage=figure_context_coverage,
+        table_coverage=table_coverage, table_context_coverage=table_context_coverage,
+        writing_coverage=writing_coverage, claim_coverage=claim_coverage, anonymity_policy=anonymity_policy,
+    )
+
+
+def write_static_review(review, output_dir: Path, *, pdf_keys=(), prior_delivery=None,
+                        presentation="full", **context):
+    """Static delivery from validated records; no advice generation/revalidation."""
+    if presentation == "layered":
+        from review.report.compact import write_static_layered_review
+
+        return write_static_layered_review(review, output_dir, pdf_keys=pdf_keys,
+                                          prior_delivery=prior_delivery, **context)
+    if presentation != "full" or not set(pdf_keys) <= {"pdf"}:
+        raise ValueError("Unknown static presentation or eligible PDF key")
+    return _write_full_package(review, output_dir, static=True, render_pdf="pdf" in pdf_keys,
+                               prior_delivery=prior_delivery or {}, **context)
+
+
+def _write_full_package(review, output_dir: Path, *, static=False, prior_delivery=None,
+                        issues=None, render_pdf=True, token_usage=None, figure_coverage=None,
+                        figure_context_coverage=None, table_coverage=None, table_context_coverage=None,
+                        writing_coverage=None, claim_coverage=None, anonymity_policy=None):
     from review.delivery import checked_delivery
 
-    result = checked_delivery(
+    original = review.model_dump(mode="json", exclude={"review_markdown"})
+    result = review.model_copy(deep=True) if static else checked_delivery(
         _checked_report(review), figure_coverage=figure_coverage, figure_context_coverage=figure_context_coverage,
         table_coverage=table_coverage, table_context_coverage=table_context_coverage,
         writing_coverage=writing_coverage, claim_coverage=claim_coverage,
@@ -806,8 +833,9 @@ def write_review(
     validate_publication_language(
         [result.model_dump(), issues or [], (token_usage or {}).get("warnings", [])]
     )
-    output_dir.mkdir(parents=True, exist_ok=True)
-    result.claims = ordered_claims(result)
+    output_dir.mkdir(parents=True, exist_ok=not static)
+    if not static:
+        result.claims = ordered_claims(result)
     result.review_markdown = render_markdown(
         result,
         issues=issues,
@@ -819,12 +847,16 @@ def write_review(
         claim_coverage=claim_coverage,
         anonymity_policy=anonymity_policy,
         token_usage=token_usage,
+        **({"_checked": True} if static else {}),
     )
+    if static:
+        result.review_markdown += "\nPDF delivery-status snapshots and per-file export details are recorded in report_manifest.json.\n"
     markdown = output_dir / "final_review.md"
     artifact = output_dir / "final_review.json"
     markdown.write_text(result.review_markdown, encoding="utf-8")
     artifact.write_text(result.model_dump_json(indent=2), encoding="utf-8")
     outputs = {"markdown": str(markdown), "json": str(artifact)}
+    pdf_snapshots = {}
     if render_pdf:
         from review.report.pdf_renderer import build_review_report_pdf
 
@@ -864,13 +896,26 @@ def write_review(
             pdf = output_dir / "final_review.pdf"
             pdf.write_bytes(content)
             outputs["pdf"] = str(pdf)
+            if static:
+                pdf_snapshots["pdf"] = {
+                    "phase": "static_finalized",
+                    "delivery": {key: result.model_dump(mode="json")[key]
+                                 for key in ("run_status", "incomplete_stages", "delivery_checks")},
+                    "records_sha256": hashlib.sha256(json.dumps(
+                        result.model_dump(mode="json", exclude={"review_markdown"}),
+                        sort_keys=True, ensure_ascii=False, separators=(",", ":"),
+                    ).encode()).hexdigest(),
+                    "pages": {},
+                }
         except Exception as exc:
             outputs["pdf_error"] = f"{type(exc).__name__}: {exc}"
             from schemas.review import DeliveryCheck
 
             result = checked_delivery(result, additional_checks=[DeliveryCheck(
                 stage="report", component="pdf", state="failed", reason=outputs["pdf_error"],
-            )])
+            ), *([DeliveryCheck(stage="report", component="pdf_delivery_finalization", state="incomplete",
+                               reason="An eligible late-delivery PDF export failed; prior bytes remain in prior_delivery.")]
+                 if static else [])])
             result.review_markdown = render_markdown(
                 result, issues=issues, figure_coverage=figure_coverage,
                 figure_context_coverage=figure_context_coverage, table_coverage=table_coverage,
@@ -880,4 +925,24 @@ def write_review(
             )
             markdown.write_text(result.review_markdown, encoding="utf-8")
             artifact.write_text(result.model_dump_json(indent=2), encoding="utf-8")
+    if static:
+        def nondelivery(value):
+            return {key: item for key, item in value.items()
+                    if key not in {"run_status", "incomplete_stages", "delivery_checks"}}
+        if nondelivery(result.model_dump(mode="json", exclude={"review_markdown"})) != nondelivery(original):
+            raise ValueError("Static full rendering changed non-delivery review records")
+        manifest = {
+            "version": "static-full-report-v1", "model_calls": 0, "static_finalization": True,
+            "prior_delivery": prior_delivery, "pdf_snapshots": pdf_snapshots,
+            "pdf_targets": {"main": {}},
+            "records_equal_saved_json": result.model_dump(mode="json") == json.loads(artifact.read_text("utf-8")),
+            "artifacts": {key: {"name": Path(path).relative_to(output_dir).as_posix(),
+                                "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest(),
+                                "role": "current_delivery"}
+                          for key, path in outputs.items() if not key.endswith("_error")},
+            "render_errors": {key: value for key, value in outputs.items() if key.endswith("_error")},
+        }
+        path = output_dir / "report_manifest.json"
+        path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+        outputs["manifest"] = str(path)
     return outputs

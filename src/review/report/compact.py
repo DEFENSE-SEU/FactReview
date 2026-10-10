@@ -511,6 +511,20 @@ def _build_pdf(review, markdown, context, targets, title):
 
 
 def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context):
+    return _write_layered_package(review, output_dir, render_pdf=render_pdf, **context)
+
+
+def write_static_layered_review(review, output_dir: Path, *, pdf_keys=(), prior_delivery=None, **context):
+    """Render validated records with an explicit eligible PDF set and no reassessment."""
+    if not set(pdf_keys) <= {"pdf", "appendix_pdf", "bundle_pdf"}:
+        raise ValueError("Unknown eligible layered PDF key")
+    return _write_layered_package(review, output_dir, render_pdf=bool(pdf_keys),
+                                  static=True, pdf_keys=frozenset(pdf_keys),
+                                  prior_delivery=prior_delivery or {}, **context)
+
+
+def _write_layered_package(review, output_dir: Path, *, render_pdf=True, static=False,
+                           pdf_keys=None, prior_delivery=None, **context):
     output_dir = Path(output_dir)
     names = (
         "final_review.md",
@@ -530,7 +544,7 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
     original = review.model_dump(mode="json", exclude={"review_markdown"})
     from review.delivery import checked_delivery
 
-    checked = checked_delivery(v2._checked_report(review), **context)
+    checked = review.model_copy(deep=True) if static else checked_delivery(v2._checked_report(review), **context)
     snapshot = checked.model_dump(mode="json", exclude={"review_markdown"})
     v2.validate_publication_language(
         [snapshot, context.get("issues") or [], (context.get("token_usage") or {}).get("warnings", [])]
@@ -584,6 +598,10 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
     appendix += _delivery_context_markdown(context)
     appendix = _attach_markers(appendix)
     main, selection = _compact_markdown(checked, nav, context)
+    if static:
+        notice = "\nPDF delivery-status snapshots and per-file export details are recorded in report_manifest.json.\n"
+        main += notice
+        appendix += notice
     bundle = _pdf_markdown(main, bundle=True) + "\n\n" + _pdf_markdown(appendix, bundle=True)
     output_dir.mkdir(parents=True, exist_ok=True)
     outputs = {}
@@ -618,6 +636,8 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
 
     if render_pdf:
         for name, key, target, title in exports:
+            if static and key not in pdf_keys:
+                continue
             text = {"main": main, "appendix": appendix, "bundle": bundle}[target]
             try:
                 content = (
@@ -661,7 +681,12 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
             final_bundle = _pdf_markdown(final_main, bundle=True) + "\n\n" + _pdf_markdown(final_appendix, bundle=True)
             return final_main, final_appendix, final_bundle
 
-        healthy = [export for export in exports if export[1] in outputs]
+        # Recovery starts with the late-stage status already applied. A new
+        # failure needs a correction only when the status/stage set changes.
+        status_changed = (checked.run_status, checked.incomplete_stages) != (
+            snapshot["run_status"], snapshot["incomplete_stages"],
+        )
+        healthy = [export for export in exports if export[1] in outputs and (not static or status_changed)]
         if healthy:
             history = output_dir / "pdf_history"
             history.mkdir(exist_ok=False)
@@ -691,6 +716,11 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
                     DeliveryCheck(stage="report", component="pdf_delivery_finalization", state="incomplete",
                                   reason="A healthy PDF could not be synchronized; its initial bytes are retained in pdf_history."),
                 ])
+        if static and any(key not in outputs for key in pdf_keys):
+            checked = checked_delivery(checked, additional_checks=[DeliveryCheck(
+                stage="report", component="pdf_delivery_finalization", state="incomplete",
+                reason="An eligible late-delivery PDF export is unavailable; prior PDF bytes remain in prior_delivery.",
+            )])
         main, appendix, bundle = final_texts(checked)
         def nondelivery(value):
             return {key: item for key, item in value.items()
@@ -719,6 +749,7 @@ def write_layered_review(review, output_dir: Path, *, render_pdf=True, **context
     manifest = {
         "version": "layered-report-v1",
         "model_calls": 0,
+        **({"prior_delivery": prior_delivery, "static_finalization": True} if static else {}),
         "navigation": {
             "method": "Internal GoTo in bundle; standalone main gives appendix file and page; Markdown uses sibling links.",
             "bundle_available": "bundle_pdf" in outputs,

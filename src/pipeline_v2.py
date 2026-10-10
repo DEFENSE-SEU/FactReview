@@ -18,7 +18,7 @@ from fact_generation.execution.v2 import ExecutionResult, execute_plans
 from fact_generation.execution.v2_config import ExecutionConfig
 from preprocessing.materials import index_repository, parse_materials
 from review.delivery import checked_delivery
-from review.recovery import interrupted_report_history, write_recovery_review
+from review.recovery import finalize_teaser_review, interrupted_report_history, write_recovery_review
 from review.report.advice import generate_advice
 from review.report.v2 import verification_limitations, write_review
 from review.teaser.v2 import teaser_payload, write_teaser
@@ -512,7 +512,7 @@ def run_v2_pipeline(
                     ))
                 review = checked_delivery(review, stages={"report": "failed"}, additional_checks=checks)
                 review, recovered = write_recovery_review(
-                    review, root / "review" / "report_recovery", **recovery_context(),
+                    review, root / "review" / "report_recovery", render_narrative=False, **recovery_context(),
                 )
                 if history:
                     path = root / "review" / "report_recovery" / "artifact_history.json"
@@ -533,21 +533,21 @@ def run_v2_pipeline(
                     stage="teaser", component="teaser_writer", state="failed",
                     reason=f"Teaser writer raised {type(exc).__name__}. Audit: {root / 'full_pipeline_summary.json'}#/stage_errors/teaser",
                 )]
-                if any(key.startswith("report_") and key.endswith("pdf") for key in summary["outputs"]):
-                    checks.append(DeliveryCheck(
-                        stage="report", component="pdf_delivery_finalization", state="incomplete",
-                        reason="A late teaser failure changed delivery status; earlier PDFs are retained as history.",
-                    ))
                 review = checked_delivery(review, stages={"teaser": "failed"}, additional_checks=checks)
-                review, recovered = write_recovery_review(
-                    review, root / "review" / "delivery_recovery", **recovery_context(),
+                review, recovered = finalize_teaser_review(
+                    review, root / "review" / "delivery_recovery",
+                    prior_outputs=summary["outputs"], report_succeeded=summary["stages"]["report"] == "ok",
+                    presentation=summary["report_presentation"], **recovery_context(),
                 )
                 # Retain every successful earlier artifact under an explicit
                 # historical role; the new paths carry final partial metadata.
                 for key in list(summary["outputs"]):
                     if key.startswith("report_"):
                         summary["outputs"]["history_" + key] = summary["outputs"].pop(key)
-                summary["outputs"].update({"report_" + key: value for key, value in recovered.items()})
+                summary["outputs"].update({"report_" + key: value for key, value in recovered.items()
+                                           if not key.endswith("_error")})
+                summary["stage_errors"].update({"report_" + key.removesuffix("_error"): value
+                                                for key, value in recovered.items() if key.endswith("_error")})
                 payload = root / "review" / "teaser_recovery" / "teaser.json"
                 _save(payload, teaser_payload(review))
                 return {"json": str(payload)}
