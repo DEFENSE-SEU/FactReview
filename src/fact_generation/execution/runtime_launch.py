@@ -74,6 +74,12 @@ def _sha(data):
     return hashlib.sha256(data).hexdigest()
 
 
+def _windows_path_fits(path, *, directory=False):
+    # Ordinary Win32 paths also reserve space for an 8.3 child on mkdir.
+    units = len(str(path).encode("utf-16-le", errors="surrogatepass")) // 2
+    return units < (248 if directory else 260)
+
+
 def _path(value, *, exists=True):
     path = Path(value).absolute()
     for ancestor in (path, *path.parents):
@@ -239,7 +245,21 @@ def prepare_observer_launch(original_command, *, entry_script, workdir, workspac
         if not entry_scope["complete"]:
             raise ValueError("observer_entry_source_capacity")
         container_cwd = "/app" + ("/" + relative_workdir if relative_workdir != "." else "")
-        attempt = f"observer_attempt_{repair_round}_{uuid.uuid4().hex}"
+        nonce = uuid.uuid4().hex
+        attempt = f"observer_attempt_{repair_round}_{nonce}"
+        if sys.platform == "win32":
+            def fits(name):
+                candidate = scratch / name
+                files = [candidate / "events.json"]
+                if metric_output is not None:
+                    files.append(candidate / "metric_output.json")
+                return _windows_path_fits(candidate, directory=True) and all(_windows_path_fits(path) for path in files)
+
+            if not fits(attempt):
+                attempt = f"o{repair_round}_{nonce}"
+            if (not fits(attempt) or not _windows_path_fits(trusted, directory=True)
+                    or any(not _windows_path_fits(trusted / name) for name in ("observer.py", "config.json"))):
+                raise ValueError("observer_path_capacity_exceeded")
         audit_dir = _path(scratch / attempt, exists=False)
         if audit_dir.exists():
             raise ValueError("observer_audit_path_not_fresh")
