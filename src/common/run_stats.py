@@ -246,6 +246,35 @@ def read(path: Path | None = None) -> dict[str, Any]:
         return _read_unlocked(path)
 
 
+def read_initialized(path: Path | None = None) -> dict[str, Any]:
+    """Read initialized accounting without normalizing or replacing unknown history.
+
+    This admission API preserves raw counters. Legacy read/update callers retain
+    their existing tolerant behavior; an absent active path is not initialized.
+    """
+    with _UPDATE_LOCK:
+        target = path or stats_path()
+        if target is None:
+            raise ValueError("usage_not_initialized")
+        payload = json.loads(target.read_text(encoding="utf-8"))
+        if not (type(payload) is dict and type(payload.get("version")) is int
+                and payload["version"] == 1 and type(payload.get("modules")) is dict
+                and set(MODULE_ORDER).issubset(payload["modules"])):
+            raise ValueError("usage_not_initialized")
+        for module in MODULE_ORDER:
+            row = payload["modules"][module]
+            if not (type(row) is dict and set(_empty_module_payload()).issubset(row)):
+                raise ValueError("usage_module_incomplete")
+            usage = row["token_usage"]
+            if not (type(usage) is dict and set(_empty_token_usage()).issubset(usage)
+                    and all(type(usage[key]) is int and usage[key] >= 0 for key in _empty_token_usage())):
+                raise ValueError("usage_tokens_invalid")
+            if not all(type(row[key]) is int and row[key] >= 0
+                       for key in ("failed_requests", "unavailable_usage_requests", "image_count")):
+                raise ValueError("usage_counts_invalid")
+        return payload
+
+
 def _read_unlocked(path: Path | None = None) -> dict[str, Any]:
     target = path or stats_path()
     if target is None or not target.exists():
@@ -570,6 +599,7 @@ __all__ = [
     "log_status",
     "module_scope",
     "read",
+    "read_initialized",
     "record_duration",
     "record_llm_call",
     "record_module_status",

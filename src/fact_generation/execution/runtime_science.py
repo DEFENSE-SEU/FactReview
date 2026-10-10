@@ -174,24 +174,7 @@ def build_consumption_context(proposal, *, plan, claim, materials, request, outc
 
 def _usage_snapshot(path):
     """Read an initialized ledger without repairing missing or malformed history."""
-    with run_stats._UPDATE_LOCK:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    _require(type(payload) is dict and type(payload.get("version")) is int
-             and payload["version"] == 1 and type(payload.get("modules")) is dict
-             and set(run_stats.MODULE_ORDER).issubset(payload["modules"]),
-             "scientific_usage_not_initialized")
-    for module in run_stats.MODULE_ORDER:
-        row = payload["modules"][module]
-        _require(type(row) is dict and set(run_stats._empty_module_payload()).issubset(row),
-                 "scientific_usage_module_incomplete")
-        usage = row["token_usage"]
-        _require(type(usage) is dict and set(run_stats._empty_token_usage()).issubset(usage)
-                 and all(type(usage[key]) is int and usage[key] >= 0
-                         for key in run_stats._empty_token_usage()), "scientific_usage_tokens_invalid")
-        _require(all(type(row[key]) is int and row[key] >= 0
-                     for key in ("failed_requests", "unavailable_usage_requests", "image_count")),
-                 "scientific_usage_counts_invalid")
-    return payload["modules"]["execution"]
+    return run_stats.read_initialized(path)["modules"]["execution"]
 
 
 def qualify_consumption(proposal, *, plan, claim, materials, request, outcome, source_files):
