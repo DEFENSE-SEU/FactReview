@@ -390,8 +390,13 @@ class CurrentClaimReviewV5(Contract):
     other_findings: list[NeedsFinding | UncertainFinding]
     source_block_ids: list[StrictStr] = Field(min_length=1)
     reason: StrictStr = Field(min_length=1)
-    scope_groups: list[ScopeGroup] = Field(min_length=1)
-    scope_atoms: list[ScopeAtomV5]
+    scope_groups: list[ScopeGroup] = Field(
+        min_length=1,
+        description="Disjoint partition of all original conditions. Every relevant atom must cover every condition in its referencing group; separate groups when conditions have different governing atoms.",
+    )
+    scope_atoms: list[ScopeAtomV5] = Field(
+        description="Only source-grounded governing restrictions. Do not create placeholder atoms for non-governing dimensions; their dimension record has atom_ids=[].",
+    )
     source_review_groups: list[ScopeSourceGroupV5]
 
 
@@ -578,6 +583,8 @@ cannot be used. Each atom's conditions must be covered by every referenced sourc
 Use block_local_whole_span or visible_source_spans for exact block-relative Python codepoint
 offsets; end is exclusive. trusted_span is Markdown-global and cannot be an atom offset.
 Partition all original conditions in scope_groups; explicitly close all six existing dimensions.
+Each referenced atom must govern every condition in its scope group. Use separate groups when
+conditions have different governing restrictions; never extend an atom to an unrelated condition.
 Only after assessing sources may a dimension be not_governing with no atoms. Declare each
 restriction ONCE in scope_atoms. Separate independent sampling, budget, augmentation and
 selection restrictions. Each atom explicitly names state, relevant sources and reason.
@@ -587,6 +594,8 @@ settings: a whole-text qualifier may govern several conditions. A named method, 
 algorithm alone does not entail its label/data training budget or sampling protocol. Existing
 explicit parameters must not be declared missing. IDs/source_refs/metadata are forbidden carriers.
 Arrays require actual item leaves; containers/null/empty strings cannot carry preservation.
+claim_path and assertion_path use RFC 6901 JSON Pointer: encode ~ as ~0 and / as ~1 within each
+original key, keeping the unmodified semantic scalar value. Do not split a key containing /.
 For missing atoms give the complete effect: source_setting, materially different alternative,
 original_permits_alternative=true, exact assertion_path/value and explanation. Check whether
 existing semantics already exclude that alternative. Background facts/provenance alone are

@@ -12,7 +12,7 @@ from typing import Any, Literal
 from pydantic import Field, StrictStr, field_validator
 
 from schemas.claim import Contract
-from screening.claim_scope import Dimension, ScopeEffect, ScopeSpan, ScopeState, fingerprint
+from screening.claim_scope import Dimension, ScopeEffect, ScopeSpan, fingerprint
 
 METADATA_KEYS = frozenset({
     "block_id", "availability", "unavailable_reason", "block_digest", "trusted_span",
@@ -82,7 +82,7 @@ def unpack_scope_payload(payload):
 class ScopeCarrierV5(Contract):
     claim_path: StrictStr = Field(
         min_length=1,
-        description="Exact original semantic scalar leaf under /conditions or whole /text. Source/ID metadata is forbidden; path presence alone proves no entailment.",
+        description="Exact RFC 6901 JSON Pointer to an original semantic scalar leaf under /conditions or whole /text. Encode each key's ~ as ~0 and / as ~1. Source/ID metadata is forbidden; path presence alone proves no entailment.",
     )
     claim_value: Any = Field(description="Exact unchanged JSON type and value at this original claim path.")
 
@@ -102,7 +102,9 @@ class ScopeAtomV5(Contract):
     id: StrictStr = Field(min_length=1)
     dimension: Dimension
     condition_ids: list[StrictStr] = Field(min_length=1)
-    state: ScopeState
+    state: Literal["preserved", "missing", "unresolved"] = Field(
+        description="A governing restriction only. Non-governing dimensions have no atom; declare them in dimensions with empty atom_ids.",
+    )
     restriction: StrictStr = Field(min_length=1, description="One authoritative governing restriction.")
     sources: list[ScopeSpan] = Field(min_length=1)
     carriers: list[ScopeCarrierV5] = Field(
