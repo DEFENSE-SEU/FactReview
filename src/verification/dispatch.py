@@ -124,7 +124,10 @@ async def verify_claims(
                 c, m, call=call, output_dir=output_dir / "theory_derivations"
             ),
             EvidenceNeed.CODE: lambda c, m: verify_code(c, m, call=call),
-            EvidenceNeed.EXPERIMENTS: lambda c, m: verify_experiments(c, m, call=call),
+            EvidenceNeed.EXPERIMENTS: lambda c, m: verify_experiments(c, m, call=call, **(
+                {"execution_wire_version": "experiments-execution-v4",
+                 "execution_audit_dir": output_dir / "execution_decisions"}
+                if len(c.conditions) > 1 else {})),
         }
         global_literature = global_literature or literature
     result = VerificationResult(claims=[claim.model_copy(deep=True) for claim in claims])

@@ -506,6 +506,12 @@ def bind_execution_target(claim, condition, reported, materials, *, selector=Non
 
 
 def validate_plan_targets(plan, claim, materials):
+    if plan.execution_origin is not None or plan.id.startswith(claim.id + ".plan.v4."):
+        from verification.execution_wire_v4 import validate_execution_origin_v4
+        try:
+            validate_execution_origin_v4(plan, claim, materials)
+        except (ValueError, OSError, KeyError, TypeError, IndexError, AttributeError) as exc:
+            raise TargetBindingError(f"Ordinary-v4 retained origin unavailable: {exc}") from exc
     ids = [condition.id for condition in plan.target_conditions]
     if (
         plan.claim_id != claim.id
