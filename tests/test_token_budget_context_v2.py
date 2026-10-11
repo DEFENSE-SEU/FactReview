@@ -194,3 +194,13 @@ def test_low_reasoning_effort_applies_only_to_configured_modules(tmp_path, monke
     assert modules["analysis"]["submodules"]["verification.experiments"]["reasoning_effort"] == {"default": 1}
     advice = modules["report_generation"]["submodules"]["report_generation:tests.test_token_budget_context_v2"]
     assert advice["reasoning_effort"] == {"low": 1}
+
+
+def test_writing_index_keeps_only_labels_named_in_the_section():
+    from screening.writing import _section_index
+
+    index = {"complete": False, "entries": [
+        {"kind": "table", "label": "1"}, {"kind": "figure", "label": "12"}, {"kind": "section", "label": "2.1"},
+    ]}
+    blocks = [MaterialBlock(id="b", text="As Table 1 and Section 2.1 show; see Figure 1.2.")]
+    assert [e["label"] for e in _section_index(index, blocks)["entries"]] == ["1", "2.1"]
