@@ -1,9 +1,10 @@
-"""Claim-local paper context for the experiment scope review.
+"""Claim-local paper context for per-claim verification requests.
 
-The scope reviewer selects program-generated source/cell/number IDs that the
-validator resolves back to original text. Restricting the catalog and blocks
-to one claim's neighbourhood shrinks the request; IDs outside it are simply
-unknown to the resolver, so trimmed material cannot be selected.
+Used by the experiment scope review and the Code check. The scope reviewer
+selects program-generated source/cell/number IDs that the validator resolves
+back to original text. Restricting the catalog and blocks to one claim's
+neighbourhood shrinks the request; IDs and blocks outside it are unknown to the
+resolvers, so trimmed material cannot be selected.
 """
 
 from __future__ import annotations
@@ -46,6 +47,9 @@ def scope_block_ids(claim, materials, seed_block_ids=()) -> set[str]:
     blocks = [block for block in everything if block.kind not in _SKIP_KINDS]
     seeds = {claim.source_block_id, *(ref.source_block_id for ref in claim.source_refs), *seed_block_ids}
     seeds = {block_id for block_id in seeds if block_id in position}
+    if not seeds:
+        # An unanchored claim has no neighbourhood; keep every evidence block.
+        return {block.id for block in blocks}
     selected = set(seeds)
     for block_id in seeds:
         for step in (-1, 1):
@@ -60,7 +64,7 @@ def scope_block_ids(claim, materials, seed_block_ids=()) -> set[str]:
         match = _CAPTION.match(block.text)
         if match:
             captions.setdefault((_kind(match.group(1)), match.group(2)), set()).add(block.id)
-    cited = set().union(*(_mentions(by_id[block_id].text) for block_id in seeds)) if seeds else set()
+    cited = set().union(*(_mentions(by_id[block_id].text) for block_id in seeds))
     # A selected caption block is itself a cited table/figure.
     cited |= {key for key, ids in captions.items() if ids & seeds}
     for key in cited:
@@ -69,7 +73,7 @@ def scope_block_ids(claim, materials, seed_block_ids=()) -> set[str]:
         selected |= {block.id for block in blocks if key in _mentions(block.text)}
     terms = condition_terms(claim)
     if terms:
-        anchors = [position[block_id] for block_id in seeds] or [0]
+        anchors = [position[block_id] for block_id in seeds]
         matches = [
             block for block in blocks
             if block.id not in selected

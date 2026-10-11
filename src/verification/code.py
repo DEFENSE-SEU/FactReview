@@ -177,6 +177,10 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
         )
     cfg = checks.resolve_llm_config()
     frozen = CodeSourceContext.capture(claim, materials, sources)
+    from verification.claim_context import local_materials, scope_block_ids
+
+    # Claim-local paper context; a paper quote outside it cannot be cited.
+    paper_context = local_materials(materials, scope_block_ids(claim, materials))
     response = ask(
         "Compare paper descriptions to indexed configs and source: architecture, loss, optimizer, "
         "hyperparameters, data processing, and evaluation protocol. Return output_schema JSON. "
@@ -209,7 +213,7 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
         {
             "claim": claim.model_dump(mode="json"),
             "allowed_condition_ids": [condition.id for condition in claim.conditions],
-            "paper_blocks": [b.model_dump() for b in materials.blocks],
+            "paper_blocks": [b.model_dump() for b in paper_context.blocks],
             "files": {name: _numbered_lines(text) for name, text in sources.items()},
             "source_scope": summary,
             "output_schema": CodeOutput.model_json_schema(),
@@ -309,7 +313,7 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
                         "artifact_sha256": hashes[span.file],
                     }
                 )
-            paper = _paper_pointer(materials, item.paper_block_id, item.paper_quote)
+            paper = _paper_pointer(paper_context, item.paper_block_id, item.paper_quote)
             validated.append((index, item, paper, covered, members))
             if item.additional_sources:
                 joint_members[index] = members

@@ -5,11 +5,13 @@ import json
 
 import pytest
 
+from common.run_stats import run_scope
 from llm.client import LLMConfig
 from schemas.claim import ClaimSourceRef
 from tests.test_experiments_bindings_v2 import ASPECTS, append_block, evidence_for
 from tests.test_experiments_prose_occurrences_v2 import production_case
 from tests.test_prose_numbers_v2 import COMPARE, DECREASE
+from verification.claim_context import dealias
 from verification.experiment_catalog import build_catalog
 from verification.experiments import _bound_prose_pair_choices, verify_experiments
 
@@ -50,7 +52,11 @@ def test_input_lists_the_direct_result_pair_and_canonical_bare_setting_keys(tmp_
         tmp_path, DECREASE if transition else COMPARE, transition=transition
     )
     original = copy.deepcopy((paper[0].model_dump(), candidate, review))
-    result, payload = capture(paper, candidate, review)
+    with run_scope(tmp_path / "stats.json"):
+        result, payload = capture(paper, candidate, review)
+    # The wire carries short ID handles; the scope audit records their originals.
+    (audit_path,) = (tmp_path / "experiment_scope").glob("*.json")
+    payload = dealias(payload, json.loads(audit_path.read_text("utf-8"))["id_aliases"])
     choices = payload["bound_prose_pair_choices"]["c1"]
     assert len(choices) == 1
     choice = choices[0]
