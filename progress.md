@@ -2,7 +2,7 @@
 
 ## 当前完整框架 checkpoint（2026-10-11）
 
-Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送Phase A的4406181、Phase3的c0bb46f、Theory的23a966d、B1的9b4a3411、Phase4 SourceAuthority的692580b0及Phase3默认auto/提取metadata的36212f3aa41b9eb96e148e85e2455f5a43bad098，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
+Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送Phase A的4406181、Phase3的c0bb46f、Theory的23a966d、B1的9b4a3411、Phase4 SourceAuthority的692580b0、Phase3默认auto/提取metadata的36212f3、Phase4统计87e546d及Phase3 VLM的dfea429824c90778c4095da86c7af453a735a19d，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
 
 Completed：最终默认全套仅运行一次，3754passed/3原默认deselected/0skipped/0fail/0error，exit0；pytest538.61s、wrapper541.797s。419源码/测试/config身份前后完全一致，原断言、marker及外部mock保持。报告final-default-regression-final-path-fixtures-v1/report.md；原56失败、后续12失败及所有局部红绿记录完整保留。原14验收第1项保留有界通过，第2及8项完整链失败；科学及商业完成仍需独立证据。
 
@@ -24,13 +24,17 @@ Completed Phase3 extraction metadata identity：标题/摘要追加原snapshot�
 
 Completed Phase4 released-statistics：8产品及新公共控制保持frozen-final-v3；default仅在完整单condition且旧健康choice为空时启用v5，显式v3/多condition v4保留。完整原Claim/条件实际值/完整数值fragment、资源recipe及raw lineage逐层重建；host全行独立N/C/I/accuracy，原论文count只接受独立原始整数token，不用论文accuracy推count。合成N100/C75/I25正控S，实际74/26即使accuracy差.01仍与原计数不符；composition未决/fragment缺/75只在0.75子串中均U且零plan。最终新public1pass/10.05s，所有材料已统一N100并保早期不一致fixture/失败。原兼容仅一次3pass/11.87s、21相关身份前后同；单public_verify keyword显式v3，逆整模块AST/63Assert同，原898科学Assert保持。Root全文产品独审46facts及后续兼容38facts闭合：released-statistics-root-independent-v1/report.md、root-statistics-vlm-static-close-v1/report.md 1aa56eb9/verification91104d2e；Root未复pytest或真实服务。12路径Phase4已提交并推送87e546d918bf054ad76e31556dff4af70719cf35，exact remote同；shared v2仍cf7b6325后才顺序授权NN接线，真实全链待新实际。
 
-Completed Phase3 VLM category completion：2源及新public27Assert控制已独审，三现有category均需具体评估行；missing/empty保有效发现并unavailable，clear不生Finding，原PDF/crop/caption/body身份及最后source守卫保持。新必要1pass/2.82s，原红及caption/reference fixture纠正保留，绿后仅import整理。8旧健康外部模型mock补缺类，不修改原失败/空/来源变动；464原Assert中463同，唯一empty status加强为unavailable并增加缺类原因，final465；原签名/markers同。必要旧3节点一次3pass/17.99s、exit0/JUnit零fail/error/skip，原WMI faulthandler警告保留，同进程自然结束未重跑。Root全文独审source34facts与migration41facts闭合，report09385cdd及收口1aa56eb9/verification91104d2e；README原默认单请求句同步auto/legacy，独立9852a548为纯文字增量。新mock不证明真实VLM质量或整篇完成，待Phase3提交。
+Completed Phase3 VLM category completion：2源及新public27Assert控制已独审，三现有category均需具体评估行；missing/empty保有效发现并unavailable，clear不生Finding，原PDF/crop/caption/body身份及最后source守卫保持。新必要1pass/2.82s，原红及caption/reference fixture纠正保留，绿后仅import整理。8旧健康外部模型mock补缺类，不修改原失败/空/来源变动；464原Assert中463同，唯一empty status加强为unavailable并增加缺类原因，final465；原签名/markers同。必要旧3节点一次3pass/17.99s、exit0/JUnit零fail/error/skip，原WMI faulthandler警告保留，同进程自然结束未重跑。Root全文独审source34facts与migration41facts闭合，report09385cdd及收口1aa56eb9/verification91104d2e；README原默认单请求句同步auto/legacy，独立9852a548为纯文字增量。14路径已提交/push dfea429 exactremote，统计/VLM双交付receipt ee346e64分别列tested工作SHA及Git blobs。新mock不证明真实VLM质量或整篇完成。
 
-Open issues：真实完整链仍失败，终态内容独审最终2c75c1dd及旧因果更正保留：claim011是single-source同义authorassertion自循环，joint消费者未被调用；新SourceAuthority实际分类未验证，其他分支/shown_derivation继续开放。旧0plan的correct_predictions/完整fragment缺口已有有限统计消费者，真实模型能否完整消费仍待验证。有限CPU Torch独审f53ad331发现准入失败误阻合法入口、foreign计算未封闭、跨批次常量Tensor调用身份三阻断，作者正在修复并获顺序shared v2接线授权。真实checkpoint/Module/样本ID/完整split/模型输出到metric输入及host重算需各自证据；宿主和已批准Docker均无Torch环境，未安装或实际验证。原Dataset无真实ID不能用host ordinal补观测；合法constant/zero/unused可测，未知dtype/codec/版本/来源继续U。B2 choice/fullfragment、一般NN、整篇召回/原子性/M2/M5、联合paper evidence、真实分类质量和literal list条件语义继续开放。
+Preparation：新统计整篇actual完整Git dfea源已归档219files/31dirs，新增v4 wire/Authority/statistics三个模块、相对f278改20file无删除；archive06efa9b3及identity772176e3于statistics-vlm-canonical-source-root-v1，排除NN脏源且0应用导入。两个agent继续新controller完整被动raw/Authority/分批/VLM/非空L3核验，限定设计独审955a85b4关闭13facts/23稳定原件；最终checker冻结独审和Root新一次prepare/admission待完成。旧8actual输入/4发布行不改，不使用100row单元fixture作为实际科学输入。
+
+Preparation NN：final-v1接线mock1pass/6.69s覆盖健康与跨两批同constant-buffer、bad-state/ID零semantic/Evidence，所有外界mock且未assessment。原wired1fail/1.95s因CommandResult.command误用，产品改cmd后同testbytes绿，历史三red另留。独审确认B1/B3及foreign最小B2修复，又发现直接C级TorchScript可绕Python来源检查，B4作为发布阻断继续修，final-v1不改写。Root官方CPU环境v1第一次build17.61s失败，原因裸FROM SHA被Docker当repo、未到pip；新独立v2改实际python@sha256摘要后build一次99.141s成功。readonly/offlineCPU环境probe一次3.687s成功：Torch2.14.0+cpu、image d91d7fbb…、2362实际包文件/523440762B、manifest1179241d…，operator environment-policy记录；无host安装、训练、LLM或作者科学执行。该环境尚未证明NN科学资格。
+
+Open issues：真实完整链仍失败，终态内容独审最终2c75c1dd及旧因果更正保留：claim011是single-source同义authorassertion自循环，joint消费者未被调用；新SourceAuthority实际分类未验证，其他分支/shown_derivation继续开放。旧0plan的correct_predictions/完整fragment缺口已有有限统计消费者，真实模型能否完整消费仍待验证。有限CPU Torch接线有界mock绿、环境已准备；B4 compiled-mode须机械拒绝后独审交付，真实checkpoint/Module/样本ID/完整split/模型输出到metric输入及host重算需实际证据。原Dataset无真实ID不能用host ordinal补观测；合法constant/zero/unused可测，未知dtype/codec/版本/来源继续U。B2 choice/fullfragment、一般NN、整篇召回/原子性/M2/M5、联合paper evidence、真实分类质量和literal list条件语义继续开放。
 
 Decisions：已有repair3上限3、auto加可选interactive并记录模式、training0、deadline及获准arxiv fallback、集中原容差、v1 conflict→questioned保持。不会因mock全套通过或两页材料实际成功宣告商业完成。当前fixed f278实际证据与随后多条件源码/测试证据分别绑定各自身份。
 
-Next action：提交并推送VLM类别合同及精确fixture/README迁移，继续NN修复/接线与独审。两个agent并行准备/审核全新完整公开入口controller草稿，当前source_pending且prepare/admission关闭，旧actual/auth绝不复用。新统计/VLM actual源待精确commit全源冻结；原完整paper/crops/所有窗口/fullClaim/实际请求lineage和硬预算保留，不制造科学输入。某项服务或能力受阻时继续其他框架工作，目标active。checks.md当前14表12项窄通过、2项完整链失败；Phase8整体开放。
+Next action：完成统计整篇controller被动检查器、最终独审、新一次离线prepare与准入，再运行真实完整公开入口；并行收口NN B4、独审提交及已准备CPU环境的实际有限推理验证。原完整paper/crops/所有窗口/fullClaim/实际请求lineage和预算保留，不制造科学输入、不复用旧auth。某项服务或能力受阻时继续其他框架工作，目标active。checks.md当前14表12项窄通过、2项完整链失败；Phase8整体开放。
 
 ## 历史回归修复与真实执行 checkpoint（2026-10-11）
 
