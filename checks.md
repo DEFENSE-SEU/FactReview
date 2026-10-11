@@ -21,7 +21,7 @@
 | 13. 基线比较与阻断记录 | 有界通过 | 历史比较与阻断保留，不据此宣称商业完成。 |
 | 14. 当前工作记录 | 有界通过 | 实际失败、已交付修复、进行中工作和下一步分别记录。 |
 
-NN v3唯一实际 `actual-894da6c8ef3a` 已结束：supervisor rc1/80.609s，模型1 logical/1 physical/9848 known，accounting closed；作者1次exit0/42.047s，0 image inspect/host metric/semantic Evidence，状态Unverified。Root全文读并核SHA接受终态独审0bc45be6/evidence52c4c509的34项身份/预算事实。新安全sidecar只定位 `proposal.sites / value_error`；具体违反键集合、范围或互异约束中的哪一项仍未知。私有答复未解析或重放，原once已消费；唯一提示合同修正已完成，独审待完成，未运行新NN实际。
+NN v3唯一实际 `actual-894da6c8ef3a` 已结束：supervisor rc1/80.609s，模型1 logical/1 physical/9848 known，accounting closed；作者1次exit0/42.047s，0 image inspect/host metric/semantic Evidence，状态Unverified。Root全文读并核SHA接受终态独审0bc45be6/evidence52c4c509的34项身份/预算事实。新安全sidecar只定位 `proposal.sites / value_error`；具体违反键集合、范围或互异约束中的哪一项仍未知。私有答复未解析或重放，原once已消费；最窄提示修正已获独审9c6158a8接受26项，Root全文读并核SHA；唯一inference Constant明确四keys/四互异整数范围/同次实际函数。完整其他AST、229原test目录文件、57旁侧源保持，Ruff/compile通过，无新pytest或实际调用，未授予新NN科学资格。
 
 整篇v4 controller独审893963af接受26项有限事实，Root全文阅读后一次离线释放bf20cdec，一次prepare rc0/3.7615s得到 `prepared-05f3e1b17653`。prepared独审c8764877/evidence e3cf47d7接受30项事实，Root全文读报告并核SHA后创建新once7fbb583c，进入唯一实际 `actual-726d457fff37`（原session48979已结束，supervised195cf9d1ee34）。rc1/272.015s，七stage返回但fullchain失败，main16logical/16physical/111984known/missing2/blocked28未closed；readiness1/1/188 closed，0计划/0 Docker。fig三类别完成，table视觉入口发生公开pre-SSE EOF；两条unknown记录是否对应真实transport不能由聚合计数证明。first要求12职责，仅10 lowering有效，008/009原子来源被原unique/visible/considered守卫拒绝，original0/12。完整407源码221文件/31目录、原输入/预算与全部科学门限保留，终态独审与最窄提示修复继续；statistics v6在此实际未获执行资格。
 
