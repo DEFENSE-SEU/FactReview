@@ -1,5 +1,15 @@
 # FactReview v2 progress
 
+2026-10-11 Phase 8 继续：Full9 actual-3f61ee15b18f 已结束 rc1/443.781s，固定来源 0795838 的完整 228 文件、prepared d27276f9、Root 接收 9fa3fe1e、唯一授权 72a19be2 保持。既定词法投影 driver97b6b99a/supervisor3c2f27b7/observer67370a8a/summaryc1ac9514/verification973a3165 确认：七阶段返回结果，整体 partial，screening/verification/report 未完成；10 条主张全部 Unverified、建议0/不可用10、计划0，无本次作者 Docker 验证。main 10 logical/10 physical/131194 known tokens，missing usage1、blocked35、closed=false，readiness 1/171 闭合。35 是拒绝记录计数，具体原始失败及各拒绝类型尚未知；没有估填用量或重跑。原严格失败与 scientific/commercial=false 保持，独立终态审核进行中。
+
+Phase 5 exact settings 指令修复已独审接受：共享 inference 提示新增6行735B，candidate/canonical 均要求完整 settings 键集合及原配置原值，缺真实字段保持 null/unresolved。原 binder/schema/localization/配置/科学门/调用数量和预算代码保持。唯一原 mock 节点加入4个缺键/多键控制，原47 Assert全部保留至49；一次1passed/7.06s、Ruff两文件及被动compile2通过。首次插件配置 rc4/no tests ran 原失败收据保留。独审 report e9de4529/facts573eba91，Root核27作者/5独审/37映射对象及当前两文件，接收 c1e61b30。实际 NN8 只证明 key 集合不一致，成员未知；真实模型改善尚未验证。
+
+NN8 已结束 rc1/47.547s，作者代码一次 rc0，1 模型调用/12436 known tokens 且用量闭合，Evidence0/Unverified。独立有限终态报告 3c9a5d9f、Root 接收 9ea9a9ce 保留原 19 项中的 7 项失败。已有绑定文件的三字段安全投影 89c56d9d 确认 pre-run 拒绝码 every_condition_setting_requires_actual_config_selector：选择器与目标设置键集合不一致，具体缺失或额外成员未知。公开接口调查 d46974b3 未发现 schema/wire 或初始化顺序不相容。NN8 来源 605 未含后续 P2/P4 修复，Full9 来源 079 包含两项修复；两次实际均不含本次提示修复，整链和执行计划第2/8项继续未通过。
+
+Root 当前收据：完整来源接收 materials-joint-canonical-source-acceptance-root-v1/receipt.json（16e4c13e）；Full9 来源与控制器接收 full-v9-bound-release-acceptance-root-v1/receipt.json（155f4838），release 44587713、status c86db05f、prepared 接收 9fa3fe1e；NN8 终态接收 nn-v8-terminal-acceptance-root-v1/receipt.json（9ea9a9ce），绑定程序字段接收 14559be1/投影 89c56d9d。新的固定路径 selector 经另一 agent 静审，以 python -I -X utf8 -B 一次执行，没有重跑模型或 Docker。Root 前置误参数/store 与离线接收错误字段失败均保留；没有替换 grant、放宽原判据或重放旧实际。Full9 固定 observer 仅记录 Experiments invoke_or_branch_contract/failed 两次，原科学子守卫 sidecar absent；完整来源/输入/执行来源/控制器/导入变化均0，checkout 32 项只作诊断。下一动作：接收 Full9 失败终态独审，提交推送已审 exact settings 修复，准备包含修复的完整来源和新NN验证；以有限程序字段定位用量缺失后继续处理真实框架缺口。整体目标保持 active。
+
+以下记录保留各自时点。
+
 2026-10-11 Phase 2 来源缺段修复已交付：非空 MinerU 列表遗漏的完整 Markdown 段落和真实标题在共享材料形成前物化，原 parser 对象/字段/ID/次序及图表行关联保持，新来源有精确字符区间、稳定摘要 ID、page=None 和明确说明。partial overlap 与不确定插入继续 unavailable。v1/v2/v3 的嵌套 HTML、PI/CDATA/声明及 subset PI 反例均保留；v4 获另一 agent 限定接受，report 4ed6d3df / facts ce2bb50e，Root 全文读取并核28新与100历史对象、六旁侧合同和当前两文件，接受收据 bfbdac5a。唯一同字节组合 mock v3 红1.20s→v4 绿0.87s，原76 Assert保持至90、Ruff/被动compile2通过；原四相关节点仅沿用v1收据，不重复通过测试。有限词法、原raw heading section行为、物理页恢复、真实召回及prompt容量限制保持；方法2/8仍未通过。
 
 第三层新NN8已绑定已接受605e6c8完整228文件/31目录来源，9控制器/16输入、原19检查与2调用/100000 token/单次作者运行预算保持；controller/release/selector/status均获独审，Root收据f3104d46/10f3931e。唯一离线prepare-335fa2985a97已rc0（manifest09929af1），应用/模型/作者执行计数全0，独立prepared身份审核中，尚无新actual。Root首次误传PLACEHOLDER被原release门预写拒绝、27文件原样，失败记录f5133b7b保留；远端TLS失败后精确核对334e329成功，原四tracked fixture的Git blob/换行属性已核，收据30563b6e。整篇Full9闭合草案11控制器/8原输入获独审34ffe92f，Root接受aacca41e；待新提交canonical和来源绑定，全部准入仍关闭。
