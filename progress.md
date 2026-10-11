@@ -1,5 +1,7 @@
 # FactReview v2 progress
 
+Completed Phase3 wire派生来源修复：Root全文读不同agent独审2055fcd9/facts07bab9f6并核4对象，接受21有限事实。仅preserved/finding两派生列表有序唯一化，完整原span、原claim/context/blocks、科学carrier/effect、全部source authority/重复原始输入门限保持；source f87a5099/test8909dd0a，整模块byte inverse及8原选段恒等。必要2failed/.33s→2passed/.21s，Ruff/静态compile，无新外部调用；逐命令test SHA未独立落盘，红绿身份依Root最终冻结proof绑定，独审准确保留收据限制。实际v5根因unknown，本批只交付有界适配器修复。
+
 Completed Phase3 first-duty 恢复：Root全文读作者e4eff661、完整diff/新test及不同agent独审23980c7e/factsfdf8fe71，核作者21对象与独审8对象，接受21有限事实。来源ACK/完整父输入/独立packed raw typed回执/原科学门限/每window一次wave/预算预留/整批整行选择和原失败保留均闭合；valid unresolved不重问。30旧函数全文及外层AST逆关系精确保持，仅两response metadata读取保护兼容服务失败。必要同test红1/.1.20s→绿1/35.28s、旧必要节点1/5.92s、Ruff/compile；实际初始reading资格和全链完成仍未知。只提交两源、唯一新test与记录，wire的后续两表达式变化单独审查。
 
 当前增量（2026-10-11）：first-duty 一次恢复作者已停止修改并冻结，Root全文读完整diff/新test/报告并核21对象，最终coverage2c8c5e40/first4c48c8a7/test662e0669；必要同字节旧源红→新源1passed35.28s、旧必要节点1passed5.92s，另agent独审中。Root wire两表达式有序唯一化已完成真实消费复现：相同mock旧2failed/.33s→新2passed/.21s，final f87a5099/test8909dd0a，整个源逆bytes/AST与8原选段恒等，Ruff/静态compile通过，等待另一agent独审。仅派生block列表变化，完整原span/科学值/raw来源重复门限保留；旧actual是否触发此路径未知。
