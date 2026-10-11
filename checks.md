@@ -2,6 +2,8 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+Completed Phase5本轮修复：inference专用prompt和payload补原授权catalog及精确块内Unicode坐标，原slice/唯一性/所选条件授权顺序与ValueError保持；新增诊断仅六角色及三个strict bool/null。Root接受不同agent独审0598d4a2/facts6c859a5f的17有限事实并核4冻结对象eff0e854，当前owned_refine eecf7872、runtime df1dbab3、新test46ba36d5一致。必要相关mock5passed/8.16s、Ruff/compile通过；初版红绿测试随后增强，保留该身份限制。一般plan intake仅隔离PydanticSerializationError和严格单项JSON编码ValueError/TypeError，共同材料/身份/未知异常/侧车落盘失败保持全局失败；所有健康origin审批前冻结、排序空位与late revalidation保持。Root接受独审acea5dc2/factsd8043d0d的18有限事实并核4冻结对象11a40dfd；当前v2 3c928ac7/recovery e0a37799/newtest5ff463b9同冻结。唯一同字节新mock旧源3failed→最终相关集合28passed/4.266s，227指定旧tests未改，科学validator与原执行loop保持。当前源码尚未启动新实际；方法2/8保持未通过。
+
 Fullv6 已结束并接受独立终审：report06e6d867/facts0009bbb2，21项来源与程序事实通过，Root全文读取报告、允许字段事实及核4个冻结对象。唯一actual9bf8f16d8fb1保持rc1/partial_usage_unknown（1370.563s）；七stage ok，11条S5/F0/Q1/U5，first6/11、original0/11、plans0/无作者Docker。五条first均为原固定atomicity/qualifiers unresolved；完整typed lowering与初始请求有效，机械retry不适用。main49/49/426456known，missing2/blocked10/closed=false；readiness另1/1/171closed，未知用量保留。实验固定码joint_final_validation_failed尚未定位具体科学子条件。以下“仍运行”条目为历史快照，当前两个actual都已结束，旧once不可复用。
 
 本次Phase8局部闭合已接受：records recovery再次失败时返回原verified claims、空ledger和execution.recovery/unavailable，继续assessment/report/teaser；原primary错误与科学证据保留。必要mock最终同字节旧源1failed/1passed→新源2passed/6.34s，Ruff/compile通过；不同agent独审736bffe5/factsfd0b5433接受12有限事实，Root核5冻结对象及当前两文件。报告JSON/Markdown、summary直接由mock核证；teaser字段由原消费者静态核证，mock只直接确认其stage成功。全局claim复制/编码及其他下游持久化故障仍开放。NN来源合同修复已获17事实独审，intake隔离28个必要相关mock通过、独审进行中；科学整链未获得新资格。

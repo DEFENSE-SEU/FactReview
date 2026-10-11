@@ -174,6 +174,32 @@ def _write_schema_validation_diagnostics(request, error, materials):
         pass
 
 
+def _write_paper_scope_diagnostics(request, error, materials):
+    """Write only fixed roles and short-circuit booleans outside author mounts."""
+    try:
+        detail = getattr(error, "paper_scope_diagnostics", None)
+        fields = ("span_matches", "quote_unique", "authorized_source_matches")
+        if (type(detail) is not dict or set(detail) != {"role", "checks"}
+                or type(detail["role"]) is not str or detail["role"] not in ROLES
+                or type(detail["checks"]) is not dict or set(detail["checks"]) != set(fields)
+                or any(value is not None and type(value) is not bool for value in detail["checks"].values())):
+            return
+        if type(request.repair_round) is not int or not 0 <= request.repair_round <= 3:
+            return
+        run_dir = plain_path(Path(request.run_dir)).resolve(strict=True)
+        path = plain_path(run_dir / f"attempt_{request.repair_round}" / "inference_paper_scope_diagnostics.json")
+        if any(path.is_relative_to(plain_path(Path(root)).resolve(strict=True)) for root in
+               (request.workspace, materials.repository.root)):
+            return
+        payload = {"schema": "torch-inference-paper-scope-diagnostics-v1", "role": detail["role"],
+                   "checks": {field: detail["checks"][field] for field in fields}}
+        with path.open("x", encoding="utf-8") as stream:
+            json.dump(payload, stream, allow_nan=False)
+            stream.write("\n")
+    except (OSError, ValueError, TypeError, AttributeError):
+        pass
+
+
 def bind_inference_request(request, *, claim, materials):
     """Program-owned attempt binding; errors retain the legal unobserved run."""
     try:
@@ -188,6 +214,8 @@ def bind_inference_request(request, *, claim, materials):
                         if isinstance(exc, error_type)), "binding_exception")
         if type(exc) is ValueError and len(exc.args) == 1 and type(exc.args[0]) is str:
             failure = exc.args[0] if exc.args[0] in _BINDING_GUARD_CODES else "local_requirement_failed"
+            if failure == "paper_source_scope_mismatch":
+                _write_paper_scope_diagnostics(request, exc, materials)
         return {"status":"unresolved","reason":"inference_request_binding_unavailable",
                 "binding_failure": failure}
 
@@ -195,6 +223,21 @@ def bind_inference_request(request, *, claim, materials):
 def require(value, reason):
     if not value:
         raise ValueError(reason)
+
+
+def _require_paper_source_scope(paper, block, condition_id, original_sources, role):
+    checks = {"span_matches": block.text[paper.start:paper.end] == paper.quote,
+              "quote_unique": None, "authorized_source_matches": None}
+    if checks["span_matches"]:
+        checks["quote_unique"] = block.text.count(paper.quote) == 1
+        if checks["quote_unique"]:
+            checks["authorized_source_matches"] = any(
+                row["block_id"] == paper.block_id and condition_id in row["covered"]
+                and paper.quote in row["quote"] for row in original_sources.values())
+    if checks["authorized_source_matches"] is not True:
+        error = ValueError("paper_source_scope_mismatch")
+        error.paper_scope_diagnostics = {"role": role, "checks": checks}
+        raise error
 
 
 def file_sha(path):
@@ -318,9 +361,7 @@ def bind_inference_proposal(proposal, *, plan, claim, materials, workspace, sour
     for role in ROLES:
         paper, source = parsed.paper[role], parsed.sources[role]
         block = blocks[paper.block_id]
-        require(block.text[paper.start:paper.end] == paper.quote and block.text.count(paper.quote) == 1
-                and any(row["block_id"] == paper.block_id and parsed.condition_id in row["covered"]
-                        and paper.quote in row["quote"] for row in original_sources.values()), "paper_source_scope_mismatch")
+        _require_paper_source_scope(paper, block, parsed.condition_id, original_sources, role)
         require(files[source.path][source.start:source.end] == source.quote and
                 files[source.path].count(source.quote) == 1, "actual_source_span_mismatch")
         catalog["paper/"+role] = {**paper.model_dump(), "block_sha256": hashlib.sha256(block.text.encode()).hexdigest()}

@@ -343,7 +343,10 @@ def _refine(
                 input_payload["science_proposal_schema"] = PartitionRuntimeProposal.model_json_schema()
             elif inference_scope:
                 from schemas.runtime_science import TorchInferenceProposal
+                from verification.code_scope import _claim_sources
+
                 input_payload["science_proposal_schema"] = TorchInferenceProposal.model_json_schema()
+                input_payload["paper_claim_sources"] = list(_claim_sources(claim, materials).values())
             source_ids = {claim.source_block_id, *(ref.source_block_id for ref in claim.source_refs)}
             input_payload["paper_sources"] = [
                 {"id": block.id, "text": block.text, "loc": block.loc.model_dump(mode="json")}
@@ -418,6 +421,14 @@ def _refine(
                 "command, seed, configuration and all scientific_claim conditions; select one original target with "
                 "all shared qualifiers. science_proposal.paper and science_proposal.sources must each have exactly "
                 "the six keys dataset, split, model, metric, population and qualifiers, with no missing or extra keys. "
+                "Each paper leaf has only block_id, quote, start and end. Its span is block-local, "
+                "zero-based Unicode codepoint [start,end) into the corresponding decoded block.text in "
+                "paper_sources; end is exclusive. The slice must exactly equal quote, and quote must be unique "
+                "within that block. Each paper quote must be contained in a paper_claim_sources quote with "
+                "the same block_id and covered containing the selected condition_id. Other text in the same "
+                "block does not authorize a source for that condition. Each source leaf has only path, quote, "
+                "start and end, using the same codepoint [start,end) convention within its complete supplied "
+                "science_files text; the source slice must exactly equal its unique quote. "
                 "Six exact original paper/source definitions establish dataset, split, model, "
                 "metric, population and qualifiers; model and metric quotes contain their full functions. Missing "
                 "provenance, unsafe dependencies, transforms or unsupported selectors require no proposal. No "
@@ -1242,14 +1253,33 @@ def _revalidate_targets(plan, claim, materials, ledger, phase):
         return {}, reason
 
 
-def _resource_origin(plan, materials):
-    value = {
-        "plan": plan.model_dump(mode="json"),
-        "repository": materials.repository.model_dump(mode="json") if materials.repository else None,
-    }
+def _resource_digest(plan_snapshot, repository_snapshot):
+    value = {"plan": plan_snapshot, "repository": repository_snapshot}
     return hashlib.sha256(json.dumps(
         value, sort_keys=True, ensure_ascii=False, allow_nan=False,
     ).encode("utf-8")).hexdigest()
+
+
+def _resource_origin(plan, materials):
+    return _resource_digest(
+        plan.model_dump(mode="json"),
+        materials.repository.model_dump(mode="json") if materials.repository else None,
+    )
+
+
+class _IntakeUnavailable(Contract):
+    """Program-only intake failure; it confers no plan or scientific identity."""
+
+    schema_id: Literal["execution-plan-intake-unavailable-v1"] = "execution-plan-intake-unavailable-v1"
+    input_ordinal: int = Field(ge=0, strict=True)
+    execution_ordinal: int = Field(ge=0, strict=True)
+    plan_id: str = Field(min_length=1, strict=True)
+    claim_id: str = Field(min_length=1, strict=True)
+    condition_ids: list[str] = Field(min_length=1)
+    state: Literal["intake_unavailable"] = "intake_unavailable"
+    error_code: Literal["plan_dump_unavailable", "plan_origin_unavailable"]
+    approved: Literal[False] = False
+    attempts_started_by_this_intake: Literal[0] = 0
 
 
 def _revalidate_resources(plan, claim, materials, ledger, point):
@@ -1317,6 +1347,26 @@ def _execute_plans(
     by_id = {claim.id: claim for claim in result.claims}
     if len(by_id) != len(claims) or len({plan.id for plan in plans}) != len(plans):
         raise ValueError("duplicate claim or plan identifiers")
+    for plan in plans:
+        claim = by_id.get(plan.claim_id)
+        ids = plan.condition_ids
+        target_ids = [condition.id for condition in plan.target_conditions]
+        if (
+            not isinstance(plan.id, str) or not plan.id.strip()
+            or claim is None
+            or not ids or any(not isinstance(identifier, str) or not identifier.strip() for identifier in ids)
+            or len(ids) != len(set(ids))
+            or len(target_ids) != len(set(target_ids))
+            or set(ids) != set(target_ids) or set(ids) != set(plan.y_paper)
+            or not set(ids).issubset(condition.id for condition in claim.conditions)
+        ):
+            raise ValueError("execution intake has invalid original plan/claim/condition association")
+    # Shared carriers must be encodable before a plan can be isolated. A shared
+    # failure remains global and cannot authorize any approval or execution.
+    claim_snapshot = [claim.model_dump(mode="json") for claim in result.claims]
+    repository_snapshot = materials.repository.model_dump(mode="json") if materials.repository else None
+    for shared in (claim_snapshot, repository_snapshot):
+        json.dumps(shared, sort_keys=True, ensure_ascii=False, allow_nan=False).encode("utf-8")
     training_budget = {"used": 0}
     execution_blocker = ""
     blocking_operations = []
@@ -1324,11 +1374,60 @@ def _execute_plans(
     ordered = sorted(
         plans, key=lambda p: (order[p.priority], p.feasibility != "ready", p.run_mode == "training")
     )
-    intakes = [
-        (plan, plan.model_dump(mode="json"), _resource_origin(plan, materials))
-        for plan in ordered
-    ]
-    for number, (plan, original_plan, resource_origin) in enumerate(intakes):
+    from pydantic_core import PydanticSerializationError
+
+    intakes, unavailable = [], []
+    input_ordinals = {plan.id: ordinal for ordinal, plan in enumerate(plans)}
+    for number, plan in enumerate(ordered):
+        error_code = None
+        try:
+            snapshot = plan.model_dump(mode="json")
+        except PydanticSerializationError:
+            error_code = "plan_dump_unavailable"
+        if error_code is None:
+            if (
+                snapshot["id"] != plan.id or snapshot["claim_id"] != plan.claim_id
+                or snapshot["condition_ids"] != plan.condition_ids
+            ):
+                raise ValueError("execution intake changed original plan/claim/condition identifiers")
+            try:
+                resource_origin = _resource_digest(snapshot, repository_snapshot)
+            except (ValueError, TypeError):
+                error_code = "plan_origin_unavailable"
+        if error_code:
+            unavailable.append(_IntakeUnavailable(
+                input_ordinal=input_ordinals[plan.id], execution_ordinal=number,
+                plan_id=plan.id, claim_id=plan.claim_id, condition_ids=list(plan.condition_ids),
+                error_code=error_code,
+            ))
+        else:
+            intakes.append((number, plan, snapshot, resource_origin))
+    if unavailable:
+        from schemas.limitations import VerificationLimitation
+
+        # Persist all failures before the first callback. Exclusive creation
+        # preserves history; a persistence failure remains a global failure.
+        with (output / "intake_unavailable.json").open("x", encoding="utf-8") as sidecar:
+            sidecar.write(json.dumps(
+                [item.model_dump(mode="json") for item in unavailable],
+                ensure_ascii=False, allow_nan=False, indent=2,
+            ) + "\n")
+            sidecar.flush()
+            os.fsync(sidecar.fileno())
+        result.issues.append(
+            f"{len(unavailable)} execution plan intake(s) unavailable; see intake_unavailable.json."
+        )
+        for ordinal, item in enumerate(unavailable):
+            reason = f"Execution intake unavailable ({item.error_code}). Audit: intake_unavailable.json#/{ordinal}"
+            result.delivery_checks.append(DeliveryCheck(
+                stage="execution", component="execution.intake", state="unavailable",
+                reason=reason, claim_id=item.claim_id,
+            ))
+            by_id[item.claim_id].verification_limitations.append(VerificationLimitation(
+                claim_id=item.claim_id, condition_ids=item.condition_ids,
+                stage="execution", kind="stage_failed", reason=reason,
+            ))
+    for number, plan, original_plan, resource_origin in intakes:
         claim = by_id.get(original_plan["claim_id"])
         if claim is None:
             raise ValueError(f"plan refers to unknown claim: {original_plan['claim_id']}")

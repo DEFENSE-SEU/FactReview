@@ -157,7 +157,29 @@ def recover_execution_records(output_dir, plans) -> tuple[list[dict], list[str]]
     issues = []
     root = Path(output_dir)
     expected_counts = Counter(plan.id for plan in plans)
-    expected = {plan.id: plan.model_dump(mode="json") for plan in plans if expected_counts[plan.id] == 1}
+    from pydantic_core import PydanticSerializationError
+
+    expected = {}
+    for ordinal, plan in enumerate(plans):
+        if expected_counts[plan.id] != 1:
+            continue
+        error_code = None
+        try:
+            snapshot = plan.model_dump(mode="json")
+        except PydanticSerializationError:
+            error_code = "plan_dump_unavailable"
+        if error_code is None:
+            try:
+                _encoded(snapshot).encode("utf-8")
+            except (ValueError, TypeError):
+                error_code = "plan_origin_unavailable"
+        if error_code:
+            issues.append(
+                f"Execution recovery excluded input ordinal {ordinal}, plan {plan.id}: "
+                f"{error_code}; whether attempts executed is unknown."
+            )
+        else:
+            expected[plan.id] = snapshot
     duplicate_ids = {identifier for identifier, count in expected_counts.items() if count > 1}
     if duplicate_ids:
         issues.append(
