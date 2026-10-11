@@ -368,7 +368,20 @@ def run_v2_pipeline(
                             reason=f"{type(exc).__name__}: {exc}",
                         )
                     )
-                records, issues = recover_execution_records(root / "execution", verification.plans)
+                try:
+                    records, issues = recover_execution_records(root / "execution", verification.plans)
+                except Exception as recovery_exc:
+                    reason = (
+                        f"Host execution record recovery unavailable ({type(recovery_exc).__name__}). "
+                        "Existing attempts, outcomes and cleanup state remain unknown; "
+                        "no new execution evidence was adopted."
+                    )
+                    return ExecutionResult(
+                        claims=retained, ledger=[], issues=[reason],
+                        delivery_checks=[DeliveryCheck(
+                            stage="execution", component="execution.recovery", state="unavailable", reason=reason,
+                        )],
+                    )
                 return ExecutionResult(claims=retained, ledger=records, issues=issues)
 
             def execution_stage():

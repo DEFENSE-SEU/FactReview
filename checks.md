@@ -2,6 +2,12 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+Fullv6 已结束并接受独立终审：report06e6d867/facts0009bbb2，21项来源与程序事实通过，Root全文读取报告、允许字段事实及核4个冻结对象。唯一actual9bf8f16d8fb1保持rc1/partial_usage_unknown（1370.563s）；七stage ok，11条S5/F0/Q1/U5，first6/11、original0/11、plans0/无作者Docker。五条first均为原固定atomicity/qualifiers unresolved；完整typed lowering与初始请求有效，机械retry不适用。main49/49/426456known，missing2/blocked10/closed=false；readiness另1/1/171closed，未知用量保留。实验固定码joint_final_validation_failed尚未定位具体科学子条件。以下“仍运行”条目为历史快照，当前两个actual都已结束，旧once不可复用。
+
+本次Phase8局部闭合已接受：records recovery再次失败时返回原verified claims、空ledger和execution.recovery/unavailable，继续assessment/report/teaser；原primary错误与科学证据保留。必要mock最终同字节旧源1failed/1passed→新源2passed/6.34s，Ruff/compile通过；不同agent独审736bffe5/factsfd0b5433接受12有限事实，Root核5冻结对象及当前两文件。报告JSON/Markdown、summary直接由mock核证；teaser字段由原消费者静态核证，mock只直接确认其stage成功。全局claim复制/编码及其他下游持久化故障仍开放。NN来源合同修复已获17事实独审，intake隔离28个必要相关mock通过、独审进行中；科学整链未获得新资格。
+
+NNv5 终态已独审接受：Root全文读 report1e208f79/facts3e2b64df并核冻结10对象；固定d432/222源码及16输入保持。唯一运行rc1，1logical/1physical/9885known closed，一次作者运行rc0，0 native image inspect/科学Evidence，状态Unverified。固定码 paper_source_scope_mismatch 指向slice/唯一性/授权来源复合守卫，具体role/子条件未知。Fullv6/session2126仍运行。独立源码核查确认inference专用提示缺少坐标和显式授权catalog；其窄修复与一般单计划intake隔离并行，必要mock及独审进行中。Root新增恢复失败后的partial报告闭合已通过2必要mock/6.34s，尚待独审。方法2/8仍未通过。
+
 本轮新实际已启动：Root全文接受NNv5 controller独审4776723c/17facts和prepared独审46d09efd/14身份facts（与下述方法14验收项分开），Fullv6 controller独审2d5dcb83和prepared独审0d6f3e68；各4对象冻结/current SHA已核。唯一offline prepare各rc0/4.7268s及4.7419s，原输入/预算保持。Root新once a630dd95/db6497bd，NNactual24cead4b/session42943已结束rc1、终态独审待完成；Fullactual9bf8f16d/session2126在运行，均fixed d432完整222source。此时第2/8项保持未通过，不以prepared身份事实宣称方法验收通过。
 
 本轮完整 committed 源码已推送并接受独审：d43283cbb35a9f69caf0572481e2c540dd657b26，canonical archive7ff231d4/identity997c6e5d，222文件/31目录；Root全文读独审dd3a6859/factsc206ad97并核7对象，15/15来源绑定事实通过。八改动及一个新增精确对应已审冻结，213共同文件原样；working只允许CRLF规范化，四必要mock最终身份保持，无重复测试。NNv5/整篇v6候选已绑定同一完整源，独立controller审查进行中，prepare/once/live未开始；第2/8项仍未通过。
@@ -21,17 +27,17 @@
 | 验收项 | 当前结果 | 依据或待办 |
 |---|---|---|
 | 1. 保持原断言和测试选择规则 | 有界通过 | 历史默认全套3754通过；后续修复分别完成必要控制与独审。 |
-| 2. 完整七阶段交付 | 未通过 | v5实际15a70742ed34七阶段ok、整链partial/rc1；终态26项独审已接受。 |
+| 2. 完整七阶段交付 | 未通过 | v6实际9bf8f16d8fb1七阶段ok、整链partial/rc1；first6/11、original0/11，终态21项身份/程序独审已接受。 |
 | 3. 无数量上限提取与拆分 | 有界通过 | 原控制与长论文历史保留；原复核有限恢复和共享来源提示均已交付，真实召回与整链待核。 |
 | 4. 主张位置、条件、证据指针 | 有界通过 | 原契约与绑定控制保留。 |
 | 5. 按 needs 分派 | 有界通过 | 原分派控制保留。 |
 | 6. 图表材料与三类 VLM 检查 | 有界通过 | v5实际图表三类检查闭合；完整程序key补充独审已接受，科学视觉判断质量仍待审查。 |
 | 7. 文献时间范围与来源限制 | 有界通过 | 原策略保留；429/超时及充分性限制仍记录。 |
-| 8. 主张关联的可行执行计划 | 未通过 | v5终态0计划/0执行Evidence/无作者Docker准入；统计v6实际效果仍未核。 |
+| 8. 主张关联的可行执行计划 | 未通过 | v6终态0计划/0执行Evidence/无作者Docker准入；joint_final_validation_failed的具体子条件待新诊断。 |
 | 9. 对齐证据与有界修复 | 有界通过 | 原资格守卫与控制保留；新NN实际尚无合格证据。 |
 | 10. 固定状态判定规则 | 有界通过 | 原纯规则与测试保留。 |
 | 11. 四状态与单向旧版适配 | 有界通过 | 原schema/报告/适配契约保留。 |
-| 12. 报告结构、建议、执行记录 | 有界通过 | 机械导出与守卫保留，实际完整性受上游partial限制。 |
+| 12. 报告结构、建议、执行记录 | 有界通过 | records recovery二次失败的partial报告已修复并独审；最新实际advice1/11，完整性受上游partial限制。 |
 | 13. 基线比较与阻断记录 | 有界通过 | 历史比较与阻断保留，不据此宣称商业完成。 |
 | 14. 当前工作记录 | 有界通过 | 实际失败、已交付修复、进行中工作和下一步分别记录。 |
 
