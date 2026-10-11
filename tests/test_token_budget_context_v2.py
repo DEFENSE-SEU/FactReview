@@ -237,3 +237,41 @@ def test_first_pass_keeps_experiment_sections_abstract_and_contributions(tmp_pat
     ids = experiment_block_ids(claim, materials)
     assert {"intro", "claim", "table", "ref", "contrib"} <= ids
     assert "method" not in ids and "bib" not in ids
+
+
+def test_code_claims_sharing_files_use_one_batched_request(tmp_path, monkeypatch):
+    from preprocessing.materials import index_repository
+    from screening import checks
+    from verification.code import batch_code_responses, verify_code
+
+    monkeypatch.delenv("CODE_SOURCE_MAX_BYTES", raising=False)
+    monkeypatch.setattr(checks, "resolve_llm_config", lambda: LLMConfig("mock", "mock", None, None))
+    claim, materials = _paper(tmp_path)
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "train.py").write_text("lr = 0.1\n", encoding="utf-8")
+    materials = materials.model_copy(update={"repository": index_repository(repo)})
+    first = claim.model_copy(update={"id": "c_a", "needs": ["Code"]})
+    second = claim.model_copy(update={"id": "c_b", "needs": ["Code"]})
+    third = claim.model_copy(update={"id": "c_c", "needs": ["Code"]})
+    modules = []
+    item = {
+        "file": "train.py", "line": 1, "quote": "lr = 0.1", "paper_block_id": "next",
+        "paper_quote": "We train every model for ten epochs.", "covered": ["c1"], "direction": "support",
+        "aspect": "hyperparameters", "detail": "Training setup matches.",
+    }
+
+    def model(**kw):
+        modules.append(kw["module"])
+        if kw["module"] == "verification.code.batch":
+            payload = json.loads(kw["prompt"])
+            assert [row["claim"]["id"] for row in payload["claims"]] == ["c_a", "c_b", "c_c"]
+            return {"results": [{"claim_id": "c_a", "items": [item]}, {"claim_id": "c_b", "items": []}]}
+        return {"items": []}
+
+    batched = batch_code_responses([first, second, third], materials, call=model)
+    assert set(batched) == {"c_a", "c_b"}  # c_c was omitted and falls back
+    result = verify_code(first, materials, call=model, scope_call=lambda **kw: {}, batched_response=batched["c_a"])
+    verify_code(third, materials, call=model, batched_response=batched.get("c_c"))
+    assert modules.count("verification.code.batch") == 1 and modules.count("verification.code") == 1
+    assert result.evidence and result.evidence[0].pointer.quote == "lr = 0.1"

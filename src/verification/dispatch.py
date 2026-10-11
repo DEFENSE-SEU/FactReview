@@ -119,12 +119,27 @@ async def verify_claims(
                 concept_catalog=catalog,
             )
 
+        from verification.code import batch_code_responses
+
+        code_claims = [c for c in claims if EvidenceNeed.CODE in c.needs and c.id not in blocked]
+        # Claims sharing one repository selection are judged in one request.
+        code_future = asyncio.create_task(asyncio.to_thread(
+            batch_code_responses, [c.model_copy(deep=True) for c in code_claims], materials, call=call
+        )) if len(code_claims) > 1 else None
+
+        async def code(claim, materials):
+            try:
+                batched = (await code_future).get(claim.id) if code_future is not None else None
+            except Exception:
+                batched = None  # The single-claim request remains available.
+            return await asyncio.to_thread(verify_code, claim, materials, call=call, batched_response=batched)
+
         branches = {
             EvidenceNeed.LITERATURE: literature,
             EvidenceNeed.THEORY: lambda c, m: verify_theory(
                 c, m, call=call, output_dir=output_dir / "theory_derivations"
             ),
-            EvidenceNeed.CODE: lambda c, m: verify_code(c, m, call=call),
+            EvidenceNeed.CODE: code,
             EvidenceNeed.EXPERIMENTS: lambda c, m: verify_experiments(
                 c, m, call=call, execution_requested=execution_requested
             ),
