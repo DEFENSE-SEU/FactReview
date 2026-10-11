@@ -2,6 +2,10 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+已接受 Phase3 first-duty 增量：Root全文读独审23980c7e/factsfdf8fe71并核8对象，21/21有限事实通过。两产品源与最终test精确对应作者冻结；原30函数、外层AST、来源和科学闭合门限保持。必要19模式组合mock及旧节点已通过，不重复测试。仅此两源/新test/记录进入本次提交；并行wire、包导入和L2诊断各自继续独审，真实恢复资格未知。
+
+进行中增量：first-duty 恢复作者已冻结 e4eff661，最终同字节组合 mock 红→绿（1 passed/35.28s）、旧必要节点通过，Root 全文读 diff/test/报告并核21对象身份，独审进行中。wire 同 block 多个合法 span 的派生来源误拒绝已由两个真实 consumer mock 复现并修复（相同测试2 failed/.33s→2 passed/.21s），仅两表达式改变，尚待不同 agent 独审。包导入 v2 的两项直接 P1 已修，但复审8c279521又确认 marked Call 结果丢失能力来源，v3 最小纠正正在冻结。L2 固定拒绝码设计17对象/源身份已核，窄实现进行中。各项尚未进入新实际，不改变第2/8项失败。
+
 上一轮两个实际使用应用源码 `40715eec136299f7b42b9a914c23ac29d5e0be89`，均未通过。三项后续修复已推送 `1aabf5be6844ea6ae40620288cc7953975a7c87b`，精确远端已核；新完整源码快照独审接受18项身份事实。本轮固定1aab的NN与整篇实际均已结束rc1。NN角色键提示已通过独审并推送2fc3a9a363e28787a31bc9a139ae228cf641b607；整篇终态独审26项已接受，整体partial/0计划/0执行证据保持。下表是当前结论，后面的checkpoint与旧表保留各自时点的历史结果。旧全套结果不自动覆盖后续源码变更。
 
 | 验收项 | 当前结果 | 依据或待办 |
@@ -11,7 +15,7 @@
 | 3. 无数量上限提取与拆分 | 有界通过 | 原控制与长论文历史保留；原复核有限恢复和共享来源提示均已交付，真实召回与整链待核。 |
 | 4. 主张位置、条件、证据指针 | 有界通过 | 原契约与绑定控制保留。 |
 | 5. 按 needs 分派 | 有界通过 | 原分派控制保留。 |
-| 6. 图表材料与三类 VLM 检查 | 有界通过 | b8ea实际三类闭合；科学视觉判断质量仍待整篇审查。 |
+| 6. 图表材料与三类 VLM 检查 | 有界通过 | v5实际图表三类检查闭合；完整程序key补充独审已接受，科学视觉判断质量仍待审查。 |
 | 7. 文献时间范围与来源限制 | 有界通过 | 原策略保留；429/超时及充分性限制仍记录。 |
 | 8. 主张关联的可行执行计划 | 未通过 | v5终态0计划/0执行Evidence/无作者Docker准入；统计v6实际效果仍未核。 |
 | 9. 对齐证据与有界修复 | 有界通过 | 原资格守卫与控制保留；新NN实际尚无合格证据。 |
@@ -28,6 +32,8 @@
 新一次性验证：NNv4独审22f2879a/evidence48eff744接受20项增量，一次元数据释放62097ad2和唯一prepare rc0/5.8957s得到prepared-ab372c855d81（manifest18a2d6fa）；prepared独审23e2d3c6/evidence2a764190接受22项。整篇v5独审eb24e1a9/factse9d7663b接受25项，一次离线释放7eb42690和唯一prepare rc0/2.5600s得到prepared-eefeefe1b272（manifest7b407181）；prepared独审2fce24e6/facts0919433e接受21项。Root分别全文读并核SHA后创建fresh once284f0a02/a076d071，进入唯一NN actual-f79ffb75bd1b/session3701与整篇actual-15a70742ed34/session20993；准入时两者均运行，固定完整1aab，原输入/预算/科学checker保持。当前NN终态另列下方，整篇也已rc1并进入终态独审；验收2/8保持未通过。
 
 NNv4终态：session3701已结束rc1，supervisor203.406s/driver201.422s；1logical/1physical/13954known closed、作者1exit0/39.203s、0inspection/hostsample/hostmetric/semantic/Evidence，Unverified。Root全文读并核SHA接受终态独审61288168/evidence7f997c88的16项事实。安全sidecar仅proposal.sources/value_error，对应既有六角色闭包；实际缺/多键和值未知，private记录只SHA/size。新的唯一NN提示增加一条精确paper/sources六键合同句（两字符串片段行，217bytes），Root全文读并核SHA接受ded28109/evidence3483b3bc的10项静态事实；finalf6fef0f1/逆全文bytes与AST通过，单文件Ruff/compile通过，0新pytest，schema/科学gate/预算原样。旧失败不重放，新提示实际效果待核。
+
+整篇v5独审完整程序key补充已接受：Root全文读report-v2 367232a3/完整key投影1ba3638a并核24对象map4019dfc4，55普通/16strict检查原值保持，表格VLM带点号key原true；无新actual/consumer。包导入源a437/test83a8暂不通过独审8c50ec11的两项P1（同根native shadow、Tuple alias mutation），原50场景绿不代表这两个未覆盖反例；最窄纠正与必要控制并行，未提交该产品。
 
 整篇v5终态独审已接受：Root全文读report bc987868/evidence3e24ad3c/final-v2 facts212aac81并核delivery18项、final-v2五项和actual十项SHA/size，26/26有限事实。fixed1aab完整221源码/31目录、原8输入/9控制器/2HTTP依赖/once保持；rc1，supervisor1213.782s/native1175.605s，七stage ok而整体partial，状态12条S4/F0/Q1/U7、advice12、plan0/执行Evidence0/无作者Docker准入。main56/56/500117known、missing0/blocked0 closed；readiness另1/1/171 closed，货币费用unknown。first11/12、original0/12、预算未耗尽；screening/verification incomplete，七个delivery组件含Literature source_context、Theory source/evidence与Experiments evidence验证失败，具体科学内容unknown。HTTP41/120准入，18 retrieval记录3raised；不能把返回stage/PDF或empty blocked IDs当完整。原checker非空plan/L3/host/statistics仍false，12只是受控原样本数量。审核器初版两项期望错误（HTTP依赖2，admission envelope）及语法/key失败已保留，仅final-v2核证，未改actual或门限。后续必须修复、独审后新完整来源/fresh once，旧失败不重放；科学充分性/全论文召回/一般NN/商业资格仍open。
 
