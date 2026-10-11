@@ -32,6 +32,7 @@ from screening.claim_coverage_wire import (
 from screening.claim_first_batches import (
     aggregate_first_batches,
     check_first_rows,
+    discovery_remaining_blocks,
     plan_first_batches,
 )
 from screening.claim_recheck_batches import (
@@ -770,6 +771,9 @@ table and footnote conclusions when material. No target count or cap on scientif
 Return only claim-coverage-discovery-v1 fields, including schema_version="claim-coverage-discovery-v1".
 reviewed_block_ids are the actual window blocks
 read in supplied order, never supplemental IDs. Explain partial reading/empty new_findings honestly.
+discovery_required_block_ids lists EVERY window block that independently needs omission review,
+including blocks already bound to current claims. review_only_block_ids marks synthetic sources;
+it does not narrow this discovery duty. A child claim review cannot complete an omission review.
 Supplemental bodies permit citation and never establish whole-window review or existing coverage.
 """
 _FIRST_CLAIM_BATCH_SYSTEM = """Independently review ALL required_claim_checks entries, in supplied
@@ -1828,7 +1832,9 @@ def review_claim_coverage(
             save()
 
     def batched_first(parent, window):
-        parent = {**copy.deepcopy(parent), "parent_provenance": {
+        parent = {**copy.deepcopy(parent),
+                  "discovery_required_block_ids": [b["id"] for b in parent["blocks"]],
+                  "parent_provenance": {
             "materials_digest": coverage["materials_digest"],
             "original_claims_digest": coverage["original_claims_digest"],
             "source_hashes": copy.deepcopy(files),
@@ -1837,6 +1843,8 @@ def review_claim_coverage(
         record = {"version": "first-review-batches-v1", "parent_digest": parent_digest,
                   "parent_manifest": parent, "planned_claim_batches": len(batches),
                   "planned_review_calls": 1 + len(batches), "results": [], "errors": [],
+                  "requests_complete": False,
+                  "discovery_remaining_block_ids": list(parent["discovery_required_block_ids"]),
                   "remaining_required_claim_ids": [r["claim_id"] for r in parent["required_claim_checks"]]}
         window["first_batches"] = record
         save()
@@ -1870,7 +1878,16 @@ def review_claim_coverage(
                                   CoverageDiscoveryV1, "screening.claims.coverage_discovery")
         results = []
         if discovery is not None and discovery["parsed_response"] is not None:
-            for payload in batches:
+            try:
+                record["discovery_remaining_block_ids"] = discovery_remaining_blocks(
+                    parent, discovery["parsed_response"])
+            except ValueError as exc:
+                record["errors"].append(str(exc))
+                save()
+                raise
+            if record["discovery_remaining_block_ids"]:
+                record["errors"].append("Discovery did not review every original window block; first batches not started")
+            for payload in batches if not record["discovery_remaining_block_ids"] else []:
                 result = first_request(_FIRST_CLAIM_BATCH_SYSTEM, payload,
                                        CoverageFirstBatchV1, "screening.claims.coverage_first_batch")
                 if result is None:
@@ -1878,7 +1895,12 @@ def review_claim_coverage(
                 results.append(result)
                 if result["parsed_response"] is None:
                     break
-        aggregate = aggregate_first_batches(parent_digest, discovery, batches, results)
+        try:
+            aggregate = aggregate_first_batches(parent_digest, discovery, batches, results, parent=parent)
+        except ValueError as exc:
+            record["errors"].append(str(exc))
+            save()
+            raise
         record["aggregate"] = copy.deepcopy(aggregate)
         record["aggregate_digest"] = _digest(aggregate)
         record["requests_complete"] = (
