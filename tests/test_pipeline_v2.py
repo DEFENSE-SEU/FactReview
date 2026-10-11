@@ -148,6 +148,17 @@ def tiny_inputs(tmp_path):
     return args, MockMinerU(parsed)
 
 
+def visual_clear_rows(kind, categories=None):
+    """Explicit healthy visual-model assessments for the synthetic image fixtures."""
+    text = {
+        "self_containedness": "Mock assessment: the synthetic labels and supplied caption identify the displayed quantities.",
+        "legibility": "Mock assessment: the synthetic labels are legible in the printed-size crop.",
+        f"text_{kind}_consistency": "Mock assessment: the synthetic crop agrees with its supplied caption and body references.",
+    }
+    return [{"category": category, "disposition": "clear", "text": text[category]}
+            for category in (categories if categories is not None else text)]
+
+
 class ModelBoundary:
     def __init__(self):
         self.calls = []
@@ -251,6 +262,8 @@ class ModelBoundary:
                 data = json.loads(kwargs["prompt"])
                 assert data["caption"] == "Table 1: Runtime in seconds."
                 assert data["printed_size_verified"] is True
+            if module in {"screening_figures", "screening_tables.visual"}:
+                return {"findings": visual_clear_rows("figure" if module == "screening_figures" else "table")}
             return {"findings": []}
         if module == "verification_literature":
             data = json.loads(kwargs["prompt"].split("\nDATA_JSON:\n", 1)[1])

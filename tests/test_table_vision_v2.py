@@ -10,6 +10,7 @@ from PIL import Image
 from preprocessing.materials import build_materials
 from preprocessing.parse.mineru_adapter import MineruParseResult
 from schemas.materials import SharedMaterials
+from tests.test_pipeline_v2 import visual_clear_rows
 
 
 @pytest.fixture
@@ -180,12 +181,14 @@ def test_visual_request_uses_real_crop_caption_all_references_and_source_pointer
                         "category": "self_containedness",
                         "disposition": "issue",
                         "text": "An asterisk attached to row A has no explained meaning in the table, caption, table footnotes or supplied body references.",
-                    }
+                    },
+                    *visual_clear_rows("table", ("legibility", "text_table_consistency")),
                 ]
             }
         return {
             "findings": [
-                {"category": "legibility", "disposition": "clear", "text": "The labels are readable."}
+                {"category": "legibility", "disposition": "clear", "text": "The labels are readable."},
+                *visual_clear_rows("table", ("self_containedness", "text_table_consistency")),
             ]
         }
 
@@ -222,7 +225,8 @@ def test_failed_table_is_atomic_and_preserves_both_neighbors(visual_materials, f
         table_id = json.loads(kwargs["prompt"])["table_id"]
         seen.append(table_id)
         if table_id != "table_2":
-            return {"findings": [issue()]}
+            return {"findings": [issue(), *visual_clear_rows(
+                "table", ("self_containedness", "text_table_consistency"))]}
         if failure == "provider":
             return {"status": "error", "error": "fixed provider failure"}
         if failure == "exception":
@@ -277,7 +281,7 @@ def test_invalid_table_image_is_unavailable_without_model_call(visual_materials,
 
     def call(**kwargs):
         seen.append(json.loads(kwargs["prompt"])["table_id"])
-        return {"findings": []}
+        return {"findings": visual_clear_rows("table")}
 
     records = []
     findings, issues = check_visual_tables(visual_materials, call=call, records=records)
@@ -314,8 +318,10 @@ def test_missing_scale_is_visible_even_when_model_finds_no_issues(visual_materia
     findings, issues = check_visual_tables(
         visual_materials, call=lambda **_: {"findings": []}, records=records
     )
-    assert findings == [] and records[0].status == "checked"
+    assert findings == [] and records[0].status == "unavailable"
     assert any("printed-size legibility unavailable" in message for message in issues)
+    assert any("unassessed categories: legibility, self_containedness, text_table_consistency" in message
+               for message in issues)
 
 
 def test_caption_assignment_ambiguity_downgrades_context_dependent_findings(visual_materials):
@@ -433,7 +439,8 @@ def test_parser_footnotes_reach_vlm_without_changing_parsed_table_block(visual_m
                     "category": "self_containedness",
                     "disposition": "clear",
                     "text": "Bold values are explained by the supplied table footnote.",
-                }
+                },
+                *visual_clear_rows("table", ("legibility", "text_table_consistency")),
             ]
         }
 

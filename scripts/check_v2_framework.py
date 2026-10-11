@@ -326,6 +326,11 @@ class FixedModel:
                             "disposition": "issue",
                             "text": "Fixture small panel text is unreadable at its printed size.",
                         },
+                        {
+                            "category": "self_containedness",
+                            "disposition": "uncertain",
+                            "text": "Fixture panel labels are visible, while the parser's ambiguous caption assignment leaves the panel meanings unresolved.",
+                        },
                     ]
                 }
             return {
@@ -334,7 +339,17 @@ class FixedModel:
                         "category": "self_containedness",
                         "disposition": "issue",
                         "text": "Fixture plotted axis has no unit label.",
-                    }
+                    },
+                    {
+                        "category": "legibility",
+                        "disposition": "clear",
+                        "text": "Fixture numeric tick and panel labels are legible in the printed-size crop.",
+                    },
+                    {
+                        "category": "text_figure_consistency",
+                        "disposition": "clear",
+                        "text": "Fixture original caption and supplied body reference identify this same plotted panel.",
+                    },
                 ]
             }
         if module == "screening_figures.context":

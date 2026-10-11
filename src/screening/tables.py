@@ -82,6 +82,10 @@ def check_visual_tables(
                 table, {"findings": [r for r in raw["findings"] if r["category"] == "legibility"]}
             )
             table_issues.extend(observed_issues)
+            missing = sorted(CATEGORIES - {row["category"] for row in raw["findings"]})
+            if missing:
+                record.status = "unavailable"
+                table_issues.append(f"{table.id}: unassessed categories: {', '.join(missing)}")
             candidates = [
                 {**row, "candidate_id": f"candidate_{i}"}
                 for i, row in enumerate(raw["findings"])
@@ -244,7 +248,8 @@ def _crop_response(table, *, call=None, printed_size_verified=False):
         "style or aesthetics. Return JSON {findings: [{category, disposition, text}]}; category is "
         "self_containedness, legibility, or text_table_consistency; disposition is issue, clear, "
         "or uncertain. Give concrete visible evidence in text. Use clear for positive observations, "
-        "uncertain for insufficient pixels/context, and findings=[] when no defect or uncertainty is found.",
+        "uncertain for insufficient pixels/context. Return at least one concrete assessment for every "
+        "category, including clear assessments when no issue is found.",
         {
             "table_id": table.id,
             "block_id": table.block_id,
