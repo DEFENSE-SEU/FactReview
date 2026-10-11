@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from tests.test_experiment_joint_sources_v2 import ASPECTS, paper, review_for
 from verification.experiments import verify_experiments
 
@@ -47,7 +48,11 @@ def run(fixture, *, rounds=1, repair_effect=None):
         if len(calls) == 1:
             return copy.deepcopy(first)
         if len(calls) == 2:
-            return copy.deepcopy(scope)
+            return authority_scope_fixture(
+                json.loads(kwargs["prompt"]), scope,
+                requirement="manuscript_reported_result", basis="reported_measurement",
+                rationale="The table and declared definition/setup members report this complete measurement.",
+            )
         assert len(calls) == 3
         assert kwargs["module"] == "verification.experiments.binding_repair"
         if repair_effect:
@@ -303,10 +308,16 @@ def test_revalidation_uses_pristine_view_and_keeps_original_audit(tmp_path, monk
         return original_validate(bounded, *args, **kwargs)
 
     monkeypatch.setattr(module, "validate_source_uses", tracked)
-    result, _ = run(fixture)
+    result, model_calls = run(fixture)
     assert result.evidence[0].sufficient
     audit = json.loads(next((tmp_path / "experiment_scope").glob("*.json")).read_text(encoding="utf-8"))
-    assert audit["response"] == fixture[3]
+    assert audit["response"] == authority_scope_fixture(
+        json.loads(model_calls[1]["prompt"]), fixture[3],
+        requirement="manuscript_reported_result", basis="reported_measurement",
+        rationale="The table and declared definition/setup members report this complete measurement.",
+    )
+    assert audit["response"]["items"] == fixture[3]["items"]
+    assert audit["response"]["conditions"] == fixture[3]["conditions"]
     assert audit["validated"] is False and audit["binding_errors"]
     assert audit["binding_repair"]["response"] == fixture[4]
     assert audit["binding_repair"]["effective_response"] != audit["response"]

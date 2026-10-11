@@ -2,6 +2,12 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+最新独审：Phase4 joint 子守卫增量和 Root 旧 repair fixture 合同迁移已接受，report9c791393/factsbfe62086，13项有限事实；Root全文读并核5个冻结对象及当前五产品/测试身份，收据08c02822。子守卫只在明确启用时记录固定20码，不改变科学值、模型输入或预算；三完整模块的独立byte/AST逆关系通过。旧fixture保留60个原Assert，一条完整响应格式等式迁移为完整catalog-v3 carrier，另加items/conditions两等式；必要控制为首次整文件61passed1failed与最终唯一changed node1passed，未声称再次全文件绿。第1项恢复有界通过。
+
+Phase3原审计v1暂不接受：不同agent审核d154671a/facts52d09192已证实新增入口对合法discovery finding mapping直接索引claim_id会KeyError，原组合mock的discovery为空；Root全文读并核22冻结对象，原失败和旧冻结保留。原作者只修该投影并在同一个必要mock加入合法finding路径，预算、完整required集合及audit-only资格保持。Root报告呈现4b72da8a已单独获有限接受，尚待与修复提交。NN quote-only三产品已冻结cf41c25b/25对象0e74af56，同字节新mock红1→最终必要集合2passed5.11s，正在distinct review。当前尚无新actual，七阶段整链与可行执行计划第2/8项保持未通过；后面的checkpoint保留各自记录时点。
+
+当前交付HEAD/remote已核92301a7010a969edbead7afb25732ef1b746712d，包含Phase8恢复报告及Phase5来源/intake两项已审修复；Root9路径工作LF与Git精确一致，记录f093b029。intake落地后的唯一必要NN组合控制另1passed/1.79s，记录2d405304；没有真实重跑。后续Phase3独立原审计（helper默认false，框架默认true）已通过一组合mock及四旧直接节点，独审进行中；audit-only单独计数不充first/original采纳指标。Root报告呈现仅增加独立审计行，六纯函数控制/Ruff/compile通过，待独审。Phase4固定joint子守卫已同test红4→绿4并待独审。该检查发现三旧repair positive在旧/新source都失败，旧mock缺catalog-v3授权外层；Root只迁移模型fixture外层，原inner保持，整文件先61passed/1failed7.61s，后一个完整审计响应断言迁移并增加两条inner精确等式，该节点1passed/.53s；其余test函数/旧断言保持，等待独立核证，不忽略原失败。新quote-only NN接口实现中，尚无新实际资格。
+
 Completed Phase5本轮修复：inference专用prompt和payload补原授权catalog及精确块内Unicode坐标，原slice/唯一性/所选条件授权顺序与ValueError保持；新增诊断仅六角色及三个strict bool/null。Root接受不同agent独审0598d4a2/facts6c859a5f的17有限事实并核4冻结对象eff0e854，当前owned_refine eecf7872、runtime df1dbab3、新test46ba36d5一致。必要相关mock5passed/8.16s、Ruff/compile通过；初版红绿测试随后增强，保留该身份限制。一般plan intake仅隔离PydanticSerializationError和严格单项JSON编码ValueError/TypeError，共同材料/身份/未知异常/侧车落盘失败保持全局失败；所有健康origin审批前冻结、排序空位与late revalidation保持。Root接受独审acea5dc2/factsd8043d0d的18有限事实并核4冻结对象11a40dfd；当前v2 3c928ac7/recovery e0a37799/newtest5ff463b9同冻结。唯一同字节新mock旧源3failed→最终相关集合28passed/4.266s，227指定旧tests未改，科学validator与原执行loop保持。当前源码尚未启动新实际；方法2/8保持未通过。
 
 Fullv6 已结束并接受独立终审：report06e6d867/facts0009bbb2，21项来源与程序事实通过，Root全文读取报告、允许字段事实及核4个冻结对象。唯一actual9bf8f16d8fb1保持rc1/partial_usage_unknown（1370.563s）；七stage ok，11条S5/F0/Q1/U5，first6/11、original0/11、plans0/无作者Docker。五条first均为原固定atomicity/qualifiers unresolved；完整typed lowering与初始请求有效，机械retry不适用。main49/49/426456known，missing2/blocked10/closed=false；readiness另1/1/171closed，未知用量保留。实验固定码joint_final_validation_failed尚未定位具体科学子条件。以下“仍运行”条目为历史快照，当前两个actual都已结束，旧once不可复用。
@@ -28,7 +34,7 @@ NNv5 终态已独审接受：Root全文读 report1e208f79/facts3e2b64df并核冻
 
 | 验收项 | 当前结果 | 依据或待办 |
 |---|---|---|
-| 1. 保持原断言和测试选择规则 | 有界通过 | 历史默认全套3754通过；后续修复分别完成必要控制与独审。 |
+| 1. 保持原断言和测试选择规则 | 有界通过 | 历史默认3754通过；旧fixture合同迁移已独审，60原Assert保持，一条完整响应格式等式迁移并增两等式，必要61+1控制与身份核证保留；未宣称当前全套再跑。 |
 | 2. 完整七阶段交付 | 未通过 | v6实际9bf8f16d8fb1七阶段ok、整链partial/rc1；first6/11、original0/11，终态21项身份/程序独审已接受。 |
 | 3. 无数量上限提取与拆分 | 有界通过 | 原控制与长论文历史保留；原复核有限恢复和共享来源提示均已交付，真实召回与整链待核。 |
 | 4. 主张位置、条件、证据指针 | 有界通过 | 原契约与绑定控制保留。 |
