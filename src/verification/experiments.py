@@ -2585,6 +2585,7 @@ def verify_experiments(
     scope_paper_format: Literal["legacy", "catalog-v1", "catalog-v2"] = "catalog-v2",
     execution_wire_version=None,
     execution_audit_dir=None,
+    diagnostics_dir=None,
 ) -> BranchResult:
     if scope_paper_format not in _AUTHORITY_SCHEMAS:
         raise ValueError("Unknown requested paper_scope_format")
@@ -2859,6 +2860,9 @@ def verify_experiments(
     if set(output.checked_aspects) != {"correspondence", "fairness", "isolation", "stability", "consistency"}:
         raise ValueError("Experiments must inspect all five required aspects")
     result = BranchResult(issues=choice_privacy.safe(output.issues))
+    from verification.rejection_diagnostics import FirstRejectionDiagnostic
+
+    rejection_diagnostic = FirstRejectionDiagnostic(diagnostics_dir, materials, "Experiments")
     choice_selections, choice_errors = {}, execution_errors
     choice_conflicts = set()
     if raw_choices != []:
@@ -2968,6 +2972,7 @@ def verify_experiments(
                 reason="Provider-sensitive choice scope blocked before model invocation; verification must be retried after repairing the diagnostic response.",
             )
         )
+        rejection_diagnostic.record("experiments_choice_privacy_blocked")
     if has_projection:
         try:
             if (
@@ -3195,6 +3200,7 @@ def verify_experiments(
                     ),
                 )
             )
+            rejection_diagnostic.record("experiments_joint_final_validation_failed")
     if scope_audit is not None and joint_catalogs:
         audit = json.loads(scope_audit.read_text(encoding="utf-8"))
         audit["joint_sources"] = {
