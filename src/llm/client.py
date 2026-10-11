@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from common import run_stats
+from common.provider_attempts import PhysicalAttemptNotStarted
 
 from .codex_auth import get_codex_auth
 from .codex_client import (
@@ -391,6 +392,7 @@ def llm_json(
                 duration_sec=time.monotonic() - t0,
                 failed=True,
                 image_count=len(images or []),
+                **({"local_denial": getattr(e, "receipt", None)} if type(e) is PhysicalAttemptNotStarted else {}),
             )
         return redact_provider_details(
             {
