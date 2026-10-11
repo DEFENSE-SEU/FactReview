@@ -1,4 +1,4 @@
-"""The smaller advice request preserves records and the existing acceptance gates."""
+"""The condensed advice request keeps every basis reference and the existing acceptance gates."""
 
 import copy
 import json
@@ -8,7 +8,7 @@ import pytest
 
 from llm.client import LLMConfig
 from review.report import advice
-from review.report.advice_request import build_request, project_input, reconstruct_input, requirements
+from review.report.advice_request import build_request, project_input, requirements
 from schemas.claim import AdviceItem, Claim, Condition, Evidence, EvidencePointer
 from schemas.limitations import VerificationLimitation
 from schemas.review import FinalReview
@@ -47,51 +47,30 @@ def evidence(direction="support", **kwargs):
     )
 
 
-def test_projection_preserves_every_scientific_record_and_unrepresented_ledger():
+def test_projection_keeps_every_basis_ref_and_condenses_long_records():
     c = claim()
     c.evidence = [
         evidence(
-            note="Original detail",
+            note="N" * 5000,
             additional_pointers=[EvidencePointer(locator="appendix.pdf", page=2, quote="Extra original")],
         )
     ]
     c.notes = ["Repeated exact note", "Repeated exact note"]
-    data = advice.advice_input(
-        c,
-        [
-            {"plan": {"claim_id": "c", "condition_ids": ["a"]}, "attempts": [{"error": "Original failure"}]},
-            {"plan": {"claim_id": "c", "condition_ids": []}, "unknown_runtime": {"x": [1, 2]}},
-        ],
-    )
-    # Projection must preserve nested records without interpreting their schema.
-    for kind in ("theory_derivations", "verification_limitations"):
-        row = {"original": {"status": "failed", "source": ["x", {"quote": "Unchanged"}]}}
-        data["claim"][kind] = [row]
-        data["basis"][f"/{kind}/0"] = {"condition_ids": ["a"], "content": copy.deepcopy(row)}
+    data = advice.advice_input(c, [{"plan": {"claim_id": "c", "condition_ids": ["a"]}, "attempts": [{"error": "x"}]}])
     frozen = copy.deepcopy(data)
     projected = project_input(data)
-    assert reconstruct_input(projected) == (data["claim"], data["ledger"])
-    assert projected["basis"] == data["basis"]
-    assert projected["ledger"][1]["unreferenced_context"] == data["ledger"][1]
+    assert set(projected["basis"]) == set(data["basis"])
+    row = projected["basis"]["/evidence/0"]["content"]
+    assert row["direction"] == "support" and row["quote"] == {"quote": "Original", "page": 1}
+    assert len(row["note"]) < 700 and "additional_pointers" not in row and "locator" not in json.dumps(row)
+    assert projected["claim"]["status"] == "unverified" and "loc" not in projected["claim"]
     assert "source_files" not in projected and data == frozen
-    projected["basis"]["/notes/0"]["content"] = "Modified copy"
-    assert data == frozen
 
 
-@pytest.mark.parametrize("change", ["unknown_top", "claim_copy", "ledger_copy", "missing_basis"])
-def test_projection_cannot_silently_omit_unknown_or_unequal_content(change):
-    c = claim()
-    c.notes = ["Original"]
-    data = advice.advice_input(c, [{"plan": {"claim_id": "c", "condition_ids": ["a"]}}])
-    if change == "unknown_top":
-        data["future_scientific_record"] = {"important": True}
-    elif change == "claim_copy":
-        data["basis"]["/notes/0"]["content"] = "Changed"
-    elif change == "ledger_copy":
-        data["basis"]["/ledger/0"]["content"] = {}
-    else:
-        del data["basis"]["/notes/0"]
-    with pytest.raises((ValueError, KeyError)):
+def test_projection_rejects_unknown_top_level_input():
+    data = advice.advice_input(claim(), [])
+    data["future_scientific_record"] = {"important": True}
+    with pytest.raises(ValueError):
         project_input(data)
 
 
@@ -202,7 +181,9 @@ def test_public_generation_audits_full_input_and_exact_projected_request(tmp_pat
         request = json.loads(kwargs["prompt"].split("\nADVICE_DATA_JSON:\n", 1)[1])
         seen.append(request)
         assert "notes" not in request["claim"]
-        assert request["basis"]["/notes/0"]["content"] == c.notes[0]
+        # Long records are clipped on the wire; the audit keeps the full input.
+        assert request["basis"]["/notes/0"]["content"].startswith(c.notes[0][:600])
+        assert len(request["basis"]["/notes/0"]["content"]) < len(c.notes[0])
         assert request["item_requirements"]["required_condition_ids"] == ["a"]
         return {
             "status": "ok",
@@ -224,7 +205,7 @@ def test_public_generation_audits_full_input_and_exact_projected_request(tmp_pat
     assert audit["request_sha256"] == advice._digest(seen[0])
     assert audit["input_sha256"] == advice._digest(advice.advice_input(c, []))
     assert audit["input"]["claim"]["notes"] == c.notes
-    assert reconstruct_input(seen[0]) == (audit["input"]["claim"], audit["input"]["ledger"])
+    assert set(seen[0]["basis"]) == set(audit["input"]["basis"])
 
 
 def test_extra_unreferenced_item_still_rejects_entire_response(tmp_path):

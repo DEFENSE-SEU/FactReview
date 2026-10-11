@@ -325,7 +325,7 @@ def test_ledger_is_claim_local_and_execution_failure_stays_a_limit(tmp_path):
 
     def call(**kwargs):
         data = payload(kwargs)
-        assert len(data["ledger"]) == 1
+        assert [ref for ref in data["basis"] if ref.startswith("/ledger/")] == ["/ledger/0"]
         assert "Other claim secret" not in kwargs["prompt"]
         response = valid_response(data)
         response["items"][0]["basis_refs"].append("/ledger/0")
