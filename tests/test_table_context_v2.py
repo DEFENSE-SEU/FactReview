@@ -13,6 +13,7 @@ from preprocessing.parse.mineru_adapter import MineruParseResult
 from screening import checks
 from screening.table_context import TableSources
 from screening.tables import check_visual_tables
+from tests.test_pipeline_v2 import visual_clear_rows
 
 
 @pytest.fixture(autouse=True)
@@ -311,7 +312,8 @@ def test_later_table_callback_revokes_prior_consumed_source(tmp_path, what, same
     def model(**kw):
         payload = json.loads(kw["prompt"])
         if kw["module"] == "screening_tables.visual":
-            return crop()
+            return {"findings": [*crop()["findings"], *visual_clear_rows(
+                "table", ("text_table_consistency",))]}
         if payload["table_id"] == "table_2":
             Path(
                 materials.tables[0].printed_crop_path if what == "crop" else materials.pages[0].path
@@ -419,7 +421,8 @@ def test_context_provider_failure_retains_valid_crop_legibility(tmp_path):
     def failure(r, p):
         raise TimeoutError("fixed context provider timeout")
 
-    findings, issues, records, calls = run(materials, failure)
+    findings, issues, records, calls = run(materials, failure, raw={"findings": [
+        *crop()["findings"], *visual_clear_rows("table", ("text_table_consistency",))]})
     assert [f.level for f in findings] == ["legibility"]
     assert records[0].status == "checked" and records[0].context_status == "failed"
     assert len(calls) == 2 and any("fixed context provider timeout" in i for i in issues)

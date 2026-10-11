@@ -105,6 +105,10 @@ def check_figures(
             figure_findings, figure_issues = _crop_findings(
                 figure, {"findings": [r for r in raw["findings"] if r["category"] == "legibility"]}
             )
+            missing = sorted(CATEGORIES - {row["category"] for row in raw["findings"]})
+            if missing:
+                record.status = "unavailable"
+                figure_issues.append(f"{figure.id}: unassessed categories: {', '.join(missing)}")
             candidates = [
                 {**row, "candidate_id": f"candidate_{index}"}
                 for index, row in enumerate(raw["findings"])
@@ -252,8 +256,9 @@ def _crop_response(figure, *, call=None, printed_size_verified=False):
         "issue, clear, or uncertain. Use issue only for a concrete observed defect; text must "
         "identify the defect and visible evidence. Use clear for normal or positive observations "
         "such as readable labels or agreement with the caption. Use uncertain when the supplied "
-        "image or context cannot establish whether a defect exists. Return an empty findings list "
-        "when no defects or uncertainties are found. Allowed categories: self_containedness "
+        "image or context cannot establish whether a defect exists. Return at least one concrete "
+        "assessment for every allowed category, including clear assessments when no issue is found. "
+        "Allowed categories: self_containedness "
         "(legend, axis labels/units, panel labels), legibility, text_figure_consistency. "
         "Evaluate labels and legends together with the supplied caption; report omissions only "
         "when they leave the figure ambiguous. "

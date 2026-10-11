@@ -13,6 +13,7 @@ from pipeline_v2 import run_v2_pipeline
 from preprocessing.parse.mineru_adapter import MineruParseResult
 from review.report.v2 import write_review
 from schemas.review import FinalReview
+from tests.test_pipeline_v2 import visual_clear_rows
 from verification.contracts import BranchResult
 
 
@@ -53,6 +54,8 @@ def test_real_pipeline_preserves_mixed_visual_coverage_and_cost_limitations(tmp_
             figure_id = json.loads(kwargs["prompt"])["figure_id"]
             seen.append(figure_id)
             failed = figure_id == "figure_2"
+            response = {"status": "error", "error": "fixture visual timeout"} if failed else {
+                "findings": visual_clear_rows("figure")}
             run_stats.record_llm_call(
                 module=module,
                 provider="mock",
@@ -62,9 +65,9 @@ def test_real_pipeline_preserves_mixed_visual_coverage_and_cost_limitations(tmp_
                 image_count=1,
                 prompt=kwargs["prompt"],
                 system=kwargs["system"],
-                response_text='{"findings": []}',
+                response_text=json.dumps(response),
             )
-            return {"status": "error", "error": "fixture visual timeout"} if failed else {"findings": []}
+            return response
         run_stats.record_llm_call(
             module=module, provider="mock", model="fixture", usage={"input_tokens": 5, "output_tokens": 2}
         )

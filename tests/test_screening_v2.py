@@ -11,6 +11,7 @@ from schemas.materials import FigureMaterial, MaterialBlock, PageImage, SharedMa
 from screening.figures import check_figures
 from screening.references import check_bibliography
 from screening.writing import check_tables, check_writing
+from tests.test_pipeline_v2 import visual_clear_rows
 from tests.test_writing_sections_v2 import confirmation
 
 
@@ -348,6 +349,7 @@ def test_figure_positive_observations_do_not_become_flaws(figure_materials):
                     "disposition": "issue",
                     "text": "The relation label Born-in_inv is too small to read at the printed size.",
                 },
+                *visual_clear_rows("figure", ("self_containedness",)),
             ]
         },
     )

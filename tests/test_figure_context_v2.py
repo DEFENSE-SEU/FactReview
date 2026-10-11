@@ -12,6 +12,7 @@ from preprocessing.materials import build_materials
 from preprocessing.parse.mineru_adapter import MineruParseResult
 from screening import checks
 from screening.figures import check_figures
+from tests.test_pipeline_v2 import visual_clear_rows
 
 
 @pytest.fixture(autouse=True)
@@ -150,7 +151,8 @@ def test_later_figure_cannot_mutate_prior_crop_and_leave_its_findings(tmp_path):
             return context_response(payload)
         if payload["figure_id"] == "figure_2":
             Path(materials.figures[0].printed_crop_path).write_bytes(b"changed later")
-        return crop_response()
+        return {"findings": [*crop_response()["findings"], *visual_clear_rows(
+            "figure", ("text_figure_consistency",))]}
 
     findings, _ = check_figures(materials, call=model, recover_errors=True, records=records)
     assert [record.status for record in records] == ["failed", "checked"]
@@ -224,7 +226,8 @@ def test_same_size_image_exchange_fails_original_pdf_pixel_binding(tmp_path, mis
         )
     else:
         Path(materials.pages[0].path).write_bytes(Path(materials.pages[1].path).read_bytes())
-    findings, _, records, calls = run_model(materials)
+    findings, _, records, calls = run_model(materials, raw={"findings": [
+        *crop_response()["findings"], *visual_clear_rows("figure", ("text_figure_consistency",))]})
     assert records[0].status == "failed" and records[1].status == "checked"
     assert all(p["figure_id"] == "figure_2" for _, p in calls)
     assert [f.evidence[0].pointer.key for f in findings] == ["figure_2"]

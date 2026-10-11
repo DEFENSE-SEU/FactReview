@@ -9,6 +9,7 @@ from PIL import Image
 from schemas.claim import ClaimLocation
 from schemas.materials import FigureMaterial, MaterialBlock, SharedMaterials
 from screening.stage import screen_paper
+from tests.test_pipeline_v2 import visual_clear_rows
 
 
 @pytest.fixture
@@ -84,7 +85,8 @@ def test_production_l1_retains_other_figures_and_persists_failed_coverage(
                 raise TimeoutError("fixture timeout")
             # The first row is valid, but this entire figure must be rejected.
             return {"findings": [visible_issue(figure), {"category": "colour", "disposition": "issue"}]}
-        return {"findings": [visible_issue(figure)]}
+        return {"findings": [visible_issue(figure), *visual_clear_rows(
+            "figure", ("self_containedness", "text_figure_consistency"))]}
 
     output = tmp_path / "screening"
     result = screen_paper(visual_materials, output, call=model_call(response, seen))
@@ -117,7 +119,8 @@ def test_unavailable_or_wrong_scale_image_is_reported_without_model_call(visual_
         figure.bbox_points = (0, 0, float("inf"), 36)
     seen = []
     result = screen_paper(
-        visual_materials, tmp_path / "screening", call=model_call(lambda figure: {"findings": []}, seen)
+        visual_materials, tmp_path / "screening", call=model_call(
+            lambda figure: {"findings": visual_clear_rows("figure")}, seen)
     )
     assert seen == ["figure_1", "figure_3"]
     assert result.figure_coverage == {"total": 3, "checked": 2, "failed": 0, "unavailable": 1}
