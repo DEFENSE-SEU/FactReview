@@ -237,7 +237,9 @@ def llm_json(
     Minimal JSON response helper for the providers used in the execution stage.
     """
     if run_stats.stats_path() is not None:
-        module = run_stats.validate_module(module or run_stats.current_module() or "")
+        # Keep the caller's specific label; record_llm_call normalizes it.
+        module = module or run_stats.current_module() or ""
+        run_stats.validate_module(module)
         run_stats.read_initialized()
     t0 = time.monotonic()
     usage: dict[str, Any] = {}
