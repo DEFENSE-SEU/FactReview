@@ -83,3 +83,19 @@ class ExecutionConfig(Contract):
     tolerance_overrides: dict[str, Annotated[float, Field(ge=0, allow_inf_nan=False)]] = Field(
         default_factory=dict
     )
+
+
+class TorchInferenceLimits(Contract):
+    """Operator policy, supplied independently of author/model proposals."""
+
+    protocol: Literal["torch-cpu-inference-v1"] = "torch-cpu-inference-v1"
+    torch_version: Literal["2.14.0"] = "2.14.0"
+    # No guessed or downloaded environment. A real deployment must pin these.
+    image_id: Annotated[str, Field(pattern=r"^sha256:[a-f0-9]{64}$")]
+    package_manifest_sha256: Annotated[str, Field(pattern=r"^[a-f0-9]{64}$")]
+    max_tensor_elements: int = Field(default=1048576, ge=1, le=1048576)
+    max_events: int = Field(default=8192, ge=1, le=65536)
+    max_samples: int = Field(default=100000, ge=1, le=1000000)
+    max_jsonl_line_bytes: int = Field(default=1048576, ge=1024, le=1048576)
+    max_partition_bytes: int = Field(default=33554432, ge=1024, le=33554432)
+    max_report_bytes: int = Field(default=33554432, ge=1024, le=33554432)

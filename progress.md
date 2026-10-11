@@ -2,6 +2,12 @@
 
 ## 当前完整框架 checkpoint（2026-10-11）
 
+Completed source：NN final-v2已获独立增量接受，Root全文读reportbf4103bc/verification4ef8fab9，12必要事实闭合、九current/frozen/test-input身份同。B4 fullclosure编译入口拒绝及批准镜像选择已修；唯一必要public mock1pass/4.87s，旧25Assert保留final34，其余六产品同final-v1。report7b7e7120/evidence5addf47b/static085cf9f0；原1/6.69与B4-only1/5.69保留。没有重复旧组或默认全套，真实NN科学执行待准入。
+
+Preparation：在既有批准Torch2.14.0+cpu image中唯一checkpoint-only操作9.859s成功，真实weights2397bytes/SHA15a7852c51d8e9ec0764126fd38b4e59dee9f6dad6455b7f2ea540db4bcc72f9。前后image与generator同，private日志仅SHA/size，0author evaluation/LLM/train。记录torch-cpu-checkpoint-root-v1；静态四条数据/两层ReLU/完整设置/全文单页材料在torch-cpu-inference-actual-preparation-v1，预声明MSE .25尚无观测。
+
+Open controller：新统计整篇控制器独审收口发现两处可达阻断：Authority合法unique subset/未决空来源会被误拒绝，旧credential扫描重新解析private日志。作者仅修这两处并重新冻结；公开产物凭证检查、完整来源/分母/实际预算保持。当前prepare/live/admission均未准入，旧actual原件与已消耗授权不复用。
+
 Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送Phase A的4406181、Phase3的c0bb46f、Theory的23a966d、B1的9b4a3411、Phase4 SourceAuthority的692580b0、Phase3默认auto/提取metadata的36212f3、Phase4统计87e546d及Phase3 VLM的dfea429824c90778c4095da86c7af453a735a19d，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
 
 Completed：最终默认全套仅运行一次，3754passed/3原默认deselected/0skipped/0fail/0error，exit0；pytest538.61s、wrapper541.797s。419源码/测试/config身份前后完全一致，原断言、marker及外部mock保持。报告final-default-regression-final-path-fixtures-v1/report.md；原56失败、后续12失败及所有局部红绿记录完整保留。原14验收第1项保留有界通过，第2及8项完整链失败；科学及商业完成仍需独立证据。
