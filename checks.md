@@ -2,6 +2,8 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+本轮新实际已启动：Root全文接受NNv5 controller独审4776723c/17facts和prepared独审46d09efd/14身份facts（与下述方法14验收项分开），Fullv6 controller独审2d5dcb83和prepared独审0d6f3e68；各4对象冻结/current SHA已核。唯一offline prepare各rc0/4.7268s及4.7419s，原输入/预算保持。Root新once a630dd95/db6497bd，NNactual24cead4b/session42943已结束rc1、终态独审待完成；Fullactual9bf8f16d/session2126在运行，均fixed d432完整222source。此时第2/8项保持未通过，不以prepared身份事实宣称方法验收通过。
+
 本轮完整 committed 源码已推送并接受独审：d43283cbb35a9f69caf0572481e2c540dd657b26，canonical archive7ff231d4/identity997c6e5d，222文件/31目录；Root全文读独审dd3a6859/factsc206ad97并核7对象，15/15来源绑定事实通过。八改动及一个新增精确对应已审冻结，213共同文件原样；working只允许CRLF规范化，四必要mock最终身份保持，无重复测试。NNv5/整篇v6候选已绑定同一完整源，独立controller审查进行中，prepare/once/live未开始；第2/8项仍未通过。
 
 已接受 Phase4固定 L2拒绝诊断：Root全文读独审a080403c/facts15634146并核10对象与当前身份，接受22有限事实；作者27对象另已核。四产品/唯一新mock，原三源17处可逆，原科学结果/异常/计划/限制/预算保持。每分支调用最多一次四固定键sidecar，None和注入兼容；必要同test红→绿1passed/.75s，4完整mock结果等价、Ruff/compile通过。仅两种首次code有运行控制，其余五种静态核证；不能解释旧actual零计划，也不能替代整链验收。
