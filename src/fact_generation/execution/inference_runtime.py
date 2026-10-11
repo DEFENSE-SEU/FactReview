@@ -8,6 +8,8 @@ import math
 import struct
 from pathlib import Path
 
+from pydantic import ValidationError
+
 from schemas.runtime_science import ROLES, TorchInferenceProposal
 
 from .repair_evidence import bounded_source, plain_path
@@ -15,6 +17,77 @@ from .resource_contract import _actual_file, _fingerprint, _scientific_claim, va
 from .v2_config import TorchInferenceLimits
 
 VERSION = "torch-cpu-inference-v1"
+
+# Only existing literal requirements can become a public binding diagnostic.
+_BINDING_GUARD_CODES = frozenset({
+    'actual_batch_position_unknown',
+    'actual_config_target_mismatch',
+    'actual_getitem_different_official_sample',
+    'actual_inference_condition_unaligned',
+    'actual_metric_host_conflict',
+    'actual_metric_return_raw_output_conflict',
+    'actual_model_or_split_config_mismatch',
+    'actual_prediction_adapter_conflict',
+    'actual_role_call_mismatch',
+    'actual_sample_tensor_binding_changed',
+    'actual_source_span_mismatch',
+    'actual_split_or_sample_mismatch',
+    'actual_torch_seed_unaligned',
+    'authenticated_inference_receipt_required',
+    'classification_logits_adapter_unavailable',
+    'complete_actual_model_metric_function_required',
+    'complete_sample_denominator_required',
+    'complete_source_changed_or_unsupplied',
+    'complete_source_supply_capacity',
+    'complete_source_supply_required',
+    'duplicate_call_identity',
+    'duplicate_json_key',
+    'duplicate_sample_id_or_capacity',
+    'empty_official_partition',
+    'every_condition_setting_requires_actual_config_selector',
+    'finite_actual_prediction_required',
+    'finite_label_required',
+    'host_metric_overflow',
+    'inference_site_index_unbound',
+    'inference_site_not_supplied',
+    'inference_source_closure_unavailable_or_changed',
+    'inference_source_site_not_unique_static_function',
+    'inference_source_sites_unbound',
+    'integer_actual_prediction_required',
+    'integer_class_label_required',
+    'integer_tensor_conversion_loss',
+    'loaded_module_order_identity_mismatch',
+    'nonfinite_json',
+    'numeric_dtype_adapter_unavailable',
+    'numeric_features_required',
+    'ordinary_single_target_required',
+    'ordinary_target_required',
+    'paper_source_scope_mismatch',
+    'partition_line_capacity_or_empty',
+    'partition_row_not_object',
+    'prediction_metric_actual_identity_missing',
+    'resource_not_exclusive_regular_file',
+    'runtime_binding_unresolved',
+    'sample_id_type',
+    'sample_ordinal_partition_incomplete',
+    'scalar_model_output_required',
+    'selected_binary_or_partition_changed',
+    'selected_data_checkpoint_config_required',
+    'source_capacity',
+    'unsafe_actual_selector',
+    'whole_partition_capacity',
+    'whole_partition_single_metric_return_required',
+})
+_BINDING_FAILURE_TYPES = (
+    (ValidationError, "invalid_schema"),
+    (UnicodeError, "unicode_error"),
+    (ValueError, "value_error"),
+    (TypeError, "type_error"),
+    (KeyError, "key_error"),
+    (IndexError, "index_error"),
+    (OSError, "io_error"),
+    (OverflowError, "overflow_error"),
+)
 
 
 def bind_inference_request(request, *, claim, materials):
@@ -24,8 +97,13 @@ def bind_inference_request(request, *, claim, materials):
             workspace=request.workspace, source_files=request.source_science_files,
             limits=request.config.docker_options.get("torch_inference"), source_sites=request.source_sites)
         return {"status":"bound", "request_sha256":_fingerprint(request.model_dump(mode="json")),"binding":binding}
-    except (ValueError,TypeError,KeyError,IndexError,OSError,UnicodeError,OverflowError):
-        return {"status":"unresolved","reason":"inference_request_binding_unavailable"}
+    except (ValueError,TypeError,KeyError,IndexError,OSError,UnicodeError,OverflowError) as exc:
+        failure = next((code for error_type, code in _BINDING_FAILURE_TYPES
+                        if isinstance(exc, error_type)), "binding_exception")
+        if type(exc) is ValueError and len(exc.args) == 1 and type(exc.args[0]) is str:
+            failure = exc.args[0] if exc.args[0] in _BINDING_GUARD_CODES else "local_requirement_failed"
+        return {"status":"unresolved","reason":"inference_request_binding_unavailable",
+                "binding_failure": failure}
 
 
 def require(value, reason):
