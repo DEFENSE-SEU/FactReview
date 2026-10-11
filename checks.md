@@ -2,6 +2,8 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+Phase3原审计v2已获different-agent有界接受：reportc9a131ae/facts36ac7df3，13有限事实；Root全文读报告/事实并核作者17与独审6冻件及当前五产品/test。合法discovery mapping的KeyError已由精确原claim路径+显式claim_id投影闭合，完整ordered required equality保持；同最终组合mock旧P1源红1→新源1passed11.89s，原45断言及旧四节点身份保留，没有重复全套。Root独立报告呈现4b72da8a沿用v1有限接受。helper默认false、框架默认true，独立原审计只保留审计findings与单独counts，不解除first pending、不提升主original计数或授adoption。NN quote作者25冻件已Root核，distinct审仍进行中。下方v1拒绝及原红绿记录保留，第2/8项仍未通过。
+
 最新独审：Phase4 joint 子守卫增量和 Root 旧 repair fixture 合同迁移已接受，report9c791393/factsbfe62086，13项有限事实；Root全文读并核5个冻结对象及当前五产品/测试身份，收据08c02822。子守卫只在明确启用时记录固定20码，不改变科学值、模型输入或预算；三完整模块的独立byte/AST逆关系通过。旧fixture保留60个原Assert，一条完整响应格式等式迁移为完整catalog-v3 carrier，另加items/conditions两等式；必要控制为首次整文件61passed1failed与最终唯一changed node1passed，未声称再次全文件绿。第1项恢复有界通过。
 
 Phase3原审计v1暂不接受：不同agent审核d154671a/facts52d09192已证实新增入口对合法discovery finding mapping直接索引claim_id会KeyError，原组合mock的discovery为空；Root全文读并核22冻结对象，原失败和旧冻结保留。原作者只修该投影并在同一个必要mock加入合法finding路径，预算、完整required集合及audit-only资格保持。Root报告呈现4b72da8a已单独获有限接受，尚待与修复提交。NN quote-only三产品已冻结cf41c25b/25对象0e74af56，同字节新mock红1→最终必要集合2passed5.11s，正在distinct review。当前尚无新actual，七阶段整链与可行执行计划第2/8项保持未通过；后面的checkpoint保留各自记录时点。

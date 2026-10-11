@@ -12,9 +12,11 @@ def digest(value):
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
 
-def plan_original_batches(parent, size):
+def plan_original_batches(parent, size, *, preserve_full_context=False):
     if type(size) is not int or size < 1:
         raise ValueError("Original batch size must be an integer >= 1")
+    if type(preserve_full_context) is not bool:
+        raise ValueError("preserve_full_context must be a boolean")
     required = parent["required_original_claim_reviews"]
     registry = {r["claim_id"]: r for r in parent["current_claims"]}
     contexts = {r["claim_id"]: r for r in parent["scope_context"]}
@@ -43,8 +45,10 @@ def plan_original_batches(parent, size):
             parent_digest=parent_digest,
             batch_id=f"original_batch_{len(batches) + 1:03d}",
             required_original_claim_reviews=rows,
-            current_claims=[copy.deepcopy(registry[key]) for key in batch_ids],
-            scope_context=[copy.deepcopy(contexts[key]) for key in batch_ids],
+            current_claims=copy.deepcopy(parent["current_claims"]) if preserve_full_context
+            else [copy.deepcopy(registry[key]) for key in batch_ids],
+            scope_context=copy.deepcopy(parent["scope_context"]) if preserve_full_context
+            else [copy.deepcopy(contexts[key]) for key in batch_ids],
         )
         batches.append(payload)
     return parent_digest, batches
