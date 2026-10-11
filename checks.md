@@ -2,6 +2,8 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+上一来源交付 `9303a058d6b1c6a594e617ae7cdd28bf71840019` 已推送并核对远端；其完整 226 文件来源快照已独审并由 Root 接受（`provider-source-sites-canonical-source-acceptance-root-v1/receipt.json`，SHA `b8d3add4`）。本轮 inference 函数位置目录与默认关闭的公开诊断接口已获独审接受，Root 完整读报告并核六冻件和三源（`inference-callable-catalog-acceptance-root-v1/receipt.json`，SHA `d0b05dd7`）；同字节必要 mock 旧失败/新通过，一条原关联节点通过，Ruff/被动编译通过。首轮复核有界恢复和固定写入诊断均已实现、必要控制通过，正在独审。future Full v8 / NN v7 仍关闭 prepare/live，当前没有新增真实运行；第 2、8 项继续未通过。
+
 本轮 Phase 5 source-sites 固定诊断已获独审通过：v1 observer 绕过入口的 P1 及原拒绝保留，窄 v2 采用 exact canonical class 分派，默认关闭及原科学门保持。独审 report `1521b322` 确认 12/12 项有限事实；Root 全文读报告/事实并核六冻件及当前三产品，接受收据 `inference-source-sites-diagnostics-acceptance-root-v2/receipt.json`（SHA `e5d75459`）。唯一必要联合 mock 保留原 34 条断言，相同最终测试在 v1 失败、v2 通过（3.83s），受影响两文件 Ruff/compile 通过；原四个测试未改、未重复运行。future Full v8 / NN v7 的预算拒绝接入已冻结、仍待另一 agent 独审：同一必要 mock 旧源失败、新源通过（0.84s），默认行为及原未知用量/闭合规则保持；原 14 条 lint 问题保留，新增为 0。两批均未进入真实运行。Callable 位置目录仅有已接受的静态设计；主张 first-review 补漏路径正在独立调查。验收第 2、8 项继续未通过。以下远端与运行描述保留各自记录时点。
 
 当前交付分支 `refactor/method-v2` 的本地与远端均为 `dbb27a782f9cc980e5271501bfd929af29b3044a`。Full v7 唯一实际运行已结束：七阶段均返回结果，11/11 条主张生成建议，主流程 58 次调用及 readiness 1 次调用的用量记录完整；整链仍为 `partial`，覆盖核验未完成，未产生实际执行计划，原完整性检查失败。Root 仅按既定固定字段投影读取程序终态（`framework-live-v7-v6-root-v1/full-terminal-program-1.json`，SHA `ee3c8ee8`），独立终态审核已确认 26 项有限程序事实，Root 接受收据为 `full-v7-terminal-acceptance-root-v1/receipt.json`（SHA `ff2e41b5`）。原主张审计完成 11/11，仍为 audit-only，没有授权采纳；实验分支固定诊断记录为 0，具体失败路径待定位。下面的过程记录保留各自时点；验收第 2、8 项仍未通过，整体目标继续进行。
