@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import Field
+from pydantic import Field, JsonValue
 
 from schemas.claim import (
     Condition,
@@ -21,6 +21,7 @@ from schemas.claim import (
     NonEmpty,
     ProjectedExecutionTargetBinding,
     ReleasedStatisticsProjectionRecord,
+    ReleasedStatisticsProposal,
     ReleasedStatisticsReview,
     ReleasedStatisticsSelection,
 )
@@ -45,6 +46,7 @@ from verification.experiment_catalog import build_catalog, resolve_source
 
 DOMAIN = "full-list-exact-match-statistics-v1"
 WIRE = "experiments-execution-v5"
+FRESH_WIRE = "experiments-execution-v6"
 RECORD = "released-statistics-choice-v1"
 
 
@@ -60,6 +62,54 @@ class StatisticsDecision(Contract):
 class StatisticsNone(Contract):
     kind: Literal["none"]
     rationale: NonEmpty
+
+
+class StatisticsOriginalFragment(Contract):
+    start: int = Field(ge=0, strict=True)
+    end: int = Field(gt=0, strict=True)
+    # Exact source characters include whitespace-only separators.
+    original_text: str = Field(min_length=1, strict=True)
+    atom_ids: list[NonEmpty]
+    separator: bool = Field(strict=True)
+
+
+class StatisticsOriginalField(Contract):
+    path: str = Field(min_length=1, strict=True)
+    original_value: JsonValue
+    atom_ids: list[NonEmpty]
+    original_empty: bool = Field(strict=True)
+    fragments: list[StatisticsOriginalFragment]
+
+
+class StatisticsOriginalProposal(ReleasedStatisticsProposal):
+    version: Literal["released-statistics-originals-v1"]
+    field_bindings: list[StatisticsOriginalField] = Field(min_length=1)
+    claim_bindings: list[StatisticsOriginalFragment] = Field(min_length=1)
+
+
+class StatisticsOriginalSelection(ReleasedStatisticsSelection):
+    version: Literal["released-statistics-originals-choice-v1"]
+    proposal: StatisticsOriginalProposal
+
+
+class StatisticsOriginalDecision(Contract):
+    kind: Literal["statistics_choice"]
+    selection: StatisticsOriginalSelection
+
+
+def original_output_schema():
+    from verification.experiments import ExperimentItem
+
+    class Output(Contract):
+        schema_version: Literal["experiments-execution-v6"]
+        execution_domain: Literal["full-list-exact-match-statistics-v1"]
+        execution_context_digest: NonEmpty
+        checked_aspects: list[str]
+        items: list[ExperimentItem]
+        issues: list[str] = Field(default_factory=list)
+        execution: Annotated[StatisticsOriginalDecision | StatisticsNone, Field(discriminator="kind")]
+
+    return Output
 
 
 def output_schema():
@@ -217,6 +267,68 @@ def lower_v5(response, registry):
         if candidate is None or selection.condition_id != candidate["condition_id"]:
             raise ProjectionError("Statistics selection is not a current original candidate")
     return normalized, selection
+
+
+def _same_original(value, original):
+    if type(value) is not type(original):
+        return False
+    if isinstance(original, dict):
+        return value.keys() == original.keys() and all(_same_original(value[k], v) for k, v in original.items())
+    if isinstance(original, list):
+        return len(value) == len(original) and all(_same_original(v, o) for v, o in zip(value, original, strict=True))
+    return value == original
+
+
+def _original_fragments(text, rows):
+    end, result = 0, []
+    for row in rows:
+        fragment = text[row.start:row.end]
+        if row.start != end or row.end > len(text) or not fragment or row.original_text != fragment:
+            raise ProjectionError("Original fragment text/Unicode offsets are missing or stale")
+        binding = row.model_dump(mode="json", exclude={"original_text"})
+        binding["text_digest"] = digest(fragment)
+        result.append(binding)
+        end = row.end
+    if end != len(text):
+        raise ProjectionError("Original string is not completely bound")
+    return result
+
+
+def lower_v6(response, registry):
+    """Bind exact original values only; independent scientific review is unchanged."""
+    parsed = original_output_schema().model_validate(response)
+    if parsed.execution_context_digest != registry["context_digest"]:
+        raise ProjectionError("Statistics first response does not declare the exact requested context/version")
+    normalized = {key: copy.deepcopy(response.get(key, [])) for key in ("checked_aspects", "items", "issues")}
+    normalized.update(plans=[], execution_choices=[])
+    if isinstance(parsed.execution, StatisticsNone):
+        return normalized, None
+    raw = parsed.execution.selection
+    candidate = registry["candidates"].get(raw.candidate_id)
+    if candidate is None or raw.condition_id != candidate["condition_id"]:
+        raise ProjectionError("Statistics selection is not a current original candidate")
+    inventory = candidate["field_inventory"]
+    if [row.path for row in raw.proposal.field_bindings] != list(inventory):
+        raise ProjectionError("Original semantic field denominator/order changed")
+    fields = []
+    for row in raw.proposal.field_bindings:
+        original = inventory[row.path]
+        if not _same_original(row.original_value, original):
+            raise ProjectionError("Original full field value/type changed")
+        binding = row.model_dump(mode="json", exclude={"original_value", "fragments"})
+        binding["value_digest"] = digest(original)
+        if isinstance(original, str):
+            binding["fragments"] = _original_fragments(original, row.fragments)
+        elif row.fragments:
+            raise ProjectionError("Nonstring original field cannot acquire synthetic text fragments")
+        else:
+            binding["fragments"] = []
+        fields.append(binding)
+    canonical = raw.model_dump(mode="json")
+    canonical["version"] = "released-predictions-choice-v2"
+    canonical["proposal"].update(version="released-predictions-v3", field_bindings=fields,
+        claim_bindings=_original_fragments(registry["snapshot"]["claim"]["text"], raw.proposal.claim_bindings))
+    return normalized, ReleasedStatisticsSelection.model_validate(canonical)
 
 
 def _fragments(text, rows, atoms):
@@ -384,12 +496,23 @@ def bind_statistics_target(claim, materials, registry, selection, audit_path):
     audit = json.loads(audit_path.read_text(encoding="utf-8"))
     data, response = audit["input"], audit["response"]
     original = audit["first_pass_response"]
-    normalized, retained = lower_v5(original, registry)
+    version = original.get("schema_version")
+    if version == FRESH_WIRE:
+        normalized, retained = lower_v6(original, registry)
+    elif version == WIRE:
+        normalized, retained = lower_v5(original, registry)
+    else:
+        raise ProjectionError("Statistics saved response has an unsupported wire version")
     context = scope_context(registry, selection, claim, materials)
-    expected_wire = {"version": WIRE, "domain": DOMAIN, "registry": registry, "errors": [],
+    expected_wire = {"version": version, "domain": DOMAIN, "registry": registry, "errors": [],
         "raw_response_sha256": digest(original), "normalized_response_sha256": digest(normalized),
         "adapter_sha256": file_hash(__file__), "saved_response_sha256": digest(original),
         "saved_normalized_sha256": digest(normalized), "wire_representation": "original"}
+    if version == FRESH_WIRE:
+        canonical_selection = retained.model_dump(mode="json") if retained is not None else None
+        expected_wire["canonical_selection_sha256"] = digest(canonical_selection)
+        if audit.get("first_pass_canonical_selection") != canonical_selection:
+            raise ProjectionError("Statistics canonical selection changed after original-value binding")
     if (retained != selection or audit.get("first_pass_normalized") != normalized
             or audit.get("execution_wire") != expected_wire
             or data.get("claim") != claim.model_dump(mode="json")

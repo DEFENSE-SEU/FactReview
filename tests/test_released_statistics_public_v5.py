@@ -4,6 +4,7 @@ import asyncio
 import copy
 import hashlib
 import json
+from functools import partial
 from pathlib import Path
 
 import fitz
@@ -150,6 +151,10 @@ def _selection(candidate, text, *, bad_fragment=False, partial_count=False):
 
 
 def test_public_statistics_original_fields_independent_review_and_host_counts(tmp_path, monkeypatch):
+    from verification.experiments import verify_experiments
+
+    monkeypatch.setattr("verification.experiments.verify_experiments",
+                        partial(verify_experiments, execution_wire_version="experiments-execution-v5"))
     def forbidden(*a, **kw):
         pytest.fail("Unmocked external boundary")
 
