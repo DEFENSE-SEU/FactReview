@@ -56,6 +56,89 @@ def check_first_rows(payload, response):
         raise ValueError("First batch must return every exact required review once in order")
 
 
+def first_failure_identity(payload, response):
+    """Only a lossless JSON response with every exact closed request identity can retry."""
+    def plain(value):
+        if type(value) in (str, int, float, bool, type(None)):
+            return True
+        if type(value) is list:
+            return all(plain(item) for item in value)
+        return type(value) is dict and all(type(key) is str and plain(item) for key, item in value.items())
+
+    if (type(response) is not dict or not plain(response)
+            or set(response) != {"schema_version", "context_id", "window_id", "parent_digest", "batch_id", "claim_reviews"}
+            or response["schema_version"] != "claim-coverage-first-batch-v1"
+            or any(type(response[key]) is not str or response[key] != payload[key]
+                   for key in ("context_id", "window_id", "parent_digest", "batch_id"))
+            or type(response["claim_reviews"]) is not list):
+        return False
+    identities = {row["claim_id"]: row["digest"] for row in payload["required_claim_checks"]}
+    supplied = {body["id"] for body in payload["blocks"]}
+    supplied.update(row["block"]["id"] for row in payload.get("supplemental_sources", []))
+    directory = set(payload.get("source_catalog", {})) | supplied
+    contexts = {row["claim_id"]: row for row in payload["scope_context"]}
+    claims = {row["claim_id"]: row for row in payload["current_claims"]}
+
+    def selected(values, available):
+        return type(values) is list and bool(values) and all(type(key) is str and key in available for key in values)
+
+    for row in response["claim_reviews"]:
+        if (type(row) is not dict or type(row.get("claim_id")) is not str
+                or row["claim_id"] not in identities or row.get("claim_digest") != identities[row["claim_id"]]
+                or not selected(row.get("source_block_ids"), supplied)):
+            return False
+        for field in ("assertion_groups", "other_findings"):
+            if type(row.get(field)) is not list or any(type(group) is not dict
+                    or not selected(group.get("source_block_ids"), supplied) for group in row[field]):
+                return False
+        if type(row.get("source_review_groups")) is not list or any(type(group) is not dict
+                or not selected(group.get("source_ids"), directory) for group in row["source_review_groups"]):
+            return False
+        sources = {source.get("source_id", source.get("block_id")): source
+                   for source in contexts[row["claim_id"]]["sources"]}
+        condition_ids = {condition["id"] for condition in claims[row["claim_id"]]["conditions"]}
+        acknowledgements = {}
+        for group in row["source_review_groups"]:
+            if (group.get("state") not in {"considered", "irrelevant", "unavailable"}
+                    or not selected(group.get("condition_ids"), condition_ids)
+                    or len(set(group["condition_ids"])) != len(group["condition_ids"])):
+                return False
+            for key in group["source_ids"]:
+                if key in acknowledgements or (key not in sources and key not in {b["id"] for b in payload["blocks"]}):
+                    return False
+                source = sources.get(key)
+                availability = payload.get("source_catalog", {}).get(key, source or {}).get("availability")
+                if ((group["state"] == "unavailable") != (availability == "unavailable")
+                        or (source is not None and not set(source["condition_ids"]) <= set(group["condition_ids"]))):
+                    return False
+                acknowledgements[key] = group["state"]
+        if not set(sources) <= set(acknowledgements):
+            return False
+        if type(row.get("scope_atoms")) is not list or any(type(atom) is not dict
+                or type(atom.get("sources")) is not list or not atom["sources"] or any(type(span) is not dict
+                    or type(span.get("block_id")) is not str or span["block_id"] not in supplied
+                    or acknowledgements.get(span["block_id"]) != "considered"
+                    for span in atom["sources"]) for atom in row["scope_atoms"]):
+            return False
+    try:
+        json.dumps(response, ensure_ascii=False, sort_keys=True, allow_nan=False)
+    except (ValueError, TypeError, OverflowError):
+        return False
+    return True
+
+
+def check_first_failed_receipt(parent, payload, result):
+    """A failed fixed slot can retain provenance, and supplies no selectable scientific row."""
+    if (result is None or result["status"] != "failed" or result["parsed_response"] is not None
+            or result.get("failure_stage") not in {"schema", "required_order"}
+            or any(not result.get(key) for key in ("context_id", "input_digest", "response_digest", "raw_audit_path"))):
+        raise ValueError("First failed slot lacks a bound mechanical failure receipt")
+    expected = {**copy.deepcopy(parent), "parent_digest": digest(parent), "batch_id": payload["batch_id"],
+                "required_claim_checks": payload["required_claim_checks"]}
+    if digest(payload) != digest(expected):
+        raise ValueError("First failed slot changed its complete frozen input")
+
+
 def check_first_receipt(parent, payload, result):
     """Check saved typed/raw identities before any first row can be selected."""
     if (result is None or result["status"] != "returned" or result["parsed_response"] is None
@@ -194,8 +277,11 @@ def aggregate_first_batches(parent_digest, discovery, batches, results, *, paren
             "raw_receipts": receipts, "path_mappings": mappings, "discovery_mappings": discovery_mappings}
 
 
-def select_first_rows(parent, parent_digest, discovery, batches, results, valid_ids, retry_batches, retry_results):
+def select_first_rows(parent, parent_digest, discovery, batches, results, valid_ids, retry_batches, retry_results,
+                      *, partial=False):
     """Select complete validated rows after an entirely successful recovery wave."""
+    if type(partial) is not bool:
+        raise ValueError("First partial selection must use a boolean")
     if digest(parent) != parent_digest or len(results) != len(batches) or len(retry_results) != len(retry_batches):
         raise ValueError("First selection lacks its complete frozen wave")
     all_batches, all_results = [*batches, *retry_batches], [*results, *retry_results]
@@ -215,6 +301,9 @@ def select_first_rows(parent, parent_digest, discovery, batches, results, valid_
     if discovery_remaining_blocks(parent, discovery["parsed_response"]):
         raise ValueError("First selection lacks full original discovery")
     for index, (payload, result) in enumerate(zip(all_batches, all_results, strict=True)):
+        if partial and index < len(batches) and result["parsed_response"] is None:
+            check_first_failed_receipt(parent, payload, result)
+            continue
         check_first_receipt(parent, payload, result)
         if index >= len(batches):
             lowering = result["lowering"]
@@ -227,6 +316,8 @@ def select_first_rows(parent, parent_digest, discovery, batches, results, valid_
     aggregate_first_batches(parent_digest, discovery, retry_batches, retry_results, parent=parent)
     selected = {}
     for index, (payload, result) in enumerate(zip(all_batches, all_results, strict=True)):
+        if partial and result["parsed_response"] is None:
+            continue
         for local, row in enumerate(result["parsed_response"]["claim_reviews"]):
             key = row["claim_id"]
             if (key in valid_ids) != (index < len(batches)):
@@ -258,6 +349,20 @@ def select_first_rows(parent, parent_digest, discovery, batches, results, valid_
     context = digest({"parent_digest": parent_digest, "discovery_payload_digest": digest(discovery_payload),
                       "planned_batches": [digest(p) for p in all_batches], "raw_receipts": receipts,
                       "row_selections": selections})
-    return {**copy.deepcopy(initial), "version": "program-first-row-selection-adapter-v1", "context_id": context,
+    view = {**copy.deepcopy(initial), "version": "program-first-row-selection-adapter-v1", "context_id": context,
             "claim_reviews": rows, "path_mappings": mappings, "row_selections": selections,
             "reviewed_source_mappings": source_mappings, "raw_receipts": receipts}
+    if partial:
+        previous = {row["claim_id"]: row for row in initial["claim_reviews"]}
+        differences = []
+        for row, selection in zip(rows, selections, strict=True):
+            old = previous.get(row["claim_id"])
+            if old is not None and old["state"] == "unresolved" and row["claim_id"] not in valid_ids:
+                origin = next(mapping for mapping in initial["path_mappings"]
+                              if mapping["raw_digest"] == digest(old))
+                differences.append({"claim_id": row["claim_id"], "previous_row": copy.deepcopy(old),
+                                    "selected_row": copy.deepcopy(row), "previous_origin": copy.deepcopy(origin),
+                                    "selected_origin": copy.deepcopy(selection), "changed": digest(old) != digest(row)})
+        view["review_differences"] = differences
+        view["context_id"] = digest({"selection_context": context, "review_differences": differences})
+    return view
