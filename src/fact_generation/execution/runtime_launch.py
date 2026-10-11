@@ -312,6 +312,82 @@ def prepare_observer_launch(original_command, *, entry_script, workdir, workspac
     return result
 
 
+def prepare_inference_launch(original_command, *, binding, **kwargs):
+    """Same protected author launch, with a distinct actual-Torch producer package.
+
+    Caller must supply the independently rebuilt binding, never a model digest.
+    Existing ordinary observation has no inference authority and remains separate.
+    """
+    try:
+        from .inference_runtime import VERSION, file_sha, require
+        from .resource_contract import _fingerprint
+        from .v2_config import TorchInferenceLimits
+
+        require(type(binding) is dict and binding.get("version") == VERSION and binding.get("status") == "bound",
+                "inference_binding_unavailable")
+        require(_fingerprint({key:value for key,value in binding.items() if key != "binding_digest"}) == binding["binding_digest"],
+                "inference_binding_changed")
+        TorchInferenceLimits.model_validate(binding["policy"])
+        root = _path(kwargs["workspace"])
+        working = _path(root / _relative(kwargs["workdir"], dot=True))
+        entry = _path(root / _relative(kwargs["entry_script"]))
+        for directory in {root, working, entry.parent}:
+            for child in directory.iterdir():
+                plain_path(child)
+                if child.name.split(".",1)[0] == "torch":
+                    raise ValueError("inference_framework_import_shadow")
+        for name, expected in binding["source_sha256"].items():
+            require(file_sha(root / _relative(name)) == expected, "inference_source_changed")
+        for name, field in ((binding["proposal"]["dataset_path"],"partition_sha256"),
+                            (binding["proposal"]["checkpoint_path"],"checkpoint_sha256")):
+            require(file_sha(root / _relative(name)) == binding[field], "inference_resource_changed")
+        sites = kwargs["source_sites"]["sites"]
+        require(all(0 <= index < len(sites) for index in binding["proposal"]["sites"].values())
+                and all(site["sha256"] == binding["source_sha256"].get(site["path"]) for site in sites),
+                "inference_site_source_not_supplied")
+    except (ValueError, KeyError, TypeError, OSError) as exc:
+        return {"status":"unresolved", "version":"readonly-torch-inference-v1", "unresolved":[{
+            "reason":str(exc) if type(exc) is ValueError else "inference_preparation_unavailable"}]}
+    result = prepare_observer_launch(original_command, **kwargs)
+    if result["status"] != "ready":
+        return result
+    try:
+        trusted = _path(result["trusted_dir"])
+        config = json.loads((trusted / "config.json").read_text(encoding="utf-8"))
+        config["inference"] = {key:binding[key] for key in ("binding_digest","proposal","policy","source_sha256",
+            "partition_sha256","partition_count","checkpoint_sha256")}
+        contents = {"observer.py":_path(Path(__file__).with_name("inference_observer.py")).read_bytes(),
+                    "source_binding.py":_path(Path(__file__).with_name("runtime_observer.py")).read_bytes(),
+                    "config.json":(json.dumps(config,sort_keys=True,ensure_ascii=True)+"\n").encode()}
+        for name, raw in contents.items():
+            path = _path(trusted / name, exists=name != "source_binding.py")
+            if name != "source_binding.py" and path.stat().st_nlink != 1:
+                raise ValueError("inference_package_not_exclusive")
+            with path.open("xb" if name == "source_binding.py" else "wb") as stream:
+                stream.write(raw)
+        result.update(version="readonly-torch-inference-v1", inference=config["inference"],
+                      package_files={key:_sha(value) for key,value in contents.items()})
+        result["scope_limits"] = ["cpu_eager_numeric_jsonl_only", "unobserved_aggregation_hooks_threads_children_uncovered",
+                                 "image_text_tokenizer_uncovered", "in_process_tampering_not_excluded",
+                                 "instrumentation_timing_not_qualified"]
+        sealed = {key:value for key,value in result.items() if key not in {"unresolved","request_sha256"}}
+        result["request_sha256"] = _sha(json.dumps(sealed,sort_keys=True,ensure_ascii=True).encode())
+    except (ValueError, TypeError, OSError) as exc:
+        result.update(status="unresolved", unresolved=[{"reason":str(exc) if type(exc) is ValueError else "inference_package_unavailable"}])
+    return result
+
+
+def inference_image_identity(image, result, *, policy):
+    """Normalize a host run_command result for one existing image, no service call."""
+    from .v2_config import TorchInferenceLimits
+    approved = TorchInferenceLimits.model_validate(policy)
+    command = ["docker", "image", "inspect", "--format", "{{.Id}}", image]
+    if (result.cmd != command or result.returncode != 0 or result.termination != "completed"
+            or result.stdout.strip() != approved.image_id):
+        raise ValueError("inference_image_not_approved")
+    return {"command":command, "returncode":0, "termination":"completed", "stdout":approved.image_id+"\n"}
+
+
 def _mount(value, option):
     if option in {"-v", "--volume"}:
         match = re.fullmatch(r"(.+):(/[^:]*)(?::(ro|rw))?", value)

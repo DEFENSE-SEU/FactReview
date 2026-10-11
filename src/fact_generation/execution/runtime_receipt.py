@@ -89,7 +89,134 @@ def _file_sha(path):
     return value.hexdigest()
 
 
+def _inference_report(request, outcome, *, report, audit, raw, paths, runtime_sites, hashes,
+                      bootstrap, argv, cwd, file_output, policy):
+    """New protocol shape and host sources, with no host compilation or grant."""
+    import math
+    req, result = request.model_dump(mode="json"), outcome.model_dump(mode="json")
+    _check(type(report) is dict and report.get("version") == "torch-cpu-inference-v1"
+           and report.get("unresolved") == [] and report.get("execution") == {"status":"completed"}
+           and _sha(raw["report"]) == audit["report_sha256"]
+           and report["binding_digest"] == audit["inference"]["binding_digest"], "inference_report_incomplete_or_changed")
+    framework = report["framework"]
+    _check(set(framework) == {"version","package_manifest_sha256","package_manifest_sha256_after","device"} and framework["device"] == "cpu"
+           and framework["version"].split("+")[0] == policy.torch_version
+           and framework["package_manifest_sha256"] == framework["package_manifest_sha256_after"] == policy.package_manifest_sha256,
+           "actual_framework_unapproved")
+    expected_hashes = {"/app/"+key:value for key,value in hashes.items()}
+    _check(_same(report["source_hashes_before"], expected_hashes) and _same(report["source_hashes_after"], expected_hashes)
+           and report["checkpoint_sha256"] == report["checkpoint_sha256_after"] == audit["inference"]["checkpoint_sha256"]
+           and report["partition_sha256_after"] == audit["inference"]["partition_sha256"], "inference_runtime_sources_changed")
+    _check(_same(report["entry"], {"argv":req["command"][1:],"cwd":cwd,
+        "path":cwd+"/"+req["command"][1],"sha256":hashes[req["plan"]["task"]["entry_script"]]}), "inference_runtime_entry_changed")
+    interpreter = report["interpreter"]
+    _check(set(interpreter) == {"version","optimize"} and type(interpreter["optimize"]) is int and interpreter["optimize"] == 0
+           and interpreter["version"].split()[0].startswith(bootstrap["declared_runtime_minor"]+"."), "inference_interpreter_unknown")
+    _check(len(report["sites"]) == len(runtime_sites), "inference_runtime_sites_missing")
+    for actual, expected in zip(report["sites"],runtime_sites,strict=True):
+        _check(type(actual) is dict and set(actual) == set(expected)|{"code_sha256"}
+               and _same(expected,{key:actual[key] for key in expected})
+               and re.fullmatch(r"[a-f0-9]{64}",actual["code_sha256"]), "inference_runtime_code_identity_unknown")
+    proposal = audit["inference"]["proposal"]
+    calls = report["calls"]
+    _check(type(calls) is list and 0 < len(calls) <= policy.max_events
+           and len({row["invocation"] for row in calls}) == len(calls), "inference_call_capacity_or_duplicates")
+
+    def tensor(value, *, with_values=True):
+        _check(type(value) is dict and set(value) == {"token","shape","dtype","sha256","tensor_version"}|({"values"} if with_values else set()),
+               "inference_tensor_protocol")
+        _check(type(value["token"]) is int and value["token"] > 0 and type(value["tensor_version"]) is int
+               and type(value["shape"]) is list and len(value["shape"]) <= 8
+               and all(type(n) is int and n >= 0 for n in value["shape"])
+               and type(value["dtype"]) is str and re.fullmatch(r"[a-f0-9]{64}",value["sha256"]), "inference_tensor_identity")
+        if with_values:
+            size = math.prod(value["shape"])
+            _check(size <= policy.max_tensor_elements, "inference_tensor_capacity")
+            def finite(item, dims):
+                if not dims:
+                    _check(type(item) in (int,float) and math.isfinite(item), "inference_tensor_value_type")
+                else:
+                    _check(type(item) is list and len(item) == dims[0], "inference_tensor_shape")
+                    for child in item:
+                        finite(child,dims[1:])
+            finite(value["values"],value["shape"])
+    _check(type(report["loaded_model_token"]) is int and report["loaded_model_token"] > 0
+           and type(report["loaded_state"]) is dict and len(report["loaded_state"]) <= policy.max_events,
+           "inference_loaded_state_unknown")
+    for name, value in report["loaded_state"].items():
+        _check(type(name) is str and name and type(value) is dict and type(value.get("checkpoint_member")) is bool,
+               "inference_registered_state_protocol")
+        tensor({"token":1,**{key:item for key,item in value.items() if key != "checkpoint_member"}},with_values=False)
+    for row in calls:
+        _check(type(row) is dict and row.get("role") in proposal["sites"]
+               and type(row.get("site")) is int and row["site"] == proposal["sites"][row["role"]]
+               and type(row.get("order")) is int and row["order"] == row["invocation"] > 0
+               and (row.get("parent_invocation") is None or type(row["parent_invocation"]) is int), "inference_call_protocol")
+        if row["role"] == "getitem":
+            tensor(row["feature_snapshot"])
+            _check(type(row["ordinal"]) is int and row["ordinal"] >= 0 and type(row["label"]) in (int,float)
+                   and type(row["id"]) in (str,int), "inference_getitem_protocol")
+        elif row["role"] == "model":
+            for key in ("output","batch_features","batch_labels"):
+                tensor(row[key])
+            _check(row["module_call_completed"] is True and row["model_token"] == report["loaded_model_token"], "inference_final_module_return_unknown")
+            _check(type(row["batch_ids"]) is list and all(type(value) in (str,int) for value in row["batch_ids"])
+                   and type(row["torch_initial_seed"]) is int, "inference_actual_batch_metadata_unknown")
+        elif row["role"] == "prediction":
+            _check(type(row.get("model_invocation")) is int and 0 < row["model_invocation"] < row["invocation"],
+                   "inference_prediction_model_call_unknown")
+            tensor(row["input"])
+            tensor(row["output"])
+        else:
+            _check(type(row["predictions"]) is list and type(row["labels"]) is list
+                   and len(row["predictions"]) == len(row["labels"]) <= policy.max_samples
+                   and type(row["value"]) in (int,float) and math.isfinite(row["value"]), "inference_metric_protocol")
+            for item in row["predictions"]+row["labels"]:
+                tensor(item)
+    _check(type(report["samples"]) is list and len(report["samples"]) == audit["inference"]["partition_count"] <= policy.max_samples,
+           "inference_sample_denominator_unknown")
+    # Independently captured host inspections, never an author report/image label.
+    for phase in ("before","after"):
+        identity_path = paths["launch"].parent / ("inference_image_"+phase+".json")
+        identity_raw = _read(identity_path)
+        identity = _json(identity_raw)
+        expected_command = ["docker","image","inspect","--format","{{.Id}}",result["environment"]["image"]]
+        _check(identity == {"command":expected_command,"returncode":0,"termination":"completed","stdout":policy.image_id+"\n"}
+               and result["commands"].count(expected_command) == 2, "actual_inference_image_identity_unknown")
+        paths["image_"+phase],raw["image_"+phase] = identity_path,identity_raw
+    _check(raw["stdout"].decode("utf-8").replace("\r\n","\n") == result["stdout"], "inference_host_stdout_changed")
+    for key,name in (("runtime_observer","report"),("runtime_observer_launch","launch")):
+        _check(_path(result["logs"][key]) == _path(paths[name]), "inference_host_audit_pointer_changed")
+    raw_path = _path(result["logs"]["raw_output"])
+    _check(raw_path == paths["launch"].parent / "raw_output.json", "inference_raw_output_pointer_changed")
+    raw_payload = _json(_read(raw_path))
+    if file_output is not None:
+        _check(_same(raw_payload,file_output["payload"]), "inference_metric_file_raw_conflict")
+    else:
+        lines = result["stdout"].strip().splitlines()
+        _check(len(lines) == 1 and _same(_json(lines[0].removeprefix("FACTREVIEW_OBSERVATIONS=").encode()),raw_payload),
+               "inference_stdout_raw_conflict")
+    refs = {key:{"path":str(path),"sha256":_sha(raw[key])} for key,path in paths.items()}
+    refs["raw_output"] = {"path":str(raw_path),"sha256":_file_sha(raw_path)}
+    return {"status":"received","report":report,"raw_output":raw_payload,"evidence_refs":refs,
+        "run_identity":{"request_sha256":_fingerprint(req),"actual_argv_sha256":_fingerprint(argv),"image_id":policy.image_id},
+        "producer_code_identity":{"basis":"fixed_inference_observer_actual_runtime_prepare_and_match",
+                                  "sites":report["sites"],"interpreter":interpreter},
+        "scientific_qualification":False,"alignment":False,"support":False,
+        "limits":["trusted_host_request_outcome_required","in_process_tampering_not_excluded",
+                  "cpu_eager_numeric_only","image_text_tokenizer_uncovered"]}
+
+
 def read_observer_receipt(request, outcome):
+    return _read_receipt(request, outcome, inference=False)
+
+
+def read_inference_receipt(request, outcome):
+    """Authenticate only the new fixed producer; old observer reports cannot upgrade."""
+    return _read_receipt(request, outcome, inference=True)
+
+
+def _read_receipt(request, outcome, *, inference):
     """received/unresolved; actual-runtime CodeType facts remain producer observations.
 
     Arbitrary custom callers or in-process malicious author tampering are outside
@@ -107,13 +234,18 @@ def read_observer_receipt(request, outcome):
         attempt, scratch = _path(run / f"attempt_{req['repair_round']}"), _path(run / "runtime_scratch")
         trusted = _path(attempt / "observer_trusted")
         _check(root == run / "workspace" and not attempt.is_relative_to(scratch)
-               and {child.name for child in trusted.iterdir()} == {"observer.py", "config.json"}, "unknown_audit_layout")
+               and {child.name for child in trusted.iterdir()} == ({"observer.py", "config.json", "source_binding.py"}
+                   if inference else {"observer.py", "config.json"}), "unknown_audit_layout")
         paths = {"launch": attempt / "runtime_observer_launch.json", "report": attempt / "runtime_observer.json",
                  "config": trusted / "config.json", "observer": trusted / "observer.py", "stdout": attempt / "run_stdout.log"}
+        if inference:
+            paths["source_binding"] = trusted / "source_binding.py"
         raw = {key: _read(path, 32 * 1024 * 1024 if key in {"report", "stdout"} else 2 * 1024 * 1024)
                for key, path in paths.items()}
         audit, config, report = (_json(raw[key]) for key in ("launch", "config", "report"))
         prepare_fields = _PREPARE | ({"metric_file"} if req["metric_output"] is not None else set())
+        if inference:
+            prepare_fields |= {"inference"}
         observer_env = env.get("runtime_observer")
         _check(type(observer_env) is dict, "unknown_launch_environment")
         capture = observer_env.get("capture")
@@ -125,7 +257,7 @@ def read_observer_receipt(request, outcome):
         prepared["status"] = "ready"
         sealed = {key: value for key, value in prepared.items() if key not in {"unresolved", "request_sha256"}}
         _check(_sha(json.dumps(sealed, sort_keys=True, ensure_ascii=True).encode()) == audit["request_sha256"], "prepare_seal_mismatch")
-        _check(audit["version"] == "readonly-python-observer-v1" and audit["workspace"] == str(root)
+        _check(audit["version"] == ("readonly-torch-inference-v1" if inference else "readonly-python-observer-v1") and audit["workspace"] == str(root)
                and audit["trusted_dir"] == str(trusted) and audit["runtime_dir"] == str(scratch)
                and audit["original_workdir"] == req["workdir"] and _same(audit["original_command"], req["command"]), "request_launch_identity_mismatch")
         entry = _relative(req["plan"]["task"]["entry_script"])
@@ -175,10 +307,31 @@ def read_observer_receipt(request, outcome):
                            relative_output), "unknown_producer_output_path")
         expected_config = {"entry": command[1], "args": command[2:], "cwd": cwd, "sites": runtime_sites,
                            "output": "/workspace/run_dir/" + relative_output}
+        if inference:
+            from schemas.runtime_science import TorchInferenceProposal
+
+            from .v2_config import TorchInferenceLimits
+            nn = audit["inference"]
+            _check(type(nn) is dict and set(nn) == {"binding_digest","proposal","policy","source_sha256",
+                "partition_sha256","partition_count","checkpoint_sha256"}, "inference_config_protocol")
+            TorchInferenceProposal.model_validate(nn["proposal"])
+            policy = TorchInferenceLimits.model_validate(nn["policy"])
+            _check(_same(nn["proposal"], TorchInferenceProposal.model_validate(req["source_science"]).model_dump(mode="json"))
+                   and _same(nn["policy"],TorchInferenceLimits.model_validate(req["config"]["docker_options"].get("torch_inference")).model_dump(mode="json")),
+                   "inference_proposal_or_policy_changed")
+            for name, expected in nn["source_sha256"].items():
+                _check(_file_sha(root / _relative(name)) == manifest.get(name) == expected, "inference_complete_source_changed")
+            _check(nn["partition_sha256"] == manifest[nn["proposal"]["dataset_path"]]
+                   and nn["checkpoint_sha256"] == manifest[nn["proposal"]["checkpoint_path"]], "inference_resources_changed")
+            expected_config["inference"] = nn
         _check(_same(config, expected_config) and audit["container_cwd"] == cwd
                and audit["launch_command"] == [command[0], "/factreview-observer/observer.py", "/factreview-observer/config.json"], "actual_config_changed")
-        _check(_sha(raw["observer"]) == _file_sha(Path(__file__).with_name("runtime_observer.py"))
-               and _same(audit["package_files"], {"observer.py": _sha(raw["observer"]), "config.json": _sha(raw["config"])}), "observer_package_changed")
+        expected_package = {"observer.py": _sha(raw["observer"]), "config.json": _sha(raw["config"])}
+        if inference:
+            _check(_sha(raw["source_binding"]) == _file_sha(Path(__file__).with_name("runtime_observer.py")), "inference_source_binding_changed")
+            expected_package["source_binding.py"] = _sha(raw["source_binding"])
+        _check(_sha(raw["observer"]) == _file_sha(Path(__file__).with_name("inference_observer.py" if inference else "runtime_observer.py"))
+               and _same(audit["package_files"], expected_package), "observer_package_changed")
         bootstrap = _bootstrap_scope(root, _path(root / entry), _path(root / workdir), req["config"]["python_version"])
         bootstrap.update(cache_path="/workspace/run_dir/.pycache", cache_absent_at_prepare=True)
         expected_mounts = {
@@ -230,6 +383,10 @@ def read_observer_receipt(request, outcome):
         expected_env = dict(_DEFAULT_ENV, FACTREVIEW_REPAIR_ROUND=str(req["repair_round"]))
         _check(all(actual_env.get(key) == value for key, value in expected_env.items())
                and set(actual_env).issubset(set(expected_env) | {"HTTP_PROXY", "http_proxy", "HTTPS_PROXY", "https_proxy", "NO_PROXY", "no_proxy"}), "declared_environment_changed_or_unknown")
+        if inference:
+            return _inference_report(request, outcome, report=report, audit=audit, raw=raw, paths=paths,
+                runtime_sites=runtime_sites, hashes=nn["source_sha256"], bootstrap=bootstrap,
+                argv=argv, cwd=cwd, file_output=file_output, policy=policy)
         _check(type(report) is dict and report.get("version") == "python-source-events-v1" and report.get("unresolved") == []
                and report.get("execution", {}).get("status") == "completed" and _sha(raw["report"]) == audit["report_sha256"], "report_changed_or_incomplete")
         _check(report.get("scope_limits") == ["in_process_tampering_not_excluded", "events_do_not_prove_scientific_roles",
