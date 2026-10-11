@@ -1,5 +1,10 @@
 # FactReview v2 acceptance checks
 
+2026-10-11 Phase 2 来源缺段修复已交付：非空 MinerU 列表遗漏的完整 Markdown 段落和真实标题在共享材料形成前物化，原 parser 对象/字段/ID/次序及图表行关联保持，新来源有精确字符区间、稳定摘要 ID、page=None 和明确说明。partial overlap 与不确定插入继续 unavailable。v1/v2/v3 的嵌套 HTML、PI/CDATA/声明及 subset PI 反例均保留；v4 获另一 agent 限定接受，report 4ed6d3df / facts ce2bb50e，Root 全文读取并核28新与100历史对象、六旁侧合同和当前两文件，接受收据 bfbdac5a。唯一同字节组合 mock v3 红1.20s→v4 绿0.87s，原76 Assert保持至90、Ruff/被动compile2通过；原四相关节点仅沿用v1收据，不重复通过测试。有限词法、原raw heading section行为、物理页恢复、真实召回及prompt容量限制保持；方法2/8仍未通过。
+
+第三层新NN8已绑定已接受605e6c8完整228文件/31目录来源，9控制器/16输入、原19检查与2调用/100000 token/单次作者运行预算保持；controller/release/selector/status均获独审，Root收据f3104d46/10f3931e。唯一离线prepare-335fa2985a97已rc0（manifest09929af1），应用/模型/作者执行计数全0，独立prepared身份审核中，尚无新actual。Root首次误传PLACEHOLDER被原release门预写拒绝、27文件原样，失败记录f5133b7b保留；远端TLS失败后精确核对334e329成功，原四tracked fixture的Git blob/换行属性已核，收据30563b6e。整篇Full9闭合草案11控制器/8原输入获独审34ffe92f，Root接受aacca41e；待新提交canonical和来源绑定，全部准入仍关闭。
+
+
 2026-10-11 Phase 4 固定子守卫交付已接受：原两处 source 增量独审与 Root 严格合同/fixture修正独审合并接受，报告 `1da13da8` / facts `5961c6ce`，Root 核22作者、32修正、4独审对象及当前文件，收据 `ee535d1a`。新增20闭枚举内存标签在原 attempted 之后、IO之前记录已经算出的首拒绝码；默认关闭、None不增标签、原一次侧文件/科学守卫/128与1m界保持。两个旧精确合同各按新增字段扩展，并增加完整固定事件/阶段快照校验；其余27 writer/41 catalog及新mock全部28原Assert保持。四份完整原baseline纳入tracked fixture，换行转换关闭。两个必要writer节点通过，catalog修后1passed/5.10s，原失败/Ruff3/被动compile7与身份收据保留，无通过节点复跑。原Full v8具体科学子码与IO原因仍unknown，方法2/8继续未通过。
 
 2026-10-11 新增测试合同与材料边界问题已保留：Phase4 原候选独审需修正，Root 严格新事件/阶段字段与 baseline 可交付性修正冻件 `d7667d1e` 等待独审；必要两 writer 与一个 catalog 节点通过，未削弱原行为断言。Phase2 嵌套 HTML 可将容器内伪 References 误作来源，原候选不提交，作者 v2 修复中。Phase5 `605e6c8` 已推送并核精确远端；真实 Full/NN 验收仍维持原失败，方法2/8未通过。
@@ -66,8 +71,8 @@ NNv5 终态已独审接受：Root全文读 report1e208f79/facts3e2b64df并核冻
 |---|---|---|
 | 1. 保持原断言和测试选择规则 | 有界通过 | 历史默认3754通过；旧fixture合同迁移已独审，60原Assert保持，一条完整响应格式等式迁移并增两等式，必要61+1控制与身份核证保留；未宣称当前全套再跑。 |
 | 2. 完整七阶段交付 | 未通过 | v8实际41aaeae3d517七阶段ok、L1动态覆盖/原复核程序检查通过；整链partial/rc1，verification文献与实验验证未完成、0计划/L3，12有限程序事实终态独审已接受。 |
-| 3. 无数量上限提取与拆分 | 有界通过 | 原控制与长论文历史保留；原复核有限恢复和共享来源提示均已交付，真实召回与整链待核。 |
-| 4. 主张位置、条件、证据指针 | 有界通过 | 原契约与绑定控制保留。 |
+| 3. 无数量上限提取与拆分 | 有界通过 | oversized 完整阅读补漏及完整 Markdown 来源缺段物化已独审；无数量上限原合同保持，真实召回和总prompt容量待整链核证。 |
+| 4. 主张位置、条件、证据指针 | 有界通过 | 原契约保留；新增完整 Markdown 来源精确char span/digest ID，page未知明确None；重叠/不确定来源仍unavailable，不提高科学资格。 |
 | 5. 按 needs 分派 | 有界通过 | 原分派控制保留。 |
 | 6. 图表材料与三类 VLM 检查 | 有界通过 | v7实际图表三类及真实图像输入检查通过；table字面程序key补充独审已核，科学视觉判断质量仍待审查。 |
 | 7. 文献时间范围与来源限制 | 有界通过 | 原策略保留；429/超时及充分性限制仍记录。 |
