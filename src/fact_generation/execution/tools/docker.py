@@ -1318,13 +1318,21 @@ def docker_run_paper_image(
     shm_size: str | None = None,
     ipc: str | None = None,
     container_name: str | None = None,
+    sandbox=None,
 ) -> list[str]:
     """
     Run a command inside a per-paper image.
     Commands execute using the image's default python environment.
     """
     env = dict(env or {})
-    proxy_env = _docker_proxy_env({})
+    policy = None
+    if sandbox is not None:
+        from ..v2_config import SANDBOX_ENV, sandbox_options, sandbox_policy
+
+        policy = sandbox_policy(sandbox)
+        if ipc not in (None, "private"):
+            raise ValueError("sandbox IPC must be private or omitted")
+    proxy_env = {} if policy is not None and policy.network == "none" else _docker_proxy_env({})
     run_dir_host = str(Path(run_dir_host).resolve())
     paper_root_host = str(Path(paper_root_host).resolve())
     run_dir_container = "/workspace/run_dir"
@@ -1342,7 +1350,12 @@ def docker_run_paper_image(
     ]
     if container_name:
         args.extend(["--name", container_name])
-    args.extend(_docker_run_user_args())
+    if policy is None:
+        args.extend(_docker_run_user_args())
+    else:
+        args.append("--read-only")
+        for option, value in sandbox_options(policy).items():
+            args.extend([option, value])
     if gpus:
         # e.g. "all" or "device=0"
         args.extend(["--gpus", str(gpus)])
@@ -1380,6 +1393,8 @@ def docker_run_paper_image(
         "HF_HOME": f"{run_dir_container}/.cache/huggingface",
         "MPLCONFIGDIR": f"{run_dir_container}/.cache/matplotlib",
     }
+    if policy is not None:
+        default_env.update(SANDBOX_ENV)
     if env.get("PYTHONPATH"):
         parts = [part for part in str(env["PYTHONPATH"]).split(":") if part]
         if paper_root_container not in parts:

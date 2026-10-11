@@ -369,7 +369,8 @@ def _read_receipt(request, outcome, *, inference):
         runs = [argv for argv in result["commands"] if type(argv) is list and argv[:2] == ["docker", "run"]]
         _check(len(runs) == 1, "actual_run_argv_not_unique")
         argv = runs[0]
-        protected = protect_observer_docker_argv(argv, launch=prepared)
+        sandbox = req["config"].get("sandbox")
+        protected = protect_observer_docker_argv(argv, launch=prepared, sandbox=sandbox)
         _check(protected["status"] == "ready" and protected["argv"] == argv, "actual_argv_not_protected")
         image_index = len(argv) - len(audit["launch_command"]) - 1
         _check(argv[image_index] == env.get("image") and argv.count("--name") == 1
@@ -381,6 +382,15 @@ def _read_receipt(request, outcome, *, inference):
                 _check(separator and name not in actual_env, "duplicate_or_inherited_environment")
                 actual_env[name] = value
         expected_env = dict(_DEFAULT_ENV, FACTREVIEW_REPAIR_ROUND=str(req["repair_round"]))
+        if sandbox is not None:
+            from .v2_config import SANDBOX_ENV, sandbox_policy
+
+            approved = sandbox_policy(sandbox)
+            expected_env.update(SANDBOX_ENV)
+            _check(_same(env.get("sandbox"), {"policy": approved.model_dump(mode="json"),
+                "user": f"{approved.uid}:{approved.gid}", "network": approved.network,
+                "author_transport_invoked": True, "argv": argv, "runtime_enforcement": "unverified"}),
+                "sandbox_policy_or_actual_argv_changed")
         _check(all(actual_env.get(key) == value for key, value in expected_env.items())
                and set(actual_env).issubset(set(expected_env) | {"HTTP_PROXY", "http_proxy", "HTTPS_PROXY", "https_proxy", "NO_PROXY", "no_proxy"}), "declared_environment_changed_or_unknown")
         if inference:

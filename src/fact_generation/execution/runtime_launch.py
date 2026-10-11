@@ -415,7 +415,7 @@ def _mount(value, option):
     return fields["source"], fields["target"], "ro" if fields.get("readonly") else "rw"
 
 
-def protect_observer_docker_argv(argv, *, launch):
+def protect_observer_docker_argv(argv, *, launch, sandbox=None):
     """Pure transformation of the existing finite Docker helper's command layout."""
     result = {"status": "unresolved", "argv": argv.copy() if type(argv) is list else argv, "unresolved": []}
     try:
@@ -433,6 +433,11 @@ def protect_observer_docker_argv(argv, *, launch):
         options, rewritten, mounts, cwd, index = argv[2:image_index], [], {}, [], 0
         pythonpath_present = False
         pairs = {"--name", "--user", "--gpus", "--shm-size", "--ipc", "-w", "--workdir", "-e", "--env"}
+        if sandbox is not None:
+            from .v2_config import SANDBOX_PAIR_FLAGS, validate_sandbox_options
+
+            validate_sandbox_options(options, sandbox)
+            pairs |= SANDBOX_PAIR_FLAGS
         while index < len(options):
             option = options[index]
             if option in {"--rm", "--read-only"}:
