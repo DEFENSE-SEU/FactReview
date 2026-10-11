@@ -1,5 +1,7 @@
 # FactReview v2 acceptance checks
 
+Phase5 safe schema sidecar checkpoint：Root全文读作者a0671cd6、新源完整diff/test及独审70bbd07b/evidence674df717，接受17/17有限事实。精确ValidationError仅在受控attempt0–3排他写固定schema_id/field/error_type最多8项，动态键/错误msg/input/context/secret不输出，写失败与已有文件保留原binding返回/资格。最终source2c851cc3/test735d0c00与frozen一致，旧51cc4d61测试字节不改。必要同node记录red/green、最终1passed/1.38s与Ruff通过；red测试4921c0b0和final735d字节不同，独审确认至sidecar读取的核心前缀AST相同，尾部完整red源未保存，不宣称同字节。P2两依赖后来改IPC，其必要控制与独审另绑定；旧green不扩展新完整来源资格。原b086具体schema字段仍未知，下一新NN运行才可定位；没有旧private解析/消费重放或真实新NN成功。
+
 Phase5 operator sandbox P2 checkpoint：Root全文读五耦合产品完整diff/test及原独审d1528f76，接受资源/用户/网络/readonly/caps/NFP策略保留原科学路径；原IPC缺口由两处七行delta关闭，全文读并接受最终独审5f761095/evidencececea3dd的26事实。默认2CPU/4GiB/noSwap/PID256/none/1000:1000/readonly/cap-drop ALL/NFP，HOME/TMPDIR在scratch；repair不能改策略，无自动root/rw/删限制降级。唯一public mock最终同SHA bf5c163红.89s→绿7.74s，原20+68Assert保持，新增24Assert，Ruff3通过；原v1必要mock/Ruff身份另外保留。当前五source/test均与frozen匹配。runtime_enforcement仍unverified，Root-only kernel探针准备中；不承接旧NN或整篇实际认证，原14验收整链2/8开放。
 
 Phase4 fresh statistics v6 source checkpoint：Root 已全文读作者 554a1565 和独审 ad02228d/evidence547ad20d，接受30项有限事实。模型提交严格原值/JSON类型与精确Unicode原片段，程序核对完整inventory/连续全文后生成原canonical v3摘要；独立atom/field/fragment/composition、SourceAuthority、整数token、全样本及预算守卫保留。两项必要public mock最终2passed/7.64s，旧34Assert保持，新33Assert覆盖10种情况，Ruff通过；同最终新test对精确旧producer为red。工作source070ed62e/221015f1、testb948088e/85117861与frozen同，schemas/claim未改。真实v6尚未运行，原b8失败保留；原14项仍12有界通过/2整链失败。
