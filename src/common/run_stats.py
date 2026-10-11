@@ -12,6 +12,8 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
+from .provider_attempts import record_denial, valid_denial_record
+
 try:
     import fcntl
 except Exception:  # pragma: no cover - Windows fallback for local development.
@@ -142,6 +144,7 @@ def _empty_module_payload(status: str = "pending") -> dict[str, Any]:
         "providers": {},
         "models": {},
         "warnings": [],
+        "local_denials": [],
     }
 
 
@@ -263,7 +266,7 @@ def read_initialized(path: Path | None = None) -> dict[str, Any]:
             raise ValueError("usage_not_initialized")
         for module in MODULE_ORDER:
             row = payload["modules"][module]
-            if not (type(row) is dict and set(_empty_module_payload()).issubset(row)):
+            if not (type(row) is dict and (set(_empty_module_payload()) - {"local_denials"}).issubset(row)):
                 raise ValueError("usage_module_incomplete")
             usage = row["token_usage"]
             if not (type(usage) is dict and set(_empty_token_usage()).issubset(usage)
@@ -272,6 +275,9 @@ def read_initialized(path: Path | None = None) -> dict[str, Any]:
             if not all(type(row[key]) is int and row[key] >= 0
                        for key in ("failed_requests", "unavailable_usage_requests", "image_count")):
                 raise ValueError("usage_counts_invalid")
+            if "local_denials" in row and (type(row["local_denials"]) is not list or not all(
+                    valid_denial_record(item, module=module) for item in row["local_denials"])):
+                raise ValueError("usage_local_denials_invalid")
         return payload
 
 
@@ -377,7 +383,8 @@ def record_llm_call(
     warning: str = "",
     failed: bool = False,
     image_count: int = 0,
-) -> None:
+    local_denial: Any = None,
+) -> Any:
     """Record a call attempt, including local/provider failures and requested images.
 
     Unknown usage on a failed attempt contributes no fabricated token estimate;
@@ -387,6 +394,27 @@ def record_llm_call(
     if not resolved_module:
         raise RuntimeError("LLM usage recording requires an active stats module")
     normalized = validate_module(resolved_module)
+
+    if local_denial is not None:
+        if (failed is True and (usage is None or (type(usage) is dict and not usage))
+                and estimated is not True and (target := stats_path()) is not None):
+            def persist(record):
+                with _UPDATE_LOCK:
+                    with _locked_payload(target) as payload:
+                        rows = payload["modules"][normalized]["local_denials"]
+                        expected = [*rows, record]
+                        rows.append(record)
+                    committed = read_initialized(target)["modules"][normalized]["local_denials"]
+                    if json.dumps(committed, sort_keys=True) != json.dumps(expected, sort_keys=True):
+                        raise RuntimeError("local_denial_not_committed")
+
+            acknowledgement = record_denial(
+                local_denial, module=normalized, provider=provider, model=model,
+                duration_sec=max(0.0, float(duration_sec or 0.0)), image_count=max(0, int(image_count)),
+                persist=persist,
+            )
+            if acknowledgement is not None:
+                return acknowledgement
 
     exact_usage = _coerce_usage(usage or {})
     has_usage = any(
@@ -398,6 +426,8 @@ def record_llm_call(
         is_estimated = False
     images = max(0, int(image_count))
     additional_warnings = []
+    if local_denial is not None:
+        additional_warnings.append("local_denial_receipt_unverified")
     if failed and not has_usage:
         additional_warnings.append(
             f"Token totals are incomplete: failed request for provider={provider or 'unknown'} "
@@ -495,6 +525,7 @@ def with_totals(payload: dict[str, Any]) -> dict[str, Any]:
     estimated = False
     warnings: list[str] = []
     call_counts = {key: 0 for key in ("failed_requests", "unavailable_usage_requests", "image_count")}
+    local_denials = []
     for module in MODULE_ORDER:
         row = data["modules"][module]
         usage = row["token_usage"]
@@ -506,6 +537,10 @@ def with_totals(payload: dict[str, Any]) -> dict[str, Any]:
         warnings.extend(str(item) for item in row.get("warnings") or [] if str(item).strip())
         for key in call_counts:
             call_counts[key] += row[key]
+        if type(row["local_denials"]) is not list or not all(
+                valid_denial_record(item, module=module) for item in row["local_denials"]):
+            raise ValueError("usage_local_denials_invalid")
+        local_denials.extend(row["local_denials"])
     data["total"] = {
         "duration_sec": duration,
         "llm_duration_sec": llm_duration,
@@ -513,6 +548,8 @@ def with_totals(payload: dict[str, Any]) -> dict[str, Any]:
         "estimated": estimated,
         "warnings": warnings,
         **call_counts,
+        "local_denials": local_denials,
+        "local_denial_count": len(local_denials),
     }
     return data
 
@@ -551,6 +588,8 @@ def format_summary_table(payload: dict[str, Any]) -> list[str]:
             notes.append(f"usage unavailable={row['unavailable_usage_requests']}")
         if row["image_count"]:
             notes.append(f"images={row['image_count']}")
+        if row["local_denials"]:
+            notes.append(f"local denied={len(row['local_denials'])}")
         if module == "parse" and int(usage.get("total_tokens") or 0) == 0:
             notes.append("external/no own LLM")
         line = (
