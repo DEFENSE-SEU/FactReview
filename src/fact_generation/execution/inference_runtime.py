@@ -200,19 +200,31 @@ def _write_paper_scope_diagnostics(request, error, materials):
         pass
 
 
-def bind_inference_request(request, *, claim, materials, source_sites_diagnostics=False):
+def bind_inference_request(request, *, claim, materials, source_sites_diagnostics=False, runtime_stage_diagnostic=None):
     """Program-owned attempt binding; errors retain the legal unobserved run."""
+    if runtime_stage_diagnostic is not None:
+        from .inference_source_sites_diagnostics import RuntimeStageDiagnostic
+
+        if type(runtime_stage_diagnostic) is not RuntimeStageDiagnostic:
+            runtime_stage_diagnostic = None
     try:
         diagnostics = {}
         if source_sites_diagnostics is True:
             from .inference_source_sites_diagnostics import SourceSitesDiagnostic
 
             diagnostics["source_sites_diagnostic"] = SourceSitesDiagnostic(request, materials)
+        if runtime_stage_diagnostic is not None:
+            diagnostics["runtime_stage_diagnostic"] = runtime_stage_diagnostic
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, phase="pre_run", stage="entry")
         binding = bind_inference_proposal(request.source_science, plan=request.plan, claim=claim, materials=materials,
             workspace=request.workspace, source_files=request.source_science_files,
             limits=request.config.docker_options.get("torch_inference"), source_sites=request.source_sites, **diagnostics)
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="context", terminal="passed", pre_run_bound=True)
         return {"status":"bound", "request_sha256":_fingerprint(request.model_dump(mode="json")),"binding":binding}
     except (ValueError,TypeError,KeyError,IndexError,OSError,UnicodeError,OverflowError) as exc:
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.reject(runtime_stage_diagnostic, pre_run_bound=False)
         if type(exc) is ValidationError:
             _write_schema_validation_diagnostics(request, exc, materials)
         failure = next((code for error_type, code in _BINDING_FAILURE_TYPES
@@ -310,8 +322,15 @@ def partition_rows(path, proposal, limits):
 
 
 def bind_inference_proposal(proposal, *, plan, claim, materials, workspace, source_files, limits, source_sites=None,
-                            source_sites_diagnostic=None):
+                            source_sites_diagnostic=None, runtime_stage_diagnostic=None):
     """Rebuild selected original resources and complete source, without running them."""
+    if runtime_stage_diagnostic is not None:
+        from .inference_source_sites_diagnostics import RuntimeStageDiagnostic
+
+        if type(runtime_stage_diagnostic) is not RuntimeStageDiagnostic:
+            runtime_stage_diagnostic = None
+        else:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="schema_resources")
     parsed = TorchInferenceProposal.model_validate(proposal)
     policy = TorchInferenceLimits.model_validate(limits)
     contract = validate_resource_contract(plan, claim, materials)
@@ -322,6 +341,8 @@ def bind_inference_proposal(proposal, *, plan, claim, materials, workspace, sour
     root = plain_path(Path(materials.repository.root)).resolve(strict=True)
     running = plain_path(Path(workspace)).resolve(strict=True)
     indexed = {row.path: row.sha256 for row in materials.repository.files}
+    if runtime_stage_diagnostic is not None:
+        RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="source_closure")
     require(type(source_files) is dict, "complete_source_supply_required")
     from .runtime_science import read_inference_sources
     rebuilt_sources, read_scope = read_inference_sources(plan,materials,workspace)
@@ -336,6 +357,8 @@ def bind_inference_proposal(proposal, *, plan, claim, materials, workspace, sour
         require(indexed.get(name) == scope["sha256"] == file_sha(_actual_file(running, name)) and
                 source_files.get(name) == text, "complete_source_changed_or_unsupplied")
         files[name] = text
+    if runtime_stage_diagnostic is not None:
+        RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="source_sites")
     if source_sites_diagnostic is not None:
         from .inference_source_sites_diagnostics import SourceSitesDiagnostic
 
@@ -345,6 +368,9 @@ def bind_inference_proposal(proposal, *, plan, claim, materials, workspace, sour
                 "inference_source_sites_unbound")
     else:
         SourceSitesDiagnostic.require_bound(source_sites_diagnostic, source_sites)
+    if runtime_stage_diagnostic is not None:
+        RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="source_sites", terminal="passed")
+        RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="paper_config_partition")
     sites = source_sites["sites"]
     require(all(index < len(sites) for index in parsed.sites.values()), "inference_site_index_unbound")
     for role, index in parsed.sites.items():
@@ -475,29 +501,55 @@ def validate_inference_flow(binding, receipt, *, partition_path):
             "scientific_qualification":False,"alignment":False,"support":False}
 
 
-def build_inference_context(proposal, *, plan, claim, materials, request, outcome, source_files):
+def build_inference_context(proposal, *, plan, claim, materials, request, outcome, source_files,
+                            runtime_stage_diagnostic=None):
     from .runtime_receipt import read_inference_receipt
-    binding = bind_inference_proposal(proposal, plan=plan, claim=claim, materials=materials,
-        workspace=request.workspace, source_files=source_files, limits=request.config.docker_options.get("torch_inference"),
-        source_sites=request.source_sites)
-    receipt = read_inference_receipt(request,outcome)
-    flow = validate_inference_flow(binding,receipt,partition_path=_actual_file(Path(request.workspace),proposal["dataset_path"]))
-    observed = {"dataset":binding["actual"]["dataset"],"metric":binding["actual"]["metric"],
-                "settings":binding["actual"]["settings"],"value":flow["value"]}
-    from .v2 import Observation, aligned
-    require(aligned(Observation.model_validate(observed), plan.target_conditions[0]), "actual_inference_condition_unaligned")
-    catalog = dict(binding["catalog"], **{"actual/inference":{"binding_digest":binding["binding_digest"],
-        "flow":flow,"runtime_framework":receipt["report"]["framework"], "producer_code_identity":receipt["producer_code_identity"],
-        "loaded_state":receipt["report"]["loaded_state"], "actual":binding["actual"],
-        "complete_samples":receipt["report"]["samples"],
-        "complete_sample_count":flow["sample_count"],"source_files":binding["source_files"],
-        "evidence_refs":receipt["evidence_refs"]}})
-    obligations = {role:["paper/"+role,"source/"+role,"actual/inference"] for role in ROLES}
-    for key in ("description","dataset","metric",*["settings/"+key for key in plan.target_conditions[0].settings]):
-        role = {"dataset":"dataset","metric":"metric","settings/model":"model","settings/split":"split"}.get(key,"qualifiers")
-        obligations["condition/"+key] = obligations[role]
-    context = {"version":VERSION,"scientific_claim":binding["scientific_claim"],"condition":plan.target_conditions[0].model_dump(mode="json"),
-               "plan":plan.model_dump(mode="json"),"resource_contract":binding["resource_contract"],"catalog":catalog,
-               "obligations":obligations,"actual_observation":observed}
-    context["context_digest"] = _fingerprint(context)
-    return context
+    diagnostics = {}
+    if runtime_stage_diagnostic is not None:
+        from .inference_source_sites_diagnostics import RuntimeStageDiagnostic
+
+        if type(runtime_stage_diagnostic) is not RuntimeStageDiagnostic:
+            runtime_stage_diagnostic = None
+        else:
+            phase = "refreshed_context" if runtime_stage_diagnostic.phase == "refreshed_context" else "initial_context"
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, phase=phase, stage="entry")
+            diagnostics["runtime_stage_diagnostic"] = runtime_stage_diagnostic
+    try:
+        binding = bind_inference_proposal(proposal, plan=plan, claim=claim, materials=materials,
+            workspace=request.workspace, source_files=source_files, limits=request.config.docker_options.get("torch_inference"),
+            source_sites=request.source_sites, **diagnostics)
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="receipt")
+        receipt = read_inference_receipt(request,outcome)
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="flow")
+        flow = validate_inference_flow(binding,receipt,partition_path=_actual_file(Path(request.workspace),proposal["dataset_path"]))
+        observed = {"dataset":binding["actual"]["dataset"],"metric":binding["actual"]["metric"],
+                    "settings":binding["actual"]["settings"],"value":flow["value"]}
+        from .v2 import Observation, aligned
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="alignment")
+        require(aligned(Observation.model_validate(observed), plan.target_conditions[0]), "actual_inference_condition_unaligned")
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="context")
+        catalog = dict(binding["catalog"], **{"actual/inference":{"binding_digest":binding["binding_digest"],
+            "flow":flow,"runtime_framework":receipt["report"]["framework"], "producer_code_identity":receipt["producer_code_identity"],
+            "loaded_state":receipt["report"]["loaded_state"], "actual":binding["actual"],
+            "complete_samples":receipt["report"]["samples"],
+            "complete_sample_count":flow["sample_count"],"source_files":binding["source_files"],
+            "evidence_refs":receipt["evidence_refs"]}})
+        obligations = {role:["paper/"+role,"source/"+role,"actual/inference"] for role in ROLES}
+        for key in ("description","dataset","metric",*["settings/"+key for key in plan.target_conditions[0].settings]):
+            role = {"dataset":"dataset","metric":"metric","settings/model":"model","settings/split":"split"}.get(key,"qualifiers")
+            obligations["condition/"+key] = obligations[role]
+        context = {"version":VERSION,"scientific_claim":binding["scientific_claim"],"condition":plan.target_conditions[0].model_dump(mode="json"),
+                   "plan":plan.model_dump(mode="json"),"resource_contract":binding["resource_contract"],"catalog":catalog,
+                   "obligations":obligations,"actual_observation":observed}
+        context["context_digest"] = _fingerprint(context)
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="context", terminal="passed")
+        return context
+    except Exception:
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.reject(runtime_stage_diagnostic)
+        raise

@@ -1,5 +1,9 @@
 # FactReview v2 acceptance checks
 
+2026-10-11 Phase 5 执行阶段诊断交付：四源与一个必要 mock 获另一 agent 独审接受（report `bc5b0a7a` / facts `1c5c578f`）；Root 核作者 30 冻件、独审三对象及当前五文件，接受收据 `d9edf44c`。四模块 raw/AST inverse 精确、55 原成员和全部 43 Assert 保持。原 exact True 开关在程序闭包记录每 attempt 的有限阶段，固定 <=512B 独占侧文件，原 request/state/ledger/科学谓词及默认调用保持；IO 失败继续原流程。必要同字节 mock 旧红→新绿/2.43s，两个原相关节点/5.13s；两个 attempts、一次 accepted repair，图异常关闭由静态审核覆盖，未重复测试。新 observer 接入进行中；NN v7 原失败及科学资格不变，Phase 8 / 第2、8项继续开放。
+
+2026-10-11 Full v8终态已独审核证：Root全文读report `b00e5c2e`/12条facts并核六冻结对象（map `46f7c34a`），接受收据 `7a1590ea`。固定来源227/31、8输入、11控制器及唯一once/admission身份闭合，五程序投影由既定词法selector独立重算一致；source/科学/private仅opaque，不复读科学正文。原所有失败字段保持，L1完整程序检查通过、整链partial仅verification/0planL3。作者IO事件只证OSError分支，具体step和科学first_subguard仍unknown。已授权在既有内存事件闭枚举中保留已算fixedfirst_subguard，默认作用域关闭、一次写/原门/128与1m上限不变；该批尚未实施完成。
+
 2026-10-11 Phase 3 oversized 补漏交付：两源与一个新必要 mock 已通过另一 agent 独审（12/12，report `dac1e258`/map `9505e237`），Root 全文读报告/事实、核六独审对象、33 作者对象及三当前产品，接受收据 ee59e16f。新片仅阅读遗漏，精确目录/完整全波/raw typed 身份闭合后进入原完整父输入及科学/ground/adoption 门；默认健康调用不增，原预算不变，显式 None 仅该新分支初始化原计数。同字节必要 mock 旧红→新绿/3.29s，旧相关节点/3.87s、受影响 Ruff/compile 保留，Root/独审零重复测试。完整 prompt 容量、完整父科学阅读、新 adapter first recovery 和缺失 Markdown 物化仍开放；该补漏尚无新实际资格。
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
@@ -57,7 +61,7 @@ NNv5 终态已独审接受：Root全文读 report1e208f79/facts3e2b64df并核冻
 | 验收项 | 当前结果 | 依据或待办 |
 |---|---|---|
 | 1. 保持原断言和测试选择规则 | 有界通过 | 历史默认3754通过；旧fixture合同迁移已独审，60原Assert保持，一条完整响应格式等式迁移并增两等式，必要61+1控制与身份核证保留；未宣称当前全套再跑。 |
-| 2. 完整七阶段交付 | 未通过 | v8实际41aaeae3d517七阶段ok、L1动态覆盖/原复核程序检查通过；整链partial/rc1，verification文献与实验验证未完成、0计划/L3，终态独审待进行。 |
+| 2. 完整七阶段交付 | 未通过 | v8实际41aaeae3d517七阶段ok、L1动态覆盖/原复核程序检查通过；整链partial/rc1，verification文献与实验验证未完成、0计划/L3，12有限程序事实终态独审已接受。 |
 | 3. 无数量上限提取与拆分 | 有界通过 | 原控制与长论文历史保留；原复核有限恢复和共享来源提示均已交付，真实召回与整链待核。 |
 | 4. 主张位置、条件、证据指针 | 有界通过 | 原契约与绑定控制保留。 |
 | 5. 按 needs 分派 | 有界通过 | 原分派控制保留。 |
