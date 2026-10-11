@@ -8,6 +8,7 @@ import pytest
 
 from schemas.claim import Claim, PredictionProjection, ProjectionScopeDecision
 from schemas.materials import SharedMaterials
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from verification.execution_projection import (
     ProjectionError,
     bind_projection_target,
@@ -132,22 +133,32 @@ def proposal_input(claim, materials, tmp_path):
         "data_paths": [proposal.data_path],
         "weight_paths": [],
     }
+    from verification.experiment_source_authority import build_authority_context
+    from verification.experiments import CatalogScopeReviewV3
+
     audit = tmp_path / "scope.json"
-    audit.write_text(
-        json.dumps(
-            {
-                "input": {
-                    "claim": claim.model_dump(mode="json"),
-                    "candidate_plans": [plan],
-                    "paper_blocks": [b.model_dump(mode="json") for b in materials.blocks],
-                    "execution_projection_context": projection_context(claim, materials),
-                },
-                "response": {
-                    "schema_version": "catalog-v2",
-                    "plan_projection_reviews": [review.model_dump(mode="json")],
-                },
-            }
+    payload = {
+        "claim": claim.model_dump(mode="json"),
+        "candidate_plans": [plan],
+        "candidate_items": [],
+        "paper_blocks": [b.model_dump(mode="json") for b in materials.blocks],
+        "execution_projection_context": projection_context(claim, materials),
+        "paper_scope_format": "catalog-v2",
+        "output_schema": CatalogScopeReviewV3.model_json_schema(),
+        "catalog": catalog,
+        "source_authority_context": build_authority_context(
+            claim, materials, [], catalog=catalog
         ),
+    }
+    response = authority_scope_fixture(
+        payload,
+        {"conditions": [], "items": [],
+         "plan_projection_reviews": [review.model_dump(mode="json")]},
+        requirement="unresolved", basis="unresolved",
+        rationale="This execution-only fixture makes no paper-support authority determination.",
+    )
+    audit.write_text(
+        json.dumps({"input": payload, "response": response}),
         "utf-8",
     )
     return proposal, review, reported, selector, plan, audit
@@ -337,7 +348,7 @@ def public_verify(tmp_path, *, change=None, with_observation=False):
         assert kwargs["module"] == "verification.experiments.scope"
         if change:
             change("scope", first, scope, claim, materials)
-        return copy.deepcopy(scope)
+        return authority_scope_fixture(json.loads(kwargs["prompt"]), scope, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
 
     with run_scope(tmp_path / "stats.json"):
         result = verify_experiments(claim, materials, call=model)

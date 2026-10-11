@@ -6,6 +6,7 @@ import json
 import pytest
 
 from llm.client import LLMConfig
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from tests.test_execution_projection_choices_v2 import public
 
 KEY = "sk-choice-privacy-unit-NOT-A-REAL-KEY-32987"
@@ -125,6 +126,8 @@ def mixed_choices(tmp_path):
                 "items": [],
                 "execution_choice_reviews": [review(c)],
             }
+        if kwargs["module"] == "verification.experiments.scope":
+            raw = authority_scope_fixture(payload, raw, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
         responses.append(copy.deepcopy(raw))
         return raw
 

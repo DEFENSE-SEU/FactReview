@@ -648,8 +648,10 @@ def bind_projection_target(
         audit.get("response", {}),
         [PlanCandidate.model_validate(p) for p in audit["input"]["candidate_plans"]],
     )
+    from verification.experiment_source_authority import retained_envelope
+
     if (
-        audit.get("response", {}).get("schema_version") != "catalog-v2"
+        not retained_envelope(audit, claim, materials)
         or reviews.get((review.plan_index, condition.id)) != review
     ):
         raise ProjectionError("Projection review does not identify one retained independent raw decision")

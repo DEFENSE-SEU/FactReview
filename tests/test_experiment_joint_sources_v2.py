@@ -9,6 +9,7 @@ import pytest
 from llm.client import LLMConfig
 from schemas.claim import Claim, ClaimLocation, Condition
 from schemas.materials import MaterialBlock, SharedMaterials
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from verification.experiment_catalog import build_catalog
 from verification.experiment_sources import prepare_joint_candidate
 from verification.experiments import ExperimentItem, verify_experiments
@@ -158,7 +159,9 @@ def run(p, review=None, items=None):
 
     def model(**kwargs):
         calls.append(kwargs)
-        return copy.deepcopy(candidate if len(calls) == 1 else response)
+        if len(calls) == 1:
+            return copy.deepcopy(candidate)
+        return authority_scope_fixture(json.loads(kwargs["prompt"]), response, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The table and declared definition/setup members report this complete measurement.")
 
     result = verify_experiments(claim, materials, call=model)
     assert len(calls) == 2
@@ -397,7 +400,10 @@ def test_rejected_plan_retains_verified_joint_observation(tmp_path):
     )
     responses = iter([output, review])
     with pytest.raises(RejectedPlan) as error:
-        verify_experiments(p[0], p[1], call=lambda **kw: next(responses))
+        verify_experiments(p[0], p[1], call=lambda **kw: (authority_scope_fixture(json.loads(kw["prompt"]), next(responses),
+                requirement="manuscript_reported_result", basis="reported_measurement",
+                rationale="Original table and declared measurement members report this result.")
+                if kw["module"] == "verification.experiments.scope" else next(responses)))
     assert error.value.observations.evidence[0].sufficient
     assert len(error.value.observations.evidence[0].additional_pointers) == 2
 
@@ -411,7 +417,9 @@ def test_source_mutation_during_scope_never_creates_decisive_joint(tmp_path):
         calls.append(kw)
         if len(calls) == 2:
             Path(p[1].markdown_path).write_text(p[1].markdown + "Source changed.", encoding="utf-8")
-        return next(responses)
+        response = next(responses)
+        return (authority_scope_fixture(json.loads(kw["prompt"]), response, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
+                if kw["module"] == "verification.experiments.scope" else response)
 
     result = verify_experiments(p[0], p[1], call=call)
     assert result.issues and not any(e.sufficient for e in result.evidence)
@@ -554,7 +562,9 @@ def test_new_mock_joint_over_unchanged_real_beit_source_objects(tmp_path, name):
 
     def model(**kwargs):
         calls.append(kwargs["module"])
-        return next(responses)
+        response = next(responses)
+        return (authority_scope_fixture(json.loads(kwargs["prompt"]), response, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
+                if kwargs["module"] == "verification.experiments.scope" else response)
 
     result = verify_experiments(claim, materials, call=model)
     assert calls == ["verification.experiments", "verification.experiments.scope"]

@@ -12,6 +12,7 @@ from common import run_stats
 from fact_generation.execution import v2
 from schemas.claim import ExecutionPlan
 from tests.execution_science_fixtures import record_observer
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from tests.test_execution_multi_condition_phase_a_v2 import _evaluation_events, _inputs, _proposal
 from util.subprocess_runner import CommandResult
 from verification.contracts import BranchResult
@@ -150,7 +151,7 @@ def test_v4_partition_origin_and_local_target_fail_closed_without_legacy_upgrade
     def model(prompt, system, cfg, *, module):
         payload = json.loads(prompt)
         if "candidate_items" in payload:
-            return {"conditions": [{"condition_id": c.id, "claim_quote": claim.text,
+            response = {"conditions": [{"condition_id": c.id, "claim_quote": claim.text,
                 "assertion": "descriptive", "matched_controls_required": False,
                 "uncertainty_sensitive": False, "relation": "none", "subject": "", "comparator": "",
                 "rationale": "Fixed two-setting claim remains intact."} for c in claim.conditions],
@@ -158,6 +159,7 @@ def test_v4_partition_origin_and_local_target_fail_closed_without_legacy_upgrade
                     "applicability": "applicable", "grounds": [{"block_id": claim.source_block_id,
                         "quote": claim.source_quote}], "rationale": "Partial paper observation retained.",
                     "full_support": False, "qualifiers_complete": False, "comparison_objects": "not_comparative"}]}
+            return authority_scope_fixture(payload, response, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
         response = _wire(payload, plans)
         if mode["value"] == "missing":
             response["execution"].pop()

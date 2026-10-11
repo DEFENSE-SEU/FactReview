@@ -10,6 +10,7 @@ import pytest
 
 from common.run_stats import run_scope
 from llm.client import LLMConfig
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from tests.test_execution_projection_choices_v2 import review, select
 from tests.test_execution_projection_semantics_v2 import inputs
 from verification.execution_projection import ProjectionError, digest
@@ -101,6 +102,8 @@ def test_public_recipe_facts_require_all_original_reviews_and_rebuild(tmp_path, 
                     rows[-1]["prediction"] = "changed"
                     path.write_text(json.dumps(rows), encoding="utf-8")
                 raw = dict(schema_version="catalog-v2", conditions=[], items=[], execution_choice_reviews=[decision])
+            if kw["module"] == "verification.experiments.scope":
+                raw = authority_scope_fixture(payload, raw, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
             responses.append(copy.deepcopy(raw))
             return raw
 

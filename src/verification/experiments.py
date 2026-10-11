@@ -47,6 +47,12 @@ from verification.experiment_catalog import (
     resolve_cell,
     resolve_source,
 )
+from verification.experiment_source_authority import (
+    SourceAuthorityReview,
+    build_authority_context,
+    decode_authority,
+    paper_authority_errors,
+)
 from verification.experiment_sources import (
     joint_limit,
     prepare_joint_candidate,
@@ -760,6 +766,31 @@ class CatalogScopeReviewV2(Contract):
         default_factory=list
     )
     execution_choice_reviews: list[ExecutionChoiceReview] = Field(default_factory=list)
+
+
+class CatalogScopeReviewV3(CatalogScopeReviewV2):
+    schema_version: Literal["catalog-v3"]
+    paper_scope_format: Literal["catalog-v2"]
+    source_authority: SourceAuthorityReview
+
+
+class CatalogScopeReviewV3V1(CatalogScopeReview):
+    schema_version: Literal["catalog-v3"]
+    paper_scope_format: Literal["catalog-v1"]
+    source_authority: SourceAuthorityReview
+
+
+class CatalogScopeReviewV3Legacy(ExperimentScopeReview):
+    schema_version: Literal["catalog-v3"]
+    paper_scope_format: Literal["legacy"]
+    source_authority: SourceAuthorityReview
+
+
+_AUTHORITY_SCHEMAS = {
+    "catalog-v2": CatalogScopeReviewV3,
+    "catalog-v1": CatalogScopeReviewV3V1,
+    "legacy": CatalogScopeReviewV3Legacy,
+}
 
 
 def _field(condition, path):
@@ -1726,14 +1757,18 @@ def _numeric_scope_check(
 
 def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=None, *, diagnostics=None):
     """One invalid condition keeps its own evidence unconfirmed; other conditions survive."""
-    version = response.get("schema_version")
-    if "schema_version" in response and (
+    envelope_version = response.get("schema_version")
+    version = response.get("paper_scope_format") if envelope_version == "catalog-v3" else envelope_version
+    if envelope_version == "catalog-v3" and version not in _AUTHORITY_SCHEMAS:
+        raise ValueError("Unknown explicit experiment paper_scope_format")
+    if "schema_version" in response and envelope_version != "catalog-v3" and (
         not isinstance(version, str) or version not in {"catalog-v1", "catalog-v2"}
     ):
         raise ValueError("Unknown experiment scope schema_version")
     catalog_mode = version in {"catalog-v1", "catalog-v2"}
     if (
-        set(response) - {"schema_version", "conditions", "items"}
+        set(response) - ({"schema_version", "conditions", "items", "paper_scope_format"}
+                         if envelope_version == "catalog-v3" else {"schema_version", "conditions", "items"})
         or not isinstance(response.get("conditions"), list)
         or not isinstance(response.get("items"), list)
     ):
@@ -2087,6 +2122,7 @@ def _scope_review(
     first_choice_response=None,
     choice_privacy=None,
     first_execution_audit=None,
+    paper_scope_format="catalog-v2",
 ):
     """Independent semantic review; its grounded structural/numeric gates fail closed."""
     from common import run_stats
@@ -2113,7 +2149,8 @@ def _scope_review(
             },
             "bridge_condition_field": "SourceBridge.condition_field uses metric or settings.KEY, unlike setting_scopes.",
         },
-        "output_schema": CatalogScopeReviewV2.model_json_schema(),
+        "output_schema": _AUTHORITY_SCHEMAS[paper_scope_format].model_json_schema(),
+        "paper_scope_format": paper_scope_format,
     }
     if any(target.projection is not None for plan in output.plans for target in plan.targets):
         from verification.execution_projection import projection_context
@@ -2147,6 +2184,10 @@ def _scope_review(
         payload["execution_choice_context"] = choice_context(choice_registry)
         payload["execution_choices"] = copy.deepcopy(raw_choices)
         payload["selection_expansions"] = copy.deepcopy(choice_selections)
+    authority_context = build_authority_context(
+        claim, materials, output.items, catalog=catalog, joint_catalogs=joint_catalogs
+    )
+    payload["source_authority_context"] = authority_context
     audit = {"claim_id": claim.id, "input": copy.deepcopy(payload)}
     if choice_selections:
         audit["choice_registry"] = copy.deepcopy(choice_registry)
@@ -2156,6 +2197,8 @@ def _scope_review(
     stats = run_stats.stats_path()
     audit_path = stats.parent / "experiment_scope" / f"{uuid.uuid4().hex}.json" if stats is not None else None
     try:
+        if paper_scope_format != "catalog-v2" and (joint_catalogs or projection_reviews is not None or choice_selections):
+            raise ValueError("Joint/projection/choice reviews require catalog-v2 inner scope")
         response = ask(
             "Independently audit experiment candidate applicability and ENTIRE condition support. "
             "Do not defer to candidate detail or fully_supported_conditions. Return output_schema JSON, "
@@ -2165,7 +2208,16 @@ def _scope_review(
             "For joint difference_number_id use only that candidate's assertion_numbers, which are the current condition's original assertion occurrences. These assertion selectors do not authorize observations, context, bridges or source_uses. Expected endpoints remain program-derived from original condition-scoped assertions and need not be declared supporting members. "
             "Only for those joint candidates, return source_uses exactly once for each member_source_id, including the primary, with its roles and rationale. For every single_source_candidate_indices entry, additional_sources is empty and source_uses MUST be []; this also applies when that single-source review uses grounds or bridges. Use the global catalog for its normal grounds/comparisons; do not put its primary source in source_uses. result/metric_definition/setup_definition/table_reference roles must actually feed the corresponding number/cell/bridge; protocol and other_qualifier uses require grounded semantic review and do not prove numerical bindings. Do not combine or upgrade other partial candidates. Invalid manifests remain unverified. "
             "For a descriptive, non-comparative joint item with comparisons=[], declare only grounded result, protocol or other_qualifier roles. Explain a definition, setup or table-reference passage as an other_qualifier semantic ground when it has no numerical/bridge consumer; this grants no numerical binding. Preserve every unresolved qualifier. Never invent a comparison or assign a mechanical role without its actual consumer to pass validation. "
-            "Use schema_version catalog-v2. Keep condition IDs exactly as supplied. Leave claim_quote empty: its existing identity is retained. "
+            f"Use schema_version catalog-v3 and paper_scope_format {paper_scope_format} exactly as requested. "
+            "Return mandatory source-authority-v1 with supplied context_digest exactly once, one ordered requirement per original authority unit and one ordered basis-unit set per candidate pair. "
+            "Copy only supplied IDs, requirement/basis enums, source IDs and rationale; complete original unit values remain in the input. "
+            "For every whole-Claim unit evaluate this condition and all shared qualifiers, keeping other conditions visible in full context. Other-condition exclusive facts do not become this condition requirements; shared qualifiers cannot be labelled irrelevant. "
+            "Any current-condition or shared external implementation/availability/execution/training component requires its external category or unresolved; manuscript author assertions cannot establish those facts. "
+            "Definitions/protocols may use manuscript_definition + definition_or_protocol; complete paper reported results with all qualifiers may use manuscript_reported_result + reported_measurement. Mixed independent obligations not completely represented by one compatible category stay unresolved. "
+            "Claim sources must be real condition-covered body sources, never synthetic claim_text. Candidate authority sources must be its original primary or actually consumed grounds/operands/contexts/bridges; catalogue presence or another candidate's source grants nothing. "
+            "Same exact source quote may establish a genuine definition or complete reported result. Authority classifications grant no execution confirmation; original execution obligations remain independent. "
+            "Keep condition IDs exactly as supplied. Leave catalog claim_quote empty: its existing identity is retained. "
+            "Follow the requested inner OUTPUT_SCHEMA exactly: legacy passage/comparison fields, catalog-v1 source/cell selectors or catalog-v2 discriminated operands. The catalog-v2-specific selector and source_uses instructions below apply only to catalog-v2. No requested format grants execution or joint access to legacy/v1. "
             "Sources, cells, numbers and cases are program-generated choices. Source/cell/number arrays follow source_fields/cell_fields/number_fields in catalog; axes and original sentences are shared by ID. Number ordinal is its one-based position among numeric occurrences in that sentence. "
             "Distinguish descriptive reports (reported scores, hardware or duration) from controlled comparisons, "
             "causal component attribution and statistical generalization. A leaderboard score/gap alone does not "
@@ -2227,19 +2279,35 @@ def _scope_review(
         paper_response = {
             key: value
             for key, value in response.items()
-            if key not in {"plan_projection_reviews", "execution_choice_reviews"}
+            if key not in {"plan_projection_reviews", "execution_choice_reviews", "source_authority"}
         }
         conditions, decisions, errors, locations = _decode_scope(
             paper_response, claim, materials, output, catalog, joint_catalogs, diagnostics=diagnostics
         )
+        authority = None
+        authority_errors = []
+        try:
+            if response.get("paper_scope_format") != paper_scope_format:
+                raise ValueError("Actual authority paper_scope_format differs from the requested contract")
+            if build_authority_context(claim, materials, output.items, catalog=catalog,
+                joint_catalogs=joint_catalogs) != authority_context:
+                raise ValueError("Authority original claim, body source or artifact changed during review")
+            authority = decode_authority(response, authority_context, materials)
+        except (ValueError, TypeError, KeyError) as exc:
+            authority_errors.append(str(exc))
+        audit["source_authority"] = {
+            "status": "validated" if authority is not None else "unavailable",
+            "context_digest": authority_context["context_digest"], "errors": authority_errors,
+        }
+        errors.extend(authority_errors)
         if projection_reviews is not None:
             from verification.execution_projection import decode_projection_reviews
 
             plan_decisions, plan_errors = decode_projection_reviews(response, output.plans)
-            if response.get("schema_version") != "catalog-v2":
+            if authority is None or paper_scope_format != "catalog-v2":
                 plan_decisions, plan_errors = (
                     {},
-                    ["Execution projections require the catalog-v2 independent review"],
+                    ["Execution projections require a valid catalog-v3 authority envelope with catalog-v2 inner review"],
                 )
             projection_reviews.update(plan_decisions)
             audit["plan_projection_errors"] = plan_errors
@@ -2254,8 +2322,8 @@ def _scope_review(
             retained, choice_errors = decode_choice_reviews(
                 review_rows, choice_selections, choice_registry, privacy_rejected_indices=rejected
             )
-            if response.get("schema_version") != "catalog-v2":
-                retained, choice_errors = {}, ["Choices require the catalog-v2 independent review"]
+            if authority is None or paper_scope_format != "catalog-v2":
+                retained, choice_errors = {}, ["Choices require a valid catalog-v3 authority envelope with catalog-v2 inner review"]
             choice_reviews.update(retained)
             choice_errors = choice_privacy.safe(choice_errors) if choice_privacy else choice_errors
             audit["execution_choice_errors"] = choice_errors
@@ -2317,6 +2385,21 @@ def _scope_review(
                     f"Binding repair {repair_audit['status']}: {len(accepted)} pair(s) accepted",
                     *repair_errors,
                 ]
+        pair_checks = []
+        for pair in authority_context["pairs"]:
+            key = (pair["item_index"], pair["condition_id"])
+            decision = decisions.get(key)
+            if output.items[key[0]].kind != "paper_support" or decision is None:
+                continue
+            reasons = authority_errors if authority is None else paper_authority_errors(
+                authority, authority_context, pair["pair_id"], decision=decision
+            )
+            pair_checks.append({"pair_id": pair["pair_id"], "errors": list(reasons)})
+            if reasons:
+                decision.full_support = False
+                decision.unresolved_qualifiers.extend(reasons)
+                errors.extend(reasons)
+        audit["source_authority"]["pair_checks"] = pair_checks
         prefix = (
             "Original scope diagnostics and binding repair history: "
             if binding_repair_rounds and audit["binding_repair"]["status"] != "not_needed"
@@ -2477,9 +2560,12 @@ def verify_experiments(
     call=None,
     scope_call=None,
     scope_binding_repair_rounds=None,
+    scope_paper_format: Literal["legacy", "catalog-v1", "catalog-v2"] = "catalog-v2",
     execution_wire_version=None,
     execution_audit_dir=None,
 ) -> BranchResult:
+    if scope_paper_format not in _AUTHORITY_SCHEMAS:
+        raise ValueError("Unknown requested paper_scope_format")
     v4 = execution_wire_version == "experiments-execution-v4"
     if execution_wire_version not in (None, "experiments-execution-v3", "experiments-execution-v4"):
         raise ValueError("Unknown experiments execution wire version")
@@ -2766,6 +2852,7 @@ def verify_experiments(
             first_choice_response=first_response,
             choice_privacy=choice_privacy,
             first_execution_audit=first_execution_audit,
+            paper_scope_format=scope_paper_format,
         )
         if output.items or has_projection or choice_selections
         else ({}, {}, None, None)

@@ -7,6 +7,7 @@ import pytest
 
 from llm.client import LLMConfig
 from schemas.claim import ClaimSourceRef
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from tests.test_experiments_bindings_v2 import ASPECTS, append_block, evidence_for
 from tests.test_experiments_prose_occurrences_v2 import production_case
 from tests.test_prose_numbers_v2 import COMPARE, DECREASE
@@ -33,7 +34,7 @@ def capture(paper, candidate, review):
         return (
             dict(checked_aspects=ASPECTS, items=[candidate], plans=[])
             if kwargs["module"] == "verification.experiments"
-            else copy.deepcopy(review)
+            else authority_scope_fixture(json.loads(kwargs["prompt"]), review, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
         )
 
     result = verify_experiments(paper[0], paper[1], call=model)
@@ -72,7 +73,7 @@ def test_input_lists_the_direct_result_pair_and_canonical_bare_setting_keys(tmp_
         assert choice["canonical_setting_scopes"]["method"] == "subject"
         assert choice["canonical_setting_scopes"]["comparator"] == "comparator"
     assert evidence_for(result, "c1").sufficient, result.issues
-    assert payload["output_schema"]["properties"]["schema_version"]["const"] == "catalog-v2"
+    assert payload["output_schema"]["properties"]["schema_version"]["const"] == "catalog-v3"
     assert original == (paper[0].model_dump(), candidate, review)
 
 

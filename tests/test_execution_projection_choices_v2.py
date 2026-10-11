@@ -5,6 +5,7 @@ import json
 
 import pytest
 
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from tests.test_execution_projection_semantics_v2 import inputs
 from verification.execution_projection import ProjectionError, field_inventory
 from verification.execution_projection_choices import (
@@ -158,6 +159,8 @@ def public(tmp_path, *, first_change=None, scope_change=None):
             )
             if scope_change:
                 scope_change(raw, claim, materials)
+        if kw["module"] == "verification.experiments.scope":
+            raw = authority_scope_fixture(payload, raw, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
         originals.append(copy.deepcopy(raw))
         return raw
 
