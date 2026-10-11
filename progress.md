@@ -2,7 +2,7 @@
 
 ## 当前完整框架 checkpoint（2026-10-11）
 
-Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送Phase A的4406181、Phase3的c0bb46f、Theory的23a966d、B1的9b4a3411及Phase4 SourceAuthority的692580b0e14d451803691f89eb23b07a06d391fd，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
+Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送Phase A的4406181、Phase3的c0bb46f、Theory的23a966d、B1的9b4a3411、Phase4 SourceAuthority的692580b0及Phase3默认auto/提取metadata的36212f3aa41b9eb96e148e85e2455f5a43bad098，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
 
 Completed：最终默认全套仅运行一次，3754passed/3原默认deselected/0skipped/0fail/0error，exit0；pytest538.61s、wrapper541.797s。419源码/测试/config身份前后完全一致，原断言、marker及外部mock保持。报告final-default-regression-final-path-fixtures-v1/report.md；原56失败、后续12失败及所有局部红绿记录完整保留。原14验收第1项保留有界通过，第2及8项完整链失败；科学及商业完成仍需独立证据。
 
@@ -22,11 +22,13 @@ Completed Phase3 default auto batching：Root七路径修复获独审d1059daf接
 
 Completed Phase3 extraction metadata identity：标题/摘要追加原snapshot并由同一guard核原值，原paper/page/block及repair index0/1保持，撤窄增量后claims.py全AST回692580b。新单一public函数完整同字节red1fail/.52s→new及原source控制2pass/.41s；正常原材料可采纳、模型调用中title/abstract变动保raw且拒绝，内部门未mock，外界禁止或mock。独审extraction-metadata-identity-independent-v1/report.md 49be6452/evidencea98f224a闭合11facts/12原件，无阻断；Root已读接受，author identity395997f4/report8193aadc绑定，原page测试全AST同。无新stage/调用预算，召回仍开放。
 
-Open issues：真实完整链仍失败，终态内容独审full-public-pipeline-native-terminal-independent-v1最终report2c75c1dd闭合，旧bf703因果澄清保记录：claim011实际为single-source同义authorassertion自循环，joint消费者未被调用。新SourceAuthority门已有必要mock及独审，其真实分类效果未验证，其他分支与shown_derivation职责仍开放。执行0plan由choice finite字段不覆盖correct_predictions等语义产生，Docker未运行；聚合entry错误含无效候选组合。claim007-full-entry-route-independent-v1/report.md 938b1825确认旧成功为不同完整七settings的v2 projected choice，本次十settings缺计数/完整fragment消费；B1普通weights/metadata/extra-config路径不能补此缺口。完整计数新domain按独审设计45e21bf3及Authority更新81c04d1f实施中，8产品+1public mock等待冻结独审；完整N/C/I应从全量发布行独立测量，原论文整数与完整fragment责任保留。有限CPU Torch推理按精确合同5afebeda实施中，当前7产品尚未接shared v2；真实checkpoint/Module/样本ID/完整split/模型输出到metric输入链及host测量需要独立验证。宿主venv未发现Torch、现Docker image无批准Torch环境，未安装或实际验证；原Dataset不返回真实ID不能以host ordinal补成实际观测。合法constant/zero/unused参数可测，dtype/codec/版本及来源未知仍保守。VLM两产品与一必要public mock正在实施，现findings三类各需明确行，缺类保有用发现并unavailable，不能自动填clear。B2 choice/fullfragment、一般NN、整篇召回/原子性/M2/M5、联合paper evidence、真实分类质量和literal list条件语义继续开放。
+Completed Phase4 released-statistics：8产品及新公共控制保持frozen-final-v3；default仅在完整单condition且旧健康choice为空时启用v5，显式v3/多condition v4保留。完整原Claim/条件实际值/完整数值fragment、资源recipe及raw lineage逐层重建；host全行独立N/C/I/accuracy，原论文count只接受独立原始整数token，不用论文accuracy推count。合成N100/C75/I25正控S，实际74/26即使accuracy差.01仍与原计数不符；composition未决/fragment缺/75只在0.75子串中均U且零plan。最终新public1pass/10.05s，所有材料已统一N100并保早期不一致fixture/失败。原兼容仅一次3pass/11.87s、21相关身份前后同；单public_verify keyword显式v3，逆整模块AST/63Assert同，原898科学Assert保持。Root全文产品独审46facts及后续兼容38facts闭合：released-statistics-root-independent-v1/report.md、root-statistics-vlm-static-close-v1/report.md 1aa56eb9/verification91104d2e；Root未复pytest或真实服务。该有界源/mock接受待Phase4提交，真实全链仍待新实际。
+
+Open issues：真实完整链仍失败，终态内容独审最终2c75c1dd及旧因果更正保留：claim011是single-source同义authorassertion自循环，joint消费者未被调用；新SourceAuthority实际分类未验证，其他分支/shown_derivation继续开放。旧0plan的correct_predictions/完整fragment缺口已有有限统计消费者，真实模型能否完整消费仍待验证。有限CPU Torch当前7产品尚未接shared v2；独审f53ad331发现准入失败误阻合法入口、foreign计算未封闭、跨批次常量Tensor调用身份三阻断，作者正在修复。真实checkpoint/Module/样本ID/完整split/模型输出到metric输入及host重算需各自证据；宿主和已批准Docker均无Torch环境，未安装或实际验证。原Dataset无真实ID不能用host ordinal补观测；合法constant/zero/unused可测，未知dtype/codec/版本/来源继续U。VLM2源及新public已通过必要控制，8旧健康模型fixture最终核验待集成；缺三类保发现且unavailable。B2 choice/fullfragment、一般NN、整篇召回/原子性/M2/M5、联合paper evidence、真实分类质量和literal list条件语义继续开放。
 
 Decisions：已有repair3上限3、auto加可选interactive并记录模式、training0、deadline及获准arxiv fallback、集中原容差、v1 conflict→questioned保持。不会因mock全套通过或两页材料实际成功宣告商业完成。当前fixed f278实际证据与随后多条件源码/测试证据分别绑定各自身份。
 
-Next action：交付已独审Phase3默认auto及提取metadata身份修复；随后独审统计消费者的必要公共mock/冻结源，接受后顺序安排NN shared v2接线，继续VLM三类完成记录。统计共享旧候选预算、原健康候选优先，不补delegate/fallback；所有原协议/条件/科学断言保留。根因有相应证据且源码交付后才准备新身份完整实际，旧失败及已消费授权全部保留，不盲重跑全套。某项服务或能力受阻时继续其他框架工作，目标active。checks.md当前14表12项保留窄通过、2项完整链失败；第13项按公开reported-blocker分支通过，Phase8整体开放。
+Next action：提交并推送已独审统计消费者，再顺序授权NN shared v2接线、收口VLM类别合同。两个agent并行准备/审核全新完整公开入口controller草稿，当前source_pending且prepare/admission关闭，旧actual/auth绝不复用。新统计actual源待精确commit全源冻结；原完整paper/crops/所有窗口/fullClaim/实际请求lineage和硬预算保留，不制造科学输入。某项服务或能力受阻时继续其他框架工作，目标active。checks.md当前14表12项窄通过、2项完整链失败；Phase8整体开放。
 
 ## 历史回归修复与真实执行 checkpoint（2026-10-11）
 

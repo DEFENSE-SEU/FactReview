@@ -2123,6 +2123,7 @@ def _scope_review(
     choice_privacy=None,
     first_execution_audit=None,
     paper_scope_format="catalog-v2",
+    statistics_context=None,
 ):
     """Independent semantic review; its grounded structural/numeric gates fail closed."""
     from common import run_stats
@@ -2188,6 +2189,13 @@ def _scope_review(
         claim, materials, output.items, catalog=catalog, joint_catalogs=joint_catalogs
     )
     payload["source_authority_context"] = authority_context
+    if statistics_context is not None:
+        from verification.released_statistics import scope_schema
+
+        if paper_scope_format != "catalog-v2":
+            raise ValueError("Statistics requires the explicit catalog-v2 inner scope")
+        payload["released_statistics_context"] = copy.deepcopy(statistics_context)
+        payload["output_schema"] = scope_schema().model_json_schema()
     audit = {"claim_id": claim.id, "input": copy.deepcopy(payload)}
     if choice_selections:
         audit["choice_registry"] = copy.deepcopy(choice_registry)
@@ -2268,7 +2276,17 @@ def _scope_review(
             "For released-predictions-v2, use the matching versioned plan review schema and the exact proposal_sha256 supplied in execution_projection_semantics_context.proposals. Independently review each unchanged atom, field binding and claim span; keep each atom's exact unique source ID set and every original mapping. The separate v2 context does not alter v1 decisions or grant paper/joint access. All original text must satisfy the finite recipe and retain its meaning; unknown predicates, inference, derived metrics and positive generalizations remain unresolved even if positions are covered. "
             "For explicit released-predictions-choice-v1 selections return execution_choice_reviews, one exact candidate/condition identity with one review per supplied obligation_id. Inspect each complete original field, whole claim, atom and source meaning independently. The program's structural candidate grants no semantic confirmation. Do not retype source sets, offsets or atom mappings; confirm the supplied obligations only if their full original meaning is retained, otherwise return unresolved. Never add a selection or upgrade null/unresolved. This is separate from plan_projection_reviews for legacy plans. "
             "The separate execution_choice_context v2 repository_recipe_facts records the indexed entry/config/data paths and SHA, complete configuration, unfiltered whole-file row count and denominator, fixed JSON keys and finite recipe implementation. These are resource measurement facts. Paper sources establish the claimed fixed sample, split and conclusion scope; retain every original sample atom and all original obligations. The sample atom fixed_released_predictions/all_records describes the candidate's whole-resource measurement boundary, and the paper sample quote need not itself declare repository release. Independently assess correspondence between that resource and the paper's sample, dataset, model and every qualifier using the complete supplied sources and facts; unresolved correspondence stays unresolved. Resource facts alone do not prove the same paper predictions, active weights, inference, training or population performance. They grant no confirmed decision, paper-support or additional source access. "
-            "Plans without a projection need no projection decision. Do not append, rewrite or merge candidates.",
+            "Plans without a projection need no projection decision. Do not append, rewrite or merge candidates. "
+            + ("For the actual released_statistics_context return execution_scope_domain=full-list-exact-match-statistics-v1 "
+               "and released_statistics_reviews with version=statistics-review-v1. Independently review every exact original "
+               "atom, field, fragment and complete-field/whole-Claim composition obligation, preserving its supplied ID, "
+               "source set, value and proposal/context digest. A position, resource fact, first proposal or confirmed flag "
+               "does not establish semantic meaning. Bare negative phrases require complete original path/value/source and "
+               "the specific excluded conclusion. Unknown meaning, external obligations or missing correspondence must stay "
+               "unresolved. Counts are paper expectations only when the exact original token states that outcome. "
+               "Do not infer counts from accuracy or resources. Keep paper_source_authority independent and its complete "
+               "denominator unchanged; it grants no execution confirmation."
+               if statistics_context is not None else ""),
             payload,
             module="verification.experiments.scope",
             call=call,
@@ -2279,7 +2297,8 @@ def _scope_review(
         paper_response = {
             key: value
             for key, value in response.items()
-            if key not in {"plan_projection_reviews", "execution_choice_reviews", "source_authority"}
+            if key not in {"plan_projection_reviews", "execution_choice_reviews", "source_authority",
+                           "execution_scope_domain", "released_statistics_reviews"}
         }
         conditions, decisions, errors, locations = _decode_scope(
             paper_response, claim, materials, output, catalog, joint_catalogs, diagnostics=diagnostics
@@ -2292,7 +2311,10 @@ def _scope_review(
             if build_authority_context(claim, materials, output.items, catalog=catalog,
                 joint_catalogs=joint_catalogs) != authority_context:
                 raise ValueError("Authority original claim, body source or artifact changed during review")
-            authority = decode_authority(response, authority_context, materials)
+            authority = decode_authority(
+                response, authority_context, materials,
+                execution_scope_domain="full-list-exact-match-statistics-v1" if statistics_context is not None else None,
+            )
         except (ValueError, TypeError, KeyError) as exc:
             authority_errors.append(str(exc))
         audit["source_authority"] = {
@@ -2567,7 +2589,7 @@ def verify_experiments(
     if scope_paper_format not in _AUTHORITY_SCHEMAS:
         raise ValueError("Unknown requested paper_scope_format")
     v4 = execution_wire_version == "experiments-execution-v4"
-    if execution_wire_version not in (None, "experiments-execution-v3", "experiments-execution-v4"):
+    if execution_wire_version not in (None, "experiments-execution-v3", "experiments-execution-v4", "experiments-execution-v5"):
         raise ValueError("Unknown experiments execution wire version")
     v4_bundle, v4_snapshot, v4_context, v4_wire = None, None, None, None
     if v4:
@@ -2615,13 +2637,32 @@ def verify_experiments(
     )
 
     choice_privacy = ChoicePrivacy()
+    statistics_registry, statistics_selection, statistics_context = None, None, None
+    route_state = {}
 
     try:
-        choice_registry = build_choice_registry(claim, materials)
+        choice_registry = build_choice_registry(claim, materials, route_state=route_state)
         choice_inputs = choice_context(choice_registry)
     except (ValueError, OSError, TypeError, KeyError) as exc:
         choice_registry = None
         choice_inputs = {"unavailable": str(exc)}
+    if (execution_wire_version in (None, "experiments-execution-v5") and len(claim.conditions) == 1
+            and choice_registry is not None and not choice_registry["candidates"]
+            and route_state.get("enumeration_complete") and route_state.get("source_snapshot_available")):
+        from verification import released_statistics as statistics_wire
+
+        try:
+            proposed_registry = statistics_wire.build_statistics_registry(
+                claim, materials, catalog=target_catalog, previous_registry=choice_registry, route_state=route_state,
+            )
+            if proposed_registry["candidates"]:
+                statistics_registry = proposed_registry
+            else:
+                choice_inputs["statistics_route"] = proposed_registry
+        except (ValueError, OSError, TypeError, KeyError) as exc:
+            choice_inputs["statistics_route_unavailable"] = str(exc)
+    if execution_wire_version == "experiments-execution-v5" and statistics_registry is None:
+        return BranchResult(issues=["Explicit statistics domain has no healthy complete structural route"])
     first_system = (
         "Check this experimental claim from the paper alone in five aspects: correspondence "
         "(an experiment for every assertion), fairness (same data/budget/tuning), isolation "
@@ -2715,6 +2756,26 @@ def verify_experiments(
         first_payload.update(execution_context_digest=v4_context,
             required_execution_conditions=ordinary_wire.required_conditions(claim),
             output_schema=ordinary_wire.output_schema(claim, v4_context))
+    if statistics_registry is not None:
+        first_system = first_system.split("For released prediction-file evaluation")[0]
+        first_system += (
+            " Return exactly schema_version=experiments-execution-v5, execution_domain=full-list-exact-match-statistics-v1, "
+            "and the supplied execution_context_digest. Return one execution kind=statistics_choice with the exact selected "
+            "released-predictions-choice-v2 candidate and a released-predictions-v3 proposal, or kind=none with rationale. "
+            "The menu supplies only resource/scalar eligibility. Preserve every original field value/digest, including empty "
+            "containers, every Claim character and every string-leaf fragment. Explicitly partition full strings using exact "
+            "Unicode offsets; separators cannot remove words or scientific qualifiers. Bind every nonempty original value and "
+            "fragment to source-grounded finite atoms. Keep all runtime keys and all three negative conclusion boundaries. "
+            "Bare negative phrases require their full original path/value and exact original source. Expected correct/incorrect "
+            "counts require actual paper integer tokens; never derive a missing paper count from a resource, accuracy or complement. "
+            "Do not emit legacy plans, ordinary decisions, execution_choices, final evidence, confirmed flags or a normalized claim. "
+            "Unknown semantics stay unresolved; one independent scope review must confirm the complete proposal before execution."
+        )
+        first_payload = {key: value for key, value in first_payload.items() if key not in {
+            "execution_projection_context", "execution_projection_semantics_context", "execution_choice_context"}}
+        first_payload.update(execution_context_digest=statistics_registry["context_digest"],
+                             released_statistics_context=statistics_registry,
+                             output_schema=statistics_wire.output_schema().model_json_schema())
     first_response = ask(first_system, first_payload, module="verification.experiments", call=choice_privacy.capture(call))
     if v4:
         ordinary_wire.save_raw(v4_bundle, first_response)
@@ -2723,7 +2784,28 @@ def verify_experiments(
     # rows locally, without discarding valid paper observations or legacy data.
     response_view = first_response
     first_execution_audit, execution_errors = None, []
-    if v4:
+    if statistics_registry is not None:
+        try:
+            response_view, statistics_selection = statistics_wire.lower_v5(first_response, statistics_registry)
+            if statistics_selection is not None:
+                statistics_context = statistics_wire.scope_context(
+                    statistics_registry, statistics_selection, claim, materials,
+                )
+                if choice_privacy.safe(statistics_context) != statistics_context:
+                    raise ValueError("Provider-sensitive statistics proposal cannot enter independent scope")
+        except (ValueError, OSError, TypeError, KeyError, IndexError) as exc:
+            statistics_selection, statistics_context = None, None
+            response_view = {key: copy.deepcopy(first_response.get(key, [])) for key in ("checked_aspects", "items", "issues")}
+            response_view.update(plans=[], execution_choices=[])
+            execution_errors.append(f"Statistics first/proposal unavailable: {exc}")
+        first_execution_audit = {"first_pass_response": copy.deepcopy(first_response),
+            "first_pass_normalized": copy.deepcopy(response_view),
+            "execution_wire": {"version": "experiments-execution-v5", "domain": statistics_wire.DOMAIN,
+                               "registry": copy.deepcopy(statistics_registry), "errors": list(execution_errors),
+                               "raw_response_sha256": statistics_wire.digest(first_response),
+                               "normalized_response_sha256": statistics_wire.digest(response_view),
+                               "adapter_sha256": statistics_wire.file_hash(statistics_wire.__file__)}}
+    elif v4:
         response_view, v4_wire = ordinary_wire.lower_v4(first_response, claim, v4_context)
         if ordinary_wire.source_snapshot(claim, materials) != v4_snapshot:
             response_view["plans"] = []
@@ -2817,7 +2899,7 @@ def verify_experiments(
             _paper_pointer(materials, item.block_id, item.quote)
         _fully_supported(_covered(claim, item.covered), item.fully_supported_conditions)
     has_projection = any(target.projection is not None for plan in output.plans for target in plan.targets)
-    catalog = target_catalog if output.items or has_projection or choice_selections else None
+    catalog = target_catalog if output.items or has_projection or choice_selections or statistics_selection else None
     joint_catalogs = {
         index: prepare_joint_candidate(claim, materials, catalog, item, index, max_sources=source_limit)
         for index, item in enumerate(output.items)
@@ -2853,8 +2935,9 @@ def verify_experiments(
             choice_privacy=choice_privacy,
             first_execution_audit=first_execution_audit,
             paper_scope_format=scope_paper_format,
+            statistics_context=statistics_context,
         )
-        if output.items or has_projection or choice_selections
+        if output.items or has_projection or choice_selections or statistics_selection
         else ({}, {}, None, None)
     )
     if scope_issue:
@@ -3151,6 +3234,21 @@ def verify_experiments(
             else:
                 # Preserve the original single-source plan rejection contract.
                 raise RejectedPlan(str(exc), result) from exc
+    if statistics_selection is not None:
+        from schemas.limitations import VerificationLimitation
+        from verification.released_statistics import statistics_plan
+
+        try:
+            if scope_audit is None:
+                raise ValueError("Statistics has no retained independent scope audit")
+            result.plans.append(statistics_plan(claim, materials, statistics_registry,
+                                               statistics_selection, scope_audit))
+        except (ValueError, OSError, TypeError, KeyError, IndexError) as exc:
+            reason = f"Statistics independent original review unavailable: {exc}"
+            result.issues.append(reason)
+            result.verification_limitations.append(VerificationLimitation(
+                claim_id=claim.id, condition_ids=[c.id for c in claim.conditions],
+                stage="Experiments", kind="plan_rejected", reason=reason))
     if v4:
         from schemas.limitations import VerificationLimitation
         for state in v4_wire["states"]:

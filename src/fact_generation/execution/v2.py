@@ -1353,7 +1353,7 @@ def _execute_plans(
 def _target_tolerance(condition, binding, config, target, gap):
     metric = (
         binding.projection.runtime_target.metric
-        if binding.version == 2 and binding.projection.proposal.version == "released-predictions-v2"
+        if binding.version == 2 and binding.projection.proposal.version in ("released-predictions-v2", "released-predictions-v3")
         else condition.metric
     )
     return config.tolerance_overrides.get(condition.metric, metric_tolerance(metric, target, delta=gap))
@@ -1575,11 +1575,16 @@ def _execute_graph(
             raw_observation = observation
             measurement_path, measurement_provenance = None, {}
             if binding.version == 2:
-                from .prediction_measurement import measure_predictions
+                from .prediction_measurement import measure_predictions, measure_released_statistics
 
                 measurement_path = Path(request.run_dir) / f"host_measurement_{len(ledger['alignment'])}.json"
                 try:
-                    measured, measurement_provenance = measure_predictions(
+                    measure = (
+                        measure_released_statistics
+                        if getattr(binding.projection, "record_version", None) == "released-statistics-choice-v1"
+                        else measure_predictions
+                    )
+                    measured, measurement_provenance = measure(
                         request,
                         binding,
                         materials,
@@ -1670,6 +1675,41 @@ def _execute_graph(
                     "paper variance has no verified paper pointer; default tolerance retained"
                 )
             consistent = abs(gap) <= tolerance
+            statistics_comparison = None
+            if binding.version == 2 and getattr(binding.projection, "record_version", None) == "released-statistics-choice-v1":
+                try:
+                    statistics_audit = json.loads(measurement_path.read_text(encoding="utf-8"))
+                    actual_statistics = statistics_audit["statistics"]
+                    n, c, i = (actual_statistics[key] for key in ("total", "correct", "incorrect"))
+                    base = statistics_audit["base_measurement"]
+                    if (statistics_audit["version"] != "host-exact-match-v2"
+                            or statistics_audit["domain"] != "full-list-exact-match-statistics-v1"
+                            or statistics_audit["all_records"] is not True
+                            or any(type(value) is not int for value in (n, c, i))
+                            or n <= 0 or min(c, i) < 0 or c + i != n
+                            or actual_statistics["accuracy"] != c / n
+                            or observation.value != c / n
+                            or n != binding.projection.sample_count
+                            or _sha(Path(base["locator"])) != base["sha256"]):
+                        raise ValueError("Fresh full-row statistics audit is invalid")
+                except (ValueError, OSError, TypeError, KeyError) as exc:
+                    reason = f"{condition.id}: trusted released-statistics comparison unavailable: {exc}"
+                    ledger["alignment"].append({"condition_id": condition.id, "comparable": False, "reason": reason})
+                    invalid_comparisons.append(reason)
+                    issues.append(f"{request.plan.id}: {reason}")
+                    continue
+                expected_statistics = {
+                    atom.outcome: atom.expected_count for atom in binding.projection.proposal.atoms
+                    if atom.kind == "outcome_count"
+                }
+                comparisons = {key: {"expected": value, "observed": actual_statistics[key],
+                                     "consistent": type(actual_statistics[key]) is int and actual_statistics[key] == value}
+                               for key, value in expected_statistics.items()}
+                statistics_comparison = {"measurement_sha256": _sha(measurement_path),
+                    "actual": actual_statistics, "outcomes": comparisons,
+                    "scalar_consistent": consistent,
+                    "consistent": all(row["consistent"] for row in comparisons.values())}
+                consistent = consistent and statistics_comparison["consistent"]
             decision = {
                 "condition_id": condition.id,
                 "aligned": True,
@@ -1681,6 +1721,7 @@ def _execute_graph(
                 "repair_round": request.repair_round,
                 "variance_source": variance_audit,
                 "paper_target_binding": bindings[condition.id].model_dump(mode="json"),
+                **({"released_statistics": statistics_comparison} if statistics_comparison is not None else {}),
                 **(
                     {
                         "measurement": str(measurement_path),
@@ -1733,6 +1774,7 @@ def _execute_graph(
                     overturnable=not decisive,
                     note=f"Paper={target}; observed={observation.value}; gap={gap}; tolerance={tolerance}; "
                     f"approval={request.config.approval_mode}; conditions={actual.model_dump(mode='json')}"
+                    + (f"; released_statistics={statistics_comparison}" if statistics_comparison is not None else "")
                     + (
                         f"; released_predictions exact-match evaluation; host independently recomputed the complete frozen data; "
                         f"no model inference or training performed; raw author output={outcome.logs['observations']}"

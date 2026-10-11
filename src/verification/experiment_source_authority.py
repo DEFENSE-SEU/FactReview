@@ -122,12 +122,18 @@ def build_authority_context(claim, materials, candidate_items, *, catalog, joint
     return {**context, "context_digest": _digest(context)}
 
 
-def decode_authority(response, context, materials):
+def decode_authority(response, context, materials, *, execution_scope_domain=None):
     """Validate exact rows and source access; unknown semantics are a legal result."""
     if response.get("schema_version") != "catalog-v3":
         raise ValueError("Fresh paper-support authority unavailable: catalog-v3 required")
     allowed = {"schema_version", "paper_scope_format", "conditions", "items", "source_authority",
         "plan_projection_reviews", "execution_choice_reviews"}
+    if execution_scope_domain is not None:
+        if (execution_scope_domain != "full-list-exact-match-statistics-v1"
+                or response.get("execution_scope_domain") != execution_scope_domain
+                or response.get("paper_scope_format") != "catalog-v2"):
+            raise ValueError("Unknown or mismatched explicit statistics authority domain")
+        allowed |= {"execution_scope_domain", "released_statistics_reviews"}
     if set(response) - allowed or not all(isinstance(response.get(k), list) for k in ("conditions", "items")):
         raise ValueError("Source-authority envelope has undeclared fields or malformed original lists")
     if response.get("paper_scope_format") not in {"legacy", "catalog-v1", "catalog-v2"}:

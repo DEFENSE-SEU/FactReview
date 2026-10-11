@@ -351,7 +351,9 @@ def public_verify(tmp_path, *, change=None, with_observation=False):
         return authority_scope_fixture(json.loads(kwargs["prompt"]), scope, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
 
     with run_scope(tmp_path / "stats.json"):
-        result = verify_experiments(claim, materials, call=model)
+        result = verify_experiments(
+            claim, materials, call=model, execution_wire_version="experiments-execution-v3"
+        )
     return claim, materials, result, calls
 
 

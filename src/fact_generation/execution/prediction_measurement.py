@@ -96,3 +96,27 @@ def measure_predictions(request, binding, materials, observation, output, *, run
         "repository": request.workspace,
         "recomputation_pointer": str(output),
     }
+
+
+def measure_released_statistics(request, binding, materials, observation, output, *, runtime_environment=None):
+    """Retain the original host audit and derive counts only from its actual rows."""
+    if getattr(binding.projection, "record_version", None) != "released-statistics-choice-v1":
+        raise ProjectionError("Unknown released statistics record")
+    output = Path(output)
+    base_path = output.with_name(output.stem + "_base_v1.json")
+    measured, provenance = measure_predictions(
+        request, binding, materials, observation, base_path, runtime_environment=runtime_environment,
+    )
+    base = json.loads(base_path.read_text(encoding="utf-8"))
+    count, correct = base["sample_count"], base["numerator"]
+    if type(count) is not int or type(correct) is not int or count <= 0 or not 0 <= correct <= count:
+        raise ProjectionError("Host full-row count contract is invalid")
+    incorrect = count - correct
+    if correct + incorrect != count or measured["value"] != correct / count:
+        raise ProjectionError("Host observed statistics are internally inconsistent")
+    audit = {**base, "version": "host-exact-match-v2", "domain": "full-list-exact-match-statistics-v1",
+             "base_measurement": {"locator": str(base_path), "sha256": file_hash(base_path)},
+             "all_records": True, "statistics": {"total": count, "correct": correct,
+                                                     "incorrect": incorrect, "accuracy": correct / count}}
+    output.write_text(json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8")
+    return measured, {**provenance, "recomputation_pointer": str(output)}
