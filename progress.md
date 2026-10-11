@@ -1,5 +1,7 @@
 # FactReview v2 progress
 
+Completed Phase4 fresh statistics v6：原无效统计proposal中模型需计算未供应摘要的问题，已通过原值/原片段wire修复。Root全文读并接受作者554a1565、独审ad02228d/evidence547ad20d的30项事实；默认有限统计route用严格v6，显式v5保持兼容，原canonical schema/科学义务/完整分母/SourceAuthority/独立scope/host统计不变。最终必要两项public mock2passed/7.64s，旧34科学Assert保留，Ruff通过，无实际LLM/检索/Docker或旧答复重放。原值、raw/normalized/canonical/adapter身份分别保留和重建。当前源070ed62e/221015f1、新testb948088e、旧test85117861已核与frozen一致；仅此四文件与本记录交付。下一步新完整canonical源下整篇真实v6验证，原b8无效结果保持；Phase8与第2/8验收继续开放，目标active。
+
 已完成Phase3有限恢复：Root全文读作者44403e6a及独审d534f6b5/evidencebf04e020，接受25事实；读semantic diff/完整新test并核源508efeee/testb7efb4ff最终SHA。原约300行验证块只加loop缩进，明确逆变换后完整原模块normalized文本/AST同baseline，216旧测试字节不变。唯一public六场景/40Assert有效同test bytes red1fail/1.04s→green1pass/2.35s，首次wholeblock接线失败0.82s保留；绿后仅删除unused import，非import AST和全部40Assert相同，两文件Ruffpass。只给clean first且完整original的合法晚发现merged finding一次剩余原预算内followup/完整重验证，来源、scope、candidate/atomicity守卫与pending键保持；first/original不完整、预算0/不足或验证失败继续partialblocked。真实b8的006/008原复核失败仍是独立待处理职责，不能用此修复宣告整篇完成。准备Phase3提交交付。
 
 已闭合整篇终态独审：Root全文读接受terminal-b8ea-independent-v1/report3d08d4d1/evidence7acfbd65，12/12完整source/input/control身份同，保持7stage返回/partial/0plan/0L3和所有科学拒绝。joint来源/覆盖问题明确属于Experiments c008；Code c008仅非决定性且sufficient=false，未定性为同一个产品缺陷。statistics空白digest被有效拒绝，后续单独fresh v6精确原值/片段引用由程序核对计算digest的接口修复已给agent，原科学atoms/SourceAuthority/独立scope和count/host门限保持。

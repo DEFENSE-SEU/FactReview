@@ -2589,7 +2589,8 @@ def verify_experiments(
     if scope_paper_format not in _AUTHORITY_SCHEMAS:
         raise ValueError("Unknown requested paper_scope_format")
     v4 = execution_wire_version == "experiments-execution-v4"
-    if execution_wire_version not in (None, "experiments-execution-v3", "experiments-execution-v4", "experiments-execution-v5"):
+    if execution_wire_version not in (
+            None, "experiments-execution-v3", "experiments-execution-v4", "experiments-execution-v5", "experiments-execution-v6"):
         raise ValueError("Unknown experiments execution wire version")
     v4_bundle, v4_snapshot, v4_context, v4_wire = None, None, None, None
     if v4:
@@ -2646,7 +2647,7 @@ def verify_experiments(
     except (ValueError, OSError, TypeError, KeyError) as exc:
         choice_registry = None
         choice_inputs = {"unavailable": str(exc)}
-    if (execution_wire_version in (None, "experiments-execution-v5") and len(claim.conditions) == 1
+    if (execution_wire_version in (None, "experiments-execution-v5", "experiments-execution-v6") and len(claim.conditions) == 1
             and choice_registry is not None and not choice_registry["candidates"]
             and route_state.get("enumeration_complete") and route_state.get("source_snapshot_available")):
         from verification import released_statistics as statistics_wire
@@ -2661,7 +2662,7 @@ def verify_experiments(
                 choice_inputs["statistics_route"] = proposed_registry
         except (ValueError, OSError, TypeError, KeyError) as exc:
             choice_inputs["statistics_route_unavailable"] = str(exc)
-    if execution_wire_version == "experiments-execution-v5" and statistics_registry is None:
+    if execution_wire_version in ("experiments-execution-v5", "experiments-execution-v6") and statistics_registry is None:
         return BranchResult(issues=["Explicit statistics domain has no healthy complete structural route"])
     first_system = (
         "Check this experimental claim from the paper alone in five aspects: correspondence "
@@ -2757,12 +2758,19 @@ def verify_experiments(
             required_execution_conditions=ordinary_wire.required_conditions(claim),
             output_schema=ordinary_wire.output_schema(claim, v4_context))
     if statistics_registry is not None:
+        statistics_version = statistics_wire.WIRE if execution_wire_version == statistics_wire.WIRE else statistics_wire.FRESH_WIRE
+        original_values = statistics_version == statistics_wire.FRESH_WIRE
         first_system = first_system.split("For released prediction-file evaluation")[0]
         first_system += (
-            " Return exactly schema_version=experiments-execution-v5, execution_domain=full-list-exact-match-statistics-v1, "
+            f" Return exactly schema_version={statistics_version}, execution_domain=full-list-exact-match-statistics-v1, "
             "and the supplied execution_context_digest. Return one execution kind=statistics_choice with the exact selected "
-            "released-predictions-choice-v2 candidate and a released-predictions-v3 proposal, or kind=none with rationale. "
-            "The menu supplies only resource/scalar eligibility. Preserve every original field value/digest, including empty "
+            + ("released-statistics-originals-choice-v1 candidate and a released-statistics-originals-v1 proposal, "
+               if original_values else "released-predictions-choice-v2 candidate and a released-predictions-v3 proposal, ")
+            + "or kind=none with rationale. The menu supplies only resource/scalar eligibility. "
+            + ("Copy each full original_value with its exact JSON type and each original_text without trimming, including whitespace. "
+               "Do not generate value_digest or text_digest; the program binds original values/slices and computes these after validation. "
+               if original_values else "Preserve every original field value/digest, ")
+            + "Preserve empty "
             "containers, every Claim character and every string-leaf fragment. Explicitly partition full strings using exact "
             "Unicode offsets; separators cannot remove words or scientific qualifiers. Bind every nonempty original value and "
             "fragment to source-grounded finite atoms. Keep all runtime keys and all three negative conclusion boundaries. "
@@ -2775,7 +2783,8 @@ def verify_experiments(
             "execution_projection_context", "execution_projection_semantics_context", "execution_choice_context"}}
         first_payload.update(execution_context_digest=statistics_registry["context_digest"],
                              released_statistics_context=statistics_registry,
-                             output_schema=statistics_wire.output_schema().model_json_schema())
+                             output_schema=(statistics_wire.original_output_schema() if original_values
+                                            else statistics_wire.output_schema()).model_json_schema())
     first_response = ask(first_system, first_payload, module="verification.experiments", call=choice_privacy.capture(call))
     if v4:
         ordinary_wire.save_raw(v4_bundle, first_response)
@@ -2786,7 +2795,8 @@ def verify_experiments(
     first_execution_audit, execution_errors = None, []
     if statistics_registry is not None:
         try:
-            response_view, statistics_selection = statistics_wire.lower_v5(first_response, statistics_registry)
+            response_view, statistics_selection = (statistics_wire.lower_v6 if original_values
+                                                    else statistics_wire.lower_v5)(first_response, statistics_registry)
             if statistics_selection is not None:
                 statistics_context = statistics_wire.scope_context(
                     statistics_registry, statistics_selection, claim, materials,
@@ -2800,11 +2810,15 @@ def verify_experiments(
             execution_errors.append(f"Statistics first/proposal unavailable: {exc}")
         first_execution_audit = {"first_pass_response": copy.deepcopy(first_response),
             "first_pass_normalized": copy.deepcopy(response_view),
-            "execution_wire": {"version": "experiments-execution-v5", "domain": statistics_wire.DOMAIN,
+            "execution_wire": {"version": statistics_version, "domain": statistics_wire.DOMAIN,
                                "registry": copy.deepcopy(statistics_registry), "errors": list(execution_errors),
                                "raw_response_sha256": statistics_wire.digest(first_response),
                                "normalized_response_sha256": statistics_wire.digest(response_view),
                                "adapter_sha256": statistics_wire.file_hash(statistics_wire.__file__)}}
+        if original_values:
+            canonical_selection = statistics_selection.model_dump(mode="json") if statistics_selection is not None else None
+            first_execution_audit["first_pass_canonical_selection"] = canonical_selection
+            first_execution_audit["execution_wire"]["canonical_selection_sha256"] = statistics_wire.digest(canonical_selection)
     elif v4:
         response_view, v4_wire = ordinary_wire.lower_v4(first_response, claim, v4_context)
         if ordinary_wire.source_snapshot(claim, materials) != v4_snapshot:
