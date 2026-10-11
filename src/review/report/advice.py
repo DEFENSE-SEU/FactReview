@@ -16,7 +16,7 @@ from typing import Literal
 from pydantic import Field, StrictStr
 
 from assessment.rules import _decisive_flaw
-from llm.client import llm_json, resolve_llm_config
+from llm.client import effort_label, llm_json, resolve_llm_config
 from llm.diagnostics import redact_provider_details
 from schemas.claim import AdviceItem, Claim, ClaimAdvice, ClaimStatus, Contract
 from schemas.review import FinalReview
@@ -377,9 +377,10 @@ def generate_advice(review: FinalReview, output_dir: Path, *, call=None) -> Advi
                 model=cfg.model,
                 attempted=True,
             )
-            raw = (call if call is not None else llm_json)(
-                prompt=prompt, system=_SYSTEM, cfg=cfg, module="report_generation"
-            )
+            with effort_label("report_generation.advice"):
+                raw = (call if call is not None else llm_json)(
+                    prompt=prompt, system=_SYSTEM, cfg=cfg, module="report_generation"
+                )
             audit["response"] = _safe(raw, cfg)
             if review.claims[index].model_dump(mode="json", exclude={"advice"}) != original[claim.id]:
                 raise ValueError("Caller assessment changed during advice generation")
