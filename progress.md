@@ -1,5 +1,13 @@
 # FactReview v2 progress
 
+2026-10-11 暂停交接：按用户本次要求整理结果后暂停目标。Phase 0–7 已有实现及提交，Phase 8 完整验收未完成；整体框架尚不能宣称商业完成。代码修复已推送并精确核远端 8837ad9eb4f28d11cab0fafb23507bcd1dcaade4。Full9 失败终态已获独审 5115efed/bd1302fd，Root 接收 e8627565，原失败及未知用量完整保留。
+
+新 8837 完整来源228文件/31目录获独审 ef889b23/5c9e8faf，identity3999bd4c/archive2ead00bb；相对079仅执行提示文件改变，其余227文件保持。NN9 关闭草案获独审 dcb9e3a9/4983f276：原7控制代码/19检查/16输入及预算保持，来源绑定、prepare、授权和实际运行均未进行。新的用量字段读取器仅为尚未执行和独审的本地候选，不计为产品修复或真实结果。暂停期间不启动新模型、Docker或整篇运行。
+
+恢复后的下一动作：先独审有限程序读取器，定位Full9缺用量的调用和两层拒绝记录，保留未知消耗；完成新NN9来源绑定及运行前审核，实际验证已推送的完整settings指令。获得与整篇故障相关的修复后再运行完整流程，核主张覆盖、图表VLM、四类核验、非空可行计划和L3、完整建议及用量闭合；原第2/8项和全部科学标准保持。
+
+恢复时精确入口：代码分支 refactor/method-v2；来源 settings-prompt-canonical-source-root-v1（独审 settings-prompt-canonical-source-final-independent-v1）；NN9草案 torch-cpu-inference-native-delivery-v9-candidate（独审 nn-v9-closed-candidate-independent-v1），Root候选绑定脚本 controller-v9-nn-source-binding-root-v1/bind.py 已仅派生、尚未执行。Full9安全程序终态在 framework-full-live-v9-root-v1，失败接收在 full-v9-terminal-acceptance-root-v1/receipt.json；用量字段设计在 full9-missing-usage-program-cause-review-v1。未执行读取器已按暂停要求冻结在 full9-missing-usage-finite-reader-implementation-v1：hashes a6bb309c6a92cc97058c9c71ef5fbd929221869a5fe76b7d4cdbff7f8838944a、select_usage_failure.py b8574a72cd96e3023ff424d9407146dc02e91b7ca5fda2a19f370ffdc6ac3d54，尚未独审、没有actual读取或生成诊断结果。恢复后先独审再由Root执行；旧once全部保留消耗状态，恢复不得重用旧actual/prepared授权。
+
 2026-10-11 Phase 8 继续：Full9 actual-3f61ee15b18f 已结束 rc1/443.781s，固定来源 0795838 的完整 228 文件、prepared d27276f9、Root 接收 9fa3fe1e、唯一授权 72a19be2 保持。既定词法投影 driver97b6b99a/supervisor3c2f27b7/observer67370a8a/summaryc1ac9514/verification973a3165 确认：七阶段返回结果，整体 partial，screening/verification/report 未完成；10 条主张全部 Unverified、建议0/不可用10、计划0，无本次作者 Docker 验证。main 10 logical/10 physical/131194 known tokens，missing usage1、blocked35、closed=false，readiness 1/171 闭合。35 是拒绝记录计数，具体原始失败及各拒绝类型尚未知；没有估填用量或重跑。原严格失败与 scientific/commercial=false 保持，独立终态审核进行中。
 
 Phase 5 exact settings 指令修复已独审接受：共享 inference 提示新增6行735B，candidate/canonical 均要求完整 settings 键集合及原配置原值，缺真实字段保持 null/unresolved。原 binder/schema/localization/配置/科学门/调用数量和预算代码保持。唯一原 mock 节点加入4个缺键/多键控制，原47 Assert全部保留至49；一次1passed/7.06s、Ruff两文件及被动compile2通过。首次插件配置 rc4/no tests ran 原失败收据保留。独审 report e9de4529/facts573eba91，Root核27作者/5独审/37映射对象及当前两文件，接收 c1e61b30。实际 NN8 只证明 key 集合不一致，成员未知；真实模型改善尚未验证。

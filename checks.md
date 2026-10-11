@@ -1,5 +1,11 @@
 # FactReview v2 acceptance checks
 
+2026-10-11 暂停交接：按用户本次要求整理结果后暂停目标。Phase 0–7 已有实现及提交，Phase 8 完整验收未完成；整体框架尚不能宣称商业完成。代码修复已推送并精确核远端 8837ad9eb4f28d11cab0fafb23507bcd1dcaade4。Full9 失败终态已获独审 5115efed/bd1302fd，Root 接收 e8627565，原失败及未知用量完整保留。
+
+新 8837 完整来源228文件/31目录获独审 ef889b23/5c9e8faf，identity3999bd4c/archive2ead00bb；相对079仅执行提示文件改变，其余227文件保持。NN9 关闭草案获独审 dcb9e3a9/4983f276：原7控制代码/19检查/16输入及预算保持，来源绑定、prepare、授权和实际运行均未进行。新的用量字段读取器仅为尚未执行和独审的本地候选，不计为产品修复或真实结果。暂停期间不启动新模型、Docker或整篇运行。
+
+恢复后的下一动作：先独审有限程序读取器，定位Full9缺用量的调用和两层拒绝记录，保留未知消耗；完成新NN9来源绑定及运行前审核，实际验证已推送的完整settings指令。获得与整篇故障相关的修复后再运行完整流程，核主张覆盖、图表VLM、四类核验、非空可行计划和L3、完整建议及用量闭合；原第2/8项和全部科学标准保持。
+
 2026-10-11 Phase 8 继续：Full9 actual-3f61ee15b18f 已结束 rc1/443.781s，固定来源 0795838 的完整 228 文件、prepared d27276f9、Root 接收 9fa3fe1e、唯一授权 72a19be2 保持。既定词法投影 driver97b6b99a/supervisor3c2f27b7/observer67370a8a/summaryc1ac9514/verification973a3165 确认：七阶段返回结果，整体 partial，screening/verification/report 未完成；10 条主张全部 Unverified、建议0/不可用10、计划0，无本次作者 Docker 验证。main 10 logical/10 physical/131194 known tokens，missing usage1、blocked35、closed=false，readiness 1/171 闭合。35 是拒绝记录计数，具体原始失败及各拒绝类型尚未知；没有估填用量或重跑。原严格失败与 scientific/commercial=false 保持，独立终态审核进行中。
 
 Phase 5 exact settings 指令修复已独审接受：共享 inference 提示新增6行735B，candidate/canonical 均要求完整 settings 键集合及原配置原值，缺真实字段保持 null/unresolved。原 binder/schema/localization/配置/科学门/调用数量和预算代码保持。唯一原 mock 节点加入4个缺键/多键控制，原47 Assert全部保留至49；一次1passed/7.06s、Ruff两文件及被动compile2通过。首次插件配置 rc4/no tests ran 原失败收据保留。独审 report e9de4529/facts573eba91，Root核27作者/5独审/37映射对象及当前两文件，接收 c1e61b30。实际 NN8 只证明 key 集合不一致，成员未知；真实模型改善尚未验证。
@@ -90,7 +96,7 @@ NNv5 终态已独审接受：Root全文读 report1e208f79/facts3e2b64df并核冻
 | 11. 四状态与单向旧版适配 | 有界通过 | 原schema/报告/适配契约保留。 |
 | 12. 报告结构、建议、执行记录 | 有界通过 | 历史 v7建议11/11；Full9 分层PDF/teaser和全部主张状态保留，但本次建议0/不可用10，上游覆盖与计划未完成，实际完整建议交付仍开放。 |
 | 13. 基线比较与阻断记录 | 有界通过 | 历史比较与阻断保留，不据此宣称商业完成。 |
-| 14. 当前工作记录 | 有界通过 | 实际失败、已交付修复、进行中工作和下一步分别记录。 |
+| 14. 当前工作记录 | 有界通过 | 已推送修复、独审结果、实际失败、未执行候选和暂停后的下一步均记录；整体目标按用户要求暂停，Phase8未完成。 |
 
 新完整应用源码快照 `coverage-sites-canonical-source-root-v1`：commit1aabf5be、archive9c2aa0da、identity0c38418e，221文件/31目录完整来自同一Git提交，只有v2.py、claim_coverage.py、claim_recheck_batches.py相对407改变。Root全文读并核SHA接受独审b114288e/evidence1aa7261d的18项事实；各自已接受源改动与组合AST/原字节恢复对应，218旁侧源码原样。此次来源核证仅stdlib和语法编译，无应用/服务/消费者。NNv4与整篇v5的原输入/预算/科学checker保持，交叉独审和prepared独审均已接受；新实际状态另列下方。
 
