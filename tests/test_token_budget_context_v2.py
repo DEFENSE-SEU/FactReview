@@ -215,3 +215,25 @@ def test_coverage_registry_is_full_only_for_referenced_claims():
     ]
     payload = {"current_claims": registry, "required_claim_checks": [{"claim_id": "claim_002"}]}
     assert _registry_view(registry, payload) == [{"claim_id": "claim_001", "text": "A."}, registry[1]]
+
+
+def test_first_pass_keeps_experiment_sections_abstract_and_contributions(tmp_path):
+    from verification.claim_context import experiment_block_ids
+
+    claim, materials = _paper(tmp_path)
+    sections = {
+        "intro": "section_1: ABSTRACT", "claim": "section_2: 1 INTRODUCTION", "next": "section_2: 1 INTRODUCTION",
+        "table": "section_4: 4 EXPERIMENTS", "ref": "section_5: 4.2 Speed", "far": "section_3: 3 METHOD",
+        "other": "section_6: 5 RELATED WORK", "bib": "section_7: REFERENCES",
+    }
+    for block in materials.blocks:
+        block.loc.section = sections[block.id]
+    materials.blocks.append(MaterialBlock(
+        id="contrib", text="Our contributions are threefold.", loc=ClaimLocation(page=1, section="section_2: 1 INTRODUCTION"),
+    ))
+    materials.blocks.append(MaterialBlock(
+        id="method", text="We define the loss.", loc=ClaimLocation(page=1, section="section_3: 3 METHOD"),
+    ))
+    ids = experiment_block_ids(claim, materials)
+    assert {"intro", "claim", "table", "ref", "contrib"} <= ids
+    assert "method" not in ids and "bib" not in ids
