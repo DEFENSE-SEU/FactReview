@@ -625,6 +625,11 @@ with shared state, condition_ids and reason. Close the COMPLETE directory. Never
 sources to read/considered/irrelevant. Unavailable stays unavailable and unresolved, never missing.
 Other original blocks with actually supplied bodies may be explicitly reviewed; unloaded IDs
 cannot be used. Each atom's conditions must be covered by every referenced source review.
+Every scope_atoms[].sources[] span must reference an original block body actually supplied and
+visible in THIS request, and its block_id must be explicitly listed in THIS claim's
+source_review_groups[].source_ids with state="considered".
+Within each atom, every (block_id, start, end) triple must be unique; different atoms may reuse a
+source span.
 Use block_local_whole_span or visible_source_spans for exact block-relative Python codepoint
 offsets; end is exclusive. trusted_span is Markdown-global and cannot be an atom offset.
 Partition all original conditions in scope_groups; explicitly close all six existing dimensions.

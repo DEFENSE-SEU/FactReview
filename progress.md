@@ -1,6 +1,8 @@
 # FactReview v2 progress
 
-最新进展（2026-10-11）：已推送 `06f2728e4c97cd3d7548dcd2bb5563c40c84b9b9`，应用源码身份为 `40715eec136299f7b42b9a914c23ac29d5e0be89`，完整canonical221文件/31目录，identity a7d851e5/archive e60a587a。Phase0–7历史实现保留，Phase8与整体目标active。checks.md开头当前表为12项有界通过、2项完整链未通过，不宣称商业完成。
+最新进展（2026-10-11）：已提交推送 `1098bb49fe46ddcd1f216966dc6e893a54e2b939`，精确远端相同，包含原复核有限恢复与NN提示修复。最近两次实际仍固定应用源码 `40715eec136299f7b42b9a914c23ac29d5e0be89`，完整canonical221文件/31目录、identity a7d851e5/archive e60a587a；失败记录保留。Phase0–7历史实现保留，Phase8与整体目标active。checks.md开头12项有界通过、2项完整链未通过，不宣称商业完成。
+
+Completed Phase3 scope提示：Root全文读诊断17b10ece、终态d7dd4ebd、作者33f476d5/完整差异，并核SHA接受独审a4a133e9/evidence33505b55的14项事实。共享v5唯一Constant补两句既有合同：每atom的来源实际供应可见、同claim组显式considered，atom内span三元组唯一、跨atom可复用。原consumer/科学判断/retry/预算和其他AST全保持；逆bytes精确回ccda，最终a1224250同冻结，221旧test7220Assert保持。单文件Ruff/compile通过，不写新tests、不跑pytest/provider。first/batch/original/retry五共享提示生效；具体原错误子谓词未知，新实际成功不预判。提交后Root完整canonical与新一次性运行继续推进。
 
 本轮交付：original-duty retry已按独审24项接受提交phase3 `f69a938fc4cc20b58c789d42cddf851828e67405`。NN sites提示修复已获独审9c6158a8接受26项，Root全文读作者51322a6c/独审及完整单Constant差异并核SHA，准备本次phase5提交。只有v2.py inference提示明确已有四keys/四互异int范围/同次原函数，完整其余AST/payload/schema/资格/预算不变，229原test目录文件与57旁侧源保持，Ruff/compile通过，无pytest/模型/HTTP/Docker。工作SHA6ad42cb2/canonical LFf35bcfdd与frozen一致；两个旧407实际保持失败，后续新源码实际需新准入。第一轮共享scope提示约束另待补齐。
 
