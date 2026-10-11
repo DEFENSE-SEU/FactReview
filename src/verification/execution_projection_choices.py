@@ -437,7 +437,7 @@ def _candidate(claim, condition, materials, catalog, sources, recipe, entry, con
     )
 
 
-def build_choice_registry(claim, materials):
+def build_choice_registry(claim, materials, *, route_state=None):
     """Finite candidates only; empty/unavailable never becomes an execution plan."""
     from verification.execution_projection_catalog import semantic_request_choices
     from verification.experiment_catalog import build_catalog
@@ -465,6 +465,9 @@ def build_choice_registry(claim, materials):
     )
     menu = semantic_request_choices(claim, materials, repository_files=repository_context_files(materials))
     catalog = build_catalog(claim, materials)
+    if route_state is not None:
+        route_state.update(enumeration_complete=False, source_snapshot_available=True,
+                           budget_exhausted=False, candidate_bound_exceeded=False)
     for condition in claim.conditions:
         found, errors = [], set()
         sources = _canonical_sources(catalog, materials, condition)
@@ -503,6 +506,8 @@ def build_choice_registry(claim, materials):
 
         def consume_check():
             if registry["budget"]["checks_used"] >= MAX_COMBINATION_CHECKS:
+                if route_state is not None:
+                    route_state["budget_exhausted"] = True
                 raise _ChoiceBudget(
                     "Registry combination-check budget exhausted; current condition unavailable"
                 )
@@ -522,6 +527,8 @@ def build_choice_registry(claim, materials):
                                 raise ProjectionError("Choice resource is outside the repository")
                             size = sum(path.stat().st_size for path in paths)
                             if registry["budget"]["resource_bytes"] + size > MAX_RESOURCE_BYTES:
+                                if route_state is not None:
+                                    route_state["budget_exhausted"] = True
                                 raise _ChoiceBudget(
                                     "Registry resource-size budget exhausted; current condition unavailable"
                                 )
@@ -552,6 +559,8 @@ def build_choice_registry(claim, materials):
                                 continue
                             found.append(candidate)
                             if len(found) > MAX_CHOICES:
+                                if route_state is not None:
+                                    route_state["candidate_bound_exceeded"] = True
                                 raise _ChoiceBudget(
                                     f"Candidate bound exceeded: at least {len(found)} > {MAX_CHOICES}; none selected"
                                 )
@@ -586,6 +595,12 @@ def build_choice_registry(claim, materials):
                 )
             )
     registry["registry_sha256"] = digest(registry)
+    if route_state is not None:
+        route_state.update(checks_used=registry["budget"]["checks_used"],
+                           resource_bytes=registry["budget"]["resource_bytes"])
+        route_state["enumeration_complete"] = not (
+            route_state["budget_exhausted"] or route_state["candidate_bound_exceeded"]
+        )
     return registry
 
 

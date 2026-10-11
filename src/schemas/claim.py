@@ -781,9 +781,95 @@ class ChoiceProjectionRecord(SemanticProjectionRecord):
     execution_origin: ChoiceExecutionOrigin | None = None
 
 
+class StatisticsCountReference(Contract):
+    source_id: NonEmpty
+    start: int = Field(ge=0, strict=True)
+    end: int = Field(gt=0, strict=True)
+    token: NonEmpty
+
+
+class StatisticsCountAtom(ProjectionAtom):
+    kind: Literal["outcome_count"]
+    outcome: Literal["correct", "incorrect"]
+    expected_count: int = Field(ge=0, strict=True)
+    count_binding: StatisticsCountReference
+
+
+StatisticsAtom = Annotated[
+    DatasetProjectionAtom | RuntimeProjectionAtom | ValueProjectionAtom | SampleProjectionAtom
+    | DefinitionProjectionAtom | BoundaryProjectionAtom | UnresolvedProjectionAtom | StatisticsCountAtom,
+    Field(discriminator="kind"),
+]
+
+
+class StatisticsFragment(Contract):
+    start: int = Field(ge=0, strict=True)
+    end: int = Field(gt=0, strict=True)
+    text_digest: NonEmpty
+    atom_ids: list[NonEmpty]
+    separator: bool = Field(strict=True)
+
+
+class StatisticsFieldBinding(Contract):
+    path: NonEmpty
+    value_digest: NonEmpty
+    atom_ids: list[NonEmpty]
+    original_empty: bool = Field(strict=True)
+    fragments: list[StatisticsFragment]
+
+
+class ReleasedStatisticsProposal(Contract):
+    version: Literal["released-predictions-v3"]
+    domain: Literal["full-list-exact-match-statistics-v1"]
+    recipe: Literal["exact_match_accuracy"]
+    candidate_id: ChoiceIdentity
+    data_path: NonEmpty
+    reported_number_id: ChoiceIdentity
+    atoms: list[StatisticsAtom] = Field(min_length=1)
+    field_bindings: list[StatisticsFieldBinding] = Field(min_length=1)
+    claim_bindings: list[StatisticsFragment] = Field(min_length=1)
+
+
+class ReleasedStatisticsSelection(Contract):
+    version: Literal["released-predictions-choice-v2"]
+    condition_id: ChoiceIdentity
+    candidate_id: ChoiceIdentity
+    decision: Literal["select"]
+    proposal: ReleasedStatisticsProposal
+    rationale: NonEmpty
+
+
+class ReleasedStatisticsReview(Contract):
+    version: Literal["statistics-review-v1"]
+    condition_id: ChoiceIdentity
+    candidate_id: ChoiceIdentity
+    proposal_sha256: NonEmpty
+    context_digest: NonEmpty
+    decision: Literal["confirmed", "unresolved"]
+    reviews: list[ExecutionChoiceObligationReview]
+    rationale: NonEmpty
+
+
+class ReleasedStatisticsProjectionRecord(ProjectionRecord):
+    record_version: Literal["released-statistics-choice-v1"]
+    proposal: ReleasedStatisticsProposal
+    scope_review: ReleasedStatisticsReview
+    selection: ReleasedStatisticsSelection
+    registry_snapshot: dict[str, Any]
+    registry_sha256: NonEmpty
+    first_response_sha256: NonEmpty
+    normalized_response_sha256: NonEmpty
+    selected_origin_sha256: NonEmpty
+    adapter_sha256: NonEmpty
+    statistics_builder_sha256: NonEmpty
+    obligations: list[dict[str, Any]]
+
+
 class ProjectedExecutionTargetBinding(ExecutionTargetBinding):
     version: Literal[2] = 2
-    projection: ChoiceProjectionRecord | ProjectionRecord | SemanticProjectionRecord
+    projection: (
+        ChoiceProjectionRecord | ProjectionRecord | SemanticProjectionRecord | ReleasedStatisticsProjectionRecord
+    )
 
 
 class ExecutionOriginV4(Contract):

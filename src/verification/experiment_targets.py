@@ -552,7 +552,16 @@ def validate_plan_targets(plan, claim, materials):
                     "Released-predictions plan differs from its bound single evaluation task"
                 )
             try:
-                if getattr(projection, "record_version", None) == "released-predictions-choice-v1":
+                if getattr(projection, "record_version", None) == "released-statistics-choice-v1":
+                    from verification.released_statistics import bind_statistics_target
+
+                    if next((c for c in claim.conditions if c.id == condition.id), None) != condition:
+                        raise TargetBindingError("Statistics target differs from the full original condition")
+                    rebuilt = bind_statistics_target(
+                        claim, materials, projection.registry_snapshot, projection.selection,
+                        projection.scope_audit,
+                    )
+                elif getattr(projection, "record_version", None) == "released-predictions-choice-v1":
                     from verification.execution_projection_choices import bind_choice_target
 
                     if next((c for c in claim.conditions if c.id == condition.id), None) != condition:
