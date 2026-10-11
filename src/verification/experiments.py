@@ -2367,6 +2367,7 @@ def _plan(
     projection_reviews=None,
     scope_audit=None,
     plan_index=0,
+    plan_id=None,
 ) -> ExecutionPlan:
     conditions = {condition.id: condition for condition in claim.conditions}
     ids = _covered(claim, [target.condition_id for target in candidate.targets])
@@ -2441,7 +2442,7 @@ def _plan(
         blockers.append("Plan is blocked; runtime requirements need clarification")
     # Training approval/budget is enforced by L3; preserve its candidate here.
     return ExecutionPlan(
-        id=f"{claim.id}.plan",
+        id=plan_id if plan_id is not None else f"{claim.id}.plan",
         claim_id=claim.id,
         condition_ids=ids,
         target_conditions=[
@@ -2476,7 +2477,26 @@ def verify_experiments(
     call=None,
     scope_call=None,
     scope_binding_repair_rounds=None,
+    execution_wire_version=None,
+    execution_audit_dir=None,
 ) -> BranchResult:
+    v4 = execution_wire_version == "experiments-execution-v4"
+    if execution_wire_version not in (None, "experiments-execution-v3", "experiments-execution-v4"):
+        raise ValueError("Unknown experiments execution wire version")
+    v4_bundle, v4_snapshot, v4_context, v4_wire = None, None, None, None
+    if v4:
+        from verification import execution_wire_v4 as ordinary_wire
+        try:
+            v4_snapshot = ordinary_wire.source_snapshot(claim, materials)
+            v4_context = ordinary_wire.digest({"version": ordinary_wire.VERSION,
+                "domain": ordinary_wire.DOMAIN, "snapshot": v4_snapshot})
+            v4_bundle = ordinary_wire.reserve_audit(execution_audit_dir, materials)
+        except (ValueError, OSError, TypeError, KeyError) as exc:
+            from schemas.limitations import VerificationLimitation
+            reason = f"Ordinary-v4 audit/source unavailable before delegation: {type(exc).__name__}"
+            return BranchResult(issues=[reason], verification_limitations=[VerificationLimitation(
+                claim_id=claim.id, condition_ids=[c.id for c in claim.conditions],
+                stage="Experiments", kind="source_context_unavailable", reason=reason)])
     if scope_binding_repair_rounds is None:
         from common.config import get_settings
 
@@ -2516,7 +2536,7 @@ def verify_experiments(
     except (ValueError, OSError, TypeError, KeyError) as exc:
         choice_registry = None
         choice_inputs = {"unavailable": str(exc)}
-    first_response = ask(
+    first_system = (
         "Check this experimental claim from the paper alone in five aspects: correspondence "
         "(an experiment for every assertion), fairness (same data/budget/tuning), isolation "
         "(credited components ablated), stability (variance/seeds/significance for small gaps), "
@@ -2575,8 +2595,9 @@ def verify_experiments(
         "Inspect the full original field/claim obligations and sources before selecting. This finite menu does not grant semantic support. "
         "Do not retype its resource paths, values, source sets, offsets or atom mappings. If no candidate can be selected and no valid legacy target is proposed, use kind=none. "
         "A choice already specifies the single target; do not repeat it as a legacy plan. None and existing null projections are never automatically upgraded. "
-        "Use projection=null for ordinary model-inference/v1 targets. No support flag is granted by a proposal.",
-        {
+        "Use projection=null for ordinary model-inference/v1 targets. No support flag is granted by a proposal."
+    )
+    first_payload = {
             "claim": claim.model_dump(mode="json"),
             "allowed_condition_ids": [condition.id for condition in claim.conditions],
             "joint_source_limit": source_limit,
@@ -2587,15 +2608,45 @@ def verify_experiments(
             "execution_choice_context": choice_inputs,
             "target_catalog": catalog_prompt(target_catalog),
             "output_schema": ExperimentsOutputV3.model_json_schema(),
-        },
-        module="verification.experiments",
-        call=choice_privacy.capture(call),
-    )
+        }
+    if v4:
+        first_system = first_system.split("For released prediction-file evaluation")[0]
+        first_system = first_system.replace("emit one explicit execution decision", "emit one explicit execution decision per original condition")
+        first_system = first_system.replace("return empty items and execution kind=none when needed",
+            "return empty items and an explicit kind=none row for each unresolved original condition when needed")
+        first_system += (
+            " Return schema_version=experiments-execution-v4, execution_domain=ordinary-conditions-v1, "
+            "and the supplied execution_context_digest exactly. Return every required_execution_conditions row "
+            "exactly once in supplied order, with its exact condition_id and condition_digest. Each row is "
+            "{kind:ordinary,plan:<one ordinary plan with exactly one target for this row and projection:null>} "
+            "or {kind:none,rationale:<explicit limitation>}. Keep the entire original Claim and all sources in view; "
+            "each plan targets only its original condition, with every shared qualifier retained. Missing rows are invalid. "
+            "Do not output choices, projections, plan IDs, origins, invented hashes or confirmation flags; "
+            "copy only the supplied context and condition digests. "
+            "Return only the closed output_schema fields; no top-level plans/execution_choices or legacy branch.")
+        first_payload = {key: value for key, value in first_payload.items() if key not in {
+            "execution_projection_context", "execution_projection_semantics_context", "execution_choice_context"}}
+        first_payload.update(execution_context_digest=v4_context,
+            required_execution_conditions=ordinary_wire.required_conditions(claim),
+            output_schema=ordinary_wire.output_schema(claim, v4_context))
+    first_response = ask(first_system, first_payload, module="verification.experiments", call=choice_privacy.capture(call))
+    if v4:
+        ordinary_wire.save_raw(v4_bundle, first_response)
+
     # Keep the strict model-facing choice schema while rejecting malformed new
     # rows locally, without discarding valid paper observations or legacy data.
     response_view = first_response
     first_execution_audit, execution_errors = None, []
-    if "schema_version" in first_response or "execution" in first_response:
+    if v4:
+        response_view, v4_wire = ordinary_wire.lower_v4(first_response, claim, v4_context)
+        if ordinary_wire.source_snapshot(claim, materials) != v4_snapshot:
+            response_view["plans"] = []
+            v4_wire["status"] = "rejected"
+            v4_wire["errors"].append("Original shared sources changed after delegation")
+        execution_errors = list(v4_wire["errors"])
+        first_execution_audit = {"first_pass_response": copy.deepcopy(first_response),
+            "first_pass_normalized": copy.deepcopy(response_view), "execution_wire": copy.deepcopy(v4_wire)}
+    elif "schema_version" in first_response or "execution" in first_response:
         try:
             response_view, wire = lower_execution_response(first_response)
         except (ValueError, TypeError, KeyError) as exc:
@@ -2621,7 +2672,8 @@ def verify_experiments(
         }
     raw_choices = copy.deepcopy(response_view.get("execution_choices", []))
     safe_choices, privacy_rejected = choice_privacy.rows(raw_choices, "selection")
-    output = ExperimentsOutput.model_validate({**response_view, "execution_choices": []})
+    output_type = ordinary_wire.ExperimentsOutputV4Normalized if v4 else ExperimentsOutput
+    output = output_type.model_validate({**response_view, "execution_choices": []})
     if set(output.checked_aspects) != {"correspondence", "fairness", "isolation", "stability", "consistency"}:
         raise ValueError("Experiments must inspect all five required aspects")
     result = BranchResult(issues=choice_privacy.safe(output.issues))
@@ -2979,6 +3031,7 @@ def verify_experiments(
                 projection_reviews=projection_reviews,
                 scope_audit=scope_audit,
                 plan_index=plan_index,
+                **({"plan_id": f"{claim.id}.plan.v4.{next(s['ordinal'] for s in v4_wire['states'] if s.get('plan_index') == plan_index)}"} if v4 else {}),
             )
             if (
                 any(target.projection is not None for target in candidate.targets)
@@ -2987,7 +3040,15 @@ def verify_experiments(
                 raise ValueError(plan.blocker)
             result.plans.append(plan)
         except ValueError as exc:
-            if any(target.projection is not None for target in candidate.targets):
+            if v4:
+                from schemas.limitations import VerificationLimitation
+                state = next(s for s in v4_wire["states"] if s.get("plan_index") == plan_index)
+                state.update(state="rejected", reason=str(exc))
+                result.issues.append(f"Ordinary-v4 plan rejected: {exc}")
+                result.verification_limitations.append(VerificationLimitation(
+                    claim_id=claim.id, condition_ids=[state["condition_id"]], stage="Experiments",
+                    kind="plan_rejected", reason=str(exc)))
+            elif any(target.projection is not None for target in candidate.targets):
                 from schemas.limitations import VerificationLimitation
 
                 result.issues.append(f"Execution projection plan rejected: {exc}")
@@ -3003,6 +3064,20 @@ def verify_experiments(
             else:
                 # Preserve the original single-source plan rejection contract.
                 raise RejectedPlan(str(exc), result) from exc
+    if v4:
+        from schemas.limitations import VerificationLimitation
+        for state in v4_wire["states"]:
+            if state["state"] == "rejected" and not any(state["condition_id"] in x.condition_ids for x in result.verification_limitations):
+                result.verification_limitations.append(VerificationLimitation(
+                    claim_id=claim.id, condition_ids=[state["condition_id"]], stage="Experiments",
+                    kind="plan_rejected", reason=state["reason"]))
+        if ordinary_wire.source_snapshot(claim, materials) != v4_snapshot:
+            result.plans.clear()
+            v4_wire["status"] = "rejected"
+            v4_wire["errors"].append("Original shared sources changed before plan retention")
+        ordinary_wire.finish_audit(v4_bundle, first_response, response_view, v4_wire,
+            v4_snapshot, v4_context, result.plans, scope_audit=scope_audit)
+        result.issues.append(f"Ordinary-v4 retained execution audit: {v4_bundle / 'origin.json'}")
     if choice_selections:
         from schemas.limitations import VerificationLimitation
         from verification.execution_projection_choices import choice_plan

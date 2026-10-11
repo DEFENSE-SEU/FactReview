@@ -786,6 +786,27 @@ class ProjectedExecutionTargetBinding(ExecutionTargetBinding):
     projection: ChoiceProjectionRecord | ProjectionRecord | SemanticProjectionRecord
 
 
+class ExecutionOriginV4(Contract):
+    version: Literal["experiments-execution-v4"]
+    domain: Literal["ordinary-conditions-v1"]
+    audit_locator: NonEmpty
+    audit_sha256: NonEmpty
+    execution_context_digest: NonEmpty
+    claim_digest: NonEmpty
+    condition_id: NonEmpty
+    condition_digest: NonEmpty
+    ordinal: int = Field(ge=0, strict=True)
+    raw_response_sha256: NonEmpty
+    raw_row_pointer: NonEmpty
+    raw_row_sha256: NonEmpty
+    raw_plan_pointer: NonEmpty
+    raw_plan_sha256: NonEmpty
+    plan_index: int = Field(ge=0, strict=True)
+    normalized_plan_pointer: NonEmpty
+    normalized_response_sha256: NonEmpty
+    adapter_sha256: NonEmpty
+
+
 class ExecutionPlan(Contract):
     id: NonEmpty
     claim_id: NonEmpty
@@ -803,6 +824,14 @@ class ExecutionPlan(Contract):
     blocker: str = ""
     priority: Literal["high", "medium", "low"]
     estimated_cost: str = "unknown"
+    execution_origin: ExecutionOriginV4 | None = None
+
+    @model_serializer(mode="wrap")
+    def retain_historical_shape(self, handler):
+        result = handler(self)
+        if self.execution_origin is None:
+            result.pop("execution_origin", None)
+        return result
 
     @model_validator(mode="after")
     def check_feasibility_and_conditions(self) -> Self:
