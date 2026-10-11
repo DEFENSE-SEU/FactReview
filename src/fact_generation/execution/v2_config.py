@@ -1,8 +1,9 @@
 """Execution policy and preserved metric tolerance profiles."""
 
+import re
 from typing import Annotated, Any, Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from schemas.claim import Contract, FiniteNumber, NonEmpty
 
@@ -68,6 +69,83 @@ class PaperVariance(Contract):
     quote: NonEmpty
 
 
+SANDBOX_ENV = {"HOME": "/workspace/run_dir/home", "TMPDIR": "/workspace/run_dir/.tmp"}
+SANDBOX_PAIR_FLAGS = {"--cpus", "--memory", "--memory-swap", "--pids-limit", "--network",
+                      "--cap-drop", "--security-opt"}
+
+
+class SandboxPolicy(Contract):
+    """Operator-only commercial runtime limits; scientific configuration stays separate."""
+
+    version: Literal["commercial-sandbox-v1"] = "commercial-sandbox-v1"
+    cpus: Annotated[FiniteNumber, Field(gt=0, strict=True)] = 2.0
+    memory_bytes: int = Field(default=4294967296, gt=0, strict=True)
+    pids_limit: int = Field(default=256, gt=0, strict=True)
+    network: str = Field(default="none", min_length=1, max_length=64, strict=True)
+    uid: int = Field(default=1000, gt=0, strict=True)
+    gid: int = Field(default=1000, gt=0, strict=True)
+    read_only_rootfs: bool = Field(default=True, strict=True)
+    cap_drop: Literal["ALL"] = "ALL"
+    no_new_privileges: bool = Field(default=True, strict=True)
+
+    @model_validator(mode="after")
+    def commercial_boundary(self):
+        if (not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", self.network)
+                or self.network.lower() in {"host", "container", "default"}):
+            raise ValueError("Sandbox network must be none, bridge or an operator-preconfigured named network")
+        if not self.read_only_rootfs or not self.no_new_privileges:
+            raise ValueError("Commercial sandbox requires readonly rootfs and no-new-privileges")
+        return self
+
+
+def sandbox_policy(value):
+    # Reparse mutable model instances instead of trusting model_copy/model_construct.
+    return SandboxPolicy.model_validate(value.model_dump(mode="json") if isinstance(value, SandboxPolicy) else value)
+
+
+def sandbox_options(value):
+    policy = sandbox_policy(value)
+    return {"--cpus": str(policy.cpus), "--memory": str(policy.memory_bytes),
+            "--memory-swap": str(policy.memory_bytes), "--pids-limit": str(policy.pids_limit),
+            "--network": policy.network, "--user": f"{policy.uid}:{policy.gid}",
+            "--cap-drop": policy.cap_drop, "--security-opt": "no-new-privileges=true"}
+
+
+def validate_sandbox_options(options, value):
+    """Check the finite actual Docker prefix; duplicate/overridden limits fail closed."""
+    expected = sandbox_options(value)
+    pairs = {"--name", "--user", "--gpus", "--shm-size", "--ipc", "-w", "--workdir", "-e", "--env",
+             "-v", "--volume", "--mount"} | SANDBOX_PAIR_FLAGS
+    seen, environment, readonly, index = set(), {}, 0, 0
+    ipc_count = 0
+    while index < len(options):
+        option = options[index]
+        if option in {"--rm", "--read-only"}:
+            readonly += option == "--read-only"
+            index += 1
+            continue
+        if option not in pairs or index + 1 >= len(options):
+            raise ValueError("sandbox Docker option layout unavailable")
+        content = options[index + 1]
+        if option == "--ipc":
+            ipc_count += 1
+            if ipc_count != 1 or content != "private":
+                raise ValueError("sandbox IPC must be private and unique")
+        if option in expected:
+            if option in seen or content != expected[option]:
+                raise ValueError("sandbox Docker limit changed or duplicated")
+            seen.add(option)
+        if option in {"-e", "--env"}:
+            key, separator, item = content.partition("=")
+            if key in SANDBOX_ENV:
+                if key in environment or not separator or item != SANDBOX_ENV[key]:
+                    raise ValueError("sandbox writable environment changed")
+                environment[key] = item
+        index += 2
+    if seen != set(expected) or readonly != 1 or environment != SANDBOX_ENV:
+        raise ValueError("sandbox Docker limits or writable environment missing")
+
+
 class ExecutionConfig(Contract):
     max_attempts: int = Field(default=3, ge=0, le=3, description="Maximum accepted repair rounds")
     approval_mode: Literal["auto", "interactive"] = "auto"
@@ -76,6 +154,7 @@ class ExecutionConfig(Contract):
     python_version: str = "3.11"
     docker_build_timeout_seconds: int = Field(default=3600, gt=0)
     docker_options: dict[str, Any] = Field(default_factory=dict)
+    sandbox: SandboxPolicy = Field(default_factory=SandboxPolicy)
     refine_with_llm: bool = True
     output_mappings: dict[str, OutputMapping] = Field(default_factory=dict)
     author_artifacts: dict[str, list[ReleasedArtifactContract]] = Field(default_factory=dict)

@@ -600,7 +600,7 @@ def _prediction_image(request, logs, *, frozen_id=None):
     return image_id, command, audit
 
 
-def _readonly_workspace_argv(argv, *, image, command, workspace, runtime_dir):
+def _readonly_workspace_argv(argv, *, image, command, workspace, runtime_dir, sandbox=None):
     """Protect author inputs before deciding whether an observer is available."""
     from .runtime_launch import _mount
 
@@ -613,9 +613,14 @@ def _readonly_workspace_argv(argv, *, image, command, workspace, runtime_dir):
                 "/workspace/run_dir": str(Path(runtime_dir).resolve())}
     pairs = {"--name", "--user", "--gpus", "--shm-size", "--ipc", "-w", "--workdir", "-e", "--env"}
     options, rewritten, mounts, index = argv[2:image_index], [], set(), 0
+    if sandbox is not None:
+        from .v2_config import SANDBOX_PAIR_FLAGS, validate_sandbox_options
+
+        validate_sandbox_options(options, sandbox)
+        pairs |= SANDBOX_PAIR_FLAGS
     while index < len(options):
         option = options[index]
-        if option == "--rm":
+        if option == "--rm" or (sandbox is not None and option == "--read-only"):
             rewritten.append(option)
             index += 1
             continue
@@ -654,8 +659,14 @@ def docker_runner(request: RunRequest) -> RunOutcome:
     # prior attempts and build logs) stay outside every runtime bind mount.
     runtime_dir = _inside(run_dir, "runtime_scratch")
     runtime_dir.mkdir(exist_ok=True)
+    for directory in ("home", ".tmp"):
+        _inside(runtime_dir, directory).mkdir(exist_ok=True)
     logs = run_dir / f"attempt_{request.repair_round}"
     logs.mkdir(parents=True, exist_ok=True)
+    sandbox_audit = {"policy": request.config.sandbox.model_dump(mode="json"),
+                     "user": f"{request.config.sandbox.uid}:{request.config.sandbox.gid}",
+                     "network": request.config.sandbox.network, "author_transport_invoked": False,
+                     "argv": None, "runtime_enforcement": "unverified"}
     options = dict(request.config.docker_options)
     options["docker_build_log_dir"] = str(logs / "build")
     if request.dependencies:
@@ -678,7 +689,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             return RunOutcome(
                 returncode=1,
                 issue=f"Isolated prediction environment unavailable: {exc}",
-                environment={"transport": "docker", "python": request.config.python_version},
+                environment={"transport": "docker", "python": request.config.python_version, "sandbox": sandbox_audit},
                 operation_failures=[ExecutionOperationFailure(
                     component="execution.environment",
                     reason=f"Isolated prediction environment preparation failed ({type(exc).__name__})",
@@ -695,7 +706,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
                 returncode=1,
                 issue="Approved inference image policy unavailable",
                 runtime_seconds=time.monotonic() - start,
-                environment={"transport": "docker", "python": request.config.python_version,
+                environment={"transport": "docker", "python": request.config.python_version, "sandbox": sandbox_audit,
                              "inference_admission": {"status": "unresolved",
                                                      "reason": "approved_inference_policy_unavailable"}},
                 operation_failures=[ExecutionOperationFailure(
@@ -725,7 +736,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             stderr=image,
             issue="Docker image unavailable",
             runtime_seconds=time.monotonic() - start,
-            environment={"transport": "docker", "python": request.config.python_version},
+            environment={"transport": "docker", "python": request.config.python_version, "sandbox": sandbox_audit},
             commands=build_commands,
             logs={"build": str(logs / "build")},
             operation_failures=[ExecutionOperationFailure(
@@ -743,18 +754,20 @@ def docker_runner(request: RunRequest) -> RunOutcome:
         env_passthrough=[],
         gpus=None if projected else options.get("docker_gpus"),
         container_name=container_name,
+        sandbox=request.config.sandbox,
     )
     # Input protection also applies to original commands without an observer.
     try:
         command = _readonly_workspace_argv(
             command, image=image, command=request.command,
-            workspace=request.workspace, runtime_dir=runtime_dir,
+            workspace=request.workspace, runtime_dir=runtime_dir, sandbox=request.config.sandbox,
         )
     except ValueError as exc:
         return RunOutcome(
             returncode=1, issue=str(exc), runtime_seconds=time.monotonic() - start,
             commands=build_commands,
-            environment={"transport": "docker", "image": image, "python": request.config.python_version},
+            environment={"transport": "docker", "image": image, "python": request.config.python_version,
+                         "sandbox": sandbox_audit},
             operation_failures=[ExecutionOperationFailure(
                 component="execution.environment", reason="Readonly workspace protection unavailable",
             )],
@@ -791,7 +804,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
                 runtime_dir=runtime_dir, repair_round=request.repair_round, runtime_python=request.config.python_version,
             )
             if observer_audit["status"] == "ready":
-                protection = protect_observer_docker_argv(command, launch=observer_audit)
+                protection = protect_observer_docker_argv(command, launch=observer_audit, sandbox=request.config.sandbox)
                 observer_audit["status"] = protection["status"]
                 observer_audit["unresolved"].extend(protection["unresolved"])
                 if protection["status"] == "ready":
@@ -809,7 +822,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             runtime_python=request.config.python_version,
         )
         if observer_audit["status"] == "ready":
-            protection = protect_observer_docker_argv(command, launch=observer_audit)
+            protection = protect_observer_docker_argv(command, launch=observer_audit, sandbox=request.config.sandbox)
             observer_audit["status"] = protection["status"]
             observer_audit["unresolved"].extend(protection["unresolved"])
             if protection["status"] == "ready":
@@ -824,7 +837,8 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             commands=[*build_commands, *inference_commands],
             logs={"runtime_observer_launch": str(logs / "runtime_observer_launch.json"), **inference_logs},
             environment={"transport": "docker", "image": image, "python": request.config.python_version,
-                         "writable_runtime_directory": str(runtime_dir), "runtime_observer": observer_audit},
+                         "writable_runtime_directory": str(runtime_dir), "runtime_observer": observer_audit,
+                         "sandbox": sandbox_audit},
             operation_failures=[ExecutionOperationFailure(
                 component="execution.environment", reason="Readonly workspace metric output protection unavailable",
             )],
@@ -1023,6 +1037,7 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             "container_name": container_name,
             "writable_runtime_directory": str(runtime_dir),
             "runtime_observer": observer_audit,
+            "sandbox": {**sandbox_audit, "author_transport_invoked": True, "argv": command},
             "process_termination": {
                 "kind": result.termination or "unknown", "exception_type": result.exception_type,
             },
@@ -1519,6 +1534,7 @@ def _target_tolerance(condition, binding, config, target, gap):
 def _execute_graph(
     initial, claim, materials, ledger, runner, repairer, issues, manifest, training_budget
 ) -> str:
+    operator_sandbox = json.dumps(ledger["config"]["sandbox"], sort_keys=True, allow_nan=False)
     def protected_changes(workspace):
         changed = []
         for path, digest in manifest.items():
@@ -1531,6 +1547,20 @@ def _execute_graph(
 
     def run(state):
         request = state["request"]
+        from .v2_config import sandbox_policy
+
+        try:
+            policy_matches = json.dumps(sandbox_policy(request.config.sandbox).model_dump(mode="json"),
+                                        sort_keys=True, allow_nan=False) == operator_sandbox
+        except (ValueError, TypeError, AttributeError):
+            policy_matches = False
+        if not policy_matches:
+            reason = "Operator sandbox policy changed during execution"
+            failure = ExecutionOperationFailure(component="execution.integrity", reason=reason)
+            state.update(outcome=RunOutcome(returncode=1, issue=reason,
+                operation_failures=[failure]), operation_failures=[failure.model_dump()],
+                reason=reason, stop=True)
+            return state
         _, binding_issue = _revalidate_targets(request.plan, claim, materials, ledger, "before_run")
         if not binding_issue:
             binding_issue = _revalidate_resources(request.plan, claim, materials, ledger, "before_run")
