@@ -2,7 +2,7 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
-上一轮两个实际使用应用源码 `40715eec136299f7b42b9a914c23ac29d5e0be89`，均未通过。三项后续修复已推送 `1aabf5be6844ea6ae40620288cc7953975a7c87b`，精确远端已核；新完整源码快照独审接受18项身份事实。本轮两个新实际正在固定1aab来源运行，尚无终态。下表是当前结论，后面的checkpoint与旧表保留各自时点的历史结果。旧全套结果不自动覆盖后续源码变更。
+上一轮两个实际使用应用源码 `40715eec136299f7b42b9a914c23ac29d5e0be89`，均未通过。三项后续修复已推送 `1aabf5be6844ea6ae40620288cc7953975a7c87b`，精确远端已核；新完整源码快照独审接受18项身份事实。本轮固定1aab的NN实际已失败，整篇实际仍运行中；现有NN角色键提示另已完成独审，随本次交付。下表是当前结论，后面的checkpoint与旧表保留各自时点的历史结果。旧全套结果不自动覆盖后续源码变更。
 
 | 验收项 | 当前结果 | 依据或待办 |
 |---|---|---|
@@ -25,7 +25,11 @@
 
 整篇v4终态独审已接受：Root全文读报告d7dd4ebd/evidence3f310f5e与公开因果摘要bc696c04并核SHA。完整源码/输入/控制器身份保持，原七阶段partial、12主张全Unverified、0plan/L3和main未closed原样保留。仅从程序分支推断，本地physical重试被预算拒绝可能再次生成空usage统计；无法由聚合missing2证明两次实际HTTP。真实EOF的未知用量与阻断守卫保持，typed local-denial接口另行只读审查，尚未实施记账修复。
 
-新一次性验证：NNv4独审22f2879a/evidence48eff744接受20项增量，一次元数据释放62097ad2和唯一prepare rc0/5.8957s得到prepared-ab372c855d81（manifest18a2d6fa）；prepared独审23e2d3c6/evidence2a764190接受22项。整篇v5独审eb24e1a9/factse9d7663b接受25项，一次离线释放7eb42690和唯一prepare rc0/2.5600s得到prepared-eefeefe1b272（manifest7b407181）；prepared独审2fce24e6/facts0919433e接受21项。Root分别全文读并核SHA后创建fresh once284f0a02/a076d071，进入唯一NN actual-f79ffb75bd1b/session3701与整篇actual-15a70742ed34/session20993；两者运行中，固定完整1aab，原输入/预算/科学checker保持。没有终态/新科学成功，验收2/8保持未通过。
+新一次性验证：NNv4独审22f2879a/evidence48eff744接受20项增量，一次元数据释放62097ad2和唯一prepare rc0/5.8957s得到prepared-ab372c855d81（manifest18a2d6fa）；prepared独审23e2d3c6/evidence2a764190接受22项。整篇v5独审eb24e1a9/factse9d7663b接受25项，一次离线释放7eb42690和唯一prepare rc0/2.5600s得到prepared-eefeefe1b272（manifest7b407181）；prepared独审2fce24e6/facts0919433e接受21项。Root分别全文读并核SHA后创建fresh once284f0a02/a076d071，进入唯一NN actual-f79ffb75bd1b/session3701与整篇actual-15a70742ed34/session20993；准入时两者均运行，固定完整1aab，原输入/预算/科学checker保持。当前NN终态另列下方，整篇仍运行；验收2/8保持未通过。
+
+NNv4终态：session3701已结束rc1，supervisor203.406s/driver201.422s；1logical/1physical/13954known closed、作者1exit0/39.203s、0inspection/hostsample/hostmetric/semantic/Evidence，Unverified。Root全文读并核SHA接受终态独审61288168/evidence7f997c88的16项事实。安全sidecar仅proposal.sources/value_error，对应既有六角色闭包；实际缺/多键和值未知，private记录只SHA/size。新的唯一NN提示增加一条精确paper/sources六键合同句（两字符串片段行，217bytes），Root全文读并核SHA接受ded28109/evidence3483b3bc的10项静态事实；finalf6fef0f1/逆全文bytes与AST通过，单文件Ruff/compile通过，0新pytest，schema/科学gate/预算原样。旧失败不重放，新提示实际效果待核。
+
+整篇v5的L1有界快照：Root全文读并核SHA接受f464237d/factsfeb2eb2f。first12职责11有效，一个固定source IDs非空/唯一错误；五请求均returned。original0/12 not_run_incomplete_first，retry/global未记录，review5/12、validation0/16、followup0/4，revisions0/unresolved1，预算未耗尽。该快照不能替代终态；最窄第一轮机械恢复的设计审查继续，原门限和坏行保持。
 
 NN v3唯一实际 `actual-894da6c8ef3a` 已结束：supervisor rc1/80.609s，模型1 logical/1 physical/9848 known，accounting closed；作者1次exit0/42.047s，0 image inspect/host metric/semantic Evidence，状态Unverified。Root全文读并核SHA接受终态独审0bc45be6/evidence52c4c509的34项身份/预算事实。新安全sidecar只定位 `proposal.sites / value_error`；具体违反键集合、范围或互异约束中的哪一项仍未知。私有答复未解析或重放，原once已消费；最窄提示修正已获独审9c6158a8接受26项，Root全文读并核SHA；唯一inference Constant明确四keys/四互异整数范围/同次实际函数。完整其他AST、229原test目录文件、57旁侧源保持，Ruff/compile通过，无新pytest或实际调用，未授予新NN科学资格。
 

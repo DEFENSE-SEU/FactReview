@@ -1,6 +1,6 @@
 # FactReview v2 progress
 
-最新进展（2026-10-11）：最近应用源码交付 `1aabf5be6844ea6ae40620288cc7953975a7c87b` 已推送且精确远端已核，包含原复核有限恢复、NN sites提示与共享scope来源提示。上一轮两个实际固定407源码且失败；本轮NN和整篇新实际正在运行固定完整1aab来源，尚无终态。Phase0–7历史实现保留，Phase8与整体目标active。checks.md开头12项有界通过、2项完整链未通过，不宣称商业完成。
+最新进展（2026-10-11）：本轮最近实际来源 `1aabf5be6844ea6ae40620288cc7953975a7c87b` 已推送且精确远端已核，包含原复核有限恢复、NN sites提示与共享scope来源提示；准备记录另已推送c5da4b8f0a44e7acd20d4405b6d0aa88dd18954b并核远端。NNv4已失败，整篇v5仍运行中；本次交付补现有NN六角色键提示，独审已接受。Phase0–7历史实现保留，Phase8与整体目标active。checks.md开头12项有界通过、2项完整链未通过，不宣称商业完成。
 
 新完整来源已接受：Root全文读并核SHA接受 `coverage-sites-canonical-independent-v1/report.md` b114288e/evidence1aa7261d，18/18必要身份事实。canonical1aab为完整221文件/31目录/252 Git PAX成员，identity0c38418e/archive9c2aa0da；相对407仅三个已审source变化，218旁侧完整字节保持，各改动与原独审冻结及AST逆关系精确对应。新NNv4和整篇v5控制器及prepared交叉独审均已接受，原输入/预算/科学门限保持，fresh UUID/once；状态见下方，不复用旧失败授权。
 
@@ -8,9 +8,13 @@
 
 Open issue：typed本地准入拒绝记账。Root全文读并核SHA接受 `provider-usage-local-denial-independent-v1/report.md` 5ac6d461，11项公开读源map5a837710，三个生产源同1aab。可在pre-delegate边界发行绑定本logical/attempt的具体类型与单用收据，local failure独立保存；真实EOF unknown/原失败记录/预算blocked/closed=false保留，不能以字符串或布尔字段豁免。只读设计及一个必要mock方案已保存，尚无实现或测试。当前优先新源码实际，另并行审一般作者仓库的NN入口覆盖范围，避免以有限fixture结论替代整体能力。
 
-Actual运行中：NNv4独审22f2879a/evidence48eff744接受20项必要增量；release62097ad2，唯一offline prepare rc0/5.8957s，prepared-ab372c855d81/manifest SHA18a2d6fa121355655a66b6d965504f70df44962320d3b6ae304559cb5adc2bd2。prepared独审23e2d3c6/evidence2a764190接受22项，Root全文读并核SHA后fresh once284f0a02，进入唯一actual-f79ffb75bd1b/supervised3890d2d1e653/session3701。Fullv5独审eb24e1a9/factse9d7663b接受25项；release7eb42690，唯一prepare rc0/2.5600s，prepared-eefeefe1b272/manifest SHA7b4071815fd01dcbaffa982e00734c777202c1e2b267e548ec374a67749e1738。prepared独审2fce24e6/facts0919433e接受21项，Root全文读并核SHA后fresh oncea076d071，进入唯一actual-15a70742ed34/supervisedb5cf6a05f163/session20993。两实际固定1aab来源，原六/九Python、16/8输入、预算和科学guard保持，无终态/科学成功。Next action：观察两actual公开阶段/终态并独审，包导入兼容修复并行推进。
+本轮Actual准入记录：NNv4独审22f2879a/evidence48eff744接受20项必要增量；release62097ad2，唯一offline prepare rc0/5.8957s，prepared-ab372c855d81/manifest SHA18a2d6fa121355655a66b6d965504f70df44962320d3b6ae304559cb5adc2bd2。prepared独审23e2d3c6/evidence2a764190接受22项，Root全文读并核SHA后fresh once284f0a02，进入唯一actual-f79ffb75bd1b/supervised3890d2d1e653/session3701。Fullv5独审eb24e1a9/factse9d7663b接受25项；release7eb42690，唯一prepare rc0/2.5600s，prepared-eefeefe1b272/manifest SHA7b4071815fd01dcbaffa982e00734c777202c1e2b267e548ec374a67749e1738。prepared独审2fce24e6/facts0919433e接受21项，Root全文读并核SHA后fresh oncea076d071，进入唯一actual-15a70742ed34/supervisedb5cf6a05f163/session20993。两实际固定1aab来源，原六/九Python、16/8输入、预算和科学guard保持。当前NN失败终态与独审见下方；整篇仍运行。Next action：观察整篇公开阶段/终态并独审，包导入兼容修复并行推进。
 
 Open scope /实施中：Root全文读并核SHA接受NN范围独审52e7e849与补充e026ec7c。现有Torch v1支持符合协议的其他作者源码及跨文件四角色，仍限numeric JSONL、CPU/eager、accuracy/MSE、direct script和原调用拓扑。原relative imports直接unavailable，absolute imports漏parent initializer与from-package submodule闭包。下一最窄Phase5修复已交agent：完整静态package/relative/transitive闭包，保留16文件/完整hash/容量/runtime来源及所有科学资格；唯一必要新mock、旧tests不改。python -m、无ID Dataset、其他codec/metric、typed per-plan intake各自仍open，不能据本轮fixture推断全面仓库兼容。
+
+NNv4已完成且失败：session3701已结束rc1，supervisor203.406s/driver201.422s；main1/1/13954known closed、readiness0、作者exit0/39.203s，0image inspection/hostmetric/semantic/Evidence，assessment U。Root全文读并核SHA接受终态独审61288168/evidence7f997c88的16项身份/程序事实；sources/value_error为唯一安全schema诊断，既有closed_torch_roles精确六键守卫生效，原缺/多键及值未知，private/raw/author/ledger/science仅SHA/size。Root最窄补现有paper/sources六键合同，finalv2f6fef0f1相对6ad仅唯一Constant217bytes，整bytes/ASTinverse、Ruff/compile通过，0pytest。Root全文读并核SHA接受提示独审ded28109/evidence3483b3bc的10项事实。实际新增一条英文合同句、两个字符串片段行，作者旧报告“两句”计数由独审明确纠正，旧冻结报告不重写。该提示随本次Phase5交付；新NN实际需下一完整源/fresh once，原失败不重放。
+
+整篇v5仍运行：唯一L1程序快照20511c27由独审f464237d/factsfeb2eb2f冻结，Root全文读并核SHA接受。first12职责11有效，source IDs非空/唯一的一项fixed错误（两子条件未知），5请求均返回；original0/12 not_run_incomplete_first，retry/global未记录，review5/12 validation0/16 followup0/4，revisions0/unresolved1。快照非终态，不把blocked IDs空数组当完整采纳。下一设计审查是完整initial身份有效后的第一轮机械invalid有界恢复，复用原预算/完整来源并保留坏行；尚无实现。整篇实际和包导入实现继续，目标不暂停。
 
 Completed Phase3 scope提示：Root全文读诊断17b10ece、终态d7dd4ebd、作者33f476d5/完整差异，并核SHA接受独审a4a133e9/evidence33505b55的14项事实。共享v5唯一Constant补两句既有合同：每atom的来源实际供应可见、同claim组显式considered，atom内span三元组唯一、跨atom可复用。原consumer/科学判断/retry/预算和其他AST全保持；逆bytes精确回ccda，最终a1224250同冻结，221旧test7220Assert保持。单文件Ruff/compile通过，不写新tests、不跑pytest/provider。first/batch/original/retry五共享提示生效；具体原错误子谓词未知，新实际成功不预判。提交后Root完整canonical与新一次性运行继续推进。
 
