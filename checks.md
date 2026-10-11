@@ -2,6 +2,8 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+本轮三项改动已共同推送并核精确remote e54c06321454eeab2be72a8a0d69c0607679a0be；Root19条source/test/docs的工作LF=Git收据5cd5e930。完整新canonical identity4e216fa3/archive9f970adc已接受不同agent独审c995a951/facts3fa8735e的12来源事实，Root全文读报告/事实并核7冻件与13current LF，收据bc5a4a0e。实际224文件/31目录/255安全成员，223Py仅被动compile；相对d432为11changed+2added+0removed、211共同原bytes保持。Root最初消息的213算术错误已更正，source/identity不改。13变更raw精确绑已审freeze，canonical只允许CRLF→LF，共享v2的quote→intake→NN全字节逆链已核。Fullv7/NNv6只candidate，原输入/预算/科学checks保持；controller/prepare/live门禁待独审及Rootrelease，当前没有新actual。独立local-denial接口另批实施，不归此固定e54c来源或实际资格。
+
 Phase5 quote-only NN入口已接受不同agent独审a180f8a3/factsfb1c64ad的12有限事实；Root全文读报告/事实并核12独审冻件与当前三产品/新test。pre-completion完整paper/源/index freeze，返后严格端点一致，只有显式candidate-v2精确唯一quote可派生LF Unicode span；旧canonical-v1坐标、原binder/六角色/授权/完整函数/容量/科学资格门限保持。新mock同字节旧红1→最终必要新旧两节点2passed5.11s，Ruff/compile通过；原actual原因仍unknown。作者230点时清单冻结229保持，reviewer当前228保持，两旁侧test变更已各自独审；明确原227清单仍226保持，不宣称旧全套对新源资格。已审Phase4与Phase3本轮分别提交3a3b4d7/ed8412d，本Phase5提交后推送授权分支并生成完整224文件/31目录canonical。新controller只pending整理及固定机械旁路，原科学checks/预算保留；尚无新实际验收。
 
 Phase3原审计v2已获different-agent有界接受：reportc9a131ae/facts36ac7df3，13有限事实；Root全文读报告/事实并核作者17与独审6冻件及当前五产品/test。合法discovery mapping的KeyError已由精确原claim路径+显式claim_id投影闭合，完整ordered required equality保持；同最终组合mock旧P1源红1→新源1passed11.89s，原45断言及旧四节点身份保留，没有重复全套。Root独立报告呈现4b72da8a沿用v1有限接受。helper默认false、框架默认true，独立原审计只保留审计findings与单独counts，不解除first pending、不提升主original计数或授adoption。NN quote作者25冻件已Root核，distinct审仍进行中。下方v1拒绝及原红绿记录保留，第2/8项仍未通过。
