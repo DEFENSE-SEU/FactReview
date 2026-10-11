@@ -1,5 +1,10 @@
 # FactReview v2 progress
 
+2026-10-11 Phase 2 来源缺段修复已交付：非空 MinerU 列表遗漏的完整 Markdown 段落和真实标题在共享材料形成前物化，原 parser 对象/字段/ID/次序及图表行关联保持，新来源有精确字符区间、稳定摘要 ID、page=None 和明确说明。partial overlap 与不确定插入继续 unavailable。v1/v2/v3 的嵌套 HTML、PI/CDATA/声明及 subset PI 反例均保留；v4 获另一 agent 限定接受，report 4ed6d3df / facts ce2bb50e，Root 全文读取并核28新与100历史对象、六旁侧合同和当前两文件，接受收据 bfbdac5a。唯一同字节组合 mock v3 红1.20s→v4 绿0.87s，原76 Assert保持至90、Ruff/被动compile2通过；原四相关节点仅沿用v1收据，不重复通过测试。有限词法、原raw heading section行为、物理页恢复、真实召回及prompt容量限制保持；方法2/8仍未通过。
+
+第三层新NN8已绑定已接受605e6c8完整228文件/31目录来源，9控制器/16输入、原19检查与2调用/100000 token/单次作者运行预算保持；controller/release/selector/status均获独审，Root收据f3104d46/10f3931e。唯一离线prepare-335fa2985a97已rc0（manifest09929af1），应用/模型/作者执行计数全0，独立prepared身份审核中，尚无新actual。Root首次误传PLACEHOLDER被原release门预写拒绝、27文件原样，失败记录f5133b7b保留；远端TLS失败后精确核对334e329成功，原四tracked fixture的Git blob/换行属性已核，收据30563b6e。整篇Full9闭合草案11控制器/8原输入获独审34ffe92f，Root接受aacca41e；待新提交canonical和来源绑定，全部准入仍关闭。
+
+
 2026-10-11 Phase 4 固定子守卫交付已接受：原两处 source 增量独审与 Root 严格合同/fixture修正独审合并接受，报告 `1da13da8` / facts `5961c6ce`，Root 核22作者、32修正、4独审对象及当前文件，收据 `ee535d1a`。新增20闭枚举内存标签在原 attempted 之后、IO之前记录已经算出的首拒绝码；默认关闭、None不增标签、原一次侧文件/科学守卫/128与1m界保持。两个旧精确合同各按新增字段扩展，并增加完整固定事件/阶段快照校验；其余27 writer/41 catalog及新mock全部28原Assert保持。四份完整原baseline纳入tracked fixture，换行转换关闭。两个必要writer节点通过，catalog修后1passed/5.10s，原失败/Ruff3/被动compile7与身份收据保留，无通过节点复跑。原Full v8具体科学子码与IO原因仍unknown，方法2/8继续未通过。
 
 2026-10-11 审核修正进行中：Phase4 原候选独审 `ee9d3daa` 指出旧精确事件集合冲突与 ignored runs baseline 依赖，保持该版“需修正”。Root 窄修正冻件 `d7667d1e`：程序 source 未变，三测试采用四份完整原 baseline tracked fixture，原 writer 和 catalog 各一条精确集合扩展，同时补完整固定事件/阶段快照；其余原 Assert 有序保持，新 mock 28 项全部保持。必要旧 writer 红1/.32s、修正后两个 writer 通过；同轮 catalog 新 kwarg 合同失败保留，补精确断言后仅该节点绿1/5.10s；Ruff3/被动 compile7，等待另一 agent 审核，未提交。Phase2 原物化候选独审发现嵌套 HTML 提前退出可能伪造 References 来源；作者修 v2，v1冻件保持，不提交该版。新的 NN 有限阶段 observer 作者进行中。已接受 Phase5 提交 `605e6c8` 推送完成，精确远端同；方法2/8和整体 active。

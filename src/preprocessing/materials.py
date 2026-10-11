@@ -395,6 +395,355 @@ def _blocks(markdown: str, rows: list[dict[str, Any]], issues: list[str]) -> lis
     return blocks
 
 
+def _markdown_gap_segments(markdown: str) -> list[tuple[int, int, str, str | None]]:
+    """Keep whole exact paragraphs/ATX headings; fences cannot introduce sections."""
+    segments = []
+    paragraph = None
+    fence = None
+    opaque = None
+    offset = 0
+    section = None
+    section_number = 0
+
+    def append(start, end, kind):
+        raw = markdown[start:end]
+        start += len(raw) - len(raw.lstrip())
+        end -= len(raw) - len(raw.rstrip())
+        if start < end:
+            segments.append((start, end, kind, section))
+
+
+    def html_boundary(root_tag):
+        # Only HTML token boundaries are used; no Markdown/DOM interpretation.
+        from html.parser import HTMLParser
+
+        void_tags = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
+
+        class Boundary(HTMLParser):
+            def __init__(self):
+                super().__init__(convert_charrefs=False)
+                self.stack = []
+                self.closed = False
+                self.uncertain = False
+                self.root_seen = False
+                self.literal = False
+
+            def handle_starttag(self, tag, attrs):
+                if self.closed:
+                    self.uncertain = True
+                    return
+                if not self.root_seen:
+                    self.root_seen = True
+                    self.uncertain = self.uncertain or tag != root_tag
+                if tag in void_tags:
+                    self.closed = not self.stack
+                else:
+                    self.stack.append(tag)
+
+            def handle_startendtag(self, tag, attrs):
+                if self.closed or tag not in void_tags:
+                    # HTML does not close a non-void element with a '/>' token.
+                    self.uncertain = True
+                elif not self.stack:
+                    self.closed = True
+
+            def handle_endtag(self, tag):
+                if self.closed or not self.stack or self.stack[-1] != tag:
+                    self.uncertain = True
+                    return
+                self.stack.pop()
+                self.closed = not self.stack
+
+            def handle_data(self, text):
+                if self.closed and text.strip():
+                    self.uncertain = True
+
+        return Boundary()
+
+    def wrapper_boundary(mode, opening):
+        class Boundary:
+            literal = True
+
+            def __init__(self):
+                self.closed = False
+                self.uncertain = False
+                self.rawdata = ""
+                self.cursor = None
+                self.quote = None
+                self.depth = 0
+                self.comment = False
+                self.pi = False
+
+            def finish(self, end):
+                self.closed = True
+                self.uncertain = bool(self.rawdata[end:].strip())
+                self.rawdata = ""
+
+            def feed(self, text):
+                if self.closed:
+                    self.uncertain = self.uncertain or bool(text.strip())
+                    return
+                if mode == "unknown" or self.uncertain:
+                    return
+                self.rawdata += text
+                if self.cursor is None:
+                    self.cursor = len(self.rawdata) - len(self.rawdata.lstrip()) + len(opening)
+                if mode in {"pi", "cdata"}:
+                    closer = "?>" if mode == "pi" else "]]>"
+                    end = self.rawdata.find(closer, self.cursor)
+                    if end != -1:
+                        self.finish(end + len(closer))
+                    else:
+                        self.rawdata = self.rawdata[max(self.cursor, len(self.rawdata) - len(closer) + 1):]
+                        self.cursor = 0
+                    return
+                while self.cursor < len(self.rawdata):
+                    char = self.rawdata[self.cursor]
+                    if self.pi:
+                        end = self.rawdata.find("?>", self.cursor)
+                        if end == -1:
+                            self.rawdata = self.rawdata[max(self.cursor, len(self.rawdata) - 1):]
+                            self.cursor = 0
+                            return
+                        self.cursor = end + 2
+                        self.pi = False
+                        continue
+                    if self.comment:
+                        end = self.rawdata.find("-->", self.cursor)
+                        if end == -1:
+                            self.cursor = max(self.cursor, len(self.rawdata) - 2)
+                            self.rawdata = self.rawdata[self.cursor:]
+                            self.cursor = 0
+                            return
+                        self.cursor = end + 3
+                        self.comment = False
+                        continue
+                    if self.quote:
+                        if char == self.quote:
+                            self.quote = None
+                    elif self.depth and self.rawdata.startswith("<?", self.cursor):
+                        self.cursor += 2
+                        self.pi = True
+                        continue
+                    elif self.rawdata.startswith("<!--", self.cursor):
+                        self.cursor += 4
+                        self.comment = True
+                        continue
+                    elif len(self.rawdata) - self.cursor < 4 and "<!--".startswith(self.rawdata[self.cursor:]):
+                        self.rawdata = self.rawdata[self.cursor:]
+                        self.cursor = 0
+                        return
+                    elif char in {"'", '"'}:
+                        self.quote = char
+                    elif char == "[":
+                        self.depth += 1
+                    elif char == "]":
+                        if not self.depth:
+                            self.uncertain = True
+                            return
+                        self.depth -= 1
+                    elif char == ">" and not self.depth:
+                        self.finish(self.cursor + 1)
+                        return
+                    elif char == "<" and not self.depth:
+                        self.uncertain = True
+                        return
+                    self.cursor += 1
+                self.rawdata = ""
+                self.cursor = 0
+
+        return Boundary()
+
+    def html_closed(boundary, line):
+        try:
+            boundary.feed(line)
+        except Exception:
+            boundary.uncertain = True
+        return boundary.closed and not boundary.uncertain and not boundary.rawdata.strip()
+
+    for line in markdown.splitlines(keepends=True):
+        fence_match = re.match(r"^[ \t]{0,3}(`{3,}|~{3,})(.*)$", line.rstrip("\r\n"))
+        if opaque is not None:
+            if opaque[2] is None:
+                closed = opaque[1].lower() in line.lower()
+            else:
+                token_closed = html_closed(opaque[2], line)
+                # Inline or ambiguous closes cannot release following headings.
+                closed = token_closed and (
+                    opaque[2].literal
+                    or re.fullmatch(r"\s*</" + re.escape(opaque[1]) + r"\s*>\s*", line, re.IGNORECASE)
+                )
+            if closed:
+                append(opaque[0], offset + len(line), "unrecognized_structure")
+                opaque = None
+        elif fence is not None:
+            if (
+                fence_match
+                and fence_match.group(1)[0] == fence[1]
+                and len(fence_match.group(1)) >= fence[2]
+                and not fence_match.group(2).strip()
+            ):
+                append(fence[0], offset + len(line), "code")
+                fence = None
+        elif fence_match:
+            if paragraph is not None:
+                append(paragraph, offset, "text")
+                paragraph = None
+            fence = (offset, fence_match.group(1)[0], len(fence_match.group(1)))
+        else:
+            # A literal ATX line inside these containers is not a section.
+            # Missing containers remain intact and unavailable for new sources.
+            stripped = line.lstrip()
+            container = re.match(r"<([A-Za-z][\w:-]*)\b", stripped)
+            closer = None
+            wrapper = None
+            if stripped.startswith("<!--"):
+                closer = "-->"
+            elif stripped.startswith("<?"):
+                wrapper, closer = ("pi", "<?"), "?>"
+            elif stripped.startswith("<![CDATA["):
+                wrapper, closer = ("cdata", "<![CDATA["), "]]>"
+            elif stripped.startswith("<!"):
+                declaration = re.match(r"<![A-Za-z][\w:-]*\b", stripped)
+                wrapper = ("declaration", declaration.group()) if declaration else ("unknown", "<!")
+                closer = ">"
+            elif re.match(r"</[A-Za-z][\w:-]*\b", stripped):
+                wrapper, closer = ("unknown", "</"), ">"
+            elif stripped.startswith("$$"):
+                closer = "$$"
+            elif stripped.startswith(r"\["):
+                closer = r"\]"
+            elif container:
+                closer = "</" + container.group(1) + ">"
+            if closer is not None:
+                if paragraph is not None:
+                    append(paragraph, offset, "text")
+                    paragraph = None
+                boundary = (
+                    html_boundary(container.group(1).lower())
+                    if container
+                    else wrapper_boundary(*wrapper) if wrapper else None
+                )
+                opening_size = 2 if stripped.startswith("$$") else 0
+                closed = (
+                    html_closed(boundary, line)
+                    if boundary is not None
+                    else closer.lower() in stripped[opening_size:].lower()
+                )
+                if closed:
+                    append(offset, offset + len(line), "unrecognized_structure")
+                else:
+                    opaque = (offset, container.group(1).lower() if container else closer, boundary)
+                offset += len(line)
+                continue
+            heading = _HEADINGS.fullmatch(line.rstrip("\r\n"))
+            if heading or not line.strip():
+                if paragraph is not None:
+                    append(paragraph, offset, "text")
+                    paragraph = None
+                if heading:
+                    section_number += 1
+                    section = f"section_{section_number}: {heading.group(1).strip()}"
+                    append(offset, offset + len(line), "heading")
+            elif paragraph is None:
+                paragraph = offset
+        offset += len(line)
+    if opaque is not None:
+        append(opaque[0], len(markdown), "uncertain_html" if opaque[2] is not None else "unrecognized_structure")
+    elif fence is not None:
+        append(fence[0], len(markdown), "unclosed_code")
+    elif paragraph is not None:
+        append(paragraph, len(markdown), "text")
+    return segments
+
+
+def _materialize_markdown_gaps(
+    markdown: str, blocks: list[MaterialBlock], issues: list[str]
+) -> list[MaterialBlock]:
+    """Add only complete original Markdown sources in verified parser-list gaps."""
+    anchors, unlocated = [], set()
+    for index, block in enumerate(blocks):
+        if block.kind in _METADATA_ROW_TYPES:
+            continue
+        loc = block.loc
+        if (
+            loc is not None
+            and loc.char_start is not None
+            and loc.char_end <= len(markdown)
+            and markdown[loc.char_start : loc.char_end] == block.text
+        ):
+            anchors.append((index, loc.char_start, loc.char_end))
+        else:
+            unlocated.add(index)
+    ordered = all(anchors[index - 1][2] <= anchors[index][1] for index in range(1, len(anchors)))
+    used_ids = {block.id for block in blocks}
+    insertions = {}
+    for start, end, kind, section in _markdown_gap_segments(markdown):
+        text = markdown[start:end]
+        if re.fullmatch(r"(?:!\[[^\]\n]*\]\([^\)\n]+\)\s*)+", text):
+            continue
+        overlaps = [(max(start, left), min(end, right)) for _, left, right in anchors if left < end and start < right]
+        covered = list(overlaps)
+        if kind == "heading":
+            heading = _HEADINGS.fullmatch(text)
+            covered.extend([(start, start + heading.start(1)), (start + heading.end(1), end)])
+        elif kind == "code":
+            lines = text.splitlines(keepends=True)
+            covered.extend([(start, start + len(lines[0])), (end - len(lines[-1]), end)])
+        else:
+            covered.extend(
+                (start + match.start(), start + match.end())
+                for match in re.finditer(r"(?m)^[ \t]{0,3}(?:[-+*]|\d+[.)])[ \t]+", text)
+            )
+        cursor, uncovered = start, False
+        for left, right in sorted(covered):
+            if markdown[cursor:left].strip():
+                uncovered = True
+            cursor = max(cursor, right)
+        if markdown[cursor:end].strip():
+            uncovered = True
+        if not uncovered:
+            continue
+        block_id = f"markdown_gap:{start}:{end}:{hashlib.sha256(text.encode('utf-8')).hexdigest()}"
+        reason = None
+        if kind == "uncertain_html":
+            reason = "unrecognized_markdown_structure"
+        elif overlaps:
+            reason = "partial_overlap"
+        elif kind in {"unclosed_code", "unrecognized_structure"}:
+            reason = "unrecognized_markdown_structure"
+        else:
+            left_index = max((index for index, _, right in anchors if right <= start), default=-1)
+            slot = next((index for index, left, _ in anchors if left >= end), len(blocks))
+            if not ordered or left_index >= slot or any(left_index < index < slot for index in unlocated):
+                reason = "unknown_insertion_gap"
+            elif block_id in used_ids:
+                reason = "source_id_collision"
+        if reason:
+            issues.append(
+                f"{block_id}: source unavailable ({reason}); complete Markdown context retained at [{start}, {end})."
+            )
+            continue
+        block = MaterialBlock(
+            id=block_id,
+            text=text,
+            kind=kind,
+            loc=ClaimLocation(page=None, section=section, char_start=start, char_end=end),
+            citations=re.findall(r"\[[^\]\n]+\]", text),
+        )
+        insertions.setdefault(slot, []).append(block)
+        used_ids.add(block_id)
+        issues.append(f"{block_id}: page unavailable; exact Markdown source span retained.")
+    if not insertions:
+        return blocks
+    result = []
+    for index in range(len(blocks) + 1):
+        result.extend(insertions.get(index, []))
+        if index < len(blocks):
+            result.append(blocks[index])
+    return result
+
+
 def _bbox(row: dict[str, Any], width: float, height: float, default: BBoxSpace) -> tuple[float, ...]:
     value = row.get("bbox")
     if not isinstance(value, (tuple, list)) or len(value) != 4:
@@ -509,6 +858,8 @@ def build_materials(
     content_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
     issues = [parsed.warning] if parsed.warning else []
     blocks = _blocks(parsed.markdown, rows, issues)
+    if rows:
+        blocks = _materialize_markdown_gaps(parsed.markdown, blocks, issues)
     heading_matches = list(_HEADINGS.finditer(parsed.markdown))
     title = heading_matches[0].group(1).strip() if heading_matches else ""
     if re.fullmatch(r"(?:abstract|page \d+|introduction)", title, re.IGNORECASE):
