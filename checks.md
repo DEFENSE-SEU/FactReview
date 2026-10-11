@@ -2,6 +2,10 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+本轮 Phase 5 source-sites 固定诊断已获独审通过：v1 observer 绕过入口的 P1 及原拒绝保留，窄 v2 采用 exact canonical class 分派，默认关闭及原科学门保持。独审 report `1521b322` 确认 12/12 项有限事实；Root 全文读报告/事实并核六冻件及当前三产品，接受收据 `inference-source-sites-diagnostics-acceptance-root-v2/receipt.json`（SHA `e5d75459`）。唯一必要联合 mock 保留原 34 条断言，相同最终测试在 v1 失败、v2 通过（3.83s），受影响两文件 Ruff/compile 通过；原四个测试未改、未重复运行。future Full v8 / NN v7 的预算拒绝接入已冻结、仍待另一 agent 独审：同一必要 mock 旧源失败、新源通过（0.84s），默认行为及原未知用量/闭合规则保持；原 14 条 lint 问题保留，新增为 0。两批均未进入真实运行。Callable 位置目录仅有已接受的静态设计；主张 first-review 补漏路径正在独立调查。验收第 2、8 项继续未通过。以下远端与运行描述保留各自记录时点。
+
+当前交付分支 `refactor/method-v2` 的本地与远端均为 `dbb27a782f9cc980e5271501bfd929af29b3044a`。Full v7 唯一实际运行已结束：七阶段均返回结果，11/11 条主张生成建议，主流程 58 次调用及 readiness 1 次调用的用量记录完整；整链仍为 `partial`，覆盖核验未完成，未产生实际执行计划，原完整性检查失败。Root 仅按既定固定字段投影读取程序终态（`framework-live-v7-v6-root-v1/full-terminal-program-1.json`，SHA `ee3c8ee8`），独立终态审核已确认 26 项有限程序事实，Root 接受收据为 `full-v7-terminal-acceptance-root-v1/receipt.json`（SHA `ff2e41b5`）。原主张审计完成 11/11，仍为 audit-only，没有授权采纳；实验分支固定诊断记录为 0，具体失败路径待定位。下面的过程记录保留各自时点；验收第 2、8 项仍未通过，整体目标继续进行。
+
 Completed Phase8 本轮typed local-denial接口：原v1拒绝与33冻件保留，LD-1 v2获不同agent复审37a6059a/facts745ce1fc有限接受；Root全文读并核4独审冻件与当前client/helper/stats/newtest四身份，收据bb6a518a。native一次固定target、原stats锁/atomic事务完成且同锁完整集合严格JSON类型读回后才发行单次ack；未提交/IO失败不能获ack或复用，首个EOF provider failed/unknown与后续block/closedfalse保持，不生成zero/估算。唯一组合test原39 Assert保留至47、同最终byte v1红1failed.39s→v2+必要旧集合17passed1.18s；受影响2文件Ruff/compile通过，旧3具名tests与Codex不改。当前e54c Full/NN source不含接口，future emitter仍在设计，不能据此认证真实记账修复。NNv6唯一actual19a658bba95e已rc1/terminal_measured49.141s，1logical1physical11890known closed、author1exit0/imageinspect0、auto/trainrepair0、Evidence0/Unverified；different-agent终态753e93a5/facts58e0b8f5的20有限事实及原7失败checks保留，Root全文读并核7冻件，收据2c742750。quote localized12/before/frozen真但三资格false；固定拒绝为inference_source_sites_unbound，早于paper-scope检查，具体联合成员及科学原因仍unknown，paper-scope诊断确实absent。Fullv7 actual18d8a847a1ff仍运行，固定程序快照仅materials/screening ok、verification running；不封整体终态，方法2/8仍未通过。下一动作提交/推送本已审接口，完成Full终态，并按固定新诊断定位NN source-sites。
 
 2026-10-11 新验证已启动：Fullv7/NNv6 candidate 获不同agent静态独审 fc52a532/facts eaab7e2f 接受，Root核7独审冻件、20作者proof和48候选，收据a1183146。两个唯一offline prepared再获不同agent独审ddeb472b/facts92b3532f，Root全文读并核8冻件、20 controller bindings，接受fc69117c；原e54c完整224/31 source、24输入、科学check/预算均保持。Fresh once绑定Full prepared-f0eed4877ccb SHA3a743acb、auth9a7b5ad1，NN prepared-ccbdf5accb8b SHAbe9ed551、auth17f424cd，随后各唯一supervise启动；Full actual18d8a847a1ff/session65679、NN actual19a658bba95e/session84580 正在运行，尚无新终态或科学资格。远端3a9f6d47d022cbb0b28a0f4222f078216b5b3634已精确核对；一次TLS握手失败后再次核对成功。future typed local-denial候选17必要mock虽通过，distinct审核c139bf53确认LD-1 silent stats no-op可发行未持久化ack，Root拒绝收据7b07a1a3，原作者窄修与同组合必要负控进行中；该future代码未进入本轮e54c actual。方法第2/8项仍未通过，Phase8与整体目标继续active。以下条目保留各自记录时点。
@@ -45,17 +49,17 @@ NNv5 终态已独审接受：Root全文读 report1e208f79/facts3e2b64df并核冻
 | 验收项 | 当前结果 | 依据或待办 |
 |---|---|---|
 | 1. 保持原断言和测试选择规则 | 有界通过 | 历史默认3754通过；旧fixture合同迁移已独审，60原Assert保持，一条完整响应格式等式迁移并增两等式，必要61+1控制与身份核证保留；未宣称当前全套再跑。 |
-| 2. 完整七阶段交付 | 未通过 | v6实际9bf8f16d8fb1七阶段ok、整链partial/rc1；first6/11、original0/11，终态21项身份/程序独审已接受。 |
+| 2. 完整七阶段交付 | 未通过 | v7实际18d8a847a1ff七阶段ok，整链仍partial/rc1；L1 first8/11、main original0/11、旁路audit11/11未授权采纳。26有限程序事实已独审核证。 |
 | 3. 无数量上限提取与拆分 | 有界通过 | 原控制与长论文历史保留；原复核有限恢复和共享来源提示均已交付，真实召回与整链待核。 |
 | 4. 主张位置、条件、证据指针 | 有界通过 | 原契约与绑定控制保留。 |
 | 5. 按 needs 分派 | 有界通过 | 原分派控制保留。 |
-| 6. 图表材料与三类 VLM 检查 | 有界通过 | v5实际图表三类检查闭合；完整程序key补充独审已接受，科学视觉判断质量仍待审查。 |
+| 6. 图表材料与三类 VLM 检查 | 有界通过 | v7实际图表三类及真实图像输入检查通过；table字面程序key补充独审已核，科学视觉判断质量仍待审查。 |
 | 7. 文献时间范围与来源限制 | 有界通过 | 原策略保留；429/超时及充分性限制仍记录。 |
-| 8. 主张关联的可行执行计划 | 未通过 | v6终态0计划/0执行Evidence/无作者Docker准入；joint_final_validation_failed的具体子条件待新诊断。 |
+| 8. 主张关联的可行执行计划 | 未通过 | v7未形成实际计划与L3执行，实验分支固定诊断0；NN v6 source-sites联合门失败，具体失败成员待定位。 |
 | 9. 对齐证据与有界修复 | 有界通过 | 原资格守卫与控制保留；新NN实际尚无合格证据。 |
 | 10. 固定状态判定规则 | 有界通过 | 原纯规则与测试保留。 |
 | 11. 四状态与单向旧版适配 | 有界通过 | 原schema/报告/适配契约保留。 |
-| 12. 报告结构、建议、执行记录 | 有界通过 | records recovery二次失败的partial报告已修复并独审；最新实际advice1/11，完整性受上游partial限制。 |
+| 12. 报告结构、建议、执行记录 | 有界通过 | v7建议11/11、分层PDF与teaser检查通过；整链仍partial，上游覆盖与计划缺口保留。 |
 | 13. 基线比较与阻断记录 | 有界通过 | 历史比较与阻断保留，不据此宣称商业完成。 |
 | 14. 当前工作记录 | 有界通过 | 实际失败、已交付修复、进行中工作和下一步分别记录。 |
 

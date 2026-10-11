@@ -200,12 +200,17 @@ def _write_paper_scope_diagnostics(request, error, materials):
         pass
 
 
-def bind_inference_request(request, *, claim, materials):
+def bind_inference_request(request, *, claim, materials, source_sites_diagnostics=False):
     """Program-owned attempt binding; errors retain the legal unobserved run."""
     try:
+        diagnostics = {}
+        if source_sites_diagnostics is True:
+            from .inference_source_sites_diagnostics import SourceSitesDiagnostic
+
+            diagnostics["source_sites_diagnostic"] = SourceSitesDiagnostic(request, materials)
         binding = bind_inference_proposal(request.source_science, plan=request.plan, claim=claim, materials=materials,
             workspace=request.workspace, source_files=request.source_science_files,
-            limits=request.config.docker_options.get("torch_inference"), source_sites=request.source_sites)
+            limits=request.config.docker_options.get("torch_inference"), source_sites=request.source_sites, **diagnostics)
         return {"status":"bound", "request_sha256":_fingerprint(request.model_dump(mode="json")),"binding":binding}
     except (ValueError,TypeError,KeyError,IndexError,OSError,UnicodeError,OverflowError) as exc:
         if type(exc) is ValidationError:
@@ -304,7 +309,8 @@ def partition_rows(path, proposal, limits):
     require(index > 0, "empty_official_partition")
 
 
-def bind_inference_proposal(proposal, *, plan, claim, materials, workspace, source_files, limits, source_sites=None):
+def bind_inference_proposal(proposal, *, plan, claim, materials, workspace, source_files, limits, source_sites=None,
+                            source_sites_diagnostic=None):
     """Rebuild selected original resources and complete source, without running them."""
     parsed = TorchInferenceProposal.model_validate(proposal)
     policy = TorchInferenceLimits.model_validate(limits)
@@ -330,9 +336,15 @@ def bind_inference_proposal(proposal, *, plan, claim, materials, workspace, sour
         require(indexed.get(name) == scope["sha256"] == file_sha(_actual_file(running, name)) and
                 source_files.get(name) == text, "complete_source_changed_or_unsupplied")
         files[name] = text
-    require(type(source_sites) is dict and source_sites.get("status") == "bound"
-            and source_sites.get("version") == "python-source-sites-v1" and source_sites.get("unresolved") == [],
-            "inference_source_sites_unbound")
+    if source_sites_diagnostic is not None:
+        from .inference_source_sites_diagnostics import SourceSitesDiagnostic
+
+    if source_sites_diagnostic is None or type(source_sites_diagnostic) is not SourceSitesDiagnostic:
+        require(type(source_sites) is dict and source_sites.get("status") == "bound"
+                and source_sites.get("version") == "python-source-sites-v1" and source_sites.get("unresolved") == [],
+                "inference_source_sites_unbound")
+    else:
+        SourceSitesDiagnostic.require_bound(source_sites_diagnostic, source_sites)
     sites = source_sites["sites"]
     require(all(index < len(sites) for index in parsed.sites.values()), "inference_site_index_unbound")
     for role, index in parsed.sites.items():
