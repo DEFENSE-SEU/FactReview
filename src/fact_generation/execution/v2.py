@@ -600,6 +600,47 @@ def _prediction_image(request, logs, *, frozen_id=None):
     return image_id, command, audit
 
 
+def _readonly_workspace_argv(argv, *, image, command, workspace, runtime_dir):
+    """Protect author inputs before deciding whether an observer is available."""
+    from .runtime_launch import _mount
+
+    image_index = len(argv) - len(command) - 1
+    if (type(argv) is not list or any(type(token) is not str for token in argv)
+            or argv[:2] != ["docker", "run"] or image_index < 2
+            or argv[image_index:] != [image, *command]):
+        raise ValueError("readonly workspace command layout unavailable")
+    expected = {"/app": str(Path(workspace).resolve()),
+                "/workspace/run_dir": str(Path(runtime_dir).resolve())}
+    pairs = {"--name", "--user", "--gpus", "--shm-size", "--ipc", "-w", "--workdir", "-e", "--env"}
+    options, rewritten, mounts, index = argv[2:image_index], [], set(), 0
+    while index < len(options):
+        option = options[index]
+        if option == "--rm":
+            rewritten.append(option)
+            index += 1
+            continue
+        if option not in pairs | {"-v", "--volume", "--mount"} or index + 1 >= len(options):
+            raise ValueError("readonly workspace command layout unavailable")
+        value = options[index + 1]
+        if option in {"-v", "--volume", "--mount"}:
+            source, target, mode = _mount(value, option)
+            if target in mounts or target not in expected or source != expected[target]:
+                raise ValueError("readonly workspace mounts are duplicated or unknown")
+            mounts.add(target)
+            if target == "/app":
+                value = (f"{source}:/app:ro" if option != "--mount"
+                         else f"type=bind,source={source},target=/app,readonly")
+            elif mode != "rw":
+                raise ValueError("readonly workspace scratch is unavailable")
+        rewritten.extend([option, value])
+        index += 2
+    if "/workspace/run_dir" not in mounts:
+        raise ValueError("readonly workspace scratch is unavailable")
+    if "/app" not in mounts:
+        rewritten.extend(["-v", expected["/app"] + ":/app:ro"])
+    return ["docker", "run", *rewritten, image, *command]
+
+
 def docker_runner(request: RunRequest) -> RunOutcome:
     """Real Docker transport. A JSON output or stdout marker supplies observations.
 
@@ -703,10 +744,21 @@ def docker_runner(request: RunRequest) -> RunOutcome:
         gpus=None if projected else options.get("docker_gpus"),
         container_name=container_name,
     )
-    # Force the fresh workspace mount regardless of legacy environment options.
-    mount = f"{Path(request.workspace).resolve()}:/app"
-    if mount not in command:
-        command[2:2] = ["-v", mount]
+    # Input protection also applies to original commands without an observer.
+    try:
+        command = _readonly_workspace_argv(
+            command, image=image, command=request.command,
+            workspace=request.workspace, runtime_dir=runtime_dir,
+        )
+    except ValueError as exc:
+        return RunOutcome(
+            returncode=1, issue=str(exc), runtime_seconds=time.monotonic() - start,
+            commands=build_commands,
+            environment={"transport": "docker", "image": image, "python": request.config.python_version},
+            operation_failures=[ExecutionOperationFailure(
+                component="execution.environment", reason="Readonly workspace protection unavailable",
+            )],
+        )
     from .runtime_launch import prepare_observer_launch, protect_observer_docker_argv
 
     inference_commands, inference_logs = [], {}
@@ -763,6 +815,20 @@ def docker_runner(request: RunRequest) -> RunOutcome:
             if protection["status"] == "ready":
                 command = protection["argv"]
     _json(logs / "runtime_observer_launch.json", observer_audit)
+    if request.metric_output and (
+        observer_audit["status"] != "ready" or type(observer_audit.get("metric_file")) is not dict
+    ):
+        return RunOutcome(
+            returncode=1, issue="Readonly workspace metric output requires an isolated output mount",
+            runtime_seconds=time.monotonic() - start,
+            commands=[*build_commands, *inference_commands],
+            logs={"runtime_observer_launch": str(logs / "runtime_observer_launch.json"), **inference_logs},
+            environment={"transport": "docker", "image": image, "python": request.config.python_version,
+                         "writable_runtime_directory": str(runtime_dir), "runtime_observer": observer_audit},
+            operation_failures=[ExecutionOperationFailure(
+                component="execution.environment", reason="Readonly workspace metric output protection unavailable",
+            )],
+        )
     output_path = (
         _inside(Path(request.workspace) / request.workdir, request.metric_output)
         if request.metric_output

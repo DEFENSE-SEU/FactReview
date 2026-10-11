@@ -1,5 +1,13 @@
 # FactReview v2 progress
 
+Completed with failure NN：actual-9e31ce326033/supervised23ae28ea49a0已rc1/wall83.813s终态；模型1logical/1physical/9656known，accounting闭合，无retry/readiness/repair/train。唯一作者Docker返回0/40.203s，0实际image inspect/host科学测量/semantic/Evidence，主张Unverified。公开binding只给inference_request_binding_unavailable，launch给inference_image_or_binding_unavailable，尚不能定位内部哪个guard失败。image声明为批准值但此次未实际前后检查。原2960完整源/16输入/控制器身份未变，原once授权已消费，private回复/日志只opaque且不重放。controller独审9cffa7be、release346051db、prepare5.84658s/c215427c、prepared独审50b3ca2d/evidence46161df9、once42e7d644均保留。下一步闭合公开终态独审、补安全固定binding诊断，再用新准确源和新授权验证；本次不计科学成功。
+
+Running full actual v3：两metadata独审196887ae/evidence19bcb69b闭合31事实，Root全文读接受后metadata-only release791b08bf、唯一offline prepare rc0/7.28333s得preparedc6f8cfa9。prepared独审309cacd6/evidencefd04092e闭合32事实，Root全文读接受后新once授权4b46544c已消费进入actual-b8ea0aeef49d/supervisedf36e35c82f00/session69181。完整221源/31目录archivec380d298/identitye1ffe4fd为精确4a；此实际早于下述只读及binding诊断修复，原8inputs/4行/九py/预算/passive门不改。科学及用量终态未知，目标active。
+
+Completed Phase5 Sandbox P1：所有作者运行在observer前唯一/app:ro，健康精确scratch file overlay保持，未观察file不能隔离则环境阻断且零作者transport。一个合并public mock五场景，同完整有效test bytes红1fail/2.58s→绿1pass/4.06s，两路径Ruffpass；新33Assert保留final34，旧五文件303Assert/markers/完整原件不改，完整逆v2 AST保持其余全部生产逻辑。Root全文读完整diff/test及独审3a4e97e3/verificationf9c242cf接受21事实及当前两frozen身份，无重复测试/服务；作者37a82e91/verification65ab0d40。真实新源及CPU/memory/PID/network/rootfs/user/caps商业合同继续开放。原14项仍12有界通过/2整链失败。
+
+Completed NN terminal review：Root全文读接受独审409a2cff/evidence84946e15，14事实/571选定原件不变。确认 binding 先于 image inspect 阻断、原作者一次exit0及9656known闭合，0科学资格/U；没有解析private或重放，旧实际不改。最窄fixed binding_failure诊断由另agent实现并做唯一必要public mock，不改require/file_sha共享异常行为。新native v2控制器仅离线草稿准备、sourcepending/live关，等Root交新的完整canonical源与独审；不复用旧actual授权。
+
 ## 当前完整框架 checkpoint（2026-10-11）
 
 Completed source：NN final-v2已获独立增量接受，Root全文读reportbf4103bc/verification4ef8fab9，12必要事实闭合、九current/frozen/test-input身份同。B4 fullclosure编译入口拒绝及批准镜像选择已修；唯一必要public mock1pass/4.87s，旧25Assert保留final34，其余六产品同final-v1。report7b7e7120/evidence5addf47b/static085cf9f0；原1/6.69与B4-only1/5.69保留。没有重复旧组或默认全套，真实NN科学执行待准入。
