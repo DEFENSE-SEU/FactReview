@@ -169,6 +169,21 @@ def test_quote_only_refinement_preserves_canonical_and_original_inference_guards
     assert bind(telemetry["science_proposal"], source_sites=telemetry["source_sites"])["status"] == "bound"
     assert [item.model_dump(mode="json") for item in (plan, claim, materials)] == originals
 
+    # Quote localization preserves the original exact-settings binding guard.
+    for value in (wire, original):
+        invalid_keysets = (
+            {key: selector for key, selector in value["settings_selectors"].items() if key != "seed"},
+            {**value["settings_selectors"], "unrequested": ["seed"]},
+        )
+        for settings_selectors in invalid_keysets:
+            invalid = copy.deepcopy(value)
+            invalid["settings_selectors"] = settings_selectors
+            telemetry, record = refine(invalid)
+            assert record["status"] == ("localized" if value is wire else "not_candidate")
+            assert telemetry["science_proposal"]["settings_selectors"] == settings_selectors
+            with pytest.raises(ValueError, match=r"^every_condition_setting_requires_actual_config_selector$"):
+                bind(telemetry["science_proposal"])
+
     # Canonical coordinates and validation errors retain their original meaning.
     legacy = copy.deepcopy(original)
     legacy["paper"]["dataset"]["start"] += 1

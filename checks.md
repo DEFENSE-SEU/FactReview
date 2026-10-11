@@ -1,5 +1,13 @@
 # FactReview v2 acceptance checks
 
+2026-10-11 Phase 8 继续：Full9 actual-3f61ee15b18f 已结束 rc1/443.781s，固定来源 0795838 的完整 228 文件、prepared d27276f9、Root 接收 9fa3fe1e、唯一授权 72a19be2 保持。既定词法投影 driver97b6b99a/supervisor3c2f27b7/observer67370a8a/summaryc1ac9514/verification973a3165 确认：七阶段返回结果，整体 partial，screening/verification/report 未完成；10 条主张全部 Unverified、建议0/不可用10、计划0，无本次作者 Docker 验证。main 10 logical/10 physical/131194 known tokens，missing usage1、blocked35、closed=false，readiness 1/171 闭合。35 是拒绝记录计数，具体原始失败及各拒绝类型尚未知；没有估填用量或重跑。原严格失败与 scientific/commercial=false 保持，独立终态审核进行中。
+
+Phase 5 exact settings 指令修复已独审接受：共享 inference 提示新增6行735B，candidate/canonical 均要求完整 settings 键集合及原配置原值，缺真实字段保持 null/unresolved。原 binder/schema/localization/配置/科学门/调用数量和预算代码保持。唯一原 mock 节点加入4个缺键/多键控制，原47 Assert全部保留至49；一次1passed/7.06s、Ruff两文件及被动compile2通过。首次插件配置 rc4/no tests ran 原失败收据保留。独审 report e9de4529/facts573eba91，Root核27作者/5独审/37映射对象及当前两文件，接收 c1e61b30。实际 NN8 只证明 key 集合不一致，成员未知；真实模型改善尚未验证。
+
+NN8 已结束 rc1/47.547s，作者代码一次 rc0，1 模型调用/12436 known tokens 且用量闭合，Evidence0/Unverified。独立有限终态报告 3c9a5d9f、Root 接收 9ea9a9ce 保留原 19 项中的 7 项失败。已有绑定文件的三字段安全投影 89c56d9d 确认 pre-run 拒绝码 every_condition_setting_requires_actual_config_selector：选择器与目标设置键集合不一致，具体缺失或额外成员未知。公开接口调查 d46974b3 未发现 schema/wire 或初始化顺序不相容。NN8 来源 605 未含后续 P2/P4 修复，Full9 来源 079 包含两项修复；两次实际均不含本次提示修复，整链和执行计划第2/8项继续未通过。
+
+以下记录保留各自时点。
+
 2026-10-11 Phase 2 来源缺段修复已交付：非空 MinerU 列表遗漏的完整 Markdown 段落和真实标题在共享材料形成前物化，原 parser 对象/字段/ID/次序及图表行关联保持，新来源有精确字符区间、稳定摘要 ID、page=None 和明确说明。partial overlap 与不确定插入继续 unavailable。v1/v2/v3 的嵌套 HTML、PI/CDATA/声明及 subset PI 反例均保留；v4 获另一 agent 限定接受，report 4ed6d3df / facts ce2bb50e，Root 全文读取并核28新与100历史对象、六旁侧合同和当前两文件，接受收据 bfbdac5a。唯一同字节组合 mock v3 红1.20s→v4 绿0.87s，原76 Assert保持至90、Ruff/被动compile2通过；原四相关节点仅沿用v1收据，不重复通过测试。有限词法、原raw heading section行为、物理页恢复、真实召回及prompt容量限制保持；方法2/8仍未通过。
 
 第三层新NN8已绑定已接受605e6c8完整228文件/31目录来源，9控制器/16输入、原19检查与2调用/100000 token/单次作者运行预算保持；controller/release/selector/status均获独审，Root收据f3104d46/10f3931e。唯一离线prepare-335fa2985a97已rc0（manifest09929af1），应用/模型/作者执行计数全0，独立prepared身份审核中，尚无新actual。Root首次误传PLACEHOLDER被原release门预写拒绝、27文件原样，失败记录f5133b7b保留；远端TLS失败后精确核对334e329成功，原四tracked fixture的Git blob/换行属性已核，收据30563b6e。整篇Full9闭合草案11控制器/8原输入获独审34ffe92f，Root接受aacca41e；待新提交canonical和来源绑定，全部准入仍关闭。
@@ -70,17 +78,17 @@ NNv5 终态已独审接受：Root全文读 report1e208f79/facts3e2b64df并核冻
 | 验收项 | 当前结果 | 依据或待办 |
 |---|---|---|
 | 1. 保持原断言和测试选择规则 | 有界通过 | 历史默认3754通过；旧fixture合同迁移已独审，60原Assert保持，一条完整响应格式等式迁移并增两等式，必要61+1控制与身份核证保留；未宣称当前全套再跑。 |
-| 2. 完整七阶段交付 | 未通过 | v8实际41aaeae3d517七阶段ok、L1动态覆盖/原复核程序检查通过；整链partial/rc1，verification文献与实验验证未完成、0计划/L3，12有限程序事实终态独审已接受。 |
+| 2. 完整七阶段交付 | 未通过 | Full9 七阶段返回结果但整链 partial/rc1；screening/verification/report 未完成，10U、建议0、计划0，本次真实用量未闭合。 |
 | 3. 无数量上限提取与拆分 | 有界通过 | oversized 完整阅读补漏及完整 Markdown 来源缺段物化已独审；无数量上限原合同保持，真实召回和总prompt容量待整链核证。 |
 | 4. 主张位置、条件、证据指针 | 有界通过 | 原契约保留；新增完整 Markdown 来源精确char span/digest ID，page未知明确None；重叠/不确定来源仍unavailable，不提高科学资格。 |
 | 5. 按 needs 分派 | 有界通过 | 原分派控制保留。 |
 | 6. 图表材料与三类 VLM 检查 | 有界通过 | v7实际图表三类及真实图像输入检查通过；table字面程序key补充独审已核，科学视觉判断质量仍待审查。 |
 | 7. 文献时间范围与来源限制 | 有界通过 | 原策略保留；429/超时及充分性限制仍记录。 |
-| 8. 主张关联的可行执行计划 | 未通过 | Full v8已结束，0计划/L3，实验验证拒绝与诊断写入io_failed；NN v7独审接受有限终态，作者rc0但Evidence0/Unverified、七项失败，source-sites absent因果未知。 |
+| 8. 主张关联的可行执行计划 | 未通过 | Full9 verification 固定 COUNT 确认计划0、无同流程L3；NN8 作者rc0但Evidence0/Unverified、原七项失败。pre-run exact settings 键集合拒绝已定位；生成指引修复及必要mock已独审接受 c1e61b30，实际成员与模型改善仍未知。 |
 | 9. 对齐证据与有界修复 | 有界通过 | 原资格守卫与控制保留；新NN实际尚无合格证据。 |
 | 10. 固定状态判定规则 | 有界通过 | 原纯规则与测试保留。 |
 | 11. 四状态与单向旧版适配 | 有界通过 | 原schema/报告/适配契约保留。 |
-| 12. 报告结构、建议、执行记录 | 有界通过 | v7建议11/11、分层PDF与teaser检查通过；整链仍partial，上游覆盖与计划缺口保留。 |
+| 12. 报告结构、建议、执行记录 | 有界通过 | 历史 v7建议11/11；Full9 分层PDF/teaser和全部主张状态保留，但本次建议0/不可用10，上游覆盖与计划未完成，实际完整建议交付仍开放。 |
 | 13. 基线比较与阻断记录 | 有界通过 | 历史比较与阻断保留，不据此宣称商业完成。 |
 | 14. 当前工作记录 | 有界通过 | 实际失败、已交付修复、进行中工作和下一步分别记录。 |
 
