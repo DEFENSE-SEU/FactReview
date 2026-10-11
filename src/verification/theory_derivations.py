@@ -360,7 +360,7 @@ def records(raw, items, *, claim, materials, context, phase, adopted, audit_poin
 
 def positive_trace_issue(record):
     if record.schema_version is None:
-        return ""  # Legacy evidence retains its historical contract, with trace unavailable.
+        return "Fresh Theory support requires a versioned derivation trace; legacy trace unavailable"
     if record.state != "validated":
         return "; ".join(record.issues) or "Theory derivation trace is invalid"
     if record.trace.outcome != "completed":

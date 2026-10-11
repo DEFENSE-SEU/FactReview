@@ -12,7 +12,7 @@ Delivery NN：九产品/必要mock与docs已Phase5提交push2960f410276cbbf53388
 
 Completed Phase2 local repair：Windows parser原图/alias I/O使用extended namespace，原metadata/containment/Markdown/hash不改。唯一必要真实ZIP/filesystem/PDF crop/FigureSources控制，外部HTTP mock，short/182/190 roots及265图像/266 alias同testbytes有效red1failed/1.04s→green1pass/1.17s；23原functions/90Assert保持，Ruff2通过。Root已全文读接受独审b2e47694/verification38ed44f1，35事实闭合，当前两产品/测试SHA与作者frozen及green同；未重复测试/服务。author67355c51/evidencefb7a5003。UNC仅静态、超190根生成crop未泛化。Root public终态因果record5b417a07/reviewd15ca9c7保留a070失败。
 
-Running Theory：Root全文读other-branch独审93c03161，24固定源/27静态前提确认新鲜Theory模型省schema/trace后legacy-unavailable路径仍可充分支持。Literature/Code本范围通过且语义质量未认证。fresh门及必要legacy负控/完整versioned正控已冻结，new1pass/.51s；8迁移节点首7pass/1fail，仅失败node引文定位修正后1pass/.22s，原253科学Assert保持，legacy一错误复合断言加强三项。独立agent正在审核final-v2六件，历史schema/adapter/report仍可读，final规则不改。
+Completed Phase4 Theory：Root全文读other-branch独审93c03161并修新鲜Theory省schema/trace仍充分支持的P1。唯一helper返回缺trace理由，new同bytes red1failed/.55s→green1pass/.51s，default verify→assess legacy自断言U/完整普通versioned正控S。8迁移节点首7pass/1fail，仅失败node引文定位修正后1pass/.22s；原253科学Assert保持，legacy一错误复合断言加强三项，Ruff6通过。Root全文读接受独审6d100cf2/verificationc6c53628，29 AST/身份事实闭合，六当前文件与frozen同；不声称最终同bytes八个共绿。历史decode/schema/adapter/report/assessment不变，真实数学质量未认证。Materials Phase2已推9956dfd7eb10a01eaebd7a14738571b7052e23d6且精确远端同。
 
 Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送Phase A的4406181、Phase3的c0bb46f、Theory的23a966d、B1的9b4a3411、Phase4 SourceAuthority的692580b0、Phase3默认auto/提取metadata的36212f3、Phase4统计87e546d及Phase3 VLM的dfea429824c90778c4095da86c7af453a735a19d，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
 
@@ -46,7 +46,7 @@ Open issues：真实完整链仍失败，终态内容独审最终2c75c1dd及旧�
 
 Decisions：已有repair3上限3、auto加可选interactive并记录模式、training0、deadline及获准arxiv fallback、集中原容差、v1 conflict→questioned保持。不会因mock全套通过或两页材料实际成功宣告商业完成。当前fixed f278实际证据与随后多条件源码/测试证据分别绑定各自身份。
 
-Next action：收齐Windows材料路径与Theory新鲜推导门的独审并按Phase2/4交付；用新完整Git源、新controller/prepared/auth启动整篇公开入口。NN已交付2960f41，runnable controller冻结c29cef67/16原输入，正在独审；接受后离线prepare、核prepared、新once准入真实CPU推理。原完整paper/crops/所有窗口/fullClaim/实际请求lineage和预算保留，不复用已消费a070或旧auth。某项服务或能力受阻时继续其他框架工作，目标active。checks.md当前14表12项窄通过、2项完整链失败；Phase8整体开放。
+Next action：Phase2/4两修复独审已接受；完成Theory交付并归档新完整Git源，将等长v3 controller草稿绑定新源后独审、prepare、核prepared、新once准入整篇入口。NN已交付2960f41，runnable controller冻结c29cef67/16原输入，正在独审；接受后离线prepare、核prepared、新once准入真实CPU推理。原完整paper/crops/所有窗口/fullClaim/实际请求lineage和预算保留，不复用已消费a070或旧auth。某项服务或能力受阻时继续其他框架工作，目标active。checks.md当前14表12项窄通过、2项完整链失败；Phase8整体开放。
 
 ## 历史回归修复与真实执行 checkpoint（2026-10-11）
 

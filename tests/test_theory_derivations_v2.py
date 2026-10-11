@@ -104,6 +104,26 @@ def invoke(claim, materials, response):
     return verify_theory(claim, materials, call=lambda **kwargs: copy.deepcopy(response))
 
 
+def versioned_support_response(response, *, goal, conclusion, reason):
+    """External mock trace with the original exact proof step and explicit conclusion."""
+    response = copy.deepcopy(response)
+    response.update(schema_version="theory-derivation-v1", derivations=[
+        {"item_index": index, "trace": {
+            "goal": goal, "assumptions": [],
+            "steps": [
+                {"id": "s1", "statement": item["step_quote"],
+                 "reason": "The supplied proof passage gives this relation.",
+                 "assumption_ids": [], "previous_step_ids": [],
+                 "sources": [{"block_id": item["block_id"], "quote": item["quote"]}]},
+                {"id": "s2", "statement": conclusion, "reason": reason,
+                 "assumption_ids": [], "previous_step_ids": ["s1"], "sources": []},
+            ],
+            "gaps": [], "outcome": "completed", "completion_reason": reason,
+        }} for index, item in enumerate(response["items"])
+    ])
+    return response
+
+
 def test_versioned_derivation_is_source_grounded_and_keeps_all_steps(tmp_path):
     claim, materials, response = paper(tmp_path)
     result = invoke(claim, materials, response)
@@ -165,7 +185,9 @@ def test_legacy_response_retains_old_evidence_and_marks_trace_unavailable(tmp_pa
     claim, materials, response = paper(tmp_path)
     legacy = {"items": response["items"]}
     result = invoke(claim, materials, legacy)
-    assert result.evidence[0].sufficient and not result.issues
+    assert not result.evidence[0].sufficient
+    assert any("versioned derivation trace" in issue for issue in result.issues)
+    assert assess_claim(claim.model_copy(update={"evidence": result.evidence}, deep=True)).status == "unverified"
     assert result.theory_derivations[0].state == "legacy_unavailable"
     assert result.theory_derivations[0].trace is None
 

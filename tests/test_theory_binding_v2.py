@@ -9,6 +9,7 @@ from llm.client import LLMConfig
 from schemas.claim import Claim, ClaimLocation, ClaimSourceRef, Condition
 from schemas.materials import MaterialBlock, SharedMaterials
 from screening import checks
+from tests.test_theory_derivations_v2 import versioned_support_response
 from verification.theory import verify_theory
 
 
@@ -71,8 +72,11 @@ def run(claim, materials, *, main="a", covered=None):
 
     def model(**kwargs):
         if kwargs["module"] == "verification.theory":
-            return {"items": [], "appendix_block_ids": ["proof"]}
-        return {
+            return versioned_support_response(
+                {"items": [], "appendix_block_ids": ["proof"]}, goal=claim.text,
+                conclusion="n is divisible by two.", reason="n = 2k gives divisibility by two.",
+            )
+        return versioned_support_response({
             "items": [
                 {
                     "block_id": "proof",
@@ -86,7 +90,7 @@ def run(claim, materials, *, main="a", covered=None):
                     "detail": "Mock declares complete support; source identity must still be checked.",
                 }
             ]
-        }
+        }, goal=claim.text, conclusion="n is divisible by two.", reason="n = 2k gives divisibility by two.")
 
     return verify_theory(claim, materials, call=model)
 
@@ -198,7 +202,7 @@ def main_derivation(claim, materials, quote, step):
     return verify_theory(
         claim,
         materials,
-        call=lambda **kwargs: {
+        call=lambda **kwargs: versioned_support_response({
             "items": [
                 {
                     "block_id": "a",
@@ -211,7 +215,8 @@ def main_derivation(claim, materials, quote, step):
                     "detail": "The derivation establishes this claim under its stated assumptions.",
                 }
             ]
-        },
+        }, goal=claim.text, conclusion=claim.text,
+           reason="The indicated proof transformation yields the original stated conclusion."),
     )
 
 

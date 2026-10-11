@@ -8,6 +8,7 @@ import pytest
 from llm.client import LLMConfig
 from schemas.claim import Claim, ClaimLocation, Condition
 from schemas.materials import MaterialBlock, SharedMaterials
+from tests.test_theory_derivations_v2 import versioned_support_response
 from verification.theory import verify_theory
 from verification.theory_sections import partition_theory_sections
 
@@ -199,12 +200,18 @@ def test_public_entry_requires_explicit_second_phase_and_preserves_claim(tmp_pat
         if len(calls) == 1:
             assert {b["id"] for b in payload["main_text"]} == {"h1", "main"}
             assert "proof" not in payload["allowed_theory_source_block_ids"]
-            return {"items": [], "appendix_block_ids": ["proof"]}
+            return versioned_support_response(
+                {"items": [], "appendix_block_ids": ["proof"]}, goal=claim.text,
+                conclusion="n is even.", reason="The exhibited representation n = 2k is the evenness criterion.",
+            )
         assert {b["id"] for b in payload["appendix_proofs"]} == {"proof"}
-        return {"items": [item(proof)]}
+        return versioned_support_response(
+            {"items": [item(proof)]}, goal=claim.text, conclusion="n is even.",
+            reason="The exhibited representation n = 2k is the evenness criterion.",
+        )
 
     result = verify_theory(claim, materials, call=call, output_dir=tmp_path / "audits")
-    # Legacy exact proof remains readable; its old eligibility contract is retained.
+    # The original exact proof remains eligible with its complete versioned trace.
     assert len(calls) == 2 and result.evidence[0].sufficient
     assert claim.model_dump(mode="json") == before
     audits = [json.loads(p.read_text("utf-8")) for p in (tmp_path / "audits").glob("*.json")]
