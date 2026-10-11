@@ -378,3 +378,96 @@ def test_parser_image_alias_cannot_overwrite_a_rendered_page(paper_pdf, parsed, 
     with Image.open(result.pages[0].path) as image:
         assert image.width > 0
     assert any("colliding with a generated artifact" in issue for issue in result.issues)
+
+
+@pytest.mark.asyncio
+async def test_public_mineru_zip_images_preserve_sources_at_windows_long_paths(paper_pdf, tmp_path, monkeypatch):
+    import json
+    import os
+    import zipfile
+    from io import BytesIO
+
+    import httpx
+
+    from preprocessing.parse.mineru_adapter import MineruAdapter, MineruConfig
+    from screening.figure_context import FigureSources
+
+    image_buffer = BytesIO()
+    Image.new("RGB", (12, 12), color="blue").save(image_buffer, format="JPEG")
+    image_bytes = image_buffer.getvalue()
+    image_name = hashlib.sha256(image_bytes).hexdigest() + ".jpg"
+    image_reference = "images/" + image_name
+    markdown = "# Paper\n\nFigure 1 shows the model.\n\nFigure 1: Model.\n\n![](" + image_reference + ")"
+    rows = [
+        {"type": "text", "text": "Paper", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": "Figure 1 shows the model.", "page_idx": 0},
+        {"type": "image", "image_caption": ["Figure 1: Model."], "img_path": image_reference,
+         "page_idx": 0, "bbox": [100, 100, 500, 500]},
+    ]
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w") as archive:
+        archive.writestr("paper.md", markdown.encode("utf-8"))
+        archive.writestr("paper_content_list.json", json.dumps(rows).encode("utf-8"))
+        archive.writestr(image_reference, image_bytes)
+    requests = []
+
+    def reply(request):
+        requests.append((request.method, request.url.path))
+        if request.method == "POST" and request.url.path == "/api/v4/file-urls/batch":
+            return httpx.Response(200, json={"code": 0, "data": {"batch_id": "fixture",
+                "file_urls": ["https://mineru.invalid/upload"]}})
+        if request.method == "PUT" and request.url.path == "/upload":
+            assert request.content == paper_pdf.read_bytes()
+            return httpx.Response(200)
+        if request.method == "GET" and request.url.path == "/api/v4/extract-results/batch/fixture":
+            return httpx.Response(200, json={"code": 0, "data": {"state": "done",
+                "full_zip_url": "https://mineru.invalid/result.zip"}})
+        if request.method == "GET" and request.url.path == "/result.zip":
+            return httpx.Response(200, content=zip_buffer.getvalue())
+        raise AssertionError("Unexpected external request")
+
+    original_client = httpx.AsyncClient
+    monkeypatch.setattr(httpx, "AsyncClient", lambda **kwargs: original_client(
+        transport=httpx.MockTransport(reply), **kwargs))
+    parser = MineruAdapter(MineruConfig(base_url="https://mineru.invalid/api/v4", api_token="fixture",
+        model_version="vlm", upload_endpoint="file-urls/batch",
+        poll_endpoint_templates=["extract-results/batch/{batch_id}"], poll_interval_seconds=0.8,
+        poll_timeout_seconds=30, allow_local_fallback=False))
+    root_units = len(str(tmp_path.resolve()).encode("utf-16-le")) // 2
+    outputs = [tmp_path / "short"]
+    for length in (182, 190):
+        width = length - root_units - 1
+        assert width > 0
+        outputs.append(tmp_path / ("m" * width))
+    for output in outputs:
+        material = await parse_materials(paper_pdf=paper_pdf, output_dir=output, paper_key="tiny", parser=parser)
+        assert Path(material.markdown_path).parent == output.resolve()
+        assert Path(material.markdown_path).read_bytes() == markdown.encode("utf-8")
+        assert material.markdown == markdown
+        assert json.loads(Path(material.content_list_path).read_text(encoding="utf-8")) == rows
+        assert material.source_pdf == str(paper_pdf.resolve())
+        assert material.provider == "mineru_v4"
+        assert material.issues == []
+        for path in (output / "assets" / image_reference, output / image_reference):
+            # Read the same real filesystem file in Windows' extended namespace;
+            # ordinary metadata/source strings above remain unchanged.
+            io_path = Path("\\\\?\\" + str(path.resolve())) if os.name == "nt" else path
+            assert io_path.read_bytes() == image_bytes
+            assert hashlib.sha256(io_path.read_bytes()).hexdigest() == image_name[:-4]
+            with Image.open(io_path) as image:
+                assert image.size == (12, 12)
+        figure = material.figures[0]
+        assert figure.references[0].text == "Figure 1 shows the model."
+        assert figure.caption == "Figure 1: Model."
+        assert figure.bbox_points == (60, 80, 300, 400)
+        with Image.open(figure.printed_crop_path) as image:
+            assert image.size == (320, 427)
+        sources = FigureSources.capture(material, figure, {})
+        sources.check(material)
+        assert sources.hashes[material.markdown_path] == hashlib.sha256(markdown.encode("utf-8")).hexdigest()
+        for block in material.blocks:
+            assert material.markdown[block.loc.char_start:block.loc.char_end] == block.text
+    assert len(str(outputs[1] / "assets" / image_reference).encode("utf-16-le")) // 2 == 265
+    assert len(str(outputs[2] / image_reference).encode("utf-16-le")) // 2 == 266
+    assert requests == [("POST", "/api/v4/file-urls/batch"), ("PUT", "/upload"),
+        ("GET", "/api/v4/extract-results/batch/fixture"), ("GET", "/result.zip")] * 3
