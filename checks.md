@@ -2,6 +2,10 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+新实际验证已启动，来源固定为已审 `00c973b` 的 227 文件/31 目录。Full v8 唯一隔离运行 `actual-41aaeae3d517` 仍在进行；NN v7 唯一运行 `actual-c545882f693c` 已结束（rc1，93.359s）。NN 程序投影显示 1 logical/1 physical、13920 known tokens、用量闭合；一次作者 Docker 运行 rc0/24.656s，image inspect 0、训练/修复 0，auto 模式，Evidence 0、Unverified，原七项失败检查保留。固定 source-sites 诊断 absent，不能据此解释失败因果，独立终态审核进行中。两次离线准备的首试状态拒绝与状态补齐后的成功分别记录；原检查未改，成功快照各获独审。全文召回调查没有发现 10/11 条数量上限，确认未物化 Markdown 来源和 oversized block 复核两项缺口，后者正在设计/实施，前者需要合法位置与来源补全。第 2、8 项继续未通过，Phase 8 与整体目标 active。下面的记录保留各自时点。
+
+当前源码已共同推送至 `00c973be09a5f78df85ccdcb825fc8ebd4ec42a5`，包含 Phase 3、4、5 三项修复。完整 committed canonical 共 227 文件、31 目录，独审 10 项来源事实通过，Root 接受收据 `ac4ab892`。NN v7 显式 source-sites 观察增量获另一 agent 独审（12 项有限事实），Root 已接受 `869940c6`。Full v8 观察增量的 v1 被独审拒绝：新增 `snapshot` 覆盖原源码 Path；v2 只改三个新诊断变量引用，保留原最终源码核验，同一增强控制修复前失败、修复后通过，原 47 断言保持至 55，独审后 Root 接受 `f6d316d4`。两个新实例等待来源绑定、离线准备与真实运行，尚无新 actual；第 2、8 项仍未通过。以下条目保留各自记录时点。
+
 本轮 Phase 5 函数目录/公开诊断已独审并提交 `6fd73e4`（Root 收据 `d0b05dd7`），Phase 4 固定 writer/dispatch 诊断已独审并提交 `11a94e8`（收据 `8b750301`，五路径 LF=Git 收据 `5874a8fd`）。Phase 3 首轮坏批继续与一次完整恢复也已独审接受（`first-review-partial-recovery-acceptance-root-v1/receipt.json`，SHA `fb9a5739`）：同字节旧源失败/新组合 24 场景通过，绿测至最终仅括号且完整 AST 相同，Ruff/被动编译通过；两条旧节点的版本限制保持明确。三项源码将统一推送、生成完整 committed 来源，再核绑定 future Full v8 / NN v7。显式诊断接线正在补齐，prepare/live 仍关闭；没有新增真实运行，第 2、8 项继续未通过。
 
 本轮 Phase 5 source-sites 固定诊断已获独审通过：v1 observer 绕过入口的 P1 及原拒绝保留，窄 v2 采用 exact canonical class 分派，默认关闭及原科学门保持。独审 report `1521b322` 确认 12/12 项有限事实；Root 全文读报告/事实并核六冻件及当前三产品，接受收据 `inference-source-sites-diagnostics-acceptance-root-v2/receipt.json`（SHA `e5d75459`）。唯一必要联合 mock 保留原 34 条断言，相同最终测试在 v1 失败、v2 通过（3.83s），受影响两文件 Ruff/compile 通过；原四个测试未改、未重复运行。future Full v8 / NN v7 的预算拒绝接入已冻结、仍待另一 agent 独审：同一必要 mock 旧源失败、新源通过（0.84s），默认行为及原未知用量/闭合规则保持；原 14 条 lint 问题保留，新增为 0。两批均未进入真实运行。Callable 位置目录仅有已接受的静态设计；主张 first-review 补漏路径正在独立调查。验收第 2、8 项继续未通过。以下远端与运行描述保留各自记录时点。
@@ -57,7 +61,7 @@ NNv5 终态已独审接受：Root全文读 report1e208f79/facts3e2b64df并核冻
 | 5. 按 needs 分派 | 有界通过 | 原分派控制保留。 |
 | 6. 图表材料与三类 VLM 检查 | 有界通过 | v7实际图表三类及真实图像输入检查通过；table字面程序key补充独审已核，科学视觉判断质量仍待审查。 |
 | 7. 文献时间范围与来源限制 | 有界通过 | 原策略保留；429/超时及充分性限制仍记录。 |
-| 8. 主张关联的可行执行计划 | 未通过 | v7未形成实际计划与L3执行，实验分支固定诊断0；NN v6 source-sites联合门失败，具体失败成员待定位。 |
+| 8. 主张关联的可行执行计划 | 未通过 | Full v8实际仍运行；NN v7作者Docker rc0但Evidence0/Unverified、原七项检查失败，source-sites诊断absent，因果未知；此前Full v7无计划与L3缺口保留。 |
 | 9. 对齐证据与有界修复 | 有界通过 | 原资格守卫与控制保留；新NN实际尚无合格证据。 |
 | 10. 固定状态判定规则 | 有界通过 | 原纯规则与测试保留。 |
 | 11. 四状态与单向旧版适配 | 有界通过 | 原schema/报告/适配契约保留。 |
