@@ -1,5 +1,7 @@
 # FactReview v2 progress
 
+Completed Phase4固定L2诊断：Root全文读完整3源diff/helper/test、作者741c19e9/等价和inverse证明及不同agent独审a080403c/facts15634146，核27作者及10独审/当前身份，接受22有限事实。七拒绝点在原limitation append之后选程序常量；每分支调用一次固定四键、≤512B、UUIDexclusive sidecar，目标ordinary且排除作者仓库/论文/图像来源目录。None/default/injected、窄写失败和原科学Evidence/plan/限制/异常/预算均保持。最终test8b3db04f同字节红.89s→绿1passed.75s；4真实consumer normal/IO失败whole结果与module序列等价，原inputs保持，Ruff/compile。两首次code动态、其余五静态；没有逐主张关联、不用缺失诊断判状态、不解释旧零plans。下一步新完整Git canonical、独审新控制器和fresh once，Phase8继续。
+
 Completed Phase5有限静态package闭包：Root全文读完整原diff/test、v2/v3窄delta、不同agent最终独审91933003/factsec19bcde，并核作者17及独审6对象，接受18事实。source7d5cfea3/test6a9f4978精确最终；parent init/relative/transitive/import reexport及有限symbol闭包和native/bytecode shadow保持严查，Tuple/List/Call已知能力传播缺口纠正，普通未标记batch允许。全原模块唯一函数逆bytes/AST、65case中原64/12Assert保留，原221旧test元数据不改；最终必要同test v2红→v3绿1passed1.59s及Ruff/compile。16文件/65536单源/262144总量、source SHA/路径/containment、消费端重建和科学资格均保留。任意factory/反射/python-m/其他codec/metric/GPU及per-plan intake仍open；真实NN及整链待完整新源/fresh once。
 
 Completed Phase3 wire派生来源修复：Root全文读不同agent独审2055fcd9/facts07bab9f6并核4对象，接受21有限事实。仅preserved/finding两派生列表有序唯一化，完整原span、原claim/context/blocks、科学carrier/effect、全部source authority/重复原始输入门限保持；source f87a5099/test8909dd0a，整模块byte inverse及8原选段恒等。必要2failed/.33s→2passed/.21s，Ruff/静态compile，无新外部调用；逐命令test SHA未独立落盘，红绿身份依Root最终冻结proof绑定，独审准确保留收据限制。实际v5根因unknown，本批只交付有界适配器修复。

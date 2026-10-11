@@ -14,6 +14,7 @@ from schemas.materials import SharedMaterials
 from screening.checks import ask, grounded_paper_pointer
 from verification import theory_derivations as derivations
 from verification.contracts import BranchResult
+from verification.rejection_diagnostics import FirstRejectionDiagnostic
 from verification.theory_concerns import review_concerns
 from verification.theory_sections import TheorySections, partition_theory_sections
 
@@ -318,7 +319,8 @@ under the same original exact-step and full-condition contracts.
 
 
 def verify_theory(
-    claim: Claim, materials: SharedMaterials, *, call=None, output_dir=None, visual_recheck_rounds=None
+    claim: Claim, materials: SharedMaterials, *, call=None, output_dir=None, visual_recheck_rounds=None,
+    diagnostics_dir=None,
 ) -> BranchResult:
     from common.config import get_settings
 
@@ -418,6 +420,7 @@ def verify_theory(
         )
         records.extend(active_records)
     result = BranchResult(theory_derivations=records, issues=list(sections.issues))
+    rejection_diagnostic = FirstRejectionDiagnostic(diagnostics_dir, materials, "Theory")
     active_cfg = second_cfg if first.appendix_block_ids else first_cfg
     concerns = []
     parser_artifacts: dict[str, list[str]] = {}
@@ -429,7 +432,7 @@ def verify_theory(
         for condition in claim.conditions
     }
 
-    def unavailable(covered, reason):
+    def unavailable(covered, reason, diagnostic_code):
         result.issues.append(reason)
         result.verification_limitations.append(
             VerificationLimitation(
@@ -440,6 +443,7 @@ def verify_theory(
                 reason=reason,
             )
         )
+        rejection_diagnostic.record(diagnostic_code)
 
     def visual_target(item, record, condition_id, trigger, notation=None):
         if not anchors[condition_id] or _proof_binding(claim, materials, item, [condition_id], sections):
@@ -492,6 +496,7 @@ def verify_theory(
                     covered,
                     "Theory no-proof observation has an invalid derivation trace: "
                     + "; ".join(record.issues),
+                    "theory_no_proof_trace_invalid",
                 )
                 continue
             scope_issue = sections.no_proof_issue(
@@ -627,13 +632,15 @@ def verify_theory(
             for condition_id in covered:
                 issue = None
                 if record.state != "validated" or record.trace is None:
+                    diagnostic_code = "theory_concern_trace_invalid"
                     issue = "Theory concern lacks a valid versioned derivation trace: " + "; ".join(
                         record.issues
                     )
                 elif not anchors[condition_id]:
+                    diagnostic_code = "theory_concern_target_source_missing"
                     issue = "Theory concern lacks an exact condition-scoped target source"
                 if issue:
-                    unavailable([condition_id], issue)
+                    unavailable([condition_id], issue, diagnostic_code)
                     result.evidence.append(
                         Evidence(
                             source="theory",
@@ -757,7 +764,8 @@ def verify_theory(
         for target, reviewed, record in recovered:
             result.theory_derivations.append(record)
             if reviewed is None:
-                unavailable(record.covered, "Visual Theory recheck invalid: " + "; ".join(record.issues))
+                unavailable(record.covered, "Visual Theory recheck invalid: " + "; ".join(record.issues),
+                            "theory_visual_recheck_invalid")
                 continue
             item = target["item"].model_copy(
                 update={
@@ -822,7 +830,8 @@ def verify_theory(
                     else "; ".join(review.issues)
                 )
                 if disposition == "unresolved":
-                    unavailable([condition_id], "Theory concern applicability unconfirmed: " + detail)
+                    unavailable([condition_id], "Theory concern applicability unconfirmed: " + detail,
+                                "theory_concern_applicability_unresolved")
                 result.evidence.append(
                     Evidence(
                         source="theory",

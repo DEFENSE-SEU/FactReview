@@ -2,6 +2,8 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+已接受 Phase4固定 L2拒绝诊断：Root全文读独审a080403c/facts15634146并核10对象与当前身份，接受22有限事实；作者27对象另已核。四产品/唯一新mock，原三源17处可逆，原科学结果/异常/计划/限制/预算保持。每分支调用最多一次四固定键sidecar，None和注入兼容；必要同test红→绿1passed/.75s，4完整mock结果等价、Ruff/compile通过。仅两种首次code有运行控制，其余五种静态核证；不能解释旧actual零计划，也不能替代整链验收。
+
 已接受 Phase5有限静态包闭包：Root全文读作者v1/v2/v3 delta和最终独审91933003/factsec19bcde，并核作者17及独审6对象，18/18有限事实通过。parent/relative/transitive来源闭包、同目录native/bytecode shadow和已知导入能力别名纠正已闭合，保留普通batch、完整SHA与16/65536/262144容量及原科学守卫。唯一必要65场景组合mock最终1passed/1.59s；不声称任意factory/反射或通用Python兼容。真实NN及整链第2/8项仍待新源验证。
 
 已接受 Phase3 wire增量：Root全文读独审2055fcd9/facts07bab9f6并核4对象，21/21有限事实通过。只对两处派生block列表按首次出现顺序唯一化，完整原span/科学值/raw重复来源门限保持，整模块byte逆恢复及8原选段恒等。必要两例红→绿，独审不重复测试；逐命令test SHA未单独落盘，同一最终test身份依Root冻结proof绑定，此收据限制保留。旧actual是否触发此路径未知，整链第2/8项仍未通过。
