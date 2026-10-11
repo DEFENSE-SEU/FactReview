@@ -14,6 +14,7 @@ from schemas.claim import Claim, ClaimLocation, Condition
 from schemas.materials import MaterialBlock, PageImage, RepositoryFile, RepositoryIndex, SharedMaterials
 from screening import checks
 from tests.experiment_authority_fixtures import authority_scope_fixture
+from tests.test_theory_derivations_v2 import versioned_support_response
 from verification.code import verify_code
 from verification.experiments import verify_experiments
 from verification.theory import verify_theory
@@ -264,9 +265,15 @@ def test_theory_reads_main_before_requesting_relevant_appendix(
             assert [b["id"] for b in payload["main_text"]] == ["main"]
             assert "appendix_proofs" not in payload
             assert "output_schema" in payload
-            return {"items": [], "appendix_block_ids": ["appendix"]}
+            return versioned_support_response(
+                {"items": [], "appendix_block_ids": ["appendix"]}, goal=theory_claim.text,
+                conclusion=theory_claim.text, reason="The stated assumption and quoted equality give convergence.",
+            )
         assert [b["id"] for b in payload["appendix_proofs"]] == ["appendix"]
-        return {"items": [theory_item()]}
+        return versioned_support_response(
+            {"items": [theory_item()]}, goal=theory_claim.text, conclusion=theory_claim.text,
+            reason="The stated assumption and quoted equality give convergence.",
+        )
 
     result = verify_theory(theory_claim, materials, call=model)
     assert len(seen) == 2 and len(result.evidence) == 1
@@ -1116,6 +1123,10 @@ def test_positive_evidence_requires_explicit_full_condition_support(
         response["items"][0].update(
             quote="Proof of Theorem 1. By the stated assumption, x = y; therefore convergence follows.",
             step_quote="x = y",
+        )
+        response = versioned_support_response(
+            response, goal=claim.text, conclusion=claim.text,
+            reason="The stated assumption and quoted equality give convergence.",
         )
     if full is None:
         del response["items"][0]["fully_supported_conditions"]
