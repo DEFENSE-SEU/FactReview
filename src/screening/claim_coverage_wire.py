@@ -154,7 +154,7 @@ def expand_scope_row(raw):
                 atom["preserved_indices"].append(i)
                 result["preserved_qualifiers"].append({
                     "restriction": atom["restriction"],
-                    "source_block_ids": [s["block_id"] for s in atom["sources"]],
+                    "source_block_ids": list(dict.fromkeys(s["block_id"] for s in atom["sources"])),
                     **carrier,
                 })
                 fields.append({"raw_path": base, "generated_path": f"/preserved_qualifiers/{i}"})
@@ -165,7 +165,7 @@ def expand_scope_row(raw):
             atom["finding_index"] = i
             result["findings"].append({
                 "kind": "missing_qualifier_or_condition", "condition_ids": atom["condition_ids"],
-                "source_block_ids": [s["block_id"] for s in atom["sources"]],
+                "source_block_ids": list(dict.fromkeys(s["block_id"] for s in atom["sources"])),
                 "restriction": atom["restriction"], "material_effect": atom["effect"]["explanation"],
                 "reason": atom["reason"],
             })
