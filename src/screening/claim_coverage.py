@@ -39,6 +39,8 @@ from screening.claim_recheck_batches import (
     aggregate_original_batches,
     check_batch_rows,
     plan_original_batches,
+    plan_remaining_original_batches,
+    select_original_rows,
 )
 from screening.claim_scope import (
     SCOPE_DIMENSIONS as SCOPE_DIMENSIONS,
@@ -1957,6 +1959,9 @@ def review_claim_coverage(
                 raw = audit["attempts"][attempt_index]["response"]
                 check_batch_rows(payload, raw)
                 result.update(response=copy.deepcopy(raw), response_digest=_digest(raw))
+                result.update(request_context_id=audit["attempts"][attempt_index]["input"]["context_id"],
+                              input_digest=_digest(audit["attempts"][attempt_index]["input"]),
+                              raw_audit_path=f"/attempts/{attempt_index}/response")
             except Exception as exc:
                 result["error"] = safe(f"{type(exc).__name__}: {exc}")
                 if len(audit["attempts"]) > attempt_index:
@@ -1980,6 +1985,82 @@ def review_claim_coverage(
             surrogate, parent["required_original_claim_reviews"], registry, source_blocks,
             materials.markdown, set(), scope_context=scope,
         )
+        valid_ids = {row["claim_id"] for row in precheck["mappings"]}
+        remaining = [row["claim_id"] for row in parent["required_original_claim_reviews"]
+                     if row["claim_id"] not in valid_ids]
+        # Only mechanical row failures in a fully returned initial review can retry.
+        # Valid scientific uncertainty, request/identity errors and invalid links stay blocked.
+        if (remaining and len(results) == len(batches) and not record["errors"]
+                and not window.get("original_duty_retry_attempted")):
+            retry = {"version": "original-duty-retry-v1", "status": "not_run_budget",
+                     "eligible_claim_ids": remaining, "initial_aggregate": copy.deepcopy(aggregate),
+                     "initial_precheck": copy.deepcopy(precheck), "budget_before": copy.deepcopy(coverage["budget"]),
+                     "batches": [], "errors": []}
+            record["remaining_duty_retry"] = retry
+            reserve = int(needs_decisions)
+            if coverage["budget"]["validation_calls"] + reserve < max_validation_calls:
+                retry_batches = plan_remaining_original_batches(parent, parent_digest, remaining, original_review_batch_size)
+                retry_results = []
+                record["planned_original_batches"] += len(retry_batches)
+                record["planned_batch_sizes"].extend(len(p["required_original_claim_reviews"]) for p in retry_batches)
+                record["planned_validation_calls"] += len(retry_batches)
+                coverage["budget"]["planned_original_batches"] += len(retry_batches)
+                coverage["budget"]["planned_validation_calls"] += len(retry_batches)
+                retry["status"] = "started"
+                window["original_duty_retry_attempted"] = True
+                save()
+                for payload in retry_batches:
+                    if coverage["budget"]["validation_calls"] + reserve >= max_validation_calls:
+                        retry["errors"].append("Remaining original call budget exhausted; global decision slot retained")
+                        break
+                    coverage["budget"]["validation_calls"] += 1
+                    attempt_index = len(audit["attempts"])
+                    result = {"batch_id": payload["batch_id"], "response": None,
+                              "response_digest": None, "error": None}
+                    try:
+                        parsed = request(_ORIGINAL_BATCH_SYSTEM, payload, OriginalRecheckBatchV1,
+                                         "screening.claims.coverage_original_batch")
+                        raw = audit["attempts"][attempt_index]["response"]
+                        check_batch_rows(payload, raw)
+                        retry_surrogate = CoverageReviewV5(
+                            schema_version="claim-coverage-v5", context_id=parsed.context_id,
+                            window_id=parent["window_id"], reviewed_block_ids=list(source_blocks),
+                            claim_reviews=parsed.original_claim_reviews, new_findings=[],
+                            explanation="Independent remaining-original batch review.",
+                        )
+                        _, retry_precheck = _lower_v3(retry_surrogate, payload["required_original_claim_reviews"],
+                            registry, source_blocks, materials.markdown, set(), scope_context=scope)
+                        result["precheck"] = retry_precheck
+                        if retry_precheck["errors"] or len(retry_precheck["mappings"]) != len(payload["required_original_claim_reviews"]):
+                            raise ValueError("Remaining original batch did not validate every scientific row")
+                        result.update(response=copy.deepcopy(raw), response_digest=_digest(raw))
+                    except Exception as exc:
+                        result["error"] = safe(f"{type(exc).__name__}: {exc}")
+                        retry["errors"].append(f"{payload['batch_id']}: {result['error']}")
+                        check()
+                    finally:
+                        saved = audit["attempts"][attempt_index] if len(audit["attempts"]) > attempt_index else None
+                        if saved is not None:
+                            result.update(request_context_id=saved["input"]["context_id"],
+                                          input_digest=_digest(saved["input"]), raw_audit_path=f"/attempts/{attempt_index}/response",
+                                          response_digest=saved.get("response_digest"))
+                        retry_results.append(result)
+                        retry["batches"].append(copy.deepcopy(result))
+                        save()
+                aggregate, aggregate_digest = select_original_rows(parent, parent_digest, batches, results,
+                                                                   valid_ids, retry_batches, retry_results)
+                record.update(aggregate=aggregate, aggregate_digest=aggregate_digest)
+                record["errors"].extend(retry["errors"])
+                surrogate = CoverageReviewV5(
+                    schema_version="claim-coverage-v5", context_id=aggregate["context_id"], window_id=parent["window_id"],
+                    reviewed_block_ids=list(source_blocks), claim_reviews=aggregate["original_claim_reviews"], new_findings=[],
+                    explanation="Program selection of independently validated original rows.",
+                )
+                lowered, precheck = _lower_v3(surrogate, parent["required_original_claim_reviews"], registry,
+                    source_blocks, materials.markdown, set(), scope_context=scope)
+                retry.update(status="returned" if not retry["errors"] else "failed",
+                             budget_after=copy.deepcopy(coverage["budget"]))
+            save()
         completed = {r.claim_id for r in lowered.claim_checks
                      if r.atomicity != "unresolved" and r.governing_qualifiers != "unresolved"}
         record["remaining_required_claim_ids"] = [r["claim_id"] for r in parent["required_original_claim_reviews"]
@@ -1988,6 +2069,8 @@ def review_claim_coverage(
         record["aggregate"]["generated_observation_ids"] = [o.id for o in lowered.observations]
         aggregate_digest = _digest(aggregate)
         record["aggregate_digest"] = aggregate_digest
+        if record.get("remaining_duty_retry", {}).get("status") in {"returned", "failed"}:
+            record["remaining_duty_retry"]["final_aggregate_digest"] = aggregate_digest
         # These IDs are generated under the final stable adapter context, never per batch.
         record["errors"].extend(f"{r['raw_path']}: {r['error']}" for r in precheck["errors"])
         if record["remaining_required_claim_ids"]:
@@ -2586,6 +2669,8 @@ def review_claim_coverage(
                         "validation_status": window["validation_status"],
                         "budget_before": copy.deepcopy(coverage["budget"]),
                     }
+                    if "remaining_duty_retry" in window.get("original_batches", {}):
+                        recovery["initial_original_batches"] = copy.deepcopy(window["original_batches"])
                     window["late_original_recovery"] = recovery
                     if (coverage["budget"]["followup_calls"] < max_followup_calls
                             and coverage["budget"]["validation_calls"] < max_validation_calls):

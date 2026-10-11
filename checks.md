@@ -1,5 +1,32 @@
 # FactReview v2 acceptance checks
 
+## 最新验收状态（2026-10-11，Phase 8 继续进行）
+
+应用源码为 `40715eec136299f7b42b9a914c23ac29d5e0be89`，随后 `06f2728e` 只增加实际沙箱环境证据。下表是当前结论，后面的 checkpoint 与旧表保留各自时点的历史结果。旧全套结果不自动覆盖后续源码变更。
+
+| 验收项 | 当前结果 | 依据或待办 |
+|---|---|---|
+| 1. 保持原断言和测试选择规则 | 有界通过 | 历史默认全套3754通过；后续修复分别完成必要控制与独审。 |
+| 2. 完整七阶段交付 | 未通过 | 新v4实际726d457fff37返回七阶段，完整链仍失败，终态独审进行中。 |
+| 3. 无数量上限提取与拆分 | 有界通过 | 原控制与长论文历史保留；原复核有限恢复已完成，第一轮两条来源问题另行补提示。 |
+| 4. 主张位置、条件、证据指针 | 有界通过 | 原契约与绑定控制保留。 |
+| 5. 按 needs 分派 | 有界通过 | 原分派控制保留。 |
+| 6. 图表材料与三类 VLM 检查 | 有界通过 | b8ea实际三类闭合；科学视觉判断质量仍待整篇审查。 |
+| 7. 文献时间范围与来源限制 | 有界通过 | 原策略保留；429/超时及充分性限制仍记录。 |
+| 8. 主张关联的可行执行计划 | 未通过 | 最近整篇0计划/0 L3；统计v6接口修复的实际效果待核。 |
+| 9. 对齐证据与有界修复 | 有界通过 | 原资格守卫与控制保留；新NN实际尚无合格证据。 |
+| 10. 固定状态判定规则 | 有界通过 | 原纯规则与测试保留。 |
+| 11. 四状态与单向旧版适配 | 有界通过 | 原schema/报告/适配契约保留。 |
+| 12. 报告结构、建议、执行记录 | 有界通过 | 机械导出与守卫保留，实际完整性受上游partial限制。 |
+| 13. 基线比较与阻断记录 | 有界通过 | 历史比较与阻断保留，不据此宣称商业完成。 |
+| 14. 当前工作记录 | 有界通过 | 实际失败、已交付修复、进行中工作和下一步分别记录。 |
+
+NN v3唯一实际 `actual-894da6c8ef3a` 已结束：supervisor rc1/80.609s，模型1 logical/1 physical/9848 known，accounting closed；作者1次exit0/42.047s，0 image inspect/host metric/semantic Evidence，状态Unverified。Root全文读并核SHA接受终态独审0bc45be6/evidence52c4c509的34项身份/预算事实。新安全sidecar只定位 `proposal.sites / value_error`；具体违反键集合、范围或互异约束中的哪一项仍未知。私有答复未解析或重放，原once已消费；唯一提示合同修正已完成，独审待完成，未运行新NN实际。
+
+整篇v4 controller独审893963af接受26项有限事实，Root全文阅读后一次离线释放bf20cdec，一次prepare rc0/3.7615s得到 `prepared-05f3e1b17653`。prepared独审c8764877/evidence e3cf47d7接受30项事实，Root全文读报告并核SHA后创建新once7fbb583c，进入唯一实际 `actual-726d457fff37`（原session48979已结束，supervised195cf9d1ee34）。rc1/272.015s，七stage返回但fullchain失败，main16logical/16physical/111984known/missing2/blocked28未closed；readiness1/1/188 closed，0计划/0 Docker。fig三类别完成，table视觉入口发生公开pre-SSE EOF；两条unknown记录是否对应真实transport不能由聚合计数证明。first要求12职责，仅10 lowering有效，008/009原子来源被原unique/visible/considered守卫拒绝，original0/12。完整407源码221文件/31目录、原输入/预算与全部科学门限保留，终态独审与最窄提示修复继续；statistics v6在此实际未获执行资格。
+
+Phase3 original-duty retry完成：Root全文读作者3703a567、最终完整diff/test及独审6e9c5cd0/evidence bac799ef，接受24项有限事实。仅完整初始批次无请求/身份/聚合错误后的机械无效原行，每窗口最多重请求一轮；有效unresolved不重问，全父职责/来源/scope保留，原有效行完整值/类型不变，fresh raw独立核证后整行选取。旧坏行/错误/收据保持，完整原复核与global/adoption门限、原预算与决策预留不变，late recovery不能再次重问。唯一最终同字节public mock7f572eed在旧源红1/2.87s、新源绿1/52.43s，14分支/48Assert，220旧文件/7172旧Assert保持，Ruff3通过。当前source ccda7de5/00a00ffe同冻结；非空新selector links与多剩余batch只静态审核，mock未覆盖，科学真实效果待新源实际核验，407 actual不包含该修复。
+
 Phase8 default sandbox actual checkpoint：唯一Root自有环境probe rc0/wall6.796s，result16147a86；Root全文读接受终态独审84806195/evidence3913a38c的21项事实。完整40715ee canonical221文件/31目录、identitya7d851e5/archivee60a587a与前后source/input/批准image相同。12严格kernel项与4外层项全部true：uid/gid1000、caps0/NFP1、onlylo、CPU2/mem4GiB/swap0/PID256、root/appRO、源写入EROFS、scratch/HOME/tmp实际可写。唯一production protected argv差异为operator-only pullnever，0model/train/build/pull，stderr仅opaque且为空。只认证本机/该批准镜像/默认策略环境，NN与整篇科学资格仍开放；失败审计器的Windows sentinel换行预期修正及原失败保留，probe字节不改，无重复真实probe。
 
 Phase5 safe schema sidecar checkpoint：Root全文读作者a0671cd6、新源完整diff/test及独审70bbd07b/evidence674df717，接受17/17有限事实。精确ValidationError仅在受控attempt0–3排他写固定schema_id/field/error_type最多8项，动态键/错误msg/input/context/secret不输出，写失败与已有文件保留原binding返回/资格。最终source2c851cc3/test735d0c00与frozen一致，旧51cc4d61测试字节不改。必要同node记录red/green、最终1passed/1.38s与Ruff通过；red测试4921c0b0和final735d字节不同，独审确认至sidecar读取的核心前缀AST相同，尾部完整red源未保存，不宣称同字节。P2两依赖后来改IPC，其必要控制与独审另绑定；旧green不扩展新完整来源资格。原b086具体schema字段仍未知，下一新NN运行才可定位；没有旧private解析/消费重放或真实新NN成功。
