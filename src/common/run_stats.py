@@ -72,6 +72,8 @@ def validate_module(module: str) -> str:
     normalized = str(module or "").strip()
     if normalized.startswith(("screening.", "screening_", "verification.", "verification_")):
         normalized = "analysis"
+    elif normalized.startswith("report_generation."):
+        normalized = "report_generation"
     if normalized not in MODULE_ORDER:
         raise ValueError(f"unknown stats module: {module!r}")
     return normalized
@@ -398,6 +400,7 @@ def record_llm_call(
     warning: str = "",
     failed: bool = False,
     image_count: int = 0,
+    reasoning_effort: str = "",
 ) -> None:
     """Record a call attempt, including local/provider failures and requested images.
 
@@ -474,6 +477,7 @@ def record_llm_call(
         sub["output_tokens"] += exact_usage["output_tokens"]
         for key, count in details.items():
             sub[key] += count
+        _inc_counter(sub.setdefault("reasoning_effort", {}), reasoning_effort or "default")
         if warning:
             _append_warning(row, warning)
         for additional_warning in additional_warnings:

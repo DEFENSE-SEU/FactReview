@@ -223,6 +223,7 @@ def invoke_codex(
     base_url: str,
     return_usage: bool = False,
     image_data: list[str] | None = None,
+    reasoning_effort: str | None = None,
 ) -> str | tuple[str, dict[str, int]]:
     url = resolve_codex_base_url(base_url).rstrip("/") + "/responses"
     payload = {
@@ -232,7 +233,7 @@ def invoke_codex(
         "tools": [],
         "tool_choice": "auto",
         "parallel_tool_calls": False,
-        "reasoning": {"summary": "auto"},
+        "reasoning": {"summary": "auto", **({"effort": reasoning_effort} if reasoning_effort else {})},
         "store": False,
         "stream": True,
         "include": ["reasoning.encrypted_content"],

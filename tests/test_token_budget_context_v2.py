@@ -130,7 +130,7 @@ def test_usage_is_recorded_per_call_site_with_cached_tokens(tmp_path):
     scope = row["analysis"]["submodules"]["verification.experiments.scope"]
     assert scope == {
         "requests": 1, "input_tokens": 100, "output_tokens": 20,
-        "cached_input_tokens": 60, "reasoning_output_tokens": 7,
+        "cached_input_tokens": 60, "reasoning_output_tokens": 7, "reasoning_effort": {"default": 1},
     }
     assert row["analysis"]["token_usage"]["input_tokens"] == 100
     assert list(row["report_generation"]["submodules"]) == [f"report_generation:{__name__}"]
@@ -169,3 +169,28 @@ def test_unanchored_claim_keeps_every_evidence_block(tmp_path):
     claim, materials = _paper(tmp_path)
     claim = claim.model_copy(update={"source_block_id": None, "source_quote": None})
     assert scope_block_ids(claim, materials) == {b.id for b in materials.blocks if b.id != "bib"}
+
+
+def test_low_reasoning_effort_applies_only_to_configured_modules(tmp_path, monkeypatch):
+    from llm import client
+
+    sent = []
+
+    def provider(**kwargs):
+        sent.append(kwargs.get("reasoning_effort"))
+        return '{"status":"ok"}', {"input_tokens": 3, "output_tokens": 2, "total_tokens": 5}
+
+    monkeypatch.setattr(client, "get_codex_auth", lambda **kw: object())
+    monkeypatch.setattr(client, "invoke_codex", provider)
+    cfg = client.LLMConfig(provider="openai-codex", model="m", base_url="https://offline.invalid", api_key=None)
+    with run_stats.run_scope(tmp_path / "stats.json"):
+        for module in ("screening.claims.coverage", "verification.experiments"):
+            client.llm_json("{}", "s", cfg, module=module)
+        with client.effort_label("report_generation.advice"):
+            client.llm_json("{}", "s", cfg, module="report_generation")
+        modules = run_stats.read()["modules"]
+    assert sent == ["low", None, "low"]
+    assert modules["analysis"]["submodules"]["screening.claims.coverage"]["reasoning_effort"] == {"low": 1}
+    assert modules["analysis"]["submodules"]["verification.experiments"]["reasoning_effort"] == {"default": 1}
+    advice = modules["report_generation"]["submodules"]["report_generation:tests.test_token_budget_context_v2"]
+    assert advice["reasoning_effort"] == {"low": 1}
