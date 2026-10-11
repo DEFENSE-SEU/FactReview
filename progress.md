@@ -2,7 +2,7 @@
 
 ## 当前完整框架 checkpoint（2026-10-11）
 
-Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2的默认回归checkpoint42fb6bf68c144c3ec484c8735266f65249733d4b及后续文档记录8fcca68均已推送；本轮继续执行，不暂停目标。
+Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送ordinary多条件Phase A的44061817bfc3dc246bd0aa15b0c3c4e346622014，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
 
 Completed：最终默认全套仅运行一次，3754passed/3原默认deselected/0skipped/0fail/0error，exit0；pytest538.61s、wrapper541.797s。419源码/测试/config身份前后完全一致，原断言、marker及外部mock保持。报告final-default-regression-final-path-fixtures-v1/report.md；原56失败、后续12失败及所有局部红绿记录完整保留。原14验收第1项现通过，另13项窄合同保持；科学及商业完成仍需独立证据。
 
@@ -10,7 +10,9 @@ Completed with failure：full-public-pipeline-native-delivery-v1的唯一actual3
 
 Completed Phase5 ordinary multi-condition A：三产品文件仅移除两处整Claim单条件门槛并补四段selected-target提示；每plan仍仅一个正式条件，全文Claim/所有conditions/source SHA、资源、host测量、receipt、独立语义、judge/assessment保持。一个必要新公共mock有36Assert，1pass/5.84s、Ruff四文件通过；两conditions分别ordinary evaluation与完整released analysis，healthy2Evidence→Supported，缺资格/错condition/错来源→Unverified，8mock Docker/7mock semantic，0真实服务。原203旧test文件完整不变；有效red及fixture字段修正等失败全部保留。作者report c987056c，独审report7ea6a371闭合无阻断；Root读两报告接受集成。原3754全套和f278 actual都早于此改，不能继承其源码身份。
 
-Open issues：真实完整链已实际失败，需基于原件修复再用新身份验证。确定L1双producer接线错误：discovery职责漏10未分配原解析块；aggregate只留discovery7 Markdown IDs，丢11首轮显式considered原源，严格scope consumer故正确拒11。Root修职责补集与显式来源ack，Single做必要公共mock，consumer/raw/fullcontext/预算保持。Theory把appendix no_proof当正式证明强制main-theorem anchor，导致真实正确无法证明观测成为branch_failed。执行0plan由choice finite字段不覆盖correct_predictions等语义产生，Docker服务未执行且没有故障。普通L2 v4多决策已授权独立5路径有限实施并由默认多条件dispatch接通，单条件/standalone旧v3保留；B2 choice/fullfragment及一般NN暂无完成证明。整篇召回/原子性/M2/M5、联合paper evidence和自我陈述循环科学资格仍开放。
+Completed Phase3 local repair：Root两产品+Single一个新mock冻结，39Assert全文红/首次诊断缺失失败/最终绿完全同字节；新1pass/1.17s、四原直接关联case4pass/16.19s、Ruff三paths通过，原test函数/consumer不改。parent新增discovery_required_block_ids为完整有序ALLwindow；partial/foreign/duplicate/order先记录原raw/remaining且不启动child。review_only保持synthetic原语义，显式source group仅新增真实body fingerprint与raw组/ID/aggregate指针，不科学confirmed/不代遗漏检查。原17块补集方案已据职责证据修正并保历史；实际7IDs属于partial Discovery，原11行未在新实际中复核。作者reportb229ed36/evidence3aea86ad，16 scoped事实通过、原实际五身份同；独审first-batch-source-ack-independent-v1/report.md b85fa949/evidence db1a2cff闭合无阻断，Root已读报告接受集成。
+
+Open issues：真实完整链仍失败，终态内容独审full-public-pipeline-native-terminal-independent-v1最终report2c75c1dd闭合，旧bf703因果澄清保记录：claim011实际为single-source同义authorassertion自循环，joint消费者未被调用，不能将其当直接原因。Theory no_proof经正式appendix theorem guard的缺陷已最小修复并必要mock绿，独审待闭合，旧actual失败不重标。执行0plan由choice finite字段不覆盖correct_predictions等语义产生，Docker未运行。普通L2 v4多决策独立5路径有限实施由默认多条件dispatch接通，单条件/standalone旧v3保留；后续审计metadata与无授权默认读文件编码差异正在准确恢复/必要复核，不沿用此前绿身份。B2 choice/fullfragment、一般NN、整篇召回/原子性/M2/M5、联合paper evidence和外部事实source-authority资格仍开放。
 
 Decisions：已有repair3上限3、auto加可选interactive并记录模式、training0、deadline及获准arxiv fallback、集中原容差、v1 conflict→questioned保持。不会因mock全套通过或两页材料实际成功宣告商业完成。当前fixed f278实际证据与随后多条件源码/测试证据分别绑定各自身份。
 
