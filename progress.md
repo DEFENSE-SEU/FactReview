@@ -6,9 +6,13 @@ Completed source：NN final-v2已获独立增量接受，Root全文读reportbf41
 
 Preparation：在既有批准Torch2.14.0+cpu image中唯一checkpoint-only操作9.859s成功，真实weights2397bytes/SHA15a7852c51d8e9ec0764126fd38b4e59dee9f6dad6455b7f2ea540db4bcc72f9。前后image与generator同，private日志仅SHA/size，0author evaluation/LLM/train。记录torch-cpu-checkpoint-root-v1；静态四条数据/两层ReLU/完整设置/全文单页材料在torch-cpu-inference-actual-preparation-v1，预声明MSE .25尚无观测。
 
-Running full actual：新统计整篇控制器两处阻断已修，Root全文读增量独审8543b436及prepared独审d33fec0b，14facts/273原件闭合。仅离线meta释放c4bfb724，唯一prepare5.627s/prepared70080f9e8119/manifest42d7efc7；新exact授权a4c8a690已独占消费，supervisor一次启动actual-a070f3548156（session22568）。完整dfea219源、8原输入/4发布行不改；main120/120/每logical1physical/known1.5M soft，ready1/1/2000另计，wall3600、Docker6/build1、auto/repair3/train0保持。终态待完成，旧失败actual不复用。
+Completed with failure：统计整篇actual-a070f3548156/supervised7b0281d71743已rc1/wall41.062s终态，ready1logical/1physical/171known、main0/0/0全closed，0Docker。Materials16.635s写原265字符Windows assets/SHA图像时FileNotFoundError，随后全stage skipped，无input/source/import/controller/controlmeta违规。原once授权已消费，失败保留。作者正修preprocessing long原件/alias I/O，保持原run_root/文件名/provenance；短/本次根/alias长根由唯一必要public mock验证。此前完整219源、8原输入/4发布行及main120/120/soft1.5M、ready1/1/2000、wall3600/Docker6/build1/auto/repair3/train0准入保持历史。
 
 Delivery NN：九产品/必要mock与docs已Phase5提交push2960f410276cbbf53388b9be7d0522f6855ac998，local/remote相同，Root deliveryc8df9943分列工作与Gitcanonical。完整221files31dirs/archive2ad44b79/identityd9bcbaf7于torch-cpu-canonical-source-root-v2；v1 local形状工具误拒合法src根目录已保留且未应用运行。新native NN控制器正在静态实现，仍未准入作者推理。并行另agent只读核Literature/Theory/Code来源权威，未增加模型或测试调用。
+
+Completed Phase2 local repair：Windows parser原图/alias I/O使用extended namespace，原metadata/containment/Markdown/hash不改。唯一必要真实ZIP/filesystem/PDF crop/FigureSources控制，外部HTTP mock，short/182/190 roots及265图像/266 alias同testbytes有效red1failed/1.04s→green1pass/1.17s；23原functions/90Assert保持，Ruff2通过。Root已全文读接受独审b2e47694/verification38ed44f1，35事实闭合，当前两产品/测试SHA与作者frozen及green同；未重复测试/服务。author67355c51/evidencefb7a5003。UNC仅静态、超190根生成crop未泛化。Root public终态因果record5b417a07/reviewd15ca9c7保留a070失败。
+
+Running Theory：Root全文读other-branch独审93c03161，24固定源/27静态前提确认新鲜Theory模型省schema/trace后legacy-unavailable路径仍可充分支持。Literature/Code本范围通过且语义质量未认证。fresh门及必要legacy负控/完整versioned正控已冻结，new1pass/.51s；8迁移节点首7pass/1fail，仅失败node引文定位修正后1pass/.22s，原253科学Assert保持，legacy一错误复合断言加强三项。独立agent正在审核final-v2六件，历史schema/adapter/report仍可读，final规则不改。
 
 Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送Phase A的4406181、Phase3的c0bb46f、Theory的23a966d、B1的9b4a3411、Phase4 SourceAuthority的692580b0、Phase3默认auto/提取metadata的36212f3、Phase4统计87e546d及Phase3 VLM的dfea429824c90778c4095da86c7af453a735a19d，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
 
@@ -42,7 +46,7 @@ Open issues：真实完整链仍失败，终态内容独审最终2c75c1dd及旧�
 
 Decisions：已有repair3上限3、auto加可选interactive并记录模式、training0、deadline及获准arxiv fallback、集中原容差、v1 conflict→questioned保持。不会因mock全套通过或两页材料实际成功宣告商业完成。当前fixed f278实际证据与随后多条件源码/测试证据分别绑定各自身份。
 
-Next action：完成统计整篇controller被动检查器、最终独审、新一次离线prepare与准入，再运行真实完整公开入口；并行收口NN B4、独审提交及已准备CPU环境的实际有限推理验证。原完整paper/crops/所有窗口/fullClaim/实际请求lineage和预算保留，不制造科学输入、不复用旧auth。某项服务或能力受阻时继续其他框架工作，目标active。checks.md当前14表12项窄通过、2项完整链失败；Phase8整体开放。
+Next action：收齐Windows材料路径与Theory新鲜推导门的独审并按Phase2/4交付；用新完整Git源、新controller/prepared/auth启动整篇公开入口。NN已交付2960f41，runnable controller冻结c29cef67/16原输入，正在独审；接受后离线prepare、核prepared、新once准入真实CPU推理。原完整paper/crops/所有窗口/fullClaim/实际请求lineage和预算保留，不复用已消费a070或旧auth。某项服务或能力受阻时继续其他框架工作，目标active。checks.md当前14表12项窄通过、2项完整链失败；Phase8整体开放。
 
 ## 历史回归修复与真实执行 checkpoint（2026-10-11）
 

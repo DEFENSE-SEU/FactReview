@@ -29,6 +29,20 @@ from schemas.materials import (
 )
 
 BBoxSpace = Literal["normalized_1000", "pdf_points"]
+
+
+def _image_io_path(path: Path) -> Path:
+    """Use Windows' extended namespace only for parser-image filesystem I/O."""
+    if os.name != "nt":
+        return path
+    value = str(path.absolute())
+    if value.startswith("\\\\?\\"):
+        return path
+    if value.startswith("\\\\"):
+        return Path("\\\\?\\UNC\\" + value[2:])
+    return Path("\\\\?\\" + value)
+
+
 _HEADINGS = re.compile(r"(?m)^#{1,6}\s+(.+?)\s*#*\s*$")
 _ANCHOR_NUMBER = r"(?:[A-Za-z]\.?)?\d+(?:\.\d+)*"
 _PANEL_SUFFIX = r"(?:[a-z]|\s*\(\s*[a-z]\s*\))?"
@@ -532,8 +546,8 @@ def build_materials(
         if not destination.is_relative_to(assets.resolve()):
             material.issues.append(f"Skipped unsafe parser image path: {name}")
             continue
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes(data)
+        _image_io_path(destination.parent).mkdir(parents=True, exist_ok=True)
+        _image_io_path(destination).write_bytes(data)
         # Keep the parser assets and the original Markdown image URLs. Editing
         # Markdown here would invalidate every previously derived character span.
         linked = (output_dir / name.replace("\\", "/")).resolve()
@@ -636,13 +650,14 @@ def build_materials(
             material.figures.append(figure)
         _table_materials(material, rows, pdf, images_dir, bbox_space)
     for linked, data in linked_images:
-        if linked.exists() and linked.read_bytes() != data:
+        linked_io = _image_io_path(linked)
+        if linked_io.exists() and linked_io.read_bytes() != data:
             material.issues.append(
                 f"Skipped parser image link colliding with a generated artifact: {linked.name}"
             )
             continue
-        linked.parent.mkdir(parents=True, exist_ok=True)
-        linked.write_bytes(data)
+        _image_io_path(linked.parent).mkdir(parents=True, exist_ok=True)
+        linked_io.write_bytes(data)
     (output_dir / "materials.json").write_text(material.model_dump_json(indent=2), encoding="utf-8")
     return material
 
