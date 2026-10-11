@@ -1693,6 +1693,17 @@ def _execute_graph(
     source_sites_diagnostics=False,
 ) -> str:
     operator_sandbox = json.dumps(ledger["config"]["sandbox"], sort_keys=True, allow_nan=False)
+    runtime_stages = None
+    if source_sites_diagnostics is True:
+        from .inference_source_sites_diagnostics import RuntimeStageDiagnostic
+
+        runtime_stages = []
+
+    def runtime_stage_for(request):
+        if runtime_stages is None:
+            return None
+        return next((item for item in runtime_stages if item.request is request), None)
+
     def protected_changes(workspace):
         changed = []
         for path, digest in manifest.items():
@@ -1748,11 +1759,16 @@ def _execute_graph(
         if type(request.source_science) is dict and request.source_science.get("version") == "torch-cpu-inference-v1":
             from .inference_runtime import bind_inference_request
 
+            diagnostics = {"source_sites_diagnostics": True} if source_sites_diagnostics is True else {}
+            if runtime_stages is not None:
+                runtime_stage_diagnostic = RuntimeStageDiagnostic(request, materials)
+                runtime_stages.append(runtime_stage_diagnostic)
+                diagnostics["runtime_stage_diagnostic"] = runtime_stage_diagnostic
             attempt = Path(request.run_dir) / f"attempt_{request.repair_round}"
             attempt.mkdir(parents=True, exist_ok=True)
             _json(attempt / "inference_binding.json", bind_inference_request(
                 request, claim=claim, materials=materials,
-                **({"source_sites_diagnostics": True} if source_sites_diagnostics is True else {}),
+                **diagnostics,
             ))
         if request.plan.run_mode == "training":
             if training_budget["used"] >= request.config.training_budget:
@@ -1862,8 +1878,10 @@ def _execute_graph(
         if request.source_science is not None and not any(item.version == 2 for item in bindings.values()):
             from .runtime_science import qualify_consumption
 
+            runtime_stage_diagnostic = runtime_stage_for(request)
             science = qualify_consumption(request.source_science, plan=request.plan, claim=claim,
-                materials=materials, request=request, outcome=outcome, source_files=request.source_science_files)
+                materials=materials, request=request, outcome=outcome, source_files=request.source_science_files,
+                **({"runtime_stage_diagnostic": runtime_stage_diagnostic} if runtime_stage_diagnostic is not None else {}))
             science_path = Path(request.run_dir) / f"attempt_{request.repair_round}" / "scientific_consumption.json"
             _json(science_path, science)
             outcome.logs["scientific_consumption"] = str(science_path)
@@ -2234,6 +2252,16 @@ def _execute_graph(
         ),
     )
     workflow.add_conditional_edges("repair", lambda state: "run" if state.get("retry") else END)
-    state = workflow.compile().invoke({"request": initial, "reason": ""}, {"recursion_limit": 20})
+    completed = False
+    try:
+        state = workflow.compile().invoke({"request": initial, "reason": ""}, {"recursion_limit": 20})
+        completed = True
+    finally:
+        if runtime_stages is not None:
+            for runtime_stage_diagnostic in runtime_stages:
+                if (not completed and runtime_stage_diagnostic is runtime_stages[-1]
+                        and runtime_stage_diagnostic.terminal not in ("rejected", "failed")):
+                    RuntimeStageDiagnostic.reject(runtime_stage_diagnostic, terminal="failed")
+                RuntimeStageDiagnostic.close(runtime_stage_diagnostic)
     ledger["operation_failures"].extend(state.get("operation_failures", []))
     return state["reason"]

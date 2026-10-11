@@ -570,16 +570,28 @@ def _build_review_context(proposal, **kwargs):
     return build_consumption_context(proposal, **kwargs)
 
 
-def qualify_consumption(proposal, *, plan, claim, materials, request, outcome, source_files):
+def qualify_consumption(proposal, *, plan, claim, materials, request, outcome, source_files, runtime_stage_diagnostic=None):
     """At most one metered independent decision; no Evidence or status is created."""
     kwargs = dict(plan=plan, claim=claim, materials=materials, request=request, outcome=outcome, source_files=source_files)
+    if runtime_stage_diagnostic is not None:
+        from .inference_source_sites_diagnostics import RuntimeStageDiagnostic
+
+        if (type(runtime_stage_diagnostic) is not RuntimeStageDiagnostic or type(proposal) is not dict
+                or proposal.get("version") != "torch-cpu-inference-v1"):
+            runtime_stage_diagnostic = None
+        else:
+            kwargs["runtime_stage_diagnostic"] = runtime_stage_diagnostic
     try:
         context = _build_review_context(proposal, **kwargs)
     except (ValueError, TypeError, KeyError, IndexError, AttributeError, OSError, SyntaxError, OverflowError, RecursionError) as exc:
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.reject(runtime_stage_diagnostic)
         return _unknown(str(exc) if type(exc) is ValueError else type(exc).__name__)
     result = _unknown("Independent semantic scope unresolved")
     result["context"] = context
     try:
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, phase="usage", stage="usage")
         stats = run_stats.stats_path()
         owned = stats is None
         if owned:
@@ -608,20 +620,34 @@ def qualify_consumption(proposal, *, plan, claim, materials, request, outcome, s
             if not measured:
                 result.update(status="failed", scientific_qualification=False, derived_observations=[],
                               reason="Scientific review usage is missing, failed, estimated or unavailable")
+                if runtime_stage_diagnostic is not None:
+                    RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, phase="usage", stage="usage", terminal="failed")
             elif result["scientific_qualification"] and context["version"] == "analysis-v1":
                 from .partition_analysis_runtime import qualified_analysis_metadata
                 result.update(qualified_analysis_metadata(context))
+            if runtime_stage_diagnostic is not None and runtime_stage_diagnostic.terminal not in ("failed", "rejected"):
+                RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, phase="usage", stage="usage", terminal=result["status"])
     except Exception as exc:
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, phase="usage", stage="usage", terminal="failed")
         result.update(status="failed", scientific_qualification=False, derived_observations=[],
                       reason=f"Scientific review accounting failed ({type(exc).__name__})")
     return result
 
 
 def _review_context(context, proposal, kwargs):
+    runtime_stage_diagnostic = kwargs.get("runtime_stage_diagnostic")
+    if runtime_stage_diagnostic is not None:
+        from .inference_source_sites_diagnostics import RuntimeStageDiagnostic
+
+        if type(runtime_stage_diagnostic) is not RuntimeStageDiagnostic:
+            runtime_stage_diagnostic = None
     result = _unknown("Independent semantic scope unresolved")
     result["context"] = context
     started = time.monotonic()
     try:
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, phase="semantic", stage="semantic_reply")
         from llm.client import llm_json, resolve_llm_config
         run_stats.validate_module("execution")  # Validate before any external admission.
         cfg = resolve_llm_config()
@@ -689,8 +715,12 @@ def _review_context(context, proposal, kwargs):
         for key, row in rows.items():
             _require(row.rationale.strip() and len(set(row.source_ids)) == len(row.source_ids)
                      and set(row.source_ids) == set(context["obligations"][key]), "semantic_source_coverage_mismatch")
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, phase="refreshed_context", stage="entry")
         refreshed = _build_review_context(proposal, **kwargs)
         _require(refreshed["context_digest"] == context["context_digest"], "science_context_changed_during_review")
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, phase="semantic", stage="semantic_reply")
         if parsed.unresolved or any(row.decision != "confirmed" for row in rows.values()) or (
             analysis and parsed.measurement_scope != "released_statistics"
         ):
@@ -702,7 +732,11 @@ def _review_context(context, proposal, kwargs):
                 evidence_refs=context["catalog"]["actual/analysis"]["evidence_refs"] if analysis
                 else context["catalog"]["actual/inference"]["evidence_refs"] if inference
                 else context["catalog"]["actual/consumption"]["flow"]["evidence_refs"])
+        if runtime_stage_diagnostic is not None:
+            RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, terminal=result["status"])
     except Exception as exc:
+        if runtime_stage_diagnostic is not None and runtime_stage_diagnostic.terminal != "rejected":
+            RuntimeStageDiagnostic.reject(runtime_stage_diagnostic, terminal="failed")
         # Requested service/protocol/integrity failure is separate from a healthy
         # reviewer returning scientific unresolved. Avoid provider error secrets.
         result.update(status="failed", reason=f"Scientific semantic review failed ({type(exc).__name__})")
