@@ -89,6 +89,90 @@ _BINDING_FAILURE_TYPES = (
     (OverflowError, "overflow_error"),
 )
 
+_PROPOSAL_SCHEMA_FIELDS = frozenset({
+    "version", "condition_id", "checkpoint_path", "state_selector", "dataset_path", "codec",
+    "id_key", "features_key", "label_key", "sites", "sample_id_selector", "sample_features_selector",
+    "sample_label_selector", "batch_ids_selector", "batch_features_selector", "batch_labels_selector",
+    "prediction_argument", "metric_prediction_argument", "metric_label_argument", "raw_value_selector",
+    "prediction_adapter", "metric_adapter", "dataset_selector", "split_selector", "model_selector",
+    "metric_selector", "settings_selectors", "paper", "sources",
+})
+_POLICY_SCHEMA_FIELDS = frozenset({
+    "protocol", "torch_version", "image_id", "package_manifest_sha256", "max_tensor_elements",
+    "max_events", "max_samples", "max_jsonl_line_bytes", "max_partition_bytes", "max_report_bytes",
+})
+_SELECTOR_SCHEMA_FIELDS = frozenset({
+    "state_selector", "sample_id_selector", "sample_features_selector", "sample_label_selector",
+    "batch_ids_selector", "batch_features_selector", "batch_labels_selector", "raw_value_selector",
+    "dataset_selector", "split_selector", "model_selector", "metric_selector",
+})
+_SCHEMA_ERROR_CODES = frozenset({
+    "missing", "literal_error", "extra_forbidden", "string_type", "string_too_short", "string_too_long",
+    "string_pattern_mismatch", "int_type", "int_parsing", "int_from_float", "float_type", "float_parsing",
+    "list_type", "dict_type", "too_short", "too_long", "greater_than_equal", "greater_than",
+    "less_than_equal", "less_than", "value_error", "model_type",
+})
+
+
+def _schema_field_path(location, schema_id):
+    """Return only finite schema paths, never dynamic keys or numeric indices."""
+    if type(location) is not tuple or not location or type(location[0]) is not str:
+        return "unknown_field"
+    root = location[0]
+    fields = _PROPOSAL_SCHEMA_FIELDS if schema_id == "proposal" else (
+        _POLICY_SCHEMA_FIELDS if schema_id == "policy" else frozenset())
+    if root not in fields:
+        return "unknown_field"
+    if len(location) == 1:
+        return root
+    if root in _SELECTOR_SCHEMA_FIELDS and len(location) in (2, 3) and type(location[1]) is int:
+        if 0 <= location[1] < 12 and (len(location) == 2 or
+                (type(location[2]) is str and location[2] in {"str", "int"})):
+            return root + ".item"
+    if root == "sites" and len(location) == 2 and type(location[1]) is str:
+        return "sites." + location[1] if location[1] in {"getitem", "model", "prediction", "metric"} else "unknown_field"
+    if root in {"paper", "sources"} and len(location) in (2, 3) and type(location[1]) is str:
+        if location[1] in ROLES:
+            prefix = root + "." + location[1]
+            if len(location) == 2:
+                return prefix
+            fields = {"quote", "start", "end", "block_id" if root == "paper" else "path"}
+            if type(location[2]) is str and location[2] in fields:
+                return prefix + "." + location[2]
+    return "unknown_field"
+
+
+def _schema_validation_diagnostics(error):
+    """Project fixed schema IDs, field paths and codes; discard all error text."""
+    schema_id = {"TorchInferenceProposal": "proposal", "TorchInferenceLimits": "policy"}.get(
+        error.title, "unknown_schema")
+    errors = error.errors(include_url=False, include_context=False, include_input=False)
+    rows = []
+    for item in errors[:8]:
+        code = item.get("type")
+        rows.append({"field": _schema_field_path(item.get("loc"), schema_id),
+                     "error_type": code if type(code) is str and code in _SCHEMA_ERROR_CODES else "unknown_error"})
+    return {"schema": "torch-inference-schema-diagnostics-v1", "schema_id": schema_id,
+            "errors": rows, "truncated": len(errors) > 8}
+
+
+def _write_schema_validation_diagnostics(request, error, materials):
+    """Write-once operator-output sidecar; failures cannot change qualification."""
+    try:
+        if type(request.repair_round) is not int or not 0 <= request.repair_round <= 3:
+            return
+        run_dir = plain_path(Path(request.run_dir)).resolve(strict=True)
+        path = plain_path(run_dir / f"attempt_{request.repair_round}" / "inference_schema_diagnostics.json")
+        if any(path.is_relative_to(plain_path(Path(root)).resolve(strict=True)) for root in
+               (request.workspace, materials.repository.root)):
+            return
+        payload = _schema_validation_diagnostics(error)
+        with path.open("x", encoding="utf-8") as stream:
+            json.dump(payload, stream, allow_nan=False)
+            stream.write("\n")
+    except (OSError, ValueError, TypeError, AttributeError):
+        pass
+
 
 def bind_inference_request(request, *, claim, materials):
     """Program-owned attempt binding; errors retain the legal unobserved run."""
@@ -98,6 +182,8 @@ def bind_inference_request(request, *, claim, materials):
             limits=request.config.docker_options.get("torch_inference"), source_sites=request.source_sites)
         return {"status":"bound", "request_sha256":_fingerprint(request.model_dump(mode="json")),"binding":binding}
     except (ValueError,TypeError,KeyError,IndexError,OSError,UnicodeError,OverflowError) as exc:
+        if type(exc) is ValidationError:
+            _write_schema_validation_diagnostics(request, exc, materials)
         failure = next((code for error_type, code in _BINDING_FAILURE_TYPES
                         if isinstance(exc, error_type)), "binding_exception")
         if type(exc) is ValueError and len(exc.args) == 1 and type(exc.args[0]) is str:
