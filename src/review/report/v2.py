@@ -353,6 +353,18 @@ def claim_coverage_lines(claim_coverage: dict | None) -> list[str]:
     blocked_text = (
         ", ".join(str(item) for item in blocked) or "none" if isinstance(blocked, list) else "unavailable"
     )
+    audit = claim_coverage.get("partial_first_original_audit")
+    audit_lines = []
+    if isinstance(audit, dict) and audit.get("audit_only") is True and audit.get("adoption_authorized") is False:
+        def audit_count(key):
+            raw = audit.get(key)
+            return str(raw) if type(raw) is int and raw >= 0 else "unavailable"
+
+        audit_lines = [
+            f"Additional audit-only original-claim reviews: {audit_count('completed')} / "
+            f"{audit_count('required')} across {audit_count('windows')} windows. "
+            "These audits do not authorize claim adoption or complete unresolved first reviews.",
+        ]
     return [
         "",
         "### Claim extraction coverage",
@@ -367,6 +379,7 @@ def claim_coverage_lines(claim_coverage: dict | None) -> list[str]:
         "A claim may be checked in more than one window.",
         f"Independent original-claim reviews: {value('original_claim_reviews_completed')} / "
         f"{value('original_claim_reviews_required')}.",
+        *audit_lines,
         f"Proposed-claim checks passed: {value('candidate_claim_checks_passed')} / "
         f"{value('candidate_claim_checks_required')}.",
         f"Unresolved observations: {value('unresolved_observations')}; "

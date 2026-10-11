@@ -1536,7 +1536,10 @@ def coverage_summary(coverage):
         "blocked_claim_ids",
         "audit_path",
     )
-    return {key: copy.deepcopy(coverage.get(key)) for key in keys}
+    summary = {key: copy.deepcopy(coverage.get(key)) for key in keys}
+    if "partial_first_original_audit" in coverage:
+        summary["partial_first_original_audit"] = copy.deepcopy(coverage["partial_first_original_audit"])
+    return summary
 
 
 def _validate_actions(response, observations, registry):
@@ -1684,8 +1687,11 @@ def review_claim_coverage(
     max_validation_calls: int = 12,
     original_review_batch_size: int | Literal["auto"] | None = "auto",
     first_review_batch_size: int | Literal["auto"] | None = "auto",
+    audit_incomplete_first: bool = False,
 ) -> ClaimCoverageResult:
     """Return isolated working copies and unresolved target IDs, without changing L1 inputs."""
+    if type(audit_incomplete_first) is not bool:
+        raise ValueError("audit_incomplete_first must be a boolean")
     for name, value in (("original_review_batch_size", original_review_batch_size),
                         ("first_review_batch_size", first_review_batch_size)):
         if value != "auto" and value is not None and (type(value) is not int or value < 1):
@@ -2069,14 +2075,17 @@ def review_claim_coverage(
         save()
         return first_surrogate(aggregate)
 
-    def batched_validation(parent, window, registry, observations, source_blocks, scope):
+    def batched_validation(parent, window, registry, observations, source_blocks, scope,
+                           *, audit_only=False, batch_size=None, validation_ceiling=None):
+        size = original_review_batch_size if batch_size is None else batch_size
+        ceiling = max_validation_calls if validation_ceiling is None else validation_ceiling
         parent = {**copy.deepcopy(parent), "parent_provenance": {
             "materials_digest": coverage["materials_digest"],
             "original_claims_digest": coverage["original_claims_digest"],
             "source_hashes": copy.deepcopy(files),
             "required_original_digest": _digest(parent["required_original_claim_reviews"]),
         }}
-        parent_digest, batches = plan_original_batches(parent, original_review_batch_size)
+        parent_digest, batches = plan_original_batches(parent, size, preserve_full_context=audit_only)
         needs_decisions = bool(parent["candidates"] or parent["observations"])
         record = {
             "version": "original-recheck-batches-v1", "parent_digest": parent_digest,
@@ -2087,13 +2096,20 @@ def review_claim_coverage(
             "remaining_required_claim_ids": [r["claim_id"] for r in parent["required_original_claim_reviews"]],
             "batches": [], "decision_status": "not_run", "errors": [],
         }
-        window["original_batches"] = record
+        retry_owner = window
+        if audit_only:
+            retry_owner = window["partial_first_original_audit"]
+            retry_owner["batch_review"] = record
+            coverage["budget"].setdefault("planned_original_batches", 0)
+            coverage["budget"].setdefault("planned_validation_calls", 0)
+        else:
+            window["original_batches"] = record
         coverage["budget"]["planned_original_batches"] += len(batches)
         coverage["budget"]["planned_validation_calls"] += record["planned_validation_calls"]
         results = []
         save()
         for payload in batches:
-            if coverage["budget"]["validation_calls"] >= max_validation_calls:
+            if coverage["budget"]["validation_calls"] >= ceiling:
                 record["errors"].append("Original batch budget exhausted; remaining obligations are unreviewed")
                 break
             coverage["budget"]["validation_calls"] += 1
@@ -2116,8 +2132,10 @@ def review_claim_coverage(
                 record["errors"].append(f"{payload['batch_id']}: {result['error']}")
                 check()
             results.append(result)
-            record["batches"].append({key: copy.deepcopy(result[key]) for key in
-                                      ("batch_id", "response_digest", "error")})
+            receipt_keys = ("batch_id", "response_digest", "error")
+            if audit_only:
+                receipt_keys += ("request_context_id", "input_digest", "raw_audit_path")
+            record["batches"].append({key: copy.deepcopy(result.get(key)) for key in receipt_keys})
             save()
         aggregate, aggregate_digest = aggregate_original_batches(parent_digest, batches, results)
         record.update(aggregate=aggregate, aggregate_digest=aggregate_digest)
@@ -2138,15 +2156,15 @@ def review_claim_coverage(
         # Only mechanical row failures in a fully returned initial review can retry.
         # Valid scientific uncertainty, request/identity errors and invalid links stay blocked.
         if (remaining and len(results) == len(batches) and not record["errors"]
-                and not window.get("original_duty_retry_attempted")):
+                and not retry_owner.get("original_duty_retry_attempted")):
             retry = {"version": "original-duty-retry-v1", "status": "not_run_budget",
                      "eligible_claim_ids": remaining, "initial_aggregate": copy.deepcopy(aggregate),
                      "initial_precheck": copy.deepcopy(precheck), "budget_before": copy.deepcopy(coverage["budget"]),
                      "batches": [], "errors": []}
             record["remaining_duty_retry"] = retry
             reserve = int(needs_decisions)
-            if coverage["budget"]["validation_calls"] + reserve < max_validation_calls:
-                retry_batches = plan_remaining_original_batches(parent, parent_digest, remaining, original_review_batch_size)
+            if coverage["budget"]["validation_calls"] + reserve < ceiling:
+                retry_batches = plan_remaining_original_batches(parent, parent_digest, remaining, size)
                 retry_results = []
                 record["planned_original_batches"] += len(retry_batches)
                 record["planned_batch_sizes"].extend(len(p["required_original_claim_reviews"]) for p in retry_batches)
@@ -2154,10 +2172,10 @@ def review_claim_coverage(
                 coverage["budget"]["planned_original_batches"] += len(retry_batches)
                 coverage["budget"]["planned_validation_calls"] += len(retry_batches)
                 retry["status"] = "started"
-                window["original_duty_retry_attempted"] = True
+                retry_owner["original_duty_retry_attempted"] = True
                 save()
                 for payload in retry_batches:
-                    if coverage["budget"]["validation_calls"] + reserve >= max_validation_calls:
+                    if coverage["budget"]["validation_calls"] + reserve >= ceiling:
                         retry["errors"].append("Remaining original call budget exhausted; global decision slot retained")
                         break
                     coverage["budget"]["validation_calls"] += 1
@@ -2224,7 +2242,7 @@ def review_claim_coverage(
             record["errors"].append("Original batches did not complete every required scientific review")
         changes, verdicts = [], []
         if not record["errors"] and needs_decisions:
-            if coverage["budget"]["validation_calls"] >= max_validation_calls:
+            if coverage["budget"]["validation_calls"] >= ceiling:
                 record["decision_status"] = "not_run_budget"
                 record["errors"].append("Global batch decisions were not reviewed within the validation budget")
             else:
@@ -2256,6 +2274,49 @@ def review_claim_coverage(
         )
         record["adapter"] = {"kind": "program_adapter_not_model_response", "digest": _digest(adapter.model_dump(mode="json"))}
         return adapter, record
+
+    def audit_partial_first(window, required, registry, source_blocks, scope, supplements):
+        """Retain independent findings without authorizing the incomplete first review."""
+        size = _effective_batch_size(original_batch_policy, len(required)) or len(required)
+        future = coverage["windows"][coverage["windows"].index(window) + 1:]
+        counts = [sum(bool(_source_ids(c) & set(w["block_ids"])) for c in current) for w in future]
+        future_reserve = sum(
+            1 if (future_size := _effective_batch_size(original_batch_policy, count)) is None
+            else (count + future_size - 1) // future_size + 1 for count in counts)
+        ceiling = max_validation_calls - future_reserve - 1
+        record = {"version": "partial-first-original-audit-v1", "audit_only": True,
+                  "adoption_authorized": False, "status": "not_run_budget",
+                  "required": len(required), "completed": 0, "findings": [], "errors": [],
+                  "reserved_future_validation_calls": future_reserve,
+                  "reserved_current_global_validation_calls": 1,
+                  "validation_call_ceiling": ceiling}
+        window["partial_first_original_audit"] = record
+        if coverage["budget"]["validation_calls"] + (len(required) + size - 1) // size > ceiling:
+            save()
+            return
+        parent = {
+            "window_id": window["id"], "current_claims": registry,
+            "required_original_claim_reviews": required, "candidates": [], "observations": [],
+            "blocks": [block.model_dump(mode="json") for block in source_blocks.values()],
+            "review_only_block_ids": [key for key in source_blocks if key not in original_block_ids],
+            "supplemental_sources": supplements, "scope_context": scope,
+        }
+        try:
+            response, batches = batched_validation(
+                parent, window, registry, [], source_blocks, scope, audit_only=True,
+                batch_size=size, validation_ceiling=ceiling)
+            findings, recheck, _ = _original_recheck(
+                response, required, registry, [], {}, source_blocks, materials.markdown,
+                scope_context=scope)
+            record.update(status=recheck["status"], completed=recheck["completed"],
+                          findings=[finding.model_dump(mode="json") for finding in findings],
+                          recheck=recheck, errors=[*batches["errors"], *recheck["errors"]])
+            if record["errors"]:
+                record["status"] = "partially_validated"
+        except Exception as exc:
+            record.update(status="failed", errors=[safe(f"{type(exc).__name__}: {exc}")])
+            check()
+        save()
 
     try:
         if len(blocks) != len(review_blocks) or len({c.id for c in current}) != len(current):
@@ -2529,6 +2590,25 @@ def review_claim_coverage(
                     window["original_recheck"]["status"] = "not_run_incomplete_first"
                     window["followup_status"] = "not_run_incomplete_first"
                     pending[f"{window['id']}:first_review_incomplete"] = set()
+                    semantic_error = "Claim atomicity or governing qualifiers remain unresolved"
+                    if (audit_incomplete_first and scope_reviewed and record["requests_complete"]
+                            and record["remaining_required_claim_ids"] and not record["errors"]
+                            and not window["claim_check_errors"] and not window["unreviewed_block_ids"]
+                            and all(context["complete"] for context in scope_context)
+                            and not any(o["state"] == "invalid" for o in window["observations"])
+                            and all(row["state"] == "checked" or (
+                                row.get("error") == semantic_error
+                                and (row["decision"]["atomicity"] == "unresolved"
+                                     or row["decision"]["governing_qualifiers"] == "unresolved"))
+                                for row in window["claim_checks"])
+                            and [row["claim_id"] for row in record["lowering"]["mappings"]
+                                 if re.fullmatch(r"/claim_reviews/(0|[1-9][0-9]*)", row["raw_path"])
+                                 and "claim_id" in row]
+                            == [row["claim_id"] for row in required]):
+                        source_ids = set(ids) | supplemental_ids
+                        audit_partial_first(window, required, registry,
+                            {key: block for key, block in blocks.items() if key in source_ids},
+                            scope_context, supplements)
                     save()
                     continue
             if not review.observations and not explicit_review:
@@ -2974,6 +3054,15 @@ def review_claim_coverage(
     for window in coverage["windows"]:
         for finding in window.get("original_recheck", {}).get("findings", []):
             finding["blocked_claim_ids"] = sorted(pending.get(finding["pending_key"], set()))
+    if any("partial_first_original_audit" in w for w in coverage["windows"]):
+        coverage["partial_first_original_audit"] = {
+            "audit_only": True, "adoption_authorized": False,
+            "windows": sum("partial_first_original_audit" in w for w in coverage["windows"]),
+            "required": sum(w.get("partial_first_original_audit", {}).get("required", 0)
+                            for w in coverage["windows"]),
+            "completed": sum(w.get("partial_first_original_audit", {}).get("completed", 0)
+                             for w in coverage["windows"]),
+        }
     coverage.update(
         original_claim_reviews_required=sum(
             w.get("original_recheck", {}).get("required", 0) for w in coverage["windows"]
