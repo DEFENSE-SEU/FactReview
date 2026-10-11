@@ -2348,311 +2348,361 @@ def review_claim_coverage(
                 "review_only_block_ids": [key for key in source_ids if key not in original_block_ids],
                 "scope_context": scope_context,
             }
-            accepted = []
-            if not review.observations:
-                window["followup_status"] = "not_needed"
-            elif coverage["budget"]["followup_calls"] >= max_followup_calls:
-                window["followup_status"] = "not_run_budget"
-            else:
-                coverage["budget"]["followup_calls"] += 1
-                try:
-                    followup = request(
-                        _FOLLOWUP_SYSTEM_V5,
-                        followup_payload,
-                        CoverageFollowupV2,
-                        "screening.claims.coverage_followup",
-                    )
-                    accepted, rejected, missing = _validate_actions(followup, review.observations, registry)
-                    window["rejected_actions"] = rejected
-                    window["missing_dispositions"] = missing
-                    for rejection in rejected:
-                        issues.append(
-                            f"{window['id']} followup action {rejection['index']} rejected: {safe(rejection['error'])}"
+            late_recovery_started = False
+            while True:
+                accepted = []
+                if not review.observations:
+                    window["followup_status"] = "not_needed"
+                elif coverage["budget"]["followup_calls"] >= max_followup_calls:
+                    window["followup_status"] = "not_run_budget"
+                else:
+                    coverage["budget"]["followup_calls"] += 1
+                    try:
+                        followup = request(
+                            _FOLLOWUP_SYSTEM_V5,
+                            followup_payload,
+                            CoverageFollowupV2,
+                            "screening.claims.coverage_followup",
                         )
-                    if missing:
-                        issues.append(f"{window['id']} followup omitted dispositions: {', '.join(missing)}")
-                    window["followup_status"] = "returned"
+                        accepted, rejected, missing = _validate_actions(followup, review.observations, registry)
+                        window["rejected_actions"] = rejected
+                        window["missing_dispositions"] = missing
+                        for rejection in rejected:
+                            issues.append(
+                                f"{window['id']} followup action {rejection['index']} rejected: {safe(rejection['error'])}"
+                            )
+                        if missing:
+                            issues.append(f"{window['id']} followup omitted dispositions: {', '.join(missing)}")
+                        window["followup_status"] = "returned"
+                    except Exception as exc:
+                        window.update(
+                            followup_status="failed", followup_error=safe(f"{type(exc).__name__}: {exc}")
+                        )
+                        issues.append(f"{window['id']} coverage followup failed: {safe(str(exc))}")
+                        check()
+                order = {o.id: i for i, o in enumerate(review.observations)}
+                candidates, prepared = [], {}
+                for action in sorted(accepted, key=lambda a: min(order[key] for key in a.observation_ids)):
+                    for key in action.observation_ids:
+                        next(o for o in window["observations"] if o["id"] == key)["followup_reason"] = (
+                            action.reason
+                        )
+                    if action.action == "unresolved":
+                        continue
+                    try:
+                        if isinstance(action, SelectedAction):
+                            action = CoverageAction.model_validate(
+                                {
+                                    **action.model_dump(mode="json"),
+                                    "claims": [
+                                        _restore_claim(
+                                            c, blocks, set(source_ids) & original_block_ids, materials.markdown
+                                        ).model_dump(mode="json")
+                                        for c in action.claims
+                                    ],
+                                }
+                            )
+                        for candidate in action.claims:
+                            if (
+                                not {
+                                    candidate.source_block_id,
+                                    *(r.source_block_id for r in candidate.source_refs),
+                                }
+                                <= set(source_ids) & original_block_ids
+                            ):
+                                raise ValueError(
+                                    "Followup claim requires an original parsed block within its supplied context"
+                                )
+                        grounded, invalid = _ground_claims(
+                            ClaimExtractionOutput(status="ok", claims=action.claims), blocks, materials.markdown
+                        )
+                        if invalid:
+                            raise ValueError("; ".join(row["error"] for row in invalid))
+                        before = [c.model_dump(mode="json") for c in current if c.id == action.original_claim_id]
+                        if action.action == "revise" and _extracted_fields(before[0]) == action.claims[
+                            0
+                        ].model_dump(mode="json"):
+                            raise ValueError(
+                                "Followup revision is unchanged and does not resolve the reported problem"
+                            )
+                        other_keys = {
+                            (c.text, c.source_block_id, c.source_quote)
+                            for c in current
+                            if c.id != action.original_claim_id
+                        }
+                        if any((c.text, c.source_block_id, c.source_quote) in other_keys for c in grounded):
+                            raise ValueError("Followup duplicates an existing unchanged claim")
+                        body = {
+                            "action": action.model_dump(mode="json", exclude={"claims"}),
+                            "old_claims": [_extracted_fields(row) for row in before],
+                            "new_claims": [_extracted_fields(c.model_dump(mode="json")) for c in grounded],
+                        }
+                        identifier = f"candidate_{len(candidates) + 1:03d}"
+                        row = {"candidate_id": identifier, "candidate_digest": _digest(body), **body}
+                        candidates.append(row)
+                        prepared[identifier] = (action, grounded, before)
+                    except Exception as exc:
+                        issues.append(f"{window['id']} {action.action} rejected: {safe(str(exc))}")
+                        window.setdefault("rejected_actions", []).append(
+                            {"observation_ids": action.observation_ids, "error": safe(str(exc))}
+                        )
+                        check()
+                window["candidate_claim_checks_required"] = sum(len(c["new_claims"]) for c in candidates)
+                window["candidate_claim_checks_passed"] = 0
+                if original_review_batch_size is None and coverage["budget"]["validation_calls"] >= max_validation_calls:
+                    window["validation_status"] = "not_run_budget"
+                    break
+                validation_payload = {
+                    **followup_payload,
+                    "observations": [
+                        {
+                            "observation_id": o.id,
+                            "observation_digest": _digest(o.model_dump(mode="json")),
+                            "observation": o.model_dump(mode="json"),
+                        }
+                        for o in review.observations
+                    ],
+                    "candidates": candidates,
+                    "required_original_claim_reviews": validation_required,
+                    "required_new_claim_checks": [
+                        {
+                            "candidate_id": c["candidate_id"],
+                            "new_claim_index": i,
+                            "new_claim_digest": _digest(claim),
+                        }
+                        for c in candidates
+                        for i, claim in enumerate(c["new_claims"], 1)
+                    ],
+                }
+                try:
+                    if original_review_batch_size is None:
+                        coverage["budget"]["validation_calls"] += 1
+                        validation = request(
+                            _VALIDATION_SYSTEM_V5, validation_payload, CoverageValidationV5,
+                            "screening.claims.coverage_validation",
+                        )
+                        validation_audit = audit["attempts"][-1]
+                        batch_errors = []
+                    else:
+                        validation, validation_audit = batched_validation(
+                            validation_payload, window, registry, review.observations,
+                            {key: blocks[key] for key in source_ids}, scope_context,
+                        )
+                        batch_errors = validation_audit["errors"]
+                    decisions, observation_decisions, bindings, errors = _validated_semantics(
+                        validation,
+                        candidates,
+                        review.observations,
+                        {key: blocks[key] for key in source_ids},
+                        materials.markdown,
+                    )
+                    fresh, recheck, links = _original_recheck(
+                        validation,
+                        validation_required,
+                        registry,
+                        review.observations,
+                        observation_decisions,
+                        {key: blocks[key] for key in source_ids},
+                        materials.markdown,
+                        scope_context,
+                    )
+                    window["original_recheck"] = recheck
+                    validation_audit["original_recheck"] = copy.deepcopy(recheck)
+                    errors.extend(batch_errors)
+                    if recheck["errors"]:
+                        errors.extend(recheck["errors"])
+                    if (
+                        recheck["status"] != "returned"
+                        or recheck["errors"]
+                        or recheck["completed"] != recheck["required"]
+                    ):
+                        # An incomplete independent original review cannot authorize adoption
+                        # or dismissal, including saved legacy responses without this review.
+                        decisions, observation_decisions = {}, {}
+                    if original_review_batch_size is not None:
+                        if any(r.verdict == "unresolved" for r in (
+                            *validation.change_decisions, *validation.observation_decisions
+                        )):
+                            errors.append("Global batch decisions contain unresolved scientific judgments")
+                        if errors:
+                            # No healthy subset can authorize a window with any incomplete decision.
+                            decisions, observation_decisions = {}, {}
+                    for observation in fresh:
+                        link = links.get(observation.id)
+                        if link:
+                            continue
+                        key = f"{window['id']}:original:{observation.id}"
+                        pending[key] = {observation.target_claim_id} if observation.kind != "uncertain" else set()
+                        if observation.kind != "uncertain":
+                            confirmed_targets.add(observation.target_claim_id)
+                    recheck["findings"] = [
+                        {
+                            **o.model_dump(mode="json"),
+                            "pending_key": f"{window['id']}:original:{o.id}",
+                            "linked_observation": links.get(o.id),
+                        }
+                        for o in fresh
+                    ]
+                    validation_audit["selected_source_bindings"] = bindings
+                    validation_audit["selected_new_claim_checks"] = [
+                        {
+                            "candidate_id": c["candidate_id"],
+                            "candidate_digest": c["candidate_digest"],
+                            "new_claim_index": row.new_claim_index,
+                            "new_claim_digest": _digest(c["new_claims"][row.new_claim_index - 1]),
+                            "decision": row.model_dump(mode="json"),
+                        }
+                        for c in candidates
+                        if c["candidate_id"] in decisions
+                        for row in decisions[c["candidate_id"]].new_claim_checks
+                    ]
+                    window["candidate_claim_checks_passed"] = sum(
+                        _new_claim_checks(decisions[c["candidate_id"]], c)[0]
+                        for c in candidates
+                        if c["candidate_id"] in decisions
+                    )
+                    window["validation_status"] = "partially_validated" if errors else "returned"
+                    window["validation_errors"] = errors
+                    issues.extend(f"{window['id']} semantic validation: {safe(error)}" for error in errors)
                 except Exception as exc:
                     window.update(
-                        followup_status="failed", followup_error=safe(f"{type(exc).__name__}: {exc}")
+                        validation_status="failed", validation_error=safe(f"{type(exc).__name__}: {exc}")
                     )
-                    issues.append(f"{window['id']} coverage followup failed: {safe(str(exc))}")
+                    issues.append(f"{window['id']} coverage validation failed: {safe(str(exc))}")
                     check()
-            order = {o.id: i for i, o in enumerate(review.observations)}
-            candidates, prepared = [], {}
-            for action in sorted(accepted, key=lambda a: min(order[key] for key in a.observation_ids)):
-                for key in action.observation_ids:
-                    next(o for o in window["observations"] if o["id"] == key)["followup_reason"] = (
-                        action.reason
-                    )
-                if action.action == "unresolved":
-                    continue
-                try:
-                    if isinstance(action, SelectedAction):
-                        action = CoverageAction.model_validate(
-                            {
-                                **action.model_dump(mode="json"),
-                                "claims": [
-                                    _restore_claim(
-                                        c, blocks, set(source_ids) & original_block_ids, materials.markdown
-                                    ).model_dump(mode="json")
-                                    for c in action.claims
-                                ],
-                            }
-                        )
-                    for candidate in action.claims:
-                        if (
-                            not {
-                                candidate.source_block_id,
-                                *(r.source_block_id for r in candidate.source_refs),
-                            }
-                            <= set(source_ids) & original_block_ids
-                        ):
-                            raise ValueError(
-                                "Followup claim requires an original parsed block within its supplied context"
-                            )
-                    grounded, invalid = _ground_claims(
-                        ClaimExtractionOutput(status="ok", claims=action.claims), blocks, materials.markdown
-                    )
-                    if invalid:
-                        raise ValueError("; ".join(row["error"] for row in invalid))
-                    before = [c.model_dump(mode="json") for c in current if c.id == action.original_claim_id]
-                    if action.action == "revise" and _extracted_fields(before[0]) == action.claims[
-                        0
-                    ].model_dump(mode="json"):
-                        raise ValueError(
-                            "Followup revision is unchanged and does not resolve the reported problem"
-                        )
-                    other_keys = {
-                        (c.text, c.source_block_id, c.source_quote)
-                        for c in current
-                        if c.id != action.original_claim_id
+                    break
+                # A clean first review can discover a merged assertion only during the
+                # independent original recheck. Give that finding one bounded recovery
+                # pass over the same frozen catalog, source context and complete duties.
+                late = [o for o in fresh if o.kind == "merged_conclusions" and o.id not in links]
+                if (not late_recovery_started and not review.observations and late
+                        and window["status"] == "reviewed" and not errors
+                        and recheck["status"] == "returned"
+                        and recheck["completed"] == recheck["required"]):
+                    recovery = {
+                        "status": "not_run_budget",
+                        "finding_ids": [o.id for o in late],
+                        "original_recheck": copy.deepcopy(recheck),
+                        "validation_status": window["validation_status"],
+                        "budget_before": copy.deepcopy(coverage["budget"]),
                     }
-                    if any((c.text, c.source_block_id, c.source_quote) in other_keys for c in grounded):
-                        raise ValueError("Followup duplicates an existing unchanged claim")
-                    body = {
-                        "action": action.model_dump(mode="json", exclude={"claims"}),
-                        "old_claims": [_extracted_fields(row) for row in before],
-                        "new_claims": [_extracted_fields(c.model_dump(mode="json")) for c in grounded],
-                    }
-                    identifier = f"candidate_{len(candidates) + 1:03d}"
-                    row = {"candidate_id": identifier, "candidate_digest": _digest(body), **body}
-                    candidates.append(row)
-                    prepared[identifier] = (action, grounded, before)
-                except Exception as exc:
-                    issues.append(f"{window['id']} {action.action} rejected: {safe(str(exc))}")
-                    window.setdefault("rejected_actions", []).append(
-                        {"observation_ids": action.observation_ids, "error": safe(str(exc))}
-                    )
-                    check()
-            window["candidate_claim_checks_required"] = sum(len(c["new_claims"]) for c in candidates)
-            window["candidate_claim_checks_passed"] = 0
-            if original_review_batch_size is None and coverage["budget"]["validation_calls"] >= max_validation_calls:
-                window["validation_status"] = "not_run_budget"
-                continue
-            validation_payload = {
-                **followup_payload,
-                "observations": [
-                    {
-                        "observation_id": o.id,
-                        "observation_digest": _digest(o.model_dump(mode="json")),
-                        "observation": o.model_dump(mode="json"),
-                    }
-                    for o in review.observations
-                ],
-                "candidates": candidates,
-                "required_original_claim_reviews": validation_required,
-                "required_new_claim_checks": [
-                    {
-                        "candidate_id": c["candidate_id"],
-                        "new_claim_index": i,
-                        "new_claim_digest": _digest(claim),
-                    }
-                    for c in candidates
-                    for i, claim in enumerate(c["new_claims"], 1)
-                ],
-            }
-            try:
-                if original_review_batch_size is None:
-                    coverage["budget"]["validation_calls"] += 1
-                    validation = request(
-                        _VALIDATION_SYSTEM_V5, validation_payload, CoverageValidationV5,
-                        "screening.claims.coverage_validation",
-                    )
-                    validation_audit = audit["attempts"][-1]
-                    batch_errors = []
-                else:
-                    validation, validation_audit = batched_validation(
-                        validation_payload, window, registry, review.observations,
-                        {key: blocks[key] for key in source_ids}, scope_context,
-                    )
-                    batch_errors = validation_audit["errors"]
-                decisions, observation_decisions, bindings, errors = _validated_semantics(
-                    validation,
-                    candidates,
-                    review.observations,
-                    {key: blocks[key] for key in source_ids},
-                    materials.markdown,
-                )
-                fresh, recheck, links = _original_recheck(
-                    validation,
-                    validation_required,
-                    registry,
-                    review.observations,
-                    observation_decisions,
-                    {key: blocks[key] for key in source_ids},
-                    materials.markdown,
-                    scope_context,
-                )
-                window["original_recheck"] = recheck
-                validation_audit["original_recheck"] = copy.deepcopy(recheck)
-                errors.extend(batch_errors)
-                if recheck["errors"]:
-                    errors.extend(recheck["errors"])
-                if (
-                    recheck["status"] != "returned"
-                    or recheck["errors"]
-                    or recheck["completed"] != recheck["required"]
-                ):
-                    # An incomplete independent original review cannot authorize adoption
-                    # or dismissal, including saved legacy responses without this review.
-                    decisions, observation_decisions = {}, {}
-                if original_review_batch_size is not None:
-                    if any(r.verdict == "unresolved" for r in (
-                        *validation.change_decisions, *validation.observation_decisions
-                    )):
-                        errors.append("Global batch decisions contain unresolved scientific judgments")
-                    if errors:
-                        # No healthy subset can authorize a window with any incomplete decision.
-                        decisions, observation_decisions = {}, {}
-                for observation in fresh:
-                    link = links.get(observation.id)
-                    if link:
+                    window["late_original_recovery"] = recovery
+                    if (coverage["budget"]["followup_calls"] < max_followup_calls
+                            and coverage["budget"]["validation_calls"] < max_validation_calls):
+                        late = [CoverageObservation.model_validate({
+                            **o.model_dump(mode="json"),
+                            "sources": [{
+                                "block_id": source.block_id,
+                                "quote": _whole_block(source.block_id, blocks, set(source_ids), materials.markdown),
+                            } for source in o.sources],
+                        }) for o in late]
+                        for observation in late:
+                            window["observations"].append({
+                                **observation.model_dump(mode="json"),
+                                "state": "unresolved",
+                                "origin": "independent_original_recheck",
+                                "pending_key": f"{window['id']}:original:{observation.id}",
+                                "source_bindings": _observation_bindings(
+                                    observation, blocks, materials.markdown,
+                                    coverage["materials_digest"], files,
+                                ),
+                            })
+                        review = review.model_copy(update={"observations": late})
+                        followup_payload["observations"] = [o.model_dump(mode="json") for o in late]
+                        recovery["status"] = "queued"
+                        late_recovery_started = True
+                        save()
                         continue
-                    key = f"{window['id']}:original:{observation.id}"
-                    pending[key] = {observation.target_claim_id} if observation.kind != "uncertain" else set()
-                    if observation.kind != "uncertain":
-                        confirmed_targets.add(observation.target_claim_id)
-                recheck["findings"] = [
-                    {
-                        **o.model_dump(mode="json"),
-                        "pending_key": f"{window['id']}:original:{o.id}",
-                        "linked_observation": links.get(o.id),
-                    }
-                    for o in fresh
-                ]
-                validation_audit["selected_source_bindings"] = bindings
-                validation_audit["selected_new_claim_checks"] = [
-                    {
-                        "candidate_id": c["candidate_id"],
-                        "candidate_digest": c["candidate_digest"],
-                        "new_claim_index": row.new_claim_index,
-                        "new_claim_digest": _digest(c["new_claims"][row.new_claim_index - 1]),
-                        "decision": row.model_dump(mode="json"),
-                    }
-                    for c in candidates
-                    if c["candidate_id"] in decisions
-                    for row in decisions[c["candidate_id"]].new_claim_checks
-                ]
-                window["candidate_claim_checks_passed"] = sum(
-                    _new_claim_checks(decisions[c["candidate_id"]], c)[0]
-                    for c in candidates
-                    if c["candidate_id"] in decisions
-                )
-                window["validation_status"] = "partially_validated" if errors else "returned"
-                window["validation_errors"] = errors
-                issues.extend(f"{window['id']} semantic validation: {safe(error)}" for error in errors)
-            except Exception as exc:
-                window.update(
-                    validation_status="failed", validation_error=safe(f"{type(exc).__name__}: {exc}")
-                )
-                issues.append(f"{window['id']} coverage validation failed: {safe(str(exc))}")
-                check()
-                continue
-            for identifier, decision in observation_decisions.items():
-                observed = next(o for o in window["observations"] if o["id"] == identifier)
-                observed["semantic_decision"] = decision.model_dump(mode="json")
-                if decision.verdict == "dismiss_observation":
-                    # Only this validated observation is cleared; earlier windows remain pending.
-                    pending.pop(f"{window['id']}:{identifier}", None)
-                    observed["state"] = "dismissed"
-            for row in candidates:
-                identifier = row["candidate_id"]
-                action, grounded, before = prepared[identifier]
-                decision = decisions.get(identifier)
-                if decision is None or decision.verdict != "accept_change":
-                    continue
-                if not all(
-                    key in observation_decisions and observation_decisions[key].verdict == "confirmed"
-                    for key in action.observation_ids
-                ):
-                    continue
-                try:
-                    other_keys = {
-                        (c.text, c.source_block_id, c.source_quote)
-                        for c in current
-                        if c.id != action.original_claim_id
-                    }
-                    if any((c.text, c.source_block_id, c.source_quote) in other_keys for c in grounded):
-                        raise ValueError("Validated candidate duplicates another adopted claim")
-                    proposed_id = next_id
-                    for index, c in enumerate(grounded):
-                        if index == 0 and action.original_claim_id is not None:
-                            c.id = action.original_claim_id
-                        else:
-                            while f"claim_{proposed_id:03d}" in {c.id for c in current}:
-                                proposed_id += 1
-                            c.id = f"claim_{proposed_id:03d}"
-                            proposed_id += 1
-                    check()
-                    if action.original_claim_id is None:
-                        current.extend(grounded)
-                    else:
-                        index = next(i for i, c in enumerate(current) if c.id == action.original_claim_id)
-                        current[index : index + 1] = grounded
-                        # A later split does not silently resolve an earlier window's problem.
-                        for affected in pending.values():
-                            if action.original_claim_id in affected:
-                                affected.update(c.id for c in grounded)
-                    next_id = proposed_id
-                    change = {
-                        "window_id": window["id"],
-                        "action": action.action,
-                        "observation_ids": action.observation_ids,
-                        "original_claim_id": action.original_claim_id,
-                        "original_index": action.original_index,
-                        "original_digest": action.original_digest,
-                        "reason": action.reason,
-                        "candidate_id": identifier,
-                        "candidate_digest": row["candidate_digest"],
-                        "semantic_decision": decision.model_dump(mode="json"),
-                        "before": before,
-                        "after": [c.model_dump(mode="json") for c in grounded],
-                    }
-                    audit["changes"].append(change)
-                    coverage["revisions"].append(
-                        {
-                            k: change[k]
-                            for k in (
-                                "window_id",
-                                "action",
-                                "observation_ids",
-                                "original_claim_id",
-                                "original_digest",
-                            )
+                for identifier, decision in observation_decisions.items():
+                    observed = next(o for o in window["observations"] if o["id"] == identifier)
+                    observed["semantic_decision"] = decision.model_dump(mode="json")
+                    if decision.verdict == "dismiss_observation":
+                        # Only this validated observation is cleared; earlier windows remain pending.
+                        pending.pop(observed.get("pending_key", f"{window['id']}:{identifier}"), None)
+                        observed["state"] = "dismissed"
+                for row in candidates:
+                    identifier = row["candidate_id"]
+                    action, grounded, before = prepared[identifier]
+                    decision = decisions.get(identifier)
+                    if decision is None or decision.verdict != "accept_change":
+                        continue
+                    if not all(
+                        key in observation_decisions and observation_decisions[key].verdict == "confirmed"
+                        for key in action.observation_ids
+                    ):
+                        continue
+                    try:
+                        other_keys = {
+                            (c.text, c.source_block_id, c.source_quote)
+                            for c in current
+                            if c.id != action.original_claim_id
                         }
-                    )
-                    coverage["revisions"][-1]["result_claim_ids"] = [c.id for c in grounded]
-                    for key in action.observation_ids:
-                        pending.pop(f"{window['id']}:{key}")
-                        next(o for o in window["observations"] if o["id"] == key)["state"] = "adopted"
-                except Exception as exc:
-                    issues.append(f"{window['id']} {action.action} rejected: {safe(str(exc))}")
-                    window.setdefault("rejected_actions", []).append(
-                        {"observation_ids": action.observation_ids, "error": safe(str(exc))}
-                    )
-                    check()
-            save()
+                        if any((c.text, c.source_block_id, c.source_quote) in other_keys for c in grounded):
+                            raise ValueError("Validated candidate duplicates another adopted claim")
+                        proposed_id = next_id
+                        for index, c in enumerate(grounded):
+                            if index == 0 and action.original_claim_id is not None:
+                                c.id = action.original_claim_id
+                            else:
+                                while f"claim_{proposed_id:03d}" in {c.id for c in current}:
+                                    proposed_id += 1
+                                c.id = f"claim_{proposed_id:03d}"
+                                proposed_id += 1
+                        check()
+                        if action.original_claim_id is None:
+                            current.extend(grounded)
+                        else:
+                            index = next(i for i, c in enumerate(current) if c.id == action.original_claim_id)
+                            current[index : index + 1] = grounded
+                            # A later split does not silently resolve an earlier window's problem.
+                            for affected in pending.values():
+                                if action.original_claim_id in affected:
+                                    affected.update(c.id for c in grounded)
+                        next_id = proposed_id
+                        change = {
+                            "window_id": window["id"],
+                            "action": action.action,
+                            "observation_ids": action.observation_ids,
+                            "original_claim_id": action.original_claim_id,
+                            "original_index": action.original_index,
+                            "original_digest": action.original_digest,
+                            "reason": action.reason,
+                            "candidate_id": identifier,
+                            "candidate_digest": row["candidate_digest"],
+                            "semantic_decision": decision.model_dump(mode="json"),
+                            "before": before,
+                            "after": [c.model_dump(mode="json") for c in grounded],
+                        }
+                        audit["changes"].append(change)
+                        coverage["revisions"].append(
+                            {
+                                k: change[k]
+                                for k in (
+                                    "window_id",
+                                    "action",
+                                    "observation_ids",
+                                    "original_claim_id",
+                                    "original_digest",
+                                )
+                            }
+                        )
+                        coverage["revisions"][-1]["result_claim_ids"] = [c.id for c in grounded]
+                        for key in action.observation_ids:
+                            observed = next(o for o in window["observations"] if o["id"] == key)
+                            pending.pop(observed.get("pending_key", f"{window['id']}:{key}"))
+                            observed["state"] = "adopted"
+                    except Exception as exc:
+                        issues.append(f"{window['id']} {action.action} rejected: {safe(str(exc))}")
+                        window.setdefault("rejected_actions", []).append(
+                            {"observation_ids": action.observation_ids, "error": safe(str(exc))}
+                        )
+                        check()
+                save()
+                break
+            if late_recovery_started:
+                recovery["status"] = "complete" if not any(
+                    f"{window['id']}:original:{key}" in pending for key in recovery["finding_ids"]
+                ) else "partial"
         check()
         reviewed = [w for w in coverage["windows"] if w["status"] in {"reviewed", "partially_reviewed"}]
         coverage["status"] = (
@@ -2687,7 +2737,7 @@ def review_claim_coverage(
     for window in coverage["windows"]:
         for observation in window["observations"]:
             observation["blocked_claim_ids"] = sorted(
-                pending.get(f"{window['id']}:{observation['id']}", set())
+                pending.get(observation.get("pending_key", f"{window['id']}:{observation['id']}"), set())
             )
     for window in coverage["windows"]:
         for finding in window.get("original_recheck", {}).get("findings", []):
