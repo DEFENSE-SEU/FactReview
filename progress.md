@@ -2,6 +2,8 @@
 
 最新进展（2026-10-11）：已推送 `06f2728e4c97cd3d7548dcd2bb5563c40c84b9b9`，应用源码身份为 `40715eec136299f7b42b9a914c23ac29d5e0be89`，完整canonical221文件/31目录，identity a7d851e5/archive e60a587a。Phase0–7历史实现保留，Phase8与整体目标active。checks.md开头当前表为12项有界通过、2项完整链未通过，不宣称商业完成。
 
+本轮交付：original-duty retry已按独审24项接受提交phase3 `f69a938fc4cc20b58c789d42cddf851828e67405`。NN sites提示修复已获独审9c6158a8接受26项，Root全文读作者51322a6c/独审及完整单Constant差异并核SHA，准备本次phase5提交。只有v2.py inference提示明确已有四keys/四互异int范围/同次原函数，完整其余AST/payload/schema/资格/预算不变，229原test目录文件与57旁侧源保持，Ruff/compile通过，无pytest/模型/HTTP/Docker。工作SHA6ad42cb2/canonical LFf35bcfdd与frozen一致；两个旧407实际保持失败，后续新源码实际需新准入。第一轮共享scope提示约束另待补齐。
+
 NN v3：controller独审dc91aa55接受24项、prepared独审94620a2c接受20项，Root全文阅读后创建新once bbaa8332。唯一实际actual-894da6c8ef3a/supervised-5bf9c2df1270已rc1/80.609s，模型1/1/9848 accounting closed，作者一次exit0/42.047s，0 inspect/host metric/语义/Evidence，assessment Unverified。Root全文读并核SHA接受终态独审0bc45be6/evidence52c4c509的34项身份/预算事实。固定公开诊断为proposal.sites/value_error；私有答复与作者日志仅SHA/size，未解析或重放，具体validator分支未知。唯一v2.py提示明确四keys/互异索引/原实际函数的修正已冻结，独审进行中，不新增测试或真实调用；原once保持已消费，未重试。
 
 整篇v4：statistics v6机械适配器、全部原科学门限及原预算获独审893963af接受26项。Root全文阅读后仅释放离线元数据bf20cdec，唯一prepare rc0/3.7615s得到prepared-05f3e1b17653，绑定应用源码407。prepared独审c8764877/evidence e3cf47d7接受30项，Root全文读报告并核SHA后创建全新once7fbb583c，唯一actual-726d457fff37/supervised195cf9d1ee34已rc1/272.015s（session48979结束）。七stage返回，fullchain失败，main16/16/111984known/missing2/blocked28未闭合、ready1/1/188闭合，0plan/0Docker。first12职责仅10 lowering有效，008/009因unique/visible/considered来源守卫拒绝，original0/12；后续table视觉logical在pre-SSE EOF后产生unknownusage并阻断请求，两聚合unknown不能直接计为两次真实HTTP。source/input/controller/import/controlmeta无身份变化，终态独审进行中，statistics v6无此次实际资格；此前失败/授权保持，不重放。
