@@ -204,3 +204,14 @@ def test_writing_index_keeps_only_labels_named_in_the_section():
     ]}
     blocks = [MaterialBlock(id="b", text="As Table 1 and Section 2.1 show; see Figure 1.2.")]
     assert [e["label"] for e in _section_index(index, blocks)["entries"]] == ["1", "2.1"]
+
+
+def test_coverage_registry_is_full_only_for_referenced_claims():
+    from screening.claim_coverage import _registry_view
+
+    registry = [
+        {"claim_id": "claim_001", "text": "A.", "digest": "d1", "conditions": [{"id": "c1"}]},
+        {"claim_id": "claim_002", "text": "B.", "digest": "d2", "conditions": [{"id": "c1"}]},
+    ]
+    payload = {"current_claims": registry, "required_claim_checks": [{"claim_id": "claim_002"}]}
+    assert _registry_view(registry, payload) == [{"claim_id": "claim_001", "text": "A."}, registry[1]]
