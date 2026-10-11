@@ -8,6 +8,10 @@ Completed Phase5 Sandbox P1：所有作者运行在observer前唯一/app:ro，�
 
 Completed NN terminal review：Root全文读接受独审409a2cff/evidence84946e15，14事实/571选定原件不变。确认 binding 先于 image inspect 阻断、原作者一次exit0及9656known闭合，0科学资格/U；没有解析private或重放，旧实际不改。最窄fixed binding_failure诊断由另agent实现并做唯一必要public mock，不改require/file_sha共享异常行为。新native v2控制器仅离线草稿准备、sourcepending/live关，等Root交新的完整canonical源与独审；不复用旧actual授权。
 
+Delivery Phase5 P1：已推1fa724a87a4ca14fdadca804d7997b9d1c189e1a，精确local/remote相同；只包含只读产品/唯一必要mock/checks/progress，未stage其他源或原data_collection。整篇b8ea实际当前stage markers为materials ok（13.760s）、screening ok（328.583s）、verification running，完整职责/科学及用量终态仍未闭合；该实际仍固定4a源。
+
+Completed Phase5 fixed binding diagnostics：Root全文读最终源/test/diff及独审263c8fc2/evidenceb114e58b接受26事实，源6dafb6fc/test51cc4d61/P1依赖c454b776与frozen/必要green同。唯一public22Assert同byte有效red1fail/1.38s→green1pass/2.29s，初import collection error单独保留；208旧test不改，Ruff2pass。仅bind catch新增57闭合字面guard/固定异常类别，原status/reason/catch/healthyreturn、require/file_sha及所有科学资格不变；2负U/0sem/noEvidence且marker不漏，健康source/receipt/host/semantic/S保持。旧9e31因果不反推，新native v2候选六py/16输入/全部budget原样，sourcepending及全部执行门关，等新canonical绑定和独审。P2资源/权限配置已给静态设计，尚未实现或实际验证。
+
 ## 当前完整框架 checkpoint（2026-10-11）
 
 Completed source：NN final-v2已获独立增量接受，Root全文读reportbf4103bc/verification4ef8fab9，12必要事实闭合、九current/frozen/test-input身份同。B4 fullclosure编译入口拒绝及批准镜像选择已修；唯一必要public mock1pass/4.87s，旧25Assert保留final34，其余六产品同final-v1。report7b7e7120/evidence5addf47b/static085cf9f0；原1/6.69与B4-only1/5.69保留。没有重复旧组或默认全套，真实NN科学执行待准入。
