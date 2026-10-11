@@ -392,6 +392,20 @@ def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     return run_v2_pipeline(args)
 
 
+def _coverage_batch_size(value):
+    if value == "auto":
+        return "auto"
+    if value == "legacy":
+        return None
+    try:
+        size = int(value)
+    except (TypeError, ValueError):
+        raise argparse.ArgumentTypeError("Use auto, legacy, or a positive batch size") from None
+    if size < 1:
+        raise argparse.ArgumentTypeError("Batch size must be positive")
+    return size
+
+
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         "factreview_full_pipeline",
@@ -457,12 +471,12 @@ def parse_args() -> argparse.Namespace:
         help="Maximum independent reviews before adopting claim corrections (default: 12)",
     )
     p.add_argument(
-        "--claim-coverage-original-batch-size", type=int, default=None,
-        help="Explicit original-review batch size (e.g. 3); each batch and final decision uses the existing validation call cap. Omit for the legacy single-request path.",
+        "--claim-coverage-original-batch-size", type=_coverage_batch_size, default="auto",
+        help="auto (default) batches more than 3 original-review duties by 3; legacy uses one request; a positive integer forces that size. Existing validation call cap applies.",
     )
     p.add_argument(
-        "--claim-coverage-first-batch-size", type=int, default=None,
-        help="Explicit first-review batch size (e.g. 3); discovery and every claim batch use the existing review call cap. Omit for the legacy first request.",
+        "--claim-coverage-first-batch-size", type=_coverage_batch_size, default="auto",
+        help="auto (default) batches more than 3 first-review duties by 3; legacy uses one request; a positive integer forces that size. Discovery and children share the existing review cap.",
     )
     p.add_argument(
         "--training-budget",
