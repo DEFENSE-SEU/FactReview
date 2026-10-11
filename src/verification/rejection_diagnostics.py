@@ -20,6 +20,42 @@ _CODES = {
 }
 
 
+_JOINT_SUBGUARDS = frozenset({
+    "candidate_contract", "source_count", "member_pointer", "member_lookup",
+    "member_quote_or_range", "member_record", "condition_candidate_uniqueness",
+    "scope_item_schema", "scope_pair_identity", "scope_inner_contract", "scope_manifest_invalid",
+    "source_uses_member_coverage", "source_uses_binding", "unused_mechanical_source_role",
+    "scope_condition", "scope_operand", "scope_ground", "scope_pair_missing", "primary_pointer", "unknown",
+})
+
+
+class JointSubguardCollector:
+    """Program-only first rejection tags; never added to a scientific manifest."""
+
+    def __init__(self):
+        self._first = {}
+
+    def record(self, index, code):
+        try:
+            if type(index) is int and index >= 0:
+                value = code if type(code) is str and code in _JOINT_SUBGUARDS else "unknown"
+                self._first.setdefault(index, value)
+        except Exception:
+            pass
+
+    def clear(self, index):
+        try:
+            self._first.pop(index, None)
+        except Exception:
+            pass
+
+    def first(self, index):
+        try:
+            return self._first.get(index, "unknown")
+        except Exception:
+            return "unknown"
+
+
 class FirstRejectionDiagnostic:
     """At most one attempted fixed diagnostic per invocation of a peer branch."""
 
@@ -27,7 +63,7 @@ class FirstRejectionDiagnostic:
         self.directory, self.materials, self.branch = directory, materials, branch
         self.attempted = False
 
-    def record(self, code):
+    def record(self, code, *, first_subguard=None):
         if self.attempted:
             return
         self.attempted = True
@@ -51,10 +87,16 @@ class FirstRejectionDiagnostic:
                 excluded.append(plain_path(Path(materials.repository.root)).resolve())
             if any(directory.is_relative_to(root) for root in excluded):
                 return
-            payload = json.dumps({
+            fields = {
                 "schema": "verification-rejection-diagnostics-v1", "branch": self.branch,
                 "scope": "first_evidence_validation_rejection", "code": code,
-            }, ensure_ascii=True, allow_nan=False) + "\n"
+            }
+            if (self.branch == "Experiments" and code == "experiments_joint_final_validation_failed"
+                    and first_subguard is not None):
+                fields.update(schema="verification-rejection-diagnostics-v2", first_subguard=(
+                    first_subguard if type(first_subguard) is str and first_subguard in _JOINT_SUBGUARDS else "unknown"
+                ))
+            payload = json.dumps(fields, ensure_ascii=True, allow_nan=False) + "\n"
             if len(payload.encode("utf-8")) > 512:
                 return
             directory.mkdir(parents=True, exist_ok=True)

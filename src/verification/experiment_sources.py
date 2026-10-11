@@ -89,7 +89,7 @@ def require_passage(catalog, materials, block_id, quote, *, purpose):
     return member["source_id"]
 
 
-def prepare_joint_candidate(claim, materials, catalog, item, index, *, max_sources=None):
+def prepare_joint_candidate(claim, materials, catalog, item, index, *, max_sources=None, joint_subguards=None):
     """Return a candidate view, including validated pointers when a member fails."""
     condition_id = item.covered[0] if len(item.covered) == 1 else ""
     identity = _stable_id(
@@ -113,14 +113,21 @@ def prepare_joint_candidate(claim, materials, catalog, item, index, *, max_sourc
     view["max_sources"] = limit
     if item.kind != "paper_support" or len(item.covered) != 1:
         view["errors"].append("Joint sources require paper_support for one original condition")
+        if joint_subguards is not None:
+            joint_subguards.record(index, "candidate_contract")
     passages = [(item.block_id, item.quote), *((p.block_id, p.quote) for p in item.additional_sources)]
     if len(passages) > limit:
         view["errors"].append(f"Joint source count exceeds configured limit {limit}; no sources truncated")
+        if joint_subguards is not None:
+            joint_subguards.record(index, "source_count")
     seen = set()
     for ordinal, (block_id, quote) in enumerate(passages):
+        subguard = "member_pointer"
         try:
             pointer = _paper_pointer(materials, block_id, quote)
+            subguard = "member_lookup"
             block = next(b for b in materials.blocks if b.id == block_id)
+            subguard = "member_quote_or_range"
             if block.text.count(quote) != 1:
                 raise ValueError("Joint member must be a unique contiguous original passage")
             start = block.text.index(quote)
@@ -128,6 +135,7 @@ def prepare_joint_candidate(claim, materials, catalog, item, index, *, max_sourc
             if span in seen:
                 raise ValueError("Duplicate joint member range")
             seen.add(span)
+            subguard = "member_record"
             parents = [
                 key
                 for key, value in catalog["sources"].items()
@@ -159,6 +167,8 @@ def prepare_joint_candidate(claim, materials, catalog, item, index, *, max_sourc
             )
         except (ValueError, OSError, StopIteration) as exc:
             view["errors"].append(f"member {ordinal}: {exc}")
+            if joint_subguards is not None:
+                joint_subguards.record(index, subguard)
     view["primary_source_id"] = next((m["source_id"] for m in view["members"] if m["ordinal"] == 0), None)
     view["member_source_ids"] = [m["source_id"] for m in view["members"]]
     bounded = {
@@ -281,11 +291,13 @@ def prepare_joint_candidate(claim, materials, catalog, item, index, *, max_sourc
     return bounded
 
 
-def validate_source_uses(catalog, row, materials, *, own_table_reference, has_label, condition):
+def validate_source_uses(catalog, row, materials, *, own_table_reference, has_label, condition, joint_subguards=None):
     """Record declared roles and concrete consumers; semantic-only roles stay explicit."""
     view = catalog["joint_view"]
     uses = {use.source_id: use for use in row.source_uses}
     if len(uses) != len(row.source_uses) or set(uses) != set(view["member_source_ids"]):
+        if joint_subguards is not None:
+            joint_subguards.record(view.get("candidate_index"), "source_uses_member_coverage")
         raise ValueError("Joint source_uses must cover each declared member exactly once")
     consumed = {key: set() for key in uses}
 

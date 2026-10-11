@@ -1755,7 +1755,7 @@ def _numeric_scope_check(
     return reasons
 
 
-def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=None, *, diagnostics=None):
+def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=None, *, diagnostics=None, joint_subguards=None):
     """One invalid condition keeps its own evidence unconfirmed; other conditions survive."""
     envelope_version = response.get("schema_version")
     version = response.get("paper_scope_format") if envelope_version == "catalog-v3" else envelope_version
@@ -1837,7 +1837,7 @@ def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=No
     joint_catalogs = joint_catalogs or {}
     seen_pairs, invalid_pairs = set(), set()
 
-    def reject_item(key, identifier, message, *, error=None, missing=False):
+    def reject_item(key, identifier, message, *, error=None, missing=False, subguard="unknown"):
         if key in expected and key[0] in joint_catalogs:
             if isinstance(error, BindingContractError):
                 typed_pairs.add(key)
@@ -1846,6 +1846,8 @@ def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=No
             invalid_pairs.add(key)
             errors.append(f"joint {key}: {message}")
             joint_catalogs[key[0]]["joint_view"]["errors"].append(message)
+            if joint_subguards is not None:
+                joint_subguards.record(key[0], subguard)
         else:
             reject(identifier, message)
 
@@ -1856,6 +1858,7 @@ def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=No
         duplicate = key in seen_pairs
         if key in expected:
             seen_pairs.add(key)
+        subguard = "scope_pair_identity"
         try:
             if duplicate:
                 raise ValueError("Scope candidate/condition pair is duplicated and cannot be restored")
@@ -1864,7 +1867,9 @@ def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=No
                 if version == "catalog-v2"
                 else (CatalogItemScope if catalog_mode else ItemScope)
             )
+            subguard = "scope_item_schema"
             row = item_schema.model_validate(raw)
+            subguard = "scope_pair_identity"
             parsed_key = (row.item_index, row.condition_id)
             if row.item_index in joint_catalogs and key != parsed_key:
                 raise ValueError(
@@ -1875,12 +1880,15 @@ def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=No
                 raise ValueError("Scope candidate/condition pair is unknown or duplicated")
             item_catalog = joint_catalogs.get(row.item_index, catalog)
             if row.item_index in joint_catalogs:
+                subguard = "scope_inner_contract"
                 if version != "catalog-v2":
                     raise ValueError("Joint candidates require the catalog-v2 source_uses contract")
+                subguard = "scope_manifest_invalid"
                 if item_catalog["joint_view"]["errors"]:
                     raise ValueError(
                         "Joint source manifest is invalid: " + "; ".join(item_catalog["joint_view"]["errors"])
                     )
+                subguard = "source_uses_binding"
                 validate_source_uses(
                     item_catalog,
                     row,
@@ -1888,13 +1896,17 @@ def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=No
                     own_table_reference=_own_table_reference,
                     has_label=_has_label,
                     condition=allowed[row.condition_id],
+                    **({"joint_subguards": joint_subguards} if joint_subguards is not None else {}),
                 )
             elif isinstance(row, CatalogItemScopeV2) and row.source_uses:
                 raise ValueError("Single-source candidates cannot claim joint source_uses")
             if catalog_mode:
+                subguard = "scope_condition"
                 if row.condition_id not in conditions:
                     raise ValueError("Catalog operand has no validated condition scope")
+                subguard = "scope_operand"
                 row = _catalog_item(row, claim, materials, item_catalog, conditions[row.condition_id])
+            subguard = "scope_ground"
             for passage in row.grounds:
                 _paper_pointer(materials, passage.block_id, passage.quote)
             decisions[key] = row
@@ -1906,10 +1918,14 @@ def _decode_scope(response, claim, materials, output, catalog, joint_catalogs=No
                 }
             )
         except (ValueError, TypeError, KeyError) as exc:
-            reject_item(key, identifier, str(exc), error=exc)
+            if (joint_subguards is not None and isinstance(exc, BindingContractError)
+                    and type(exc.code) is str and exc.code == "unused_mechanical_source_role"):
+                subguard = "unused_mechanical_source_role"
+            reject_item(key, identifier, str(exc), error=exc, subguard=subguard)
     for key in expected - decisions.keys():
         reject_item(
-            key, key[1], "Scope review must cover every candidate/condition pair exactly once", missing=True
+            key, key[1], "Scope review must cover every candidate/condition pair exactly once", missing=True,
+            subguard="scope_pair_missing",
         )
     conditions = {key: row for key, row in conditions.items() if key not in invalid}
     decisions = {
@@ -2124,6 +2140,7 @@ def _scope_review(
     first_execution_audit=None,
     paper_scope_format="catalog-v2",
     statistics_context=None,
+    joint_subguards=None,
 ):
     """Independent semantic review; its grounded structural/numeric gates fail closed."""
     from common import run_stats
@@ -2301,7 +2318,8 @@ def _scope_review(
                            "execution_scope_domain", "released_statistics_reviews"}
         }
         conditions, decisions, errors, locations = _decode_scope(
-            paper_response, claim, materials, output, catalog, joint_catalogs, diagnostics=diagnostics
+            paper_response, claim, materials, output, catalog, joint_catalogs, diagnostics=diagnostics,
+            **({"joint_subguards": joint_subguards} if joint_subguards is not None else {}),
         )
         authority = None
         authority_errors = []
@@ -2381,6 +2399,8 @@ def _scope_review(
             for key, (decision, bounded, position) in accepted.items():
                 decisions[key] = decision
                 joint_catalogs[key[0]] = bounded
+                if joint_subguards is not None:
+                    joint_subguards.clear(key[0])
                 locations[:] = [
                     row for row in locations if (row["candidate_index"], row["condition_id"]) != key
                 ]
@@ -2586,6 +2606,7 @@ def verify_experiments(
     execution_wire_version=None,
     execution_audit_dir=None,
     diagnostics_dir=None,
+    joint_subguard_diagnostics=False,
 ) -> BranchResult:
     if scope_paper_format not in _AUTHORITY_SCHEMAS:
         raise ValueError("Unknown requested paper_scope_format")
@@ -2860,9 +2881,10 @@ def verify_experiments(
     if set(output.checked_aspects) != {"correspondence", "fairness", "isolation", "stability", "consistency"}:
         raise ValueError("Experiments must inspect all five required aspects")
     result = BranchResult(issues=choice_privacy.safe(output.issues))
-    from verification.rejection_diagnostics import FirstRejectionDiagnostic
+    from verification.rejection_diagnostics import FirstRejectionDiagnostic, JointSubguardCollector
 
     rejection_diagnostic = FirstRejectionDiagnostic(diagnostics_dir, materials, "Experiments")
+    joint_subguards = JointSubguardCollector() if joint_subguard_diagnostics is True else None
     choice_selections, choice_errors = {}, execution_errors
     choice_conflicts = set()
     if raw_choices != []:
@@ -2919,7 +2941,8 @@ def verify_experiments(
     has_projection = any(target.projection is not None for plan in output.plans for target in plan.targets)
     catalog = target_catalog if output.items or has_projection or choice_selections or statistics_selection else None
     joint_catalogs = {
-        index: prepare_joint_candidate(claim, materials, catalog, item, index, max_sources=source_limit)
+        index: prepare_joint_candidate(claim, materials, catalog, item, index, max_sources=source_limit,
+            **({"joint_subguards": joint_subguards} if joint_subguards is not None else {}))
         for index, item in enumerate(output.items)
         if item.additional_sources
     }
@@ -2932,6 +2955,8 @@ def verify_experiments(
                 joint_catalogs[index]["joint_view"]["errors"].append(
                     "Each condition permits only one explicit joint candidate"
                 )
+                if joint_subguards is not None:
+                    joint_subguards.record(index, "condition_candidate_uniqueness")
     frozen_output = copy.deepcopy(output.model_dump()) if scope_binding_repair_rounds else None
     projection_reviews = {}
     choice_reviews = {}
@@ -2954,6 +2979,7 @@ def verify_experiments(
             first_execution_audit=first_execution_audit,
             paper_scope_format=scope_paper_format,
             statistics_context=statistics_context,
+            **({"joint_subguards": joint_subguards} if joint_subguards is not None else {}),
         )
         if output.items or has_projection or choice_selections or statistics_selection
         else ({}, {}, None, None)
@@ -3013,6 +3039,8 @@ def verify_experiments(
             if view is None:
                 raise
             view["errors"].append(f"Primary source became unavailable: {exc}")
+            if joint_subguards is not None:
+                joint_subguards.record(index, "primary_pointer")
             result.issues.append(f"Joint candidate {index}: {view['errors'][-1]}")
             continue
         covered = _covered(claim, item.covered)
@@ -3200,7 +3228,8 @@ def verify_experiments(
                     ),
                 )
             )
-            rejection_diagnostic.record("experiments_joint_final_validation_failed")
+            rejection_diagnostic.record("experiments_joint_final_validation_failed",
+                **({"first_subguard": joint_subguards.first(index)} if joint_subguards is not None else {}))
     if scope_audit is not None and joint_catalogs:
         audit = json.loads(scope_audit.read_text(encoding="utf-8"))
         audit["joint_sources"] = {
