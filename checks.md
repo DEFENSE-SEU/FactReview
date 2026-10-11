@@ -1,8 +1,10 @@
 # FactReview v2 acceptance checks
 
+2026-10-11 Phase 3 oversized 补漏交付：两源与一个新必要 mock 已通过另一 agent 独审（12/12，report `dac1e258`/map `9505e237`），Root 全文读报告/事实、核六独审对象、33 作者对象及三当前产品，接受收据 ee59e16f。新片仅阅读遗漏，精确目录/完整全波/raw typed 身份闭合后进入原完整父输入及科学/ground/adoption 门；默认健康调用不增，原预算不变，显式 None 仅该新分支初始化原计数。同字节必要 mock 旧红→新绿/3.29s，旧相关节点/3.87s、受影响 Ruff/compile 保留，Root/独审零重复测试。完整 prompt 容量、完整父科学阅读、新 adapter first recovery 和缺失 Markdown 物化仍开放；该补漏尚无新实际资格。
+
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
-新实际验证已启动，来源固定为已审 `00c973b` 的 227 文件/31 目录。Full v8 唯一隔离运行 `actual-41aaeae3d517` 仍在进行；NN v7 唯一运行 `actual-c545882f693c` 已结束（rc1，93.359s）。NN 程序投影显示 1 logical/1 physical、13920 known tokens、用量闭合；一次作者 Docker 运行 rc0/24.656s，image inspect 0、训练/修复 0，auto 模式，Evidence 0、Unverified，原七项失败检查保留。固定 source-sites 诊断 absent，不能据此解释失败因果，独立终态审核进行中。两次离线准备的首试状态拒绝与状态补齐后的成功分别记录；原检查未改，成功快照各获独审。全文召回调查没有发现 10/11 条数量上限，确认未物化 Markdown 来源和 oversized block 复核两项缺口，后者正在设计/实施，前者需要合法位置与来源补全。第 2、8 项继续未通过，Phase 8 与整体目标 active。下面的记录保留各自时点。
+2026-10-11 最新实际状态：Full v8 `actual-41aaeae3d517` 已结束（rc1，1184.031s），session 5599 不再轮询或复用；来源固定为已审 `00c973b`。七阶段均返回结果，screening 的动态覆盖、原主张复核及 claim 检查程序字段均 true，图表三类图像绑定通过，10/10 主张建议生成。整链继续 partial，仅 verification 未完成：文献读取/来源不可用和实验 evidence_validation_failed；计划 0、L3 未运行，原失败验收保留。main 55/55/476003 known 和 readiness 1/171 用量均闭合。新 writer 诊断捕获 Experiments joint_final_validation_failed 的 attempted/io_failed 各一次，具体科学子守卫未知；Root 自有 262 字符 Windows 文件路径探针普通 open 失败、扩展命名空间成功，只核证环境行为，不作本次失败因果证明。NN v7 终态已独审核证，Root 收据 `18838320`，原七项失败、Evidence0/Unverified 保留。oversized 补漏已冻结（`dcd762aa`，必要 mock 同字节旧红→新绿），另一 agent 正在审查；执行 late-stage 固定诊断仅四源与一个必要 mock 实施中。未物化 Markdown 来源与完整真实召回仍开放。Phase 0–7 既有实现保留，Phase 8/第2与8/整体目标 active。下方历史记录保留各自时点。
 
 当前源码已共同推送至 `00c973be09a5f78df85ccdcb825fc8ebd4ec42a5`，包含 Phase 3、4、5 三项修复。完整 committed canonical 共 227 文件、31 目录，独审 10 项来源事实通过，Root 接受收据 `ac4ab892`。NN v7 显式 source-sites 观察增量获另一 agent 独审（12 项有限事实），Root 已接受 `869940c6`。Full v8 观察增量的 v1 被独审拒绝：新增 `snapshot` 覆盖原源码 Path；v2 只改三个新诊断变量引用，保留原最终源码核验，同一增强控制修复前失败、修复后通过，原 47 断言保持至 55，独审后 Root 接受 `f6d316d4`。两个新实例等待来源绑定、离线准备与真实运行，尚无新 actual；第 2、8 项仍未通过。以下条目保留各自记录时点。
 
@@ -55,13 +57,13 @@ NNv5 终态已独审接受：Root全文读 report1e208f79/facts3e2b64df并核冻
 | 验收项 | 当前结果 | 依据或待办 |
 |---|---|---|
 | 1. 保持原断言和测试选择规则 | 有界通过 | 历史默认3754通过；旧fixture合同迁移已独审，60原Assert保持，一条完整响应格式等式迁移并增两等式，必要61+1控制与身份核证保留；未宣称当前全套再跑。 |
-| 2. 完整七阶段交付 | 未通过 | v7实际18d8a847a1ff七阶段ok，整链仍partial/rc1；L1 first8/11、main original0/11、旁路audit11/11未授权采纳。26有限程序事实已独审核证。 |
+| 2. 完整七阶段交付 | 未通过 | v8实际41aaeae3d517七阶段ok、L1动态覆盖/原复核程序检查通过；整链partial/rc1，verification文献与实验验证未完成、0计划/L3，终态独审待进行。 |
 | 3. 无数量上限提取与拆分 | 有界通过 | 原控制与长论文历史保留；原复核有限恢复和共享来源提示均已交付，真实召回与整链待核。 |
 | 4. 主张位置、条件、证据指针 | 有界通过 | 原契约与绑定控制保留。 |
 | 5. 按 needs 分派 | 有界通过 | 原分派控制保留。 |
 | 6. 图表材料与三类 VLM 检查 | 有界通过 | v7实际图表三类及真实图像输入检查通过；table字面程序key补充独审已核，科学视觉判断质量仍待审查。 |
 | 7. 文献时间范围与来源限制 | 有界通过 | 原策略保留；429/超时及充分性限制仍记录。 |
-| 8. 主张关联的可行执行计划 | 未通过 | Full v8实际仍运行；NN v7作者Docker rc0但Evidence0/Unverified、原七项检查失败，source-sites诊断absent，因果未知；此前Full v7无计划与L3缺口保留。 |
+| 8. 主张关联的可行执行计划 | 未通过 | Full v8已结束，0计划/L3，实验验证拒绝与诊断写入io_failed；NN v7独审接受有限终态，作者rc0但Evidence0/Unverified、七项失败，source-sites absent因果未知。 |
 | 9. 对齐证据与有界修复 | 有界通过 | 原资格守卫与控制保留；新NN实际尚无合格证据。 |
 | 10. 固定状态判定规则 | 有界通过 | 原纯规则与测试保留。 |
 | 11. 四状态与单向旧版适配 | 有界通过 | 原schema/报告/适配契约保留。 |
