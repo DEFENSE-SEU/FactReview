@@ -142,15 +142,233 @@ def read_inference_sources(plan, materials, workspace):
         "ctypes", "_ctypes", "importlib", "subprocess", "multiprocessing", "asyncio", "concurrent"}
     root = plain_path(Path(workspace)).resolve(strict=True)
     index = {row.path:row for row in materials.repository.files}
-    queue = list(dict.fromkeys(name for name in (plan.task.entry_script,plan.task.config,"README.md") if name))
+    selected = list(dict.fromkeys(name for name in (plan.task.entry_script,plan.task.config,"README.md") if name))
+    # The observer preserves the direct script directory and repository PYTHONPATH.
+    # A nested importer's directory is not another absolute-import search root.
+    entry_parent = Path(plan.task.entry_script).parent.as_posix() if plan.task.entry_script else "."
+    search_roots = tuple(dict.fromkeys(("", "" if entry_parent == "." else entry_parent + "/")))
     files, missing, seen, total = {},[],set(),0
-    while queue:
-        name = queue.pop(0)
-        if name in seen:
-            continue
+    states, contexts, bindings, uncertain = {}, {}, {}, {}
+    unique_index = len(index) == len(materials.repository.files)
+
+    def source_path(name):
+        path = plain_path(root / name)
+        _require(path.resolve().is_relative_to(root), "inference_import_path_outside_repository")
+        return path
+
+    def exists(name):
+        return name in index or source_path(name).exists()
+
+    def candidates(prefix, parts):
+        stem = prefix + "/".join(parts)
+        return [name for name in (stem + ".py", stem + "/__init__.py") if exists(name)]
+
+    def local_root(prefix, first):
+        stem = prefix + first
+        return bool(candidates(prefix, (first,)) or source_path(stem).exists()
+                    or any(name.startswith(stem + "/") for name in index)
+                    or any(path.suffix.lower() in {".pyc", ".pyo", ".pyd", ".so"}
+                           for path in source_path(prefix or ".").glob(first + ".*")))
+
+    def unshadowed(name):
+        path = source_path(name)
+        prefix = name.rsplit("/", 1)[0] + "/" if "/" in name else ""
+        names = {child.name for child in path.parent.iterdir()}
+        names.update(row[len(prefix):] for row in index if row.startswith(prefix) and "/" not in row[len(prefix):])
+        _require(not any(Path(row).suffix.lower() in {".pyc", ".pyo", ".pyd", ".so"}
+                         and row.split(".", 1)[0].casefold() == path.stem.casefold() for row in names),
+                 "local_import_native_or_bytecode_shadow")
+
+    def module(parts, prefix=None):
+        _require(parts and all(part.isidentifier() for part in parts), "invalid_local_import_name")
+        roots = search_roots if prefix is None else (prefix,)
+        matches = [(base, name) for base in roots for name in candidates(base, parts)]
+        _require(len(matches) <= 1, "ambiguous_local_import_source")
+        if not matches:
+            _require(prefix is None and not any(local_root(base, parts[0]) for base in roots)
+                     and parts[0] in approved_stdlib | {"torch"}, "foreign_or_missing_local_import_source")
+            return None
+        base, target = matches[0]
+        _require(not any(other != base and local_root(other, parts[0]) for other in roots),
+                 "ambiguous_local_import_root")
+        parent = None
+        for length in range(1, len(parts) + 1):
+            current_parts = parts[:length]
+            current = target if length == len(parts) else base + "/".join(current_parts) + "/__init__.py"
+            if length < len(parts):
+                _require(candidates(base, current_parts) == [current], "local_parent_package_unavailable")
+            unshadowed(current)
+            load(current, (base, current_parts, current.endswith("/__init__.py")))
+            # Import machinery binds a child attribute only after it initialized.
+            if parent is not None and states[current] == "done":
+                bindings[parent][current_parts[-1]] = True
+            parent = current
+        return target
+
+    def imported(node, name):
+        if isinstance(node, ast.Import):
+            for row in node.names:
+                module(tuple(row.name.split(".")))
+            return
+        _require(all(row.name != "*" for row in node.names), "local_star_import_binding_unavailable")
+        prefix = None
+        parts = tuple(node.module.split(".")) if node.module else ()
+        if node.level:
+            context = contexts[name]
+            _require(context is not None, "direct_script_relative_import_unavailable")
+            prefix, current, package = context
+            package_parts = current if package else current[:-1]
+            _require(node.level <= len(package_parts), "relative_import_level_outside_package")
+            parts = package_parts[:len(package_parts) - node.level + 1] + parts
+        source = module(parts, prefix)
+        if source is None:
+            return
+        for row in node.names:
+            _require(row.name not in uncertain[source], "local_import_binding_unavailable")
+            if row.name in bindings[source]:
+                _require(bindings[source][row.name], "local_import_binding_unavailable")
+                continue
+            base, current, package = contexts[source]
+            _require(package, "local_import_symbol_unbound")
+            child = module((*current, row.name), base)
+            _require(child is not None and states[child] == "done", "local_import_child_unavailable")
+            bindings[source][row.name] = True
+
+    def written(node):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            return [node.name]
+        if isinstance(node, ast.Import):
+            return [row.asname or row.name.split(".")[0] for row in node.names]
+        if isinstance(node, ast.ImportFrom):
+            return [row.asname or row.name for row in node.names]
+        if isinstance(node, ast.AnnAssign) and node.value is None:
+            return []  # An annotation alone does not create a module attribute.
+        result, pending = [], list(ast.iter_child_nodes(node))
+        while pending:
+            child = pending.pop()
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Import, ast.ImportFrom)):
+                result.extend(written(child))
+            elif isinstance(child, ast.Name) and isinstance(child.ctx, (ast.Store, ast.Del)):
+                result.append(child.id)
+            else:
+                pending.extend(ast.iter_child_nodes(child))
+        return result
+
+    def checked_imports(tree):
+        # Do not grant paths or names synthesized by module hooks or import aliases.
+        nodes = list(ast.walk(tree))
+        sys_aliases, getters, import_aliases, critical_aliases, containers = set(), {"getattr"}, set(), set(), set()
+        sys_attributes = {"path", "modules", "meta_path", "path_hooks", "path_importer_cache"}
+        for node in nodes:
+            if isinstance(node, ast.Import):
+                sys_aliases.update(row.asname or "sys" for row in node.names if row.name == "sys")
+                import_aliases.update(row.asname or row.name.split(".")[0] for row in node.names)
+            if isinstance(node, ast.ImportFrom):
+                import_aliases.update(row.asname or row.name for row in node.names)
+            if isinstance(node, ast.ImportFrom) and not node.level:
+                if node.module == "sys":
+                    _require(all(row.name not in sys_attributes for row in node.names), "dynamic_local_import_uncovered")
+                if node.module == "builtins":
+                    getters.update(row.asname or row.name for row in node.names if row.name == "getattr")
+        def origin(node):
+            while isinstance(node, (ast.Attribute, ast.Subscript)):
+                node = node.value
+            return node.id if isinstance(node, ast.Name) else None
+
+        def critical(node):
+            return origin(node) in critical_aliases or (
+                origin(node) in import_aliases
+                and any(isinstance(child, ast.Attribute) and child.attr in sys_attributes for child in ast.walk(node)))
+
+        def capable(node):
+            if isinstance(node, (ast.Tuple, ast.List)):
+                return any(capable(child) for child in node.elts)
+            if isinstance(node, ast.Starred):
+                return capable(node.value)
+            if isinstance(node, ast.Call):
+                return any(capable(arg) for arg in node.args) or any(capable(arg.value) for arg in node.keywords)
+            return origin(node) in sys_aliases | getters | import_aliases | critical_aliases | containers
+
+        def pairs(target, value):
+            if isinstance(target, (ast.Tuple, ast.List)):
+                if (isinstance(value, (ast.Tuple, ast.List)) and len(target.elts) == len(value.elts)
+                        and not any(isinstance(child, ast.Starred) for child in [*target.elts, *value.elts])):
+                    return [pair for left, right in zip(target.elts, value.elts, strict=True) for pair in pairs(left, right)]
+                _require(not capable(value), "local_import_unpacking_capability_unavailable")
+                return []  # Ordinary unmarked data batches retain their existing boundary.
+            return [(target, value)]
+
+        for _ in range(128):
+            additions, getter_additions, import_additions, critical_additions, container_additions = (
+                set(), set(), set(), set(), set())
+            for node in nodes:
+                targets = node.targets if isinstance(node, ast.Assign) else (
+                    [node.target] if isinstance(node, ast.AnnAssign) else [])
+                for target, value in [pair for candidate in targets for pair in pairs(candidate, node.value)]:
+                    if not isinstance(target, ast.Name):
+                        continue
+                    if isinstance(value, ast.Name) and value.id in sys_aliases:
+                        additions.add(target.id)
+                    if ((isinstance(value, ast.Name) and value.id in getters)
+                            or (isinstance(value, ast.Attribute) and value.attr == "getattr")):
+                        getter_additions.add(target.id)
+                    if origin(value) in import_aliases:
+                        import_additions.add(target.id)
+                    if value is not None and critical(value):
+                        critical_additions.add(target.id)
+                    if ((isinstance(value, (ast.Tuple, ast.List, ast.Call)) and capable(value))
+                            or origin(value) in containers):
+                        container_additions.add(target.id)
+            if (additions <= sys_aliases and getter_additions <= getters
+                    and import_additions <= import_aliases and critical_additions <= critical_aliases
+                    and container_additions <= containers):
+                break
+            sys_aliases.update(additions)
+            getters.update(getter_additions)
+            import_aliases.update(import_additions)
+            critical_aliases.update(critical_additions)
+            containers.update(container_additions)
+            _require(max(map(len, (sys_aliases, getters, import_aliases, critical_aliases, containers))) <= 128,
+                     "local_import_alias_capacity")
+        else:
+            raise ValueError("local_import_alias_capacity")
+        forbidden_names = {"__import__", "__getattr__", "__path__", "__package__", "__spec__", "__loader__",
+                           "setattr", "delattr"}
+        forbidden_attributes = forbidden_names | {"import_module"}
+        for node in nodes:
+            _require(not isinstance(node, ast.Name) or node.id not in forbidden_names,
+                     "dynamic_local_import_uncovered")
+            _require(not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) or node.name not in forbidden_names,
+                     "dynamic_local_import_uncovered")
+            _require(not isinstance(node, ast.Attribute) or node.attr not in forbidden_attributes,
+                     "dynamic_local_import_uncovered")
+            if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name) and node.value.id in sys_aliases:
+                _require(node.attr not in sys_attributes, "dynamic_local_import_uncovered")
+            if isinstance(node, (ast.Attribute, ast.Subscript)) and isinstance(node.ctx, (ast.Store, ast.Del)):
+                _require(origin(node) not in import_aliases, "local_import_namespace_mutation_uncovered")
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+                mutators = {"append", "extend", "insert", "remove", "pop", "clear", "reverse", "sort",
+                            "update", "setdefault", "popitem", "__setitem__", "__delitem__", "__iadd__", "__imul__"}
+                _require(node.func.attr not in mutators or not critical(node.func.value),
+                         "dynamic_local_import_uncovered")
+            if isinstance(node, ast.Call) and ((isinstance(node.func, ast.Name) and node.func.id in getters)
+                                              or (isinstance(node.func, ast.Attribute) and node.func.attr == "getattr")):
+                _require(len(node.args) >= 2 and isinstance(node.args[1], ast.Constant)
+                         and type(node.args[1].value) is str
+                         and node.args[1].value not in forbidden_names | sys_attributes | {"getattr", "import_module"},
+                         "dynamic_local_import_uncovered")
+            if isinstance(node, ast.ImportFrom):
+                _require(all(row.name not in forbidden_names for row in node.names), "dynamic_local_import_uncovered")
+
+    def load(name, context=None):
+        nonlocal total
+        if name in states:
+            _require(contexts[name] == context and states[name] != "failed", "local_import_identity_unavailable")
+            return
+        states[name], contexts[name], bindings[name], uncertain[name] = "loading", context, {}, set()
         seen.add(name)
         try:
-            _require(name in index and len(seen) <= 16, "inference_source_closure_capacity_or_unindexed")
+            _require(unique_index and name in index and len(seen) <= 16, "inference_source_closure_capacity_or_unindexed")
             raw, scope = bounded_source(_actual_file(root,name))
             _require(raw is not None and scope["complete"] and scope["sha256"] == index[name].sha256,
                      "inference_source_changed_or_capacity")
@@ -161,24 +379,55 @@ def read_inference_sources(plan, materials, workspace):
             if name.endswith(".py"):
                 tree = ast.parse(text)
                 _inference_source_admission(tree)
+                checked_imports(tree)
+                counts = {}
+                direct_imports = {id(node) for node in tree.body if isinstance(node, (ast.Import, ast.ImportFrom))}
+                simple = (ast.Assign, ast.AnnAssign, ast.Import, ast.ImportFrom,
+                          ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+                for node in tree.body:
+                    for symbol in written(node):
+                        counts[symbol] = counts.get(symbol, 0) + 1
+                        if not isinstance(node, simple):
+                            uncertain[name].add(symbol)
                 for node in ast.walk(tree):
-                    if isinstance(node,ast.Call) and ((isinstance(node.func,ast.Name) and node.func.id=="__import__")
-                            or (isinstance(node.func,ast.Attribute) and node.func.attr=="import_module")):
-                        raise ValueError("dynamic_local_import_uncovered")
-                    if isinstance(node,ast.ImportFrom) and node.level:
-                        raise ValueError("relative_local_import_closure_unavailable")
-                    modules = [row.name for row in node.names] if isinstance(node,ast.Import) else (
-                        [node.module] if isinstance(node,ast.ImportFrom) and node.module and not node.level else [])
-                    for module in modules:
-                        stem = module.replace(".","/")
-                        matches = {candidate for parent in ("",Path(name).parent.as_posix()+"/")
-                                   for candidate in (parent+stem+".py",parent+stem+"/__init__.py") if candidate in index}
-                        _require(len(matches) <= 1, "ambiguous_local_import_source")
-                        _require(matches or module.split(".",1)[0] in approved_stdlib | {"torch"},
-                                 "foreign_import_source_unapproved")
-                        queue.extend(sorted(matches))
+                    if isinstance(node, ast.Global):
+                        uncertain[name].update(node.names)
+                uncertain[name].update(symbol for symbol, count in counts.items() if count > 1)
+                # Establish explicit attributes in source order, including re-exports.
+                # A currently initializing package cannot expose a future binding.
+                for node in tree.body:
+                    if isinstance(node, (ast.Import, ast.ImportFrom)):
+                        imported(node, name)
+                    symbols = written(node) if isinstance(node, simple) else []
+                    certain = isinstance(node, (ast.Import, ast.ImportFrom, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                    if isinstance(node, (ast.Assign, ast.AnnAssign)) and node.value is not None:
+                        if isinstance(node.value, ast.Name):
+                            certain = bindings[name].get(node.value.id, False) and node.value.id not in uncertain[name]
+                        else:
+                            try:
+                                ast.literal_eval(node.value)
+                                certain = True
+                            except (ValueError, TypeError):
+                                certain = False
+                    for symbol in symbols:
+                        bindings[name][symbol] = certain and symbol not in uncertain[name]
+                # Conservatively include imports in functions and conditional blocks;
+                # they do not become proven module-level exported attributes.
+                for node in ast.walk(tree):
+                    if isinstance(node, (ast.Import, ast.ImportFrom)) and id(node) not in direct_imports:
+                        imported(node, name)
+            states[name] = "done"
         except (OSError, ValueError, UnicodeError, SyntaxError):
+            states[name] = "failed"
             missing.append(name)
+            raise
+
+    for name in selected:
+        try:
+            load(name)
+        except (OSError, ValueError, UnicodeError, SyntaxError):
+            if name not in missing:
+                missing.append(name)
     resources = {}
     for name in [*plan.task.data_paths,*plan.task.weight_paths]:
         try:
