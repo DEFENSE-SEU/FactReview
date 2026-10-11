@@ -291,10 +291,8 @@ def run_v2_pipeline(
                     claim_coverage_review_calls=getattr(args, "claim_coverage_review_calls", 12),
                     claim_coverage_followup_calls=getattr(args, "claim_coverage_followup_calls", 12),
                     claim_coverage_validation_calls=getattr(args, "claim_coverage_validation_calls", 12),
-                    **({"claim_coverage_original_batch_size": args.claim_coverage_original_batch_size}
-                       if getattr(args, "claim_coverage_original_batch_size", None) is not None else {}),
-                    **({"claim_coverage_first_batch_size": args.claim_coverage_first_batch_size}
-                       if getattr(args, "claim_coverage_first_batch_size", None) is not None else {}),
+                    claim_coverage_original_batch_size=getattr(args, "claim_coverage_original_batch_size", "auto"),
+                    claim_coverage_first_batch_size=getattr(args, "claim_coverage_first_batch_size", "auto"),
                 ),
                 recover=recover_screening,
             )

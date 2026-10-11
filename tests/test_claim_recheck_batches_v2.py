@@ -109,7 +109,7 @@ def test_complete_23_obligations_exact_sources_conditions_and_default_compatibil
     before = [c.model_dump(mode="json") for c in claims]
     calls = []
     result = m.review_claim_coverage(
-        paper, claims, original_review_batch_size=3, call=callback(calls), output_dir=tmp_path / "batches"
+        paper, claims, first_review_batch_size=None, original_review_batch_size=3, call=callback(calls), output_dir=tmp_path / "batches"
     )
     batches = [p for module, p in calls if module.endswith("coverage_original_batch")]
     assert [len(p["required_original_claim_reviews"]) for p in batches] == [3] * 7 + [2]
@@ -151,7 +151,8 @@ def test_complete_23_obligations_exact_sources_conditions_and_default_compatibil
             return callback([])(**kw)
         return oracle(p)
 
-    legacy_default = m.review_claim_coverage(paper, claims, call=old_call, output_dir=tmp_path / "default")
+    legacy_default = m.review_claim_coverage(paper, claims, first_review_batch_size=None,
+        original_review_batch_size=None, call=old_call, output_dir=tmp_path / "default")
     assert defaults == ["screening.claims.coverage", "screening.claims.coverage_validation"]
     assert legacy_default.coverage["status"] == "complete"
 
@@ -203,6 +204,7 @@ def test_failure_budget_and_invalid_batches_preserve_partial_and_zero_adoption(t
         result = m.review_claim_coverage(
             paper,
             claims,
+            first_review_batch_size=None,
             original_review_batch_size=2,
             max_validation_calls=0 if mode == "zero_budget" else 1 if mode == "budget" else 12,
             call=callback(calls, merge="claim_004", corrupt=corrupt),
@@ -239,6 +241,7 @@ def test_failure_budget_and_invalid_batches_preserve_partial_and_zero_adoption(t
     result = m.review_claim_coverage(
         paper,
         claims,
+        first_review_batch_size=None,
         original_review_batch_size=12,
         call=callback(calls, merge="claim_011", corrupt=unicode_index),
         output_dir=tmp_path / "unicode_index",
@@ -276,6 +279,7 @@ def test_cross_batch_links_global_decisions_and_all_window_adoption_gate(tmp_pat
         result = m.review_claim_coverage(
             paper,
             claims,
+            first_review_batch_size=None,
             original_review_batch_size=2,
             call=callback(calls, merge="claim_004", corrupt=corrupt),
             output_dir=tmp_path / mode,

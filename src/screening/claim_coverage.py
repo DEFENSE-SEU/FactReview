@@ -1655,6 +1655,13 @@ def _validated_semantics(response, candidates, observations, blocks, markdown):
     return selected_changes, selected_observations, sources, errors
 
 
+def _effective_batch_size(policy, required_count):
+    """Bound output duties while retaining the complete original source context."""
+    if policy == "auto":
+        return 3 if required_count > 3 else None
+    return policy
+
+
 def review_claim_coverage(
     materials: SharedMaterials,
     claims: list[Claim],
@@ -1665,18 +1672,15 @@ def review_claim_coverage(
     max_review_calls: int = 12,
     max_followup_calls: int = 12,
     max_validation_calls: int = 12,
-    original_review_batch_size: int | None = None,
-    first_review_batch_size: int | None = None,
+    original_review_batch_size: int | Literal["auto"] | None = "auto",
+    first_review_batch_size: int | Literal["auto"] | None = "auto",
 ) -> ClaimCoverageResult:
     """Return isolated working copies and unresolved target IDs, without changing L1 inputs."""
-    if original_review_batch_size is not None and (
-        type(original_review_batch_size) is not int or original_review_batch_size < 1
-    ):
-        raise ValueError("original_review_batch_size must be None or an integer >= 1")
-    if first_review_batch_size is not None and (
-        type(first_review_batch_size) is not int or first_review_batch_size < 1
-    ):
-        raise ValueError("first_review_batch_size must be None or an integer >= 1")
+    for name, value in (("original_review_batch_size", original_review_batch_size),
+                        ("first_review_batch_size", first_review_batch_size)):
+        if value != "auto" and value is not None and (type(value) is not int or value < 1):
+            raise ValueError(f"{name} must be auto, None or an integer >= 1")
+    original_batch_policy, first_batch_policy = original_review_batch_size, first_review_batch_size
     for name, value, minimum in (
         ("window_chars", window_chars, 1),
         ("max_review_calls", max_review_calls, 0),
@@ -2043,6 +2047,15 @@ def review_claim_coverage(
                 if _source_ids(c) & set(ids)
             ]
             window["required_claim_checks"] = required
+            first_review_batch_size = _effective_batch_size(first_batch_policy, len(required))
+            original_review_batch_size = _effective_batch_size(original_batch_policy, len(required))
+            if "auto" in (first_batch_policy, original_batch_policy):
+                window["batching"] = {
+                    "first_policy": first_batch_policy, "original_policy": original_batch_policy,
+                    "first_review_batch_size": first_review_batch_size,
+                    "original_review_batch_size": original_review_batch_size,
+                    "meaning": "Output duties only; original source and scientific context remain complete.",
+                }
             window["original_recheck"] = {
                 "status": "not_run",
                 "required": len(required),
@@ -2320,6 +2333,9 @@ def review_claim_coverage(
                     characters=sum(len(r["block"]["text"]) for r in supplements),
                 )
             validation_required = [*required, *additional_required]
+            original_review_batch_size = _effective_batch_size(original_batch_policy, len(validation_required))
+            if "batching" in window:
+                window["batching"]["original_review_batch_size"] = original_review_batch_size
             window["validation_required_original_claim_reviews"] = copy.deepcopy(validation_required)
             window["original_recheck"]["required"] = len(validation_required)
             source_ids = [key for key in blocks if key in source_ids]

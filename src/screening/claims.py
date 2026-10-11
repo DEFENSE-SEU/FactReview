@@ -146,10 +146,12 @@ class SourceBlockRepairs(Contract):
 
 
 def _check_repair_materials(materials, snapshot):
-    paper_key, markdown, originals = snapshot
+    paper_key, markdown, originals, title, abstract = snapshot
     if (
         materials.paper_key != paper_key
         or materials.markdown != markdown
+        or materials.title != title
+        or materials.abstract != abstract
         or len(materials.blocks) != len(originals)
         or any(
             current is not original or current.model_dump(mode="json") != saved
@@ -294,6 +296,8 @@ def extract_claims(
         materials.paper_key,
         materials.markdown,
         [(block, block.model_dump(mode="json")) for block in materials.blocks],
+        materials.title,
+        materials.abstract,
     )
     markdown_hash = hashlib.sha256(materials.markdown.encode("utf-8")).hexdigest()
     paper_data = {
