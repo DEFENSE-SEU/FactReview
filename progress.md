@@ -2,7 +2,7 @@
 
 ## 当前完整框架 checkpoint（2026-10-11）
 
-Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送Phase A的4406181、Phase3的c0bb46f及Theory的23a966de889c7e28dbd7a038a6c59b9ca12cbe24，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
+Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送Phase A的4406181、Phase3的c0bb46f、Theory的23a966d及B1的9b4a3411e50ca4f00744ab30e324d456d98fe933，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
 
 Completed：最终默认全套仅运行一次，3754passed/3原默认deselected/0skipped/0fail/0error，exit0；pytest538.61s、wrapper541.797s。419源码/测试/config身份前后完全一致，原断言、marker及外部mock保持。报告final-default-regression-final-path-fixtures-v1/report.md；原56失败、后续12失败及所有局部红绿记录完整保留。原14验收第1项现通过，另13项窄合同保持；科学及商业完成仍需独立证据。
 
@@ -20,7 +20,7 @@ Open issues：真实完整链仍失败，终态内容独审full-public-pipeline-
 
 Decisions：已有repair3上限3、auto加可选interactive并记录模式、training0、deadline及获准arxiv fallback、集中原容差、v1 conflict→questioned保持。不会因mock全套通过或两页材料实际成功宣告商业完成。当前fixed f278实际证据与随后多条件源码/测试证据分别绑定各自身份。
 
-Next action：提交/推送已独审B1；并行细化并实施完整计数/限定语的真实执行消费者以及外部事实source-authority资格，保原协议可读和原科学断言。仅在根因被相应必要控制覆盖后准备新身份完整实际，旧失败全部保留，不盲重跑全套。某项服务或能力受阻时继续其他框架工作，目标保持active。
+Next action：并行细化并实施完整计数/限定语的真实执行消费者以及外部事实source-authority资格，保原协议可读和原科学断言。新权威envelope要让旧execution子合同与真实原raw version正交，所有fresh入口不得从旧raw获得新充分性；准确fixture迁移范围正在独审。仅在根因被相应必要控制覆盖后准备新身份完整实际，旧失败全部保留，不盲重跑全套。某项服务或能力受阻时继续其他框架工作，目标保持active。checks.md当前14表使用规定的pass/fail/unresolved及correction列，12项保留窄通过、2项完整链失败；第13项按公开reported-blocker分支通过。
 
 ## 历史回归修复与真实执行 checkpoint（2026-10-11）
 
