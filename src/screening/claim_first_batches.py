@@ -37,11 +37,46 @@ def plan_first_batches(parent, size):
     return parent_digest, discovery, batches
 
 
+def plan_remaining_first_batches(parent, parent_digest, invalid_ids, size):
+    """Keep the frozen full input; narrow only this wave's output obligations."""
+    verified, _, _ = plan_first_batches(parent, size)
+    required = [row for row in parent["required_claim_checks"] if row["claim_id"] in invalid_ids]
+    if verified != parent_digest or not invalid_ids or invalid_ids != [row["claim_id"] for row in required]:
+        raise ValueError("Remaining first duties differ from the frozen ordered parent")
+    return [{**copy.deepcopy(parent), "parent_digest": parent_digest,
+             "batch_id": f"first_retry_001_{index + 1:03d}",
+             "required_claim_checks": copy.deepcopy(required[start:start + size])}
+            for index, start in enumerate(range(0, len(required), size))]
+
+
 def check_first_rows(payload, response):
     expected = [(r["claim_id"], r["digest"]) for r in payload["required_claim_checks"]]
     actual = [(r["claim_id"], r["claim_digest"]) for r in response["claim_reviews"]]
     if actual != expected:
         raise ValueError("First batch must return every exact required review once in order")
+
+
+def check_first_receipt(parent, payload, result):
+    """Check saved typed/raw identities before any first row can be selected."""
+    if (result is None or result["status"] != "returned" or result["parsed_response"] is None
+            or not result["context_id"] or not result["input_digest"] or not result["raw_audit_path"]):
+        raise ValueError("First selection lacks a complete independent receipt")
+    response = result["parsed_response"]
+    if (response["context_id"] != result["context_id"] or response["window_id"] != parent["window_id"]
+            or response["parent_digest"] != digest(parent)
+            or digest(response) != result["parsed_digest"]
+            or result["parsed_digest"] != result["response_digest"]):
+        raise ValueError("First selection changed request, raw or typed identity")
+    expected = {**copy.deepcopy(parent), "parent_digest": digest(parent)}
+    if "batch_id" in payload:
+        expected.update(batch_id=payload["batch_id"], required_claim_checks=payload["required_claim_checks"])
+        if response["batch_id"] != payload["batch_id"] or response["schema_version"] != "claim-coverage-first-batch-v1":
+            raise ValueError("First selection changed batch protocol or identity")
+        check_first_rows(payload, response)
+    elif response["schema_version"] != "claim-coverage-discovery-v1":
+        raise ValueError("First selection changed discovery protocol")
+    if digest(payload) != digest(expected):
+        raise ValueError("First selection changed the complete scientific parent input")
 
 
 def discovery_remaining_blocks(parent, response):
@@ -157,3 +192,72 @@ def aggregate_first_batches(parent_digest, discovery, batches, results, *, paren
             "reviewed_block_ids": reviewed_ids, "reviewed_source_mappings": source_mappings,
             "explanation": discovery_response["explanation"] if discovery_response else "Discovery unavailable; original duties remain unreviewed.",
             "raw_receipts": receipts, "path_mappings": mappings, "discovery_mappings": discovery_mappings}
+
+
+def select_first_rows(parent, parent_digest, discovery, batches, results, valid_ids, retry_batches, retry_results):
+    """Select complete validated rows after an entirely successful recovery wave."""
+    if digest(parent) != parent_digest or len(results) != len(batches) or len(retry_results) != len(retry_batches):
+        raise ValueError("First selection lacks its complete frozen wave")
+    all_batches, all_results = [*batches, *retry_batches], [*results, *retry_results]
+    if not retry_batches or len({p["batch_id"] for p in all_batches}) != len(all_batches):
+        raise ValueError("First selection has empty or repeated recovery batches")
+    required = parent["required_claim_checks"]
+    required_ids = [row["claim_id"] for row in required]
+    if not set(valid_ids) <= set(required_ids):
+        raise ValueError("First selection contains foreign accepted duties")
+    if [row for p in batches for row in p["required_claim_checks"]] != required:
+        raise ValueError("First selection changed initial obligations")
+    invalid = [row for row in required if row["claim_id"] not in valid_ids]
+    if [row for p in retry_batches for row in p["required_claim_checks"]] != invalid:
+        raise ValueError("First selection changed the exact mechanical recovery duties")
+    discovery_payload = {**copy.deepcopy(parent), "parent_digest": parent_digest}
+    check_first_receipt(parent, discovery_payload, discovery)
+    if discovery_remaining_blocks(parent, discovery["parsed_response"]):
+        raise ValueError("First selection lacks full original discovery")
+    for index, (payload, result) in enumerate(zip(all_batches, all_results, strict=True)):
+        check_first_receipt(parent, payload, result)
+        if index >= len(batches):
+            lowering = result["lowering"]
+            expected = [(f"/claim_reviews/{i}", row["claim_id"])
+                        for i, row in enumerate(payload["required_claim_checks"])]
+            actual = [(row["raw_path"], row["claim_id"]) for row in lowering["mappings"]]
+            if lowering["errors"] or actual != expected:
+                raise ValueError("First selection lacks every validated fresh scientific row")
+    initial = aggregate_first_batches(parent_digest, discovery, batches, results, parent=parent)
+    aggregate_first_batches(parent_digest, discovery, retry_batches, retry_results, parent=parent)
+    selected = {}
+    for index, (payload, result) in enumerate(zip(all_batches, all_results, strict=True)):
+        for local, row in enumerate(result["parsed_response"]["claim_reviews"]):
+            key = row["claim_id"]
+            if (key in valid_ids) != (index < len(batches)):
+                continue
+            if key in selected or key not in required_ids:
+                raise ValueError("First selection contains repeated or foreign rows")
+            selected[key] = (payload, result, local, row)
+    if set(selected) != set(required_ids):
+        raise ValueError("First selection is incomplete; successful subsets cannot be adopted")
+    rows, mappings, selections, source_mappings = [], [], [], []
+    for key in required_ids:
+        payload, result, local, row = selected[key]
+        mapping = {"batch_id": payload["batch_id"], "raw_audit_path": result["raw_audit_path"],
+                   "raw_path": f"/claim_reviews/{local}", "aggregate_path": f"/claim_reviews/{len(rows)}",
+                   "raw_digest": digest(row)}
+        mappings.append(copy.deepcopy(mapping))
+        selections.append({**mapping, "claim_id": key, "claim_digest": row["claim_digest"],
+                           "request_context_id": result["context_id"], "input_digest": result["input_digest"],
+                           "response_digest": result["response_digest"], "parsed_digest": result["parsed_digest"]})
+        source_mappings.extend(_source_acknowledgements(parent, row, result, payload["batch_id"], local))
+        rows.append(copy.deepcopy(row))
+    reviewed_ids = initial["reviewed_block_ids"]
+    for mapping in source_mappings:
+        mapping["aggregate_path"] = (f"/reviewed_block_ids/{reviewed_ids.index(mapping['block_id'])}"
+                                     if mapping["block_id"] in reviewed_ids else None)
+    receipts = [{key: copy.deepcopy(result[key]) for key in
+                 ("context_id", "input_digest", "response_digest", "parsed_digest", "status", "raw_audit_path")}
+                for result in [discovery, *all_results]]
+    context = digest({"parent_digest": parent_digest, "discovery_payload_digest": digest(discovery_payload),
+                      "planned_batches": [digest(p) for p in all_batches], "raw_receipts": receipts,
+                      "row_selections": selections})
+    return {**copy.deepcopy(initial), "version": "program-first-row-selection-adapter-v1", "context_id": context,
+            "claim_reviews": rows, "path_mappings": mappings, "row_selections": selections,
+            "reviewed_source_mappings": source_mappings, "raw_receipts": receipts}

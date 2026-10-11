@@ -31,9 +31,12 @@ from screening.claim_coverage_wire import (
 )
 from screening.claim_first_batches import (
     aggregate_first_batches,
+    check_first_receipt,
     check_first_rows,
     discovery_remaining_blocks,
     plan_first_batches,
+    plan_remaining_first_batches,
+    select_first_rows,
 )
 from screening.claim_recheck_batches import (
     aggregate_original_batches,
@@ -1860,9 +1863,10 @@ def review_claim_coverage(
         window["first_batches"] = record
         save()
 
-        def first_request(system, payload, schema, module):
+        def first_request(system, payload, schema, module, recovery=None):
+            errors = record["errors"] if recovery is None else recovery["errors"]
             if coverage["budget"]["review_calls"] >= max_review_calls:
-                record["errors"].append("First review call budget exhausted before delegate")
+                errors.append("First review call budget exhausted before delegate")
                 return None
             coverage["budget"]["review_calls"] += 1
             index = len(audit["attempts"])
@@ -1870,7 +1874,7 @@ def review_claim_coverage(
             try:
                 parsed = request(system, payload, schema, module)
             except Exception as exc:
-                record["errors"].append(safe(f"{type(exc).__name__}: {exc}"))
+                errors.append(safe(f"{type(exc).__name__}: {exc}"))
                 check()
             # request may refuse unsafe input before appending an attempt; never borrow prior raw.
             raw = audit["attempts"][index] if len(audit["attempts"]) > index else None
@@ -1881,7 +1885,8 @@ def review_claim_coverage(
                       "status": raw["status"] if raw else "not_started",
                       "raw_audit_path": f"/attempts/{index}" if raw else None,
                       "parsed_response": parsed.model_dump(mode="json") if parsed else None}
-            record["results"].append(copy.deepcopy(result))
+            if recovery is None:
+                record["results"].append(copy.deepcopy(result))
             save()
             return result
 
@@ -1919,13 +1924,150 @@ def review_claim_coverage(
             and len(results) == len(batches)
             and all(r["parsed_response"] is not None for r in results)
             and not record["errors"])
+
+        def first_surrogate(value):
+            return CoverageReviewV5.model_validate({
+                "schema_version": "claim-coverage-v5", "context_id": value["context_id"],
+                "window_id": parent["window_id"], "reviewed_block_ids": value["reviewed_block_ids"],
+                "claim_reviews": value["claim_reviews"], "new_findings": value["new_findings"],
+                "explanation": value["explanation"],
+            })
+
+        supplemental_ids = {r["block"]["id"] for r in parent["supplemental_sources"]}
+
+        def first_lowering(value, duties):
+            return _lower_v3(first_surrogate(value), duties, parent["current_claims"], blocks,
+                             materials.markdown, supplemental_ids, scope_context=parent["scope_context"])[1]
+
+        def independent_receipt(payload, result, schema, module):
+            check_first_receipt(parent, payload, result)
+            match = re.fullmatch(r"/attempts/(0|[1-9][0-9]*)", result["raw_audit_path"])
+            if match is None or int(match[1]) >= len(audit["attempts"]):
+                raise ValueError("First recovery lost its original raw audit receipt")
+            raw = audit["attempts"][int(match[1])]
+            packed = pack_scope_payload({**payload, "visible_source_spans": _visible_source_spans(payload)})
+            expected = {**packed, "context_id": _digest(packed)}
+            if (raw["module"] != module or raw["status"] != "returned"
+                    or _digest(raw["input"]) != _digest(expected)
+                    or _digest(raw["input"]) != result["input_digest"]
+                    or _digest(raw["response"]) != raw["response_digest"]
+                    or raw["response_digest"] != result["response_digest"]
+                    or _digest(schema.model_validate(raw["response"]).model_dump(mode="json")) != result["parsed_digest"]):
+                raise ValueError("First recovery changed the independent input, raw or typed response")
+
+        if record["requests_complete"]:
+            initial_lowering = first_lowering(aggregate, parent["required_claim_checks"])
+            valid_ids = {row["claim_id"] for row in initial_lowering["mappings"] if "claim_id" in row}
+            invalid = [i for i, row in enumerate(aggregate["claim_reviews"]) if row["claim_id"] not in valid_ids]
+            error_paths = [row["raw_path"] for row in initial_lowering["errors"]]
+            expected_paths = [f"/claim_reviews/{i}" for i in invalid]
+            # Valid unresolved rows are mappings; only typed row failures are eligible.
+            # Discovery failures and any source/request/identity failure stay closed.
+            if invalid and error_paths == expected_paths and not window.get("first_duty_retry_attempted"):
+                eligible = True
+                try:
+                    independent_receipt(discovery_payload, discovery, CoverageDiscoveryV1,
+                                        "screening.claims.coverage_discovery")
+                    for payload, result in zip(batches, results, strict=True):
+                        independent_receipt(payload, result, CoverageFirstBatchV1,
+                                            "screening.claims.coverage_first_batch")
+                    allowed = set(aggregate["reviewed_block_ids"]) | supplemental_ids
+                    for row in aggregate["claim_reviews"]:
+                        directory = next(c for c in parent["scope_context"] if c["claim_id"] == row["claim_id"])
+                        acknowledged = {key: group for group in row["source_review_groups"] for key in group["source_ids"]}
+                        if not {s["block_id"] for s in directory["sources"]} <= set(acknowledged):
+                            raise ValueError("First source acknowledgements do not close the original directory")
+                        if any(span["block_id"] not in acknowledged
+                               or acknowledged[span["block_id"]]["state"] != "considered"
+                               for atom in row["scope_atoms"] for span in atom["sources"]):
+                            raise ValueError("First atom source lacks its original explicit reading acknowledgement")
+                        used = [*row["source_block_ids"],
+                                *(key for group in row["assertion_groups"] for key in group["source_block_ids"]),
+                                *(key for finding in row["other_findings"] for key in finding["source_block_ids"]),
+                                *(span["block_id"] for atom in row["scope_atoms"] for span in atom["sources"]),
+                                *(key for group in row["source_review_groups"] if group["state"] != "unavailable"
+                                  for key in group["source_ids"])]
+                        for key in used:
+                            _whole_block(key, blocks, allowed, materials.markdown)
+                except (ValueError, KeyError, TypeError) as exc:
+                    eligible = False
+                    record["retry_ineligibility"] = safe(f"{type(exc).__name__}: {exc}")
+                if eligible:
+                    remaining = [aggregate["claim_reviews"][i]["claim_id"] for i in invalid]
+                    retry_batches = plan_remaining_first_batches(parent, parent_digest, remaining, first_review_batch_size)
+                    future = coverage["windows"][coverage["windows"].index(window) + 1:]
+                    counts = [sum(bool(_source_ids(c) & set(w["block_ids"])) for c in current) for w in future]
+                    review_reserve = sum(1 if (size := _effective_batch_size(first_batch_policy, count)) is None
+                                         else 1 + (count + size - 1) // size for count in counts)
+                    validation_reserve = sum(
+                        1 if (size := _effective_batch_size(original_batch_policy, count)) is None
+                        else (count + size - 1) // size + 1
+                        for count in [len(parent["required_claim_checks"]), *counts])
+                    retry = {"version": "first-duty-retry-v1", "status": "not_run_budget",
+                             "eligible_claim_ids": remaining, "initial_aggregate": copy.deepcopy(aggregate),
+                             "initial_lowering": copy.deepcopy(initial_lowering),
+                             "budget_before": copy.deepcopy(coverage["budget"]), "batches": [], "errors": [],
+                             "planned_batch_digests": [_digest(p) for p in retry_batches],
+                             "reserved_future_review_calls": review_reserve,
+                             "reserved_original_global_validation_calls": validation_reserve,
+                             "reserve_meaning": "Complete current duties and later windows under the unchanged current claim registry; one possible global decision per window."}
+                    record["remaining_duty_retry"] = retry
+                    if (coverage["budget"]["review_calls"] + len(retry_batches) + review_reserve <= max_review_calls
+                            and coverage["budget"]["validation_calls"] + validation_reserve <= max_validation_calls):
+                        window["first_duty_retry_attempted"] = True
+                        retry["status"] = "started"
+                        record["planned_claim_batches"] += len(retry_batches)
+                        record["planned_review_calls"] += len(retry_batches)
+                        coverage["budget"]["planned_first_claim_batches"] += len(retry_batches)
+                        coverage["budget"]["planned_first_review_calls"] += len(retry_batches)
+                        save()
+                        retry_results = []
+                        for payload in retry_batches:
+                            result = first_request(_FIRST_CLAIM_BATCH_SYSTEM, payload, CoverageFirstBatchV1,
+                                                   "screening.claims.coverage_first_duty_retry", recovery=retry)
+                            try:
+                                independent_receipt(payload, result, CoverageFirstBatchV1,
+                                                    "screening.claims.coverage_first_duty_retry")
+                                fresh = aggregate_first_batches(parent_digest, discovery, [payload], [result], parent=parent)
+                                fresh["new_findings"] = []  # Discovery stays in its original independent receipt.
+                                lowering = first_lowering(fresh, payload["required_claim_checks"])
+                                result["lowering"] = lowering
+                                expected = [(f"/claim_reviews/{i}", row["claim_id"])
+                                            for i, row in enumerate(payload["required_claim_checks"])]
+                                actual = [(row["raw_path"], row["claim_id"]) for row in lowering["mappings"]]
+                                if lowering["errors"] or actual != expected:
+                                    raise ValueError("First recovery did not validate every fresh scientific row")
+                                retry_results.append(result)
+                            except (ValueError, KeyError, TypeError) as exc:
+                                retry["errors"].append(safe(f"{payload['batch_id']}: {type(exc).__name__}: {exc}"))
+                                check()
+                            finally:
+                                retry["batches"].append(copy.deepcopy(result))
+                                save()
+                            if retry["errors"]:
+                                break
+                        if not retry["errors"]:
+                            try:
+                                selected = select_first_rows(parent, parent_digest, discovery, batches, results,
+                                                             valid_ids, retry_batches, retry_results)
+                                final_lowering = first_lowering(selected, parent["required_claim_checks"])
+                                if final_lowering["errors"] or {r["claim_id"] for r in final_lowering["mappings"]
+                                                                 if "claim_id" in r} != set(valid_ids) | set(remaining):
+                                    raise ValueError("First selected view did not close every typed row")
+                                aggregate = selected
+                                record.update(aggregate=copy.deepcopy(aggregate), aggregate_digest=_digest(aggregate))
+                                retry.update(status="returned", final_aggregate_digest=_digest(aggregate))
+                            except (ValueError, KeyError, TypeError) as exc:
+                                retry["errors"].append(safe(f"First selection: {type(exc).__name__}: {exc}"))
+                                check()
+                        if retry["errors"]:
+                            retry["status"] = "failed"
+                            record["errors"].extend(retry["errors"])
+                    else:
+                        retry["errors"].append("Whole first recovery wave lacks review or reserved original/global capacity")
+                    retry["budget_after"] = copy.deepcopy(coverage["budget"])
         save()
-        return CoverageReviewV5.model_validate({
-            "schema_version": "claim-coverage-v5", "context_id": aggregate["context_id"],
-            "window_id": parent["window_id"], "reviewed_block_ids": aggregate["reviewed_block_ids"],
-            "claim_reviews": aggregate["claim_reviews"], "new_findings": aggregate["new_findings"],
-            "explanation": aggregate["explanation"],
-        })
+        return first_surrogate(aggregate)
 
     def batched_validation(parent, window, registry, observations, source_blocks, scope):
         parent = {**copy.deepcopy(parent), "parent_provenance": {
@@ -2263,8 +2405,8 @@ def review_claim_coverage(
                     )
                     lowering["version"] = (
                         "claim-coverage-v5-scope-lowering-v1"
-                        if isinstance(audit["attempts"][-1]["response"], dict)
-                        and audit["attempts"][-1]["response"].get("schema_version") == "claim-coverage-v5"
+                        if isinstance(audit["attempts"][-1].get("response"), dict)
+                        and audit["attempts"][-1].get("response", {}).get("schema_version") == "claim-coverage-v5"
                         else lowering["version"]
                     )
                     if first_review_batch_size is None:
