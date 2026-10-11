@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import Field, StrictInt, StrictStr
+from pydantic import Field, StrictInt, StrictStr, ValidationError
 
 from common import run_stats
 from llm.client import llm_json, resolve_llm_config
@@ -31,9 +31,11 @@ from screening.claim_coverage_wire import (
 )
 from screening.claim_first_batches import (
     aggregate_first_batches,
+    check_first_failed_receipt,
     check_first_receipt,
     check_first_rows,
     discovery_remaining_blocks,
+    first_failure_identity,
     plan_first_batches,
     plan_remaining_first_batches,
     select_first_rows,
@@ -1688,10 +1690,13 @@ def review_claim_coverage(
     original_review_batch_size: int | Literal["auto"] | None = "auto",
     first_review_batch_size: int | Literal["auto"] | None = "auto",
     audit_incomplete_first: bool = False,
+    first_partial_recovery_rounds: int = 0,
 ) -> ClaimCoverageResult:
     """Return isolated working copies and unresolved target IDs, without changing L1 inputs."""
     if type(audit_incomplete_first) is not bool:
         raise ValueError("audit_incomplete_first must be a boolean")
+    if type(first_partial_recovery_rounds) is not int or first_partial_recovery_rounds not in (0, 1):
+        raise ValueError("first_partial_recovery_rounds must be 0 or 1")
     for name, value in (("original_review_batch_size", original_review_batch_size),
                         ("first_review_batch_size", first_review_batch_size)):
         if value != "auto" and value is not None and (type(value) is not int or value < 1):
@@ -1828,7 +1833,13 @@ def review_claim_coverage(
                     if schema is CoverageDiscoveryV1 else "claim-coverage-first-batch-v1")
             ):
                 raise ValueError("First response must declare the exact requested protocol")
-            parsed = parser.model_validate(raw)
+            try:
+                parsed = parser.model_validate(raw)
+            except ValidationError:
+                if (first_partial_recovery_rounds and schema is CoverageFirstBatchV1
+                        and first_failure_identity(payload, raw)):
+                    row["failure_stage"] = "schema"
+                raise
             if parsed.context_id != context_id or parsed.window_id != payload["window_id"]:
                 raise ValueError("Coverage response does not match the current closed context")
             if schema in (OriginalRecheckBatchV1, CoverageBatchDecisionsV1):
@@ -1842,7 +1853,15 @@ def review_claim_coverage(
                 if schema is CoverageFirstBatchV1:
                     if parsed.batch_id != payload["batch_id"]:
                         raise ValueError("First response differs from its assigned batch")
-                    check_first_rows(payload, parsed.model_dump(mode="json"))
+                    try:
+                        check_first_rows(payload, parsed.model_dump(mode="json"))
+                    except ValueError:
+                        identities = {r["claim_id"]: r["digest"] for r in payload["required_claim_checks"]}
+                        if (first_partial_recovery_rounds and first_failure_identity(payload, raw)
+                                and all(r.claim_id in identities and r.claim_digest == identities[r.claim_id]
+                                        for r in parsed.claim_reviews)):
+                            row["failure_stage"] = "required_order"
+                        raise
             row["status"] = "returned"
             return parsed
         except Exception as exc:
@@ -1867,6 +1886,9 @@ def review_claim_coverage(
                   "discovery_remaining_block_ids": list(parent["discovery_required_block_ids"]),
                   "remaining_required_claim_ids": [r["claim_id"] for r in parent["required_claim_checks"]]}
         window["first_batches"] = record
+        if first_partial_recovery_rounds:
+            record["initial_batch_slots"] = [{"batch_id": p["batch_id"], "payload": copy.deepcopy(p),
+                                               "payload_digest": _digest(p), "result": None} for p in batches]
         save()
 
         def first_request(system, payload, schema, module, recovery=None):
@@ -1891,6 +1913,8 @@ def review_claim_coverage(
                       "status": raw["status"] if raw else "not_started",
                       "raw_audit_path": f"/attempts/{index}" if raw else None,
                       "parsed_response": parsed.model_dump(mode="json") if parsed else None}
+            if first_partial_recovery_rounds and parsed is None:
+                result["failure_stage"] = raw.get("failure_stage", "unclassified") if raw else "unclassified"
             if recovery is None:
                 record["results"].append(copy.deepcopy(result))
             save()
@@ -1898,7 +1922,7 @@ def review_claim_coverage(
 
         discovery = first_request(_FIRST_DISCOVERY_SYSTEM, discovery_payload,
                                   CoverageDiscoveryV1, "screening.claims.coverage_discovery")
-        results = []
+        results = [None] * len(batches) if first_partial_recovery_rounds else []
         if discovery is not None and discovery["parsed_response"] is not None:
             try:
                 record["discovery_remaining_block_ids"] = discovery_remaining_blocks(
@@ -1909,14 +1933,21 @@ def review_claim_coverage(
                 raise
             if record["discovery_remaining_block_ids"]:
                 record["errors"].append("Discovery did not review every original window block; first batches not started")
-            for payload in batches if not record["discovery_remaining_block_ids"] else []:
+            for slot, payload in enumerate(batches if not record["discovery_remaining_block_ids"] else []):
                 result = first_request(_FIRST_CLAIM_BATCH_SYSTEM, payload,
                                        CoverageFirstBatchV1, "screening.claims.coverage_first_batch")
                 if result is None:
                     break
-                results.append(result)
+                if first_partial_recovery_rounds:
+                    results[slot] = result
+                    record["initial_batch_slots"][slot]["result"] = copy.deepcopy(result)
+                    save()
+                else:
+                    results.append(result)
                 if result["parsed_response"] is None:
-                    break
+                    if (not first_partial_recovery_rounds
+                            or result.get("failure_stage") not in {"schema", "required_order"}):
+                        break
         try:
             aggregate = aggregate_first_batches(parent_digest, discovery, batches, results, parent=parent)
         except ValueError as exc:
@@ -1928,7 +1959,7 @@ def review_claim_coverage(
         record["requests_complete"] = (
             discovery is not None and discovery["parsed_response"] is not None
             and len(results) == len(batches)
-            and all(r["parsed_response"] is not None for r in results)
+            and all(r is not None and r["parsed_response"] is not None for r in results)
             and not record["errors"])
 
         def first_surrogate(value):
@@ -1961,7 +1992,160 @@ def review_claim_coverage(
                     or _digest(schema.model_validate(raw["response"]).model_dump(mode="json")) != result["parsed_digest"]):
                 raise ValueError("First recovery changed the independent input, raw or typed response")
 
-        if record["requests_complete"]:
+        if first_partial_recovery_rounds:
+            initial_lowering = first_lowering(aggregate, parent["required_claim_checks"])
+            mapped = {r["claim_id"] for r in initial_lowering["mappings"] if "claim_id" in r}
+            valid_ids = {r["claim_id"] for r in aggregate["claim_reviews"]
+                         if r["claim_id"] in mapped and r["state"] != "unresolved"}
+            remaining = [r["claim_id"] for r in parent["required_claim_checks"] if r["claim_id"] not in valid_ids]
+
+            def independent_failure(payload, result):
+                check_first_failed_receipt(parent, payload, result)
+                match = re.fullmatch(r"/attempts/(0|[1-9][0-9]*)", result["raw_audit_path"])
+                if match is None or int(match[1]) >= len(audit["attempts"]):
+                    raise ValueError("First mechanical failure lost its independent raw receipt")
+                raw = audit["attempts"][int(match[1])]
+                packed = pack_scope_payload({**payload, "visible_source_spans": _visible_source_spans(payload)})
+                expected = {**packed, "context_id": _digest(packed)}
+                if (raw["module"] != "screening.claims.coverage_first_batch" or raw["status"] != "failed"
+                        or raw.get("failure_stage") != result["failure_stage"]
+                        or _digest(raw["input"]) != _digest(expected)
+                        or _digest(raw["input"]) != result["input_digest"]
+                        or result["context_id"] != expected["context_id"]
+                        or _digest(raw["response"]) != raw["response_digest"]
+                        or raw["response_digest"] != result["response_digest"]
+                        or not first_failure_identity(expected, raw["response"])):
+                    raise ValueError("First mechanical failure changed its fixed input/raw/identity binding")
+                if result["failure_stage"] == "schema":
+                    try:
+                        CoverageFirstBatchV1.model_validate(raw["response"])
+                    except ValidationError:
+                        return
+                    raise ValueError("First schema failure has no actual schema rejection")
+                parsed = CoverageFirstBatchV1.model_validate(raw["response"])
+                identities = {r["claim_id"]: r["digest"] for r in payload["required_claim_checks"]}
+                if any(r.claim_id not in identities or r.claim_digest != identities[r.claim_id]
+                       for r in parsed.claim_reviews):
+                    raise ValueError("First mechanical order failure changed a claim identity")
+                try:
+                    check_first_rows(payload, parsed.model_dump(mode="json"))
+                except ValueError:
+                    return
+                raise ValueError("First ordered-duty failure has no actual ordered-duty rejection")
+
+            if remaining and not window.get("first_duty_retry_attempted"):
+                eligible = True
+                try:
+                    independent_receipt(discovery_payload, discovery, CoverageDiscoveryV1,
+                                        "screening.claims.coverage_discovery")
+                    if record["discovery_remaining_block_ids"] or any(
+                            not re.fullmatch(r"/claim_reviews/(0|[1-9][0-9]*)", r["raw_path"])
+                            for r in initial_lowering["errors"]):
+                        raise ValueError("First recovery cannot replace discovery or its findings")
+                    allowed = set(aggregate["reviewed_block_ids"]) | supplemental_ids
+                    for slot, (payload, result) in enumerate(zip(batches, results, strict=True)):
+                        frozen = record["initial_batch_slots"][slot]
+                        if (frozen["batch_id"] != payload["batch_id"] or frozen["payload_digest"] != _digest(payload)
+                                or _digest(frozen["payload"]) != _digest(payload) or frozen["result"] != result):
+                            raise ValueError("First original batch slot changed")
+                        if result is None or result["parsed_response"] is None:
+                            independent_failure(payload, result)
+                            continue
+                        independent_receipt(payload, result, CoverageFirstBatchV1,
+                                            "screening.claims.coverage_first_batch")
+                        for row in result["parsed_response"]["claim_reviews"]:
+                            directory = next(c for c in parent["scope_context"] if c["claim_id"] == row["claim_id"])
+                            acknowledged = {key: group for group in row["source_review_groups"] for key in group["source_ids"]}
+                            if not {s["block_id"] for s in directory["sources"]} <= set(acknowledged):
+                                raise ValueError("First source acknowledgements do not close the original directory")
+                            if any(span["block_id"] not in acknowledged
+                                   or acknowledged[span["block_id"]]["state"] != "considered"
+                                   for atom in row["scope_atoms"] for span in atom["sources"]):
+                                raise ValueError("First atom source lacks its original explicit reading acknowledgement")
+                            used = [*row["source_block_ids"],
+                                    *(key for group in row["assertion_groups"] for key in group["source_block_ids"]),
+                                    *(key for finding in row["other_findings"] for key in finding["source_block_ids"]),
+                                    *(span["block_id"] for atom in row["scope_atoms"] for span in atom["sources"]),
+                                    *(key for group in row["source_review_groups"] if group["state"] != "unavailable"
+                                      for key in group["source_ids"])]
+                            for key in used:
+                                _whole_block(key, blocks, allowed, materials.markdown)
+                except (ValueError, KeyError, TypeError) as exc:
+                    eligible = False
+                    record["partial_recovery_ineligibility"] = safe(f"{type(exc).__name__}: {exc}")
+                if eligible:
+                    retry_batches = plan_remaining_first_batches(parent, parent_digest, remaining, first_review_batch_size)
+                    future = coverage["windows"][coverage["windows"].index(window) + 1:]
+                    counts = [sum(bool(_source_ids(c) & set(w["block_ids"])) for c in current) for w in future]
+                    review_reserve = sum(1 if (size := _effective_batch_size(first_batch_policy, count)) is None
+                                         else 1 + (count + size - 1) // size for count in counts)
+                    validation_reserve = sum(
+                        1 if (size := _effective_batch_size(original_batch_policy, count)) is None
+                        else (count + size - 1) // size + 1
+                        for count in [len(parent["required_claim_checks"]), *counts])
+                    retry = {"version": "first-partial-recovery-v1", "status": "not_run_budget",
+                             "eligible_claim_ids": remaining, "initial_aggregate": copy.deepcopy(aggregate),
+                             "initial_errors": copy.deepcopy(record["errors"]),
+                             "initial_lowering": copy.deepcopy(initial_lowering),
+                             "budget_before": copy.deepcopy(coverage["budget"]), "batches": [], "errors": [],
+                             "planned_batch_digests": [_digest(p) for p in retry_batches],
+                             "reserved_future_review_calls": review_reserve,
+                             "reserved_original_global_validation_calls": validation_reserve}
+                    record["partial_recovery"] = retry
+                    if (coverage["budget"]["review_calls"] + len(retry_batches) + review_reserve <= max_review_calls
+                            and coverage["budget"]["validation_calls"] + validation_reserve <= max_validation_calls):
+                        window["first_duty_retry_attempted"] = True
+                        retry["status"] = "started"
+                        record["planned_claim_batches"] += len(retry_batches)
+                        record["planned_review_calls"] += len(retry_batches)
+                        coverage["budget"]["planned_first_claim_batches"] += len(retry_batches)
+                        coverage["budget"]["planned_first_review_calls"] += len(retry_batches)
+                        save()
+                        retry_results = []
+                        for payload in retry_batches:
+                            result = first_request(_FIRST_CLAIM_BATCH_SYSTEM, payload, CoverageFirstBatchV1,
+                                                   "screening.claims.coverage_first_partial_recheck", recovery=retry)
+                            try:
+                                independent_receipt(payload, result, CoverageFirstBatchV1,
+                                                    "screening.claims.coverage_first_partial_recheck")
+                                fresh = aggregate_first_batches(parent_digest, discovery, [payload], [result], parent=parent)
+                                fresh["new_findings"] = []
+                                lowering = first_lowering(fresh, payload["required_claim_checks"])
+                                result["lowering"] = lowering
+                                expected = [(f"/claim_reviews/{i}", r["claim_id"])
+                                            for i, r in enumerate(payload["required_claim_checks"])]
+                                if lowering["errors"] or [(r["raw_path"], r["claim_id"]) for r in lowering["mappings"]] != expected:
+                                    raise ValueError("First partial recovery did not validate every fresh scientific row")
+                                retry_results.append(result)
+                            except (ValueError, KeyError, TypeError) as exc:
+                                retry["errors"].append(safe(f"{payload['batch_id']}: {type(exc).__name__}: {exc}"))
+                                check()
+                            finally:
+                                retry["batches"].append(copy.deepcopy(result))
+                                save()
+                            if retry["errors"]:
+                                break
+                        if not retry["errors"]:
+                            try:
+                                selected = select_first_rows(parent, parent_digest, discovery, batches, results,
+                                                             valid_ids, retry_batches, retry_results, partial=True)
+                                final_lowering = first_lowering(selected, parent["required_claim_checks"])
+                                if (final_lowering["errors"] or [r["claim_id"] for r in final_lowering["mappings"]
+                                        if "claim_id" in r] != [r["claim_id"] for r in parent["required_claim_checks"]]):
+                                    raise ValueError("First partial selection did not close the full ordered row set")
+                                aggregate = selected
+                                record.update(aggregate=copy.deepcopy(aggregate), aggregate_digest=_digest(aggregate),
+                                              selected_requests_complete=True, selected_errors=[])
+                                retry.update(status="returned", final_aggregate_digest=_digest(aggregate))
+                            except (ValueError, KeyError, TypeError) as exc:
+                                retry["errors"].append(safe(f"First partial selection: {type(exc).__name__}: {exc}"))
+                                check()
+                        if retry["errors"]:
+                            retry["status"] = "failed"
+                    else:
+                        retry["errors"].append("Whole first partial recovery lacks review or reserved original/global capacity")
+                    retry["budget_after"] = copy.deepcopy(coverage["budget"])
+        elif record["requests_complete"]:
             initial_lowering = first_lowering(aggregate, parent["required_claim_checks"])
             valid_ids = {row["claim_id"] for row in initial_lowering["mappings"] if "claim_id" in row}
             invalid = [i for i, row in enumerate(aggregate["claim_reviews"]) if row["claim_id"] not in valid_ids]
@@ -2580,10 +2764,12 @@ def review_claim_coverage(
                 )
             if first_review_batch_size is not None:
                 record = window["first_batches"]
+                first_complete = record.get("selected_requests_complete", record["requests_complete"])
+                first_errors = record.get("selected_errors", record["errors"])
                 checked = {r["claim_id"] for r in window["claim_checks"] if r["state"] == "checked"}
                 record["remaining_required_claim_ids"] = [
                     r["claim_id"] for r in required if r["claim_id"] not in checked]
-                if (not record["requests_complete"] or record["remaining_required_claim_ids"]
+                if (not first_complete or record["remaining_required_claim_ids"]
                         or window["claim_check_errors"] or window["unreviewed_block_ids"]
                         or any(o["state"] == "invalid" for o in window["observations"])):
                     window["status"] = "partially_reviewed"
@@ -2591,8 +2777,8 @@ def review_claim_coverage(
                     window["followup_status"] = "not_run_incomplete_first"
                     pending[f"{window['id']}:first_review_incomplete"] = set()
                     semantic_error = "Claim atomicity or governing qualifiers remain unresolved"
-                    if (audit_incomplete_first and scope_reviewed and record["requests_complete"]
-                            and record["remaining_required_claim_ids"] and not record["errors"]
+                    if (audit_incomplete_first and scope_reviewed and first_complete
+                            and record["remaining_required_claim_ids"] and not first_errors
                             and not window["claim_check_errors"] and not window["unreviewed_block_ids"]
                             and all(context["complete"] for context in scope_context)
                             and not any(o["state"] == "invalid" for o in window["observations"])

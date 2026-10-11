@@ -59,9 +59,13 @@ def screen_paper(
     claim_coverage_original_batch_size="auto",
     claim_coverage_first_batch_size="auto",
     claim_coverage_partial_first_audit=True,
+    claim_coverage_first_partial_recovery_rounds=1,
 ):
     if type(claim_coverage_partial_first_audit) is not bool:
         raise ValueError("claim_coverage_partial_first_audit must be a boolean")
+    if (type(claim_coverage_first_partial_recovery_rounds) is not int
+            or claim_coverage_first_partial_recovery_rounds not in (0, 1)):
+        raise ValueError("claim_coverage_first_partial_recovery_rounds must be 0 or 1")
     # Failed extraction cannot become an apparently successful review with zero claims.
     result = ScreeningResult(claims=[], anonymity_policy=anonymity_policy)
     extraction_error = None
@@ -87,6 +91,7 @@ def screen_paper(
                 original_review_batch_size=claim_coverage_original_batch_size,
                 first_review_batch_size=claim_coverage_first_batch_size,
                 audit_incomplete_first=claim_coverage_partial_first_audit,
+                first_partial_recovery_rounds=claim_coverage_first_partial_recovery_rounds,
             )
             result.claims = coverage.claims
             result.claim_coverage = coverage_summary(coverage.coverage)

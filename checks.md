@@ -2,7 +2,7 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
-上一来源交付 `9303a058d6b1c6a594e617ae7cdd28bf71840019` 已推送并核对远端；其完整 226 文件来源快照已独审并由 Root 接受（收据 `b8d3add4`）。Phase 5 函数目录与公开诊断接口已独审接受并本地提交 `6fd73e4`（Root 收据 `d0b05dd7`，五路径 working LF=Git 收据 `ff248b2b`）。Phase 4 固定 writer/Experiments dispatch 程序诊断已获独审接受（`verification-write-outcomes-acceptance-root-v1/receipt.json`，SHA `8b750301`）；唯一差分 mock、三条必要原节点、Ruff/被动编译通过，原返回/侧车/科学门保持。首轮复核有界恢复正在独审。future Full v8 / NN v7 的显式诊断接线正在补齐，prepare/live 仍关闭；没有新增真实运行，第 2、8 项继续未通过。
+本轮 Phase 5 函数目录/公开诊断已独审并提交 `6fd73e4`（Root 收据 `d0b05dd7`），Phase 4 固定 writer/dispatch 诊断已独审并提交 `11a94e8`（收据 `8b750301`，五路径 LF=Git 收据 `5874a8fd`）。Phase 3 首轮坏批继续与一次完整恢复也已独审接受（`first-review-partial-recovery-acceptance-root-v1/receipt.json`，SHA `fb9a5739`）：同字节旧源失败/新组合 24 场景通过，绿测至最终仅括号且完整 AST 相同，Ruff/被动编译通过；两条旧节点的版本限制保持明确。三项源码将统一推送、生成完整 committed 来源，再核绑定 future Full v8 / NN v7。显式诊断接线正在补齐，prepare/live 仍关闭；没有新增真实运行，第 2、8 项继续未通过。
 
 本轮 Phase 5 source-sites 固定诊断已获独审通过：v1 observer 绕过入口的 P1 及原拒绝保留，窄 v2 采用 exact canonical class 分派，默认关闭及原科学门保持。独审 report `1521b322` 确认 12/12 项有限事实；Root 全文读报告/事实并核六冻件及当前三产品，接受收据 `inference-source-sites-diagnostics-acceptance-root-v2/receipt.json`（SHA `e5d75459`）。唯一必要联合 mock 保留原 34 条断言，相同最终测试在 v1 失败、v2 通过（3.83s），受影响两文件 Ruff/compile 通过；原四个测试未改、未重复运行。future Full v8 / NN v7 的预算拒绝接入已冻结、仍待另一 agent 独审：同一必要 mock 旧源失败、新源通过（0.84s），默认行为及原未知用量/闭合规则保持；原 14 条 lint 问题保留，新增为 0。两批均未进入真实运行。Callable 位置目录仅有已接受的静态设计；主张 first-review 补漏路径正在独立调查。验收第 2、8 项继续未通过。以下远端与运行描述保留各自记录时点。
 
