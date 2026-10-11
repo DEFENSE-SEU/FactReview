@@ -13,6 +13,7 @@ from llm.client import LLMConfig
 from schemas.claim import Claim, ClaimLocation, Condition
 from schemas.materials import MaterialBlock, PageImage, RepositoryFile, RepositoryIndex, SharedMaterials
 from screening import checks
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from verification.code import verify_code
 from verification.experiments import verify_experiments
 from verification.theory import verify_theory
@@ -138,7 +139,7 @@ def scope_response(kwargs):
     # This shared fixture describes an absolute reported result. The dedicated
     # isolation fixture explicitly attributes that result to a component.
     causal = data["claim"]["text"] == "The attention component causes the improvement in A test MRR."
-    return {
+    response = {
         "conditions": [
             {
                 "condition_id": condition["id"],
@@ -171,6 +172,7 @@ def scope_response(kwargs):
             for condition in item["covered"]
         ],
     }
+    return authority_scope_fixture(data, response, requirement="unresolved" if causal else "manuscript_reported_result", basis="reported_measurement", rationale="The fixture absolute result is reported; component causal attribution remains unresolved.")
 
 
 def mock_response(payload: dict):
@@ -393,6 +395,8 @@ def test_code_preserves_indentation_in_exact_source_quote(
 
 
 def test_experiments_paper_support_and_claim_linked_plan(claim: Claim, materials: SharedMaterials) -> None:
+    claim.source_block_id = "main"
+    claim.source_quote = claim.text
     def model(**kwargs):
         if kwargs["module"] == "verification.experiments.scope":
             return scope_response(kwargs)
@@ -541,6 +545,8 @@ def test_unbound_paper_comparisons_cannot_question_claim(
 
 
 def test_invalid_comparison_preserves_independent_paper_support(claim, materials):
+    claim.source_block_id = "main"
+    claim.source_quote = claim.text
     from assessment import assess_claim
 
     response = contradiction_response(
@@ -1091,6 +1097,9 @@ def support_response(branch, **changes):
 def test_positive_evidence_requires_explicit_full_condition_support(
     branch, full, claim, theory_claim, code_claim, materials
 ):
+    if branch is verify_experiments:
+        claim.source_block_id = "main"
+        claim.source_quote = claim.text
     from assessment.rules import assess_claim
 
     if branch is verify_code:

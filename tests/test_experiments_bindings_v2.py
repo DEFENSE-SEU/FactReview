@@ -11,6 +11,7 @@ import pytest
 from llm.client import LLMConfig
 from schemas.claim import Claim, ClaimLocation, Condition
 from schemas.materials import MaterialBlock, SharedMaterials
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from verification.experiment_catalog import build_catalog
 from verification.experiments import ExperimentsOutput, _decode_scope, verify_experiments
 
@@ -225,7 +226,7 @@ def legacy_review(paper, candidate, review):
     }
 
 
-def run(paper, candidate, review):
+def run(paper, candidate, review, *, raw_responses=None):
     calls = []
 
     def model(**kwargs):
@@ -233,9 +234,13 @@ def run(paper, candidate, review):
         if kwargs["module"] == "verification.experiments":
             return dict(checked_aspects=ASPECTS, items=[candidate], plans=[])
         assert kwargs["module"] == "verification.experiments.scope"
-        return review
+        response = authority_scope_fixture(json.loads(kwargs["prompt"]), review, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports its result with the original measurement qualifiers.")
+        if raw_responses is not None:
+            raw_responses.append(copy.deepcopy(response))
+        return response
 
-    result = verify_experiments(paper[0], paper[1], call=model)
+    result = verify_experiments(paper[0], paper[1], call=model,
+                                scope_paper_format=review.get("schema_version", "legacy"))
     assert calls == ["verification.experiments", "verification.experiments.scope"]
     return result
 
@@ -519,8 +524,10 @@ def test_catalog_response_audit_and_report_resolve_exact_cells_and_sources(tmp_p
     from schemas.review import FinalReview
 
     paper, candidate, review = beit042(tmp_path)
+    raw_responses = []
     with run_stats.run_scope(tmp_path / "run" / "run_stats.json"):
-        result = run(paper, candidate, review)
+        result = run(paper, candidate, review, raw_responses=raw_responses)
+    review = raw_responses[0]
     claim = paper[0]
     claim.evidence = result.evidence
     paths = list((tmp_path / "run" / "experiment_scope").glob("*.json"))
@@ -659,7 +666,7 @@ def test_production_schema_offers_prose_selectors_and_derives_known_roles_and_en
         payload = json.loads(kwargs["prompt"])
         seen.append(payload)
         schemas = payload["output_schema"]["$defs"]
-        assert payload["output_schema"]["properties"]["schema_version"]["const"] == "catalog-v2"
+        assert payload["output_schema"]["properties"]["schema_version"]["const"] == "catalog-v3"
         comparison_fields = schemas["CatalogComparisonV2"]["properties"]
         assert {"left", "right", "difference_number_id"} <= comparison_fields.keys()
         assert (
@@ -677,7 +684,19 @@ def test_production_schema_offers_prose_selectors_and_derives_known_roles_and_en
             not {"endpoint_required", "subject_setting", "comparator_setting"}
             & schemas["CatalogConditionScope"]["properties"].keys()
         )
-        return review
+        # This default-v2 schema fixture selects the same exact original numbers.
+        typed_review = copy.deepcopy(review)
+        comparison = typed_review["items"][0]["comparisons"][0]
+        for side in ("left", "right"):
+            source_id = comparison.pop(f"{side}_source_id")
+            token = comparison.pop(f"{side}_token")
+            context = comparison.pop(f"{side}_value_context")
+            block_id = paper[2]["sources"][source_id]["block_id"]
+            number_id = next(key for key, value in paper[2]["numbers"].items()
+                             if value["block_id"] == block_id and value["token"] == token
+                             and value["sentence"] == context)
+            comparison[side] = {"kind": "prose", "number_id": number_id}
+        return authority_scope_fixture(payload, typed_review, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The same original result numbers and complete measurement settings are reported.")
 
     result = verify_experiments(paper[0], paper[1], call=model)
     assert len(seen) == 1

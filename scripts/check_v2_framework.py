@@ -28,6 +28,7 @@ from tests.execution_science_fixtures import (
     science_model,
     statistics_definition,
 )
+from tests.experiment_authority_fixtures import authority_scope_fixture
 
 from llm.client import LLMConfig
 from pipeline_v2 import STAGES, run_v2_pipeline
@@ -406,7 +407,7 @@ class FixedModel:
                 ]
             }
         if module == "verification.experiments.scope":
-            return {
+            response = {
                 "conditions": [
                     {
                         "condition_id": condition["id"],
@@ -437,6 +438,7 @@ class FixedModel:
                     for condition in item["covered"]
                 ],
             }
+            return authority_scope_fixture(payload, response, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
         if module == "verification.experiments":
             blocks = payload["paper_blocks"]
             claim = payload["claim"]

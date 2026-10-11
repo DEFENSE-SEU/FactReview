@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from schemas.claim import Claim, SemanticPredictionProjection, SemanticProjectionScopeDecision
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from tests.test_execution_projection_v2 import original_inputs, proposal_input
 from verification.execution_projection import ProjectionError, digest, field_inventory
 from verification.execution_projection_semantics import validate_semantic_obligations
@@ -251,7 +252,7 @@ def public(tmp_path, damage=None, *, with_observation=False):
         assert kw["module"] == "verification.experiments.scope"
         if damage:
             damage(scope, claim, materials)
-        return copy.deepcopy(scope)
+        return authority_scope_fixture(json.loads(kw["prompt"]), scope, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
 
     with run_scope(tmp_path / "stats.json"):
         result = verify_experiments(claim, materials, call=model)

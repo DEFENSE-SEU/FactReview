@@ -29,6 +29,7 @@ from tests.execution_science_fixtures import (
     record_observer,
     statistics_definition,
 )
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from tests.literature_scope_fixtures import native_response, scientific_response
 from verification import literature
 
@@ -271,7 +272,7 @@ class ModelBoundary:
         blocks = data.get("paper_blocks", data.get("main_text", []))
         block = next(b for b in blocks if "A test MRR" in b["text"])
         if module == "verification.experiments.scope":
-            return {
+            response = {
                 "conditions": [
                     {
                         "condition_id": "a",
@@ -298,6 +299,7 @@ class ModelBoundary:
                     }
                 ],
             }
+            return authority_scope_fixture(data, response, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the absolute rank measurement and its original settings.")
         if module == "verification.code":
             return {
                 "items": [

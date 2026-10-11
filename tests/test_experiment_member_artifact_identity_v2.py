@@ -2,6 +2,7 @@
 
 import copy
 import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -10,6 +11,7 @@ from reportlab.pdfgen.canvas import Canvas
 
 from schemas.claim import Claim, ClaimLocation, Condition
 from schemas.materials import MaterialBlock, SharedMaterials
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from tests.test_experiment_joint_sources_v2 import ASPECTS
 from tests.test_experiment_joint_sources_v2 import offline as offline
 from verification.experiment_catalog import build_catalog, resolve_source
@@ -166,7 +168,9 @@ def public_verify(data, mutate=None):
         assert len(calls) <= 2
         if len(calls) == 2 and mutate:
             mutate(materials)
-        return copy.deepcopy(first if len(calls) == 1 else scope)
+        if len(calls) == 1:
+            return copy.deepcopy(first)
+        return authority_scope_fixture(json.loads(kwargs["prompt"]), scope, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The original PDF table and protocol report this comparison.")
 
     result = verify_experiments(claim, materials, call=model)
     assert len(calls) == 2

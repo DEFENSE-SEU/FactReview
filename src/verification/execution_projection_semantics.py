@@ -692,8 +692,10 @@ def bind_semantic_target(
     decisions, _ = decode_projection_reviews(
         audit.get("response", {}), [PlanCandidate.model_validate(p) for p in data["candidate_plans"]]
     )
+    from verification.experiment_source_authority import retained_envelope
+
     if (
-        audit.get("response", {}).get("schema_version") != "catalog-v2"
+        not retained_envelope(audit, claim, materials)
         or decisions.get((review.plan_index, condition.id)) != review
     ):
         raise ProjectionError("Semantic plan lacks one retained independent raw review")

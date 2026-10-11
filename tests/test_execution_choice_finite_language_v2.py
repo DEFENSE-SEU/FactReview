@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from schemas.claim import Claim, Condition
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from tests.test_execution_projection_choices_v2 import review, select
 from tests.test_execution_projection_v2 import original_inputs
 from verification.execution_projection import field_inventory
@@ -444,7 +445,7 @@ def test_actual006_public_two_calls_still_require_independent_scope(tmp_path, co
         decision = review(selected[0])
         if not confirmed:
             decision["reviews"][0]["decision"] = "unresolved"
-        return dict(schema_version="catalog-v2", conditions=[], items=[], execution_choice_reviews=[decision])
+        return authority_scope_fixture(payload, dict(schema_version="catalog-v2", conditions=[], items=[], execution_choice_reviews=[decision]), requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
 
     with run_scope(tmp_path / "stats.json"):
         result = verify_experiments(claim, materials, call=model, scope_binding_repair_rounds=0)

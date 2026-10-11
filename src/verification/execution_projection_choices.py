@@ -855,8 +855,10 @@ def bind_choice_target(claim, materials, registry, selection, review, audit_path
             "review",
         ),
     )
+    from verification.experiment_source_authority import retained_envelope
+
     if (
-        audit.get("response", {}).get("schema_version") != "catalog-v2"
+        not retained_envelope(audit, original, materials)
         or accepted.get(condition.id) != selection
         or decisions.get(condition.id) != review
     ):

@@ -18,8 +18,10 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT))
 
 import pymupdf
+from tests.experiment_authority_fixtures import authority_scope_fixture
 
 from pipeline_v2 import run_v2_pipeline
 from preprocessing.parse.mineru_adapter import MineruParseResult
@@ -216,7 +218,7 @@ class CompGCNModelFixture:
                 ]
             }
         if name == "verification.experiments.scope":
-            return {
+            response = {
                 "conditions": [
                     {
                         "condition_id": condition["id"],
@@ -246,6 +248,7 @@ class CompGCNModelFixture:
                     for condition in item["covered"]
                 ],
             }
+            return authority_scope_fixture(payload, response, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports the complete fixed result and retains its original qualifiers.")
         if name == "verification.experiments":
             source = block_id(self.table)
             return {

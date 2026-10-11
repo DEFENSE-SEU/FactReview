@@ -12,6 +12,7 @@ from common import run_stats
 from llm.client import LLMConfig
 from schemas.claim import Claim, ClaimLocation, ClaimSourceRef, Condition
 from schemas.materials import MaterialBlock, SharedMaterials
+from tests.experiment_authority_fixtures import authority_scope_fixture
 from verification.experiments import verify_experiments
 
 ASPECTS = ["correspondence", "fairness", "isolation", "stability", "consistency"]
@@ -140,7 +141,7 @@ def scope(claim, items, **condition_changes):
     }
 
 
-def run(paper, items, review):
+def run(paper, items, review, *, raw_responses=None):
     claim, materials = paper
     calls = []
 
@@ -154,9 +155,16 @@ def run(paper, items, review):
         assert kwargs["module"] == "verification.experiments.scope"
         if isinstance(review, Exception):
             raise review
-        return review
+        # Causal/stability claims remain semantically unresolved for paper support.
+        requirements = {row["condition_id"]: ("unresolved" if row["assertion"] in
+            {"causal_attribution", "statistical_generalization"} else "manuscript_reported_result")
+            for row in review["conditions"]}
+        response = authority_scope_fixture(json.loads(kwargs["prompt"]), review, requirement=requirements, basis="reported_measurement", rationale="The fixture reports its result with the original measurement qualifiers.")
+        if raw_responses is not None:
+            raw_responses.append(copy.deepcopy(response))
+        return response
 
-    result = verify_experiments(claim, materials, call=model, scope_call=reviewer)
+    result = verify_experiments(claim, materials, call=model, scope_call=reviewer, scope_paper_format="legacy")
     assert calls == ["verification.experiments", "verification.experiments.scope"]
     return result
 
@@ -772,8 +780,13 @@ def test_scope_audit_preserves_inputs_response_and_safe_filename(paper, tmp_path
     items = [item(materials)]
     review = scope(claim, items)
     review["items"][0]["comparisons"] = [comparison(materials)]
+    raw_responses = []
+    from functools import partial
+
+    run = partial(globals()["run"], raw_responses=raw_responses)
     with run_stats.run_scope(tmp_path / "run" / "run_stats.json"):
         assert run(paper, items, review).evidence[0].sufficient
+    review = raw_responses[0]
     paths = list((tmp_path / "run" / "experiment_scope").glob("*.json"))
     assert len(paths) == 1 and len(paths[0].stem) == 32
     audit = json.loads(paths[0].read_text(encoding="utf-8"))
