@@ -223,3 +223,59 @@ def dealias(value, aliases):
     if isinstance(value, list):
         return [dealias(item, aliases) for item in value]
     return aliases.get(value, value) if isinstance(value, str) else value
+
+
+_EXPERIMENT_SECTION = re.compile(
+    r"experiment|evaluat|result|setup|setting|implementation|ablation|analys|benchmark|dataset|baseline"
+    r"|training|hyper-?param|comparison|study|studies|detail",
+    re.I,
+)
+_CONTRIBUTION = re.compile(r"contribution|we (?:propose|introduce|present|show|demonstrate)", re.I)
+
+
+def _section_title(block) -> str:
+    section = (block.loc.section if block.loc else "") or ""
+    return section.split(":", 1)[-1]
+
+
+def experiment_block_ids(claim, materials) -> set[str]:
+    """Blocks for the experiment check's first pass.
+
+    Kept: the claim's own context (scope_block_ids); every block of a section
+    whose heading names experiments, evaluation, results, setup/settings,
+    implementation, ablations, analysis, benchmarks, datasets, baselines,
+    training/hyperparameters, comparisons/studies or details, and of its numbered
+    subsections (5 -> 5.3); every block of a section
+    holding a table; the abstract; and introduction paragraphs stating
+    contributions ("contribution", "we propose/introduce/present/show/demonstrate").
+    Setup and ablation passages needed for fairness/isolation/consistency
+    checks live in those sections. A paper whose headings match nothing keeps
+    every evidence block.
+    """
+    blocks = [block for block in materials.blocks if block.kind not in _SKIP_KINDS]
+    table_sections = {
+        _section_title(block) for block in blocks if block.kind == "table" or "<table" in block.text.casefold()
+    }
+    titles = {_section_title(block) for block in blocks}
+    experimental = {title for title in titles if _EXPERIMENT_SECTION.search(title)}
+    # Numbered subsections of an experimental section (5 -> 5.3) belong to it.
+    numbers = {m[1] for title in experimental if (m := re.match(r"\s*([A-Z]?\d+(?:\.\d+)*)\b", title))}
+    experimental |= {
+        title
+        for title in titles
+        if (m := re.match(r"\s*([A-Z]?\d+(?:\.\d+)*)\b", title))
+        and any(m[1].startswith(number + ".") for number in numbers)
+    }
+    if not experimental and not table_sections:
+        return {block.id for block in blocks}
+    selected = scope_block_ids(claim, materials)
+    for block in blocks:
+        title = _section_title(block)
+        if (
+            title in experimental
+            or title in table_sections
+            or re.search(r"abstract", title, re.I)
+            or (re.search(r"introduction", title, re.I) and _CONTRIBUTION.search(block.text))
+        ):
+            selected.add(block.id)
+    return selected

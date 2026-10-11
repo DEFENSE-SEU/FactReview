@@ -515,8 +515,6 @@ class ExperimentsOutputV3PaperOnly(ExperimentsOutputV3):
     execution: NoExecutionDecision
 
 
-_NON_EVIDENCE_KINDS = {"ref_text", "page_number", "header", "footer"}
-
 
 def lower_execution_response(raw):
     """Validate explicit new wire; preserve raw objects when producing the internal view."""
@@ -2646,8 +2644,12 @@ def verify_experiments(
     except (ValueError, OSError, TypeError, KeyError) as exc:
         choice_registry = None
         choice_inputs = {"unavailable": str(exc)}
-    # Bibliography entries and running headers carry no experimental evidence.
-    paper_blocks = [b.model_dump() for b in materials.blocks if b.kind not in _NON_EVIDENCE_KINDS]
+    from verification.claim_context import experiment_block_ids
+
+    # Experiment sections, table sections, abstract, contribution statements and
+    # the claim's own context; see experiment_block_ids for the selection rule.
+    first_pass_ids = experiment_block_ids(claim, materials)
+    paper_blocks = [b.model_dump() for b in materials.blocks if b.id in first_pass_ids]
     if execution_requested:
         system = _FIRST_PASS_PAPER + _FIRST_PASS_EXECUTION
         payload = {
@@ -2762,6 +2764,8 @@ def verify_experiments(
             result.issues.append(f"Execution choice first-pass audit: {rejected_path}")
     # Invalid first-pass source/coverage contracts still raise before an audit.
     for item in output.items:
+        if {item.block_id, *(p.block_id for p in item.additional_sources)} - first_pass_ids:
+            raise ValueError("Experiment item cites a block outside the supplied paper context")
         if not item.additional_sources:
             _paper_pointer(materials, item.block_id, item.quote)
         _fully_supported(_covered(claim, item.covered), item.fully_supported_conditions)
