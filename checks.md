@@ -2,7 +2,7 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
-应用源码为 `40715eec136299f7b42b9a914c23ac29d5e0be89`，随后 `06f2728e` 只增加实际沙箱环境证据。下表是当前结论，后面的 checkpoint 与旧表保留各自时点的历史结果。旧全套结果不自动覆盖后续源码变更。
+最近两个实际使用应用源码 `40715eec136299f7b42b9a914c23ac29d5e0be89`；本轮后续修复的身份与有限核验分别列在下方。下表是当前结论，后面的checkpoint与旧表保留各自时点的历史结果。旧全套结果不自动覆盖后续源码变更。
 
 | 验收项 | 当前结果 | 依据或待办 |
 |---|---|---|
@@ -26,6 +26,8 @@ NN v3唯一实际 `actual-894da6c8ef3a` 已结束：supervisor rc1/80.609s，模
 整篇v4 controller独审893963af接受26项有限事实，Root全文阅读后一次离线释放bf20cdec，一次prepare rc0/3.7615s得到 `prepared-05f3e1b17653`。prepared独审c8764877/evidence e3cf47d7接受30项事实，Root全文读报告并核SHA后创建新once7fbb583c，进入唯一实际 `actual-726d457fff37`（原session48979已结束，supervised195cf9d1ee34）。rc1/272.015s，七stage返回但fullchain失败，main16logical/16physical/111984known/missing2/blocked28未closed；readiness1/1/188 closed，0计划/0 Docker。fig三类别完成，table视觉入口发生公开pre-SSE EOF；两条unknown记录是否对应真实transport不能由聚合计数证明。first要求12职责，仅10 lowering有效，008/009原子来源被原unique/visible/considered守卫拒绝，original0/12。完整407源码221文件/31目录、原输入/预算与全部科学门限保留，终态独审与最窄提示修复继续；statistics v6在此实际未获执行资格。
 
 Phase3 original-duty retry完成：Root全文读作者3703a567、最终完整diff/test及独审6e9c5cd0/evidence bac799ef，接受24项有限事实。仅完整初始批次无请求/身份/聚合错误后的机械无效原行，每窗口最多重请求一轮；有效unresolved不重问，全父职责/来源/scope保留，原有效行完整值/类型不变，fresh raw独立核证后整行选取。旧坏行/错误/收据保持，完整原复核与global/adoption门限、原预算与决策预留不变，late recovery不能再次重问。唯一最终同字节public mock7f572eed在旧源红1/2.87s、新源绿1/52.43s，14分支/48Assert，220旧文件/7172旧Assert保持，Ruff3通过。当前source ccda7de5/00a00ffe同冻结；非空新selector links与多剩余batch只静态审核，mock未覆盖，科学真实效果待新源实际核验，407 actual不包含该修复。
+
+Phase3 scope提示完成：Root全文读诊断17b10ece、终态d7dd4ebd与作者33f476d5/完整单Constant差异，接受独审a4a133e9/evidence33505b55的14项事实。仅共享v5 scope增加两句现有consumer合同：atom span来自同claim显式considered组的实际供应可见正文、同atom三元组唯一，跨atom可复用。不自动改state/span/atom，不修改科学门限、retry或预算；全文逆bytes/AST恢复，221旧文件/7220旧Assert保持。单文件Ruff/compile通过，无pytest/真实服务；working a1224250同冻结。first/batch/original/retry五共享提示生效，407原失败细项仍未知，新实际科学资格待核。
 
 Phase8 default sandbox actual checkpoint：唯一Root自有环境probe rc0/wall6.796s，result16147a86；Root全文读接受终态独审84806195/evidence3913a38c的21项事实。完整40715ee canonical221文件/31目录、identitya7d851e5/archivee60a587a与前后source/input/批准image相同。12严格kernel项与4外层项全部true：uid/gid1000、caps0/NFP1、onlylo、CPU2/mem4GiB/swap0/PID256、root/appRO、源写入EROFS、scratch/HOME/tmp实际可写。唯一production protected argv差异为operator-only pullnever，0model/train/build/pull，stderr仅opaque且为空。只认证本机/该批准镜像/默认策略环境，NN与整篇科学资格仍开放；失败审计器的Windows sentinel换行预期修正及原失败保留，probe字节不改，无重复真实probe。
 
