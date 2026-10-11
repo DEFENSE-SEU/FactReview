@@ -12,14 +12,14 @@ from llm.client import LLMConfig
 from llm.codex_client import _coerce_usage
 from schemas.claim import Claim, ClaimLocation, Condition
 from schemas.materials import MaterialBlock, SharedMaterials
-from verification.experiment_catalog import build_catalog, resolve_source
-from verification.experiment_scope_context import (
+from verification.claim_context import (
     alias_ids,
     condition_groups,
     dealias,
     local_catalog,
     scope_block_ids,
 )
+from verification.experiment_catalog import build_catalog, resolve_source
 from verification.experiments import verify_experiments
 
 TABLE = (
@@ -134,3 +134,38 @@ def test_usage_is_recorded_per_call_site_with_cached_tokens(tmp_path):
     }
     assert row["analysis"]["token_usage"]["input_tokens"] == 100
     assert list(row["report_generation"]["submodules"]) == [f"report_generation:{__name__}"]
+
+
+def test_code_check_sends_and_accepts_only_claim_local_blocks(tmp_path, monkeypatch):
+    from preprocessing.materials import index_repository
+    from screening import checks
+    from verification.code import verify_code
+
+    monkeypatch.delenv("CODE_SOURCE_MAX_BYTES", raising=False)
+    monkeypatch.setattr(checks, "resolve_llm_config", lambda: LLMConfig("mock", "mock", None, None))
+    claim, materials = _paper(tmp_path)
+    claim = claim.model_copy(update={"needs": ["Code"]})
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "train.py").write_text("lr = 0.1\n", encoding="utf-8")
+    materials = materials.model_copy(update={"repository": index_repository(repo)})
+    sent = []
+
+    def model(**kw):
+        sent.append(json.loads(kw["prompt"]))
+        return {"items": [{
+            "file": "train.py", "line": 1, "quote": "lr = 0.1", "paper_block_id": "other",
+            "paper_quote": "Table 2: Speed.", "covered": ["c1"], "direction": "support",
+            "aspect": "hyperparameters", "detail": "Cites a block that was not sent.",
+        }]}
+
+    with pytest.raises(ValueError, match="block"):
+        verify_code(claim, materials, call=model)
+    ids = {block["id"] for block in sent[0]["paper_blocks"]}
+    assert "claim" in ids and "other" not in ids and "bib" not in ids
+
+
+def test_unanchored_claim_keeps_every_evidence_block(tmp_path):
+    claim, materials = _paper(tmp_path)
+    claim = claim.model_copy(update={"source_block_id": None, "source_quote": None})
+    assert scope_block_ids(claim, materials) == {b.id for b in materials.blocks if b.id != "bib"}

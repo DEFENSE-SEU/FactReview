@@ -2131,7 +2131,7 @@ def _scope_review(
 ):
     """Independent semantic review; its grounded structural/numeric gates fail closed."""
     from common import run_stats
-    from verification.experiment_scope_context import (
+    from verification.claim_context import (
         alias_ids,
         candidate_block_ids,
         condition_groups,
