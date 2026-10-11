@@ -2,21 +2,23 @@
 
 ## 当前完整框架 checkpoint（2026-10-11）
 
-Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送ordinary多条件Phase A的44061817bfc3dc246bd0aa15b0c3c4e346622014，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
+Task：继续完整三层框架；目标active，Phase0–7历史实现保留，Phase8整体交付开放。授权分支refactor/method-v2已推送Phase A的4406181及Phase3的c0bb46f29b57ec611dc6ab9b709ee59cc28629bc，精确远端已核；默认全套通过仅绑定此前42fb checkpoint。本轮继续执行，不暂停目标。
 
 Completed：最终默认全套仅运行一次，3754passed/3原默认deselected/0skipped/0fail/0error，exit0；pytest538.61s、wrapper541.797s。419源码/测试/config身份前后完全一致，原断言、marker及外部mock保持。报告final-default-regression-final-path-fixtures-v1/report.md；原56失败、后续12失败及所有局部红绿记录完整保留。原14验收第1项现通过，另13项窄合同保持；科学及商业完成仍需独立证据。
 
-Completed with failure：full-public-pipeline-native-delivery-v1的唯一actual3d0f27e116d0/supervised0c54517d27b9已rc1终态，wall888.703s；完整生产源固定f2786581b713c8ed39c18d39ad3d204b165b530d、216files/31dirs。主59logical/59physical、406761known tokens；readiness1/171独立，accounting全部closed、无retry。原8受保护输入、prepared源码、控制器与application imports身份无违规。真实MinerU无fallback、7 image inputs、四L2分支、JSON/MD/三PDF/SVG交付已实际运行；完整链失败：首轮及原复核0/11、计划0、Docker0、Theory一个灾难分支失败。partial报告及全部原raw保留，终态内容独审继续。后续工作树不进入本次f278实际，原实际/授权不复用。
+Completed with failure：full-public-pipeline-native-delivery-v1的唯一actual3d0f27e116d0/supervised0c54517d27b9已rc1终态，wall888.703s；完整生产源固定f2786581b713c8ed39c18d39ad3d204b165b530d、216files/31dirs。主59logical/59physical、406761known tokens；readiness1/171独立，accounting全部closed、无retry。原8受保护输入、prepared源码、控制器与application imports身份无违规。真实MinerU无fallback、7 image inputs、四L2分支、JSON/MD/三PDF/SVG交付已实际运行；完整链失败：首轮及原复核0/11、计划0、Docker0、Theory一个灾难分支失败。partial报告及全部原raw保留，终态内容独审已闭合。后续工作树不进入本次f278实际，原实际/授权不复用。
 
 Completed Phase5 ordinary multi-condition A：三产品文件仅移除两处整Claim单条件门槛并补四段selected-target提示；每plan仍仅一个正式条件，全文Claim/所有conditions/source SHA、资源、host测量、receipt、独立语义、judge/assessment保持。一个必要新公共mock有36Assert，1pass/5.84s、Ruff四文件通过；两conditions分别ordinary evaluation与完整released analysis，healthy2Evidence→Supported，缺资格/错condition/错来源→Unverified，8mock Docker/7mock semantic，0真实服务。原203旧test文件完整不变；有效red及fixture字段修正等失败全部保留。作者report c987056c，独审report7ea6a371闭合无阻断；Root读两报告接受集成。原3754全套和f278 actual都早于此改，不能继承其源码身份。
 
 Completed Phase3 local repair：Root两产品+Single一个新mock冻结，39Assert全文红/首次诊断缺失失败/最终绿完全同字节；新1pass/1.17s、四原直接关联case4pass/16.19s、Ruff三paths通过，原test函数/consumer不改。parent新增discovery_required_block_ids为完整有序ALLwindow；partial/foreign/duplicate/order先记录原raw/remaining且不启动child。review_only保持synthetic原语义，显式source group仅新增真实body fingerprint与raw组/ID/aggregate指针，不科学confirmed/不代遗漏检查。原17块补集方案已据职责证据修正并保历史；实际7IDs属于partial Discovery，原11行未在新实际中复核。作者reportb229ed36/evidence3aea86ad，16 scoped事实通过、原实际五身份同；独审first-batch-source-ack-independent-v1/report.md b85fa949/evidence db1a2cff闭合无阻断，Root已读报告接受集成。
 
-Open issues：真实完整链仍失败，终态内容独审full-public-pipeline-native-terminal-independent-v1最终report2c75c1dd闭合，旧bf703因果澄清保记录：claim011实际为single-source同义authorassertion自循环，joint消费者未被调用，不能将其当直接原因。Theory no_proof经正式appendix theorem guard的缺陷已最小修复并必要mock绿，独审待闭合，旧actual失败不重标。执行0plan由choice finite字段不覆盖correct_predictions等语义产生，Docker未运行。普通L2 v4多决策独立5路径有限实施由默认多条件dispatch接通，单条件/standalone旧v3保留；后续审计metadata与无授权默认读文件编码差异正在准确恢复/必要复核，不沿用此前绿身份。B2 choice/fullfragment、一般NN、整篇召回/原子性/M2/M5、联合paper evidence和外部事实source-authority资格仍开放。
+Completed Phase4 Theory local repair：原两行appendix→main theorem guard移到合法no_proof的continue之后，原正式证明与来源/全文条件守卫保持。新公共mock22Assert，最终1pass/.59s；原wrong-theorem否定节点在此前必要组已通过，22原函数/59原Assert完整不变。只纠正新测试真实审计字段名，首红与最终字节差异明确保留。作者theory-appendix-no-proof-guard-fix-v1/report.md；独审theory-appendix-no-proof-guard-independent-v1/report.md 2f6ca640/evidence32afaddb关闭19facts/23原件，Root已读报告与当前hash接受。缺证明仍无科学Evidence，旧actual失败不重标。
+
+Open issues：真实完整链仍失败，终态内容独审full-public-pipeline-native-terminal-independent-v1最终report2c75c1dd闭合，旧bf703因果澄清保记录：claim011实际为single-source同义authorassertion自循环，joint消费者未被调用，不能将其当直接原因。执行0plan由choice finite字段不覆盖correct_predictions等语义产生，Docker未运行；聚合entry错误含无效候选组合，不能称有效完整JSON entry也失败。普通L2 v4多决策五产品路径及一个新测试已冻结，默认多条件dispatch接通，单条件/standalone旧v3保留。审计metadata增量及原Unicode解析AST恢复后最终必要3节点3pass/15.60s、Ruff通过，报告multi-condition-v4-wire-implementation-v1/report.md cbb9cfe9；独立审核进行中。B1尚不覆盖实际单条件的计数/完整限定语；B2 choice/fullfragment、一般NN、整篇召回/原子性/M2/M5、联合paper evidence和外部事实source-authority资格仍开放。
 
 Decisions：已有repair3上限3、auto加可选interactive并记录模式、training0、deadline及获准arxiv fallback、集中原容差、v1 conflict→questioned保持。不会因mock全套通过或两页材料实际成功宣告商业完成。当前fixed f278实际证据与随后多条件源码/测试证据分别绑定各自身份。
 
-Next action：阶段提交/推送已独审Phase A；并行修L1真实双缺陷、实施ordinary L2 v4、闭合唯一真实终态内容独审。随后按证据修Theory与执行choice/纸内证据科学缺口，仅跑必要控制和获准身份的新实际，不盲重跑全套。某项服务或能力受阻时继续其他框架工作，目标保持active。
+Next action：提交/推送已独审Theory修复；并行审核普通L2 v4，设计当前单条件完整计数/限定语的真实执行接线以及外部事实source-authority资格。仅在根因被相应必要控制覆盖后准备新身份完整实际，旧失败全部保留，不盲重跑全套。某项服务或能力受阻时继续其他框架工作，目标保持active。
 
 ## 历史回归修复与真实执行 checkpoint（2026-10-11）
 

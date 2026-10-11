@@ -515,3 +515,114 @@ def test_notation_model_cannot_change_frozen_manuscript_after_trace_validation(t
 
     with pytest.raises(ValueError, match="artifact changed"):
         verify_theory(claim, materials, call=model)
+
+
+def test_appendix_local_no_proof_keeps_unable_trace_without_main_theorem_anchor(tmp_path, monkeypatch):
+    from tests.test_theory_sections_v2 import paper as section_paper
+    from verification.theory_sections import partition_theory_sections
+
+    monkeypatch.setattr("subprocess.Popen", lambda *a, **kw: pytest.fail("Process"))
+    materials = section_paper(
+        tmp_path,
+        [
+            ("main_heading", "heading", "1 Method"),
+            ("main", "text", "The evaluator compares fixed predictions and labels."),
+            ("appendix", "heading", "Appendix A Baseline proof"),
+            ("baseline", "text", "For every real x, x*x is nonnegative."),
+            ("scope_heading", "heading", "Separate research scope"),
+            ("scope", "text", "LabelProtocol introduces a novel pseudo-labeling method for inductive evaluation."),
+        ],
+    )
+    source = next(block for block in materials.blocks if block.id == "scope")
+    claim = Claim(
+        id="appendix-local",
+        text=source.text,
+        loc=source.loc,
+        source_block_id=source.id,
+        source_quote=source.text,
+        conditions=[Condition(id="c1", description="Novel LabelProtocol pseudo-labeling method with inductive evaluation")],
+        needs=["Theory"],
+    )
+    before_claim = copy.deepcopy(claim.model_dump(mode="json"))
+    before_materials = copy.deepcopy(materials.model_dump(mode="json"))
+    before_markdown = Path(materials.markdown_path).read_bytes()
+    partition = partition_theory_sections(materials)
+    assert partition.roles[source.id] == "appendix"
+    first = {
+        "schema_version": "theory-derivation-v1",
+        "items": [],
+        "appendix_block_ids": ["scope_heading", "scope"],
+        "derivations": [],
+    }
+    second = {
+        "schema_version": "theory-derivation-v1",
+        "appendix_block_ids": [],
+        "items": [{
+            "block_id": source.id,
+            "quote": source.text,
+            "step_quote": "",
+            "covered": ["c1"],
+            "fully_supported_conditions": [],
+            "kind": "no_proof",
+            "direction": "flaw",
+            "main_block_id": source.id,
+            "detail": "The passage states the novelty claim without an author derivation or comparison.",
+        }],
+        "derivations": [{
+            "item_index": 0,
+            "trace": {
+                "goal": claim.text,
+                "assumptions": [{
+                    "id": "a1",
+                    "text": "A complete LabelProtocol method and prior-work comparison are required.",
+                    "status": "required_unstated",
+                    "sources": [{"block_id": source.id, "quote": source.text}],
+                }],
+                "steps": [],
+                "gaps": [{
+                    "at": "goal",
+                    "reason": "The original passage contains an assertion without a derivation or comparison.",
+                    "needed": "The author's complete method and supporting comparison.",
+                    "sources": [{"block_id": source.id, "quote": source.text}],
+                }],
+                "outcome": "unable",
+                "completion_reason": "The available author passage cannot establish the novelty claim.",
+            },
+        }],
+    }
+    raw_before = copy.deepcopy([first, second])
+    requests = []
+
+    def model(**kwargs):
+        requests.append(kwargs["module"])
+        payload = json.loads(kwargs["prompt"])
+        assert payload["claim"] == before_claim
+        assert payload["allowed_theory_source_block_ids"] == (
+            ["main_heading", "main"] if len(requests) == 1
+            else ["main_heading", "main", "scope_heading", "scope"]
+        )
+        return copy.deepcopy(first if len(requests) == 1 else second)
+
+    result = verify_theory(claim, materials, call=model, output_dir=tmp_path / "audit")
+    assert requests == ["verification.theory", "verification.theory.appendix"]
+    assert len(result.theory_derivations) == 1
+    record = result.theory_derivations[0]
+    assert record.phase == "appendix" and record.adopted and record.state == "validated"
+    assert record.trace.outcome == "unable"
+    assert record.trace.assumptions[0].status == "required_unstated"
+    assert record.trace.gaps[0].sources[0].pointer.quote == source.text
+    assert record.trace.gaps[0].sources[0].pointer.locator == str(Path(materials.markdown_path).resolve())
+    assert not result.evidence and len(result.questions) == 1
+    assert result.questions[0].claim_id == claim.id
+    assert "No proof located" in result.issues[-1]
+    assert not result.verification_limitations
+    assert assess_claim(claim).status == "unverified"
+    assert claim.model_dump(mode="json") == before_claim
+    assert materials.model_dump(mode="json") == before_materials
+    assert Path(materials.markdown_path).read_bytes() == before_markdown
+    assert [first, second] == raw_before
+    audit_paths = sorted((tmp_path / "audit").glob("*.json"))
+    assert len(audit_paths) == 2
+    assert all(path.is_file() for path in audit_paths)
+    appendix_audit = json.loads(Path(record.audit_pointer).read_text(encoding="utf-8"))
+    assert appendix_audit["response"] == second

@@ -486,8 +486,6 @@ def verify_theory(
         pointer = _paper_pointer(materials, item.block_id, item.quote)
         covered = _covered(claim, item.covered)
         full_support = _fully_supported(covered, item.fully_supported_conditions)
-        if item.block_id in appendix and item.main_block_id not in main_ids:
-            raise ValueError("An appendix proof must link to a main-text theorem")
         if item.kind == "no_proof":
             if record.schema_version is not None and record.state != "validated":
                 unavailable(
@@ -521,6 +519,8 @@ def verify_theory(
                 )
             )
             continue
+        if item.block_id in appendix and item.main_block_id not in main_ids:
+            raise ValueError("An appendix proof must link to a main-text theorem")
         if item.direction == "support":
             if item.kind != "derivation" or not item.step_quote.strip() or item.step_quote not in item.quote:
                 raise ValueError("Theory support requires an exact derivation-step quote")
