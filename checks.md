@@ -2,6 +2,8 @@
 
 ## 最新验收状态（2026-10-11，Phase 8 继续进行）
 
+本轮完整 committed 源码已推送并接受独审：d43283cbb35a9f69caf0572481e2c540dd657b26，canonical archive7ff231d4/identity997c6e5d，222文件/31目录；Root全文读独审dd3a6859/factsc206ad97并核7对象，15/15来源绑定事实通过。八改动及一个新增精确对应已审冻结，213共同文件原样；working只允许CRLF规范化，四必要mock最终身份保持，无重复测试。NNv5/整篇v6候选已绑定同一完整源，独立controller审查进行中，prepare/once/live未开始；第2/8项仍未通过。
+
 已接受 Phase4固定 L2拒绝诊断：Root全文读独审a080403c/facts15634146并核10对象与当前身份，接受22有限事实；作者27对象另已核。四产品/唯一新mock，原三源17处可逆，原科学结果/异常/计划/限制/预算保持。每分支调用最多一次四固定键sidecar，None和注入兼容；必要同test红→绿1passed/.75s，4完整mock结果等价、Ruff/compile通过。仅两种首次code有运行控制，其余五种静态核证；不能解释旧actual零计划，也不能替代整链验收。
 
 已接受 Phase5有限静态包闭包：Root全文读作者v1/v2/v3 delta和最终独审91933003/factsec19bcde，并核作者17及独审6对象，18/18有限事实通过。parent/relative/transitive来源闭包、同目录native/bytecode shadow和已知导入能力别名纠正已闭合，保留普通batch、完整SHA与16/65536/262144容量及原科学守卫。唯一必要65场景组合mock最终1passed/1.59s；不声称任意factory/反射或通用Python兼容。真实NN及整链第2/8项仍待新源验证。
