@@ -1,0 +1,29 @@
+{
+  "purpose": "Exact frozen before modules for offline differential tests; never runtime application sources.",
+  "objects": [
+    {
+      "fixture": "before-rejection_diagnostics.py",
+      "original_frozen_source": "verification-write-outcomes-implementation-root-v1/before-rejection_diagnostics.py",
+      "sha256": "03ade92645fed8601f6096924c59cc288b5ddb7a3c08c3d0cff2b5b018667dc2",
+      "size": 4654
+    },
+    {
+      "fixture": "before-dispatch.py",
+      "original_frozen_source": "verification-write-outcomes-implementation-root-v1/before-dispatch.py",
+      "sha256": "3538cd1d55e80a4875176840ba8bfc4d63bc2065a2b4be7a4d22677d8d265a5c",
+      "size": 11621
+    },
+    {
+      "fixture": "before-joint-subguard.py",
+      "original_frozen_source": "verification-joint-subguard-outcomes-implementation-v1/before-rejection_diagnostics.py",
+      "sha256": "9e6e8cbb0c952cdf7289ed7cf350e9ea5a576b3683ca0bc33df7c1352566d1bc",
+      "size": 9695
+    },
+    {
+      "fixture": "before-catalog-v2.py",
+      "original_frozen_source": "inference-callable-catalog-implementation-v1/before/v2.py",
+      "sha256": "2cdbbc262d2752835210fec47e6a8fdb8e3e21800640cfc279b0ea2eb6b61976",
+      "size": 119721
+    }
+  ]
+}

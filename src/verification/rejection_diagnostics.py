@@ -41,7 +41,7 @@ _OUTCOMES = frozenset({
     "constructed", "record_called", "attempted", "already_attempted",
     "disabled_or_invalid_arguments", "invalid_destination", "path_validation_failed",
     "input_overlap", "payload_capacity", "path_identity_changed", "written", "io_failed", "unknown", "failed",
-})
+}) | frozenset(f"joint_subguard_{tag}" for tag in _JOINT_SUBGUARDS)
 _OUTCOME_CODES = frozenset().union(*_CODES.values(), {"experiments_dispatch_failed", "unknown"})
 _OUTCOME_MAX_ROWS = 128
 _OUTCOME_MAX_COUNT = 1_000_000
@@ -182,6 +182,10 @@ class FirstRejectionDiagnostic:
             return
         self.attempted = True
         _write_event(self, code, "attempted")
+        if (first_subguard is not None and type(self.branch) is str and self.branch == "Experiments"
+                and type(code) is str and code == "experiments_joint_final_validation_failed"):
+            tag = first_subguard if type(first_subguard) is str and first_subguard in _JOINT_SUBGUARDS else "unknown"
+            _write_event(self, code, f"joint_subguard_{tag}")
         try:
             if (self.directory is None or type(self.branch) is not str or self.branch not in _CODES
                     or type(code) is not str or code not in _CODES[self.branch]):

@@ -16,6 +16,7 @@ from common import run_stats
 from fact_generation.execution import inference_callable_catalog as catalog
 from fact_generation.execution import inference_runtime, v2
 from fact_generation.execution.inference_proposal_wire import freeze_sources
+from fact_generation.execution.inference_source_sites_diagnostics import RuntimeStageDiagnostic
 from fact_generation.execution.resource_contract import build_resource_contract
 from fact_generation.execution.runtime_launch import bind_source_sites
 from fact_generation.execution.runtime_observer import prepare_site
@@ -44,8 +45,7 @@ def test_complete_callable_catalog_and_public_diagnostic_seam(tmp_path, monkeypa
     monkeypatch.setattr("llm.client.resolve_llm_config", lambda: None)
     monkeypatch.setattr(v2.time, "monotonic", lambda: 10.0)
 
-    root = Path(__file__).resolve().parents[1]
-    before_path = root / "runs/v2_method_delivery/inference-callable-catalog-implementation-v1/before/v2.py"
+    before_path = Path(__file__).resolve().parent / "fixtures/v2_original_sources/before-catalog-v2.py"
     spec = importlib.util.spec_from_file_location("fact_generation.execution._catalog_before_v2", before_path)
     before = importlib.util.module_from_spec(spec)
     monkeypatch.setitem(sys.modules, spec.name, before)
@@ -330,6 +330,7 @@ raise RuntimeError("Author module and decorators must never execute")
     def binding(*values, **kwargs):
         if "source_sites_diagnostics" in kwargs:
             assert kwargs["source_sites_diagnostics"] is True
+            assert type(kwargs["runtime_stage_diagnostic"]) is RuntimeStageDiagnostic
         dispatch["bind"].append(set(kwargs))
         return real_bind(*values, **kwargs)
 
@@ -356,7 +357,16 @@ raise RuntimeError("Author module and decorators must never execute")
         assert all(value is None or type(value) is bool for value in observation["checks"].values())
         assert dispatch["inner"][-1] == {"config", "runner", "approver", "repairer", "source_sites_diagnostics"}
         assert dispatch["graph"][-1] == {"source_sites_diagnostics"}
-        assert dispatch["bind"][-1] == {"claim", "materials", "source_sites_diagnostics"}
+        assert dispatch["bind"][-1] == {
+            "claim", "materials", "source_sites_diagnostics", "runtime_stage_diagnostic",
+        }
+        stage_raw = (output / "run_0000/attempt_0/inference_runtime_stage_diagnostics.json").read_bytes()
+        assert len(stage_raw) <= 512
+        assert json.loads(stage_raw) == {
+            "schema": "torch-inference-runtime-stage-v1", "scope": "attempt_program_stages",
+            "audit_only": True, "adoption_authorized": False, "phase": "pre_run", "stage": "source_sites",
+            "terminal": "rejected", "pre_run_bound": False, "source_sites_reached": True, "source_sites_passed": False,
+        }
     for index, choice in enumerate((None, False, 1, "true")):
         output = tmp_path / "operator" / ("default"+str(index))
         options = {} if choice is None else {"source_sites_diagnostics": choice}

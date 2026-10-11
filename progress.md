@@ -1,5 +1,9 @@
 # FactReview v2 progress
 
+2026-10-11 Phase 4 固定子守卫交付已接受：原两处 source 增量独审与 Root 严格合同/fixture修正独审合并接受，报告 `1da13da8` / facts `5961c6ce`，Root 核22作者、32修正、4独审对象及当前文件，收据 `ee535d1a`。新增20闭枚举内存标签在原 attempted 之后、IO之前记录已经算出的首拒绝码；默认关闭、None不增标签、原一次侧文件/科学守卫/128与1m界保持。两个旧精确合同各按新增字段扩展，并增加完整固定事件/阶段快照校验；其余27 writer/41 catalog及新mock全部28原Assert保持。四份完整原baseline纳入tracked fixture，换行转换关闭。两个必要writer节点通过，catalog修后1passed/5.10s，原失败/Ruff3/被动compile7与身份收据保留，无通过节点复跑。原Full v8具体科学子码与IO原因仍unknown，方法2/8继续未通过。
+
+2026-10-11 审核修正进行中：Phase4 原候选独审 `ee9d3daa` 指出旧精确事件集合冲突与 ignored runs baseline 依赖，保持该版“需修正”。Root 窄修正冻件 `d7667d1e`：程序 source 未变，三测试采用四份完整原 baseline tracked fixture，原 writer 和 catalog 各一条精确集合扩展，同时补完整固定事件/阶段快照；其余原 Assert 有序保持，新 mock 28 项全部保持。必要旧 writer 红1/.32s、修正后两个 writer 通过；同轮 catalog 新 kwarg 合同失败保留，补精确断言后仅该节点绿1/5.10s；Ruff3/被动 compile7，等待另一 agent 审核，未提交。Phase2 原物化候选独审发现嵌套 HTML 提前退出可能伪造 References 来源；作者修 v2，v1冻件保持，不提交该版。新的 NN 有限阶段 observer 作者进行中。已接受 Phase5 提交 `605e6c8` 推送完成，精确远端同；方法2/8和整体 active。
+
 2026-10-11 Phase 5 执行阶段诊断交付：四源与一个必要 mock 获另一 agent 独审接受（report `bc5b0a7a` / facts `1c5c578f`）；Root 核作者 30 冻件、独审三对象及当前五文件，接受收据 `d9edf44c`。四模块 raw/AST inverse 精确、55 原成员和全部 43 Assert 保持。原 exact True 开关在程序闭包记录每 attempt 的有限阶段，固定 <=512B 独占侧文件，原 request/state/ledger/科学谓词及默认调用保持；IO 失败继续原流程。必要同字节 mock 旧红→新绿/2.43s，两个原相关节点/5.13s；两个 attempts、一次 accepted repair，图异常关闭由静态审核覆盖，未重复测试。新 observer 接入进行中；NN v7 原失败及科学资格不变，Phase 8 / 第2、8项继续开放。
 
 2026-10-11 Full v8终态已独审核证：Root全文读report `b00e5c2e`/12条facts并核六冻结对象（map `46f7c34a`），接受收据 `7a1590ea`。固定来源227/31、8输入、11控制器及唯一once/admission身份闭合，五程序投影由既定词法selector独立重算一致；source/科学/private仅opaque，不复读科学正文。原所有失败字段保持，L1完整程序检查通过、整链partial仅verification/0planL3。作者IO事件只证OSError分支，具体step和科学first_subguard仍unknown。已授权在既有内存事件闭枚举中保留已算fixedfirst_subguard，默认作用域关闭、一次写/原门/128与1m上限不变；该批尚未实施完成。

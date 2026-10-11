@@ -17,7 +17,7 @@ from verification.contracts import BranchResult, RejectedPlan
 
 
 def _before(name):
-    path = Path(__file__).resolve().parents[1] / "runs/v2_method_delivery/verification-write-outcomes-implementation-root-v1"
+    path = Path(__file__).resolve().parent / "fixtures/v2_original_sources"
     module = ModuleType(f"before_{name}")
     exec(compile((path / f"before-{name}.py").read_bytes(), f"before_{name}.py", "exec", dont_inherit=True), module.__dict__)
     return module
@@ -109,9 +109,14 @@ async def test_program_write_outcomes_preserve_original_contract(tmp_path, monke
         assert snapshot["closed"] is True and snapshot["adoption_authorized"] is False
         assert snapshot["coverage"] == "captured_scope_events_only"
         rows = snapshot["events"]
+        subguard_outcomes = set() if mode in {"invalid_branch", "invalid_code"} else {"joint_subguard_unknown"}
         assert {row["outcome"] for row in rows} == {
             "constructed", "record_called", "attempted", "already_attempted", outcome,
-        }
+        } | subguard_outcomes
+        assert [row for row in rows if row["outcome"] == "joint_subguard_unknown"] == (
+            [{"branch": "Experiments", "code": fixed_code, "stage": "writer",
+              "outcome": "joint_subguard_unknown", "count": 1}] if subguard_outcomes else []
+        )
         assert sum(row["count"] for row in rows if row["outcome"] == "record_called") == 2
         assert "SECRET_BODY_NEVER_CAPTURED" not in json.dumps(snapshot)
         assert str(tmp_path) not in json.dumps(snapshot)
