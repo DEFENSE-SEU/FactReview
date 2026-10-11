@@ -899,6 +899,21 @@ def _claim_registry(claims):
     ]
 
 
+def _registry_view(registry, payload):
+    """Full rows for claims this request references; others by id and text only."""
+    text = json.dumps({k: v for k, v in payload.items() if k != "current_claims"}, ensure_ascii=False)
+    return [
+        row if f'"{row["claim_id"]}"' in text else {"claim_id": row["claim_id"], "text": row["text"]}
+        for row in registry
+    ]
+
+
+_REGISTRY_NOTE = (
+    "current_claims lists every extracted claim; claims not referenced elsewhere in this request "
+    "carry only claim_id and text."
+)
+
+
 def _source_ids(claim):
     return {claim.source_block_id, *(ref.source_block_id for ref in claim.source_refs)} - {None}
 
@@ -2107,6 +2122,8 @@ def review_claim_coverage(
                 "supplemental_sources": supplements,
                 "scope_context": scope_context,
             }
+            payload["current_claims"] = _registry_view(registry, payload)
+            payload["current_claims_note"] = _REGISTRY_NOTE
             if first_review_batch_size is None:
                 coverage["budget"]["review_calls"] += 1
             try:
@@ -2310,6 +2327,8 @@ def review_claim_coverage(
                 "review_only_block_ids": [key for key in source_ids if key not in original_block_ids],
                 "scope_context": scope_context,
             }
+            followup_payload["current_claims"] = _registry_view(registry, followup_payload)
+            followup_payload["current_claims_note"] = _REGISTRY_NOTE
             accepted = []
             if not review.observations:
                 window["followup_status"] = "not_needed"
@@ -2434,6 +2453,7 @@ def review_claim_coverage(
                     for i, claim in enumerate(c["new_claims"], 1)
                 ],
             }
+            validation_payload["current_claims"] = _registry_view(registry, validation_payload)
             try:
                 if original_review_batch_size is None:
                     coverage["budget"]["validation_calls"] += 1
