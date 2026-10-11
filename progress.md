@@ -1,6 +1,6 @@
 # FactReview v2 progress
 
-最新交付：上一推送 `9303a058d6b1c6a594e617ae7cdd28bf71840019` 与远端精确核对；完整 226 文件/31 目录/257 安全成员的 committed 来源快照已独审、Root 接受（收据 `b8d3add4`）。本轮 Phase 5 的冻结函数目录与公开 source-sites 诊断接口已完成实现、必要控制及独审，Root 接受 12 项限定事实（收据 `d0b05dd7`）。目录保持科学资格 False，默认调用 kwargs 不变，exact True 才启用诊断。首轮坏批继续及一次恢复、固定 writer/dispatch 程序诊断也已完成必要控制，正在独审。Full v8 / NN v7 继续 source_pending、无 prepare/live 准入，NN 的显式开启与有限观察投影正在单独补齐；本次没有新的真实服务验证。
+最新交付：上一推送 `9303a058d6b1c6a594e617ae7cdd28bf71840019` 与远端精确核对；完整 226 文件来源快照已独审、Root 接受（收据 `b8d3add4`）。本轮 Phase 5 函数目录/公开 source-sites 诊断已独审、本地提交 `6fd73e4`（Root 收据 `d0b05dd7`，五路径 LF=Git 收据 `ff248b2b`）。Phase 4 固定 writer/dispatch 诊断也已独审接受 12 项限定事实，Root 收据 `8b750301`；唯一差分 mock 与三条必要原节点通过，Ruff/被动编译通过。首轮坏批继续及一次恢复待最终独审。Full v8 / NN v7 继续 source_pending、无 prepare/live 准入，两侧显式开启与有限程序投影正在单独补齐。本轮未新增真实服务验证，第 2、8 项保持未通过。
 
 Decisions（本轮）：first-review 新恢复 helper 默认 0、整体框架默认显式 1，可关闭，每窗口最多一轮，健康流程新增调用为 0；复用原预算与未来窗口 reserve，保留失败槽位、原回执和完整采用门。合法 unresolved 只能经新的完整核验获得新判断，未完成时继续 pending。该增量先限既有 batched 路径，unbatched 的恢复仍开放。inference 目录只提供完整冻结源码中程序核验的位置，原角色及最多八条 source-sites、原科学门保持；公开执行 API 的诊断选项默认关闭，只有 exact True 才传递。writer 诊断同样默认关闭，只记录固定程序事件，close 仅关闭已捕获事件的作用域，不能证明所有线程被观察或科学资格。本轮三项实现已冻结，当前限定控制结果不能替代真实整链成功。
 

@@ -13,6 +13,7 @@ from schemas.materials import SharedMaterials
 from schemas.review import DeliveryCheck
 from screening.visual_audit import redacted_record
 from verification.contracts import BranchResult, RejectedPlan
+from verification.rejection_diagnostics import record_experiments_dispatch_failure
 
 
 class VerificationResult(Contract):
@@ -156,11 +157,14 @@ async def verify_claims(
     jobs = [(claim, name) for claim in result.claims if claim.id not in blocked for name in claim.needs]
 
     async def run(claim, name):
+        failure_stage = "branch_lookup"
         try:
             branch = branches[name]
+            failure_stage = "invoke_or_branch_contract"
             try:
                 value = await _invoke(branch, claim.model_copy(deep=True), materials)
             except RejectedPlan as exc:
+                failure_stage = "rejected_plan_recovery"
                 if name != EvidenceNeed.EXPERIMENTS or exc.observations.plans:
                     raise ValueError(
                         "Rejected-plan recovery requires Experiments observations without plans"
@@ -176,9 +180,12 @@ async def verify_claims(
                         reason=str(exc),
                     )
                 )
+            failure_stage = "result_validation"
             _validate_result(claim, name, value)
             return value
         except Exception as exc:
+            if name == EvidenceNeed.EXPERIMENTS:
+                record_experiments_dispatch_failure(failure_stage)
             message = f"{name} verification failed: {exc}"
             return BranchResult(
                 issues=[message],
