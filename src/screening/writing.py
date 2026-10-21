@@ -103,7 +103,8 @@ _SYSTEM = (
     "Explain the violated grammatical relation or the competing scientific interpretations; a preferred "
     "wording alone does not establish a defect. OCR may alter symbols, words or spacing; proposed errors "
     "require original PDF confirmation. Copy quotes without normalizing math or whitespace. "
-    "Use the full-paper cross_reference_index for targets outside this section. Keep figure, table, section, "
+    "Use the full-paper cross_reference_index for targets outside this section; it lists the paper's "
+    "located targets whose labels occur in this section's text. Keep figure, table, section, "
     "appendix and equation namespaces distinct. A cross_reference candidate must state target_kind, "
     "target_label and reference_problem. The index is incomplete parser evidence; an absent target alone "
     "does not prove a missing manuscript object. unresolved_placeholder requires a visibly unexpanded "
@@ -250,6 +251,17 @@ def _reference_context(row, index):
     return matches, None
 
 
+def _section_index(index, blocks):
+    """Index entries whose label occurs in the section; validation still uses the full index."""
+    text = "\n".join(block.text for block in blocks)
+    entries = [
+        entry
+        for entry in index["entries"]
+        if entry["label"] and re.search(r"(?<![\w.])" + re.escape(entry["label"]) + r"(?![\w]|\.\d)", text)
+    ]
+    return {**index, "entries": entries}
+
+
 def _safe(value, configs):
     for cfg in configs:
         value = checks.redact_provider_details(value, cfg)
@@ -281,7 +293,7 @@ def _check_section(materials, group, record, index, *, call, first_candidate, so
             "blocks": [block.model_dump() for block in group["blocks"]],
             "policy_only_block_ids": group["policy_only"],
             "anonymity_policy": record.anonymity_policy,
-            "cross_reference_index": index,
+            "cross_reference_index": _section_index(index, group["blocks"]),
             "candidate_schema": WritingCandidate.model_json_schema(),
         },
         module="screening_writing",

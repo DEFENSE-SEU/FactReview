@@ -1,65 +1,74 @@
-"""Lossless model-facing advice input and explicit per-item basis requirements."""
+"""Condensed model-facing advice input and explicit per-item basis requirements."""
 
 from __future__ import annotations
 
 import copy
+import json
 
 from assessment.rules import _decisive_flaw
 from schemas.claim import ClaimStatus
 
-VERSION = "advice-request-v1"
-_ARRAYS = ("evidence", "questions", "notes", "theory_derivations", "verification_limitations")
+VERSION = "advice-request-v2"
+_CLAIM_FIELDS = ("id", "text", "status", "importance", "needs", "source_quote", "conditions")
+_DROP = ("pointer", "locator", "sha", "digest", "audit", "schema_version", "claim_id", "item_index")
+
+
+def _clip(value, limit):
+    text = str(value or "")
+    return text if len(text) <= limit else text[:limit] + " ...[truncated]"
+
+
+def _quote(pointer):
+    return {"quote": _clip(pointer.get("quote"), 300), "page": pointer.get("page")}
+
+
+def _condense(content):
+    """Keep a record's verdict-bearing fields; long text is clipped and paths dropped."""
+    if isinstance(content, str):
+        return _clip(content, 600)
+    if not isinstance(content, dict):
+        return _clip(json.dumps(content, ensure_ascii=False), 600)
+    result = {}
+    for key, value in content.items():
+        if key in ("pointer", "source_pointer") and isinstance(value, dict):
+            result["quote"] = _quote(value)
+        elif key == "trace" and isinstance(value, dict):
+            result["trace"] = {
+                "outcome": value.get("outcome"),
+                "completion_reason": _clip(value.get("completion_reason"), 300),
+                "gaps": [_clip(gap.get("reason") if isinstance(gap, dict) else gap, 200) for gap in value.get("gaps", [])][:5],
+            }
+        elif any(part in key for part in _DROP) or key == "additional_pointers":
+            continue
+        elif isinstance(value, str):
+            result[key] = _clip(value, 600)
+        elif isinstance(value, list):
+            result[key] = [_clip(v, 300) if isinstance(v, str) else v for v in value[:5]] if all(
+                isinstance(v, (str, int, float, bool)) or v is None for v in value
+            ) else _clip(json.dumps(value[:3], ensure_ascii=False), 600)
+        elif isinstance(value, dict):
+            result[key] = _clip(json.dumps(value, ensure_ascii=False), 400)
+        else:
+            result[key] = value
+    return {key: value for key, value in result.items() if value is not None}
 
 
 def project_input(data):
-    """Remove only checked duplicate content; the full input remains the audit contract."""
+    """Condensed model-facing view: the claim's frozen state plus each basis record's
+    verdict, gaps and a clipped quote. The full input stays the audit and validation contract."""
     known = {"claim", "basis", "ledger", "source_files", "input_version"}
     if set(data) - known:
         raise ValueError("Unknown advice input fields cannot be omitted from the request")
-    result = {
+    claim = data["claim"]
+    return {
         "request_version": VERSION,
         "input_version": data.get("input_version", "advice-v1"),
-        "claim": copy.deepcopy(data["claim"]),
-        "basis": copy.deepcopy(data["basis"]),
-        "catalog_arrays": {},
-        "ledger": [],
+        "claim": {key: copy.deepcopy(claim[key]) for key in _CLAIM_FIELDS if key in claim},
+        "basis": {
+            ref: {"condition_ids": list(row["condition_ids"]), "content": _condense(row["content"])}
+            for ref, row in data["basis"].items()
+        },
     }
-    for kind in _ARRAYS:
-        if kind not in result["claim"]:
-            continue
-        rows = result["claim"].pop(kind)
-        refs = [f"/{kind}/{index}" for index in range(len(rows))]
-        if [result["basis"][ref]["content"] for ref in refs] != rows:
-            raise ValueError("Advice request cannot remove unequal claim content")
-        result["catalog_arrays"][kind] = refs
-    for index, row in enumerate(data["ledger"]):
-        ref = f"/ledger/{index}"
-        if ref in result["basis"]:
-            if result["basis"][ref]["content"] != row:
-                raise ValueError("Advice request cannot remove unequal ledger content")
-            result["ledger"].append({"basis_ref": ref})
-        else:
-            result["ledger"].append({"unreferenced_context": copy.deepcopy(row)})
-    rebuilt_claim, rebuilt_ledger = reconstruct_input(result)
-    if rebuilt_claim != data["claim"] or rebuilt_ledger != data["ledger"]:
-        raise ValueError("Advice request must reconstruct the complete original scientific input")
-    return result
-
-
-def reconstruct_input(request):
-    """Recover the complete claim and linked ledger for integrity checks."""
-    claim = copy.deepcopy(request["claim"])
-    for kind, refs in request["catalog_arrays"].items():
-        claim[kind] = [copy.deepcopy(request["basis"][ref]["content"]) for ref in refs]
-    ledger = [
-        copy.deepcopy(
-            row["unreferenced_context"]
-            if "unreferenced_context" in row
-            else request["basis"][row["basis_ref"]]["content"]
-        )
-        for row in request["ledger"]
-    ]
-    return claim, ledger
 
 
 def requirements(claim, data):
@@ -129,4 +138,11 @@ def requirements(claim, data):
 def build_request(claim, data):
     request = project_input(data)
     request["item_requirements"] = requirements(claim, data)
+    named = {
+        ref
+        for row in request["item_requirements"]["conditions"]
+        for ref in [*row["required_basis_refs"], *(r for group in row["one_or_more_from_each_group"] for r in group)]
+    }
+    if named - set(request["basis"]):
+        raise ValueError("Advice requirements reference a basis record absent from the request")
     return request

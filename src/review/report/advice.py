@@ -16,7 +16,7 @@ from typing import Literal
 from pydantic import Field, StrictStr
 
 from assessment.rules import _decisive_flaw
-from llm.client import llm_json, resolve_llm_config
+from llm.client import effort_label, llm_json, resolve_llm_config
 from llm.diagnostics import redact_provider_details
 from schemas.claim import AdviceItem, Claim, ClaimAdvice, ClaimStatus, Contract
 from schemas.review import FinalReview
@@ -49,11 +49,10 @@ Preserve all stated limits. Do not give publication acceptance/rejection advice.
 Cover all uncovered conditions for unverified and all supported conditions for
 supported. Existing author questions are inputs, not evidence of a final verdict.
 
-The request stores each scientific record once in basis. catalog_arrays lists
-the exact basis references for the claim's evidence, notes, questions, derivations
-and operational limitations; ledger rows likewise reference basis where possible.
-These are complete original records, with no summarization. Read their contents.
-Local source-file integrity hashes are retained separately in the immutable audit.
+The request lists the claim's frozen state and each evidence, note, question,
+derivation, operational limitation, execution record and coverage gap once in basis,
+condensed to its verdict-bearing fields with long quotes and notes truncated.
+The complete records and local source-file hashes stay in the immutable audit.
 item_requirements enumerates the validator's per-condition requirements. EVERY
 item must include all required_basis_refs and at least one reference from EACH
 one_or_more_from_each_group, for EACH condition it names. Obey required_action
@@ -377,9 +376,10 @@ def generate_advice(review: FinalReview, output_dir: Path, *, call=None) -> Advi
                 model=cfg.model,
                 attempted=True,
             )
-            raw = (call if call is not None else llm_json)(
-                prompt=prompt, system=_SYSTEM, cfg=cfg, module="report_generation"
-            )
+            with effort_label("report_generation.advice"):
+                raw = (call if call is not None else llm_json)(
+                    prompt=prompt, system=_SYSTEM, cfg=cfg, module="report_generation"
+                )
             audit["response"] = _safe(raw, cfg)
             if review.claims[index].model_dump(mode="json", exclude={"advice"}) != original[claim.id]:
                 raise ValueError("Caller assessment changed during advice generation")

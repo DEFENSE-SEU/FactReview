@@ -55,6 +55,10 @@ class Settings(BaseSettings):
     agent_resume_attempts: int = 2
     experiment_scope_binding_repair_rounds: int = Field(default=0, ge=0, le=1)
     theory_visual_recheck_rounds: int = Field(default=1, ge=0, le=1)
+    # Lower reasoning effort for extraction/coverage/writing/advice calls, matched by
+    # module-label prefix; judgement calls keep the provider default. "" disables.
+    llm_low_effort_modules: str = "screening.claims,screening_writing,report_generation.advice"
+    llm_low_reasoning_effort: str = Field(default="low", pattern=r"^(|minimal|low|medium|high)$")
 
     @field_validator("theory_visual_recheck_rounds", mode="before")
     @classmethod

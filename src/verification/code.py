@@ -84,15 +84,7 @@ def _numbered_lines(text: str) -> list[dict]:
 
 def _scope_summary(scope: dict, claim: Claim) -> dict:
     """Keep prompt/report metadata bounded; full manifests remain in the run."""
-    summary = {key: scope[key] for key in ("budget_bytes", "selected_bytes")}
-    summary.update(
-        selected_count=len(scope["selected_files"]),
-        omitted_count=len(scope["omitted_files"]),
-        omission_reasons=dict(Counter(row["reason"] for row in scope["omitted_files"])),
-        selected_sample=[path[:160] for path in scope["selected_files"][:10]],
-        omitted_sample=[{**row, "path": row["path"][:160]} for row in scope["omitted_files"][:10]],
-        sample_limit=10,
-    )
+    summary = _summary_fields(scope)
     stats = run_stats.stats_path()
     if stats is not None:
         directory = stats.parent / "code_scopes"
@@ -103,6 +95,19 @@ def _scope_summary(scope: dict, claim: Claim) -> dict:
             json.dumps({"claim_id": claim.id, **scope}, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         summary["manifest"] = str(path)
+    return summary
+
+
+def _summary_fields(scope: dict) -> dict:
+    summary = {key: scope[key] for key in ("budget_bytes", "selected_bytes")}
+    summary.update(
+        selected_count=len(scope["selected_files"]),
+        omitted_count=len(scope["omitted_files"]),
+        omission_reasons=dict(Counter(row["reason"] for row in scope["omitted_files"])),
+        selected_sample=[path[:160] for path in scope["selected_files"][:10]],
+        omitted_sample=[{**row, "path": row["path"][:160]} for row in scope["omitted_files"][:10]],
+        sample_limit=10,
+    )
     return summary
 
 
@@ -139,7 +144,45 @@ class CodeOutput(Contract):
     issues: list[str] = Field(default_factory=list)
 
 
-def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_call=None) -> BranchResult:
+_CODE_SYSTEM = (
+    "Compare paper descriptions to indexed configs and source: architecture, loss, optimizer, "
+    "hyperparameters, data processing, and evaluation protocol. Return output_schema JSON. "
+    "Each item requires a specific source/config file, its one-based first line and exact contiguous "
+    "line quote, plus an exact located paper quote. Explain the agreement or mismatch in detail. "
+    "covered must be a nonempty list of distinct exact strings from allowed_condition_ids, the IDs "
+    "in claim.conditions. Never use claim.id, block IDs, datasets, or metric names. Include only "
+    "conditions the item actually addresses. Omit items that cannot be tied to an allowed condition "
+    "and explain the limitation in issues; return items=[] when none can be grounded. "
+    "For support, explicitly list fully_supported_conditions only when this one item establishes "
+    "the ENTIRE condition and every relevant qualifier of the claim. Leave the list empty for "
+    "partial agreement and describe the missing parts in detail. Source presence, loading code, "
+    "or a download hook does not prove a public URL works or that all claimed data is released. "
+    "Architecture and implementation do not establish historical novelty, reported performance, "
+    "or an extension absent from the implementation. Do not fully support such conditions using "
+    "only relevant source lines. "
+    "Copy paper_quote verbatim as one contiguous substring of the selected paper block's text. "
+    "Copy quote as complete contiguous source lines starting at line, preserving indentation. "
+    "Preserve all mathematical markup, whitespace, punctuation, and spelling; do not normalize "
+    "math, paraphrase, or join disjoint passages. "
+    "source_scope lists omitted files and the source budget. An omitted file has not been inspected; "
+    "do not infer missing implementations or repository-wide agreement from this selection. "
+    "Only cite supplied files. Never execute or change code. Do not invent status or sufficiency fields. "
+    "When one condition requires multiple files, explicitly propose ONE support item with primary "
+    "file/line/quote and additional_sources containing every other exact source range needed. "
+    "Such a joint item must cover exactly one condition. Establish the actual cross-file links "
+    "and all original qualifiers; do not automatically merge separate partial observations. "
+    "additional_sources=[] retains single-source behavior. Local file contents do not establish "
+    "public URL availability, a measured execution result, or external release completeness."
+)
+
+
+def _sources_digest(sources: dict[str, str]) -> str:
+    return hashlib.sha256(json.dumps(sources, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
+def verify_code(
+    claim: Claim, materials: SharedMaterials, *, call=None, scope_call=None, batched_response=None
+) -> BranchResult:
     budget = int(os.environ.get("CODE_SOURCE_MAX_BYTES", "200000"))
     if budget <= 0:
         raise ValueError("CODE_SOURCE_MAX_BYTES must be a positive integer")
@@ -177,46 +220,27 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
         )
     cfg = checks.resolve_llm_config()
     frozen = CodeSourceContext.capture(claim, materials, sources)
-    response = ask(
-        "Compare paper descriptions to indexed configs and source: architecture, loss, optimizer, "
-        "hyperparameters, data processing, and evaluation protocol. Return output_schema JSON. "
-        "Each item requires a specific source/config file, its one-based first line and exact contiguous "
-        "line quote, plus an exact located paper quote. Explain the agreement or mismatch in detail. "
-        "covered must be a nonempty list of distinct exact strings from allowed_condition_ids, the IDs "
-        "in claim.conditions. Never use claim.id, block IDs, datasets, or metric names. Include only "
-        "conditions the item actually addresses. Omit items that cannot be tied to an allowed condition "
-        "and explain the limitation in issues; return items=[] when none can be grounded. "
-        "For support, explicitly list fully_supported_conditions only when this one item establishes "
-        "the ENTIRE condition and every relevant qualifier of the claim. Leave the list empty for "
-        "partial agreement and describe the missing parts in detail. Source presence, loading code, "
-        "or a download hook does not prove a public URL works or that all claimed data is released. "
-        "Architecture and implementation do not establish historical novelty, reported performance, "
-        "or an extension absent from the implementation. Do not fully support such conditions using "
-        "only relevant source lines. "
-        "Copy paper_quote verbatim as one contiguous substring of the selected paper block's text. "
-        "Copy quote as complete contiguous source lines starting at line, preserving indentation. "
-        "Preserve all mathematical markup, whitespace, punctuation, and spelling; do not normalize "
-        "math, paraphrase, or join disjoint passages. "
-        "source_scope lists omitted files and the source budget. An omitted file has not been inspected; "
-        "do not infer missing implementations or repository-wide agreement from this selection. "
-        "Only cite supplied files. Never execute or change code. Do not invent status or sufficiency fields. "
-        "When one condition requires multiple files, explicitly propose ONE support item with primary "
-        "file/line/quote and additional_sources containing every other exact source range needed. "
-        "Such a joint item must cover exactly one condition. Establish the actual cross-file links "
-        "and all original qualifiers; do not automatically merge separate partial observations. "
-        "additional_sources=[] retains single-source behavior. Local file contents do not establish "
-        "public URL availability, a measured execution result, or external release completeness.",
-        {
-            "claim": claim.model_dump(mode="json"),
-            "allowed_condition_ids": [condition.id for condition in claim.conditions],
-            "paper_blocks": [b.model_dump() for b in materials.blocks],
-            "files": {name: _numbered_lines(text) for name, text in sources.items()},
-            "source_scope": summary,
-            "output_schema": CodeOutput.model_json_schema(),
-        },
-        module="verification.code",
-        call=call,
-    )
+    from verification.claim_context import local_materials, scope_block_ids
+
+    # Claim-local paper context; a paper quote outside it cannot be cited.
+    paper_context = local_materials(materials, scope_block_ids(claim, materials))
+    if batched_response is not None and batched_response["sources_sha256"] == _sources_digest(sources):
+        # One shared-repository request already judged this claim with the same files.
+        response = batched_response["response"]
+    else:
+        response = ask(
+            _CODE_SYSTEM,
+            {
+                "claim": claim.model_dump(mode="json"),
+                "allowed_condition_ids": [condition.id for condition in claim.conditions],
+                "paper_blocks": [b.model_dump() for b in paper_context.blocks],
+                "files": {name: _numbered_lines(text) for name, text in sources.items()},
+                "source_scope": summary,
+                "output_schema": CodeOutput.model_json_schema(),
+            },
+            module="verification.code",
+            call=call,
+        )
     frozen.check(claim, materials)
     response = deepcopy(response)
     parse_issues = []
@@ -309,7 +333,7 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
                         "artifact_sha256": hashes[span.file],
                     }
                 )
-            paper = _paper_pointer(materials, item.paper_block_id, item.paper_quote)
+            paper = _paper_pointer(paper_context, item.paper_block_id, item.paper_quote)
             validated.append((index, item, paper, covered, members))
             if item.additional_sources:
                 joint_members[index] = members
@@ -486,3 +510,80 @@ def verify_code(claim: Claim, materials: SharedMaterials, *, call=None, scope_ca
             joint_failure(evidence.code_joint_binding.candidate_index, evidence.covered, exc)
     result.evidence = retained
     return result
+
+
+class _ClaimCodeResult(CodeOutput):
+    claim_id: NonEmpty
+
+
+class CodeBatchOutput(Contract):
+    results: list[_ClaimCodeResult]
+
+
+_BATCH_SYSTEM = (
+    "Several claims share the same indexed repository files. Check each claims entry independently, "
+    "exactly as if it were the only claim: use only its claim, allowed_condition_ids and the "
+    "paper_blocks named by its paper_block_ids. Return results with exactly one entry per claims entry, "
+    "each {claim_id, items, issues} following the per-claim rules below. "
+)
+
+
+def batch_code_responses(claims: list[Claim], materials: SharedMaterials, *, call=None, max_claims=6) -> dict:
+    """One request per group of claims with identical selected files.
+
+    Returns {claim_id: {"sources_sha256", "response"}}; verify_code reuses a response
+    only when its own file selection has the same digest. A claim the batch omits or
+    a failed batch falls back to verify_code's single-claim request.
+    """
+    from verification.claim_context import scope_block_ids
+
+    budget = int(os.environ.get("CODE_SOURCE_MAX_BYTES", "200000"))
+    groups = {}
+    for claim in claims:
+        sources, scope = _indexed_sources(materials, claim=claim, budget=budget)
+        if sources:
+            key = _sources_digest(sources)
+            groups.setdefault(key, {"sources": sources, "scope": scope, "claims": []})["claims"].append(claim)
+    blocks = {block.id: block for block in materials.blocks}
+    results = {}
+    for key, group in groups.items():
+        members = group["claims"]
+        if len(members) < 2:
+            continue
+        for start in range(0, len(members), max_claims):
+            chunk = members[start : start + max_claims]
+            context = {claim.id: scope_block_ids(claim, materials) for claim in chunk}
+            shared = set().union(*context.values())
+            try:
+                response = ask(
+                    _BATCH_SYSTEM + _CODE_SYSTEM,
+                    {
+                        "claims": [
+                            {
+                                "claim": claim.model_dump(mode="json"),
+                                "allowed_condition_ids": [c.id for c in claim.conditions],
+                                "paper_block_ids": [b for b in blocks if b in context[claim.id]],
+                            }
+                            for claim in chunk
+                        ],
+                        "paper_blocks": [blocks[b].model_dump() for b in blocks if b in shared],
+                        "files": {name: _numbered_lines(text) for name, text in group["sources"].items()},
+                        "source_scope": _summary_fields(group["scope"]),
+                        "output_schema": CodeBatchOutput.model_json_schema(),
+                    },
+                    module="verification.code.batch",
+                    call=call,
+                )
+            except RuntimeError:
+                continue
+            rows = response.get("results") if isinstance(response, dict) else None
+            rows = [r for r in rows if isinstance(r, dict)] if isinstance(rows, list) else []
+            seen = Counter(row.get("claim_id") for row in rows)
+            for row in rows:
+                # A missing, duplicated or malformed row falls back to the single-claim request.
+                if row.get("claim_id") in context and seen[row["claim_id"]] == 1 and isinstance(row.get("items"), list):
+                    results[row["claim_id"]] = {
+                        "sources_sha256": key,
+                        "response": {k: row[k] for k in ("items", "issues") if k in row},
+                    }
+    return results

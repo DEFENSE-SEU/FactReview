@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import base64
+import contextlib
+import contextvars
 import json
 import mimetypes
 import os
@@ -226,6 +228,29 @@ def _parse_json_response(text: str) -> dict[str, Any]:
     return {"status": "unknown", "raw": text}
 
 
+_EFFORT_LABEL: contextvars.ContextVar[str] = contextvars.ContextVar("factreview_effort_label", default="")
+
+
+@contextlib.contextmanager
+def effort_label(label: str):
+    """Name calls for reasoning-effort selection when their stats module is shared."""
+    token = _EFFORT_LABEL.set(label)
+    try:
+        yield
+    finally:
+        _EFFORT_LABEL.reset(token)
+
+
+def reasoning_effort(module: str | None) -> str:
+    """Configured low effort for matching labels; "" keeps the provider default."""
+    from common.config import get_settings
+
+    settings = get_settings()
+    prefixes = [p.strip() for p in settings.llm_low_effort_modules.split(",") if p.strip()]
+    label = _EFFORT_LABEL.get() or str(module or "")
+    return settings.llm_low_reasoning_effort if any(label.startswith(p) for p in prefixes) else ""
+
+
 def llm_json(
     prompt: str,
     system: str,
@@ -238,8 +263,11 @@ def llm_json(
     Minimal JSON response helper for the providers used in the execution stage.
     """
     if run_stats.stats_path() is not None:
-        module = run_stats.validate_module(module or run_stats.current_module() or "")
+        # Keep the caller's specific label; record_llm_call normalizes it.
+        module = module or run_stats.current_module() or ""
+        run_stats.validate_module(module)
         run_stats.read_initialized()
+    effort = reasoning_effort(module) if cfg.provider == "openai-codex" else ""
     t0 = time.monotonic()
     usage: dict[str, Any] = {}
     text = ""
@@ -306,6 +334,7 @@ def llm_json(
                         model=cfg.model,
                         base_url=cfg.base_url or "https://chatgpt.com/backend-api/codex",
                         return_usage=True,
+                        **({"reasoning_effort": effort} if effort else {}),
                         **(
                             {"image_data": [f"data:{mime};base64,{data}" for mime, data in encoded_images]}
                             if encoded_images
@@ -328,6 +357,7 @@ def llm_json(
                             duration_sec=time.monotonic() - t0,
                             failed=True,
                             image_count=len(images or []),
+                            reasoning_effort=effort,
                             warning="Codex transport attempt 1 failed before SSE with EOF/reset; "
                             f"{redact_provider_details(str(exc), cfg)}. "
                             "One retry follows; missing usage remains unavailable.",
@@ -393,6 +423,7 @@ def llm_json(
                 failed=True,
                 image_count=len(images or []),
                 **({"local_denial": getattr(e, "receipt", None)} if type(e) is PhysicalAttemptNotStarted else {}),
+                reasoning_effort=effort,
             )
         return redact_provider_details(
             {
@@ -416,6 +447,7 @@ def llm_json(
             response_text=text,
             duration_sec=time.monotonic() - t0,
             image_count=len(images or []),
+            reasoning_effort=effort,
         )
 
     return redact_provider_details(_parse_json_response(text), cfg)

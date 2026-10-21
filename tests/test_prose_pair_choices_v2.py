@@ -5,6 +5,7 @@ import json
 
 import pytest
 
+from common.run_stats import run_scope
 from llm.client import LLMConfig
 from schemas.claim import ClaimSourceRef
 from tests.experiment_authority_fixtures import authority_scope_fixture
@@ -51,7 +52,8 @@ def test_input_lists_the_direct_result_pair_and_canonical_bare_setting_keys(tmp_
         tmp_path, DECREASE if transition else COMPARE, transition=transition
     )
     original = copy.deepcopy((paper[0].model_dump(), candidate, review))
-    result, payload = capture(paper, candidate, review)
+    with run_scope(tmp_path / "stats.json"):
+        result, payload = capture(paper, candidate, review)
     choices = payload["bound_prose_pair_choices"]["c1"]
     assert len(choices) == 1
     choice = choices[0]

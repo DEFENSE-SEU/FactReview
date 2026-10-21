@@ -74,6 +74,8 @@ def validate_module(module: str) -> str:
     normalized = str(module or "").strip()
     if normalized.startswith(("screening.", "screening_", "verification.", "verification_")):
         normalized = "analysis"
+    elif normalized.startswith("report_generation."):
+        normalized = "report_generation"
     if normalized not in MODULE_ORDER:
         raise ValueError(f"unknown stats module: {module!r}")
     return normalized
@@ -360,6 +362,27 @@ def _coerce_usage(usage: Any) -> dict[str, int]:
     return result
 
 
+_DETAIL_KEYS = ("cached_input_tokens", "reasoning_output_tokens")
+
+
+def _caller_label() -> str:
+    """Name the first frame outside the model client and stats plumbing."""
+    skip = ("llm.", "common.run_stats", "screening.checks", "asyncio", "threading", "concurrent", "contextlib")
+    frame = sys._getframe(2)
+    while frame is not None:
+        name = str(frame.f_globals.get("__name__") or "")
+        if name and not name.startswith(skip):
+            return name
+        frame = frame.f_back
+    return "unknown"
+
+
+def _submodule_label(requested: str | None, normalized: str) -> str:
+    """Keep the caller's specific module label; collapse only adds the stats module."""
+    clean = str(requested or "").strip()
+    return clean if clean and clean != normalized else f"{normalized}:{_caller_label()}"
+
+
 def estimate_tokens(text: str) -> int:
     clean = str(text or "")
     if not clean:
@@ -384,6 +407,7 @@ def record_llm_call(
     failed: bool = False,
     image_count: int = 0,
     local_denial: Any = None,
+    reasoning_effort: str = "",
 ) -> Any:
     """Record a call attempt, including local/provider failures and requested images.
 
@@ -394,6 +418,10 @@ def record_llm_call(
     if not resolved_module:
         raise RuntimeError("LLM usage recording requires an active stats module")
     normalized = validate_module(resolved_module)
+    submodule = _submodule_label(resolved_module, normalized)
+    details = {
+        key: max(0, int((usage or {}).get(key) or 0)) for key in _DETAIL_KEYS
+    }
 
     if local_denial is not None:
         if (failed is True and (usage is None or (type(usage) is dict and not usage))
@@ -469,6 +497,17 @@ def record_llm_call(
         )
         _inc_counter(row["providers"], provider or "unknown")
         _inc_counter(row["models"], model or "unknown")
+        # Per-call-site breakdown; module totals above stay the accounting contract.
+        sub = row.setdefault("submodules", {}).setdefault(
+            submodule,
+            {"requests": 0, "input_tokens": 0, "output_tokens": 0, **dict.fromkeys(_DETAIL_KEYS, 0)},
+        )
+        sub["requests"] += 1
+        sub["input_tokens"] += exact_usage["input_tokens"]
+        sub["output_tokens"] += exact_usage["output_tokens"]
+        for key, count in details.items():
+            sub[key] += count
+        _inc_counter(sub.setdefault("reasoning_effort", {}), reasoning_effort or "default")
         if warning:
             _append_warning(row, warning)
         for additional_warning in additional_warnings:

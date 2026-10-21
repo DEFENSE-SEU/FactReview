@@ -342,6 +342,7 @@ def run_v2_pipeline(
                             global_literature=global_literature,
                             call=call,
                             blocked_claim_ids=screening.blocked_claim_ids,
+                            execution_requested=bool(getattr(args, "run_execution", False)),
                         )
                     ),
                     recover=recover_verification,

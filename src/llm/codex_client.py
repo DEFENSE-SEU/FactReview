@@ -180,11 +180,21 @@ def _coerce_usage(value: Any) -> dict[str, int]:
     total_count = counts.get("total_tokens", 0)
     if total_count <= 0:
         total_count = input_count + output_count
-    return {
+    result = {
         "input_tokens": input_count,
         "output_tokens": output_count,
         "total_tokens": total_count,
     }
+    # Responses API breakdowns: cached prompt prefix and reasoning share of output.
+    for target, parent, key in (
+        ("cached_input_tokens", "input_tokens_details", "cached_tokens"),
+        ("reasoning_output_tokens", "output_tokens_details", "reasoning_tokens"),
+    ):
+        details = value.get(parent)
+        raw = details.get(key) if isinstance(details, dict) else None
+        if type(raw) is int and raw >= 0:
+            result[target] = raw
+    return result
 
 
 def _extract_usage(payload: dict[str, Any]) -> dict[str, int]:
@@ -213,6 +223,7 @@ def invoke_codex(
     base_url: str,
     return_usage: bool = False,
     image_data: list[str] | None = None,
+    reasoning_effort: str | None = None,
 ) -> str | tuple[str, dict[str, int]]:
     url = resolve_codex_base_url(base_url).rstrip("/") + "/responses"
     payload = {
@@ -222,7 +233,7 @@ def invoke_codex(
         "tools": [],
         "tool_choice": "auto",
         "parallel_tool_calls": False,
-        "reasoning": {"summary": "auto"},
+        "reasoning": {"summary": "auto", **({"effort": reasoning_effort} if reasoning_effort else {})},
         "store": False,
         "stream": True,
         "include": ["reasoning.encrypted_content"],

@@ -43,7 +43,7 @@ def case():
 
 def review(payload, *, groups=1, findings=(), state="resolved"):
     c = payload["current_claims"][0]
-    all_ids = [x["id"] for x in c["conditions"]]
+    all_ids = [x["id"] for x in c.get("conditions", [])]
     partitions = [all_ids] if groups == 1 else [[i] for i in all_ids]
     raw = {
         "schema_version": "claim-coverage-v3",
@@ -53,7 +53,7 @@ def review(payload, *, groups=1, findings=(), state="resolved"):
         "claim_reviews": [
             {
                 "claim_id": c["claim_id"],
-                "claim_digest": c["digest"],
+                "claim_digest": c.get("digest"),
                 "state": state,
                 "assertion_groups": [
                     {
