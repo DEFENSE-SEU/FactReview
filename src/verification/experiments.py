@@ -2183,25 +2183,13 @@ def _scope_review(
 ):
     """Independent semantic review; its grounded structural/numeric gates fail closed."""
     from common import run_stats
-    from verification.claim_context import (
-        candidate_block_ids,
-        condition_groups,
-        local_catalog,
-        local_materials,
-        scope_block_ids,
-    )
 
     joint_catalogs = joint_catalogs or {}
     execution_review = projection_reviews is not None or bool(choice_selections) or statistics_context is not None
-    if execution_review:
-        # Execution projections/choices are audited against the whole paper.
-        context_ids = {block.id for block in materials.blocks}
-    else:
-        # Claim-local context: IDs outside it are unknown to the resolvers below.
-        context_ids = scope_block_ids(claim, materials, candidate_block_ids(output))
-        if catalog is not None:
-            catalog = local_catalog(catalog, context_ids, condition_groups(claim))
-    context_materials = local_materials(materials, context_ids)
+    # The scope review reads the whole paper: source-authority selectors may cite
+    # any table, including ones the first pass did not quote.
+    context_ids = {block.id for block in materials.blocks}
+    context_materials = materials
     payload = {
         "claim": claim.model_dump(mode="json"),
         "paper_blocks": [block.model_dump() for block in context_materials.blocks],
