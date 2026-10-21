@@ -272,6 +272,10 @@ materials → L1 screening → L2 typed verification → L3 execution (optional)
 
 The full design is in [`docs/method_v2_spec.md`](docs/method_v2_spec.md).
 
+## Benchmark
+
+[`benchmark/papers.csv`](benchmark/papers.csv) lists the 300 peer-reviewed papers used in the evaluation, in six groups from Agents4Science, ICLR, TMLR, Nature Communications, COLM and ICML. See [`benchmark/README.md`](benchmark/README.md).
+
 ## Troubleshooting
 
 - **`codex login` fails or is not on PATH** — install OpenAI's Codex CLI (`npm install -g @openai/codex`), then rerun `codex login` and pick the ChatGPT sign-in flow.
