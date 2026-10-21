@@ -499,6 +499,7 @@ def render_markdown(
     lines += [
         "## 1. Overview",
         "",
+        *([f"Claim gate: {review.gate}.", ""] if review.gate else []),
         "| Status | Count |",
         "|---|---:|",
     ]

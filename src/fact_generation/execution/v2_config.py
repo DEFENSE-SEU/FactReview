@@ -156,6 +156,9 @@ class ExecutionConfig(Contract):
     docker_options: dict[str, Any] = Field(default_factory=dict)
     sandbox: SandboxPolicy = Field(default_factory=SandboxPolicy)
     refine_with_llm: bool = True
+    # Ablation switches; defaults are the method's strict alignment and dependency-only repair.
+    alignment: Literal["strict", "relaxed"] = "strict"
+    repairer: Literal["default", "llm"] = "default"
     output_mappings: dict[str, OutputMapping] = Field(default_factory=dict)
     author_artifacts: dict[str, list[ReleasedArtifactContract]] = Field(default_factory=dict)
     paper_variances: dict[str, dict[str, PaperVariance]] = Field(default_factory=dict)

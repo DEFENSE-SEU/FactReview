@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 from pydantic import Field
 
-from schemas.claim import Claim, ClaimStatus, Contract, Finding, NonEmpty
+from schemas.claim import Claim, ClaimStatus, Contract, Finding, GateLevel, NonEmpty
 
 
 class DeliveryCheck(Contract):
@@ -32,6 +32,8 @@ class FinalReview(Contract):
     # None preserves the unspecified context of historical artifacts.
     execution_requested: bool | None = None
     advice_requested: bool | None = None
+    # The gate tier whose result is each claim's status; None for historical artifacts.
+    gate: GateLevel | None = None
     delivery_checks: list[DeliveryCheck] = Field(default_factory=list)
 
     @property

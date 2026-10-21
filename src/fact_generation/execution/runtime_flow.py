@@ -178,7 +178,7 @@ def _tree(proposal, source, sites):
     return selected, resources, label_keys
 
 
-def bind_builtin_flow(proposal, *, plan, claim, materials, supplied_files, source_sites):
+def bind_builtin_flow(proposal, *, plan, claim, materials, supplied_files, source_sites, alignment="strict"):
     """Rebuild original scientific/resource identities; model input only selects sites/quotes."""
     try:
         _require(type(proposal) is dict and set(proposal) == {"version", "roles", "conditions"}
@@ -211,7 +211,9 @@ def bind_builtin_flow(proposal, *, plan, claim, materials, supplied_files, sourc
         row, condition = proposal["conditions"][0], plan.target_conditions[0]
         _require(type(row) is dict and set(row) == {"condition", "paper_quote", "model_rationale", "metric_rationale"}
                  and _same(row["condition"], condition.model_dump(mode="json"))
-                 and condition.dataset and condition.metric and condition.settings.get("model") and condition.settings.get("split")
+                 # relaxed ablation matches the dataset only; strict also needs the paper metric, model and split.
+                 and condition.dataset and (alignment == "relaxed" or (condition.metric and condition.settings.get("model")
+                                                                        and condition.settings.get("split")))
                  and all(type(row[key]) is str and row[key].strip() for key in ("paper_quote", "model_rationale", "metric_rationale")),
                  "paper_model_or_all_condition_proposals_missing")
         blocks = [block for block in materials.blocks if block.id == claim.source_block_id]
@@ -258,7 +260,7 @@ def _json_file(path):
 
 def validate_builtin_flow(binding, *, plan, claim, materials, supplied_files, source_sites,
                           observer_report=None, run_request=None, raw_value=None,
-                          runtime_request=None, runtime_outcome=None):
+                          runtime_request=None, runtime_outcome=None, alignment="strict"):
     """Witness finite value edges; paper roles never receive scientific qualification.
 
     Direct reports require same-interpreter CodeType validation and do not bind stdout.
@@ -269,7 +271,7 @@ def validate_builtin_flow(binding, *, plan, claim, materials, supplied_files, so
     try:
         _require(type(binding) is dict and binding.get("status") == "bound", "unbound_flow")
         rebuilt = bind_builtin_flow(binding["proposal"], plan=plan, claim=claim, materials=materials,
-                                    supplied_files=supplied_files, source_sites=source_sites)
+                                    supplied_files=supplied_files, source_sites=source_sites, alignment=alignment)
         _require(_same(rebuilt, binding) and rebuilt["status"] == "bound", "changed_binding")
         receipt = None
         if runtime_request is not None or runtime_outcome is not None:
