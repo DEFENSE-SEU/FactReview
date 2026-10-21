@@ -1,146 +1,5 @@
 # FactReview <a href="https://arxiv.org/abs/2604.04074"><img src="https://img.shields.io/badge/arXiv-2604.04074-b31b1b.svg" alt="Paper"></a> <img src="https://img.shields.io/badge/license-AGPL--3.0-green.svg" alt="License">
 
-## Method v2
-
-The default pipeline follows the [method specification](docs/method_v2_spec.md):
-
-`materials → L1 screening → L2 typed verification → L3 execution (optional) → assessment → report → teaser`
-
-Claims are extracted before verification. A separate source-window review checks for omitted claims, lost experimental qualifiers and independently checkable conclusions that were merged. Source-grounded additions, corrections and splits retain an explicit before/after audit. Each claim records its paper location, conditions and evidence needs. Literature, Theory, Code and Experiments receive only the claims routed to them. The report consumes the assessed records and preserves their evidence sources.
-
-The default coverage review uses a v5 wire with one shared source catalog and one explicit declaration per governing restriction. The program derives auditable compatibility views and checks the original source, condition, scalar-carrier and materiality contracts before authorizing changes. Sources omitted from a review receive no implied approval. Older responses remain readable, with incomplete current-protocol reviews marked unreviewed.
-
-Use `--claim-coverage-original-batch-size 3` to review original claims in separate batches before the final candidate and observation decisions. Each claim retains all its conditions and source bindings. Every batch and final decision counts toward `--claim-coverage-validation-calls`; the option does not increase that limit. Missing, invalid, unresolved or budget-blocked obligations leave the window partial and prevent adoption or dismissal. The default `auto` uses batches of 3 when a window has more than 3 duties; smaller windows use a single request. Set `--claim-coverage-original-batch-size legacy` for the original single-request protocol.
-
-After fixed-rule assessment, the report agent writes per-claim advice with local evidence references. Each advice call and its input snapshot are saved, and its usage is included in report accounting. Failed or stale advice is marked unavailable. Original PDF crops feed separate figure and table VLM checks; missing crops and failed checks have explicit coverage counts.
-
-When extraction fails, independent writing, visual and reference checks can still produce an explicitly partial report. A later verification or execution failure retains the last complete claim snapshot and any recoverable execution audit records. The failed stage remains visible in the summary and CLI result; counts describe retained claims only.
-
-If an owned report history file cannot be read during recovery, its path and error class are recorded separately without adopting contents or inventing a hash. Recovery preserves the original failure and the last validated scientific records, continues independent delivery, and excludes unreadable prior metadata from PDF eligibility. A directory that cannot accept recovery writes remains a storage limitation.
-
-| Status | Evidence rule |
-|---|---|
-| `supported` | Sufficient support covers every condition, with no concern affecting the claim. |
-| `flawed` | Sufficient flaw evidence survives reasonable author explanations. |
-| `questioned` | An author-resolvable concern, or sufficient support and flaw evidence overlap. |
-| `unverified` | Available evidence cannot decide the claim. |
-
-Paper-internal support stays explicitly labelled. The report has four parts: Overview, Claim list, Other findings, Execution ledger. Claim order is flawed, questioned, unverified, supported. FactReview assists reviewers and provides no publication decision.
-
-Use `--report-presentation layered` for a reading report, a technical appendix and a combined PDF with internal navigation. The reading report keeps every claim and condition, valid advice, author questions and recorded sufficient evidence; it also shows a representative from each remaining evidence group. Scientific evidence, diagnostic text and source passages remain in the appendix and canonical JSON. The appendix retains each run's commands, environment, logs, metrics, alignment, approval and repair records. Identical target bindings are expanded once per run with links from subsequent occurrences; machine catalogs have exact canonical JSON locations and hashes. Manifest pages labelled `raw_json_locator` locate the execution view or JSON reference, and do not promise that the complete raw subtree is printed on that page. The renderer makes no model calls or new judgments. `--report-presentation full` retains the original detailed layout.
-
-### Run v2
-
-Use Python 3.11+ and the existing LLM and MinerU configuration. Install the runtime and reference-check dependencies:
-
-```bash
-pip install -e ".[runtime,refcheck,positioning,dev]"
-python scripts/execute_review_pipeline.py path/to/paper.pdf \
-  --paper-key my_paper --submission-deadline YYYY-MM-DD \
-  --repository-root path/to/released/repository
-```
-
-Built wheels include the unchanged RefCopilot library. With a wheel installed using its
-`runtime,refcheck,positioning` extras, run the same options through `python -m pipeline_full`.
-The source distribution also includes the library needed to rebuild the wheel.
-From a checkout, `python scripts/check_v2_distribution.py path/to/factreview.whl` installs
-that wheel into a fresh local directory and checks application imports, the reference
-adapter, CLI options and PDF output with external calls blocked. This check reuses the
-current environment's third-party dependencies; dependency resolution and live services
-require separate validation.
-
-Replace `YYYY-MM-DD` with the target venue's actual submission deadline. Literature treats the preceding three calendar months as concurrent work. A missing deadline leaves Literature verification unresolved. The default never derives a date from the paper's arXiv ID. `--repository-url https://github.com/owner/repo` or `--repository-root` explicitly binds the authors' released source. Repository links found in a manuscript are recorded as candidates; even a unique link may identify a third-party dependency or baseline, so it is not automatically used as the submitted implementation.
-
-The default v2 Literature route checks a background citation against its identified source without adding generic novelty searches. Explicit novelty conditions and the separate global missing-work/baseline review retain active retrieval. Reading requests include the actual claim, relevant conditions and located source excerpts. If the title and abstract provide no recognized technical scope, global retrieval can use validated method/evaluation section targets; unavailable scope is recorded as incomplete delivery. Section seeds do not establish an important omission or scientific sufficiency.
-
-Explicit novelty conditions use a source-bound search plan: recognized mechanism, target setting and evaluation terms retain their original quotation, location, hash and condition participation. The arXiv route compiles a closed title/abstract query grammar and records the exact request and paging scope. Missing roles, truncation, an unsupported structured provider or an unexhausted search leave absence insufficient. Readable positive evidence can still proceed through the existing guards. The vocabulary and searched indexes are bounded; the global missing-work review retains its separately labelled legacy seed route.
-
-Fallback arXiv reads through `PaperSearchAdapter` share one connection slot across adapter instances and async event loops in the same process, with 3.2 seconds between completed and subsequent requests. A valid `Retry-After` on 429/503 makes later reads explicitly unavailable until the server's cooling period expires; no additional HTTP request or automatic retry is made during that period. Separate worker processes, machines and independent reference-check clients require deployment-level coordination under [arXiv's API limits](https://info.arxiv.org/help/api/tou.html).
-
-`PAPER_READ_TIMEOUT_SECONDS` (default 180) bounds one asynchronous paper-reading operation, including queueing, metadata and PDF transfer; a remote batch shares that deadline. Timeouts remain service limitations and preserve independently completed evidence. Synchronous PDF text extraction runs in process and has no enforced CPU deadline. Empty PDF pages retain their physical positions in cited page numbers.
-
-When the venue deadline is unavailable, explicitly enable `--derive-cutoff-from-arxiv`. For a local PDF, also supply `--arxiv-id ID`. This resolves the first submission's exact `published` date through arXiv metadata and records the fallback in `cutoff.json`, the run summary and report limitations. An explicit deadline takes precedence. Unavailable or mismatched metadata leaves Literature unresolved; revision dates and the identifier's month never become a guessed day-level cutoff.
-
-Add `--run-execution` for Docker verification. `--approval-mode auto` is the default; `--approval-mode interactive` displays each eligible plan and requests a decision. `--training-budget 0` permits no training runs. Positive budgets count every training run, including retries, and only high-priority training plans qualify. `--max-attempts 3` permits at most three accepted infrastructure repairs; accepted values are 0–3.
-
-L3 creates a separate workspace after approval. It checks actual runtime dataset, metric and settings before using a result. Repairs are limited to dependencies, paths, launch arguments and wrappers; the original model, loss, data, evaluation and baselines stay protected. Ambiguous paper targets and missing resources remain blocked with a recorded reason. Default metric tolerances are centralized in [`v2_config.py`](src/fact_generation/execution/v2_config.py), including both historical profiles.
-
-Use `--execution-config path/to/config.json` for an `ExecutionConfig` JSON document. Explicit CLI options override the corresponding file fields, including an explicit training budget of zero. Per-plan `output_mappings` select dataset, metric and settings from actual output. They cannot substitute expected paper values. Per-plan `author_artifacts` bind a released data/log file's path, SHA-256, metadata selectors and recomputation operation before execution; the operator must confirm its role as authors' released data or logs. Per-plan/per-condition `paper_variances` require an exact paper block, quotation and nonnegative value. The operator must confirm the statistic's meaning, units and condition binding; quotation validation alone does not establish those semantics. These optional contracts are empty by default.
-
-Figure checks, writing-candidate confirmation, reference-mismatch confirmation and theorem-notation confirmation send actual image pixels to the configured multimodal model. By default they inherit the main model. Set `VLM_MODEL_PROVIDER`, `VLM_MODEL`, `VLM_BASE_URL` and `VLM_API_KEY` to override the visual route. A provider change uses that provider's configuration; `openai-codex` uses the local Codex login and accepts no `VLM_API_KEY`. The selected model must support images. Unsupported image requests and individual figure failures remain visible in screening records and report limitations. Figure input includes the caption, every linked body sentence and a crop rendered at 96 dpi for printed-size checks. Missing physical dimensions leave printed-size legibility unresolved.
-
-Theory can request one original-page visual proof recheck when a confirmed parser discrepancy or an adopted partial supporting derivation leaves a condition unresolved. `THEORY_VISUAL_RECHECK_ROUNDS=1` enables this batch by default; `0` disables it. A new complete, source-bound derivation is required for sufficient support. Original gaps stay in the record, and visual readings are labelled as model transcriptions with page-image and audit hashes. Both transcription and mathematical judgments depend on the model.
-
-For supported released-prediction formats, Experiments offers a finite set of source-bound execution choices. A separate model review must confirm the complete claim and each mapping to the dataset, metric and settings. L3 revalidates the saved selection and resources before running Docker, then independently recomputes the metric over the complete frozen prediction file. The ledger identifies this as evaluation of released predictions and records that no inference or training occurred. Unsupported or ambiguous mappings remain unavailable.
-
-The read-only repository index includes Python, C/C++, CUDA, R, Julia, Java, Go, Rust, MATLAB, Fortran, Scala and existing JavaScript/TypeScript sources. Code verification admits complete source/config files within `CODE_SOURCE_MAX_BYTES` (default 200000 serialized UTF-8 bytes, including line metadata). Selection prioritizes claim-named paths, configs and entry scripts. Omitted files are explicit; this budget does not cover the paper text or constitute exhaustive repository review. The full selection manifest is saved locally, while model/report metadata uses bounded samples.
-
-Outputs are saved under `runs/<paper-key>_<timestamp>_<unique-id>/`:
-
-- `materials/materials.json`: original parser content, page/figure images and repository index.
-- `screening/screening.json`, `verification/verification.json`: claims, findings, evidence, plans and unresolved issues.
-- `execution/`: per-run commands, output, approval, alignment and repair records when enabled.
-- `review/report/final_review.{json,md,pdf}`: canonical records and the rendered review.
-- With `--report-presentation layered`, `technical_appendix.{md,pdf}` retains complete records and `review_bundle.{md,pdf}` combines the reading report and appendix. The bundle provides internal source and return links; the standalone reading PDF gives appendix page references. `report_manifest.json` records artifact hashes, display choices and locations for every canonical JSON field. Individual PDF export failures are retained in the summary while available JSON and Markdown outputs remain usable.
-- `review/teaser/teaser.{json,svg}` and `teaser_prompt.md`: deterministic four-status summary and optional image-authoring prompt.
-- `full_pipeline_summary.json`, `run_stats.json`: stage results, errors and measured or explicitly estimated usage.
-- `cutoff.json`: the date used for Literature, its provenance, or the reason it remains unresolved.
-- `visual_calls/`: per-image-call model/provider, image hash and dimensions, input context, response or failure, and duration. Provider credentials are removed from diagnostics.
-- `code_scopes/`: complete selected/omitted source manifests for each Code inspection, including the configured source budget.
-- `code_scope_reviews/`: independent condition-level applicability reviews of Code candidates, including source bridges, requirement facets and unresolved coverage.
-- `claim_extraction/`: original extraction responses and bounded source-repair attempts. `CLAIM_SOURCE_MAX_REPAIRS` defaults to 3 and accepts 0–3; this is separate from execution repair. Repairs preserve every candidate conclusion and condition while correcting exact source bindings.
-- `screening/claim_coverage/coverage.json`: source windows, per-claim checks, proposed corrections, independent validation and adopted changes. `--claim-coverage-window-chars` defaults to 24000; `--claim-coverage-review-calls`, `--claim-coverage-followup-calls` and `--claim-coverage-validation-calls` each default to 12. Both `--claim-coverage-first-batch-size` and `--claim-coverage-original-batch-size` default to `auto`: a window with more than 3 review duties uses batches of 3; smaller windows retain one request. Set a positive integer to force batching, or `legacy` to request the original single-request route. The first batched stage independently reviews the whole window before the claim batches. Full source and scientific context remain available, and every request consumes the existing stage budget. Budget exhaustion leaves the remaining duties explicitly incomplete. These limits do not set a claim-count target. Unreviewed ranges, rejected changes and unresolved extraction problems remain visible. Definite unresolved problems hold their affected claims while healthy claims continue. A completed model review does not prove exhaustive extraction.
-- `experiment_scope/`: independent applicability/support reviews for experimental evidence, including numerical comparison checks and unresolved qualifiers.
-- `screening/reference_validation.json`: original-PDF reference confirmation decisions; the original `reference_check.json` is retained separately.
-
-The summary and report expose figure totals, checked/failed/unavailable counts, attempted/failed model calls and missing usage. Text estimates explicitly exclude unknown image token costs; failed calls with no reported usage do not acquire invented token estimates.
-
-The v2 teaser is rendered locally as SVG. The old Gemini teaser API, old runtime-job reuse, automatic task invention and the legacy per-paper time-budget flag are outside the v2 entry point; explicit unsupported options produce a recorded error. `--execution-docker-build-timeout-sec` controls Docker image-build timeout. Docker is required for enabled execution.
-
-### Verification and known limits
-
-```bash
-python -m pytest
-```
-
-Unit tests mock service boundaries and block external network connections. On Windows, the suite chooses a fresh short temporary path under `runs/pytest` to keep the original execution-path assertions portable. Existing live-test markers remain opt-in.
-
-Framework tests cover stage contracts, claim routing, source grounding, execution approval/alignment/repair and report consistency. To check a configured Docker daemon explicitly, run:
-
-```bash
-python -m pytest tests/stages/test_execution.py::test_docker_daemon_is_available_for_execution_stage -m requires_docker
-```
-
-The supplementary `python scripts/check_v2_compgcn.py` check is an explicitly labelled offline fixture replay using one real PDF and repository. It saves its mocked-service boundaries and a historical-label comparison. A live MinerU/LLM/Docker result requires locally configured credentials and services. Individual case results do not establish framework-wide review accuracy or repository compatibility.
-
-Run `python scripts/check_v2_visual.py` for an opt-in live visual probe. It generates two random codes present only in image pixels and four controlled PDF figures (consistent context, nonexistent panel reference, missing axis labels, unreadably small printed labels). It calls the actual configured visual model, saves the inputs and responses, and returns a failing exit code for failed checks. Figure parsing uses fixture content; these six probes establish limited integration behavior and provide no review-accuracy estimate. `--mode transport` and `--mode figures` select subsets. Results are saved under `runs/v2_visual/`.
-
-`python scripts/check_v2_framework.py` exercises five complementary full v2 scenarios with fixed external boundaries. Add `--scenario mapped_runtime --scenario mapped_runtime_misaligned --docker` for the actual Docker route through output mapping, alignment, assessment and the final report. See [framework validation](docs/framework_validation.md) for the matrix, commands, saved artifacts and interpretation limits. Training stays at zero.
-
-Literature records its search scope. An adapter that does not certify search completeness cannot support a novelty claim solely because no close work was returned. The technical query vocabulary leaves uncovered domains visibly unresolved. Theory and Code preserve questionable differences for author explanation; this implementation includes no automated theorem prover. Claim splitting semantics depend on the configured model, while source locations, exact quotations, routing and aggregation have deterministic checks.
-
-Claims can retain multiple original passages in `source_refs`, each with a location and condition scope. These locate the asserted conclusion and its qualifiers; they do not count as verification evidence. Citation support is restricted to the conditions attached to each original passage, and author-year labels such as `2018a` and `2018b` remain distinct. Experimental candidates receive a separate scope review before affecting assessment: a hardware report does not require a component ablation, and incomplete comparisons cannot establish full support. Unavailable or ambiguous reviews remain explicit limitations.
-
-Experimental table reviews select program-generated source, cell and case IDs. The verifier restores exact original values and coordinates, checks explicit table axes and claimed endpoints, and validates cited links to metric definitions or treatment settings. A treatment can apply to the subject alone. Invalid bindings remain unconfirmed for their condition; independently valid conditions survive. Nonliteral model aliases or unresolved table references can still prevent numerical support. Formal theorem proofs must match their target statement and source scope; ordinary main-text derivations retain exact-step checks and model-based semantic assessment.
-
-The default experimental scope schema also provides IDs for individual numbers in the original prose. It retains each occurrence's source and unit, shares repeated sentence text, and supports bounded explicit subject/comparator and named-setting transition forms. Unknown source scope or units remain unresolved. The original candidate and its independent review must both establish complete support; collecting partial observations does not automatically upgrade a claim. Saved older scope responses retain their strict compatibility path.
-
-Code candidates with validated source lines receive one additional batch model review per claim. Complete support requires agreement with every implementation qualifier and its original claim source. A configuration line cannot establish measured performance, novelty or working public downloads. Exact source files are checked again after the review; failed or ambiguous scope decisions retain non-deciding observations. This semantic review remains model-dependent.
-
-Use `scripts/check_v2_experiments.py` to recheck selected claims from a saved run with real model calls and optional independent coverage expectations. See [the validation guide](docs/framework_validation.md) for commands and recorded service boundaries.
-
-### Historical artifacts and RefCopilot
-
-Historical demo outputs remain unchanged. Read old JSON, Markdown or HTML claim artifacts through `schemas.v1_adapter.read_v1_artifact`; `in_conflict` becomes `questioned` for display and retains its original label. Reading an old artifact does not reassess its evidence.
-
-RefCopilot remains available independently; see its [README](RefCopilot/README.md). V2 L1 calls its entry-level bibliography checker; citation support is handled by the Literature branch.
-
-<details>
-<summary>Historical v1 guide and demo outputs</summary>
-
-The following guide describes the original v1 workflow and its saved demonstrations. Its commands, flags and defaults apply to the original version; this checkout's pipeline script runs v2. Use the v2 instructions above for current runs.
-
-
 <p align="center">
   <img src="demos/Graph/compgcn/teaser_figure.png" alt="A FactReview output for the CompGCN paper: technical positioning, claim verdicts, reproduced experimental numbers, strengths and weaknesses — all on one page." width="900">
 </p>
@@ -196,14 +55,16 @@ python -m venv .venv && source .venv/bin/activate    # Windows: .venv\Scripts\ac
 pip install -e ".[runtime]"
 codex login                                          # ChatGPT sign-in flow
 cp .env.example .env                                 # then set MINERU_API_TOKEN
-python scripts/execute_review_pipeline.py demos/Graph/compgcn/paper.pdf
+python scripts/execute_review_pipeline.py demos/Graph/compgcn/paper.pdf --submission-deadline 2019-09-25
 ```
 
 When the run finishes, open the headline output:
 
 ```
-runs/<paper_key>_<timestamp>/stages/review/report/final_review.pdf
+runs/<paper_key>_<timestamp>_<id>/review/report/final_review.pdf
 ```
+
+`--submission-deadline` sets the date Literature checks against; without it, Literature claims stay unverified. Pass `--repository-url` or `--repository-root` to bind the authors' released code for the Code and Experiments checks.
 
 That is your review. To run on your own paper:
 
@@ -233,21 +94,23 @@ You get a Markdown + JSON report listing fabricated, retracted, outdated, and in
 
 ## What FactReview Produces
 
-Every major claim in the paper is tagged with one of four verdicts:
+Every extracted claim gets one of four statuses, decided by fixed rules over the collected evidence:
 
-| Verdict | What it means | From the CompGCN demo |
-|---|---|---|
-| **✓ Supported** | Independent literature evidence (or a reproduced number) agrees with the claim. | *"Scales with relations via basis decomposition"* — verified that performance is stable while parameter count scales linearly with `B` (Section 6.3, Figure 3). |
-| **⚠ Partially supported** | Evidence agrees with part of the claim and disagrees with or fails to address the rest. | *"Outperforms baselines in Link Prediction, Node Classification, and Graph Classification"* — verified on the first two; on Graph Classification, PACHYSAN beats CompGCN 92.6% vs 89.0% (Tables 3 and 5). |
-| **✗ In conflict** | Independent evidence directly contradicts the claim. | — |
-| **? Inconclusive** | Neither external nor in-paper evidence is sufficient to judge. | — |
+| Status | Evidence rule |
+|---|---|
+| **Supported** | Sufficient support covers every condition of the claim, with no concern affecting it. |
+| **Questioned** | An author-resolvable concern, or sufficient support and flaw evidence overlap. |
+| **Flawed** | Sufficient flaw evidence survives reasonable author explanations. |
+| **Unverified** | Available evidence cannot decide the claim. |
+
+A gate then checks Supported claims against the evidence their type needs (`--gate lenient|default|strict`); a Supported claim without that evidence is reported as Unverified, and all three tiers are kept in `gate_status`. The demos in this README were produced by v1, whose labels map as `in_conflict` → Questioned.
 
 What makes the report distinctive (beyond the verdicts):
 
 - **Design-axis positioning matrix** — neighbor papers retrieved from Semantic Scholar (and optional OpenAlex) are placed on a small set of design dimensions specific to the paper's domain, so reviewers can see which dimensions the paper genuinely innovates on. See [`src/fact_generation/positioning/stage_runner.py`](src/fact_generation/positioning/stage_runner.py).
 - **Statistical-rigor downgrades** — comparative claims with Δ < 2σ are auto-downgraded; missing ablations are flagged. See [`src/review/report/claim_audit.py`](src/review/report/claim_audit.py).
 - **Publication-date cutoff** — when the input is an arXiv URL or ID, FactReview derives a `YYYY-MM` cutoff from the arXiv identifier so the manuscript is not penalized for missing citations to work that was published after it. Override with `--cutoff-date` or disable with `--no-cutoff`.
-- **Optional code execution** — the execution stage runs a bounded `prepare → plan → run → judge → fix → finalize` Docker loop (default `--max-attempts 5`) and writes its verdict into `stages/fact_generation/execution/execution.json`. See [`src/fact_generation/execution/stage_runner.py`](src/fact_generation/execution/stage_runner.py).
+- **Optional code execution** — L3 runs confirmed plans in a Docker sandbox, checks that dataset, metric and settings match the claim, allows at most 3 bounded repairs (`--max-attempts`), and records commands, logs and metrics under `execution/`. See [`src/fact_generation/execution/v2.py`](src/fact_generation/execution/v2.py).
 - **One-page teaser figure for triage** — alongside the Markdown + PDF, FactReview generates a layout-constrained one-page figure (the hero image of this README) that compresses the positioning matrix, claim verdicts, paper-vs-reproduced numbers, and strengths/weaknesses into a single screen. The layout is fixed across every paper so a reviewer's eye lands on the same regions every time — designed for the realistic per-paper budget reviewers and area chairs actually have.
 
 ## What RefCopilot Produces
@@ -354,7 +217,13 @@ Or globally via `FACTREVIEW_ENABLE_REFCHECK=true`. The full result lands in `sta
 | `--disable-semantic-scholar` | off | Disable Semantic Scholar objective related-work retrieval for this run. Equivalent to setting `SEMANTIC_SCHOLAR_ENABLED=false` before loading settings. |
 | `--enable-refcheck` | off | Run RefCopilot as the refcheck stage. |
 | `--run-execution` | off | Enables the code-execution stage. Requires Docker. |
-| `--max-attempts` | `5` | Max iterations of the execution stage's `judge → fix` loop. |
+| `--max-attempts` | `3` | Repair rounds in L3 execution, 0–3. |
+| `--submission-deadline` | – | Venue deadline (`YYYY-MM-DD`) that bounds Literature retrieval. |
+| `--repository-url` / `--repository-root` | – | The authors' released code for Code and Experiments checks. |
+| `--gate` | `default` | Claim gate tier reported as each claim's status: `lenient`, `default`, `strict`. Also `CLAIM_GATE`. |
+| `--alignment` | `strict` | Execution alignment; `relaxed` matches the dataset only (ablation). |
+| `--repairer` | `default` | Execution repair proposer; `llm` proposes whitelisted repairs (ablation). See [execution ablations](docs/execution_ablations.md). |
+| `--report-presentation` | `full` | `layered` writes a reading report plus a technical appendix and a linked PDF bundle. |
 | `--no-pdf-extract` | off | Skip MinerU re-extraction inside the execution `prepare` node when the parse stage already produced the snapshot. |
 | `--reuse-job-id` | – | Reuse a prior agent-runtime job, skipping the parse-stage agent run. Accepts either an absolute path to a `runtime/jobs/<id>` directory (taken as-is) or a bare job id (looked up under the current run dir, then under `<run-root>/**/runtime/jobs/<id>`). Useful for re-rendering the report after a downstream-stage tweak without paying the parse cost again. |
 | `--run-root` | `runs` | Override the root output directory. |
@@ -376,42 +245,32 @@ python scripts/execute_stage_teaser.py         --run-dir runs/<run>
 
 ### Outputs
 
-Each run writes to `runs/<paper_key>_<timestamp>/`. Primary artifacts:
+Each run writes to `runs/<paper_key>_<timestamp>_<id>/`. Primary artifacts:
 
-- `full_pipeline_summary.json` — per-stage status, error reasons, and output paths.
-- `inputs/source_pdf/` — copy of the input paper PDF.
-- `runtime/jobs/<job_id>/` — raw runtime job state, MinerU output, prompts, and agent traces.
-- `stages/preprocessing/parse/paper.json` — parse-stage outputs and bridge state.
-- `stages/fact_generation/refcheck/` — reference check report (only when `--enable-refcheck`).
-- `stages/fact_generation/positioning/` — literature neighbours and design-axis table.
-- `stages/fact_generation/execution/current/` — in-place workspace for the latest execution attempt; the prior attempt is archived alongside as `current.<timestamp>` (only when `--run-execution`).
-- `stages/fact_generation/execution/history/` — per-attempt orchestrator outputs (only when `--run-execution`).
-- `stages/review/report/final_review.{json,md,pdf}` — **the headline review.**
-- `stages/review/report/final_review_clean.md` — same review without the refcheck section, used by the teaser.
-- `stages/review/teaser/teaser_figure_prompt.txt` — teaser figure prompt.
-- `stages/review/teaser/teaser_figure.png` — teaser image (only when Gemini is enabled).
-
-`workspace/`, `logs/`, and `debug/` are intermediate; you usually do not need to look at them.
+- `full_pipeline_summary.json`, `run_stats.json` — stage results, errors and token usage.
+- `materials/materials.json` — parsed paper, page and figure images, repository index.
+- `screening/screening.json` — L1 claims and basic checks; `screening/claim_coverage/` holds the extraction coverage review.
+- `verification/verification.json` — L2 evidence, findings and execution plans.
+- `execution/` — L3 commands, logs, alignment and repair records (only with `--run-execution`).
+- `review/report/final_review.{json,md,pdf}` — **the headline review.**
+- `review/teaser/teaser.{json,svg}` — the one-page four-status summary.
 
 ## Pipeline Architecture
 
 <p align="center">
-  <img src="overview.png" alt="FactReview pipeline overview" width="800">
+  <img src="docs/pipeline.png" alt="FactReview pipeline: L1 screening and claim extraction, L2 typed verification, L3 execution, evidence-linked review" width="900">
 </p>
 
-The pipeline runs six sub-stages, grouped into three phases. `refcheck` and `execution` are skipped by default.
-
 ```text
-preprocessing                fact_generation                        review
-parse → refcheck? → positioning → execution? → report → teaser
+materials → L1 screening → L2 typed verification → L3 execution (optional) → assessment → report → teaser
 ```
 
-- **parse** — PDF → structured `Paper` (MinerU cloud).
-- **refcheck** — bibliography validation via [RefCopilot](RefCopilot/) (off by default; `--enable-refcheck`).
-- **positioning** — neighbour papers, design axes, novelty verdict.
-- **execution** — optional Docker-based code-running stage (off by default; `--run-execution`).
-- **report** — synthesises the final review Markdown / PDF, extracts reviewer-salient claims, and runs the claim audit.
-- **teaser** — teaser figure prompt and (optionally) image.
+- **L1 screening & extraction** — writing, figure and reference checks; claims extracted with their location, conditions and evidence needs.
+- **L2 typed verification** — each claim goes only to the branches it needs: Literature (prior work), Theory (equations and derivations), Code (code and config), Experiments (evaluation and run plan).
+- **L3 execution** — runs confirmed plans in a Docker sandbox, aligns dataset, metric and settings with the claim, and allows at most 3 bounded repairs (dependencies, paths, launch arguments; never model, data or evaluation).
+- **Assessment and report** — fixed status rules and the claim gate set each status; the report links every judgement to related work, code or a run log.
+
+The full design is in [`docs/method_v2_spec.md`](docs/method_v2_spec.md).
 
 ## Troubleshooting
 
@@ -484,5 +343,3 @@ If FactReview helped your work, please ⭐ the repo and cite:
 ## License
 
 AGPL-3.0-only.
-
-</details>

@@ -1,16 +1,9 @@
 # FactReview v2 — Method Specification
 
-Status: agreed design for the ARR resubmission. This document is the single source of truth for
-the v2 refactor and for the Method section of the paper. Anything not covered here is out of scope
-until it is added here first.
-
-Maintainer update (2026-10-09): the supplied Method §§4.1–4.3 extends this design with
-table VLM checks, chapter-level writing/cross-reference/submission-policy checks,
-explicit theory derivation records and status-conditioned reviewer advice. The
-implementation/validation state of each addition is tracked in `checks.md`; this
-amendment does not certify that every addition is already complete. Existing
-confirmed auto approval, optional interactive approval, training budget 0 and
-explicitly requested arXiv fallback remain in force.
+This document specifies the v2 pipeline: claim-level screening, typed verification,
+bounded execution and evidence-linked assessment. Later additions cover table VLM checks,
+chapter-level writing/cross-reference/submission-policy checks, explicit theory derivation
+records and status-conditioned reviewer advice.
 
 ## 0. Goal and principles
 
