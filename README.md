@@ -274,7 +274,12 @@ The full design is in [`docs/method_v2_spec.md`](docs/method_v2_spec.md).
 
 ## Benchmark
 
-[`benchmark/papers.csv`](benchmark/papers.csv) lists the 300 peer-reviewed papers used in the evaluation, in six groups from Agents4Science, ICLR, TMLR, Nature Communications, COLM and ICML. See [`benchmark/README.md`](benchmark/README.md).
+The evaluation uses 300 peer-reviewed papers in six groups from Agents4Science, ICLR, TMLR, Nature Communications, COLM and ICML. PDFs, public OpenReview review threads and per-paper licenses are on Hugging Face at [kabuda777/factreview-bench](https://huggingface.co/datasets/kabuda777/factreview-bench); [`benchmark/papers.csv`](benchmark/papers.csv) is the same index, described in [`benchmark/README.md`](benchmark/README.md).
+
+```python
+from datasets import load_dataset
+papers = load_dataset("kabuda777/factreview-bench", split="train")
+```
 
 ## Troubleshooting
 

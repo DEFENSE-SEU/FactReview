@@ -1,6 +1,6 @@
 # Benchmark papers
 
-`papers.csv` lists the 300 papers used to evaluate FactReview. Every paper has public peer reviews. PDFs and review texts are not redistributed here; fetch them from the source with `platform_id` (OpenReview forum id) or `doi` (Nature Communications).
+`papers.csv` lists the 300 papers used to evaluate FactReview. Every paper has public peer reviews. PDFs, OpenReview review threads and each paper's license are in the Hugging Face dataset [kabuda777/factreview-bench](https://huggingface.co/datasets/kabuda777/factreview-bench); `platform_id` (OpenReview forum id) and `doi` (Nature Communications) point to the originals.
 
 | Group | Source | Papers |
 |---|---|---|
