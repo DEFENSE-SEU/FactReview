@@ -407,6 +407,25 @@ class FixedModel:
                 return {"items": [], "appendix_block_ids": [b["id"] for b in payload["appendix_index"]]}
             proof = next(b for b in payload["appendix_proofs"] if b["text"].startswith("Proof."))
             return {
+                "schema_version": "theory-derivation-v1",
+                "derivations": [{"item_index": 0, "trace": {
+                    "goal": source["text"],
+                    "assumptions": [{
+                        "id": "a1", "text": "x is real", "status": "paper_explicit",
+                        "sources": [{"block_id": proof["id"], "quote": "for every real x"}],
+                    }],
+                    "steps": [
+                        {"id": "s1", "statement": "x squared = x * x >= 0",
+                         "reason": "If x is nonnegative its product with itself is nonnegative; if x is negative, both factors are negative and their product is positive.",
+                         "assumption_ids": ["a1"], "previous_step_ids": [],
+                         "sources": [{"block_id": proof["id"], "quote": "x squared = x * x >= 0"}]},
+                        {"id": "s2", "statement": source["text"],
+                         "reason": "The sign cases exhaust the real domain, including zero, establishing the theorem for every real x.",
+                         "assumption_ids": ["a1"], "previous_step_ids": ["s1"], "sources": []},
+                    ],
+                    "gaps": [], "outcome": "completed",
+                    "completion_reason": "The appendix's squared-product relation proves the full nonnegativity claim over the real domain.",
+                }}],
                 "items": [
                     {
                         "block_id": proof["id"],

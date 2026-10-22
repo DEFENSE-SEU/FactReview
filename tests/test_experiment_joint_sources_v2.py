@@ -151,7 +151,7 @@ def review_for(bounded, *, index=0):
     return {"schema_version": "catalog-v2", "conditions": [condition], "items": [item]}
 
 
-def run(p, review=None, items=None):
+def run(p, review=None, items=None, *, raw_responses=None):
     claim, materials, item, _, bounded = p
     candidate = {"checked_aspects": ASPECTS, "items": items or [item.model_dump()], "plans": [], "issues": []}
     response = review if review is not None else review_for(bounded)
@@ -161,7 +161,10 @@ def run(p, review=None, items=None):
         calls.append(kwargs)
         if len(calls) == 1:
             return copy.deepcopy(candidate)
-        return authority_scope_fixture(json.loads(kwargs["prompt"]), response, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The table and declared definition/setup members report this complete measurement.")
+        wrapped = authority_scope_fixture(json.loads(kwargs["prompt"]), response, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The table and declared definition/setup members report this complete measurement.")
+        if raw_responses is not None:
+            raw_responses.append(copy.deepcopy(wrapped))
+        return wrapped
 
     result = verify_experiments(claim, materials, call=model)
     assert len(calls) == 2
@@ -334,6 +337,21 @@ def test_missing_member_source_error_does_not_erase_healthy_concern(tmp_path):
     items[0]["additional_sources"][0]["quote"] = "Missing exact quote."
     result, _ = run(p, review, items)
     assert not result.evidence[0].sufficient and result.evidence[1].concern
+
+
+def test_missing_primary_preserves_healthy_concern_without_fabricating_authority(tmp_path):
+    p = paper(tmp_path)
+    review, items = with_concern(p)
+    items[0]["quote"] = "Missing exact primary quote."
+    result, calls = run(p, review, items)
+    assert len(result.evidence) == 1
+    assert result.evidence[0].sufficient and result.evidence[0].concern
+    assert result.issues
+    registry = json.loads(calls[1]["prompt"])["source_authority_context"]
+    invalid_pair = registry["pairs"][0]
+    assert invalid_pair["item_index"] == 0 and invalid_pair["primary_source_id"] is None
+    assert invalid_pair["unit_ids"] == registry["pairs"][1]["unit_ids"]
+    assert all(source["quote"] != items[0]["quote"] for source in registry["sources"].values())
 
 
 def test_original_partial_observation_is_not_merged_or_upgraded(tmp_path):

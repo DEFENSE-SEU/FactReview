@@ -599,20 +599,24 @@ def test_default_dependency_repair_uses_known_missing_module(inputs, tmp_path):
 
 def test_stale_metric_file_cannot_support_new_execution(inputs, tmp_path, monkeypatch):
     plan, _, materials = inputs
-    root = Path(materials.repository.root)
-    (root / "metrics.json").write_text(
-        json.dumps({"observations": [observation().model_dump()]}), encoding="utf-8"
-    )
-    materials.repository = index_repository(root)
     plan.task.metric_output = "metrics.json"
+    payload = accuracy_fixture(inputs, monkeypatch)
+    root = Path(materials.repository.root)
+    original = json.dumps(payload).encode()
+    (root / "metrics.json").write_bytes(original)
+    materials.repository = index_repository(root)
     monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "fixture-image"))
-    monkeypatch.setattr(v2, "docker_run_paper_image", lambda **kwargs: ["docker", "run", "fixture-image"])
     monkeypatch.setattr(
-        v2, "run_command", lambda cmd, cwd, timeout_sec: CommandResult(cmd, cwd, 0, "", "", 0)
+        v2, "run_command", lambda *args, **kwargs: pytest.fail("Stale output must block author execution")
     )
     result = run(inputs, tmp_path, None)
     assert not result.claims[0].evidence
-    assert "not refreshed" in result.ledger[0]["attempts"][0]["issue"]
+    attempt = result.ledger[0]["attempts"][0]
+    assert "isolated output mount" in attempt["issue"]
+    audit = json.loads(Path(attempt["logs"]["runtime_observer_launch"]).read_text(encoding="utf-8"))
+    assert audit["unresolved"] == [{"reason": "observer_output_path_not_fresh_json"}]
+    assert (root / "metrics.json").read_bytes() == original
+    assert (Path(attempt["request"]["workspace"]) / "metrics.json").read_bytes() == original
 
 
 def test_compgcn_author_json_decoded_by_default_docker_path(inputs, tmp_path, monkeypatch):
@@ -901,9 +905,6 @@ def test_canonical_boolean_metric_cannot_support_claim(inputs, tmp_path, monkeyp
     )
     bind_fixture_sources(inputs, [("c1", text, token)])
     monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "test-image:1"))
-    monkeypatch.setattr(
-        v2, "docker_run_paper_image", lambda **kwargs: ["docker", "run", "test-image:1", *kwargs["cmd"]]
-    )
 
     def transport(command, cwd, timeout_sec):
         raw = {**observation().model_dump(), "value": value}
@@ -933,11 +934,12 @@ def test_failed_docker_attempt_cleans_only_its_named_container(
 ):
     monkeypatch.setattr(v2, "docker_ensure_paper_image", lambda *args, **kwargs: (True, "test-image:1"))
     containers, commands = [], []
+    native_docker_command = v2.docker_run_paper_image
 
     def docker_command(**kwargs):
         name = kwargs["container_name"]
         containers.append(name)
-        return ["docker", "run", "--rm", "--name", name, "test-image:1", *kwargs["cmd"]]
+        return native_docker_command(**kwargs)
 
     def transport(command, cwd, timeout_sec):
         commands.append(command)

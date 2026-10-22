@@ -13,6 +13,7 @@ from fact_generation.execution.runtime_launch import (
 )
 from fact_generation.execution.v2 import ExecutionConfig, ExecutionOperationFailure, RunOutcome, RunRequest
 from tests import test_runtime_flow_v2 as flow_fixture
+from tests.execution_runtime_fixtures import sandbox_argv, sandbox_audit
 
 
 @pytest.fixture(autouse=True)
@@ -60,7 +61,9 @@ def fixture(tmp_path):
     for key, value in env.items():
         command.extend(["-e", key + "=" + value])
     command.extend(["mock-image", *request.command])
-    command = protect_observer_docker_argv(command, launch=launch)["argv"]
+    protected = protect_observer_docker_argv(sandbox_argv(command, request), launch=launch, sandbox=request.config.sandbox)
+    assert protected["status"] == "ready", protected
+    command = protected["argv"]
     expected = launch["source_sha256"]
     report = {"version": "python-source-events-v1", "unresolved": [], "execution": {"status": "completed"},
         "interpreter": {"version": "3.11.14 (mock producer)", "executable": "/usr/local/bin/python", "optimize": 0},
@@ -85,6 +88,7 @@ def fixture(tmp_path):
     (run / "source_manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
     outcome = RunOutcome(returncode=0, stdout="1\n", commands=[["docker", "image", "inspect", "mock-image"], command],
         environment={"transport": "docker", "image": "mock-image", "container_name": "factreview-mock",
+                     "sandbox": sandbox_audit(command, request),
                      "runtime_observer": launch, "process_termination": {"kind": "completed", "exception_type": None}},
         logs={"runtime_observer": str(attempt / "runtime_observer.json"),
               "runtime_observer_launch": str(attempt / "runtime_observer_launch.json"),
@@ -106,6 +110,33 @@ def test_fixed_runtime_producer_receipt_never_host_compiles_or_grants_science(tm
     assert result["scientific_qualification"] is False and not result["alignment"] and not result["support"]
     assert result["run_identity"]["command"] == request.command and result["run_identity"]["runtime_root"] == "/app"
     assert result["evidence_refs"]["stdout"]["sha256"] == hashlib.sha256(b"1\n").hexdigest()
+
+
+@pytest.mark.parametrize("fault", ["missing_limit", "changed_limit", "missing_readonly", "missing_home", "missing_audit", "changed_audit"])
+def test_receipt_requires_actual_operator_sandbox_and_matching_audit(tmp_path, fault):
+    from fact_generation.execution.runtime_receipt import read_observer_receipt
+
+    request, outcome, _ = fixture(tmp_path)
+    assert read_observer_receipt(request, outcome)["status"] == "received"
+    argv = outcome.commands[-1]
+    if fault == "missing_limit":
+        index = argv.index("--cpus")
+        del argv[index:index + 2]
+    elif fault == "changed_limit":
+        argv[argv.index("--network") + 1] = "host"
+    elif fault == "missing_readonly":
+        argv.remove("--read-only")
+    elif fault == "missing_home":
+        index = argv.index("HOME=/workspace/run_dir/home")
+        del argv[index - 1:index + 1]
+    elif fault == "missing_audit":
+        del outcome.environment["sandbox"]
+    else:
+        outcome.environment["sandbox"]["policy"]["cpus"] = 99.0
+    receipt = read_observer_receipt(request, outcome)
+    assert receipt["status"] == "unresolved"
+    expected = "sandbox_policy_or_actual_argv_changed" if fault.endswith("audit") else "actual_argv_not_protected"
+    assert receipt["reason"] == expected
 
 
 def test_receipt_modification_forgery_and_unknown_scope_refused(tmp_path):

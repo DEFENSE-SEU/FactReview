@@ -19,6 +19,7 @@ from fact_generation.execution.runtime_observer import _snapshot
 from preprocessing.materials import index_repository
 from schemas.claim import Claim, ClaimLocation, ClaimSourceRef, Condition, ExecutionPlan, ExecutionTask
 from schemas.materials import MaterialBlock, SharedMaterials
+from tests.execution_runtime_fixtures import sandbox_argv, sandbox_audit
 from tests.test_runtime_flow_v2 import SOURCE
 from verification.experiment_targets import bind_execution_target
 
@@ -124,7 +125,9 @@ def captured_runner(data, weights):
         for key, value in env.items():
             argv += ["-e", key+"="+value]
         argv += ["mock-image", *request.command]
-        argv = protect_observer_docker_argv(argv, launch=launch)["argv"]
+        protected = protect_observer_docker_argv(sandbox_argv(argv, request), launch=launch, sandbox=request.config.sandbox)
+        assert protected["status"] == "ready", protected
+        argv = protected["argv"]
         calls = [{}, {"path": "data.json"}, {"path": "weights.json"}, {"data": data, "weights": weights}, {"predictions": 6, "labels": 5}]
         returns = [1, data, weights, 6, 1]
         indices = [0, 1, 1, 2, 3]
@@ -151,6 +154,7 @@ def captured_runner(data, weights):
         (attempt / "runtime_observer_launch.json").write_text(json.dumps(launch), encoding="utf-8")
         (attempt / "run_stdout.log").write_bytes(b"1\n")
         return v2.RunOutcome(returncode=0, stdout="1\n", commands=[argv], environment={"transport": "docker",
+            "sandbox": sandbox_audit(argv, request),
             "image": "mock-image", "container_name": "factreview-mock", "runtime_observer": launch,
             "process_termination": {"kind": "completed", "exception_type": None}}, logs={"runtime_observer": str(attempt / "runtime_observer.json"),
             "runtime_observer_launch": str(attempt / "runtime_observer_launch.json"), "stdout": str(attempt / "run_stdout.log")})

@@ -67,7 +67,10 @@ def build_authority_context(claim, materials, candidate_items, *, catalog, joint
     scientific = _scientific_claim(claim)
     joint_catalogs = joint_catalogs or {}
     sources, units, pairs = {}, [], []
-    for current in [catalog, *joint_catalogs.values()]:
+    for original_catalog in [catalog, *joint_catalogs.values()]:
+        # Resolving bounded sources records actual-consumer diagnostics. Merely
+        # listing sources for authority review must leave that trace untouched.
+        current = copy.deepcopy(original_catalog)
         for key in current["sources"]:
             source = resolve_source(current, key, materials)
             if source["block_id"] is None:  # Synthetic Claim text is input context only.
@@ -93,17 +96,23 @@ def build_authority_context(claim, materials, candidate_items, *, catalog, joint
         item = candidate.model_dump(mode="json") if hasattr(candidate, "model_dump") else candidate
         block = next(b for b in materials.blocks if b.id == item["block_id"])
         quote = item["quote"]
-        if not quote or block.text.count(quote) != 1 or block.loc is None:
-            raise ValueError("Authority primary must identify one exact located original quote")
-        start = block.text.index(quote)
-        primary = {"block_id": block.id, "start": start, "end": start+len(quote),
-            "quote": quote, "kind": "candidate_primary", "covered": item["covered"],
-            "block_sha256": hashlib.sha256(block.text.encode("utf-8")).hexdigest(),
-            "loc": block.loc.model_dump(mode="json", exclude_none=True)}
-        key = "primary_" + _digest(primary)[:24]
-        sources[key] = primary
         current = joint_catalogs.get(index, catalog)
-        visible = [key, *[sid for sid in current["sources"] if sid in sources]]
+        key = None
+        if not quote or block.text.count(quote) != 1 or block.loc is None:
+            # Joint validation already records a missing primary locally. Keep
+            # its authority denominator without inventing a manuscript source
+            # or aborting the independent review of healthy candidates.
+            if index not in joint_catalogs or current["joint_view"]["primary_source_id"] is not None:
+                raise ValueError("Authority primary must identify one exact located original quote")
+        else:
+            start = block.text.index(quote)
+            primary = {"block_id": block.id, "start": start, "end": start+len(quote),
+                "quote": quote, "kind": "candidate_primary", "covered": item["covered"],
+                "block_sha256": hashlib.sha256(block.text.encode("utf-8")).hexdigest(),
+                "loc": block.loc.model_dump(mode="json", exclude_none=True)}
+            key = "primary_" + _digest(primary)[:24]
+            sources[key] = primary
+        visible = ([key] if key is not None else []) + [sid for sid in current["sources"] if sid in sources]
         for identifier in item["covered"]:
             row = {"item_index": index, "condition_id": identifier,
                 "unit_ids": [u["unit_id"] for u in units if u["condition_id"] == identifier],

@@ -52,9 +52,8 @@ def test_execution_recovery_failure_preserves_primary_error_and_partial_report(
     assert summary["stage_errors"] == {"execution": "ValueError: primary execution failure"}
     review_text = Path(summary["outputs"]["report_json"]).read_text(encoding="utf-8")
     review = json.loads(review_text)
-    # This existing model fixture has incomplete claim coverage; retain it in delivery.
-    assert summary["claim_coverage"]["status"] == "partial"
-    assert review["run_status"] == "partial" and review["incomplete_stages"] == ["screening", "execution"]
+    assert summary["claim_coverage"]["status"] == "complete"
+    assert review["run_status"] == "partial" and review["incomplete_stages"] == ["execution"]
     assert review["ledger"] == [] and len(review["claims"]) == len(retained) == 4
     for claim in review["claims"]:
         before = retained[claim["id"]]

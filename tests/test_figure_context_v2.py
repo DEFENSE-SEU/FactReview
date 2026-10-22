@@ -370,7 +370,9 @@ def test_later_figure_cannot_change_a_previously_consumed_page(tmp_path):
             Path(materials.pages[0].path).write_bytes(b"changed previous page")
         return response
 
-    findings, _, records, _ = run_model(materials, mutate)
+    raw = {"findings": [*crop_response()["findings"], *visual_clear_rows(
+        "figure", ("text_figure_consistency",))]}
+    findings, _, records, _ = run_model(materials, mutate, raw=raw)
     assert [r.status for r in records] == ["failed", "checked"]
     assert [r.context_status for r in records] == ["failed", "checked"]
     assert [f.evidence[0].pointer.key for f in findings] == ["figure_2"]
@@ -384,7 +386,9 @@ def test_future_figure_baseline_cannot_be_changed_by_first_callback(tmp_path):
             Path(materials.figures[1].printed_crop_path).write_bytes(b"changed future crop")
         return response
 
-    _, _, records, calls = run_model(materials, mutate)
+    raw = {"findings": [*crop_response()["findings"], *visual_clear_rows(
+        "figure", ("text_figure_consistency",))]}
+    _, _, records, calls = run_model(materials, mutate, raw=raw)
     assert [r.status for r in records] == ["checked", "failed"]
     assert len(calls) == 2
 

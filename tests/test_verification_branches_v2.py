@@ -446,6 +446,8 @@ def test_experiments_missing_ablation_is_concrete_author_question(
     claim: Claim, materials: SharedMaterials
 ) -> None:
     claim.text = "The attention component causes the improvement in A test MRR."
+    claim.source_block_id = "main"
+    claim.source_quote = claim.text
     materials.blocks[0].text += " " + claim.text
     materials.markdown = materials.blocks[0].text + materials.blocks[1].text
     Path(materials.markdown_path).write_text(materials.markdown, encoding="utf-8")
@@ -465,7 +467,7 @@ def test_experiments_missing_ablation_is_concrete_author_question(
             )
         ),
     )
-    assert result.evidence[0].concern and result.evidence[0].overturnable
+    assert result.evidence[0].concern and result.evidence[0].overturnable, result.issues
     assert result.questions[0].claim_id == claim.id
 
 
@@ -597,6 +599,9 @@ def test_same_setting_and_scale_paper_disagreement_remains_questioned(
     claim.conditions[0].metric = metric
     claim.conditions[0].settings = settings
     response = contradiction_response(materials, left, right, left_token, right_token)
+    claim.text = left
+    claim.source_block_id = "comparison_left"
+    claim.source_quote = left
     result = verify_experiments(claim, materials, call=mock_response(response))
     assert len(result.evidence) == 1 and not result.issues
     evidence = result.evidence[0]
@@ -632,6 +637,8 @@ def test_explicit_value_context_disambiguates_real_paper_disagreement(claim, mat
     comparison = response["items"][0]["comparison"]
     comparison[0]["value_context"] = "A test MRR is 0.4."
     comparison[1]["value_context"] = "A test MRR is 0.5."
+    claim.source_block_id = "comparison_left"
+    claim.source_quote = comparison[0]["value_context"]
     result = verify_experiments(claim, materials, call=mock_response(response))
     assert len(result.evidence) == 1 and result.evidence[0].concern
     assert result.questions and not result.issues

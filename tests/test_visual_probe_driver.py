@@ -10,6 +10,7 @@ from PIL import Image
 
 from llm.client import LLMConfig
 from screening.figures import FigureCheckRecord
+from tests.test_pipeline_v2 import visual_clear_rows
 
 spec = importlib.util.spec_from_file_location(
     "visual_probe", Path(__file__).resolve().parents[1] / "scripts/check_v2_visual.py"
@@ -70,7 +71,10 @@ def test_tiny_printed_labels_use_real_pixels_and_require_legibility_issue(
                     "category": category,
                     "disposition": disposition,
                     "text": "The axis and legend text is too small to read at this size.",
-                }
+                },
+                *visual_clear_rows("figure", [name for name in (
+                    "self_containedness", "legibility", "text_figure_consistency"
+                ) if name != category]),
             ]
         }
 

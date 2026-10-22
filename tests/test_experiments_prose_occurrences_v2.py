@@ -133,9 +133,10 @@ def test_unknown_version_never_silently_uses_legacy_scope(tmp_path, version):
     )
     assert evidence_for(run(paper, candidate, review), "c1").sufficient
     review["schema_version"] = version
-    result = run(paper, candidate, review)
+    result = run(paper, candidate, review, wrap_authority=False, scope_paper_format="legacy")
     assert not evidence_for(result, "c1").sufficient
-    assert any("schema_version" in issue for issue in result.issues)
+    expected_error = "paper_scope_format" if version == "catalog-v3" else "schema_version"
+    assert any(expected_error in issue for issue in result.issues)
 
 
 def test_partial_first_pass_is_not_promoted_by_valid_occurrence_scope(tmp_path):

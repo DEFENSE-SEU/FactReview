@@ -33,6 +33,8 @@ from tests.execution_science_fixtures import (
 )
 from tests.experiment_authority_fixtures import authority_scope_fixture
 from tests.literature_scope_fixtures import native_response, scientific_response
+from tests.test_claim_first_batches_v2 import first_callback
+from tests.test_theory_derivations_v2 import versioned_support_response
 from verification import literature
 
 ASPECTS = ["correspondence", "fairness", "isolation", "stability", "consistency"]
@@ -166,10 +168,16 @@ def visual_clear_rows(kind, categories=None):
 class ModelBoundary:
     def __init__(self):
         self.calls = []
+        self.coverage_batches = first_callback([])
 
     def __call__(self, **kwargs):
         module = kwargs["module"]
         self.calls.append(module)
+        if module in {
+            "screening.claims.coverage_discovery", "screening.claims.coverage_first_batch",
+            "screening.claims.coverage_original_batch", "screening.claims.coverage_batch_decisions",
+        }:
+            return self.coverage_batches(**kwargs)
         if module in {"screening.claims.coverage", "screening.claims.coverage_validation"}:
             from tests.test_claim_coverage_v2 import review, validation
 
@@ -360,7 +368,7 @@ class ModelBoundary:
                 ],
             }
         if module == "verification.theory":
-            return {
+            return versioned_support_response({
                 "items": [
                     {
                         "block_id": block["id"],
@@ -373,7 +381,8 @@ class ModelBoundary:
                         "step_quote": "x = x",
                     }
                 ]
-            }
+            }, goal="The identity theorem states x = x.", conclusion="x = x",
+                reason="Equality is reflexive, so the stated identity follows directly.")
         if module == "verification.experiments":
             return {
                 "checked_aspects": ASPECTS,
@@ -498,6 +507,7 @@ def test_real_v2_stages_with_mocked_external_services_render_pdf_and_svg(tiny_in
     assert list(summary["stages"]) == list(pipeline_v2.STAGES)
     assert set(summary["stages"].values()) == {"ok"}
     assert summary["stage_errors"] == {}
+    assert summary["incomplete_stages"] == []
     assert summary["counts"] == {"supported": 4, "flawed": 0, "questioned": 0, "unverified": 0}
     stats = summary["run_stats"]["modules"]
     assert stats["reference_check"]["status"] == "ok"
@@ -1016,6 +1026,8 @@ def _assert_strict_gate(summary):
 
 def test_strict_gate_reaches_review_report_and_teaser(tiny_inputs, monkeypatch):
     tiny_inputs[0].gate = "strict"
+    # A paper-only experiment score exercises the stricter independent-evidence gate.
+    tiny_inputs[0].run_execution = False
     summary, *_ = run_tiny(tiny_inputs, monkeypatch, render_pdf=False)
     review = _assert_strict_gate(summary)
     lenient = sum(claim.gate_status["lenient"].status == ClaimStatus.SUPPORTED for claim in review.claims)

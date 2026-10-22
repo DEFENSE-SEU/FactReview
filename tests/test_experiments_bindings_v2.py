@@ -226,7 +226,7 @@ def legacy_review(paper, candidate, review):
     }
 
 
-def run(paper, candidate, review, *, raw_responses=None):
+def run(paper, candidate, review, *, raw_responses=None, wrap_authority=True, scope_paper_format=None):
     calls = []
 
     def model(**kwargs):
@@ -234,13 +234,14 @@ def run(paper, candidate, review, *, raw_responses=None):
         if kwargs["module"] == "verification.experiments":
             return dict(checked_aspects=ASPECTS, items=[candidate], plans=[])
         assert kwargs["module"] == "verification.experiments.scope"
-        response = authority_scope_fixture(json.loads(kwargs["prompt"]), review, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports its result with the original measurement qualifiers.")
+        response = (authority_scope_fixture(json.loads(kwargs["prompt"]), review, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The fixture reports its result with the original measurement qualifiers.")
+                    if wrap_authority else copy.deepcopy(review))
         if raw_responses is not None:
             raw_responses.append(copy.deepcopy(response))
         return response
 
     result = verify_experiments(paper[0], paper[1], call=model,
-                                scope_paper_format=review.get("schema_version", "legacy"))
+                                scope_paper_format=scope_paper_format or review.get("schema_version", "legacy"))
     assert calls == ["verification.experiments", "verification.experiments.scope"]
     return result
 
@@ -657,7 +658,9 @@ def test_catalog_statistical_concern_checks_the_selected_prose_comparison(tmp_pa
 
 
 def test_production_schema_offers_prose_selectors_and_derives_known_roles_and_endpoints(tmp_path):
-    paper, candidate, review = prose_case(tmp_path)
+    from tests.test_experiments_prose_occurrences_v2 import production_case
+
+    paper, candidate, review = production_case(tmp_path)
     seen = []
 
     def model(**kwargs):
@@ -684,19 +687,7 @@ def test_production_schema_offers_prose_selectors_and_derives_known_roles_and_en
             not {"endpoint_required", "subject_setting", "comparator_setting"}
             & schemas["CatalogConditionScope"]["properties"].keys()
         )
-        # This default-v2 schema fixture selects the same exact original numbers.
-        typed_review = copy.deepcopy(review)
-        comparison = typed_review["items"][0]["comparisons"][0]
-        for side in ("left", "right"):
-            source_id = comparison.pop(f"{side}_source_id")
-            token = comparison.pop(f"{side}_token")
-            context = comparison.pop(f"{side}_value_context")
-            block_id = paper[2]["sources"][source_id]["block_id"]
-            number_id = next(key for key, value in paper[2]["numbers"].items()
-                             if value["block_id"] == block_id and value["token"] == token
-                             and value["sentence"] == context)
-            comparison[side] = {"kind": "prose", "number_id": number_id}
-        return authority_scope_fixture(payload, typed_review, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The same original result numbers and complete measurement settings are reported.")
+        return authority_scope_fixture(payload, review, requirement="manuscript_reported_result", basis="reported_measurement", rationale="The same original result numbers and complete measurement settings are reported.")
 
     result = verify_experiments(paper[0], paper[1], call=model)
     assert len(seen) == 1

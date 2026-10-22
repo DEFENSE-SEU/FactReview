@@ -88,16 +88,19 @@ def test_post_revalidation_stale_advice_updates_all_text_artifacts(tmp_path, mon
 
 def test_pipeline_nested_partial_keeps_operational_stages_and_outputs_consistent(tiny_inputs, monkeypatch):
     healthy = ModelBoundary()
+    incomplete_calls = []
 
     def incomplete_first_review(**kwargs):
         response = healthy(**kwargs)
-        if kwargs["module"] == "screening.claims.coverage":
+        if kwargs["module"] in {"screening.claims.coverage", "screening.claims.coverage_first_batch"}:
             # Exercise a real incomplete nested receipt while retaining its
             # original context, sources and other claim-review records.
             response["claim_reviews"] = response["claim_reviews"][:-1]
+            incomplete_calls.append(kwargs["module"])
         return response
 
     summary, _, _, _ = run_tiny(tiny_inputs, monkeypatch, call=incomplete_first_review, render_pdf=False)
+    assert incomplete_calls
     assert set(summary["stages"].values()) == {"ok"}
     saved = json.loads(Path(summary["outputs"]["report_json"]).read_text("utf-8"))
     teaser = json.loads(Path(summary["outputs"]["teaser_json"]).read_text("utf-8"))

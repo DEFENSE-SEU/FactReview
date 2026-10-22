@@ -108,7 +108,13 @@ def invoke(data):
     def model(**kwargs):
         calls.append(kwargs)
         assert len(calls) <= 2, "Contract clarification must not add a repair call"
-        return copy.deepcopy(first if len(calls) == 1 else scope)
+        if len(calls) == 1:
+            return copy.deepcopy(first)
+        from tests.experiment_authority_fixtures import authority_scope_fixture
+
+        return authority_scope_fixture(json.loads(kwargs["prompt"]), scope,
+            requirement="manuscript_reported_result", basis="reported_measurement",
+            rationale="The declared sources report the result with its original qualifiers.")
 
     result = verify_experiments(claim, materials, call=model)
     assert len(calls) == 2

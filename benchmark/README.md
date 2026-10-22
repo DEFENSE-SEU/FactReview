@@ -11,7 +11,7 @@
 | `cross_discipline` | Nature Communications with peer review files | 26 |
 | `fresh` | COLM 2026 accepted, ICML 2026 rejected (public), TMLR after 2026-06-30 | 66 |
 
-`depth` is `precise` for the 60 papers annotated in full and `light` for the other 240. `fresh` papers were reviewed after the training cutoff of the evaluated models and measure contamination.
+`depth` is `precise` for the 60 papers selected for full annotation and `light` for the other 240. These values describe the annotation scope. Human review is still pending, and annotations are excluded from the public dataset. `fresh` papers were reviewed after the training cutoff of the evaluated models and measure contamination.
 
 Columns:
 

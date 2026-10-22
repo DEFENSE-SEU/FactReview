@@ -14,6 +14,7 @@ from fact_generation.execution.resource_contract import build_resource_contract
 from fact_generation.execution.runtime_observer import _snapshot
 from fact_generation.execution.runtime_receipt import _DEFAULT_ENV, read_observer_receipt
 from preprocessing.materials import index_repository
+from tests.execution_runtime_fixtures import sandbox_argv, sandbox_audit
 from tests.test_partition_rank_analysis_v2 import fixture
 
 
@@ -58,9 +59,9 @@ def test_fresh_metric_file_capture_receipt_and_full_rank_context(tmp_path, monke
     for key, value in env.items():
         argv += ["-e",key+"="+value]
     argv += ["image",*request.command]
-    protected = launch_api.protect_observer_docker_argv(argv, launch=launch)
+    protected = launch_api.protect_observer_docker_argv(sandbox_argv(argv, request), launch=launch, sandbox=request.config.sandbox)
     assert protected["status"] == "ready"
-    assert launch_api.protect_observer_docker_argv(protected["argv"], launch=launch)["argv"] == protected["argv"]
+    assert launch_api.protect_observer_docker_argv(protected["argv"], launch=launch, sandbox=request.config.sandbox)["argv"] == protected["argv"]
     payload = {"metrics":{"MRR":.4}, "observations":[{"dataset":"Benchmark","metric":"MRR","settings":{"split":"test","score_func":"transe","opn":"sub"},"value":.4}]}
     report = {"version":"python-source-events-v1", "unresolved":[], "execution":{"status":"completed"},
         "interpreter":{"version":"3.11.14 (mock producer)","executable":"/usr/local/bin/python","optimize":0},
@@ -86,7 +87,7 @@ def test_fresh_metric_file_capture_receipt_and_full_rank_context(tmp_path, monke
     decoded, mapping = v2.decode_output(payload)
     (attempt/"output_mapping.json").write_text(json.dumps({"source":str(attempt/"raw_output.json"),"selectors":mapping}),encoding="utf-8")
     outcome = v2.RunOutcome(returncode=0,stdout=stdout,commands=[protected["argv"]],observations=[v2.Observation.model_validate(row) for row in decoded],
-        environment={"transport":"docker","image":"image","container_name":"mock","runtime_observer":launch_env,"process_termination":{"kind":"completed","exception_type":None}},
+        environment={"transport":"docker","image":"image","container_name":"mock","runtime_observer":launch_env,"sandbox":sandbox_audit(protected["argv"], request),"process_termination":{"kind":"completed","exception_type":None}},
         logs={"runtime_observer":str(attempt/"runtime_observer.json"),"runtime_observer_launch":str(attempt/"runtime_observer_launch.json"),"stdout":str(attempt/"run_stdout.log"),
               "raw_output":str(attempt/"raw_output.json"),"output_mapping":str(attempt/"output_mapping.json"),"raw_metric_file":capture["record"]["host_copy"],"metric_file_capture":capture["metadata"]["path"]})
     receipt = read_observer_receipt(request,outcome)

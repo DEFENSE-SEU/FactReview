@@ -79,6 +79,9 @@ def test_theory_uses_appendix_without_supporting_the_unproved_claim(matrix):
     claims = {row["id"]: row for row in review["claims"]}
     assert claims["claim_001"]["status"] == "supported"
     assert claims["claim_001"]["evidence"][0]["pointer"]["page"] == 2
+    trace = next(row for row in claims["claim_001"]["theory_derivations"] if row["adopted"])
+    assert trace["state"] == "validated" and trace["trace"]["outcome"] == "completed"
+    assert trace["trace"]["steps"][0]["sources"][0]["pointer"]["page"] == 2
     assert claims["claim_002"]["status"] == "unverified"
     assert not claims["claim_002"]["evidence"] and claims["claim_002"]["questions"]
     calls = json.loads(Path(case["paths"]["model_calls"]).read_text(encoding="utf-8"))

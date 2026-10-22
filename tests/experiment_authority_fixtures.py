@@ -14,7 +14,7 @@ def _choice(profile, condition_id):
     return profile[condition_id] if isinstance(profile, dict) else profile
 
 
-def _source_for_passage(payload, passage):
+def _source_for_passage(payload, passage, *, required=True):
     context = payload["source_authority_context"]
     sources = context.get("sources", {})
     matched = [sid for sid, source in sources.items()
@@ -31,8 +31,10 @@ def _source_for_passage(payload, passage):
         if (block is not None and source.get("block_id") == passage.get("block_id")
                 and block[source["start"]:source["end"]] == passage.get("quote")):
             return sid
-    # Keep an original invalid passage invalid, with a visible unmapped selector.
-    return "fixture_unmapped_original_passage"
+    # A valid numeric subquote/sentence need not have its own catalog source.
+    # Authority may cite the primary and exact declared grounds instead. The
+    # unchanged inner review still validates every operand and passage itself.
+    return "fixture_unmapped_original_passage" if required else None
 
 
 def _declared_source_ids(payload, row):
@@ -40,7 +42,9 @@ def _declared_source_ids(payload, row):
     def visit(value):
         if isinstance(value, dict):
             if set(value) >= {"block_id", "quote"}:
-                result.append(_source_for_passage(payload, value))
+                source_id = _source_for_passage(payload, value, required=False)
+                if source_id is not None:
+                    result.append(source_id)
             for key, child in value.items():
                 if key in {"grounds_source_ids", "ground_source_ids", "source_ids", "context_source_ids"}:
                     result.extend(child)
@@ -53,10 +57,12 @@ def _declared_source_ids(payload, row):
                         result.append("fixture_unmapped_original_number")
                     else:
                         number = dict(zip(catalog["number_fields"], values, strict=True))
-                        result.append(_source_for_passage(payload, {
+                        source_id = _source_for_passage(payload, {
                             "block_id": number["block_id"],
                             "quote": catalog["sentences"][number["sentence_id"]],
-                        }))
+                        }, required=False)
+                        if source_id is not None:
+                            result.append(source_id)
                 else:
                     visit(child)
         elif isinstance(value, list):
@@ -98,9 +104,12 @@ def authority_scope_fixture(payload, response, *, requirement, basis, rationale)
         source_ids = [pair["primary_source_id"]]
         if len(rows) == 1:
             source_ids.extend(_declared_source_ids(payload, rows[0]))
-        source_ids = list(dict.fromkeys(source_ids))
+        # These rows classify the declared, available authority sources. Invalid
+        # inner selectors remain in the original response so its per-condition
+        # decoder rejects them without poisoning a healthy neighbor's envelope.
+        source_ids = list(dict.fromkeys(sid for sid in source_ids if sid in pair["visible_source_ids"]))
         candidates.append({"pair_id": pair["pair_id"], "units": [
-            {"unit_id": uid, "basis": _choice(basis, units[uid]["condition_id"]),
+            {"unit_id": uid, "basis": _choice(basis, units[uid]["condition_id"]) if source_ids else "unresolved",
              "evidence_source_ids": copy.deepcopy(source_ids), "rationale": rationale}
             for uid in pair["unit_ids"]
         ]})
