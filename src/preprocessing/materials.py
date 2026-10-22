@@ -1,0 +1,1050 @@
+"""Prepare v2 inputs once, without starting the legacy review agent.
+
+MinerU content-list boxes use a 0..1000 coordinate system by default. Callers
+with PDF-point boxes must explicitly select ``bbox_space="pdf_points"`` (or
+set ``bbox_space`` on a row); coordinate magnitudes are never used to guess.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+import os
+import re
+from pathlib import Path
+from typing import Any, Literal
+
+from preprocessing.parse.mineru_adapter import MineruAdapter, MineruConfig, MineruParseResult
+from schemas.claim import ClaimLocation
+from schemas.materials import (
+    FigureCaptionPart,
+    FigureMaterial,
+    MaterialBlock,
+    PageImage,
+    RepositoryFile,
+    RepositoryIndex,
+    SharedMaterials,
+    TableMaterial,
+)
+
+BBoxSpace = Literal["normalized_1000", "pdf_points"]
+
+
+def _image_io_path(path: Path) -> Path:
+    """Use Windows' extended namespace only for parser-image filesystem I/O."""
+    if os.name != "nt":
+        return path
+    value = str(path.absolute())
+    if value.startswith("\\\\?\\"):
+        return path
+    if value.startswith("\\\\"):
+        return Path("\\\\?\\UNC\\" + value[2:])
+    return Path("\\\\?\\" + value)
+
+
+_HEADINGS = re.compile(r"(?m)^#{1,6}\s+(.+?)\s*#*\s*$")
+_ANCHOR_NUMBER = r"(?:[A-Za-z]\.?)?\d+(?:\.\d+)*"
+_PANEL_SUFFIX = r"(?:[a-z]|\s*\(\s*[a-z]\s*\))?"
+_FIGURE_ANCHOR = rf"{_ANCHOR_NUMBER}{_PANEL_SUFFIX}(?![\w]|\.\d)"
+_FIGURE_REF = re.compile(
+    rf"\bfig(?:ure)?s?\.?\s*({_FIGURE_ANCHOR}"
+    rf"(?:\s*(?:,\s*(?:(?:and|&)\s*)?|(?:and|&|[-–])\s*){_FIGURE_ANCHOR})*)",
+    re.IGNORECASE,
+)
+_TABLE_REF = re.compile(
+    rf"\btab(?:le)?s?\.?\s*({_FIGURE_ANCHOR}"
+    rf"(?:\s*(?:,\s*(?:(?:and|&)\s*)?|(?:and|&|[-–])\s*){_FIGURE_ANCHOR})*)",
+    re.IGNORECASE,
+)
+_REFERENCE_HEADING = re.compile(r"^(?:\d+[.\s]+)?(?:references|bibliography)$", re.IGNORECASE)
+_METADATA_ROW_TYPES = {"header", "footer", "page_number", "page_num", "page_footnote", "aside_text"}
+_IGNORED_DIRS = {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache"}
+_TEXT_SUFFIXES = {
+    ".py",
+    ".sh",
+    ".ps1",
+    ".bat",
+    ".md",
+    ".rst",
+    ".txt",
+    ".yaml",
+    ".yml",
+    ".json",
+    ".toml",
+    ".ini",
+    ".cfg",
+    ".c",
+    ".cpp",
+    ".h",
+    ".js",
+    ".ts",
+    ".ipynb",
+    ".r",
+    ".jl",
+    ".java",
+    ".go",
+    ".rs",
+    ".cu",
+    ".cuh",
+    ".cc",
+    ".cxx",
+    ".hpp",
+    ".m",
+    ".f",
+    ".f90",
+    ".f95",
+    ".scala",
+    ".sql",
+}
+
+
+def index_repository(root: Path) -> RepositoryIndex:
+    """Read a released-repository snapshot; never execute or modify its files."""
+    root = root.resolve(strict=True)
+    if not root.is_dir():
+        raise ValueError(f"repository root is not a directory: {root}")
+    index = RepositoryIndex(root=str(root))
+    paths = []
+    for directory, directories, names in os.walk(root, followlinks=False):
+        directories[:] = [
+            name
+            for name in directories
+            if name not in _IGNORED_DIRS
+            and not (Path(directory) / name).is_symlink()
+            and not getattr(Path(directory) / name, "is_junction", lambda: False)()
+        ]
+        paths.extend(Path(directory) / name for name in names)
+    for path in sorted(paths):
+        relative = path.relative_to(root)
+        if any(part in _IGNORED_DIRS for part in relative.parts) or not path.is_file():
+            continue
+        if path.is_symlink() or not path.resolve().is_relative_to(root):
+            continue
+        suffix, name = path.suffix.lower(), path.name.lower()
+        kind = "asset"
+        if suffix in {".md", ".rst"} or name.startswith(("readme", "license")):
+            kind = "documentation"
+        elif suffix in {".yaml", ".yml", ".json", ".toml", ".ini", ".cfg"} or name in {
+            "requirements.txt",
+            "dockerfile",
+            "makefile",
+            "environment.yml",
+        }:
+            kind = "config"
+        elif suffix in {".sh", ".ps1", ".bat"} or (
+            suffix == ".py"
+            and re.search(r"(?:^|_)(?:main|run|train|eval|evaluate|infer|predict)(?:_|$)", path.stem)
+        ):
+            kind = "entry"
+        elif suffix in _TEXT_SUFFIXES:
+            kind = "source"
+        digest = hashlib.sha256()
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        line_count = None
+        if suffix in _TEXT_SUFFIXES or kind in {"config", "documentation"}:
+            try:
+                line_count = len(path.read_text(encoding="utf-8").splitlines())
+            except (UnicodeError, OSError):
+                pass
+        row = RepositoryFile(
+            path=relative.as_posix(), kind=kind, line_count=line_count, sha256=digest.hexdigest()
+        )
+        index.files.append(row)
+        if kind == "entry":
+            index.entry_scripts.append(row.path)
+        if kind == "config":
+            index.configs.append(row.path)
+    return index
+
+
+def _content_text(value: Any) -> str:
+    if isinstance(value, str):
+        return value.strip()
+    if isinstance(value, list):
+        return "\n".join(text for item in value if (text := _content_text(item)))
+    if isinstance(value, dict):
+        return _content_text(value.get("text") or value.get("content"))
+    return ""
+
+
+def _row_text(row: dict[str, Any]) -> str:
+    kind = str(row.get("type") or "text")
+    keys = {
+        "image": ("image_caption", "caption"),
+        "chart": ("chart_caption", "caption", "content"),
+        "table": ("table_caption", "table_body", "text"),
+        "code": ("code_caption", "code_body", "text"),
+        "equation": ("text", "equation"),
+        "list": ("list_items", "text"),
+    }.get(kind, ("text",))
+    parts = []
+    for key in keys:
+        value = _content_text(row.get(key))
+        if value and (kind != "code" or value not in parts):
+            parts.append(value)
+    return "\n".join(parts)
+
+
+def figure_caption_parts(row: dict[str, Any]) -> list[FigureCaptionPart]:
+    """Preserve scalar caption elements without assigning caption/axis roles."""
+    keys = (
+        ("chart_caption", "caption", "content")
+        if row.get("type") == "chart"
+        else ("image_caption", "caption")
+    )
+    parts = []
+    for key in keys:
+        values = row.get(key)
+        for index, value in enumerate(values if isinstance(values, list) else [values]):
+            if isinstance(value, dict):
+                value = value.get("text") or value.get("content")
+            if isinstance(value, str) and value.strip():
+                parts.append(FigureCaptionPart(id=f"{key}:{index}", field=key, index=index, text=value))
+    return parts
+
+
+def _page(row: dict[str, Any]) -> int | None:
+    idx = row.get("page_idx")
+    if isinstance(idx, int) and not isinstance(idx, bool) and idx >= 0:
+        return idx + 1
+    number = row.get("page") or row.get("page_number")
+    if isinstance(number, int) and not isinstance(number, bool) and number > 0:
+        return number
+    return None
+
+
+def _span(markdown: str, text: str, cursor: int) -> tuple[int, int] | None:
+    start = markdown.find(text, cursor)
+    if start >= 0:
+        return start, start + len(text)
+    # MinerU can normalize whitespace between markdown and content-list text.
+    pattern = r"\s+".join(re.escape(word) for word in text.split())
+    if pattern:
+        match = re.search(pattern, markdown[cursor:])
+        if match:
+            return cursor + match.start(), cursor + match.end()
+    return None
+
+
+def _anchors(text: str, *, pattern: re.Pattern = _FIGURE_REF) -> set[str]:
+    anchors = set()
+    for match in pattern.finditer(text):
+        group = match.group(1)
+        # Panel labels identify part of the same figure and are kept in the
+        # original reference text, while linkage uses its parent figure number.
+        anchors.update(
+            value.lower()
+            for value in re.findall(rf"({_ANCHOR_NUMBER}){_PANEL_SUFFIX}(?![\w]|\.\d)", group, re.IGNORECASE)
+        )
+        for start, end in re.findall(r"\b(\d+)\s*[-–]\s*(\d+)\b", group):
+            if 0 < int(end) - int(start) <= 30:
+                anchors.update(str(value) for value in range(int(start), int(end) + 1))
+    return anchors
+
+
+def _sentences(block: MaterialBlock) -> list[MaterialBlock]:
+    results = []
+    start = 0
+    spans = []
+    for boundary in re.finditer(r"(?<=[.!?])\s+(?=[A-Z])", block.text):
+        prefix = block.text[: boundary.start()]
+        if re.search(
+            r"\b(?:figs?|figures?|tabs?|tables?|eqs?|secs?|e\.g|i\.e|et al)\.$|\b[A-Z]\.$",
+            prefix,
+            re.IGNORECASE,
+        ):
+            continue
+        spans.append((start, boundary.start()))
+        start = boundary.end()
+    spans.append((start, len(block.text)))
+    for start, end in spans:
+        raw = block.text[start:end]
+        text = raw.strip()
+        if not text:
+            continue
+        loc = block.loc.model_copy() if block.loc else None
+        if loc and loc.char_start is not None:
+            leading = len(raw) - len(raw.lstrip())
+            loc.char_start += start + leading
+            loc.char_end = loc.char_start + len(text)
+        results.append(
+            MaterialBlock(
+                id=f"{block.id}.s{len(results) + 1}",
+                text=text,
+                kind="text",
+                loc=loc,
+                citations=block.citations,
+            )
+        )
+    return results
+
+
+def _blocks(markdown: str, rows: list[dict[str, Any]], issues: list[str]) -> list[MaterialBlock]:
+    headings = list(_HEADINGS.finditer(markdown))
+    blocks = []
+    cursor = 0
+    parser_section = None
+    if not rows:
+        rows = [
+            {"type": "text", "text": match.group(), "_span": (match.start(), match.end())}
+            for match in re.finditer(r"\S[^\n]*(?:\n(?!\s*\n)[^\n]+)*", markdown)
+        ]
+        issues.append("Parser returned no content list; text blocks have no parser page locations.")
+    material_rows = []
+    for idx, row in enumerate(rows, 1):
+        items = row.get("list_items")
+        if row.get("type") == "list" and isinstance(items, list) and items:
+            # Keep item locations independent: Markdown may insert bullet
+            # markers between items that are absent from parser list_items.
+            for item_idx, item in enumerate(items, 1):
+                item_text = _content_text(item)
+                if item and not item_text:
+                    issues.append(
+                        f"block_{idx}.item_{item_idx}: unsupported list item content; inspect content_list.json."
+                    )
+                material_rows.append(
+                    (
+                        f"block_{idx}.item_{item_idx}",
+                        {
+                            **row,
+                            "list_items": [],
+                            "text": item_text,
+                        },
+                    )
+                )
+        else:
+            material_rows.append((f"block_{idx}", row))
+    for block_id, row in material_rows:
+        kind = str(row.get("type") or "text")
+        metadata = kind in _METADATA_ROW_TYPES
+        text = _row_text(row)
+        if not metadata and kind not in {
+            "text",
+            "list",
+            "table",
+            "equation",
+            "code",
+            "image",
+            "chart",
+            "ref_text",
+            "title",
+            "heading",
+        }:
+            issues.append(f"{block_id}: unsupported parser row type {kind!r}; inspect content_list.json.")
+        if not text:
+            content_keys = set(row) - {
+                "type",
+                "page_idx",
+                "page",
+                "page_number",
+                "bbox",
+                "bbox_space",
+                "text_level",
+                "img_path",
+                "image_path",
+                "id",
+                "list_items",
+            }
+            if any(row[key] for key in content_keys):
+                issues.append(
+                    f"{block_id}: parser content could not be converted to text; inspect content_list.json."
+                )
+            continue
+        # Headers, page numbers and marginal notes may be absent from Markdown.
+        # Their repeated text must not consume a later body passage or image hash.
+        span = None if metadata else row.get("_span") or _span(markdown, text, cursor)
+        if span:
+            cursor = span[1]
+            text = markdown[span[0] : span[1]]
+        elif not metadata:
+            issues.append(f"{block_id}: parser text could not be aligned to markdown; char span unavailable.")
+        if row.get("text_level") and not metadata:
+            parser_section = f"{block_id}: {text.lstrip('# ').strip()}"
+        section = parser_section
+        for number, heading in enumerate(headings, 1):
+            if span and heading.start() <= span[0]:
+                section = f"section_{number}: {heading.group(1).strip()}"
+        page = _page(row)
+        if page is None and section:
+            page_match = re.search(r": Page (\d+)$", section, re.IGNORECASE)
+            page = int(page_match.group(1)) if page_match else None
+        loc = (
+            ClaimLocation(
+                page=page,
+                section=section,
+                char_start=span[0] if span else None,
+                char_end=span[1] if span else None,
+            )
+            if (page or section or span)
+            else None
+        )
+        if loc is None:
+            issues.append(f"{block_id}: parser supplied no verifiable location.")
+        if not metadata and (
+            row.get("text_level") or any(span and h.start() <= span[0] < h.end() for h in headings)
+        ):
+            kind = "heading"
+        blocks.append(
+            MaterialBlock(
+                id=block_id, text=text, kind=kind, loc=loc, citations=re.findall(r"\[[^\]\n]+\]", text)
+            )
+        )
+    return blocks
+
+
+def _markdown_gap_segments(markdown: str) -> list[tuple[int, int, str, str | None]]:
+    """Keep whole exact paragraphs/ATX headings; fences cannot introduce sections."""
+    segments = []
+    paragraph = None
+    fence = None
+    opaque = None
+    offset = 0
+    section = None
+    section_number = 0
+
+    def append(start, end, kind):
+        raw = markdown[start:end]
+        start += len(raw) - len(raw.lstrip())
+        end -= len(raw) - len(raw.rstrip())
+        if start < end:
+            segments.append((start, end, kind, section))
+
+
+    def html_boundary(root_tag):
+        # Only HTML token boundaries are used; no Markdown/DOM interpretation.
+        from html.parser import HTMLParser
+
+        void_tags = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
+
+        class Boundary(HTMLParser):
+            def __init__(self):
+                super().__init__(convert_charrefs=False)
+                self.stack = []
+                self.closed = False
+                self.uncertain = False
+                self.root_seen = False
+                self.literal = False
+
+            def handle_starttag(self, tag, attrs):
+                if self.closed:
+                    self.uncertain = True
+                    return
+                if not self.root_seen:
+                    self.root_seen = True
+                    self.uncertain = self.uncertain or tag != root_tag
+                if tag in void_tags:
+                    self.closed = not self.stack
+                else:
+                    self.stack.append(tag)
+
+            def handle_startendtag(self, tag, attrs):
+                if self.closed or tag not in void_tags:
+                    # HTML does not close a non-void element with a '/>' token.
+                    self.uncertain = True
+                elif not self.stack:
+                    self.closed = True
+
+            def handle_endtag(self, tag):
+                if self.closed or not self.stack or self.stack[-1] != tag:
+                    self.uncertain = True
+                    return
+                self.stack.pop()
+                self.closed = not self.stack
+
+            def handle_data(self, text):
+                if self.closed and text.strip():
+                    self.uncertain = True
+
+        return Boundary()
+
+    def wrapper_boundary(mode, opening):
+        class Boundary:
+            literal = True
+
+            def __init__(self):
+                self.closed = False
+                self.uncertain = False
+                self.rawdata = ""
+                self.cursor = None
+                self.quote = None
+                self.depth = 0
+                self.comment = False
+                self.pi = False
+
+            def finish(self, end):
+                self.closed = True
+                self.uncertain = bool(self.rawdata[end:].strip())
+                self.rawdata = ""
+
+            def feed(self, text):
+                if self.closed:
+                    self.uncertain = self.uncertain or bool(text.strip())
+                    return
+                if mode == "unknown" or self.uncertain:
+                    return
+                self.rawdata += text
+                if self.cursor is None:
+                    self.cursor = len(self.rawdata) - len(self.rawdata.lstrip()) + len(opening)
+                if mode in {"pi", "cdata"}:
+                    closer = "?>" if mode == "pi" else "]]>"
+                    end = self.rawdata.find(closer, self.cursor)
+                    if end != -1:
+                        self.finish(end + len(closer))
+                    else:
+                        self.rawdata = self.rawdata[max(self.cursor, len(self.rawdata) - len(closer) + 1):]
+                        self.cursor = 0
+                    return
+                while self.cursor < len(self.rawdata):
+                    char = self.rawdata[self.cursor]
+                    if self.pi:
+                        end = self.rawdata.find("?>", self.cursor)
+                        if end == -1:
+                            self.rawdata = self.rawdata[max(self.cursor, len(self.rawdata) - 1):]
+                            self.cursor = 0
+                            return
+                        self.cursor = end + 2
+                        self.pi = False
+                        continue
+                    if self.comment:
+                        end = self.rawdata.find("-->", self.cursor)
+                        if end == -1:
+                            self.cursor = max(self.cursor, len(self.rawdata) - 2)
+                            self.rawdata = self.rawdata[self.cursor:]
+                            self.cursor = 0
+                            return
+                        self.cursor = end + 3
+                        self.comment = False
+                        continue
+                    if self.quote:
+                        if char == self.quote:
+                            self.quote = None
+                    elif self.depth and self.rawdata.startswith("<?", self.cursor):
+                        self.cursor += 2
+                        self.pi = True
+                        continue
+                    elif self.rawdata.startswith("<!--", self.cursor):
+                        self.cursor += 4
+                        self.comment = True
+                        continue
+                    elif len(self.rawdata) - self.cursor < 4 and "<!--".startswith(self.rawdata[self.cursor:]):
+                        self.rawdata = self.rawdata[self.cursor:]
+                        self.cursor = 0
+                        return
+                    elif char in {"'", '"'}:
+                        self.quote = char
+                    elif char == "[":
+                        self.depth += 1
+                    elif char == "]":
+                        if not self.depth:
+                            self.uncertain = True
+                            return
+                        self.depth -= 1
+                    elif char == ">" and not self.depth:
+                        self.finish(self.cursor + 1)
+                        return
+                    elif char == "<" and not self.depth:
+                        self.uncertain = True
+                        return
+                    self.cursor += 1
+                self.rawdata = ""
+                self.cursor = 0
+
+        return Boundary()
+
+    def html_closed(boundary, line):
+        try:
+            boundary.feed(line)
+        except Exception:
+            boundary.uncertain = True
+        return boundary.closed and not boundary.uncertain and not boundary.rawdata.strip()
+
+    for line in markdown.splitlines(keepends=True):
+        fence_match = re.match(r"^[ \t]{0,3}(`{3,}|~{3,})(.*)$", line.rstrip("\r\n"))
+        if opaque is not None:
+            if opaque[2] is None:
+                closed = opaque[1].lower() in line.lower()
+            else:
+                token_closed = html_closed(opaque[2], line)
+                # Inline or ambiguous closes cannot release following headings.
+                closed = token_closed and (
+                    opaque[2].literal
+                    or re.fullmatch(r"\s*</" + re.escape(opaque[1]) + r"\s*>\s*", line, re.IGNORECASE)
+                )
+            if closed:
+                append(opaque[0], offset + len(line), "unrecognized_structure")
+                opaque = None
+        elif fence is not None:
+            if (
+                fence_match
+                and fence_match.group(1)[0] == fence[1]
+                and len(fence_match.group(1)) >= fence[2]
+                and not fence_match.group(2).strip()
+            ):
+                append(fence[0], offset + len(line), "code")
+                fence = None
+        elif fence_match:
+            if paragraph is not None:
+                append(paragraph, offset, "text")
+                paragraph = None
+            fence = (offset, fence_match.group(1)[0], len(fence_match.group(1)))
+        else:
+            # A literal ATX line inside these containers is not a section.
+            # Missing containers remain intact and unavailable for new sources.
+            stripped = line.lstrip()
+            container = re.match(r"<([A-Za-z][\w:-]*)\b", stripped)
+            closer = None
+            wrapper = None
+            if stripped.startswith("<!--"):
+                closer = "-->"
+            elif stripped.startswith("<?"):
+                wrapper, closer = ("pi", "<?"), "?>"
+            elif stripped.startswith("<![CDATA["):
+                wrapper, closer = ("cdata", "<![CDATA["), "]]>"
+            elif stripped.startswith("<!"):
+                declaration = re.match(r"<![A-Za-z][\w:-]*\b", stripped)
+                wrapper = ("declaration", declaration.group()) if declaration else ("unknown", "<!")
+                closer = ">"
+            elif re.match(r"</[A-Za-z][\w:-]*\b", stripped):
+                wrapper, closer = ("unknown", "</"), ">"
+            elif stripped.startswith("$$"):
+                closer = "$$"
+            elif stripped.startswith(r"\["):
+                closer = r"\]"
+            elif container:
+                closer = "</" + container.group(1) + ">"
+            if closer is not None:
+                if paragraph is not None:
+                    append(paragraph, offset, "text")
+                    paragraph = None
+                boundary = (
+                    html_boundary(container.group(1).lower())
+                    if container
+                    else wrapper_boundary(*wrapper) if wrapper else None
+                )
+                opening_size = 2 if stripped.startswith("$$") else 0
+                closed = (
+                    html_closed(boundary, line)
+                    if boundary is not None
+                    else closer.lower() in stripped[opening_size:].lower()
+                )
+                if closed:
+                    append(offset, offset + len(line), "unrecognized_structure")
+                else:
+                    opaque = (offset, container.group(1).lower() if container else closer, boundary)
+                offset += len(line)
+                continue
+            heading = _HEADINGS.fullmatch(line.rstrip("\r\n"))
+            if heading or not line.strip():
+                if paragraph is not None:
+                    append(paragraph, offset, "text")
+                    paragraph = None
+                if heading:
+                    section_number += 1
+                    section = f"section_{section_number}: {heading.group(1).strip()}"
+                    append(offset, offset + len(line), "heading")
+            elif paragraph is None:
+                paragraph = offset
+        offset += len(line)
+    if opaque is not None:
+        append(opaque[0], len(markdown), "uncertain_html" if opaque[2] is not None else "unrecognized_structure")
+    elif fence is not None:
+        append(fence[0], len(markdown), "unclosed_code")
+    elif paragraph is not None:
+        append(paragraph, len(markdown), "text")
+    return segments
+
+
+def _materialize_markdown_gaps(
+    markdown: str, blocks: list[MaterialBlock], issues: list[str]
+) -> list[MaterialBlock]:
+    """Add only complete original Markdown sources in verified parser-list gaps."""
+    anchors, unlocated = [], set()
+    for index, block in enumerate(blocks):
+        if block.kind in _METADATA_ROW_TYPES:
+            continue
+        loc = block.loc
+        if (
+            loc is not None
+            and loc.char_start is not None
+            and loc.char_end <= len(markdown)
+            and markdown[loc.char_start : loc.char_end] == block.text
+        ):
+            anchors.append((index, loc.char_start, loc.char_end))
+        else:
+            unlocated.add(index)
+    ordered = all(anchors[index - 1][2] <= anchors[index][1] for index in range(1, len(anchors)))
+    used_ids = {block.id for block in blocks}
+    insertions = {}
+    for start, end, kind, section in _markdown_gap_segments(markdown):
+        text = markdown[start:end]
+        if re.fullmatch(r"(?:!\[[^\]\n]*\]\([^\)\n]+\)\s*)+", text):
+            continue
+        overlaps = [(max(start, left), min(end, right)) for _, left, right in anchors if left < end and start < right]
+        covered = list(overlaps)
+        if kind == "heading":
+            heading = _HEADINGS.fullmatch(text)
+            covered.extend([(start, start + heading.start(1)), (start + heading.end(1), end)])
+        elif kind == "code":
+            lines = text.splitlines(keepends=True)
+            covered.extend([(start, start + len(lines[0])), (end - len(lines[-1]), end)])
+        else:
+            covered.extend(
+                (start + match.start(), start + match.end())
+                for match in re.finditer(r"(?m)^[ \t]{0,3}(?:[-+*]|\d+[.)])[ \t]+", text)
+            )
+        cursor, uncovered = start, False
+        for left, right in sorted(covered):
+            if markdown[cursor:left].strip():
+                uncovered = True
+            cursor = max(cursor, right)
+        if markdown[cursor:end].strip():
+            uncovered = True
+        if not uncovered:
+            continue
+        block_id = f"markdown_gap:{start}:{end}:{hashlib.sha256(text.encode('utf-8')).hexdigest()}"
+        reason = None
+        if kind == "uncertain_html":
+            reason = "unrecognized_markdown_structure"
+        elif overlaps:
+            reason = "partial_overlap"
+        elif kind in {"unclosed_code", "unrecognized_structure"}:
+            reason = "unrecognized_markdown_structure"
+        else:
+            left_index = max((index for index, _, right in anchors if right <= start), default=-1)
+            slot = next((index for index, left, _ in anchors if left >= end), len(blocks))
+            if not ordered or left_index >= slot or any(left_index < index < slot for index in unlocated):
+                reason = "unknown_insertion_gap"
+            elif block_id in used_ids:
+                reason = "source_id_collision"
+        if reason:
+            issues.append(
+                f"{block_id}: source unavailable ({reason}); complete Markdown context retained at [{start}, {end})."
+            )
+            continue
+        block = MaterialBlock(
+            id=block_id,
+            text=text,
+            kind=kind,
+            loc=ClaimLocation(page=None, section=section, char_start=start, char_end=end),
+            citations=re.findall(r"\[[^\]\n]+\]", text),
+        )
+        insertions.setdefault(slot, []).append(block)
+        used_ids.add(block_id)
+        issues.append(f"{block_id}: page unavailable; exact Markdown source span retained.")
+    if not insertions:
+        return blocks
+    result = []
+    for index in range(len(blocks) + 1):
+        result.extend(insertions.get(index, []))
+        if index < len(blocks):
+            result.append(blocks[index])
+    return result
+
+
+def _bbox(row: dict[str, Any], width: float, height: float, default: BBoxSpace) -> tuple[float, ...]:
+    value = row.get("bbox")
+    if not isinstance(value, (tuple, list)) or len(value) != 4:
+        raise ValueError("missing or invalid parser bbox")
+    coords = tuple(float(item) for item in value)
+    if not all(math.isfinite(item) for item in coords):
+        raise ValueError("non-finite parser bbox")
+    space = row.get("bbox_space", default)
+    if space == "normalized_1000":
+        if not all(0 <= item <= 1000 for item in coords):
+            raise ValueError("normalized bbox outside 0..1000")
+        coords = tuple(item * (width if i % 2 == 0 else height) / 1000 for i, item in enumerate(coords))
+    elif space != "pdf_points":
+        raise ValueError(f"unsupported bbox space: {space}")
+    x1, y1, x2, y2 = coords
+    if not (0 <= x1 < x2 <= width and 0 <= y1 < y2 <= height):
+        raise ValueError("bbox is outside the page or has non-positive area")
+    return coords
+
+
+def _table_materials(material: SharedMaterials, rows, pdf, images_dir: Path, bbox_space: BBoxSpace):
+    """Keep table pixels and coverage separate from the historical figure contract."""
+    import fitz
+    from PIL import Image
+
+    blocks = {block.id: block for block in material.blocks}
+    for row_number, row in enumerate(rows, 1):
+        if row.get("type") != "table":
+            continue
+        raw_captions = row.get("table_caption")
+        caption = _content_text(raw_captions)
+        caption_anchors = set()
+        for line in caption.splitlines():
+            label = _TABLE_REF.match(line.lstrip())
+            if label:
+                caption_anchors.update(_anchors(label.group(), pattern=_TABLE_REF))
+        ambiguous = len(caption_anchors) > 1 or (
+            isinstance(raw_captions, list) and sum(bool(_content_text(value)) for value in raw_captions) > 1
+        )
+        block_id = f"block_{row_number}"
+        block = blocks.get(block_id)
+        table = TableMaterial(
+            id=f"table_{len(material.tables) + 1}",
+            block_id=block_id,
+            parser_row_index=row_number,
+            parser_bbox_space=bbox_space,
+            anchor=next(iter(caption_anchors)) if len(caption_anchors) == 1 and not ambiguous else "",
+            loc=block.loc if block else None,
+            caption=caption,
+            footnotes=_content_text(row.get("table_footnote")),
+            caption_ambiguous=ambiguous,
+        )
+        if not caption:
+            table.issues.append(f"{table.id}: parser supplied no table caption.")
+        elif ambiguous:
+            table.issues.append(
+                f"{table.id}: crop-to-caption assignment is ambiguous; parser supplied multiple table captions."
+            )
+        elif not table.anchor:
+            table.issues.append(f"{table.id}: caption has no table citation anchor.")
+        for body in material.blocks:
+            if body.kind not in {"text", "list"} or body in material.bibliography:
+                continue
+            table.references.extend(
+                sentence
+                for sentence in _sentences(body)
+                if caption_anchors & _anchors(sentence.text, pattern=_TABLE_REF)
+            )
+        try:
+            page_number = _page(row)
+            if page_number is None or page_number > len(pdf):
+                raise ValueError("missing or out-of-range parser page")
+            page = pdf[page_number - 1]
+            box = _bbox(row, page.rect.width, page.rect.height, bbox_space)
+            table.bbox_points = box
+            crop = images_dir / f"{table.id}.png"
+            printed = images_dir / f"{table.id}_printed.png"
+            page.get_pixmap(dpi=200, clip=fitz.Rect(box)).save(crop)
+            size = (max(1, round((box[2] - box[0]) * 96 / 72)), max(1, round((box[3] - box[1]) * 96 / 72)))
+            with Image.open(crop) as image:
+                image.resize(size, Image.Resampling.LANCZOS).save(printed, dpi=(96, 96))
+            table.crop_path, table.printed_crop_path = str(crop), str(printed)
+            if table.loc is None:
+                table.loc = ClaimLocation(page=page_number)
+        except (ValueError, TypeError, OverflowError) as exc:
+            table.issues.append(f"{table.id}: crop/printed-size input unavailable: {exc}")
+        material.tables.append(table)
+
+
+def build_materials(
+    parsed: MineruParseResult,
+    *,
+    paper_pdf: Path,
+    output_dir: Path,
+    paper_key: str,
+    repo_root: Path | None = None,
+    bbox_space: BBoxSpace = "normalized_1000",
+) -> SharedMaterials:
+    """Materialize parser output and real PDF crops; retain unavailable inputs as issues."""
+    import fitz
+    from PIL import Image
+
+    if bbox_space not in {"normalized_1000", "pdf_points"}:
+        raise ValueError(f"unsupported bbox space: {bbox_space}")
+    output_dir = output_dir.resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    paper_pdf = paper_pdf.resolve(strict=True)
+    markdown_path = output_dir / "paper.md"
+    content_path = output_dir / "content_list.json"
+    markdown_path.write_text(parsed.markdown, encoding="utf-8", newline="")
+    rows = [row for row in (parsed.content_list or []) if isinstance(row, dict)]
+    content_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+    issues = [parsed.warning] if parsed.warning else []
+    blocks = _blocks(parsed.markdown, rows, issues)
+    if rows:
+        blocks = _materialize_markdown_gaps(parsed.markdown, blocks, issues)
+    heading_matches = list(_HEADINGS.finditer(parsed.markdown))
+    title = heading_matches[0].group(1).strip() if heading_matches else ""
+    if re.fullmatch(r"(?:abstract|page \d+|introduction)", title, re.IGNORECASE):
+        title = ""
+    abstract = ""
+    for idx, heading in enumerate(heading_matches):
+        if heading.group(1).strip().lower() == "abstract":
+            end = heading_matches[idx + 1].start() if idx + 1 < len(heading_matches) else len(parsed.markdown)
+            abstract = parsed.markdown[heading.end() : end].strip()
+            break
+    material = SharedMaterials(
+        paper_key=paper_key,
+        title=title,
+        abstract=abstract,
+        source_pdf=str(paper_pdf),
+        markdown=parsed.markdown,
+        markdown_path=str(markdown_path),
+        content_list_path=str(content_path),
+        provider=parsed.provider,
+        blocks=blocks,
+        issues=issues,
+        repository=index_repository(repo_root) if repo_root else None,
+    )
+    in_bibliography = False
+    for block in blocks:
+        if block.kind == "heading":
+            in_bibliography = bool(_REFERENCE_HEADING.fullmatch(block.text.lstrip("# ").strip()))
+        elif block.kind == "ref_text" or (in_bibliography and block.kind in {"text", "list"}):
+            material.bibliography.append(block)
+
+    assets = output_dir / "assets"
+    linked_images = []
+    for name, data in (parsed.image_files or {}).items():
+        destination = (assets / name.replace("\\", "/")).resolve()
+        if not destination.is_relative_to(assets.resolve()):
+            material.issues.append(f"Skipped unsafe parser image path: {name}")
+            continue
+        _image_io_path(destination.parent).mkdir(parents=True, exist_ok=True)
+        _image_io_path(destination).write_bytes(data)
+        # Keep the parser assets and the original Markdown image URLs. Editing
+        # Markdown here would invalidate every previously derived character span.
+        linked = (output_dir / name.replace("\\", "/")).resolve()
+        if linked.is_relative_to((output_dir / "images").resolve()):
+            linked_images.append((linked, data))
+
+    images_dir = output_dir / "images"
+    images_dir.mkdir(exist_ok=True)
+    image_rows = [(i, row) for i, row in enumerate(rows, 1) if row.get("type") in {"image", "chart"}]
+    if not image_rows:
+        image_rows = [
+            (0, {"type": "image", "caption": match.group(1), "img_path": match.group(2)})
+            for match in re.finditer(r"!\[([^\]]*)\]\(([^)]+)\)", parsed.markdown)
+        ]
+    with fitz.open(paper_pdf) as pdf:
+        for idx, page in enumerate(pdf, 1):
+            page_path = images_dir / f"page_{idx}.png"
+            page.get_pixmap(dpi=200).save(page_path)
+            material.pages.append(
+                PageImage(
+                    page=idx,
+                    path=str(page_path),
+                    width_points=page.rect.width,
+                    height_points=page.rect.height,
+                )
+            )
+        for idx, (row_number, row) in enumerate(image_rows, 1):
+            caption = _row_text(row)
+            first_reference = _FIGURE_REF.search(caption)
+            caption_anchors = set()
+            for line in caption.splitlines():
+                label = _FIGURE_REF.match(line.lstrip())
+                if label:
+                    caption_anchors.update(_anchors(label.group()))
+            if not caption_anchors and first_reference:
+                caption_anchors.add(re.match(_ANCHOR_NUMBER, first_reference.group(1)).group().lower())
+            raw_captions = row.get("chart_caption") or row.get("image_caption") or row.get("caption")
+            caption_ambiguous = len(caption_anchors) > 1 or (
+                isinstance(raw_captions, list)
+                and sum(bool(_content_text(value)) for value in raw_captions) > 1
+            )
+            anchor = (
+                next(iter(caption_anchors)) if len(caption_anchors) == 1 and not caption_ambiguous else ""
+            )
+            block = next((b for b in blocks if b.id == f"block_{row_number}"), None)
+            figure = FigureMaterial(
+                id=f"figure_{idx}",
+                block_id=block.id if block else "",
+                parser_row_index=row_number if row_number else None,
+                parser_bbox_space=bbox_space,
+                caption_parts=figure_caption_parts(row),
+                anchor=anchor,
+                caption=caption,
+                caption_ambiguous=caption_ambiguous,
+                loc=block.loc if block else None,
+            )
+            if not caption:
+                material.issues.append(f"{figure.id}: parser supplied no caption.")
+            if len(caption_anchors) > 1:
+                material.issues.append(
+                    f"{figure.id}: parser combined captions for figure anchors {', '.join(sorted(caption_anchors))}; "
+                    "crop-to-caption assignment is ambiguous."
+                )
+            elif caption_ambiguous:
+                material.issues.append(
+                    f"{figure.id}: parser supplied multiple captions; crop-to-caption assignment is ambiguous."
+                )
+            elif not anchor:
+                material.issues.append(f"{figure.id}: caption has no figure citation anchor.")
+            for body in blocks:
+                if body.kind not in {"text", "list"} or body in material.bibliography:
+                    continue
+                figure.references.extend(
+                    sentence for sentence in _sentences(body) if caption_anchors & _anchors(sentence.text)
+                )
+            try:
+                page_number = _page(row)
+                if page_number is None or page_number > len(pdf):
+                    raise ValueError("missing or out-of-range parser page")
+                page = pdf[page_number - 1]
+                box = _bbox(row, page.rect.width, page.rect.height, bbox_space)
+                figure.bbox_points = box
+                crop = images_dir / f"{figure.id}.png"
+                printed = images_dir / f"{figure.id}_printed.png"
+                page.get_pixmap(dpi=200, clip=fitz.Rect(box)).save(crop)
+                # Resize to the physical box dimensions: renderer clip rounding
+                # can otherwise add two extra pixels at non-integer origins.
+                size = (
+                    max(1, round((box[2] - box[0]) * 96 / 72)),
+                    max(1, round((box[3] - box[1]) * 96 / 72)),
+                )
+                with Image.open(crop) as image:
+                    image.resize(size, Image.Resampling.LANCZOS).save(printed, dpi=(96, 96))
+                figure.crop_path = str(crop)
+                figure.printed_crop_path = str(printed)
+                if figure.loc is None:
+                    figure.loc = ClaimLocation(page=page_number)
+            except (ValueError, TypeError, OverflowError) as exc:
+                material.issues.append(f"{figure.id}: crop/printed-size input unavailable: {exc}")
+            material.figures.append(figure)
+        _table_materials(material, rows, pdf, images_dir, bbox_space)
+    for linked, data in linked_images:
+        linked_io = _image_io_path(linked)
+        if linked_io.exists() and linked_io.read_bytes() != data:
+            material.issues.append(
+                f"Skipped parser image link colliding with a generated artifact: {linked.name}"
+            )
+            continue
+        _image_io_path(linked.parent).mkdir(parents=True, exist_ok=True)
+        linked_io.write_bytes(data)
+    (output_dir / "materials.json").write_text(material.model_dump_json(indent=2), encoding="utf-8")
+    return material
+
+
+async def parse_materials(
+    *,
+    paper_pdf: Path,
+    output_dir: Path,
+    paper_key: str,
+    repo_root: Path | None = None,
+    parser: MineruAdapter | None = None,
+    bbox_space: BBoxSpace = "normalized_1000",
+) -> SharedMaterials:
+    """Call MinerU directly; no claim extraction, retrieval, or report work runs here."""
+    if parser is None:
+        from common.config import get_settings
+
+        settings = get_settings()
+        parser = MineruAdapter(
+            MineruConfig(
+                base_url=settings.mineru_base_url,
+                api_token=settings.mineru_api_token,
+                model_version=settings.mineru_model_version,
+                upload_endpoint=settings.mineru_upload_endpoint,
+                poll_endpoint_templates=settings.mineru_poll_templates(),
+                poll_interval_seconds=settings.mineru_poll_interval_seconds,
+                poll_timeout_seconds=settings.mineru_poll_timeout_seconds,
+                allow_local_fallback=settings.mineru_allow_local_fallback,
+            )
+        )
+    parsed = await parser.parse_pdf(pdf_path=paper_pdf, data_id=paper_key)
+    return build_materials(
+        parsed,
+        paper_pdf=paper_pdf,
+        output_dir=output_dir,
+        paper_key=paper_key,
+        repo_root=repo_root,
+        bbox_space=bbox_space,
+    )

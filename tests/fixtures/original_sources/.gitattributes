@@ -1,0 +1,2 @@
+# Differential baselines retain their frozen byte identities on every checkout.
+*.py -text

@@ -1,42 +1,41 @@
-"""Review schemas — the output of §3.4 review (report + teaser)."""
+"""V2 review artifacts; historical report contracts live in legacy_review."""
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Any, Literal
 
-from schemas.claim import ClaimLabel
+from pydantic import Field
 
-
-class EvidenceLink(BaseModel):
-    """A pointer back to the evidence that justifies an assessment."""
-
-    kind: str  # "paper" | "literature" | "execution"
-    locator: str  # section_id / neighbor.name / task_id…
-    snippet: str = ""  # short human-readable excerpt
-    score: float | None = None  # optional confidence / similarity
+from schemas.claim import Claim, ClaimStatus, Contract, Finding, GateLevel, NonEmpty
 
 
-class ClaimAssessment(BaseModel):
-    """A single claim's verdict with linked evidence."""
+class DeliveryCheck(Contract):
+    """A requested operation that the system could not finish."""
 
-    model_config = ConfigDict(extra="ignore")
-
-    claim_id: str
-    label: ClaimLabel
-    rationale: str
-    evidence: list[EvidenceLink] = Field(default_factory=list)
-    confidence: float | None = None  # 0..1 when available
-    subclaim_labels: dict[str, ClaimLabel] = Field(default_factory=dict)
+    stage: Literal["materials", "screening", "verification", "execution", "assessment", "report", "teaser"]
+    component: NonEmpty
+    state: Literal["failed", "incomplete", "unavailable"]
+    responsibility: Literal["system"] = "system"
+    reason: NonEmpty
+    claim_id: str | None = None
 
 
-class FinalReview(BaseModel):
-    """The full §3.4 output: review text + per-claim assessments."""
+class FinalReview(Contract):
+    paper_key: NonEmpty
+    run_id: NonEmpty
+    claims: list[Claim] = Field(default_factory=list)
+    findings: list[Finding] = Field(default_factory=list)
+    ledger: list[dict[str, Any]] = Field(default_factory=list)
+    review_markdown: str = ""
+    run_status: Literal["completed", "partial"] = "completed"
+    incomplete_stages: list[str] = Field(default_factory=list)
+    # None preserves the unspecified context of historical artifacts.
+    execution_requested: bool | None = None
+    advice_requested: bool | None = None
+    # The gate tier whose result is each claim's status; None for historical artifacts.
+    gate: GateLevel | None = None
+    delivery_checks: list[DeliveryCheck] = Field(default_factory=list)
 
-    model_config = ConfigDict(extra="ignore")
-
-    paper_key: str
-    run_id: str
-    review_markdown: str  # the concise review text
-    evidence_markdown: str  # the linked evidence report
-    assessments: list[ClaimAssessment] = Field(default_factory=list)
-    summary_counts: dict[ClaimLabel, int] = Field(default_factory=dict)
+    @property
+    def summary_counts(self) -> dict[ClaimStatus, int]:
+        return {status: sum(claim.status == status for claim in self.claims) for status in ClaimStatus}

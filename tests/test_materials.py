@@ -1,0 +1,473 @@
+"""Shared-material fixtures use real PDF rendering and a mocked MinerU boundary."""
+
+from __future__ import annotations
+
+import hashlib
+from pathlib import Path
+from unittest.mock import AsyncMock
+
+import fitz
+import pytest
+from PIL import Image
+
+from preprocessing.materials import _anchors, build_materials, index_repository, parse_materials
+from preprocessing.parse.mineru_adapter import MineruParseResult
+from schemas.materials import SharedMaterials
+
+
+@pytest.fixture
+def paper_pdf(tmp_path: Path) -> Path:
+    path = tmp_path / "paper.pdf"
+    with fitz.open() as pdf:
+        page = pdf.new_page(width=600, height=800)
+        page.draw_rect(fitz.Rect(60, 80, 300, 400), color=(0, 0, 0), fill=(0.1, 0.6, 0.8))
+        page.insert_text((75, 110), "Panel (a)")
+        pdf.save(path)
+    return path
+
+
+@pytest.fixture
+def parsed() -> MineruParseResult:
+    rows = [
+        {"type": "text", "text": "Tiny Paper", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": "Abstract", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": "A local test paper.", "page_idx": 0},
+        {"type": "text", "text": "1 Method", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": "Figure 1 shows our model [1]. Figure 10 shows a baseline.", "page_idx": 0},
+        {"type": "text", "text": "Figs. 1 and 10 share the same units.", "page_idx": 0},
+        {"type": "equation", "text": "$$ y = W x $$", "page_idx": 0},
+        {"type": "table", "table_body": "| Metric | Value |\n|---|---|\n| MRR | 0.4 |", "page_idx": 0},
+        {
+            "type": "image",
+            "image_caption": ["Figure 1: Model with panel (a)."],
+            "page_idx": 0,
+            "bbox": [100, 100, 500, 500],
+        },
+        {
+            "type": "image",
+            "image_caption": ["Figure 10: Baseline."],
+            "page_idx": 0,
+            "bbox": [500, 500, 800, 750],
+        },
+        {"type": "text", "text": "References", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": "[1] Author. Relevant work. 2020.", "page_idx": 0},
+    ]
+    markdown = "\n\n".join(
+        ("# " if row.get("text_level") else "")
+        + (row.get("text") or row.get("table_body") or "\n".join(row.get("image_caption", [])))
+        for row in rows
+    )
+    return MineruParseResult(
+        markdown=markdown,
+        content_list=rows,
+        image_files=None,
+        batch_id="fixture",
+        raw_result=None,
+        provider="mineru_fixture",
+    )
+
+
+def test_materials_render_all_pages_crops_and_printed_size(paper_pdf, parsed, tmp_path):
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert len(result.pages) == 1
+    assert Path(result.pages[0].path).is_file()
+    assert len(result.figures) == 2
+    for figure in result.figures:
+        assert figure.caption and figure.loc.page == 1
+        assert Path(figure.crop_path).is_file()
+        assert Path(figure.printed_crop_path).is_file()
+    assert result.figures[0].bbox_points == (60, 80, 300, 400)
+    with Image.open(result.figures[0].printed_crop_path) as image:
+        assert abs(image.width - 240 * 96 / 72) <= 1
+        assert abs(image.height - 320 * 96 / 72) <= 1
+    with Image.open(result.figures[0].crop_path) as image:
+        assert image.width > 320
+    assert result.issues == []
+
+
+def test_materials_link_exact_figure_anchors_and_all_referencing_sentences(paper_pdf, parsed, tmp_path):
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    first, tenth = result.figures
+    assert [row.text for row in first.references] == [
+        "Figure 1 shows our model [1].",
+        "Figs. 1 and 10 share the same units.",
+    ]
+    assert [row.text for row in tenth.references] == [
+        "Figure 10 shows a baseline.",
+        "Figs. 1 and 10 share the same units.",
+    ]
+    for figure in result.figures:
+        for reference in figure.references:
+            assert result.markdown[reference.loc.char_start : reference.loc.char_end] == reference.text
+
+
+def test_materials_preserve_source_and_bibliography_with_verifiable_spans(paper_pdf, parsed, tmp_path):
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert Path(result.markdown_path).read_text(encoding="utf-8") == parsed.markdown
+    assert result.markdown == parsed.markdown
+    assert result.title == "Tiny Paper"
+    assert result.abstract == "A local test paper."
+    assert result.bibliography[0].text == "[1] Author. Relevant work. 2020."
+    assert next(row for row in result.blocks if row.kind == "equation").text == "$$ y = W x $$"
+    assert "| MRR | 0.4 |" in next(row for row in result.blocks if row.kind == "table").text
+    for block in result.blocks:
+        assert block.loc.page == 1
+        assert block.loc.section
+        assert result.markdown[block.loc.char_start : block.loc.char_end] == block.text
+    round_trip = SharedMaterials.model_validate_json((tmp_path / "out" / "materials.json").read_text())
+    assert round_trip == result
+
+
+@pytest.mark.parametrize("bbox", [None, [-1, 0, 100, 100], [0, 0, 0, 100], [0, 0, 1001, 100]])
+def test_materials_missing_or_invalid_bbox_retains_figure_and_reason(paper_pdf, parsed, tmp_path, bbox):
+    parsed.content_list[8]["bbox"] = bbox
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    figure = result.figures[0]
+    assert figure.caption and figure.references
+    assert figure.crop_path == ""
+    assert figure.printed_crop_path == ""
+    assert any("figure_1: crop/printed-size input unavailable" in issue for issue in result.issues)
+
+
+def test_materials_pdf_point_bbox_is_explicit(paper_pdf, parsed, tmp_path):
+    parsed.content_list[8]["bbox"] = [60, 80, 300, 400]
+    parsed.content_list[8]["bbox_space"] = "pdf_points"
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert result.figures[0].bbox_points == (60, 80, 300, 400)
+    # The second row remains normalized even though its values also fit PDF points.
+    assert result.figures[1].bbox_points == (300, 400, 480, 600)
+
+
+def test_materials_missing_char_span_never_fabricates_offsets(paper_pdf, parsed, tmp_path):
+    parsed.content_list.append({"type": "text", "text": "Missing from the markdown.", "page_idx": 0})
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    block = result.blocks[-1]
+    assert block.loc.page == 1
+    assert block.loc.char_start is None and block.loc.char_end is None
+    assert any("could not be aligned" in issue for issue in result.issues)
+
+
+def test_materials_empty_reference_list_is_valid(paper_pdf, parsed, tmp_path):
+    parsed.content_list[8]["image_caption"] = ["Figure 2: Unreferenced drawing."]
+    parsed.markdown = parsed.markdown.replace(
+        "Figure 1: Model with panel (a).", "Figure 2: Unreferenced drawing."
+    )
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert result.figures[0].references == []
+    assert result.figures[0].crop_path and result.figures[0].caption
+
+
+def test_materials_repeated_paragraphs_keep_distinct_exact_spans(paper_pdf, parsed, tmp_path):
+    text = "Figure 1 has shared axes."
+    parsed.markdown += f"\n\n{text}\n\n{text}"
+    parsed.content_list.extend([{"type": "text", "text": text, "page_idx": 0}] * 2)
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    first, second = result.blocks[-2:]
+    assert first.loc.char_start < second.loc.char_start
+    assert result.markdown[first.loc.char_start : first.loc.char_end] == text
+    assert result.markdown[second.loc.char_start : second.loc.char_end] == text
+
+
+def test_materials_figure_reference_sentence_preserves_scientific_abbreviations(paper_pdf, parsed, tmp_path):
+    original = parsed.content_list[4]["text"]
+    replacement = "We use e.g. Fig.1 for a complete description. Figure 10 shows a baseline."
+    parsed.content_list[4]["text"] = replacement
+    parsed.markdown = parsed.markdown.replace(original, replacement)
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert result.figures[0].references[0].text == "We use e.g. Fig.1 for a complete description."
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("Figure A.1 shows the proof.", {"a.1"}),
+        ("Figures 1, 2, and 3 summarize the results.", {"1", "2", "3"}),
+        ("Figures A.1, A.2, and A.3 summarize the results.", {"a.1", "a.2", "a.3"}),
+        ("Figs.1, 2 & 3 and Figure S1 agree.", {"1", "2", "3", "s1"}),
+        ("Figures 1–3 are the ablations.", {"1", "2", "3"}),
+        ("Figure A.10 and Figure 10 are distinct.", {"a.10", "10"}),
+        ("Table A.1 and Eq. 3 are omitted.", set()),
+        ("Figure A.1invalid is an invalid anchor.", set()),
+    ],
+)
+def test_figure_anchor_grammar_and_exact_nonmatches(text, expected):
+    assert _anchors(text) == expected
+
+
+def test_materials_list_items_keep_claims_references_and_spans(paper_pdf, parsed, tmp_path):
+    old_text = parsed.content_list[4]["text"]
+    texts = ["Figure 1 shows the first advantage [1].", "Figure 10 shows the second advantage."]
+    parsed.content_list[4] = {"type": "list", "list_items": [texts[0], {"text": texts[1]}], "page_idx": 0}
+    parsed.markdown = parsed.markdown.replace(old_text, "\n".join(f"- {text}" for text in texts))
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    items = [block for block in result.blocks if block.kind == "list"]
+    assert [block.text for block in items] == texts
+    for block in items:
+        assert block.loc.page == 1
+        assert result.markdown[block.loc.char_start : block.loc.char_end] == block.text
+    assert result.figures[0].references[0].text == texts[0]
+    assert result.figures[1].references[0].text == texts[1]
+    assert result.issues == []
+
+
+def test_materials_unsupported_content_row_is_visible(paper_pdf, parsed, tmp_path):
+    parsed.content_list.append(
+        {"type": "custom_block", "content": "Important source content.", "page_idx": 0}
+    )
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert any("unsupported parser row type 'custom_block'" in issue for issue in result.issues)
+    assert any("parser content could not be converted to text" in issue for issue in result.issues)
+    assert "Important source content." in Path(result.content_list_path).read_text(encoding="utf-8")
+
+
+def test_repository_index_lists_entries_configs_and_never_writes(tmp_path):
+    root = tmp_path / "repo"
+    (root / "config").mkdir(parents=True)
+    (root / ".git").mkdir()
+    (root / "run.py").write_text("if __name__ == '__main__':\n    pass\n")
+    (root / "README.md").write_text("Run python run.py\n")
+    (root / "model.py").write_text("class Model: pass\n")
+    (root / "config" / "train.yaml").write_text("epochs: 3\n")
+    (root / ".git" / "config").write_text("private metadata")
+    before = {
+        p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in root.rglob("*")
+        if p.is_file()
+    }
+    result = index_repository(root)
+    assert result.entry_scripts == ["run.py"]
+    assert result.configs == ["config/train.yaml"]
+    assert {row.path for row in result.files} == {"run.py", "README.md", "model.py", "config/train.yaml"}
+    assert next(row for row in result.files if row.path == "run.py").line_count == 2
+    after = {
+        p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in root.rglob("*")
+        if p.is_file()
+    }
+    assert before == after
+
+
+@pytest.mark.asyncio
+async def test_parse_materials_uses_only_injected_mineru(paper_pdf, parsed, tmp_path):
+    parser = AsyncMock()
+    parser.parse_pdf.return_value = parsed
+    result = await parse_materials(
+        paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny", parser=parser
+    )
+    parser.parse_pdf.assert_awaited_once_with(pdf_path=paper_pdf, data_id="tiny")
+    assert result.provider == "mineru_fixture"
+    assert result.figures
+
+
+def test_parser_assets_cannot_escape_materials_output(paper_pdf, parsed, tmp_path):
+    parsed.image_files = {"../../escaped.png": b"bad", "images/asset.png": b"saved"}
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert not (tmp_path / "escaped.png").exists()
+    assert (tmp_path / "out" / "assets" / "images" / "asset.png").read_bytes() == b"saved"
+    assert any("unsafe parser image path" in issue for issue in result.issues)
+
+
+def test_mineru_charts_keep_crops_and_ambiguous_caption_assignments(paper_pdf, parsed, tmp_path):
+    captions = ["Figure 3: Basis-vector ablation.", "Figure 4: Pruned relations.", "Figure 5: Scaling."]
+    body = "Figures 3, 4, and 5 compare the model variants."
+    parsed.markdown = "\n\n".join(["# Paper", body, *captions])
+    parsed.content_list = [
+        {"type": "text", "text": "Paper", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": body, "page_idx": 0},
+        *[
+            {
+                "type": "chart",
+                "img_path": f"images/chart_{index}.jpg",
+                "content": "",
+                "chart_caption": caption,
+                "chart_footnote": [],
+                "bbox": [100, 100, 500, 500],
+                "page_idx": 0,
+            }
+            for index, caption in enumerate(([captions[0]], [], captions[1:]))
+        ],
+    ]
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert len(result.figures) == 3
+    assert [f.anchor for f in result.figures] == ["3", "", ""]
+    assert [f.caption_ambiguous for f in result.figures] == [False, False, True]
+    assert result.figures[2].caption == "\n".join(captions[1:])
+    assert result.figures[2].references[0].text == body
+    assert all(Path(f.printed_crop_path).is_file() and f.loc.page == 1 for f in result.figures)
+    assert all(f.bbox_points == (60, 80, 300, 400) for f in result.figures)
+    assert any("figure_2: parser supplied no caption" in issue for issue in result.issues)
+    assert any("figure anchors 4, 5" in issue and "ambiguous" in issue for issue in result.issues)
+    assert not any("unsupported parser row type 'chart'" in issue for issue in result.issues)
+    restored = SharedMaterials.model_validate_json(
+        (tmp_path / "out/materials.json").read_text(encoding="utf-8")
+    )
+    assert restored.figures[2].caption_ambiguous
+
+
+def test_multiple_parser_captions_remain_ambiguous_without_distinct_figure_labels(
+    paper_pdf, parsed, tmp_path
+):
+    parsed.content_list[8]["image_caption"] = ["Figure 1: First panel.", "An additional caption."]
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert result.figures[0].caption_ambiguous and result.figures[0].anchor == ""
+    assert any("multiple captions" in issue and "ambiguous" in issue for issue in result.issues)
+
+
+def test_mineru_metadata_never_consumes_body_spans_or_changes_sections(paper_pdf, parsed, tmp_path):
+    first, second = "A complete first paragraph.", "The result is 123 and includes margin notes."
+    parsed.markdown = f"# Paper\n\n{first}\n\n![](images/hash123.jpg)\n\n{second}"
+    parsed.content_list = [
+        {"type": "text", "text": "Paper", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": first, "page_idx": 0},
+        {"type": "header", "text": "Appendix", "text_level": 1, "page_idx": 0},
+        {"type": "page_number", "text": "1", "page_idx": 0},
+        {"type": "page_num", "text": "2", "page_idx": 0},
+        {"type": "aside_text", "text": "margin notes", "page_idx": 0},
+        {"type": "page_footnote", "text": "123", "page_idx": 0},
+        {"type": "text", "text": second, "page_idx": 0},
+    ]
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    for block in result.blocks[2:-1]:
+        assert block.loc.page == 1
+        assert block.loc.char_start is None and block.loc.char_end is None
+        assert "Appendix" not in block.loc.section
+    body = result.blocks[-1]
+    assert body.text == second
+    assert body.loc.char_start == parsed.markdown.index(second)
+    assert result.markdown[body.loc.char_start : body.loc.char_end] == second
+    assert not any("could not be aligned" in issue for issue in result.issues)
+
+
+def test_mineru_bibliography_excludes_page_metadata_and_ends_at_next_heading(paper_pdf, parsed, tmp_path):
+    refs = ["A. Author. First result. 2020.", "B. Author. Second result. 2021."]
+    parsed.markdown = "\n\n".join(["# References", *refs, "# Appendix", "Additional results."])
+    parsed.content_list = [
+        {"type": "text", "text": "References", "text_level": 1, "page_idx": 0},
+        {"type": "ref_text", "text": refs[0], "page_idx": 0},
+        {"type": "header", "text": "Published at a conference", "page_idx": 0},
+        {"type": "page_number", "text": "1", "page_idx": 0},
+        {"type": "aside_text", "text": "margin note", "page_idx": 0},
+        {"type": "page_footnote", "text": "footnote", "page_idx": 0},
+        {"type": "ref_text", "text": refs[1], "page_idx": 0},
+        {"type": "text", "text": "Appendix", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": "Additional results.", "page_idx": 0},
+    ]
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert [block.text for block in result.bibliography] == refs
+    assert not any("unsupported parser row type" in issue for issue in result.issues)
+    for block in result.bibliography:
+        assert result.markdown[block.loc.char_start : block.loc.char_end] == block.text
+
+
+def test_mineru_markdown_image_links_resolve_without_changing_source_bytes(paper_pdf, parsed, tmp_path):
+    parsed.markdown += "\n\n![](images/source.jpg)\n"
+    parsed.image_files = {"images/source.jpg": b"original image bytes"}
+    digest = hashlib.sha256(parsed.markdown.encode("utf-8")).hexdigest()
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    assert hashlib.sha256(Path(result.markdown_path).read_bytes()).hexdigest() == digest
+    assert result.markdown == parsed.markdown
+    assert (Path(result.markdown_path).parent / "images/source.jpg").read_bytes() == b"original image bytes"
+    assert (tmp_path / "out/assets/images/source.jpg").read_bytes() == b"original image bytes"
+    for block in result.blocks:
+        assert result.markdown[block.loc.char_start : block.loc.char_end] == block.text
+
+
+def test_parser_image_alias_cannot_overwrite_a_rendered_page(paper_pdf, parsed, tmp_path):
+    parsed.image_files = {"images/page_1.png": b"untrusted source asset"}
+    result = build_materials(parsed, paper_pdf=paper_pdf, output_dir=tmp_path / "out", paper_key="tiny")
+    with Image.open(result.pages[0].path) as image:
+        assert image.width > 0
+    assert any("colliding with a generated artifact" in issue for issue in result.issues)
+
+
+@pytest.mark.asyncio
+async def test_public_mineru_zip_images_preserve_sources_at_windows_long_paths(paper_pdf, tmp_path, monkeypatch):
+    import json
+    import os
+    import zipfile
+    from io import BytesIO
+
+    import httpx
+
+    from preprocessing.parse.mineru_adapter import MineruAdapter, MineruConfig
+    from screening.figure_context import FigureSources
+
+    image_buffer = BytesIO()
+    Image.new("RGB", (12, 12), color="blue").save(image_buffer, format="JPEG")
+    image_bytes = image_buffer.getvalue()
+    image_name = hashlib.sha256(image_bytes).hexdigest() + ".jpg"
+    image_reference = "images/" + image_name
+    markdown = "# Paper\n\nFigure 1 shows the model.\n\nFigure 1: Model.\n\n![](" + image_reference + ")"
+    rows = [
+        {"type": "text", "text": "Paper", "text_level": 1, "page_idx": 0},
+        {"type": "text", "text": "Figure 1 shows the model.", "page_idx": 0},
+        {"type": "image", "image_caption": ["Figure 1: Model."], "img_path": image_reference,
+         "page_idx": 0, "bbox": [100, 100, 500, 500]},
+    ]
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w") as archive:
+        archive.writestr("paper.md", markdown.encode("utf-8"))
+        archive.writestr("paper_content_list.json", json.dumps(rows).encode("utf-8"))
+        archive.writestr(image_reference, image_bytes)
+    requests = []
+
+    def reply(request):
+        requests.append((request.method, request.url.path))
+        if request.method == "POST" and request.url.path == "/api/v4/file-urls/batch":
+            return httpx.Response(200, json={"code": 0, "data": {"batch_id": "fixture",
+                "file_urls": ["https://mineru.invalid/upload"]}})
+        if request.method == "PUT" and request.url.path == "/upload":
+            assert request.content == paper_pdf.read_bytes()
+            return httpx.Response(200)
+        if request.method == "GET" and request.url.path == "/api/v4/extract-results/batch/fixture":
+            return httpx.Response(200, json={"code": 0, "data": {"state": "done",
+                "full_zip_url": "https://mineru.invalid/result.zip"}})
+        if request.method == "GET" and request.url.path == "/result.zip":
+            return httpx.Response(200, content=zip_buffer.getvalue())
+        raise AssertionError("Unexpected external request")
+
+    original_client = httpx.AsyncClient
+    monkeypatch.setattr(httpx, "AsyncClient", lambda **kwargs: original_client(
+        transport=httpx.MockTransport(reply), **kwargs))
+    parser = MineruAdapter(MineruConfig(base_url="https://mineru.invalid/api/v4", api_token="fixture",
+        model_version="vlm", upload_endpoint="file-urls/batch",
+        poll_endpoint_templates=["extract-results/batch/{batch_id}"], poll_interval_seconds=0.8,
+        poll_timeout_seconds=30, allow_local_fallback=False))
+    root_units = len(str(tmp_path.resolve()).encode("utf-16-le")) // 2
+    outputs = [tmp_path / "short"]
+    for length in (182, 190):
+        width = length - root_units - 1
+        assert width > 0
+        outputs.append(tmp_path / ("m" * width))
+    for output in outputs:
+        material = await parse_materials(paper_pdf=paper_pdf, output_dir=output, paper_key="tiny", parser=parser)
+        assert Path(material.markdown_path).parent == output.resolve()
+        assert Path(material.markdown_path).read_bytes() == markdown.encode("utf-8")
+        assert material.markdown == markdown
+        assert json.loads(Path(material.content_list_path).read_text(encoding="utf-8")) == rows
+        assert material.source_pdf == str(paper_pdf.resolve())
+        assert material.provider == "mineru_v4"
+        assert material.issues == []
+        for path in (output / "assets" / image_reference, output / image_reference):
+            # Read the same real filesystem file in Windows' extended namespace;
+            # ordinary metadata/source strings above remain unchanged.
+            io_path = Path("\\\\?\\" + str(path.resolve())) if os.name == "nt" else path
+            assert io_path.read_bytes() == image_bytes
+            assert hashlib.sha256(io_path.read_bytes()).hexdigest() == image_name[:-4]
+            with Image.open(io_path) as image:
+                assert image.size == (12, 12)
+        figure = material.figures[0]
+        assert figure.references[0].text == "Figure 1 shows the model."
+        assert figure.caption == "Figure 1: Model."
+        assert figure.bbox_points == (60, 80, 300, 400)
+        with Image.open(figure.printed_crop_path) as image:
+            assert image.size == (320, 427)
+        sources = FigureSources.capture(material, figure, {})
+        sources.check(material)
+        assert sources.hashes[material.markdown_path] == hashlib.sha256(markdown.encode("utf-8")).hexdigest()
+        for block in material.blocks:
+            assert material.markdown[block.loc.char_start:block.loc.char_end] == block.text
+    assert len(str(outputs[1] / "assets" / image_reference).encode("utf-16-le")) // 2 == 265
+    assert len(str(outputs[2] / image_reference).encode("utf-16-le")) // 2 == 266
+    assert requests == [("POST", "/api/v4/file-urls/batch"), ("PUT", "/upload"),
+        ("GET", "/api/v4/extract-results/batch/fixture"), ("GET", "/result.zip")] * 3

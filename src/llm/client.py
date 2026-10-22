@@ -1,20 +1,28 @@
 from __future__ import annotations
 
+import base64
+import contextlib
+import contextvars
 import json
+import mimetypes
 import os
 import re
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from pathlib import Path
 from typing import Any
 
 from common import run_stats
+from common.provider_attempts import PhysicalAttemptNotStarted
 
 from .codex_auth import get_codex_auth
 from .codex_client import (
+    CodexResponseError,
     invoke_codex,
     resolve_codex_base_url,
     resolve_codex_model,
 )
+from .diagnostics import redact_provider_details
 from .provider_capabilities import is_codex_provider, normalize_provider
 
 
@@ -69,19 +77,25 @@ def resolve_llm_config(
         api_key = (os.getenv("DEEPSEEK_API_KEY") or "").strip() or None
         base = base_url or os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
         mdl = model or os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
-        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens)
+        return LLMConfig(
+            provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens
+        )
 
     if prov == "qwen":
         api_key = (os.getenv("QWEN_API_KEY") or "").strip() or None
         base = base_url or os.getenv("QWEN_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
         mdl = model or os.getenv("QWEN_MODEL", "qwen-3")
-        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens)
+        return LLMConfig(
+            provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens
+        )
 
     if prov == "claude":
         api_key = (os.getenv("CLAUDE_API_KEY") or "").strip() or None
         base = base_url or os.getenv("CLAUDE_BASE_URL", "https://api.anthropic.com")
         mdl = model or os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
-        return LLMConfig(provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens)
+        return LLMConfig(
+            provider=prov, model=mdl, base_url=base, api_key=api_key, max_tokens=resolved_max_tokens
+        )
 
     if is_codex_provider(prov):
         return LLMConfig(
@@ -114,6 +128,62 @@ def resolve_llm_config(
         api_key=None,
         max_tokens=resolved_max_tokens,
     )
+
+
+def resolve_vlm_config(*, fallback: LLMConfig | None = None) -> LLMConfig:
+    """Resolve optional visual-model overrides without silently changing providers.
+
+    With no visual overrides the regular model configuration is inherited.
+    A different visual provider uses its own credentials and defaults; a key
+    belonging to the main provider must not be sent to another provider.
+    """
+    provider = (os.getenv("VLM_MODEL_PROVIDER") or "").strip()
+    model = (os.getenv("VLM_MODEL") or "").strip()
+    base_url = (os.getenv("VLM_BASE_URL") or "").strip()
+    api_key = (os.getenv("VLM_API_KEY") or "").strip()
+    if not any((provider, model, base_url, api_key)) and fallback is not None:
+        return fallback
+    requested = _resolve_provider(provider or (fallback.provider if fallback else ""))
+    if is_codex_provider(requested):
+        requested = "openai-codex"
+    if requested not in {"openai-codex", "openai", "claude", "deepseek", "qwen"}:
+        raise ValueError(f"unsupported visual model provider: {requested}")
+
+    main_config = fallback or resolve_llm_config()
+    fallback_provider = normalize_provider(main_config.provider)
+    if is_codex_provider(fallback_provider):
+        fallback_provider = "openai-codex"
+    inherited = (
+        main_config
+        if not provider or requested == fallback_provider
+        else resolve_llm_config(provider=provider)
+    )
+    if not any((provider, model, base_url, api_key)):
+        return inherited
+    if requested == "openai-codex":
+        if api_key:
+            raise ValueError("The openai-codex visual provider uses Codex login; VLM_API_KEY is unsupported")
+        return replace(inherited, model=model or inherited.model, base_url=base_url or inherited.base_url)
+
+    # Execution settings may describe the Codex backend. A separate OpenAI
+    # visual provider must use OpenAI's own connection and credentials.
+    # Preserve the legacy resolver's priorities when sharing the main provider.
+    if requested == "openai" and (requested != fallback_provider or inherited.provider != "openai"):
+        inherited = LLMConfig(
+            provider="openai",
+            model=(os.getenv("OPENAI_MODEL") or "").strip() or "gpt-5",
+            base_url=(os.getenv("OPENAI_BASE_URL") or "").strip() or "https://api.openai.com/v1",
+            api_key=(os.getenv("OPENAI_API_KEY") or "").strip() or None,
+        )
+    resolved = replace(
+        inherited,
+        model=model or inherited.model,
+        base_url=base_url or inherited.base_url,
+        api_key=api_key or inherited.api_key,
+    )
+    if not resolved.api_key:
+        raise ValueError(f"Visual model provider {requested} requires VLM_API_KEY or its provider API key")
+    return resolved
 
 
 def _parse_json_response(text: str) -> dict[str, Any]:
@@ -158,30 +228,83 @@ def _parse_json_response(text: str) -> dict[str, Any]:
     return {"status": "unknown", "raw": text}
 
 
+_EFFORT_LABEL: contextvars.ContextVar[str] = contextvars.ContextVar("factreview_effort_label", default="")
+
+
+@contextlib.contextmanager
+def effort_label(label: str):
+    """Name calls for reasoning-effort selection when their stats module is shared."""
+    token = _EFFORT_LABEL.set(label)
+    try:
+        yield
+    finally:
+        _EFFORT_LABEL.reset(token)
+
+
+def reasoning_effort(module: str | None) -> str:
+    """Configured low effort for matching labels; "" keeps the provider default."""
+    from common.config import get_settings
+
+    settings = get_settings()
+    prefixes = [p.strip() for p in settings.llm_low_effort_modules.split(",") if p.strip()]
+    label = _EFFORT_LABEL.get() or str(module or "")
+    return settings.llm_low_reasoning_effort if any(label.startswith(p) for p in prefixes) else ""
+
+
 def llm_json(
     prompt: str,
     system: str,
     cfg: LLMConfig,
     *,
     module: str | None = None,
+    images: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     Minimal JSON response helper for the providers used in the execution stage.
     """
+    if run_stats.stats_path() is not None:
+        # Keep the caller's specific label; record_llm_call normalizes it.
+        module = module or run_stats.current_module() or ""
+        run_stats.validate_module(module)
+        run_stats.read_initialized()
+    effort = reasoning_effort(module) if cfg.provider == "openai-codex" else ""
     t0 = time.monotonic()
     usage: dict[str, Any] = {}
     text = ""
+    retry_failure_recorded = False
     try:
+        encoded_images = []
+        for image_path in images or []:
+            mime = mimetypes.guess_type(image_path)[0]
+            if mime not in {"image/png", "image/jpeg", "image/webp", "image/gif"}:
+                raise ValueError(f"unsupported image format: {image_path}")
+            encoded_images.append((mime, base64.b64encode(Path(image_path).read_bytes()).decode("ascii")))
         if cfg.provider == "claude":
             from anthropic import Anthropic
 
-            client = Anthropic(api_key=cfg.api_key)
+            client = Anthropic(api_key=cfg.api_key, base_url=cfg.base_url)
             resp = client.messages.create(
                 model=cfg.model,
                 max_tokens=cfg.max_tokens or 8192,
                 temperature=cfg.temperature,
                 system=system,
-                messages=[{"role": "user", "content": prompt}],
+                messages=[
+                    {
+                        "role": "user",
+                        "content": (
+                            [{"type": "text", "text": prompt}]
+                            + [
+                                {
+                                    "type": "image",
+                                    "source": {"type": "base64", "media_type": mime, "data": data},
+                                }
+                                for mime, data in encoded_images
+                            ]
+                            if encoded_images
+                            else prompt
+                        ),
+                    }
+                ],
             )
             text = ""
             try:
@@ -190,21 +313,59 @@ def llm_json(
             except Exception:
                 text = str(resp).strip()
             raw_usage = getattr(resp, "usage", None)
-            usage = {
-                "input_tokens": int(getattr(raw_usage, "input_tokens", 0) or 0),
-                "output_tokens": int(getattr(raw_usage, "output_tokens", 0) or 0),
-            }
-            usage["total_tokens"] = int(usage["input_tokens"]) + int(usage["output_tokens"])
+            usage = (
+                {
+                    "input_tokens": int(getattr(raw_usage, "input_tokens", 0) or 0),
+                    "output_tokens": int(getattr(raw_usage, "output_tokens", 0) or 0),
+                }
+                if raw_usage is not None
+                else {}
+            )
+            if usage:
+                usage["total_tokens"] = int(usage["input_tokens"]) + int(usage["output_tokens"])
         elif cfg.provider == "openai-codex":
             auth = get_codex_auth(allow_browser_login=True)
-            codex_result = invoke_codex(
-                prompt=prompt,
-                system=system,
-                auth=auth,
-                model=cfg.model,
-                base_url=cfg.base_url or "https://chatgpt.com/backend-api/codex",
-                return_usage=True,
-            )
+            for attempt in range(2):
+                try:
+                    codex_result = invoke_codex(
+                        prompt=prompt,
+                        system=system,
+                        auth=auth,
+                        model=cfg.model,
+                        base_url=cfg.base_url or "https://chatgpt.com/backend-api/codex",
+                        return_usage=True,
+                        **({"reasoning_effort": effort} if effort else {}),
+                        **(
+                            {"image_data": [f"data:{mime};base64,{data}" for mime, data in encoded_images]}
+                            if encoded_images
+                            else {}
+                        ),
+                    )
+                    break
+                except CodexResponseError as exc:
+                    if attempt != 0 or not exc.pre_sse_transient:
+                        raise
+                    # Persist the failed physical request before another POST.
+                    # If recording/backoff fails, no new request has begun.
+                    retry_failure_recorded = True
+                    if run_stats.stats_path() is not None:
+                        run_stats.record_llm_call(
+                            module=module,
+                            provider=cfg.provider,
+                            model=cfg.model,
+                            usage=exc.usage,
+                            duration_sec=time.monotonic() - t0,
+                            failed=True,
+                            image_count=len(images or []),
+                            reasoning_effort=effort,
+                            warning="Codex transport attempt 1 failed before SSE with EOF/reset; "
+                            f"{redact_provider_details(str(exc), cfg)}. "
+                            "One retry follows; missing usage remains unavailable.",
+                        )
+                    time.sleep(1.0)
+                    t0 = time.monotonic()
+                    usage = {}
+                    retry_failure_recorded = False
             if isinstance(codex_result, tuple):
                 text, usage = codex_result
             else:
@@ -212,12 +373,26 @@ def llm_json(
         else:
             from openai import OpenAI
 
-            client = OpenAI(api_key=cfg.api_key, base_url=cfg.base_url)
+            client = OpenAI(api_key=cfg.api_key, base_url=cfg.base_url, max_retries=0)
             kwargs: dict[str, Any] = {
                 "model": cfg.model,
                 "messages": [
                     {"role": "system", "content": system},
-                    {"role": "user", "content": prompt},
+                    {
+                        "role": "user",
+                        "content": (
+                            [{"type": "text", "text": prompt}]
+                            + [
+                                {
+                                    "type": "image_url",
+                                    "image_url": {"url": f"data:{mime};base64,{data}", "detail": "high"},
+                                }
+                                for mime, data in encoded_images
+                            ]
+                            if encoded_images
+                            else prompt
+                        ),
+                    },
                 ],
                 "temperature": cfg.temperature,
             }
@@ -226,19 +401,40 @@ def llm_json(
             resp = client.chat.completions.create(**kwargs)
             text = (resp.choices[0].message.content or "").strip()
             raw_usage = getattr(resp, "usage", None)
-            usage = {
-                "input_tokens": int(getattr(raw_usage, "prompt_tokens", 0) or 0),
-                "output_tokens": int(getattr(raw_usage, "completion_tokens", 0) or 0),
-                "total_tokens": int(getattr(raw_usage, "total_tokens", 0) or 0),
-            }
+            usage = (
+                {
+                    "input_tokens": int(getattr(raw_usage, "prompt_tokens", 0) or 0),
+                    "output_tokens": int(getattr(raw_usage, "completion_tokens", 0) or 0),
+                    "total_tokens": int(getattr(raw_usage, "total_tokens", 0) or 0),
+                }
+                if raw_usage is not None
+                else {}
+            )
     except Exception as e:
-        return {
-            "status": "error",
-            "error": f"{type(e).__name__}: {e}",
-            "provider": cfg.provider,
-            "model": cfg.model,
-            "base_url": cfg.base_url,
-        }
+        if isinstance(e, CodexResponseError):
+            usage = e.usage
+        if not retry_failure_recorded and run_stats.stats_path() is not None:
+            run_stats.record_llm_call(
+                module=module,
+                provider=cfg.provider,
+                model=cfg.model,
+                usage=usage,
+                duration_sec=time.monotonic() - t0,
+                failed=True,
+                image_count=len(images or []),
+                **({"local_denial": getattr(e, "receipt", None)} if type(e) is PhysicalAttemptNotStarted else {}),
+                reasoning_effort=effort,
+            )
+        return redact_provider_details(
+            {
+                "status": "error",
+                "error": f"{type(e).__name__}: {e}",
+                "provider": cfg.provider,
+                "model": cfg.model,
+                "base_url": cfg.base_url,
+            },
+            cfg,
+        )
 
     if run_stats.stats_path() is not None:
         run_stats.record_llm_call(
@@ -250,6 +446,8 @@ def llm_json(
             system=system,
             response_text=text,
             duration_sec=time.monotonic() - t0,
+            image_count=len(images or []),
+            reasoning_effort=effort,
         )
 
-    return _parse_json_response(text)
+    return redact_provider_details(_parse_json_response(text), cfg)

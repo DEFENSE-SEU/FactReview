@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
-from pydantic import AliasChoices, Field
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -53,6 +54,26 @@ class Settings(BaseSettings):
     agent_max_tokens: int = 4096
     agent_max_turns: int = 1000
     agent_resume_attempts: int = 2
+    experiment_scope_binding_repair_rounds: int = Field(default=0, ge=0, le=1)
+    theory_visual_recheck_rounds: int = Field(default=1, ge=0, le=1)
+    # Lower reasoning effort for extraction/coverage/writing/advice calls, matched by
+    # module-label prefix; judgement calls keep the provider default. "" disables.
+    llm_low_effort_modules: str = "screening.claims,screening_writing,report_generation.advice"
+    llm_low_reasoning_effort: str = Field(default="low", pattern=r"^(|minimal|low|medium|high)$")
+
+    @field_validator("theory_visual_recheck_rounds", mode="before")
+    @classmethod
+    def bounded_theory_visual_rounds(cls, value):
+        if (type(value) is int and value in (0, 1)) or (type(value) is str and value in {"0", "1"}):
+            return int(value)
+        raise ValueError("theory_visual_recheck_rounds must be 0 or 1")
+
+    @field_validator("experiment_scope_binding_repair_rounds", mode="before")
+    @classmethod
+    def bounded_binding_repair_rounds(cls, value):
+        if (type(value) is int and value in (0, 1)) or (type(value) is str and value in {"0", "1"}):
+            return int(value)
+        raise ValueError("experiment_scope_binding_repair_rounds must be 0 or 1")
 
     max_pdf_bytes: int = 50 * 1024 * 1024
 
@@ -79,6 +100,9 @@ class Settings(BaseSettings):
     paper_search_timeout_seconds: int = 120
     paper_search_health_endpoint: str = "/health"
     paper_search_health_timeout_seconds: int = 5
+    paper_search_page_size: int = Field(default=8, ge=1, le=100)
+    paper_search_max_pages: int = Field(default=1, ge=1, le=100)
+    paper_search_max_results: int = Field(default=8, ge=1, le=10_000)
 
     paper_read_base_url: str | None = None
     paper_read_api_key: str | None = None
@@ -126,6 +150,12 @@ class Settings(BaseSettings):
     pdf_title_font_size: int = 15
     pdf_body_font_size: int = 10
     pdf_page_margin: int = 48
+
+    # Claim gate tier reported as each claim's status; all three are always recorded.
+    claim_gate: Literal["lenient", "default", "strict"] = Field(
+        default="default",
+        validation_alias=AliasChoices("FACTREVIEW_CLAIM_GATE", "CLAIM_GATE"),
+    )
 
     # Evaluation status threshold (absolute delta, directional by metric type)
     eval_status_threshold: float = 0.05

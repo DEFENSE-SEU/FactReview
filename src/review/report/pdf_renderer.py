@@ -3,7 +3,9 @@ from __future__ import annotations
 import html
 import io
 import logging
+import os
 import re
+import sys
 import textwrap
 from collections import defaultdict
 from collections.abc import Iterable
@@ -653,6 +655,7 @@ def _render_markdown_inline_children(
     inline_code_font: str,
     body_font: str | None = None,
     formula_font: str | None = None,
+    implicit_math: bool = True,
 ) -> str:
     if not children:
         return ""
@@ -678,9 +681,10 @@ def _render_markdown_inline_children(
         token_content = str(getattr(token, "content", "") or "")
 
         if token_type == "text":
-            escaped_text = _render_formula_aware_text(
-                token_content,
-                formula_font=effective_formula_font or None,
+            escaped_text = (
+                _render_formula_aware_text(token_content, formula_font=effective_formula_font or None)
+                if implicit_math
+                else _escape(token_content)
             )
             if strong_depth > 0 or italic_depth > 0:
                 emphasis_font = _resolve_markdown_emphasis_font(
@@ -707,7 +711,7 @@ def _render_markdown_inline_children(
             parts.append("<br/>")
             continue
         if token_type == "code_inline":
-            if _looks_like_formula_text(token_content):
+            if implicit_math and _looks_like_formula_text(token_content):
                 parts.append(
                     _apply_strike(
                         _render_formula_aware_text(
@@ -737,6 +741,13 @@ def _render_markdown_inline_children(
             continue
         if token_type == "html_inline":
             raw_html = str(token_content or "").strip()
+            anchor = re.fullmatch(
+                r'<a id="(factreview-(?:(?:source|record|main)-[a-f0-9]{64}|evidence-[0-9]{6,}(?:-source-[0-9]{2,})?))">',
+                raw_html,
+            )
+            if anchor:
+                parts.append(f'<a name="{anchor.group(1)}"/>')
+                continue
             open_green = re.match(
                 r'^<span\s+style\s*=\s*"\s*color\s*:\s*(green|#16a34a)\s*;?\s*"\s*>$',
                 raw_html,
@@ -926,12 +937,25 @@ def _safe_file(path: Path | None) -> Path | None:
     return None
 
 
-def _register_ttf_font(font_name: str, font_path: Path, *, quiet: bool = False) -> bool:
-    if font_name in pdfmetrics.getRegisteredFontNames():
+def _register_ttf_font(
+    font_name: str, font_path: Path, *, quiet: bool = False, required_chars: Iterable[str] = ()
+) -> bool:
+    registered = font_name in pdfmetrics.getRegisteredFontNames()
+    if registered and not required_chars:
         return True
 
     try:
-        pdfmetrics.registerFont(TTFont(font_name, str(font_path)))
+        font = pdfmetrics.getFont(font_name) if registered else TTFont(font_name, str(font_path))
+        missing = sorted({char for char in required_chars if not font.face.charToGlyph.get(ord(char))})
+        if missing:
+            logger.info(
+                "Skipped PDF math font %s: missing glyphs %s",
+                font_path,
+                ", ".join(f"U+{ord(char):04X}" for char in missing),
+            )
+            return False
+        if not registered:
+            pdfmetrics.registerFont(font)
         return True
     except Exception as exc:
         if quiet:
@@ -946,8 +970,9 @@ def _resolve_report_fonts() -> ReportFonts:
 
     Body and heading fall through to ReportLab's built-in CJK CID font
     (``STSong-Light``) so Chinese characters render even without any
-    repo-local font assets. Mono prefers a system DejaVu font for full
-    Unicode coverage and falls back to the built-in Courier.
+    repo-local font assets. Mono/formulas prefer the existing system DejaVu
+    candidates. Windows can use an installed font covering the renderer's
+    mapped math symbols; unavailable fonts retain the limited Courier fallback.
     """
     global _FONTS_CACHE
     if _FONTS_CACHE is not None:
@@ -979,6 +1004,19 @@ def _resolve_report_fonts() -> ReportFonts:
         if _register_ttf_font(FONT_MONO_UNICODE_NAME, mono_path, quiet=True):
             mono_font = FONT_MONO_UNICODE_NAME
             break
+
+    if mono_font == FONT_MONO_NAME and sys.platform == "win32":
+        directory = Path(os.environ.get("WINDIR") or "C:/Windows") / "Fonts"
+        required_chars = "".join(_LATEX_COMMAND_REPLACEMENTS.values()) + "".join(_LATEX_MATHBB_MAP.values())
+        for name, filename in (("Cambria", "cambria.ttc"), ("SegoeUISymbol", "seguisym.ttf")):
+            path = _safe_file(directory / filename)
+            if path and _register_ttf_font(
+                f"DS-WindowsMath-{name}", path, quiet=True, required_chars=required_chars
+            ):
+                mono_font = f"DS-WindowsMath-{name}"
+                break
+    if mono_font == FONT_MONO_NAME:
+        logger.warning("PDF formula font falls back to Courier; mathematical glyphs may be unavailable")
 
     _FONTS_CACHE = ReportFonts(body=body_font, heading=heading_font, mono=mono_font)
     return _FONTS_CACHE
@@ -1336,7 +1374,44 @@ def _looks_like_ascii_tree(line: str) -> bool:
     return any(token in stripped for token in tree_tokens)
 
 
-def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) -> None:
+class _AnchoredParagraph(Paragraph):
+    """Keep generated targets at the first laid-out fragment, including CJK text.
+
+    ReportLab's inline empty anchor fragments cannot wrap reliably in CJK mode.
+    Registering the bookmark when the paragraph is drawn also keeps a target on
+    its actual page when the layout moves or splits that paragraph.
+    """
+
+    _anchor = re.compile(
+        r'<a name="(factreview-(?:(?:source|record|main)-[a-f0-9]{64}|evidence-[0-9]{6,}(?:-source-[0-9]{2,})?))"/>'
+    )
+
+    def __init__(self, text, *args, **kwargs):
+        self._report_targets = self._anchor.findall(text) if isinstance(text, str) else []
+        if self._report_targets:
+            text = self._anchor.sub("", text)
+        super().__init__(text, *args, **kwargs)
+
+    def split(self, availWidth, availHeight):
+        parts = super().split(availWidth, availHeight)
+        if parts:
+            parts[0]._report_targets = self._report_targets
+        return parts
+
+    def draw(self):
+        for target in self._report_targets:
+            self.canv.bookmarkHorizontal(target, 0, self.height)
+            pages = getattr(self.canv, "_factreview_target_pages", None)
+            if pages is not None:
+                if target in pages:
+                    raise ValueError("Duplicate generated report target")
+                pages[target] = self.canv.getPageNumber()
+        super().draw()
+
+
+def _append_markdown_report(
+    story: list, styles: StyleSheet1, *, markdown: str, implicit_math: bool = True
+) -> None:
     clean = _normalize_newlines(str(markdown or "")).strip()
     if not clean:
         return
@@ -1403,9 +1478,9 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
         formula_font = str(styles["MarkdownCode"].fontName or "").strip()
         if _contains_non_ascii(formula):
             formula_font = str(styles["BodyTextEnterprise"].fontName or "").strip() or formula_font
-        story.append(Paragraph(_escape("Equation"), styles["LabelText"]))
+        story.append(_AnchoredParagraph(_escape("Equation"), styles["LabelText"]))
         story.append(
-            Paragraph(
+            _AnchoredParagraph(
                 _render_formula_chunk(
                     formula,
                     formula_font=formula_font or None,
@@ -1459,7 +1534,7 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
         normalized_lines = [str(line or "").rstrip() for line in lines if str(line or "").strip()]
         if not normalized_lines:
             return
-        story.append(Paragraph(_escape("Logic Tree"), styles["LabelText"]))
+        story.append(_AnchoredParagraph(_escape("Logic Tree"), styles["LabelText"]))
         story.append(
             Preformatted(
                 _wrap_markdown_code_lines(normalized_lines, width=94),
@@ -1511,6 +1586,7 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                                 else styles["MarkdownTableCell"].fontName
                             ),
                             formula_font=styles["MarkdownCode"].fontName,
+                            implicit_math=implicit_math,
                         )
                     inner_cursor += 1
                 current_row.append(cell_markup.strip())
@@ -1541,7 +1617,7 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                     for cell in padded:
                         style_name = "MarkdownTableHeader" if is_header else "MarkdownTableCell"
                         content = cell or "&nbsp;"
-                        row_flowables.append(Paragraph(content, styles[style_name]))
+                        row_flowables.append(_AnchoredParagraph(content, styles[style_name]))
                     table_data.append(row_flowables)
 
                 markdown_table = Table(
@@ -1608,7 +1684,7 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                 prefix = f"{item_counter}. " if open_type == "ordered_list_open" else "• "  # noqa: B023 — closure is invoked synchronously within the iteration that defines it.
                 body = "<br/>".join(item_paragraph_parts).strip()
                 if body:
-                    story.append(Paragraph(f"{prefix}{body}", list_style))
+                    story.append(_AnchoredParagraph(f"{prefix}{body}", list_style))
                     item_rendered = True
                 item_paragraph_parts = []
 
@@ -1624,6 +1700,7 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                             inline_code_font=styles["MarkdownCode"].fontName,
                             body_font=list_style.fontName,
                             formula_font=styles["MarkdownCode"].fontName,
+                            implicit_math=implicit_math,
                         )
                         if markup:
                             item_paragraph_parts.append(markup)
@@ -1683,10 +1760,11 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                 inline_code_font=styles["MarkdownCode"].fontName,
                 body_font=heading_body_font,
                 formula_font=styles["MarkdownCode"].fontName,
+                implicit_math=implicit_math,
             )
 
             if level <= 1:
-                story.append(Paragraph(heading_text or "&nbsp;", styles["SectionTitle"]))
+                story.append(_AnchoredParagraph(heading_text or "&nbsp;", styles["SectionTitle"]))
                 story.append(
                     HRFlowable(
                         width="100%",
@@ -1698,9 +1776,9 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                     )
                 )
             elif level == 2:
-                story.append(Paragraph(heading_text or "&nbsp;", styles["MarkdownHeadingL2"]))
+                story.append(_AnchoredParagraph(heading_text or "&nbsp;", styles["MarkdownHeadingL2"]))
             else:
-                story.append(Paragraph(heading_text or "&nbsp;", styles["MarkdownHeadingL3"]))
+                story.append(_AnchoredParagraph(heading_text or "&nbsp;", styles["MarkdownHeadingL3"]))
             cursor += 3
             continue
 
@@ -1727,9 +1805,10 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                     inline_code_font=styles["MarkdownCode"].fontName,
                     body_font=styles["BodyTextEnterprise"].fontName,
                     formula_font=styles["MarkdownCode"].fontName,
+                    implicit_math=implicit_math,
                 )
                 if paragraph_markup:
-                    story.append(Paragraph(paragraph_markup, styles["BodyTextEnterprise"]))
+                    story.append(_AnchoredParagraph(paragraph_markup, styles["BodyTextEnterprise"]))
             cursor += 3
             continue
 
@@ -1766,13 +1845,14 @@ def _append_markdown_report(story: list, styles: StyleSheet1, *, markdown: str) 
                         inline_code_font=styles["MarkdownCode"].fontName,
                         body_font=styles["BodyTextEnterprise"].fontName,
                         formula_font=styles["MarkdownCode"].fontName,
+                        implicit_math=implicit_math,
                     )
                     if quote_markup:
                         quote_parts.append(quote_markup)
                 inner_cursor += 1
             if quote_parts:
                 story.append(
-                    Paragraph(
+                    _AnchoredParagraph(
                         f"❝ {'<br/>'.join(quote_parts)}",
                         styles["BodyTextEnterprise"],
                     )
@@ -3562,6 +3642,8 @@ def build_review_report_pdf(
     owner_email: str | None = None,
     token_usage: dict[str, Any] | None = None,
     agent_model: str | None = None,
+    implicit_math: bool = True,
+    navigation_targets: dict[str, int] | None = None,
 ) -> bytes:
     fonts = _resolve_report_fonts()
     logo_path: Path | None = None
@@ -3631,11 +3713,19 @@ def build_review_report_pdf(
         [
             Paragraph("<b>Token Usage</b>", styles["BodyTextEnterprise"]),
             Paragraph(
-                _escape(f"Input {token_input} | Output {token_output} | Total {token_total}"),
+                _escape(
+                    "Unavailable"
+                    if token_payload.get("unavailable")
+                    else f"Input {token_input} | Output {token_output} | Total {token_total}"
+                    + (" (estimated)" if token_payload.get("estimated") else "")
+                ),
                 styles["BodyTextEnterprise"],
             ),
             Paragraph("<b>LLM Requests</b>", styles["BodyTextEnterprise"]),
-            Paragraph(_escape(str(token_requests)), styles["BodyTextEnterprise"]),
+            Paragraph(
+                _escape("Unavailable" if token_payload.get("unavailable") else str(token_requests)),
+                styles["BodyTextEnterprise"],
+            ),
         ],
         [
             Paragraph("<b>Generated At</b>", styles["BodyTextEnterprise"]),
@@ -3685,7 +3775,7 @@ def build_review_report_pdf(
             title="Final Agent Report",
             subtitle="Structured markdown synthesized by the annotation agent.",
         )
-        _append_markdown_report(story, styles, markdown=final_report_text)
+        _append_markdown_report(story, styles, markdown=final_report_text, implicit_math=implicit_math)
 
     if source_pdf_bytes:
         story.append(PageBreak())
@@ -3718,6 +3808,8 @@ def build_review_report_pdf(
 
     def _on_page(canvas, doc):
         canvas.setProducer("FactReview")
+        if navigation_targets is not None:
+            canvas._factreview_target_pages = navigation_targets
         _draw_header_footer(
             canvas,
             doc,

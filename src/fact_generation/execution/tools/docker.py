@@ -11,7 +11,7 @@ from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 from util.run_layout import slugify_run_key
-from util.subprocess_runner import run_command
+from util.subprocess_runner import persist_command_result, run_command
 
 
 def docker_cmd(args: list[str]) -> list[str]:
@@ -128,12 +128,13 @@ _README_DEP_RE = re.compile(
 
 
 def _read_text_limited(path: Path, max_bytes: int = 500_000) -> str:
+    if type(max_bytes) is not int or max_bytes < 0:
+        return ""
     try:
-        data = path.read_bytes()
+        with path.open("rb") as stream:
+            data = stream.read(max_bytes)
     except Exception:
         return ""
-    if len(data) > max_bytes:
-        data = data[:max_bytes]
     return data.decode("utf-8", errors="ignore")
 
 
@@ -672,8 +673,11 @@ def _paper_install_deps_py_text() -> str:
         "\n"
         "\n"
         "def _repo_uses_torch_scatter(repo_root: Path, max_files: int = 400, max_bytes: int = 200_000) -> bool:\n"
+        "    installer = Path(__file__).resolve()\n"
         "    n = 0\n"
         "    for p in repo_root.rglob('*.py'):\n"
+        "        if p.resolve() == installer:\n"
+        "            continue\n"
         "        n += 1\n"
         "        if n > max_files:\n"
         "            break\n"
@@ -1133,6 +1137,21 @@ def docker_ensure_paper_image(
     The generated Dockerfile is stored under <paper_root>/deployment/Dockerfile (inside build context).
     """
     pr = Path(paper_root_host).resolve()
+    command_number = 0
+
+    def recorded_command(*args, **kwargs):
+        nonlocal command_number
+        result = run_command(*args, **kwargs)
+        log_dir = cfg.get("docker_build_log_dir")
+        if log_dir:
+            command_number += 1
+            target = Path(log_dir)
+            target.mkdir(parents=True, exist_ok=True)
+            persist_command_result(result, target, prefix=f"build_{command_number}")
+            with (target / "commands.jsonl").open("a", encoding="utf-8") as stream:
+                stream.write(json.dumps({"command": result.cmd, "returncode": result.returncode,
+                                         "cwd": result.cwd, "runtime_seconds": result.duration_sec}) + "\n")
+        return result
     if not pr.exists():
         return False, f"paper_root_not_found: {pr}"
     unavailable = _docker_preflight_unavailable()
@@ -1173,7 +1192,7 @@ def docker_ensure_paper_image(
 
     # Fast path: if image exists, skip build.
     docker_env = _docker_cli_env(cfg)
-    r = run_command(docker_cmd(["image", "inspect", image]), cwd=str(_repo_root()), timeout_sec=60, env=docker_env)
+    r = recorded_command(docker_cmd(["image", "inspect", image]), cwd=str(_repo_root()), timeout_sec=60, env=docker_env)
     if r.returncode == 0:
         return True, image
     if _docker_daemon_unavailable(r):
@@ -1202,7 +1221,7 @@ def docker_ensure_paper_image(
     except Exception:
         return False, f"write_dockerfile_failed: {dockerfile_path}"
 
-    build = run_command(
+    build = recorded_command(
         docker_cmd(["build", *_docker_build_args(cfg), "-t", image, "-f", str(dockerfile_path), "."]),
         cwd=str(pr),
         timeout_sec=timeout_sec,
@@ -1298,13 +1317,22 @@ def docker_run_paper_image(
     gpus: str | None = None,
     shm_size: str | None = None,
     ipc: str | None = None,
+    container_name: str | None = None,
+    sandbox=None,
 ) -> list[str]:
     """
     Run a command inside a per-paper image.
     Commands execute using the image's default python environment.
     """
     env = dict(env or {})
-    proxy_env = _docker_proxy_env({})
+    policy = None
+    if sandbox is not None:
+        from ..config import SANDBOX_ENV, sandbox_options, sandbox_policy
+
+        policy = sandbox_policy(sandbox)
+        if ipc not in (None, "private"):
+            raise ValueError("sandbox IPC must be private or omitted")
+    proxy_env = {} if policy is not None and policy.network == "none" else _docker_proxy_env({})
     run_dir_host = str(Path(run_dir_host).resolve())
     paper_root_host = str(Path(paper_root_host).resolve())
     run_dir_container = "/workspace/run_dir"
@@ -1320,7 +1348,14 @@ def docker_run_paper_image(
         "run",
         "--rm",
     ]
-    args.extend(_docker_run_user_args())
+    if container_name:
+        args.extend(["--name", container_name])
+    if policy is None:
+        args.extend(_docker_run_user_args())
+    else:
+        args.append("--read-only")
+        for option, value in sandbox_options(policy).items():
+            args.extend([option, value])
     if gpus:
         # e.g. "all" or "device=0"
         args.extend(["--gpus", str(gpus)])
@@ -1358,6 +1393,8 @@ def docker_run_paper_image(
         "HF_HOME": f"{run_dir_container}/.cache/huggingface",
         "MPLCONFIGDIR": f"{run_dir_container}/.cache/matplotlib",
     }
+    if policy is not None:
+        default_env.update(SANDBOX_ENV)
     if env.get("PYTHONPATH"):
         parts = [part for part in str(env["PYTHONPATH"]).split(":") if part]
         if paper_root_container not in parts:

@@ -13,10 +13,10 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from schemas.claim import Claim, ClaimLabel, ClaimLocation, ClaimType
 from schemas.config import LLMCfg
+from schemas.legacy_claim import Claim, ClaimLabel, ClaimLocation, ClaimType
+from schemas.legacy_review import ClaimAssessment, EvidenceLink, FinalReview
 from schemas.paper import Paper, PaperMetadata, Section
-from schemas.review import ClaimAssessment, EvidenceLink, FinalReview
 from schemas.stage import StageResult
 
 
