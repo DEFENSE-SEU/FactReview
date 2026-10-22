@@ -1,12 +1,12 @@
 # FactReview <a href="https://arxiv.org/abs/2604.04074"><img src="https://img.shields.io/badge/arXiv-2604.04074-b31b1b.svg" alt="Paper"></a> <img src="https://img.shields.io/badge/license-AGPL--3.0-green.svg" alt="License">
 
 <p align="center">
-  <img src="demos/Graph/compgcn/teaser_figure.png" alt="A FactReview output for the CompGCN paper: technical positioning, claim verdicts, reproduced experimental numbers, strengths and weaknesses — all on one page." width="900">
+  <img src="docs/pipeline.png" alt="FactReview pipeline: L1 screening and claim extraction, L2 typed verification, L3 execution, evidence-linked review" width="900">
 </p>
 
 <p align="center"><strong>Evidence-grounded reviews for ML papers — every claim traced back to the literature, the paper, or actually running the code.</strong></p>
 
-You give FactReview a paper PDF (or an arXiv URL). It returns a Markdown + PDF review where every major claim is tagged with one of four verdicts and linked to a paper section, a literature neighbor, or a number it reproduced by running the paper's code. The image above is a real FactReview output for [CompGCN](https://arxiv.org/abs/1911.03082) — design-axis positioning, color-coded verdicts, paper-vs-reproduced numbers with Δ, and auto-synthesized strengths and weaknesses, on one page. It is **deliberately designed as a one-minute review aid**: as ML submission volumes outrun reviewer capacity and per-paper attention shrinks, the bottleneck is no longer "can a reviewer read the paper" but "can they triage ten of them this week."
+You give FactReview a paper PDF (or an arXiv URL). It returns a Markdown + PDF review where every major claim is tagged with one of four verdicts and linked to a paper section, a literature neighbor, or a number it reproduced by running the paper's code. The pipeline above shows L1 screening and claim extraction, L2 typed verification, optional L3 execution, and the evidence-linked review.
 
 > **Two tools in this repo.**
 > **[FactReview](#quick-start--factreview)** takes a paper and returns a full evidence-grounded review.
@@ -14,7 +14,7 @@ You give FactReview a paper PDF (or an arXiv URL). It returns a Markdown + PDF r
 
 ## Why FactReview
 
-Generic LLM reviewers — pasting a PDF into ChatGPT, Gemini, or Claude — fail in five predictable ways. FactReview is built around fixing each of them.
+Generic LLM reviewers — pasting a PDF into ChatGPT, Gemini, or Claude — fail in four predictable ways. FactReview is built around fixing each of them.
 
 | Generic LLM reviewer | FactReview |
 |---|---|
@@ -22,18 +22,10 @@ Generic LLM reviewers — pasting a PDF into ChatGPT, Gemini, or Claude — fail
 | **Calls Δ = 0.3% a "significant improvement"** because the paper said so. | The claim-audit pass auto-downgrades comparative claims when Δ < 2σ and flags missing ablations. See [`src/review/report/claim_audit.py`](src/review/report/claim_audit.py). |
 | **Faults the paper for not citing related work that was published after it.** | When the input is an arXiv URL, FactReview derives a publication-date cutoff from the arXiv ID and applies it to retrieval (server-side at Semantic Scholar and client-side in the agent's `paper_search`). |
 | **Cannot verify a single reported number.** | Optional Docker-based execution stage runs the paper's repository on its claimed benchmarks via a `prepare → plan → run → judge → fix → finalize` loop, then reports paper-vs-reproduced deltas. See [`src/fact_generation/execution/stage_runner.py`](src/fact_generation/execution/stage_runner.py). |
-| **Returns a wall of prose** that a tired reviewer still has to read end-to-end before they can decide if the paper is worth deeper attention. | A fixed-layout **one-page teaser figure** (the hero image above) lets a reviewer or area chair triage a paper in roughly a minute — positioning, verdicts, paper-vs-reproduced numbers, and weaknesses always in the same on-screen regions. The full review is one click away when the teaser raises a question. Increasingly the deciding factor as ML submission volumes outrun reviewer capacity. |
 
 ## See it in Action
 
-The hero image is FactReview's most condensed deliverable: a one-page **teaser** purpose-built for triage. The layout is fixed — verdicts and positioning in the top half, reproduced numbers and synthesized strengths/weaknesses in the bottom half — so a reviewer's eye lands on the same regions across every paper, and the whole thing is legible without scrolling. Each panel earns its place:
-
-- **Technical Positioning** (top-left) — The paper is placed against neighbor methods on a small set of design axes pulled from related-work retrieval. Reviewers can see at a glance which dimensions the paper actually innovates on.
-- **Claims** (top-center) — Every major claim the paper makes is tagged with a verdict (✓ Supported, ⚠ Partially supported, ✗ In conflict, ? Inconclusive) and linked back to the section it came from.
-- **Experiment / Ablation** (bottom-left) — Paper-reported numbers and FactReview's reproduced numbers are shown side by side with Δ. The CompGCN demo includes a row where the paper's "outperforms baselines" claim is downgraded — PACHYSAN actually beats CompGCN 92.6% vs 89.0% on Graph Classification (MUTAG).
-- **Summary / Strengths / Weaknesses** (right) — Auto-synthesized, including weaknesses the paper itself does not own up to (e.g., "random seeds and significance testing not reported").
-
-For the full review behind that image, open [`demos/Graph/compgcn/report.pdf`](demos/Graph/compgcn/report.pdf).
+Open the [CompGCN review](demos/Graph/compgcn/report.pdf) for an example of the rendered report.
 
 **More demos** (each contains the full run artifacts and rendered review):
 
@@ -42,8 +34,6 @@ For the full review behind that image, open [`demos/Graph/compgcn/report.pdf`](d
 | Graph | [CompGCN](demos/Graph/compgcn) · [Graphormer](demos/Graph/graphormer) · [SACN](demos/Graph/sacn) |
 | Image | [BEiT](demos/Image/beit) · [FixMatch](demos/Image/fixmatch) · [LRCN](demos/Image/lrcn) · [UDA](demos/Image/uda) |
 | Text | [BERT](demos/Text/bert) · [Prefix-Tuning](demos/Text/Prefix-Tuning) |
-
-> The teaser figure is the format we recommend for first-pass triage; the full Markdown + PDF review at `final_review.{md,pdf}` is what reviewers should open when a teaser raises questions. Rendering the figure itself requires Gemini (or pasting the saved prompt into the Gemini web app — FactReview writes the prompt to disk and copies it to your clipboard if no key is set). The Markdown + PDF review is generated unconditionally; only the teaser figure is gated on Gemini. See [Configuration](#configuration).
 
 ## Quick Start — FactReview
 
@@ -111,7 +101,6 @@ What makes the report distinctive (beyond the verdicts):
 - **Statistical-rigor downgrades** — comparative claims with Δ < 2σ are auto-downgraded; missing ablations are flagged. See [`src/review/report/claim_audit.py`](src/review/report/claim_audit.py).
 - **Publication-date cutoff** — when the input is an arXiv URL or ID, FactReview derives a `YYYY-MM` cutoff from the arXiv identifier so the manuscript is not penalized for missing citations to work that was published after it. Override with `--cutoff-date` or disable with `--no-cutoff`.
 - **Optional code execution** — L3 runs confirmed plans in a Docker sandbox, checks that dataset, metric and settings match the claim, allows at most 3 bounded repairs (`--max-attempts`), and records commands, logs and metrics under `execution/`. See [`src/fact_generation/execution/v2.py`](src/fact_generation/execution/v2.py).
-- **One-page teaser figure for triage** — alongside the Markdown + PDF, FactReview generates a layout-constrained one-page figure (the hero image of this README) that compresses the positioning matrix, claim verdicts, paper-vs-reproduced numbers, and strengths/weaknesses into a single screen. The layout is fixed across every paper so a reviewer's eye lands on the same regions every time — designed for the realistic per-paper budget reviewers and area chairs actually have.
 
 ## What RefCopilot Produces
 
@@ -159,15 +148,6 @@ FactReview keeps routine configuration in two places: `.env` for secrets and run
 
 **MinerU PDF parsing (required).** `MINERU_API_TOKEN` must be set. FactReview uses MinerU's cloud API by default — free tier, no local CUDA / GPU / model download. Get a token at <https://mineru.net>. You can also pass `--mineru-api-token` per-run.
 
-**Gemini teaser figure (optional).** If `GEMINI_API_KEY` is empty, FactReview writes the prompt to `teaser_figure_prompt.txt`, copies it to your clipboard, and tells you to paste it into the Gemini web app. If `GEMINI_API_KEY` is set, FactReview uses it automatically. Force prompt-only with `--teaser-mode prompt` or `TEASER_USE_GEMINI=false`.
-
-<details>
-<summary><strong>Prompt-only Gemini workflow (manual upload)</strong></summary>
-
-The prompt refers to "the attached reference image" — when you paste it into Gemini / ChatGPT / any image-model web UI, **also upload a layout reference image in the same message**. The recommended reference is `demos/Graph/compgcn/teaser_figure.png`, which the prompt's geometry constraints are written against. Without this image the model has nothing to anchor the layout to and tends to leave panels empty. Override which file is used with `TEASER_TEMPLATE_REFERENCE_PNG=path/to/your_template.png` in `.env`.
-
-</details>
-
 **Semantic Scholar related-work retrieval (on by default).** The positioning stage uses Semantic Scholar for objective related-work neighbors unless `SEMANTIC_SCHOLAR_ENABLED=false` is set. Set `SEMANTIC_SCHOLAR_API_KEY` to avoid rate limits during positioning retrieval. Free key at <https://www.semanticscholar.org/product/api>. Disable it for one run with `--disable-semantic-scholar`.
 
 **Agent `paper_search/read_paper` tools (on by default).** FactReview lets the review agent run claim-driven literature searches and requires a `read_paper` deep-read pass after effective search results before writing Technical Positioning. Set `PAPER_SEARCH_ENABLED=false` for manuscript/Semantic-Scholar-only runs. Available providers include `arxiv` (no key), `semantic_scholar`, `openalex`, and `remote`. The `semantic_scholar` provider reuses `SEMANTIC_SCHOLAR_API_KEY`, and `openalex` can use `OPENALEX_API_KEY` if set. `remote` keeps compatibility with advanced `/pasa/search` services. When `read_paper` is called without `PAPER_READ_BASE_URL`, FactReview uses a built-in arXiv PDF full-text fallback; set `PAPER_READ_BASE_URL` only if you run a stronger compatible reader service.
@@ -203,7 +183,7 @@ pip install -e ".[refcheck]"
 python scripts/execute_review_pipeline.py path/to/paper.pdf --enable-refcheck
 ```
 
-Or globally via `FACTREVIEW_ENABLE_REFCHECK=true`. The full result lands in `stages/fact_generation/refcheck/reference_check.json`; the Markdown summary appended to `final_review.md` lists fabricated references only. For the complete breakdown, run RefCopilot's standalone CLI or read the JSON directly. The report sub-stage also writes `final_review_clean.md` (without the refcheck section) for the teaser sub-stage.
+Or globally via `FACTREVIEW_ENABLE_REFCHECK=true`. The full result lands in `stages/fact_generation/refcheck/reference_check.json`; the Markdown summary appended to `final_review.md` lists fabricated references only. For the complete breakdown, run RefCopilot's standalone CLI or read the JSON directly.
 
 ### Flags
 
@@ -212,8 +192,6 @@ Or globally via `FACTREVIEW_ENABLE_REFCHECK=true`. The full result lands in `sta
 | `--llm-provider` | `openai-codex` | Switches the LLM provider. Mirrors to `MODEL_PROVIDER`. |
 | `--llm-model` | provider default | Mirrors to `AGENT_MODEL`, `EXECUTION_OPENAI_MODEL`, and `OPENAI_CODEX_MODEL` (when the provider is Codex). |
 | `--mineru-api-token` | from `.env` | One-off override for `MINERU_API_TOKEN`. |
-| `--gemini-api-key` | from `.env` | One-off override for `GEMINI_API_KEY`. |
-| `--teaser-mode` | `auto` | `auto` = use Gemini when `GEMINI_API_KEY` is set, otherwise prompt-only. `prompt` = always prompt-only. `api` = always attempt the Gemini image API. |
 | `--disable-semantic-scholar` | off | Disable Semantic Scholar objective related-work retrieval for this run. Equivalent to setting `SEMANTIC_SCHOLAR_ENABLED=false` before loading settings. |
 | `--enable-refcheck` | off | Run RefCopilot as the refcheck stage. |
 | `--run-execution` | off | Enables the code-execution stage. Requires Docker. |
@@ -240,7 +218,6 @@ python scripts/execute_stage_refcheck.py       --run-dir runs/<run>
 python scripts/execute_stage_positioning.py    --run-dir runs/<run>
 python scripts/execute_stage_execution.py      --run-dir runs/<run>
 python scripts/execute_stage_report.py         --run-dir runs/<run>
-python scripts/execute_stage_teaser.py         --run-dir runs/<run>
 ```
 
 ### Outputs
@@ -253,16 +230,11 @@ Each run writes to `runs/<paper_key>_<timestamp>_<id>/`. Primary artifacts:
 - `verification/verification.json` — L2 evidence, findings and execution plans.
 - `execution/` — L3 commands, logs, alignment and repair records (only with `--run-execution`).
 - `review/report/final_review.{json,md,pdf}` — **the headline review.**
-- `review/teaser/teaser.{json,svg}` — the one-page four-status summary.
 
 ## Pipeline Architecture
 
-<p align="center">
-  <img src="docs/pipeline.png" alt="FactReview pipeline: L1 screening and claim extraction, L2 typed verification, L3 execution, evidence-linked review" width="900">
-</p>
-
 ```text
-materials → L1 screening → L2 typed verification → L3 execution (optional) → assessment → report → teaser
+materials → L1 screening → L2 typed verification → L3 execution (optional) → assessment → report
 ```
 
 - **L1 screening & extraction** — writing, figure and reference checks; claims extracted with their location, conditions and evidence needs.
@@ -287,7 +259,6 @@ papers = load_dataset("kabuda777/factreview-bench", split="train")
 - **`MINERU_API_TOKEN` missing** — the parse stage will raise on the first run. Get a token from <https://mineru.net> (free tier is sufficient for most papers) and set it in `.env` or pass `--mineru-api-token`.
 - **`--enable-refcheck` errors with missing deps** — install with `pip install -e ".[refcheck]"`.
 - **Positioning stage is slow or returns sparse results** — unauthenticated Semantic Scholar requests are rate-limited. Set `SEMANTIC_SCHOLAR_API_KEY` in `.env` (free key from <https://www.semanticscholar.org/product/api>).
-- **Teaser stage skips silently / no `teaser_figure.png`** — `GEMINI_API_KEY` is unset (this is the default). The prompt is still written to `stages/review/teaser/teaser_figure_prompt.txt` and copied to your clipboard; paste it into the Gemini web app to generate the image manually.
 
 ## Advanced Configuration
 
@@ -302,7 +273,6 @@ Less common environment variables — set in `.env` or via the shell. `.env.exam
 | `MINERU_ALLOW_LOCAL_FALLBACK` | Set to `true` to let the execution stage's `prepare` node fall back to the local `mineru` CLI when the cloud snapshot is unavailable. |
 | `MINERU_LOCAL_BACKEND` / `MINERU_LOCAL_DEVICE` / `MINERU_LOCAL_SOURCE` | Tune the local `mineru` CLI's pipeline backend, device, and source mirror. Only consulted when `MINERU_ALLOW_LOCAL_FALLBACK=true` and a local MinerU install is present. |
 | `OPENAI_AGENTS_DISABLE_TRACING` | Set to `0` to enable the openai-agents SDK trace exporter. Disabled (`1`) by default to avoid POSTing traces to the Agents tracing endpoint. |
-| `TEASER_USE_GEMINI` | Force prompt-only teaser output (`false`) even when a Gemini key is configured. Equivalent to `--teaser-mode prompt`. |
 | `OPENAI_CODEX_BASE_URL` | Point Codex at a different Codex-compatible endpoint (default: `https://chatgpt.com/backend-api/codex`). |
 | `SEMANTIC_SCHOLAR_ENABLED` | Enable or disable Semantic Scholar objective related-work retrieval. Defaults to `true`; set `false` to skip it persistently. |
 | `SEMANTIC_SCHOLAR_API_KEY` | Recommended. Free API key from [Semantic Scholar](https://www.semanticscholar.org/product/api) for the positioning stage and `PAPER_SEARCH_PROVIDER=semantic_scholar`. Without it, unauthenticated requests may be rate-limited. |
@@ -325,7 +295,7 @@ ruff format --check .
 # from pyproject.toml's [tool.mypy] section.
 mypy src/schemas src/util src/common
 pytest                          # default: ~50 fast tests, gated markers off
-pytest -m e2e                   # report-audit + teaser tail integration
+pytest -m e2e                   # end-to-end integration tests
 pytest -m requires_docker       # execution stage (needs Docker daemon)
 pytest -m ""                    # full set, including all gated tests
 ```
