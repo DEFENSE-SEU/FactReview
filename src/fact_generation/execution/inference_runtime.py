@@ -12,9 +12,9 @@ from pydantic import ValidationError
 
 from schemas.runtime_science import ROLES, TorchInferenceProposal
 
+from .config import TorchInferenceLimits
 from .repair_evidence import bounded_source, plain_path
 from .resource_contract import _actual_file, _fingerprint, _scientific_claim, validate_resource_contract
-from .v2_config import TorchInferenceLimits
 
 VERSION = "torch-cpu-inference-v1"
 
@@ -526,7 +526,7 @@ def build_inference_context(proposal, *, plan, claim, materials, request, outcom
         flow = validate_inference_flow(binding,receipt,partition_path=_actual_file(Path(request.workspace),proposal["dataset_path"]))
         observed = {"dataset":binding["actual"]["dataset"],"metric":binding["actual"]["metric"],
                     "settings":binding["actual"]["settings"],"value":flow["value"]}
-        from .v2 import Observation, aligned
+        from .runner import Observation, aligned
         if runtime_stage_diagnostic is not None:
             RuntimeStageDiagnostic.mark(runtime_stage_diagnostic, stage="alignment")
         require(aligned(Observation.model_validate(observed), plan.target_conditions[0]), "actual_inference_condition_unaligned")

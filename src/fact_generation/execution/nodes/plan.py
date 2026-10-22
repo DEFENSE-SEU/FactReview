@@ -11,9 +11,9 @@ from util.fs import write_text
 from util.meta import collect_meta, write_meta
 from util.recorder import append_event
 
+from ..config import metric_tolerance
 from ..tools.paper_tables import extract_paper_metric_targets
 from ..tools.task_infer import infer_tasks_heuristic, infer_tasks_llm
-from ..v2_config import metric_tolerance
 from .prepare import (
     _ensure_default_baseline,
     _read_text,

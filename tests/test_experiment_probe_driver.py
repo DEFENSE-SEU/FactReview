@@ -12,7 +12,7 @@ from schemas.materials import SharedMaterials
 from verification.contracts import BranchResult, RejectedPlan
 
 spec = importlib.util.spec_from_file_location(
-    "experiment_probe", Path(__file__).resolve().parents[1] / "scripts/check_v2_experiments.py"
+    "experiment_probe", Path(__file__).resolve().parents[1] / "scripts/check_experiments.py"
 )
 probe = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(probe)

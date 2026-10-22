@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 
 from common import run_stats
-from fact_generation.execution import v2
+from fact_generation.execution import runner as v2
 from fact_generation.execution.resource_contract import build_resource_contract
 from fact_generation.execution.runtime_observer import _snapshot
 from preprocessing.materials import index_repository

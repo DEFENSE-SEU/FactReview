@@ -1,6 +1,6 @@
 """Mock host captures obey the same operator sandbox contract as native runs."""
 
-from fact_generation.execution.v2_config import SANDBOX_ENV, sandbox_options
+from fact_generation.execution.config import SANDBOX_ENV, sandbox_options
 
 
 def sandbox_argv(argv, request):

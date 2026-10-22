@@ -7,7 +7,7 @@ import re
 from collections import Counter
 from pathlib import Path
 
-from .v2_config import ExecutionConfig
+from .config import ExecutionConfig
 
 
 def _encoded(value):
@@ -50,7 +50,7 @@ def _historical_request(value):
 
 
 def _validate_record(row, expected, directory):
-    from .v2 import ExecutionOperationFailure, RunOutcome, RunRequest
+    from .runner import ExecutionOperationFailure, RunOutcome, RunRequest
 
     required = {
         "plan",

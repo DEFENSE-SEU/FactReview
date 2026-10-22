@@ -527,7 +527,7 @@ def build_consumption_context(proposal, *, plan, claim, materials, request, outc
     observed = {"dataset": dataset, "metric": metric, "settings": settings, "value": flow["value"]}
     # Exact actual facts cannot be renamed to make the target fit. Metric equivalence
     # remains the established program rule; source semantics are still reviewed.
-    from .v2 import Observation, aligned
+    from .runner import Observation, aligned
     _require(aligned(Observation.model_validate(observed), condition, mode), "actual_metadata_or_partition_conflicts_with_target")
     facts = {"actual_observation": observed, "data": data, "weights": weights,
         "partition_selector": partition, "actual_numeric_selectors": actual_rows,

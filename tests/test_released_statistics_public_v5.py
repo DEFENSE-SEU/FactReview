@@ -12,13 +12,13 @@ import pytest
 
 from assessment.rules import assess_claim
 from common.run_stats import run_scope
-from fact_generation.execution.v2 import ExecutionConfig, Observation, RunOutcome, execute_plans
+from fact_generation.execution.runner import ExecutionConfig, Observation, RunOutcome, execute_plans
 from llm.client import LLMConfig
-from review.report.v2 import render_markdown
+from review.report.renderer import render_markdown
 from schemas.review import FinalReview
 from screening.claims import extract_claims
 from tests.experiment_authority_fixtures import authority_scope_fixture
-from tests.test_execution_projection_v2 import original_inputs
+from tests.test_execution_projection import original_inputs
 from verification.contracts import BranchResult
 from verification.dispatch import verify_claims
 from verification.execution_projection import digest

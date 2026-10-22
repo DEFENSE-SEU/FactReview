@@ -1,7 +1,7 @@
 # Execution ablations
 
-Switches for the L3 execution ablations (§5.3 of `method_v2_spec.md`). Each one is a CLI flag of
-`src/pipeline_full.py` and, where noted, a field of `ExecutionConfig` (`src/fact_generation/execution/v2_config.py`)
+Switches for the L3 execution ablations (§5.3 of `method_spec.md`). Each one is a CLI flag of
+`src/pipeline_full.py` and, where noted, a field of `ExecutionConfig` (`src/fact_generation/execution/config.py`)
 that can also be set through `--execution-config`. A CLI flag given explicitly overrides the JSON file.
 
 | Ablation | Switch | Default (main experiment) | Ablation setting |
@@ -26,7 +26,7 @@ tolerance rules are unchanged. The evidence note and each `alignment` ledger ent
 
 `relaxed` covers these checks:
 
-- candidate selection in `execute_plans` (`src/fact_generation/execution/v2.py`);
+- candidate selection in `execute_plans` (`src/fact_generation/execution/runner.py`);
 - the source-flow binding in `bind_builtin_flow` and `validate_builtin_flow`
   (`src/fact_generation/execution/runtime_flow.py`), which then requires only `condition.dataset`
   instead of dataset, metric, `settings.model` and `settings.split`;
@@ -51,7 +51,7 @@ These checks stay strict under `relaxed`:
 
 The default repairer only proposes dependencies, so path, launch-argument and wrapper repairs never
 occur and runs with `--max-attempts 1..3` can be identical. Use `--repairer llm` for the repair-round
-ablation. The LLM repairer (`llm_repair` in `src/fact_generation/execution/v2.py`) first applies the
+ablation. The LLM repairer (`llm_repair` in `src/fact_generation/execution/runner.py`) first applies the
 default dependency fix; otherwise it sends the command, dependencies and the last 4000 characters of
 stdout/stderr to `llm_json` and asks for one repair or `null`. Its proposal passes through the same
 `Repair` schema and `_apply_repair` whitelist as any other repairer, and a rejected proposal ends the

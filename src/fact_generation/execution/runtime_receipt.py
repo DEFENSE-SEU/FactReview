@@ -310,7 +310,7 @@ def _read_receipt(request, outcome, *, inference):
         if inference:
             from schemas.runtime_science import TorchInferenceProposal
 
-            from .v2_config import TorchInferenceLimits
+            from .config import TorchInferenceLimits
             nn = audit["inference"]
             _check(type(nn) is dict and set(nn) == {"binding_digest","proposal","policy","source_sha256",
                 "partition_sha256","partition_count","checkpoint_sha256"}, "inference_config_protocol")
@@ -383,7 +383,7 @@ def _read_receipt(request, outcome, *, inference):
                 actual_env[name] = value
         expected_env = dict(_DEFAULT_ENV, FACTREVIEW_REPAIR_ROUND=str(req["repair_round"]))
         if sandbox is not None:
-            from .v2_config import SANDBOX_ENV, sandbox_policy
+            from .config import SANDBOX_ENV, sandbox_policy
 
             approved = sandbox_policy(sandbox)
             expected_env.update(SANDBOX_ENV)

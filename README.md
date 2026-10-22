@@ -18,10 +18,10 @@ Generic LLM reviewers — pasting a PDF into ChatGPT, Gemini, or Claude — fail
 
 | Generic LLM reviewer | FactReview |
 |---|---|
-| **Hallucinates citations** ("As shown by Smith et al., 2021…" — no such paper). | Every reference is verified in parallel against arXiv, Semantic Scholar, OpenReview, and (optional) OpenAlex. Fabrications, retractions, and arXiv withdrawals are flagged. See [RefCopilot](#what-refcopilot-produces). |
-| **Calls Δ = 0.3% a "significant improvement"** because the paper said so. | Experiments checks ground comparisons in the paper's tables and conditions, examine variance and statistical support, and record unresolved concerns. See [`src/verification/experiments.py`](src/verification/experiments.py). |
+| **Hallucinates citations** ("As shown by Smith et al., 2021…" — no such paper). | Every reference is verified in parallel against arXiv, Semantic Scholar, OpenReview, and (optional) OpenAlex. Fabrications, retractions, and arXiv withdrawals are flagged. |
+| **Calls Δ = 0.3% a "significant improvement"** because the paper said so. | Experiments checks ground comparisons in the paper's tables and conditions, examine variance and statistical support, and record unresolved concerns. |
 | **Faults the paper for not citing related work that was published after it.** | Literature checks use the supplied submission deadline and record its provenance. An explicit arXiv fallback can resolve the first-submission date; an unresolved deadline leaves Literature claims unverified. |
-| **Cannot verify a single reported number.** | Optional Docker-based execution runs claim-linked plans against the authors' released repository, checks alignment with the paper, and records commands, logs, metrics and bounded repairs. See [`src/fact_generation/execution/v2.py`](src/fact_generation/execution/v2.py). |
+| **Cannot verify a single reported number.** | Optional Docker-based execution runs claim-linked plans against the authors' released repository, checks alignment with the paper, and records commands, logs, metrics and bounded repairs. |
 
 ## See it in Action
 
@@ -68,7 +68,7 @@ python scripts/execute_review_pipeline.py path/to/paper.pdf --paper-key my_paper
 python scripts/execute_review_pipeline.py https://arxiv.org/abs/1911.03082
 ```
 
-If `codex` is not on your PATH, install OpenAI's Codex CLI (`npm install -g @openai/codex`) and rerun `codex login`. Get a free MinerU token from <https://mineru.net> (the free tier covers most papers). For all other configuration knobs, see [Configuration](#configuration). For CLI flags and rerun guidance, see [CLI Reference](#cli-reference).
+If `codex` is not on your PATH, install OpenAI's Codex CLI (`npm install -g @openai/codex`) and rerun `codex login`. Get a free MinerU token from <https://mineru.net> (the free tier covers most papers).
 
 ## Quick Start — RefCopilot
 
@@ -93,14 +93,14 @@ Every extracted claim gets one of four statuses, decided by fixed rules over the
 | **Flawed** | Sufficient flaw evidence survives reasonable author explanations. |
 | **Unverified** | Available evidence cannot decide the claim. |
 
-A gate then checks Supported claims against the evidence their type needs (`--gate lenient|default|strict`); a Supported claim without that evidence is reported as Unverified, and all three tiers are kept in `gate_status`. The demos in this README were produced by v1, whose labels map as `in_conflict` → Questioned.
+A gate then checks Supported claims against the evidence their type needs (`--gate lenient|default|strict`); a Supported claim without that evidence is reported as Unverified, and all three tiers are kept in `gate_status`. In the demo reports, `in_conflict` corresponds to Questioned.
 
 What makes the report distinctive (beyond the verdicts):
 
-- **Claim-linked literature evidence** — Literature checks retrieve related work, read source passages, and assess whether the retrieved evidence covers each claim's conditions. See [`src/verification/literature.py`](src/verification/literature.py).
-- **Grounded experiment checks** — numerical comparisons and concerns about correspondence, fairness, isolation, stability and consistency are linked to the paper's reported evidence. See [`src/verification/experiments.py`](src/verification/experiments.py).
+- **Claim-linked literature evidence** — Literature checks retrieve related work, read source passages, and assess whether the retrieved evidence covers each claim's conditions.
+- **Grounded experiment checks** — numerical comparisons and concerns about correspondence, fairness, isolation, stability and consistency are linked to the paper's reported evidence.
 - **Submission-date boundary** — `--submission-deadline YYYY-MM-DD` bounds Literature checks. If the venue deadline is unknown, opt into `--derive-cutoff-from-arxiv` to resolve the first-submission date and record that fallback in `cutoff.json`. Unresolved dates leave Literature claims unverified.
-- **Optional code execution** — L3 runs confirmed plans in a Docker sandbox, checks that dataset, metric and settings match the claim, allows at most 3 bounded repairs (`--max-attempts`), and records commands, logs and metrics under `execution/`. See [`src/fact_generation/execution/v2.py`](src/fact_generation/execution/v2.py).
+- **Optional code execution** — L3 runs confirmed plans in a Docker sandbox, checks that dataset, metric and settings match the claim, allows at most 3 bounded repairs (`--max-attempts`), and records commands, logs and metrics under `execution/`.
 
 ## What RefCopilot Produces
 
@@ -133,12 +133,12 @@ For each fixable warning, RefCopilot emits a corrected BibTeX entry with a leadi
 
 What's behind the accuracy:
 
-- **Four-backend parallel lookup** — arXiv, Semantic Scholar, OpenReview, and (when `OPENALEX_API_KEY` is set) OpenAlex are queried concurrently; results are merged with per-field provenance. See [`RefCopilot/src/refcopilot/pipeline.py`](RefCopilot/src/refcopilot/pipeline.py).
+- **Four-backend parallel lookup** — arXiv, Semantic Scholar, OpenReview, and (when `OPENALEX_API_KEY` is set) OpenAlex are queried concurrently; results are merged with per-field provenance.
 - **Two-stage hallucination detection** — a fast offline heuristic (title similarity + author overlap + OCR-garbled-title detection) handles the easy cases; the LLM is only invoked on the ambiguous ones. Saves tokens, raises precision.
 - **"Second-chance" lookup** — if no backend matches but the LLM judges the paper as real, RefCopilot asks the LLM for canonical metadata (corrected title, DOI, arXiv ID) and retries all four backends once with the suggested values.
-- **Retraction detection** — unified `is_retracted` signal from OpenAlex (publisher retractions + Retraction Watch) plus arXiv withdrawn-preprint notices. See [`RefCopilot/src/refcopilot/verify/retraction.py`](RefCopilot/src/refcopilot/verify/retraction.py).
+- **Retraction detection** — unified `is_retracted` signal from OpenAlex (publisher retractions + Retraction Watch) plus arXiv withdrawn-preprint notices.
 
-FactReview v2 invokes RefCopilot during L1 screening whenever parsed bibliography entries are available. Its full result is written to `screening/reference_check.json`; grounded findings are included in the review.
+FactReview invokes RefCopilot during L1 screening whenever parsed bibliography entries are available. Its full result is written to `screening/reference_check.json`; grounded findings are included in the review.
 
 ## Configuration
 
@@ -149,8 +149,6 @@ FactReview keeps routine configuration in two places: `.env` for secrets and run
 **MinerU PDF parsing (required).** `MINERU_API_TOKEN` must be set. FactReview uses MinerU's cloud API by default — free tier, no local CUDA / GPU / model download. Get a token at <https://mineru.net>. You can also pass `--mineru-api-token` per-run.
 
 **Literature retrieval (on by default).** L2 uses claim-driven searches and source reading. `PAPER_SEARCH_PROVIDER` selects `arxiv` (no key), `semantic_scholar`, `openalex`, or `remote`. The `semantic_scholar` provider uses `SEMANTIC_SCHOLAR_API_KEY`; `openalex` can use `OPENALEX_API_KEY`. Set `PAPER_SEARCH_ENABLED=false` to disable retrieval; missing literature evidence remains visible in the review. `remote` supports compatible `/pasa/search` services. Without `PAPER_READ_BASE_URL`, reading uses a built-in arXiv PDF fallback; configure a reader endpoint only if you run a compatible service.
-
-For OpenAlex, local PDF fallback, agent-tracing knobs, and other rarely-touched variables see [Advanced Configuration](#advanced-configuration).
 
 ## CLI Reference
 
@@ -176,7 +174,7 @@ python scripts/execute_review_pipeline.py path/to/paper.pdf --run-execution
 
 On native Linux, the sandbox defaults to the host user's positive UID/GID so mounted outputs remain writable. Root launches and Docker Desktop default to `1000:1000`; root launches prepare ownership of the private code snapshot and output directories. If you override `sandbox.uid` in `--execution-config`, a non-root Linux launch requires it to match the host UID and reports a configuration error otherwise.
 
-The runtime installation already includes the bibliography checker. `--enable-refcheck` is accepted for compatibility and has no additional effect in v2. Read `screening/reference_check.json` for its complete result, or run RefCopilot's standalone CLI for a bibliography-only report.
+Read `screening/reference_check.json` for the complete bibliography-check result, or run RefCopilot's standalone CLI for a bibliography-only report.
 
 ### Flags
 
@@ -185,7 +183,6 @@ The runtime installation already includes the bibliography checker. `--enable-re
 | `--llm-provider` | `openai-codex` | Switches the LLM provider. Mirrors to `MODEL_PROVIDER`. |
 | `--llm-model` | provider default | Mirrors to `AGENT_MODEL`, `EXECUTION_OPENAI_MODEL`, and `OPENAI_CODEX_MODEL` (when the provider is Codex). |
 | `--mineru-api-token` | from `.env` | One-off override for `MINERU_API_TOKEN`. |
-| `--enable-refcheck` | compatibility only | V2 L1 always checks available bibliography entries with RefCopilot. |
 | `--run-execution` | off | Enables the code-execution stage. Requires Docker. |
 | `--max-attempts` | `3` | Repair rounds in L3 execution, 0–3. |
 | `--submission-deadline` | – | Venue deadline (`YYYY-MM-DD`) that bounds Literature retrieval. |
@@ -194,16 +191,14 @@ The runtime installation already includes the bibliography checker. `--enable-re
 | `--repository-url` / `--repository-root` | – | The authors' released code for Code and Experiments checks. |
 | `--gate` | `default` | Claim gate tier reported as each claim's status: `lenient`, `default`, `strict`. Also `CLAIM_GATE`. |
 | `--alignment` | `strict` | Execution alignment; `relaxed` matches the dataset only (ablation). |
-| `--repairer` | `default` | Execution repair proposer; `llm` proposes whitelisted repairs (ablation). See [execution ablations](docs/execution_ablations.md). |
+| `--repairer` | `default` | Execution repair proposer; `llm` proposes whitelisted repairs (ablation). |
 | `--report-presentation` | `full` | `layered` writes a reading report plus a technical appendix and a linked PDF bundle. |
 | `--run-root` | `runs` | Override the root output directory. |
-| `--cutoff-date` | – | Legacy alias: only a day-level value (`YYYY-MM-DD`) resolves the deadline. Prefer `--submission-deadline`. |
+| `--cutoff-date` | – | Alias accepting a day-level value (`YYYY-MM-DD`). Prefer `--submission-deadline`. |
 
-### Reruns and Legacy Options
+### Reruns
 
-Rerun `scripts/execute_review_pipeline.py` with the original PDF and desired options to create a new v2 run. V2 rejects `--reuse-job-id` and `--no-cutoff` with an unsupported-option error.
-
-The `scripts/execute_stage_*.py` commands use the legacy v1 run layout. They do not support resuming or regenerating stages in a v2 run directory.
+Rerun `scripts/execute_review_pipeline.py` with the original PDF and desired options to create a new run directory.
 
 ### Outputs
 
@@ -229,11 +224,9 @@ materials → L1 screening → L2 typed verification → L3 execution (optional)
 - **L3 execution** — runs confirmed plans in a Docker sandbox, aligns dataset, metric and settings with the claim, and allows at most 3 bounded repairs (dependencies, paths, launch arguments; never model, data or evaluation).
 - **Assessment and report** — fixed status rules and the claim gate set each status; the report links every judgement to related work, code or a run log.
 
-The full design is in [`docs/method_v2_spec.md`](docs/method_v2_spec.md).
-
 ## Benchmark
 
-The evaluation uses 300 peer-reviewed papers in six groups from Agents4Science, ICLR, TMLR, Nature Communications, COLM and ICML. PDFs, public OpenReview review threads and per-paper licenses are on Hugging Face at [kabuda777/factreview-bench](https://huggingface.co/datasets/kabuda777/factreview-bench); [`benchmark/papers.csv`](benchmark/papers.csv) is the same index, described in [`benchmark/README.md`](benchmark/README.md).
+The evaluation uses 300 peer-reviewed papers in six groups from Agents4Science, ICLR, TMLR, Nature Communications, COLM and ICML. PDFs, public OpenReview review threads and per-paper licenses are on Hugging Face at [kabuda777/factreview-bench](https://huggingface.co/datasets/kabuda777/factreview-bench).
 
 ```python
 from datasets import load_dataset
@@ -273,7 +266,7 @@ pip install -e ".[runtime,dev]"
 
 ruff check .
 ruff format --check .
-# Narrow CI smoke check (the contracts most likely to break consumers). For a
+# Narrow type check (the contracts most likely to break consumers). For a
 # full pass, run `mypy` with no args — it picks up the broader package list
 # from pyproject.toml's [tool.mypy] section.
 mypy src/schemas src/util src/common

@@ -8,7 +8,7 @@ import pytest
 
 from common import run_stats
 from llm.client import LLMConfig
-from tests.test_literature_service_responsibility_v2 import boundaries, comparison, inputs
+from tests.test_literature_service_responsibility import boundaries, comparison, inputs
 from verification.literature import verify_literature
 
 

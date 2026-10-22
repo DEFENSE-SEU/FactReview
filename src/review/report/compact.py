@@ -13,7 +13,7 @@ import re
 from datetime import UTC, datetime
 from pathlib import Path
 
-from review.report import v2
+from review.report import renderer as v2
 
 
 def _digest(value):

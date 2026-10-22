@@ -15,11 +15,11 @@ from pathlib import Path
 from schemas.partition_analysis import PartitionRuntimeProposal
 from schemas.runtime_science import ROLES
 
+from .outputs import _actual_metrics, _metric_key, _runtime_value, decode_output
 from .partition_analysis import _constant, _digest, _object, _read, _require, analyze_partition
 from .resource_contract import _actual_file
 from .runtime_observer import _snapshot
 from .runtime_receipt import read_observer_receipt
-from .v2_outputs import _actual_metrics, _metric_key, _runtime_value, decode_output
 
 
 def _audit_file(path, expected):
@@ -155,7 +155,7 @@ def build_partition_runtime_context(proposal, *, plan, claim, materials, request
                  and str(exc) == "runtime dataset is missing at the configured JSON path",
                  "analysis_stdout_decoder_rejected: " + str(exc))
         decoded, mapping = [], None
-    from .v2 import Observation, aligned
+    from .runner import Observation, aligned
     _require(_digest([Observation.model_validate(row).model_dump(mode="json") for row in decoded])
              == _digest([row.model_dump(mode="json") for row in outcome.observations]),
              "analysis_decoded_observations_unsupported_or_changed")

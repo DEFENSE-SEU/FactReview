@@ -387,7 +387,7 @@ def run_legacy_pipeline(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def run_full_pipeline(args: argparse.Namespace) -> dict[str, Any]:
-    from pipeline_v2 import run_v2_pipeline
+    from pipeline import run_v2_pipeline
 
     return run_v2_pipeline(args)
 

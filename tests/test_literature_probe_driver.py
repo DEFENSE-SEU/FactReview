@@ -14,7 +14,7 @@ from schemas.claim import Claim, ClaimLocation, Condition
 from schemas.materials import MaterialBlock, SharedMaterials
 
 spec = importlib.util.spec_from_file_location(
-    "literature_probe", Path(__file__).resolve().parents[1] / "scripts/check_v2_literature.py"
+    "literature_probe", Path(__file__).resolve().parents[1] / "scripts/check_literature.py"
 )
 probe = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(probe)

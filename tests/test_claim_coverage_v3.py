@@ -7,7 +7,7 @@ import pytest
 
 from schemas.materials import MaterialBlock
 from screening import claim_coverage as m
-from tests.test_claim_coverage_v2 import (
+from tests.test_claim_coverage import (
     CFG,
     action,
     candidate,
@@ -148,7 +148,7 @@ def test_explicit_groups_lower_once_and_split_through_three_stages(tmp_path, wit
 
 def test_legacy_v2_missing_merge_stays_unreviewed(tmp_path):
     paper, claims = case()
-    from tests.test_claim_coverage_v2 import review as old_review
+    from tests.test_claim_coverage import review as old_review
 
     def call(**kw):
         p = json.loads(kw["prompt"].split("DATA_JSON:\n", 1)[1])
@@ -368,7 +368,7 @@ def test_historical_background_public_context_and_version_boundary(tmp_path, leg
         assert p["supplemental_sources"][0]["block"] == paper.blocks[0].model_dump(mode="json")
         assert p["supplemental_sources"][0]["bindings"][0]["association"] == "unassigned_background"
         if legacy_second:
-            from tests.test_claim_coverage_v2 import review as old_review
+            from tests.test_claim_coverage import review as old_review
 
             r = old_review(
                 p,

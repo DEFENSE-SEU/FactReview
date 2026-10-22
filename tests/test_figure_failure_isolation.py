@@ -9,7 +9,7 @@ from PIL import Image
 from schemas.claim import ClaimLocation
 from schemas.materials import FigureMaterial, MaterialBlock, SharedMaterials
 from screening.stage import screen_paper
-from tests.test_pipeline_v2 import visual_clear_rows
+from tests.test_pipeline import visual_clear_rows
 
 
 @pytest.fixture
@@ -150,7 +150,7 @@ def test_legacy_image_without_bbox_keeps_explicit_unverified_scale(visual_materi
     assert [record.printed_size_verified for record in result.figure_checks] == [True, False, True]
     assert any("figure_2: printed-size legibility unavailable" in issue for issue in result.issues)
     assert any("printed-size legibility unavailable" in issue for issue in result.figure_checks[1].issues)
-    from review.report.v2 import write_review
+    from review.report.renderer import write_review
     from schemas.review import FinalReview
 
     output = write_review(

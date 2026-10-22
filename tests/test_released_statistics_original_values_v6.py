@@ -9,7 +9,7 @@ import pytest
 from assessment.rules import assess_claim
 from common.config import Settings
 from common.run_stats import run_scope
-from fact_generation.execution.v2 import ExecutionConfig, Observation, RunOutcome, execute_plans
+from fact_generation.execution.runner import ExecutionConfig, Observation, RunOutcome, execute_plans
 from llm.client import LLMConfig
 from schemas.claim import Claim
 from tests.experiment_authority_fixtures import authority_scope_fixture

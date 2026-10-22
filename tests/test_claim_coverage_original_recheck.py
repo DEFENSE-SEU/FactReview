@@ -6,7 +6,7 @@ import json
 import pytest
 
 from screening import claim_coverage as m
-from tests.test_claim_coverage_v2 import CFG, action, extracted, followup, validation
+from tests.test_claim_coverage import CFG, action, extracted, followup, validation
 from tests.test_claim_coverage_v3 import QUALIFIER, case, review
 
 
@@ -106,7 +106,7 @@ def test_same_problem_link_allows_validated_split_without_duplicate_pending(tmp_
     assert result.coverage["status"] == "complete"
     summary = m.coverage_summary(result.coverage)
     assert summary["original_claim_reviews_completed"] == summary["original_claim_reviews_required"] == 1
-    from review.report.v2 import claim_coverage_lines
+    from review.report.renderer import claim_coverage_lines
 
     assert "Independent original-claim reviews: 1 / 1." in claim_coverage_lines(summary)
     assert result.coverage["windows"][0]["original_recheck"]["findings"][0]["linked_observation"]

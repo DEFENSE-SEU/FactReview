@@ -37,6 +37,7 @@ Path("metrics.json").write_text(json.dumps({"value": value, "readonly": readonly
 
 
 def prepare(case: str, image: str) -> dict:
+    from fact_generation.execution.config import SandboxPolicy
     from fact_generation.execution.runtime_launch import (
         bind_source_sites,
         prepare_observer_launch,
@@ -44,7 +45,6 @@ def prepare(case: str, image: str) -> dict:
     )
     from fact_generation.execution.runtime_permissions import prepare_runtime_permissions
     from fact_generation.execution.tools.docker import docker_run_paper_image
-    from fact_generation.execution.v2_config import SandboxPolicy
 
     root = Path("/probe") / case
     root.mkdir()
@@ -134,8 +134,8 @@ def inspect_case(case: str) -> dict:
 
 
 def hostile_paths() -> dict:
+    from fact_generation.execution.config import SandboxPolicy
     from fact_generation.execution.runtime_permissions import prepare_runtime_permissions
-    from fact_generation.execution.v2_config import SandboxPolicy
 
     root = Path("/probe/links")
     root.mkdir()

@@ -319,9 +319,9 @@ def prepare_inference_launch(original_command, *, binding, **kwargs):
     Existing ordinary observation has no inference authority and remains separate.
     """
     try:
+        from .config import TorchInferenceLimits
         from .inference_runtime import VERSION, file_sha, require
         from .resource_contract import _fingerprint
-        from .v2_config import TorchInferenceLimits
 
         require(type(binding) is dict and binding.get("version") == VERSION and binding.get("status") == "bound",
                 "inference_binding_unavailable")
@@ -379,7 +379,7 @@ def prepare_inference_launch(original_command, *, binding, **kwargs):
 
 def inference_image_identity(image, result, *, policy):
     """Normalize a host run_command result for one existing image, no service call."""
-    from .v2_config import TorchInferenceLimits
+    from .config import TorchInferenceLimits
     approved = TorchInferenceLimits.model_validate(policy)
     command = ["docker", "image", "inspect", "--format", "{{.Id}}", image]
     if (result.cmd != command or result.returncode != 0 or result.termination != "completed"
@@ -434,7 +434,7 @@ def protect_observer_docker_argv(argv, *, launch, sandbox=None):
         pythonpath_present = False
         pairs = {"--name", "--user", "--gpus", "--shm-size", "--ipc", "-w", "--workdir", "-e", "--env"}
         if sandbox is not None:
-            from .v2_config import SANDBOX_PAIR_FLAGS, validate_sandbox_options
+            from .config import SANDBOX_PAIR_FLAGS, validate_sandbox_options
 
             validate_sandbox_options(options, sandbox)
             pairs |= SANDBOX_PAIR_FLAGS

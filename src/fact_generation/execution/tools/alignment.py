@@ -7,7 +7,7 @@ from typing import Any
 
 from util.fs import ensure_dir, write_text
 
-from ..v2_config import TOLERANCES, metric_tolerance
+from ..config import TOLERANCES, metric_tolerance
 from .paper_tables import PaperMetricTarget, _metric_key, extract_paper_metric_targets
 
 

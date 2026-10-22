@@ -7,7 +7,7 @@ import pytest
 
 from screening import claim_coverage as m
 from tests.claim_scope_mock import with_scope
-from tests.test_claim_coverage_v2 import CFG, validation
+from tests.test_claim_coverage import CFG, validation
 from tests.test_claim_coverage_v3 import case, review
 
 
@@ -276,7 +276,7 @@ def test_low_shared_budget_cannot_clear_old_pending_or_backfill_completion(monke
 
 def test_candidate_heading_ancestry_requires_exact_span_and_complete_prefix_chain():
     from screening.claim_scope import _source_candidates
-    from tests.test_claim_coverage_v2 import projection
+    from tests.test_claim_coverage import projection
 
     raw = [
         {"id": "h1", "text": "4 Experiments", "kind": "heading"},
@@ -327,8 +327,8 @@ def test_additional_remote_footnote_requires_actual_visible_original_body(visibl
 
 
 def test_third_only_target_cannot_be_omitted_or_backfilled_into_first(monkeypatch, tmp_path):
-    from tests.test_claim_coverage_v2 import observation, small
-    from tests.test_claim_coverage_v2 import review as legacy_review
+    from tests.test_claim_coverage import observation, small
+    from tests.test_claim_coverage import review as legacy_review
 
     paper, claims = small()
     monkeypatch.setattr(m, "resolve_llm_config", lambda: CFG)

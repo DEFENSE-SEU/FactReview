@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.test_execution_projection_choices_v2 import offline, public  # noqa: F401
+from tests.test_execution_projection_choices import offline, public  # noqa: F401
 
 
 def choice_wire(raw, *_):
@@ -105,7 +105,7 @@ def test_bad_execution_is_local_and_never_selected_automatically(tmp_path, bad):
 
 
 def test_none_and_legacy_lower_only_the_explicit_branch(tmp_path):
-    from tests.test_execution_projection_semantics_v2 import inputs
+    from tests.test_execution_projection_semantics import inputs
     from verification.experiments import lower_execution_response
 
     def first(raw, *_):

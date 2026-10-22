@@ -1327,7 +1327,7 @@ def docker_run_paper_image(
     env = dict(env or {})
     policy = None
     if sandbox is not None:
-        from ..v2_config import SANDBOX_ENV, sandbox_options, sandbox_policy
+        from ..config import SANDBOX_ENV, sandbox_options, sandbox_policy
 
         policy = sandbox_policy(sandbox)
         if ipc not in (None, "private"):

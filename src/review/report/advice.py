@@ -204,7 +204,7 @@ def advice_input(claim: Claim, ledger: list[dict], *, version="advice-v2") -> di
 
 def validate_items(claim: Claim, data: dict, items: list[AdviceItem]) -> None:
     # Import lazily: the renderer calls this module for static advice validation.
-    from review.report.v2 import validate_publication_language
+    from review.report.renderer import validate_publication_language
 
     ids = {c.id for c in claim.conditions}
     all_covered = set()
@@ -278,7 +278,7 @@ def _safe(value, cfg=None):
 
 
 def _failure(exc, cfg):
-    from review.report.v2 import validate_publication_language
+    from review.report.renderer import validate_publication_language
 
     message = _safe(f"{type(exc).__name__}: {exc}", cfg)
     try:

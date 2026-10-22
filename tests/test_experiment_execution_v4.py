@@ -9,11 +9,11 @@ import pytest
 
 from assessment.rules import assess_claim
 from common import run_stats
-from fact_generation.execution import v2
+from fact_generation.execution import runner as v2
 from schemas.claim import ExecutionPlan
 from tests.execution_science_fixtures import record_observer
 from tests.experiment_authority_fixtures import authority_scope_fixture
-from tests.test_execution_multi_condition_phase_a_v2 import _evaluation_events, _inputs, _proposal
+from tests.test_execution_multi_condition_phase_a import _evaluation_events, _inputs, _proposal
 from util.subprocess_runner import CommandResult
 from verification.contracts import BranchResult
 from verification.dispatch import verify_claims

@@ -6,7 +6,7 @@ import json
 import pytest
 
 from screening import claim_coverage as m
-from tests.test_claim_coverage_v2 import CFG, action, extracted, followup, validation
+from tests.test_claim_coverage import CFG, action, extracted, followup, validation
 from tests.test_claim_coverage_v3 import case, review
 from tests.test_claim_coverage_v4 import missing_row, preserved_row, scope_row
 

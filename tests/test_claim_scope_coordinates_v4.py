@@ -82,7 +82,7 @@ def test_source_and_carrier_instructions_name_canonical_offsets_and_item_leaf():
 
 
 def test_native_first_and_third_bind_visible_body_metadata_in_context_without_extra_call(monkeypatch, tmp_path):
-    from tests.test_claim_coverage_v2 import CFG, review, validation
+    from tests.test_claim_coverage import CFG, review, validation
     from tests.test_claim_coverage_v3 import case
 
     paper, claims = case()

@@ -168,8 +168,8 @@ def test_external_self_assertion_closed_sources_and_retained_execution_fail_clos
         assert audit["response"] == saved[-1]
 
     # One actual public choice producer still retains its independent 19-obligation contract.
-    from tests.test_execution_projection_choices_v2 import review, select
-    from tests.test_execution_projection_semantics_v2 import inputs
+    from tests.test_execution_projection_choices import review, select
+    from tests.test_execution_projection_semantics import inputs
     (tmp_path / "choice").mkdir()
     claim, materials, _, _ = inputs(tmp_path / "choice")
     calls = []

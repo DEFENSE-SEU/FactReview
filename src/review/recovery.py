@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from review.delivery import checked_delivery
-from review.report.v2 import (
+from review.report.renderer import (
     _checked_report,
     render_markdown,
     validate_publication_language,
