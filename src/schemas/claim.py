@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from enum import StrEnum
-from typing import Annotated, Any, Literal, Self
+from typing import Annotated, Any, Generic, Literal, Self, TypeVar
 from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_serializer, model_validator
@@ -51,7 +51,7 @@ class ClaimLocation(Contract):
     def localizable(self) -> Self:
         if (self.char_start is None) != (self.char_end is None):
             raise ValueError("char_start and char_end must be supplied together")
-        if self.char_start is not None and self.char_end <= self.char_start:
+        if self.char_start is not None and self.char_end is not None and self.char_end <= self.char_start:
             raise ValueError("char_end must follow char_start")
         if self.page is None and not (self.section or "").strip() and self.char_start is None:
             raise ValueError("a claim location requires a page, section, or character span")
@@ -273,51 +273,81 @@ class TheorySource(Contract):
     artifact_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
 
 
-class TheoryAssumption(Contract):
+_TheorySourceT = TypeVar("_TheorySourceT", bound=Contract)
+
+
+class _TheoryAssumption(Contract, Generic[_TheorySourceT]):
     id: NonEmpty
     text: NonEmpty
     status: Literal["paper_explicit", "required_unstated"]
-    sources: list[TheorySource] = Field(default_factory=list)
+    sources: list[_TheorySourceT] = Field(default_factory=list)
 
 
-class TheoryStep(Contract):
+class TheoryAssumption(_TheoryAssumption[TheorySource]):
+    pass
+
+
+class _TheoryStep(Contract, Generic[_TheorySourceT]):
     id: NonEmpty
     statement: NonEmpty
     reason: NonEmpty
     assumption_ids: list[str] = Field(default_factory=list)
     previous_step_ids: list[str] = Field(default_factory=list)
-    sources: list[TheorySource] = Field(default_factory=list)
+    sources: list[_TheorySourceT] = Field(default_factory=list)
 
 
-class TheoryGap(Contract):
+class TheoryStep(_TheoryStep[TheorySource]):
+    pass
+
+
+class _TheoryGap(Contract, Generic[_TheorySourceT]):
     at: NonEmpty
     reason: NonEmpty
     needed: NonEmpty
-    sources: list[TheorySource] = Field(default_factory=list)
+    sources: list[_TheorySourceT] = Field(default_factory=list)
 
 
-class TheoryTrace(Contract):
+class TheoryGap(_TheoryGap[TheorySource]):
+    pass
+
+
+_AssumptionT = TypeVar("_AssumptionT", bound=Contract)
+_StepT = TypeVar("_StepT", bound=Contract)
+_GapT = TypeVar("_GapT", bound=Contract)
+
+
+class _TheoryTrace(Contract, Generic[_AssumptionT, _StepT, _GapT]):
     """Model-authored mathematical reasoning, without formal-proof guarantees."""
 
     goal: NonEmpty
-    assumptions: list[TheoryAssumption]
-    steps: list[TheoryStep]
-    gaps: list[TheoryGap]
+    assumptions: list[_AssumptionT]
+    steps: list[_StepT]
+    gaps: list[_GapT]
     outcome: Literal["completed", "partial", "unable"]
     completion_reason: NonEmpty
 
 
-class TheoryDerivationRecord(Contract):
-    schema_version: Literal["theory-derivation-v1"] | None = None
+class TheoryTrace(_TheoryTrace[TheoryAssumption, TheoryStep, TheoryGap]):
+    """Model-authored mathematical reasoning, without formal-proof guarantees."""
+
+
+_TheoryVersionT = TypeVar("_TheoryVersionT", bound=str)
+_TheoryPhaseT = TypeVar("_TheoryPhaseT", bound=str)
+_TheoryScopeT = TypeVar("_TheoryScopeT", bound=str)
+_TheoryTraceT = TypeVar("_TheoryTraceT", bound=Contract)
+
+
+class _TheoryDerivationRecord(Contract, Generic[_TheoryVersionT, _TheoryPhaseT, _TheoryScopeT, _TheoryTraceT]):
+    schema_version: _TheoryVersionT | None = None
     claim_id: NonEmpty
     item_index: int | None = Field(default=None, ge=0, strict=True)
-    phase: Literal["main", "appendix"]
+    phase: _TheoryPhaseT
     adopted: bool
     covered: list[str] = Field(default_factory=list)
     source_pointer: EvidencePointer | None = None
     state: Literal["validated", "invalid", "legacy_unavailable"]
-    validation_scope: Literal["structure_and_source_only"] = "structure_and_source_only"
-    trace: TheoryTrace | None = None
+    validation_scope: _TheoryScopeT
+    trace: _TheoryTraceT | None = None
     issues: list[str] = Field(default_factory=list)
     audit_pointer: str | None = None
     source_hashes: dict[str, str] = Field(default_factory=dict)
@@ -346,6 +376,13 @@ class TheoryDerivationRecord(Contract):
         return self
 
 
+class TheoryDerivationRecord(_TheoryDerivationRecord[
+    Literal["theory-derivation-v1"], Literal["main", "appendix"],
+    Literal["structure_and_source_only"], TheoryTrace,
+]):
+    validation_scope: Literal["structure_and_source_only"] = "structure_and_source_only"
+
+
 class TheoryVisualSource(Contract):
     source_kind: Literal["visual"] = "visual"
     origin: Literal["model_transcribed_from_original_pixels"] = "model_transcribed_from_original_pixels"
@@ -362,25 +399,26 @@ class TheoryVisualSource(Contract):
     audit_pointer: NonEmpty
 
 
-class TheoryVisualAssumption(TheoryAssumption):
-    sources: list[TheorySource | TheoryVisualSource] = Field(default_factory=list)
+class TheoryVisualAssumption(_TheoryAssumption[TheorySource | TheoryVisualSource]):
+    pass
 
 
-class TheoryVisualStep(TheoryStep):
-    sources: list[TheorySource | TheoryVisualSource] = Field(default_factory=list)
+class TheoryVisualStep(_TheoryStep[TheorySource | TheoryVisualSource]):
+    pass
 
 
-class TheoryVisualGap(TheoryGap):
-    sources: list[TheorySource | TheoryVisualSource] = Field(default_factory=list)
+class TheoryVisualGap(_TheoryGap[TheorySource | TheoryVisualSource]):
+    pass
 
 
-class TheoryVisualTrace(TheoryTrace):
-    assumptions: list[TheoryVisualAssumption]
-    steps: list[TheoryVisualStep]
-    gaps: list[TheoryVisualGap]
+class TheoryVisualTrace(_TheoryTrace[TheoryVisualAssumption, TheoryVisualStep, TheoryVisualGap]):
+    pass
 
 
-class TheoryVisualRecord(TheoryDerivationRecord):
+class TheoryVisualRecord(_TheoryDerivationRecord[
+    Literal["theory-visual-derivation-v1"], Literal["visual_recheck"],
+    Literal["structure_source_identity_and_model_visual_reading"], TheoryVisualTrace,
+]):
     schema_version: Literal["theory-visual-derivation-v1"]
     phase: Literal["visual_recheck"]
     state: Literal["validated", "invalid"]
@@ -466,8 +504,8 @@ class Claim(Contract):
             if question.claim_id is not None and question.claim_id != self.id:
                 raise ValueError("an author question must refer to its enclosing claim")
         if self.advice:
-            for item in self.advice.items:
-                if not set(item.condition_ids).issubset(ids):
+            for advice_item in self.advice.items:
+                if not set(advice_item.condition_ids).issubset(ids):
                     raise ValueError("advice must refer to its enclosing claim's condition ids")
         for record in self.theory_derivations:
             if record.claim_id != self.id or not set(record.covered).issubset(ids):
@@ -533,10 +571,13 @@ class PaperTargetSelector(Contract):
         return self
 
 
-class ExecutionTargetBinding(Contract):
+_TargetVersionT = TypeVar("_TargetVersionT", bound=int)
+
+
+class _ExecutionTargetBinding(Contract, Generic[_TargetVersionT]):
     """Reconstructable target proof. Consumers must revalidate it against the paper."""
 
-    version: Literal[1] = 1
+    version: _TargetVersionT
     condition_id: NonEmpty
     reported: PaperTargetPassage
     selector: PaperTargetSelector
@@ -549,6 +590,12 @@ class ExecutionTargetBinding(Contract):
     quantity_kind: Literal["absolute_measurement"] = "absolute_measurement"
     subject: str | None = None
     unit: str | None = None
+
+
+class ExecutionTargetBinding(_ExecutionTargetBinding[Literal[1]]):
+    """Reconstructable target proof. Consumers must revalidate it against the paper."""
+
+    version: Literal[1] = 1
 
 
 class ProjectionFieldRole(Contract):
@@ -708,8 +755,12 @@ class SemanticProjectionScopeDecision(ProjectionScopeDecision):
     claim_reviews: list[ProjectionClaimReview]
 
 
-class ProjectionRecord(Contract):
-    proposal: PredictionProjection | SemanticPredictionProjection
+_ProjectionT = TypeVar("_ProjectionT", bound=Contract)
+_ProjectionReviewT = TypeVar("_ProjectionReviewT", bound=Contract)
+
+
+class _ProjectionRecord(Contract, Generic[_ProjectionT, _ProjectionReviewT]):
+    proposal: _ProjectionT
     runtime_target: Condition
     sample_count: int = Field(gt=0, strict=True)
     source_pointers: dict[str, EvidencePointer]
@@ -721,10 +772,16 @@ class ProjectionRecord(Contract):
     config_path: NonEmpty
     label_key: NonEmpty
     prediction_key: NonEmpty
-    scope_review: ProjectionScopeDecision | SemanticProjectionScopeDecision
+    scope_review: _ProjectionReviewT
     scope_audit: NonEmpty
     scope_audit_sha256: NonEmpty
     recipe_sha256: NonEmpty
+
+
+class ProjectionRecord(_ProjectionRecord[
+    PredictionProjection | SemanticPredictionProjection, ProjectionScopeDecision | SemanticProjectionScopeDecision,
+]):
+    pass
 
 
 class SemanticProjectionRecord(ProjectionRecord):
@@ -870,7 +927,7 @@ class ReleasedStatisticsReview(Contract):
     rationale: NonEmpty
 
 
-class ReleasedStatisticsProjectionRecord(ProjectionRecord):
+class ReleasedStatisticsProjectionRecord(_ProjectionRecord[ReleasedStatisticsProposal, ReleasedStatisticsReview]):
     record_version: Literal["released-statistics-choice-v1"]
     proposal: ReleasedStatisticsProposal
     scope_review: ReleasedStatisticsReview
@@ -885,7 +942,7 @@ class ReleasedStatisticsProjectionRecord(ProjectionRecord):
     obligations: list[dict[str, Any]]
 
 
-class ProjectedExecutionTargetBinding(ExecutionTargetBinding):
+class ProjectedExecutionTargetBinding(_ExecutionTargetBinding[Literal[2]]):
     version: Literal[2] = 2
     projection: (
         ChoiceProjectionRecord | ProjectionRecord | SemanticProjectionRecord | ReleasedStatisticsProjectionRecord

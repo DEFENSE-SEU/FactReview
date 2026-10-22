@@ -68,6 +68,31 @@ def test_actual_helper_preserves_origin_and_original_exit_codes(tmp_path, monkey
     assert old.termination is None and old.exception_type is None
 
 
+def test_timeout_fallback_decodes_bytes_when_pipe_drain_fails(tmp_path, monkeypatch):
+    proc = Mock()
+    proc.communicate.side_effect = [
+        subprocess.TimeoutExpired(
+            ["fixture"], 1, output=b"partial stdout\xff", stderr=b"partial stderr\xfe"
+        ),
+        OSError("pipe already closed"),
+    ]
+    killed = Mock()
+    monkeypatch.setattr(process.subprocess, "Popen", Mock(return_value=proc))
+    monkeypatch.setattr(process, "_kill_process_tree", killed)
+
+    result = process.run_command(["fixture"], str(tmp_path), timeout_sec=1)
+
+    assert (result.termination, result.returncode, result.exception_type) == (
+        "timed_out", 124, "TimeoutExpired"
+    )
+    assert result.stdout == "partial stdout\ufffd"
+    assert result.stderr == "TimeoutExpired: command exceeded timeout_sec=1\npartial stderr\ufffd"
+    killed.assert_called_once_with(proc)
+    process.persist_command_result(result, tmp_path, "run")
+    assert (tmp_path / "run_stdout.log").read_text("utf-8") == result.stdout
+    assert (tmp_path / "run_stderr.log").read_text("utf-8") == result.stderr
+
+
 def test_docker_consumer_uses_declared_origin_without_inferring_from_codes(
     execution_inputs, tmp_path, monkeypatch
 ):

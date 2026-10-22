@@ -1,6 +1,8 @@
 """One combined operator-sandbox control; all external boundaries are mocked."""
 
 import json
+import os
+import sys
 
 import pytest
 from pydantic import ValidationError
@@ -24,7 +26,9 @@ def test_public_execution_applies_immutable_operator_sandbox_to_all_native_route
     default = v2.ExecutionConfig().sandbox
     policy = default.model_dump(mode="json")
     assert policy == {"version": "commercial-sandbox-v1", "cpus": 2.0, "memory_bytes": 4294967296,
-        "pids_limit": 256, "network": "none", "uid": 1000, "gid": 1000,
+        "pids_limit": 256, "network": "none",
+        "uid": (os.geteuid() or 1000) if sys.platform == "linux" else 1000,
+        "gid": (os.getegid() or 1000) if sys.platform == "linux" else 1000,
         "read_only_rootfs": True, "cap_drop": "ALL", "no_new_privileges": True}
     for network in ("none", "bridge", "review-isolated_net.1"):
         assert type(default).model_validate({"network": network}).network == network

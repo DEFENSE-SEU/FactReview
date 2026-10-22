@@ -475,6 +475,9 @@ def protect_observer_docker_argv(argv, *, launch, sandbox=None):
                     elif key == "PYTHONPYCACHEPREFIX":
                         if content != "/workspace/run_dir/.pycache":
                             raise ValueError("bootstrap_cache_path_unknown")
+                    elif key == "PYTHONDONTWRITEBYTECODE":
+                        if content != "1":
+                            raise ValueError("bootstrap_bytecode_writes_enabled")
                     elif key not in {"PYTHONUNBUFFERED", "PYTHONIOENCODING", "PYTHONUTF8"}:
                         raise ValueError("bootstrap_import_environment_unknown_or_unsafe")
             rewritten.extend([option, value])

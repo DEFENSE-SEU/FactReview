@@ -128,6 +128,7 @@ def read_v1_artifact(path: str | Path) -> LegacyArtifact:
     text = source.read_text(encoding="utf-8")
     raw: Any = json.loads(text) if source.suffix.lower() == ".json" else text
     result = LegacyArtifact(source_path=str(source), raw=raw)
+    records: object
     if isinstance(raw, str):
         records = _markdown_claims(raw, result.issues)
     elif isinstance(raw, list):

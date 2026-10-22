@@ -3,13 +3,24 @@ from __future__ import annotations
 import os
 import signal
 import subprocess
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Protocol, cast
 
 from .fs import ensure_dir, write_text
 from .verbose import is_verbose
+
+
+class _WindowsProcessHandle(Protocol):
+    # CPython exposes this handle only for a successfully started Windows child.
+    _handle: int
+
+
+CommandTermination = Literal[
+    "completed", "launch_failed", "communication_failed", "timed_out", "unfinished"
+]
 
 
 @dataclass(frozen=True)
@@ -21,9 +32,7 @@ class CommandResult:
     stderr: str
     duration_sec: float
     # None preserves the unknown origin of historical/uninstrumented results.
-    termination: Literal[
-        "completed", "launch_failed", "communication_failed", "timed_out", "unfinished"
-    ] | None = None
+    termination: CommandTermination | None = None
     exception_type: str | None = None
 
 
@@ -35,7 +44,7 @@ def _tail(text: str, n: int = 2000) -> str:
 
 
 def _create_windows_kill_on_close_job(proc: subprocess.Popen[str]) -> int | None:
-    if os.name != "nt":
+    if sys.platform != "win32":
         return None
     try:
         import ctypes
@@ -99,7 +108,7 @@ def _create_windows_kill_on_close_job(proc: subprocess.Popen[str]) -> int | None
         if not ok:
             kernel32.CloseHandle(job)
             return None
-        if not kernel32.AssignProcessToJobObject(job, int(proc._handle)):
+        if not kernel32.AssignProcessToJobObject(job, int(cast(_WindowsProcessHandle, proc)._handle)):
             kernel32.CloseHandle(job)
             return None
         return int(job)
@@ -108,7 +117,7 @@ def _create_windows_kill_on_close_job(proc: subprocess.Popen[str]) -> int | None
 
 
 def _close_windows_job(job_handle: int | None) -> None:
-    if os.name != "nt" or not job_handle:
+    if sys.platform != "win32" or not job_handle:
         return
     try:
         import ctypes
@@ -124,7 +133,7 @@ def _close_windows_job(job_handle: int | None) -> None:
 
 def _kill_process_tree(proc: subprocess.Popen[str]) -> None:
     try:
-        if os.name == "nt":
+        if sys.platform == "win32":
             ps_list_script = f"""
 $ErrorActionPreference = 'SilentlyContinue'
 $root = {int(proc.pid)}
@@ -189,6 +198,11 @@ while ($front.Count -gt 0) {{
             pass
 
 
+def _decode_timeout_output(value: str | bytes | None) -> str:
+    # TimeoutExpired may carry bytes even when Popen uses text mode.
+    return value.decode("utf-8", errors="replace") if isinstance(value, bytes) else value or ""
+
+
 def run_command(
     cmd: list[str],
     cwd: str,
@@ -197,7 +211,8 @@ def run_command(
 ) -> CommandResult:
     start = time.time()
     proc = None
-    termination, exception_type = "completed", None
+    termination: CommandTermination = "completed"
+    exception_type: str | None = None
     effective_timeout = None if timeout_sec is None or int(timeout_sec) <= 0 else int(timeout_sec)
     if is_verbose():
         try:
@@ -236,8 +251,8 @@ def run_command(
             try:
                 out, err = proc.communicate(timeout=5)
             except Exception:
-                out = e.stdout or ""
-                err = e.stderr or ""
+                out = _decode_timeout_output(e.stdout)
+                err = _decode_timeout_output(e.stderr)
             rc = 124
             err = f"TimeoutExpired: command exceeded timeout_sec={effective_timeout}" + (
                 f"\n{err}" if str(err or "").strip() else ""

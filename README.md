@@ -19,9 +19,9 @@ Generic LLM reviewers — pasting a PDF into ChatGPT, Gemini, or Claude — fail
 | Generic LLM reviewer | FactReview |
 |---|---|
 | **Hallucinates citations** ("As shown by Smith et al., 2021…" — no such paper). | Every reference is verified in parallel against arXiv, Semantic Scholar, OpenReview, and (optional) OpenAlex. Fabrications, retractions, and arXiv withdrawals are flagged. See [RefCopilot](#what-refcopilot-produces). |
-| **Calls Δ = 0.3% a "significant improvement"** because the paper said so. | The claim-audit pass auto-downgrades comparative claims when Δ < 2σ and flags missing ablations. See [`src/review/report/claim_audit.py`](src/review/report/claim_audit.py). |
-| **Faults the paper for not citing related work that was published after it.** | When the input is an arXiv URL, FactReview derives a publication-date cutoff from the arXiv ID and applies it to retrieval (server-side at Semantic Scholar and client-side in the agent's `paper_search`). |
-| **Cannot verify a single reported number.** | Optional Docker-based execution stage runs the paper's repository on its claimed benchmarks via a `prepare → plan → run → judge → fix → finalize` loop, then reports paper-vs-reproduced deltas. See [`src/fact_generation/execution/stage_runner.py`](src/fact_generation/execution/stage_runner.py). |
+| **Calls Δ = 0.3% a "significant improvement"** because the paper said so. | Experiments checks ground comparisons in the paper's tables and conditions, examine variance and statistical support, and record unresolved concerns. See [`src/verification/experiments.py`](src/verification/experiments.py). |
+| **Faults the paper for not citing related work that was published after it.** | Literature checks use the supplied submission deadline and record its provenance. An explicit arXiv fallback can resolve the first-submission date; an unresolved deadline leaves Literature claims unverified. |
+| **Cannot verify a single reported number.** | Optional Docker-based execution runs claim-linked plans against the authors' released repository, checks alignment with the paper, and records commands, logs, metrics and bounded repairs. See [`src/fact_generation/execution/v2.py`](src/fact_generation/execution/v2.py). |
 
 ## See it in Action
 
@@ -54,7 +54,7 @@ When the run finishes, open the headline output:
 runs/<paper_key>_<timestamp>_<id>/review/report/final_review.pdf
 ```
 
-`--submission-deadline` sets the date Literature checks against; without it, Literature claims stay unverified. Pass `--repository-url` or `--repository-root` to bind the authors' released code for the Code and Experiments checks.
+`--submission-deadline` sets the date Literature checks against. Without a resolved deadline, Literature claims stay unverified. The runtime installation includes RefCopilot dependencies, and L1 checks bibliography entries by default. Pass `--repository-url` or `--repository-root` to bind the authors' released code for the Code and Experiments checks.
 
 That is your review. To run on your own paper:
 
@@ -68,7 +68,7 @@ python scripts/execute_review_pipeline.py path/to/paper.pdf --paper-key my_paper
 python scripts/execute_review_pipeline.py https://arxiv.org/abs/1911.03082
 ```
 
-If `codex` is not on your PATH, install OpenAI's Codex CLI (`npm install -g @openai/codex`) and rerun `codex login`. Get a free MinerU token from <https://mineru.net> (the free tier covers most papers). For all other configuration knobs, see [Configuration](#configuration). For all CLI flags and single-stage reruns, see [CLI Reference](#cli-reference).
+If `codex` is not on your PATH, install OpenAI's Codex CLI (`npm install -g @openai/codex`) and rerun `codex login`. Get a free MinerU token from <https://mineru.net> (the free tier covers most papers). For all other configuration knobs, see [Configuration](#configuration). For CLI flags and rerun guidance, see [CLI Reference](#cli-reference).
 
 ## Quick Start — RefCopilot
 
@@ -97,9 +97,9 @@ A gate then checks Supported claims against the evidence their type needs (`--ga
 
 What makes the report distinctive (beyond the verdicts):
 
-- **Design-axis positioning matrix** — neighbor papers retrieved from Semantic Scholar (and optional OpenAlex) are placed on a small set of design dimensions specific to the paper's domain, so reviewers can see which dimensions the paper genuinely innovates on. See [`src/fact_generation/positioning/stage_runner.py`](src/fact_generation/positioning/stage_runner.py).
-- **Statistical-rigor downgrades** — comparative claims with Δ < 2σ are auto-downgraded; missing ablations are flagged. See [`src/review/report/claim_audit.py`](src/review/report/claim_audit.py).
-- **Publication-date cutoff** — when the input is an arXiv URL or ID, FactReview derives a `YYYY-MM` cutoff from the arXiv identifier so the manuscript is not penalized for missing citations to work that was published after it. Override with `--cutoff-date` or disable with `--no-cutoff`.
+- **Claim-linked literature evidence** — Literature checks retrieve related work, read source passages, and assess whether the retrieved evidence covers each claim's conditions. See [`src/verification/literature.py`](src/verification/literature.py).
+- **Grounded experiment checks** — numerical comparisons and concerns about correspondence, fairness, isolation, stability and consistency are linked to the paper's reported evidence. See [`src/verification/experiments.py`](src/verification/experiments.py).
+- **Submission-date boundary** — `--submission-deadline YYYY-MM-DD` bounds Literature checks. If the venue deadline is unknown, opt into `--derive-cutoff-from-arxiv` to resolve the first-submission date and record that fallback in `cutoff.json`. Unresolved dates leave Literature claims unverified.
 - **Optional code execution** — L3 runs confirmed plans in a Docker sandbox, checks that dataset, metric and settings match the claim, allows at most 3 bounded repairs (`--max-attempts`), and records commands, logs and metrics under `execution/`. See [`src/fact_generation/execution/v2.py`](src/fact_generation/execution/v2.py).
 
 ## What RefCopilot Produces
@@ -138,21 +138,19 @@ What's behind the accuracy:
 - **"Second-chance" lookup** — if no backend matches but the LLM judges the paper as real, RefCopilot asks the LLM for canonical metadata (corrected title, DOI, arXiv ID) and retries all four backends once with the suggested values.
 - **Retraction detection** — unified `is_retracted` signal from OpenAlex (publisher retractions + Retraction Watch) plus arXiv withdrawn-preprint notices. See [`RefCopilot/src/refcopilot/verify/retraction.py`](RefCopilot/src/refcopilot/verify/retraction.py).
 
-When RefCopilot is invoked from FactReview's pipeline (`--enable-refcheck`), the full result is written to `stages/fact_generation/refcheck/reference_check.json` and a fabricated-references summary is appended to `final_review.md`.
+FactReview v2 invokes RefCopilot during L1 screening whenever parsed bibliography entries are available. Its full result is written to `screening/reference_check.json`; grounded findings are included in the review.
 
 ## Configuration
 
-FactReview keeps routine configuration in two places: `.env` for secrets and runtime choices, CLI flags for one-off overrides. The four settings most users touch:
+FactReview keeps routine configuration in two places: `.env` for secrets and runtime choices, CLI flags for one-off overrides. The settings most users touch:
 
 **LLM backend (default: Codex login).** `.env.example` ships with `MODEL_PROVIDER=openai-codex` and the Codex model alias pre-filled — copy to `.env` and run `codex login` once. The Codex model alias is *not* a public OpenAI Platform model id; do not try to use it with `OPENAI_API_KEY` against `api.openai.com`.
 
 **MinerU PDF parsing (required).** `MINERU_API_TOKEN` must be set. FactReview uses MinerU's cloud API by default — free tier, no local CUDA / GPU / model download. Get a token at <https://mineru.net>. You can also pass `--mineru-api-token` per-run.
 
-**Semantic Scholar related-work retrieval (on by default).** The positioning stage uses Semantic Scholar for objective related-work neighbors unless `SEMANTIC_SCHOLAR_ENABLED=false` is set. Set `SEMANTIC_SCHOLAR_API_KEY` to avoid rate limits during positioning retrieval. Free key at <https://www.semanticscholar.org/product/api>. Disable it for one run with `--disable-semantic-scholar`.
+**Literature retrieval (on by default).** L2 uses claim-driven searches and source reading. `PAPER_SEARCH_PROVIDER` selects `arxiv` (no key), `semantic_scholar`, `openalex`, or `remote`. The `semantic_scholar` provider uses `SEMANTIC_SCHOLAR_API_KEY`; `openalex` can use `OPENALEX_API_KEY`. Set `PAPER_SEARCH_ENABLED=false` to disable retrieval; missing literature evidence remains visible in the review. `remote` supports compatible `/pasa/search` services. Without `PAPER_READ_BASE_URL`, reading uses a built-in arXiv PDF fallback; configure a reader endpoint only if you run a compatible service.
 
-**Agent `paper_search/read_paper` tools (on by default).** FactReview lets the review agent run claim-driven literature searches and requires a `read_paper` deep-read pass after effective search results before writing Technical Positioning. Set `PAPER_SEARCH_ENABLED=false` for manuscript/Semantic-Scholar-only runs. Available providers include `arxiv` (no key), `semantic_scholar`, `openalex`, and `remote`. The `semantic_scholar` provider reuses `SEMANTIC_SCHOLAR_API_KEY`, and `openalex` can use `OPENALEX_API_KEY` if set. `remote` keeps compatibility with advanced `/pasa/search` services. When `read_paper` is called without `PAPER_READ_BASE_URL`, FactReview uses a built-in arXiv PDF full-text fallback; set `PAPER_READ_BASE_URL` only if you run a stronger compatible reader service.
-
-For OpenAlex, local MinerU fallback, agent-tracing knobs, and other rarely-touched variables see [Advanced Configuration](#advanced-configuration).
+For OpenAlex, local PDF fallback, agent-tracing knobs, and other rarely-touched variables see [Advanced Configuration](#advanced-configuration).
 
 ## CLI Reference
 
@@ -168,22 +166,17 @@ You can also pass an arXiv URL — abstract links are normalized to the PDF down
 python scripts/execute_review_pipeline.py https://arxiv.org/abs/1911.03082 --paper-key compgcn
 ```
 
-When the input is an arXiv link, FactReview auto-derives a publication-date cutoff (`YYYY-MM`) from the arXiv identifier so positioning retrieval only considers prior work. Override with `--cutoff-date YYYY[-MM[-DD]]`, or disable entirely with `--no-cutoff`. Local PDFs default to no cutoff unless `--cutoff-date` is supplied.
+Supply `--submission-deadline YYYY-MM-DD` for Literature assessment. To use an arXiv paper's first-submission date when the venue deadline is unknown, add `--derive-cutoff-from-arxiv`; local PDFs also need `--arxiv-id`. FactReview records the resolved date and its source in `cutoff.json`. An arXiv URL alone does not resolve the deadline. Missing or unresolved dates leave Literature claims unverified.
 
-`refcheck` and `execution` are off by default. Enable code execution (Docker daemon required, no extra Python deps):
+L1 bibliography checks run by default. Code execution is opt-in (Docker daemon required, no extra Python deps):
 
 ```bash
 python scripts/execute_review_pipeline.py path/to/paper.pdf --run-execution
 ```
 
-Enable RefCopilot inside the pipeline:
+On native Linux, the sandbox defaults to the host user's positive UID/GID so mounted outputs remain writable. Root launches and Docker Desktop default to `1000:1000`; root launches prepare ownership of the private code snapshot and output directories. If you override `sandbox.uid` in `--execution-config`, a non-root Linux launch requires it to match the host UID and reports a configuration error otherwise.
 
-```bash
-pip install -e ".[refcheck]"
-python scripts/execute_review_pipeline.py path/to/paper.pdf --enable-refcheck
-```
-
-Or globally via `FACTREVIEW_ENABLE_REFCHECK=true`. The full result lands in `stages/fact_generation/refcheck/reference_check.json`; the Markdown summary appended to `final_review.md` lists fabricated references only. For the complete breakdown, run RefCopilot's standalone CLI or read the JSON directly.
+The runtime installation already includes the bibliography checker. `--enable-refcheck` is accepted for compatibility and has no additional effect in v2. Read `screening/reference_check.json` for its complete result, or run RefCopilot's standalone CLI for a bibliography-only report.
 
 ### Flags
 
@@ -192,33 +185,25 @@ Or globally via `FACTREVIEW_ENABLE_REFCHECK=true`. The full result lands in `sta
 | `--llm-provider` | `openai-codex` | Switches the LLM provider. Mirrors to `MODEL_PROVIDER`. |
 | `--llm-model` | provider default | Mirrors to `AGENT_MODEL`, `EXECUTION_OPENAI_MODEL`, and `OPENAI_CODEX_MODEL` (when the provider is Codex). |
 | `--mineru-api-token` | from `.env` | One-off override for `MINERU_API_TOKEN`. |
-| `--disable-semantic-scholar` | off | Disable Semantic Scholar objective related-work retrieval for this run. Equivalent to setting `SEMANTIC_SCHOLAR_ENABLED=false` before loading settings. |
-| `--enable-refcheck` | off | Run RefCopilot as the refcheck stage. |
+| `--enable-refcheck` | compatibility only | V2 L1 always checks available bibliography entries with RefCopilot. |
 | `--run-execution` | off | Enables the code-execution stage. Requires Docker. |
 | `--max-attempts` | `3` | Repair rounds in L3 execution, 0–3. |
 | `--submission-deadline` | – | Venue deadline (`YYYY-MM-DD`) that bounds Literature retrieval. |
+| `--derive-cutoff-from-arxiv` | off | Resolve the arXiv first-submission date if no explicit deadline is supplied; record fallback provenance. |
+| `--arxiv-id` | – | arXiv identity for a local PDF when using `--derive-cutoff-from-arxiv`. |
 | `--repository-url` / `--repository-root` | – | The authors' released code for Code and Experiments checks. |
 | `--gate` | `default` | Claim gate tier reported as each claim's status: `lenient`, `default`, `strict`. Also `CLAIM_GATE`. |
 | `--alignment` | `strict` | Execution alignment; `relaxed` matches the dataset only (ablation). |
 | `--repairer` | `default` | Execution repair proposer; `llm` proposes whitelisted repairs (ablation). See [execution ablations](docs/execution_ablations.md). |
 | `--report-presentation` | `full` | `layered` writes a reading report plus a technical appendix and a linked PDF bundle. |
-| `--no-pdf-extract` | off | Skip MinerU re-extraction inside the execution `prepare` node when the parse stage already produced the snapshot. |
-| `--reuse-job-id` | – | Reuse a prior agent-runtime job, skipping the parse-stage agent run. Accepts either an absolute path to a `runtime/jobs/<id>` directory (taken as-is) or a bare job id (looked up under the current run dir, then under `<run-root>/**/runtime/jobs/<id>`). Useful for re-rendering the report after a downstream-stage tweak without paying the parse cost again. |
 | `--run-root` | `runs` | Override the root output directory. |
-| `--cutoff-date` | auto | Inclusive publication-date cutoff for positioning retrieval, as `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`. When omitted, an arXiv URL/ID is used to auto-derive `YYYY-MM` from the arXiv identifier; for non-arXiv inputs no cutoff is applied. Both Semantic Scholar (server-side `year=` filter) and the agent's `paper_search` calls (client-side filter) are constrained to papers at or before the cutoff, so the agent does not penalise the manuscript for not citing later work. |
-| `--no-cutoff` | off | Disable the publication-date cutoff entirely (overrides `--cutoff-date` and arXiv auto-derivation). Useful for analysing how the paper compares against later work. |
+| `--cutoff-date` | – | Legacy alias: only a day-level value (`YYYY-MM-DD`) resolves the deadline. Prefer `--submission-deadline`. |
 
-### Single-Stage Reruns
+### Reruns and Legacy Options
 
-Each stage has a standalone script that reads the same per-run layout. `parse` takes the original PDF (because the bridge state may not exist yet); the rest work off the run dir alone:
+Rerun `scripts/execute_review_pipeline.py` with the original PDF and desired options to create a new v2 run. V2 rejects `--reuse-job-id` and `--no-cutoff` with an unsupported-option error.
 
-```bash
-python scripts/execute_stage_parse.py          path/to/paper.pdf --run-dir runs/<run>
-python scripts/execute_stage_refcheck.py       --run-dir runs/<run>
-python scripts/execute_stage_positioning.py    --run-dir runs/<run>
-python scripts/execute_stage_execution.py      --run-dir runs/<run>
-python scripts/execute_stage_report.py         --run-dir runs/<run>
-```
+The `scripts/execute_stage_*.py` commands use the legacy v1 run layout. They do not support resuming or regenerating stages in a v2 run directory.
 
 ### Outputs
 
@@ -227,6 +212,8 @@ Each run writes to `runs/<paper_key>_<timestamp>_<id>/`. Primary artifacts:
 - `full_pipeline_summary.json`, `run_stats.json` — stage results, errors and token usage.
 - `materials/materials.json` — parsed paper, page and figure images, repository index.
 - `screening/screening.json` — L1 claims and basic checks; `screening/claim_coverage/` holds the extraction coverage review.
+- `screening/reference_check.json` — RefCopilot results for available bibliography entries.
+- `cutoff.json` — Literature deadline and resolution provenance.
 - `verification/verification.json` — L2 evidence, findings and execution plans.
 - `execution/` — L3 commands, logs, alignment and repair records (only with `--run-execution`).
 - `review/report/final_review.{json,md,pdf}` — **the headline review.**
@@ -257,8 +244,8 @@ papers = load_dataset("kabuda777/factreview-bench", split="train")
 
 - **`codex login` fails or is not on PATH** — install OpenAI's Codex CLI (`npm install -g @openai/codex`), then rerun `codex login` and pick the ChatGPT sign-in flow.
 - **`MINERU_API_TOKEN` missing** — the parse stage will raise on the first run. Get a token from <https://mineru.net> (free tier is sufficient for most papers) and set it in `.env` or pass `--mineru-api-token`.
-- **`--enable-refcheck` errors with missing deps** — install with `pip install -e ".[refcheck]"`.
-- **Positioning stage is slow or returns sparse results** — unauthenticated Semantic Scholar requests are rate-limited. Set `SEMANTIC_SCHOLAR_API_KEY` in `.env` (free key from <https://www.semanticscholar.org/product/api>).
+- **Reference checking reports missing dependencies** — update the runtime installation with `pip install -e ".[runtime]"`; it includes the bundled RefCopilot library's dependencies.
+- **Semantic Scholar retrieval is slow or returns sparse results** — when using `PAPER_SEARCH_PROVIDER=semantic_scholar`, set `SEMANTIC_SCHOLAR_API_KEY` in `.env` (free key from <https://www.semanticscholar.org/product/api>) to reduce unauthenticated rate limits.
 
 ## Advanced Configuration
 
@@ -266,17 +253,13 @@ Less common environment variables — set in `.env` or via the shell. `.env.exam
 
 | Variable | Purpose |
 |---|---|
-| `FACTREVIEW_ENABLE_REFCHECK` | Enable reference checking globally (equivalent to the `--enable-refcheck` flag). |
-| `FACTREVIEW_EXECUTION_ENABLE_REFCHECK` | Enable a refcheck sweep *inside* the execution stage's refcheck node. Independent from the global gate above. |
 | `OPENALEX_API_KEY` | Optional OpenAlex API key. When set, OpenAlex is queried as a fourth cross-check signal in RefCopilot and used by `PAPER_SEARCH_PROVIDER=openalex`; when empty, OpenAlex paper search still works unauthenticated. Free key at <https://openalex.org/settings/api>. |
 | `MINERU_BASE_URL` | Override the MinerU cloud API endpoint (default: `https://mineru.net/api/v4`). |
-| `MINERU_ALLOW_LOCAL_FALLBACK` | Set to `true` to let the execution stage's `prepare` node fall back to the local `mineru` CLI when the cloud snapshot is unavailable. |
-| `MINERU_LOCAL_BACKEND` / `MINERU_LOCAL_DEVICE` / `MINERU_LOCAL_SOURCE` | Tune the local `mineru` CLI's pipeline backend, device, and source mirror. Only consulted when `MINERU_ALLOW_LOCAL_FALLBACK=true` and a local MinerU install is present. |
+| `MINERU_ALLOW_LOCAL_FALLBACK` | Set to `true` to allow basic local `pypdf` text extraction when cloud parsing is unavailable. Missing structured evidence limits downstream checks. |
 | `OPENAI_AGENTS_DISABLE_TRACING` | Set to `0` to enable the openai-agents SDK trace exporter. Disabled (`1`) by default to avoid POSTing traces to the Agents tracing endpoint. |
 | `OPENAI_CODEX_BASE_URL` | Point Codex at a different Codex-compatible endpoint (default: `https://chatgpt.com/backend-api/codex`). |
-| `SEMANTIC_SCHOLAR_ENABLED` | Enable or disable Semantic Scholar objective related-work retrieval. Defaults to `true`; set `false` to skip it persistently. |
-| `SEMANTIC_SCHOLAR_API_KEY` | Recommended. Free API key from [Semantic Scholar](https://www.semanticscholar.org/product/api) for the positioning stage and `PAPER_SEARCH_PROVIDER=semantic_scholar`. Without it, unauthenticated requests may be rate-limited. |
-| `PAPER_SEARCH_ENABLED` | Enable the agent `paper_search` tool. Defaults to `true`; set `false` to force manuscript/Semantic-Scholar-only runs. |
+| `SEMANTIC_SCHOLAR_API_KEY` | API key for RefCopilot and `PAPER_SEARCH_PROVIDER=semantic_scholar`. Free key from [Semantic Scholar](https://www.semanticscholar.org/product/api). Unauthenticated requests may be rate-limited. |
+| `PAPER_SEARCH_ENABLED` | Enable L2 Literature retrieval. Defaults to `true`; set `false` to disable it. Missing evidence remains unresolved. |
 | `PAPER_SEARCH_PROVIDER` | Retrieval backend for `paper_search`: `arxiv` (zero-key), `semantic_scholar`, `openalex`, or `remote`. |
 | `PAPER_SEARCH_BASE_URL` / `PAPER_SEARCH_ENDPOINT` | Only needed for `PAPER_SEARCH_PROVIDER=remote`; points to a compatible `/pasa/search` service. |
 | `PAPER_SEARCH_API_KEY` / `PAPER_SEARCH_HEALTH_ENDPOINT` | Optional bearer token and health endpoint for `remote` paper search. Default health endpoint: `/health`. |
@@ -294,7 +277,7 @@ ruff format --check .
 # full pass, run `mypy` with no args — it picks up the broader package list
 # from pyproject.toml's [tool.mypy] section.
 mypy src/schemas src/util src/common
-pytest                          # default: ~50 fast tests, gated markers off
+pytest                          # default suite, gated markers off
 pytest -m e2e                   # end-to-end integration tests
 pytest -m requires_docker       # execution stage (needs Docker daemon)
 pytest -m ""                    # full set, including all gated tests

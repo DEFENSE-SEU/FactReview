@@ -1,5 +1,5 @@
 """Located proposals and independent decisions for finite scientific consumption."""
-from typing import Annotated, Literal
+from typing import Annotated, Generic, Literal, TypeVar
 
 from pydantic import Field, StrictInt, StrictStr, field_validator
 
@@ -56,18 +56,29 @@ class ObligationDecision(Contract):
     rationale: str = Field(min_length=1)
 
 
-class ScienceReview(Contract):
-    version: Literal["builtin-source-science-v1"]
+_VersionT = TypeVar("_VersionT", bound=str)
+
+
+class _ScienceReview(Contract, Generic[_VersionT]):
+    version: _VersionT
     context_digest: str = Field(pattern=r"^[a-f0-9]{64}$")
     condition_id: str = Field(min_length=1)
     obligations: list[ObligationDecision] = Field(min_length=1)
     unresolved: list[str]
 
 
-class TorchInferenceProposal(Contract):
+class ScienceReview(_ScienceReview[Literal["builtin-source-science-v1"]]):
+    pass
+
+
+_PaperDefinitionT = TypeVar("_PaperDefinitionT", bound=Contract)
+_SourceDefinitionT = TypeVar("_SourceDefinitionT", bound=Contract)
+
+
+class TorchInferenceProposalBase(Contract, Generic[_VersionT, _PaperDefinitionT, _SourceDefinitionT]):
     """Source selections only; runtime state and measurements are never proposals."""
 
-    version: Literal["torch-cpu-inference-v1"]
+    version: _VersionT
     condition_id: str = Field(min_length=1)
     checkpoint_path: str = Field(min_length=1)
     state_selector: list[StrictStr | StrictInt] = Field(default_factory=list, max_length=12)
@@ -94,8 +105,8 @@ class TorchInferenceProposal(Contract):
     model_selector: Selector
     metric_selector: Selector
     settings_selectors: dict[str, Selector]
-    paper: dict[str, PaperDefinition]
-    sources: dict[str, SourceDefinition]
+    paper: dict[str, _PaperDefinitionT]
+    sources: dict[str, _SourceDefinitionT]
 
     @field_validator("state_selector", "batch_features_selector", "batch_labels_selector",
                      "sample_id_selector", "sample_features_selector", "sample_label_selector", "batch_ids_selector",
@@ -128,5 +139,11 @@ class TorchInferenceProposal(Contract):
         return value
 
 
-class TorchInferenceReview(ScienceReview):
-    version: Literal["torch-cpu-inference-v1"]
+class TorchInferenceProposal(TorchInferenceProposalBase[
+    Literal["torch-cpu-inference-v1"], PaperDefinition, SourceDefinition,
+]):
+    """Source selections only; runtime state and measurements are never proposals."""
+
+
+class TorchInferenceReview(_ScienceReview[Literal["torch-cpu-inference-v1"]]):
+    pass

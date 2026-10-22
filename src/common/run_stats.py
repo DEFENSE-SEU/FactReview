@@ -10,6 +10,7 @@ import threading
 import time
 from collections.abc import Iterator
 from pathlib import Path
+from types import FrameType
 from typing import Any
 
 from .provider_attempts import record_denial, valid_denial_record
@@ -161,13 +162,16 @@ def _empty_payload() -> dict[str, Any]:
 def _normalize_payload(payload: Any) -> dict[str, Any]:
     data = payload if isinstance(payload, dict) else {}
     data.setdefault("version", 1)
-    modules = data.get("modules") if isinstance(data.get("modules"), dict) else {}
+    raw_modules = data.get("modules")
+    modules = raw_modules if isinstance(raw_modules, dict) else {}
     data["modules"] = modules
     for module in MODULE_ORDER:
-        current = modules.get(module) if isinstance(modules.get(module), dict) else {}
+        raw_current = modules.get(module)
+        current = raw_current if isinstance(raw_current, dict) else {}
         base = _empty_module_payload()
         base.update(current)
-        token_usage = base.get("token_usage") if isinstance(base.get("token_usage"), dict) else {}
+        raw_usage = base.get("token_usage")
+        token_usage = raw_usage if isinstance(raw_usage, dict) else {}
         merged_token = _empty_token_usage()
         for key in merged_token:
             merged_token[key] = max(0, int(token_usage.get(key) or 0))
@@ -179,7 +183,8 @@ def _normalize_payload(payload: Any) -> dict[str, Any]:
             base[key] = max(0, int(base.get(key) or 0))
         base["providers"] = base.get("providers") if isinstance(base.get("providers"), dict) else {}
         base["models"] = base.get("models") if isinstance(base.get("models"), dict) else {}
-        warnings = base.get("warnings") if isinstance(base.get("warnings"), list) else []
+        raw_warnings = base.get("warnings")
+        warnings = raw_warnings if isinstance(raw_warnings, list) else []
         base["warnings"] = [str(item) for item in warnings if str(item).strip()]
         modules[module] = base
     data["pipeline"] = data.get("pipeline") if isinstance(data.get("pipeline"), dict) else {}
@@ -200,7 +205,7 @@ def _file_locked_payload(path: Path) -> Iterator[dict[str, Any]]:
     lock_path = path.with_name(path.name + ".lock")
     lock_fh = lock_path.open("a+", encoding="utf-8")
     try:
-        if fcntl is not None:
+        if sys.platform != "win32" and fcntl is not None:
             fcntl.flock(lock_fh.fileno(), fcntl.LOCK_EX)
         if path.exists():
             try:
@@ -215,7 +220,7 @@ def _file_locked_payload(path: Path) -> Iterator[dict[str, Any]]:
         tmp.write_text(json.dumps(normalized, ensure_ascii=False, indent=2), encoding="utf-8")
         tmp.replace(path)
     finally:
-        if fcntl is not None:
+        if sys.platform != "win32" and fcntl is not None:
             fcntl.flock(lock_fh.fileno(), fcntl.LOCK_UN)
         lock_fh.close()
 
@@ -368,7 +373,7 @@ _DETAIL_KEYS = ("cached_input_tokens", "reasoning_output_tokens")
 def _caller_label() -> str:
     """Name the first frame outside the model client and stats plumbing."""
     skip = ("llm.", "common.run_stats", "screening.checks", "asyncio", "threading", "concurrent", "contextlib")
-    frame = sys._getframe(2)
+    frame: FrameType | None = sys._getframe(2)
     while frame is not None:
         name = str(frame.f_globals.get("__name__") or "")
         if name and not name.startswith(skip):

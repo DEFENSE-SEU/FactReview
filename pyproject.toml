@@ -82,6 +82,8 @@ execution = []
 
 # ── agent_runtime (the OpenAI-Agents-based runtime + PDF rendering) ──────────
 runtime = [
+  # V2 L1 always checks the bibliography with the bundled RefCopilot library.
+  "factreview[refcheck]",
   "pydantic-settings>=2.3.0",
   "httpx>=0.27.0",
   "openai-agents>=0.6.0",

@@ -1,6 +1,8 @@
 """Execution policy and preserved metric tolerance profiles."""
 
+import os
 import re
+import sys
 from typing import Annotated, Any, Literal
 
 from pydantic import Field, model_validator
@@ -69,9 +71,15 @@ class PaperVariance(Contract):
     quote: NonEmpty
 
 
-SANDBOX_ENV = {"HOME": "/workspace/run_dir/home", "TMPDIR": "/workspace/run_dir/.tmp"}
+SANDBOX_ENV = {"HOME": "/workspace/run_dir/home", "TMPDIR": "/workspace/run_dir/.tmp",
+               "PYTHONDONTWRITEBYTECODE": "1"}
 SANDBOX_PAIR_FLAGS = {"--cpus", "--memory", "--memory-swap", "--pids-limit", "--network",
                       "--cap-drop", "--security-opt"}
+
+
+def _default_identity(getter):
+    value = getattr(os, getter)() if sys.platform == "linux" else 1000
+    return value if value > 0 else 1000
 
 
 class SandboxPolicy(Contract):
@@ -82,8 +90,8 @@ class SandboxPolicy(Contract):
     memory_bytes: int = Field(default=4294967296, gt=0, strict=True)
     pids_limit: int = Field(default=256, gt=0, strict=True)
     network: str = Field(default="none", min_length=1, max_length=64, strict=True)
-    uid: int = Field(default=1000, gt=0, strict=True)
-    gid: int = Field(default=1000, gt=0, strict=True)
+    uid: int = Field(default_factory=lambda: _default_identity("geteuid"), gt=0, strict=True)
+    gid: int = Field(default_factory=lambda: _default_identity("getegid"), gt=0, strict=True)
     read_only_rootfs: bool = Field(default=True, strict=True)
     cap_drop: Literal["ALL"] = "ALL"
     no_new_privileges: bool = Field(default=True, strict=True)

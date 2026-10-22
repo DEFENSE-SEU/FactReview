@@ -913,6 +913,28 @@ def docker_runner(request: RunRequest) -> RunOutcome:
                 component="execution.environment", reason="Readonly workspace metric output protection unavailable",
             )],
         )
+    from .runtime_permissions import prepare_runtime_permissions
+
+    try:
+        ready_observer = observer_audit["status"] == "ready"
+        filesystem_audit = prepare_runtime_permissions(
+            workspace=request.workspace, runtime_dir=runtime_dir, sandbox=request.config.sandbox,
+            trusted_dir=observer_audit.get("trusted_dir") if ready_observer else None,
+            audit_output=observer_audit.get("audit_output") if ready_observer else None,
+            metric_capture=observer_audit.get("metric_file", {}).get("capture_path") if ready_observer else None,
+        )
+    except (ValueError, OSError) as exc:
+        _json(logs / "runtime_permissions.json", {"status": "failed", "reason": str(exc)})
+        return RunOutcome(
+            returncode=1, issue=f"Runtime mount permissions unavailable: {exc}",
+            runtime_seconds=time.monotonic() - start,
+            commands=[*build_commands, *inference_commands],
+            environment={"transport": "docker", "image": image, "sandbox": sandbox_audit},
+            operation_failures=[ExecutionOperationFailure(
+                component="execution.environment", reason="Runtime mount permissions unavailable",
+            )],
+        )
+    _json(logs / "runtime_permissions.json", filesystem_audit)
     output_path = (
         _inside(Path(request.workspace) / request.workdir, request.metric_output)
         if request.metric_output

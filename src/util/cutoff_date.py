@@ -20,7 +20,7 @@ import re
 from calendar import monthrange
 from dataclasses import dataclass
 from datetime import date
-from typing import Literal
+from typing import Literal, SupportsInt, cast
 from urllib.parse import urlparse
 
 # arXiv ID variants:
@@ -100,10 +100,10 @@ def publication_relation(
         except ValueError:
             return "unknown"
     else:
-        year = _coerce_year(raw if re.fullmatch(r"\d{4}", raw) else paper.get("year"))
-        if year is None:
+        coarse_year = _coerce_year(raw if re.fullmatch(r"\d{4}", raw) else paper.get("year"))
+        if coarse_year is None:
             return "unknown"
-        first, last = date(year, 1, 1), date(year, 12, 31)
+        first, last = date(coarse_year, 1, 1), date(coarse_year, 12, 31)
     cutoff, concurrent = deadline.to_date(), concurrent_window_start(deadline)
     if last < concurrent:
         return "prior"
@@ -262,7 +262,8 @@ def _coerce_year(value: object | None) -> int | None:
     if value is None:
         return None
     try:
-        year = int(value)
+        # int performs the runtime coercion check; unsupported objects are rejected below.
+        year = int(cast(SupportsInt, value))
     except (TypeError, ValueError):
         return None
     if not (1900 <= year <= 2100):
